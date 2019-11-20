@@ -48,7 +48,6 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
-                        console.log("list container add success", this.containers);
                     }
                 });
     }
@@ -56,14 +55,14 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
     ngAfterViewInit() {
         // * Init container
         this.shipmentGoodSummaryComponent.initContainer();
+        this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
     }
 
     onSubmitData() {
         const form: any = this.formCreateComponent.formCreate.getRawValue();
-        console.log(form);
         const formData = {
-            eta: !!form.eta ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
-            etd: !!form.etd ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
+            eta: !!form.eta && !!form.etd.eta ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
+            etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDate: !!form.serviceDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             mawb: form.mawb,
@@ -94,6 +93,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
             cbm: this.shipmentGoodSummaryComponent.totalCBM,
 
         };
+
 
         const fclImportAddModel = new FCLImportAddModel(formData);
         fclImportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaFCLImport;

@@ -68,7 +68,7 @@
                                 (itemSelected)="onSelectDataFormInfo($event, 'Shipper')"
                                 [displayFields]="configShipper.displayFields">
                             </app-combo-grid-virtual-scroll>
-                            <textarea rows="6" class="form-control m-input m-input--square"
+                            <textarea rows="3" class="form-control m-input m-input--square"
                                 formControlName="ShipperDescription"></textarea>
                         </div>
 
@@ -85,7 +85,7 @@
                                 (itemSelected)="onSelectDataFormInfo($event, 'Consignee')"
                                 [displayFields]="configConsignee.displayFields">
                             </app-combo-grid-virtual-scroll>
-                            <textarea rows="6" class="form-control m-input m-input--square"
+                            <textarea rows="3" class="form-control m-input m-input--square"
                                 formControlName="ConsigneeDescription"></textarea>
                             <div class="form-control-feedback" *ngIf="isSubmited && !selectedConsignee.value ">
                                 Consignee is required!
@@ -104,7 +104,7 @@
                                 (itemSelected)="onSelectDataFormInfo($event, 'NotifyParty')"
                                 [displayFields]="configNotifyParty.displayFields">
                             </app-combo-grid-virtual-scroll>
-                            <textarea rows="6" class="form-control m-input m-input--square"
+                            <textarea rows="3" class="form-control m-input m-input--square"
                                 formControlName="NotifyPartyDescription"></textarea>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
                                 (itemSelected)="onSelectDataFormInfo($event, 'AlsoNotifyParty')"
                                 [displayFields]="configAlsoNotifyParty.displayFields">
                             </app-combo-grid-virtual-scroll>
-                            <textarea rows="6" class="form-control m-input m-input--square"
+                            <textarea rows="3" class="form-control m-input m-input--square"
                                 formControlName="AlsoNotifyPartyDescription"></textarea>
                         </div>
                     </div>
@@ -138,20 +138,42 @@
                                 House Bill of Lading No required!
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Estimated Time of Departure
-                            </label>
-                            <div class="m-input-icon">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [singleDatePicker]="true" formControlName="etd" readonly />
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
+                        <div class="form-group row">
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="">
+                                    ETD
+                                </label>
+                                <div class="m-input-icon">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [singleDatePicker]="true" formControlName="etd" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
                                     </span>
-                                </span>
+                                </div>
                             </div>
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="">
+                                    ETA <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="m-input-icon">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [minDate]="mindateEta" [singleDatePicker]="true" formControlName="eta"
+                                        readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="form-control-feedback" *ngIf="isSubmited && ( !eta.value )">
+                                    Estimated Time of Arrival is required !
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>
@@ -169,31 +191,6 @@
                                 House Bill of Lading Type is required !
                             </div>
                         </div>
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmited && ( !eta.value )}">
-                            <!-- {{mindateEta | json}} -->
-
-                            <label class="form-control-label" for="">
-                                Estimated Time of Arrival <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="m-input-icon">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [minDate]="mindateEta" [singleDatePicker]="true" formControlName="eta" readonly />
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
-                            </div>
-                            <div class="form-control-feedback" *ngIf="isSubmited && ( !eta.value )">
-                                Estimated Time of Arrival is required !
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-
-                    <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Place of Receipt
@@ -201,9 +198,12 @@
                             <input type="text" class="form-control m-input m-input--square"
                                 formControlName="placeofReceipt">
                         </div>
-
                     </div>
+                </div>
+                <div class="row">
+
                     <div class="col-lg-4">
+
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmited && !selectedPortOfLoading.value }">
                             <label class="form-control-label">
@@ -221,7 +221,6 @@
                         </div>
 
                     </div>
-
                     <div class="col-lg-4">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmited  && (!selectedPortOfDischarge.value || PortChargeLikePortLoading == true) }">
@@ -241,10 +240,8 @@
                                 Port of Discharge must be different Port of Loading
                             </div>
                         </div>
-
                     </div>
-                </div>
-                <div class="row">
+
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
@@ -255,6 +252,8 @@
                         </div>
 
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label">
@@ -270,125 +269,133 @@
 
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Feeder Vessel No
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square"
-                                formControlName="feederVessel1">
-                        </div>
-                    </div>
+                        <div class="form-group row">
+                            <div class="col-lg-6">
 
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Feeder Voyage No
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square"
-                                formControlName="feederVoyageNo">
+                                <label class="form-control-label" for="">
+                                    Arrival Vessel
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square"
+                                    formControlName="arrivalVessel">
 
-                        </div>
 
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Arrival Vessel
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square"
-                                formControlName="arrivalVessel">
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Arrival Voyage No
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square"
-                                formControlName="arrivalVoyage">
-
-                        </div>
-
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Document Date
-                            </label>
-                            <div class="m-input-icon">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [singleDatePicker]="true" name="singledater" formControlName="documnentDate"
-                                    readonly />
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Document No
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square"
-                                formControlName="documentNo">
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
+                            <div class="col-lg-6">
 
-                            <label class="form-control-label" for="">
-                                ETA at Warehouse
-                            </label>
-                            <div class="m-input-icon">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [minDate]="mindateEtaWareHouse" [singleDatePicker]="true" name="singledater"
-                                    formControlName="dateETA" readonly />
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
+                                <label class="form-control-label" for="">
+                                    Arrival Voyage No
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square"
+                                    formControlName="arrivalVoyage">
+
+
                             </div>
 
                         </div>
                     </div>
+                    <div class="col-lg-4">
+                        <div class="form-group row">
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="">
+                                    Feeder Vessel
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square"
+                                    formControlName="feederVessel1">
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="">
+                                    Feeder Voyage No
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square"
+                                    formControlName="feederVoyageNo">
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmited && !servicetype.value}">
 
                             <label class="form-control-label" for="">
-                                Warehouse Notice
+                                Service Type. <span class="m--font-danger">(*)</span>
                             </label>
-                            <textarea class="form-control " formControlName="warehousenotice"></textarea>
+                            <select formControlName="serviceType" class="form-control">
+                                <option [ngValue]="null">Please Select</option>
+                                <option *ngFor="let item of serviceTypes" [ngValue]="item">
+                                    {{item.title}}</option>
+                            </select>
+                            <div class="form-control-feedback" *ngIf="isSubmited && !servicetype.value">
+                                Service Type is required !
+                            </div>
+
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Shpping Mark
-                            </label>
-                            <textarea class="form-control " formControlName="shppingMark"></textarea>
+                        <div class="form-group row">
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="">
+                                    Document Date
+                                </label>
+                                <div class="m-input-icon">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [singleDatePicker]="true" name="singledater" formControlName="documnentDate"
+                                        readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="">
+                                    Document No
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square"
+                                    formControlName="documentNo">
+                            </div>
+
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Remark
-                            </label>
-                            <textarea class="form-control " formControlName="remark"></textarea>
+                        <div class="form-group row">
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="">
+                                    ETA at Warehouse
+                                </label>
+
+                                <div class="m-input-icon">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [minDate]="mindateEtaWareHouse" [singleDatePicker]="true" name="singledater"
+                                        formControlName="dateETA" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="">
+                                    Number of Origin B/L<span class="m--font-danger">(*)</span>
+                                </label>
+                                <select formControlName="numberOfOrigin" class="form-control">
+                                    <option *ngFor="let item of numberOfOrigins" [ngValue]="item">
+                                        {{item.title}}</option>
+                                </select>
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
@@ -421,21 +428,7 @@
                                 </span>
                             </div>
                         </div>
-
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Number of Origin B/L <span class="m--font-danger">(*)</span>
-                            </label>
-                            <select formControlName="numberOfOrigin" class="form-control">
-                                <option *ngFor="let item of numberOfOrigins" [ngValue]="item">
-                                    {{item.title}}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
@@ -444,11 +437,36 @@
                             <input type="text" class="form-control m-input m-input--square"
                                 formControlName="referenceNo">
                         </div>
+
                     </div>
-
-
                 </div>
+                <div class="row">
 
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Shipping Mark
+                            </label>
+                            <textarea class="form-control " formControlName="shppingMark"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Remark
+                            </label>
+                            <textarea class="form-control " formControlName="remark"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                In Word
+                            </label>
+                            <textarea class="form-control " formControlName="warehousenotice"></textarea>
+                        </div>
+                    </div>
+                </div>
 
 
             </div>

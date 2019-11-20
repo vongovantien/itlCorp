@@ -15,7 +15,6 @@ import { DataService, SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ShareContainerImportComponent } from 'src/app/business-modules/share-business';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -29,6 +28,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     mblid: string = null;
     hblid: string = null;
     containers: Container[] = [];
+    initContainers: Container[] = [];
 
     headers: CommonInterface.IHeaderTable[] = [];
 
@@ -38,10 +38,10 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     commodities: any[] = new Array<any>();
 
     isSubmitted: boolean = false;
-
-    unitOfMeasure: string = 'Kgs';
+    isAdd: boolean = false;
 
     isDuplicateContPakage: boolean = false;
+
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -49,7 +49,6 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         private cdRef: ChangeDetectorRef,
         private _dataService: DataService,
         private _sortService: SortService,
-        private _toastService: ToastrService
     ) {
         super();
 
@@ -71,7 +70,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
             { title: 'Commodity', field: 'commodityId', sortable: true, },
             { title: 'Description', field: 'description', sortable: true, },
             { title: 'N.W', field: 'nw', sortable: true, },
-            { title: 'Unit', field: 'unitOfMeasure', sortable: true, },
+            { title: 'Unit', field: 'unitOfMeasureId', sortable: true, },
         ];
         this.cdRef.detectChanges(); // * tell ChangeDetect update view in app-table-header (field required).
         this.getMasterData();
@@ -83,13 +82,16 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
             .subscribe(
                 (res: fromStore.IContainerState | any) => {
                     this.containers = res;
+                    if (!this.initContainers.length) {
+                        this.initContainers = res;
+                    }
                 }
             );
     }
 
     addNewContainer() {
         this.isSubmitted = false;
-        this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119 }))); // * DISPATCH Add ACTION 
+        this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
     }
 
     deleteContainerItem(index: number) {
@@ -141,6 +143,8 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
                     container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
                 }
                 this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
+
+                this.initContainers = this.containers;
 
                 this.isSubmitted = false;
                 this.hide();
@@ -215,6 +219,11 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
 
     closePopup() {
         this.isSubmitted = false;
+        if (!this.isAdd) {
+            this._store.dispatch(new fromStore.GetContainerSuccessAction(this.initContainers));
+        } else {
+            // this._store.dispatch(new fromStore.GetContainerSuccessAction([]));
+        }
         this.hide();
     }
 

@@ -47,7 +47,7 @@ export class DetailChargeComponent implements OnInit {
         { text: ChargeConstants.SI_DES, id: ChargeConstants.SI_CODE },
         { text: ChargeConstants.SE_DES, id: ChargeConstants.SE_CODE },
         { text: ChargeConstants.SFE_CODE, id: ChargeConstants.SFE_CODE },
-        { text: ChargeConstants.SFI_DES, id: ChargeConstants.SFE_CODE },
+        { text: ChargeConstants.SFI_DES, id: ChargeConstants.SFI_CODE },
         { text: ChargeConstants.SLE_DES, id: ChargeConstants.SLE_CODE },
         { text: ChargeConstants.SLI_DES, id: ChargeConstants.SLI_CODE },
         { text: ChargeConstants.SCE_DES, id: ChargeConstants.SCE_CODE },

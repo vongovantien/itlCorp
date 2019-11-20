@@ -18,6 +18,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { GetBuyingSurchargeAction } from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 @Component({
     selector: 'buying-charge',
@@ -146,7 +147,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     getMasterData() {
         forkJoin([
-            this._catalogueRepo.getCharges({ active: true }),
+            this.getCharge(),
             this._catalogueRepo.getUnit({ active: true }),
             this._catalogueRepo.getCurrencyBy({ active: true }),
             this._catalogueRepo.getListPartner(null, null, { active: true })
@@ -162,6 +163,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             );
     }
 
+    getCharge() {
+        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.DEBIT });
+    }
+
     sortSurcharge() {
         this.charges = this._sortService.sort(this.charges, this.sort, this.order);
     }
@@ -169,7 +174,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     onSelectDataFormInfo(data: Charge | any, type: string, chargeItem: CsShipmentSurcharge) {
 
         [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
-        console.log({ data, chargeItem });
 
         switch (type) {
             case 'charge':

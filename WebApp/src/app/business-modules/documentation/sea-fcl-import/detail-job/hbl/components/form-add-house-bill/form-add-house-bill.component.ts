@@ -15,6 +15,7 @@ export class FormAddHouseBillComponent extends AppForm {
     mtBill: AbstractControl;
     hwbno: AbstractControl;
     hbltype: AbstractControl;
+    servicetype: AbstractControl;
     etd: AbstractControl;
     eta: AbstractControl;
     pickupPlace: AbstractControl;
@@ -88,6 +89,16 @@ export class FormAddHouseBillComponent extends AppForm {
         { title: 'Surrendered', value: 'Surrendered' }
     ];
 
+    serviceTypes: CommonInterface.ICommonTitleValue[] = [
+        { title: 'FCL/FCL', value: 'FCL/FCL' },
+        { title: 'LCL/LCL', value: 'LCL/LCL' },
+        { title: 'FCL/LCL', value: 'FCL/LCL' },
+        { title: 'CY/CFS', value: 'CY/CFS' },
+        { title: 'CY/CY', value: 'CY/CY' },
+        { title: 'CFS/CY', value: 'CFS/CY' },
+        { title: 'CFS/CFS', value: 'CFS/CFS' }
+    ];
+
     numberOfOrigins: CommonInterface.ICommonTitleValue[] = [
         { title: 'One(1)', value: 1 },
         { title: 'Two(2)', value: 2 },
@@ -99,6 +110,7 @@ export class FormAddHouseBillComponent extends AppForm {
         private _catalogueRepo: CatalogueRepo,
         private _documentationRepo: DocumentationRepo,
         private _systemRepo: SystemRepo
+
 
     ) {
         super();
@@ -118,7 +130,7 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'taxCode', label: 'Tax Code' },
 
             ],
-        }, { selectedDisplayFields: ['partnerNameEn'], });
+        }, { selectedDisplayFields: ['shortName'], });
 
         this.configSaleman = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -134,7 +146,7 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'taxCode', label: 'Tax Code' },
 
             ],
-        }, { selectedDisplayFields: ['partnerNameEn'], });
+        }, { selectedDisplayFields: ['shortName'], });
 
         this.configConsignee = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -143,7 +155,7 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'partnerNameEn', label: 'Name EN' },
                 { field: 'taxCode', label: 'Tax Code' }
             ],
-        }, { selectedDisplayFields: ['partnerNameEn'], });
+        }, { selectedDisplayFields: ['shortName'], });
 
         this.configNotifyParty = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -152,7 +164,7 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'partnerNameEn', label: 'Name EN' },
                 { field: 'taxCode', label: 'Tax Code' }
             ],
-        }, { selectedDisplayFields: ['partnerNameEn'], });
+        }, { selectedDisplayFields: ['shortName'], });
 
         this.configAlsoNotifyParty = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -161,7 +173,7 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'partnerNameEn', label: 'Name EN' },
                 { field: 'taxCode', label: 'Tax Code' }
             ],
-        }, { selectedDisplayFields: ['partnerNameEn'], });
+        }, { selectedDisplayFields: ['shortName'], });
 
         this.configPortOfLoading = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -186,7 +198,7 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'partnerNameEn', label: 'Name EN' },
                 { field: 'taxCode', label: 'Tax Code' }
             ],
-        }, { selectedDisplayFields: ['partnerNameEn'], });
+        }, { selectedDisplayFields: ['shortName'], });
 
         this.configPlaceOfIssued = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -196,10 +208,7 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'code', label: 'Code' }
             ],
         }, { selectedDisplayFields: ['name_EN'], });
-
         this.initForm();
-
-
     }
 
 
@@ -219,7 +228,8 @@ export class FormAddHouseBillComponent extends AppForm {
 
                 Validators.required
             ],
-            hbOfladingType: [],
+            hbOfladingType: [null,
+                Validators.required],
             finalDestination: [
 
             ],
@@ -251,12 +261,16 @@ export class FormAddHouseBillComponent extends AppForm {
             ConsigneeDescription: [],
             NotifyPartyDescription: [],
             AlsoNotifyPartyDescription: [],
+            serviceType: [null,
+                Validators.required]
 
         });
 
         this.mtBill = this.formGroup.controls['masterBill'];
         this.hwbno = this.formGroup.controls['hbOfladingNo'];
         this.hbltype = this.formGroup.controls['hbOfladingType'];
+        this.servicetype = this.formGroup.controls['serviceType'];
+
         this.etd = this.formGroup.controls['etd'];
         this.eta = this.formGroup.controls['eta'];
         this.pickupPlace = this.formGroup.controls['placeofReceipt'];

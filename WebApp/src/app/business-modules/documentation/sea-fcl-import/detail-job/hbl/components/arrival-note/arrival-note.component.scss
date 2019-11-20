@@ -7,7 +7,9 @@
             left: -1px;
             background: #fff;
         }
-
+        .cdk-virtual-scroll-content-wrapper {
+            position: initial;
+        }
         .table-editable {
             padding-bottom: 175px;
             .e--combogrid {
@@ -17,18 +19,12 @@
                     border: unset;
                 }
                 table {
+                    white-space: pre-wrap;
                     th:first-child {
                         min-width: 130px;
                     }
                 }
                 tr {
-                    th:not(:first-child) {
-                        min-width: 130px;
-                    }
-                    td:not(:first-child) {
-                        min-width: 130px;
-                    }
-
                     td:first-child {
                         min-width: 130px;
                     }

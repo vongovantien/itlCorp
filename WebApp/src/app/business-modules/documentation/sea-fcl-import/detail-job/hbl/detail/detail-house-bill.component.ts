@@ -170,6 +170,17 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             "Tel: " + this.formHouseBill.selectedAlsoNotifyParty.data.tel + "\n" +
             "Fax: " + this.formHouseBill.selectedAlsoNotifyParty.data.fax + "\n" : this.hblDetail.alsoNotifyPartyDescription;
 
+        modelUpdate.arrivalFirstNotice = this.hblDetail.arrivalFirstNotice;
+        modelUpdate.arrivalFooter = this.hblDetail.arrivalFooter;
+        modelUpdate.arrivalHeader = this.hblDetail.arrivalHeader;
+        modelUpdate.arrivalNo = this.hblDetail.arrivalNo;
+        modelUpdate.arrivalSecondNotice = this.hblDetail.arrivalSecondNotice;
+        modelUpdate.deliveryOrderNo = this.hblDetail.deliveryOrderNo;
+        modelUpdate.deliveryOrderPrintedDate = this.hblDetail.deliveryOrderPrintedDate;
+        modelUpdate.dofooter = this.hblDetail.dofooter;
+        modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
+        modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
+
         this.updateHbl(modelUpdate);
     }
 
@@ -212,6 +223,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                         this.formHouseBill.selectedShipper = { field: 'shortName', value: res.data.shipperId };
                         this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === res.data.hbltype)[0]);
+                        this.formHouseBill.servicetype.setValue(this.formHouseBill.serviceTypes.filter(i => i.value === res.data.serviceType)[0]);
                         this.formHouseBill.localVessel.setValue(res.data.localVessel);
                         this.formHouseBill.localVoyNo.setValue(res.data.localVoyNo);
                         this.formHouseBill.oceanVessel.setValue(res.data.oceanVessel);
@@ -220,11 +232,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                             this.formHouseBill.documentNo.setValue(res.data.documentNo);
                         !!this.hblDetail.etawarehouse ? this.formHouseBill.etawarehouse.setValue({ startDate: new Date(this.hblDetail.etawarehouse), endDate: new Date(this.hblDetail.etawarehouse) }) : this.formHouseBill.etawarehouse.setValue(null), // * Date;
-                            // this.formHouseBill.etawarehouse.setValue(res.data.etawarehouse);
                             this.formHouseBill.warehouseNotice.setValue(res.data.warehouseNotice);
                         this.formHouseBill.shippingMark.setValue(res.data.shippingMark);
                         this.formHouseBill.remark.setValue(res.data.remark);
-                        // this.formHouseBill.issueHBLDate.setValue(res.data.issueHbldate);
                         !!this.hblDetail.issueHbldate ? this.formHouseBill.issueHBLDate.setValue({ startDate: new Date(this.hblDetail.issueHbldate), endDate: new Date(this.hblDetail.issueHbldate) }) : this.formHouseBill.issueHBLDate.setValue(null), // * Date;
 
                             this.formHouseBill.referenceNo.setValue(res.data.referenceNo);
@@ -267,8 +277,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
-    onPreview() {
-        if (this.selectedTab === HBL_TAB.DELIVERY) {
+    onPreview(type: string) {
+        //Preview Delivery Order
+        if (type === 'DELIVERY_ORDER') {
             this._documentationRepo.previewDeliveryOrder(this.hblId)
                 .pipe(
                     catchError(this.catchError),
@@ -285,8 +296,11 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     },
                 );
         }
-        if (this.selectedTab === HBL_TAB.DETAIL) {
-            this._documentationRepo.previewProofofDelivery(this.hblDetail.id)
+
+        //Preview Arrival Notice
+        if(type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND'){
+            const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
+            this._documentationRepo.previewArrivalNotice({hblId: this.hblId, currency: _currency})
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => { })
@@ -295,9 +309,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     (res: any) => {
                         this.dataReport = res;
                         setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
                             this.reportPopup.show();
                         }, 1000);
-
                     },
                 );
         }

@@ -73,7 +73,6 @@ export class SeaFClImportFormCreateComponent extends AppForm {
     ngOnInit(): void {
         this.configComboGridPartner = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
-                // { field: 'id', label: 'PartnerID' },
                 { field: 'shortName', label: 'Name Abbr' },
                 { field: 'partnerNameEn', label: 'Name EN' },
                 { field: 'taxCode', label: 'Tax Code' },
@@ -155,13 +154,14 @@ export class SeaFClImportFormCreateComponent extends AppForm {
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
                 if (!!value.startDate) {
-                    this.formCreate.controls["serviceDate"].setValue(value);
+                    // * serviceDate hadn't value
+                    if (!this.formCreate.controls["serviceDate"].value || !this.formCreate.controls["serviceDate"].value.startDate) {
+                        this.formCreate.controls["serviceDate"].setValue(value);
+                    }
                 } else {
                     this.formCreate.controls["serviceDate"].setValue(null);
                 }
             });
-
-        console.log("initForm done");
     }
 
     initFormUpdate() {
@@ -310,11 +310,16 @@ export class SeaFClImportFormCreateComponent extends AppForm {
                 this.serviceTypes = commonData.serviceTypes;
                 this.ladingTypes = commonData.billOfLadings;
                 this.shipmentTypes = commonData.shipmentTypes;
+                this.shipmentType.setValue(this.shipmentTypes[0].value);
+
             } else {
                 const commonData: any = await this._documentRepo.getShipmentDataCommon().toPromise();
                 this.serviceTypes = commonData.serviceTypes;
                 this.ladingTypes = commonData.billOfLadings;
                 this.shipmentTypes = commonData.shipmentTypes;
+
+                this.shipmentType.setValue(this.shipmentTypes[0].value);
+
                 this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
             }
 

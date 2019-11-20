@@ -18,6 +18,7 @@ import { catchError, takeUntil } from 'rxjs/operators';
 
 import * as fromStore from '../../../store';
 import { SystemConstants } from 'src/constants/system.const';
+import { Container } from 'src/app/shared/models/document/container.model';
 
 @Component({
     selector: 'app-create-house-bill',
@@ -30,11 +31,12 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
     @ViewChild(ImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ImportHouseBillDetailComponent;
 
-    fclImportAddModel: FCLImportAddModel = new FCLImportAddModel();
     jobId: string = '';
 
     shipmentDetail: any = {}; // TODO model.
     selectedHbl: any = {}; // TODO model.
+
+    containers: Container[] = [];
 
     constructor(
         protected _progressService: NgProgress,
@@ -57,8 +59,8 @@ export class CreateHouseBillComponent extends AppForm {
             .subscribe(
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
-                        this.fclImportAddModel.csMawbcontainers = [];
-                        this.fclImportAddModel.csMawbcontainers = action.payload;
+
+                        this.containers = action.payload;
                     }
                 });
     }
@@ -81,7 +83,13 @@ export class CreateHouseBillComponent extends AppForm {
 
     ngAfterViewInit() {
         this.shipmentGoodSummaryComponent.initContainer();
+        this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
+
         this.formHouseBill.mtBill.setValue(this.shipmentDetail.mawb);
+        if (this.shipmentDetail.typeOfService != null) {
+            this.formHouseBill.servicetype.setValue(this.formHouseBill.serviceTypes.filter(i => i.value === this.shipmentDetail.typeOfService)[0]);
+
+        }
 
     }
 
@@ -199,6 +207,7 @@ export class CreateHouseBillComponent extends AppForm {
             alsoNotifyPartyDescription: this.formHouseBill.alsoNotifyPartyDescriptionModel !== undefined ? this.formHouseBill.alsoNotifyPartyDescriptionModel : this.formHouseBill.alsonotifyPartyDescription.value,
             hwbno: this.formHouseBill.hwbno.value,
             hbltype: this.formHouseBill.hbltype.value != null ? this.formHouseBill.hbltype.value.value : null,
+            servicetype: this.formHouseBill.servicetype.value != null ? this.formHouseBill.servicetype.value.value : null,
             etd: !!this.formHouseBill.etd.value ? formatDate(this.formHouseBill.etd.value.startDate !== undefined ? this.formHouseBill.etd.value.startDate : this.formHouseBill.etd.value, 'yyyy-MM-dd', 'en') : null,
             eta: !!this.formHouseBill.eta.value ? formatDate(this.formHouseBill.eta.value.startDate !== undefined ? this.formHouseBill.eta.value.startDate : this.formHouseBill.eta.value, 'yyyy-MM-dd', 'en') : null,
             pickupPlace: this.formHouseBill.pickupPlace.value,
@@ -221,13 +230,24 @@ export class CreateHouseBillComponent extends AppForm {
             referenceNo: this.formHouseBill.referenceNo.value,
             customerId: this.formHouseBill.selectedCustomer.value,
             oceanVoyNo: this.formHouseBill.oceanVoyNo.value,
-            csMawbcontainers: this.fclImportAddModel.csMawbcontainers,
+            csMawbcontainers: this.containers,
             commodity: this.shipmentGoodSummaryComponent.commodities,
             packageContainer: this.shipmentGoodSummaryComponent.containerDetail,
             desOfGoods: this.shipmentGoodSummaryComponent.description,
             cbm: this.shipmentGoodSummaryComponent.totalCBM,
             grossWeight: this.shipmentGoodSummaryComponent.grossWeight,
-            netWeight: this.shipmentGoodSummaryComponent.netWeight
+            netWeight: this.shipmentGoodSummaryComponent.netWeight,
+
+            arrivalSecondNotice: null,
+            arrivalNo: null,
+            arrivalHeader: null,
+            arrivalFooter: null,
+            arrivalFirstNotice: null,
+            deliveryOrderNo: null,
+            deliveryOrderPrintedDate: null,
+            dofooter: null,
+            dosentTo1: null,
+            dosentTo2: null,
         };
         return body;
     }
@@ -251,6 +271,7 @@ export interface ITransactionDetail {
     alsoNotifyPartyDescription: string;
     hwbno: string;
     hbltype: string;
+    servicetype: string;
     etd: string;
     eta: string;
     pickupPlace: string;
@@ -279,4 +300,14 @@ export interface ITransactionDetail {
     cbm: number;
     grossWeight: number;
     netWeight: number;
+    arrivalSecondNotice: string;
+    arrivalNo: string;
+    arrivalHeader: string;
+    arrivalFooter: string;
+    arrivalFirstNotice: string;
+    deliveryOrderNo: string;
+    deliveryOrderPrintedDate: string;
+    dofooter: string;
+    dosentTo1: string;
+    dosentTo2: string;
 }

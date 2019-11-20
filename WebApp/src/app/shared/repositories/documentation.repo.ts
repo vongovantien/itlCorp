@@ -418,6 +418,11 @@ export class DocumentationRepo {
         );
     }
 
+    previewArrivalNotice(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/PreviewArrivalNotice`, body).pipe(
+            map((data: any) => data)
+        );
+    }
     previewProofofDelivery(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewProofOfDelivery`, { id: id }).pipe(
             catchError((error) => throwError(error)),
