@@ -4,17 +4,13 @@
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (referenceNo.dirty && !referenceNo.valid) || (isSubmitted && !referenceNo.valid)}">
+                        <div class="form-group">
                             <label class="form-control-label" for="">
-                                Reference No <span class="m--font-danger">(*)</span>
+                                Reference No
                             </label>
-                            <input type="text" class="form-control m-input m-input--square"
+                            <input disabled type="text" class="form-control m-input m-input--square"
                                 formControlName="referenceNo">
-                            <div class="form-control-feedback"
-                                *ngIf="isSubmitted && (referenceNo.errors | equalError: 'required') || (referenceNo.errors | equalError: 'required') && referenceNo.dirty">
-                                Reference No is required!
-                            </div>
+
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -102,7 +98,8 @@
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfLoading"
                                 [selectedDisplayFields]="configPortOfLoading.selectedDisplayFields"
                                 [dataSources]="configPortOfLoading.dataSource"
-                                [displayFields]="configPortOfLoading.displayFields">
+                                [displayFields]="configPortOfLoading.displayFields"
+                                (itemSelected)="onSelectDataFormInfo($event, 'PortOfLoading')">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback" *ngIf="isSubmitted &&  !selectedPortOfLoading.value  ">
                                 Port of Loading is required!
@@ -185,11 +182,16 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (agent.dirty && !agent.valid) || (isSubmitted && !agent.valid)}">
                             <label class="form-control-label" for="">
-                                Agent
+                                Agent who assembled this manifest <span class="m--font-danger">(*)</span>
                             </label>
                             <textarea class="form-control" rows="5" formControlName="agent"> </textarea>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && (agent.errors | equalError: 'required') || (agent.errors | equalError: 'required') && agent.dirty">
+                                Agent who assembled this manifest is required!
+                            </div>
                         </div>
                     </div>
                 </div>
