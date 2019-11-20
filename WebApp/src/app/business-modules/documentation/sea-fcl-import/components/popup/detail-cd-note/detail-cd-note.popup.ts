@@ -33,14 +33,14 @@ export class CdNoteDetailPopupComponent extends PopupBase {
 
     dataReport: any = null;
 
-    previewModes: any[] = 
-    [
-        { title: 'Preview', value: "", isDisabled: true },
-        { title: 'Preview with USD', value: "USD", isDisabled: false },
-        { title: 'Preview with Local', value: "VND", isDisabled: false },
-        { title: 'Preview with Original', value: "USD", isDisabled: false }
-    ];
-    selectedPreviewMode: any;//CommonInterface.ICommonTitleValue;
+    // previewModes: any[] = 
+    // [
+    //     { title: 'Preview', value: "", isDisabled: true },
+    //     { title: 'Preview with USD', value: "USD", isDisabled: false },
+    //     { title: 'Preview with Local', value: "VND", isDisabled: false },
+    //     { title: 'Preview with Original', value: "USD", isDisabled: false }
+    // ];
+    // selectedPreviewMode: any;//CommonInterface.ICommonTitleValue;
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -65,7 +65,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
             { title: "Debit Value (Local)", field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
-        this.selectedPreviewMode = this.previewModes[0];
+        //this.selectedPreviewMode = this.previewModes[0];
     }
 
     getDetailCdNote(jobId: string, cdNote: string) {
@@ -104,7 +104,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
     }
 
     closePopup() {
-        this.selectedPreviewMode = this.previewModes[0];
+        //this.selectedPreviewMode = this.previewModes[0];
         this.hide();
     }
 
@@ -163,8 +163,8 @@ export class CdNoteDetailPopupComponent extends PopupBase {
         }
     }
 
-    onChangePreviewMode(data: any){
-        this._documentationRepo.previewSIFCdNote({jobId: this.jobId, creditDebitNo: this.cdNote, currency: data.value})
+    previewCdNote(data: string) {
+        this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
