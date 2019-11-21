@@ -1,0 +1,201 @@
+<div class="m-content form-manifest">
+    <form [formGroup]="formGroup">
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Reference No
+                            </label>
+                            <input disabled type="text" class="form-control m-input m-input--square"
+                                formControlName="referenceNo">
+
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (supplier.dirty && !supplier.valid) || (isSubmitted && !supplier.valid)}">
+                            <label class="form-control-label" for="">
+                                Supplier <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" formControlName="supplier">
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && (supplier.errors | equalError: 'required') || (supplier.errors | equalError: 'required') && supplier.dirty">
+                                Supplier No is required!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Attention
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" formControlName="attention">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (marksOfNationality.dirty && !marksOfNationality.valid) || (isSubmitted && !marksOfNationality.valid)}">
+                            <label class="form-control-label" for="">
+                                Marks of Nationality & Registration <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square"
+                                formControlName="marksOfNationality">
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && (marksOfNationality.errors | equalError: 'required') || (marksOfNationality.errors | equalError: 'required') && marksOfNationality.dirty">
+                                Marks of Nationality & Registration is required!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (vesselNo.dirty && !vesselNo.valid) || (isSubmitted && !vesselNo.valid)}">
+                            <label class="form-control-label" for="">
+                                Vessel No <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" formControlName="vesselNo">
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && (vesselNo.errors | equalError: 'required') || (vesselNo.errors | equalError: 'required') && vesselNo.dirty">
+                                Vessel No is required!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (date.dirty && !date.valid) || (isSubmitted && !date.valid)}">
+                            <label class="form-control-label" for="">
+                                Date <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="m-input-icon">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                    [singleDatePicker]="true" formControlName="date" readonly />
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && (date.errors | equalError: 'required') || (date.errors | equalError: 'required') && date.dirty">
+                                Date is required!
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmited && !selectedPortOfLoading.value }">
+                            <label class="form-control-label">
+                                Port of Loading <span class="m--font-danger">(*)</span>
+                            </label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfLoading"
+                                [selectedDisplayFields]="configPortOfLoading.selectedDisplayFields"
+                                [dataSources]="configPortOfLoading.dataSource"
+                                [displayFields]="configPortOfLoading.displayFields"
+                                (itemSelected)="onSelectDataFormInfo($event, 'PortOfLoading')">
+                            </app-combo-grid-virtual-scroll>
+                            <div class="form-control-feedback" *ngIf="isSubmitted &&  !selectedPortOfLoading.value  ">
+                                Port of Loading is required!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmited  && (!selectedPortOfDischarge.value || PortChargeLikePortLoading == true) }">
+                            <label class="form-control-label">
+                                Port of Discharge <span class="m--font-danger">(*)</span>
+                            </label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfDischarge"
+                                [selectedDisplayFields]="configPortOfDischarge.selectedDisplayFields"
+                                [dataSources]="configPortOfDischarge.dataSource"
+                                [displayFields]="configPortOfDischarge.displayFields">
+                            </app-combo-grid-virtual-scroll>
+                            <div class="form-control-feedback" *ngIf="isSubmitted &&  !selectedPortOfDischarge.value  ">
+                                Port of Discharge is required!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (freightCharge.dirty && !freightCharge.valid) || (isSubmitted && !freightCharge.valid)}">
+                            <label class="form-control-label" for="">
+                                Freight Charge <span class="m--font-danger">(*)</span>
+                            </label>
+                            <ng-select [items]="freightCharges" placeholder="select" formControlName="freightCharge">
+                            </ng-select>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && (freightCharge.errors | equalError: 'required') || (freightCharge.errors | equalError: 'required') && freightCharge.dirty">
+                                Freight Charge is required!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Consolidator
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        formControlName="consolidator">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        De-Consolidator
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        formControlName="deconsolidator">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Weight(Kgs)
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        formControlName="weight">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Volume(CBM)
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        formControlName="volume">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (agent.dirty && !agent.valid) || (isSubmitted && !agent.valid)}">
+                            <label class="form-control-label" for="">
+                                Agent who assembled this manifest <span class="m--font-danger">(*)</span>
+                            </label>
+                            <textarea class="form-control" rows="5" formControlName="agent"> </textarea>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && (agent.errors | equalError: 'required') || (agent.errors | equalError: 'required') && agent.dirty">
+                                Agent who assembled this manifest is required!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
