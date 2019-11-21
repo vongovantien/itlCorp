@@ -88,13 +88,13 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (this.description != null) {
+        if (!this.description) {
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
 
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
 
-        if (this.commodities != null) {
+        if (!this.commodities) {
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
                 .reduce((acc: string, curr: any) => acc += curr + "\n", '');

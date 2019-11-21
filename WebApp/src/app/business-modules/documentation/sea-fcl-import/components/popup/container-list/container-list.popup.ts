@@ -130,9 +130,9 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
 
     onSaveContainerList() {
         this.isSubmitted = true;
-        if (!this.containers.length) {
-            return;
-        }
+        // if (!this.containers.length) {
+        //     return;
+        // }
 
         if (this.checkValidateContainer()) {
             // * DISPATCH SAVE ACTION
