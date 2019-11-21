@@ -19,7 +19,7 @@
                         <table class="table table-striped table-brand dataTable">
                             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
                                 <th class="table-actions-col no-sorting first">
-                                    <label class="m-checkbox">
+                                    <label class="m-checkbox m-checkbox--bold m-checkbox--state-success">
                                         <input type="checkbox" [(ngModel)]="isCheckAllCharge"
                                             (change)="checkUncheckAllCharge()">
                                         <span></span>
@@ -31,19 +31,13 @@
                                     *ngFor="let charges of listChargePartnerAddMore; let i = index; trackBy: trackByFn">
                                     <tr class="collapse-toggle-row tgroup" *ngIf='charges.listCharges.length > 0'>
                                         <td colspan="12">
-                                            <!-- <label class="m-checkbox">
+                                            <label class="m-checkbox m-checkbox--bold m-checkbox--state-success">
                                                 <input type="checkbox" (change)="onChangeCheckBoxGrpCharge(charges)"
                                                     value="{{charges}}" [(ngModel)]="charges.isSelected"
                                                     name="{{charges.hwbno}}">
                                                 HBL No: {{charges.hwbno}}
                                                 <span></span>
-                                            </label> -->
-                                            <!-- <label> -->
-                                                <!-- <span (change)="onChangeCheckBoxGrpCharge(charges)"
-                                                    [(ngModel)]="charges.isSelected"
-                                                    ></span> -->
-                                                HBL No: {{charges.hwbno}}
-                                            <!-- </label> -->
+                                            </label>
                                         </td>
                                     </tr>
                                     <tr class="child"

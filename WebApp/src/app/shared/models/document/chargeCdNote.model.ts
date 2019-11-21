@@ -6,6 +6,7 @@ export class ChargeCdNote {
     id: string = "";
     listCharges: CsShipmentSurchargeDetail[] = new Array<CsShipmentSurchargeDetail>();
     isSelected: boolean = false;
+    isDeleted: boolean = false;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
