@@ -324,12 +324,14 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                     var resultSaleman = sysUserRepo.Get(x => x.Id == detail.SaleManId).FirstOrDefault();
                     var pol = catPlaceRepo.Get(x => x.Id == detail.Pol).FirstOrDefault();
                     var pod = catPlaceRepo.Get(x => x.Id == detail.Pod).FirstOrDefault();
+                    var shipment = csTransactionRepo.Get(x => x.Id == queryDetail.JobId).First();
                     detail.CustomerName = resultPartner?.PartnerNameEn;
                     detail.CustomerNameVn = resultPartner?.PartnerNameVn;
                     detail.SaleManId = resultSaleman?.Id;
                     detail.NotifyParty = resultNoti?.PartnerNameEn;
                     detail.POLName = pol?.NameEn;
                     detail.PODName = pod?.NameEn;
+                    detail.ShipmentEta = shipment.Eta;
                     return detail;
             }
         }

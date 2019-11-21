@@ -61,7 +61,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
     onSubmitData() {
         const form: any = this.formCreateComponent.formCreate.getRawValue();
         const formData = {
-            eta: !!form.eta && !!form.etd.eta ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
+            eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDate: !!form.serviceDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
 

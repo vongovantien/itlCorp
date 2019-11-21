@@ -43,6 +43,27 @@
             </summary>
             <param name="appSettings"></param>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportEManifest(System.Guid)">
+            <summary>
+            Export E-Manifest of a housebill
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportGoodsDeclare(System.String)">
+            <summary>
+            Export goods declare by house bill id
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportDangerousGoods(System.String)">
+            <summary>
+            export dangerous goods
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.ReportDataController">
             <summary>
             A base class for an MVC controller without view support.

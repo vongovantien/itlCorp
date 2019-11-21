@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
 import { ChargeCdNote } from "src/app/shared/models/document/chargeCdNote.model";
+import { SortService } from "src/app/shared/services";
 
 @Component({
     selector: 'add-remaining-charge-popup',
@@ -14,8 +15,9 @@ export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
     listChargePartnerAddMore: ChargeCdNote[] = [];
     listChargePartner: ChargeCdNote[] = [];
     partner: string = "";
-    constructor() {
+    constructor(private _sortService: SortService) {
         super();
+        this.requestSort = this.sortRemainingCharge;
     }
 
     ngOnInit() {
@@ -35,25 +37,21 @@ export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
     }
 
     addCharge() {
-        //console.log('add charge')
-        console.log(this.listChargePartnerAddMore);
         let chargesSelected = [];
         let grpChargeSelected = [];
         if (this.listChargePartnerAddMore.length > 0) {
             for (const charges of this.listChargePartnerAddMore) {
-                console.log(charges.listCharges.filter(group => group.isSelected))
                 chargesSelected = charges.listCharges.filter(group => group.isSelected);
                 if (chargesSelected.length > 0) {
-                    grpChargeSelected.push({ id: charges.id, hwbno: charges.hwbno, listCharges: chargesSelected });
+                    grpChargeSelected.push({ id: charges.id, hwbno: charges.hwbno, isDeleted: false, listCharges: chargesSelected });
                 }
             }
         }
         let result = [];
-        //console.log('grpChargeSelected')
-        console.log(grpChargeSelected);
         for (const group of grpChargeSelected) {
             if (this.listChargePartner.length > 0) {
                 for (const item of this.listChargePartner) {
+                    item.isDeleted = false;
                     if (item.hwbno == group.hwbno) {
                         for (const charge of group.listCharges) {
                             item.listCharges.push(charge)
@@ -61,11 +59,10 @@ export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
                     }
                 }
             } else {
-                result.push({ id: group.id, hwbno: group.hwbno, listCharges: group.listCharges });
+                result.push({ id: group.id, hwbno: group.hwbno, isDeleted: false, listCharges: group.listCharges });
             }
         }
         this.listChargePartner = this.listChargePartner.length > 0 ? this.listChargePartner : result;
-        console.log(this.listChargePartner);
         this.onAddCharge.emit(this.listChargePartner);
 
         this.isCheckAllCharge = false;
@@ -86,9 +83,22 @@ export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
         }
     }
 
+    onChangeCheckBoxGrpCharge(charges: any) {
+        this.isCheckAllCharge = this.listChargePartnerAddMore.every((item: any) => item.isSelected);
+        for (const charge of charges.listCharges) {
+            charge.isSelected = charges.isSelected;
+        }
+    }
+
     onChangeCheckBoxItemCharge(chargeGroup: any) {
         chargeGroup.isSelected = chargeGroup.listCharges.every((item: any) => item.isSelected);
         this.isCheckAllCharge = this.listChargePartnerAddMore.every((item: any) => item.isSelected);
+    }
+
+    sortRemainingCharge(sort: string): void {
+        this.listChargePartnerAddMore.forEach(element => {
+            element.listCharges = this._sortService.sort(element.listCharges, sort, this.order);
+        });
     }
 
 }

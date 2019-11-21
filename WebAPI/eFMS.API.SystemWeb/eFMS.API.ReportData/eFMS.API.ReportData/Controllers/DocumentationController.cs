@@ -34,6 +34,11 @@ namespace eFMS.API.ReportData.Controllers
             this.aPis = appSettings.Value;
         }
 
+        /// <summary>
+        /// Export E-Manifest of a housebill
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <returns></returns>
         [Route("ExportEManifest")]
         [HttpGet]
         public async Task<IActionResult> ExportEManifest(Guid hblid)
@@ -48,6 +53,52 @@ namespace eFMS.API.ReportData.Controllers
                 return null;
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "E-Manifest.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export goods declare by house bill id
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <returns></returns>
+        [Route("ExportGoodsDeclare")]
+        [HttpGet]
+        public async Task<IActionResult> ExportGoodsDeclare(string hblid)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid);
+
+            var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
+
+            var stream = new DocumentationHelper().CreateGoodsDeclare(dataObject.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Import Goods Declare.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
+        /// export dangerous goods
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <returns></returns>
+        [Route("ExportDangerousGoods")]
+        [HttpGet]
+        public async Task<IActionResult> ExportDangerousGoods(string hblid)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid);
+
+            var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
+
+            var stream = new DocumentationHelper().CreateDangerousGoods(dataObject.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Dangerous Goods.xlsx");
 
             return fileContent;
         }

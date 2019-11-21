@@ -22,17 +22,26 @@
                             <span class="caret"></span>
                         </a>
                         <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">
-                            <li role="menuitem"><a class="dropdown-item" (click)="onPreview('ARRIVAL_ORIGINAL')">Arrival
-                                    Notice (Original Currency)</a></li>
-                            <li role="menuitem"><a class="dropdown-item" (click)="onPreview('ARRIVAL_VND')">Arrival
-                                    Notice (VND)</a></li>
+                            <li role="menuitem"><a class="dropdown-item"
+                                    (click)="onPreview('ARRIVAL_ORIGINAL')">Original Currency</a></li>
+                            <li role="menuitem"><a class="dropdown-item" (click)="onPreview('ARRIVAL_VND')">VND</a></li>
                         </ul>
                     </li>
                     <li role="menuitem"><a class="dropdown-item" (click)="onPreview('DELIVERY_ORDER')">Delivery
                             Order</a></li>
-                    <li role="menuitem"><a class="dropdown-item" (click)="onPreview('PROOF_OF_DELIVERY')">Proof of
-                            Delivery</a></li>
-                    <li role="menuitem"><a class="dropdown-item" (click)="onPreview('MANIFEST')">Manifest</a>
+                    <li role="menuitem" dropdown triggers="mouseover" placement="right" container="body">
+                        <a dropdownToggle class="dropdown-item dropdown-toggle" (click)="false">Export Manifest
+                            <span class="caret"></span>
+                        </a>
+                        <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">
+                            <li role="menuitem"><a class="dropdown-item"
+                                    (click)="onPreview('E_MANIFEST')">E-Manifest</a></li>
+                            <li role="menuitem"><a class="dropdown-item" (click)="onPreview('GOODS_DECLARE')">Goods
+                                    Declare</a></li>
+                            <li role="menuitem"><a class="dropdown-item"
+                                    (click)="onPreview('DANGEROUS_GOODS')">Dangerous
+                                    Goods</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>

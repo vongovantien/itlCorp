@@ -24,5 +24,6 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? GW { get; set; }
         public string Packages { get; set; }
         public string Containers { get; set; }
+        public DateTime? ShipmentEta { get; set; }
     }
 }

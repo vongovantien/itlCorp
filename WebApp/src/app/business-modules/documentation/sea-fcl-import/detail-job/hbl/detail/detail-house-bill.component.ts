@@ -5,7 +5,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
 import { CreateHouseBillComponent } from '../create/create-house-bill.component';
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
@@ -57,6 +57,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _store: Store<fromStore.ISeaFCLImportState>,
+        private _exportRepository: ExportRepo
     ) {
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
     }
@@ -197,8 +198,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     this._progressRef.complete();
-                    if (res.status) {
-                        this.hblDetail = res.data;
+                    if (!!res) {
+                        this.hblDetail = res;
                         this.shipmentGoodSummaryComponent.containerDetail = this.hblDetail.packageContainer;
                         this.shipmentGoodSummaryComponent.commodities = this.hblDetail.commodity;
                         this.shipmentGoodSummaryComponent.description = this.hblDetail.desOfGoods;
@@ -206,39 +207,39 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                         this.shipmentGoodSummaryComponent.netWeight = this.hblDetail.netWeight;
                         this.shipmentGoodSummaryComponent.totalChargeWeight = this.hblDetail.chargeWeight;
                         this.shipmentGoodSummaryComponent.totalCBM = this.hblDetail.cbm;
-                        this.formHouseBill.etd.setValue(res.data.etd);
+                        this.formHouseBill.etd.setValue(this.hblDetail.etd);
                         !!this.hblDetail.etd ? this.formHouseBill.etd.setValue({ startDate: new Date(this.hblDetail.etd), endDate: new Date(this.hblDetail.etd) }) : this.formHouseBill.etd.setValue(null), // * Date;
                             this.formHouseBill.getListSaleman();
-                        this.formHouseBill.mtBill.setValue(res.data.mawb);
-                        this.formHouseBill.shipperDescription.setValue(res.data.shipperDescription);
-                        this.formHouseBill.consigneeDescription.setValue(res.data.consigneeDescription);
-                        this.formHouseBill.notifyPartyDescription.setValue(res.data.notifyPartyDescription);
-                        this.formHouseBill.alsonotifyPartyDescription.setValue(res.data.alsoNotifyPartyDescription);
+                        this.formHouseBill.mtBill.setValue(this.hblDetail.mawb);
+                        this.formHouseBill.shipperDescription.setValue(this.hblDetail.shipperDescription);
+                        this.formHouseBill.consigneeDescription.setValue(this.hblDetail.consigneeDescription);
+                        this.formHouseBill.notifyPartyDescription.setValue(this.hblDetail.notifyPartyDescription);
+                        this.formHouseBill.alsonotifyPartyDescription.setValue(this.hblDetail.alsoNotifyPartyDescription);
 
-                        this.formHouseBill.hwbno.setValue(res.data.hwbno);
-                        this.formHouseBill.pickupPlace.setValue(res.data.pickupPlace);
-                        // this.formHouseBill.eta.setValue(res.data.eta);
+                        this.formHouseBill.hwbno.setValue(this.hblDetail.hwbno);
+                        this.formHouseBill.pickupPlace.setValue(this.hblDetail.pickupPlace);
+                        // this.formHouseBill.eta.setValue(this.hblDetail.eta);
                         !!this.hblDetail.eta ? this.formHouseBill.eta.setValue({ startDate: new Date(this.hblDetail.eta), endDate: new Date(this.hblDetail.eta) }) : this.formHouseBill.eta.setValue(null), // * Date;
-                            this.formHouseBill.finalDestinationPlace.setValue(res.data.finalDestinationPlace);
+                            this.formHouseBill.finalDestinationPlace.setValue(this.hblDetail.finalDestinationPlace);
 
-                        this.formHouseBill.selectedShipper = { field: 'shortName', value: res.data.shipperId };
-                        this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === res.data.hbltype)[0]);
-                        this.formHouseBill.servicetype.setValue(this.formHouseBill.serviceTypes.filter(i => i.value === res.data.serviceType)[0]);
-                        this.formHouseBill.localVessel.setValue(res.data.localVessel);
-                        this.formHouseBill.localVoyNo.setValue(res.data.localVoyNo);
-                        this.formHouseBill.oceanVessel.setValue(res.data.oceanVessel);
-                        this.formHouseBill.oceanVoyNo.setValue(res.data.oceanVoyNo);
+                        this.formHouseBill.selectedShipper = { field: 'shortName', value: this.hblDetail.shipperId };
+                        this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === this.hblDetail.hbltype)[0]);
+                        this.formHouseBill.servicetype.setValue(this.formHouseBill.serviceTypes.filter(i => i.value === this.hblDetail.serviceType)[0]);
+                        this.formHouseBill.localVessel.setValue(this.hblDetail.localVessel);
+                        this.formHouseBill.localVoyNo.setValue(this.hblDetail.localVoyNo);
+                        this.formHouseBill.oceanVessel.setValue(this.hblDetail.oceanVessel);
+                        this.formHouseBill.oceanVoyNo.setValue(this.hblDetail.oceanVoyNo);
                         !!this.hblDetail.documentDate ? this.formHouseBill.documentDate.setValue({ startDate: new Date(this.hblDetail.documentDate), endDate: new Date(this.hblDetail.documentDate) }) : this.formHouseBill.documentDate.setValue(null), // * Date;
 
-                            this.formHouseBill.documentNo.setValue(res.data.documentNo);
+                            this.formHouseBill.documentNo.setValue(this.hblDetail.documentNo);
                         !!this.hblDetail.etawarehouse ? this.formHouseBill.etawarehouse.setValue({ startDate: new Date(this.hblDetail.etawarehouse), endDate: new Date(this.hblDetail.etawarehouse) }) : this.formHouseBill.etawarehouse.setValue(null), // * Date;
-                            this.formHouseBill.warehouseNotice.setValue(res.data.warehouseNotice);
-                        this.formHouseBill.shippingMark.setValue(res.data.shippingMark);
-                        this.formHouseBill.remark.setValue(res.data.remark);
+                            this.formHouseBill.warehouseNotice.setValue(this.hblDetail.warehouseNotice);
+                        this.formHouseBill.shippingMark.setValue(this.hblDetail.shippingMark);
+                        this.formHouseBill.remark.setValue(this.hblDetail.remark);
                         !!this.hblDetail.issueHbldate ? this.formHouseBill.issueHBLDate.setValue({ startDate: new Date(this.hblDetail.issueHbldate), endDate: new Date(this.hblDetail.issueHbldate) }) : this.formHouseBill.issueHBLDate.setValue(null), // * Date;
 
-                            this.formHouseBill.referenceNo.setValue(res.data.referenceNo);
-                        this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === res.data.originBlnumber)[0]);
+                            this.formHouseBill.referenceNo.setValue(this.hblDetail.referenceNo);
+                        this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.hblDetail.originBlnumber)[0]);
                         this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? moment(this.hblDetail.etd) : null;
                         this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? moment(this.hblDetail.eta) : null;
 
@@ -249,20 +250,20 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                                     return;
                                 }
                             });
-                            this.formHouseBill.selectedCustomer = { field: 'id', value: res.data.customerId };
-                            this.formHouseBill.selectedShipper = { field: 'id', value: res.data.shipperId };
-                            this.formHouseBill.selectedConsignee = { field: 'id', value: res.data.consigneeId };
-                            this.formHouseBill.selectedNotifyParty = { field: 'id', value: res.data.notifyPartyId };
-                            this.formHouseBill.selectedAlsoNotifyParty = { field: 'id', value: res.data.alsoNotifyPartyId };
-                            this.formHouseBill.selectedPortOfLoading = { field: 'id', value: res.data.pol };
-                            this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: res.data.pod };
-                            this.formHouseBill.selectedSupplier = { field: 'id', value: res.data.coloaderId };
-                            this.formHouseBill.selectedPlaceOfIssued = { field: 'id', value: res.data.issueHblplace };
+                            this.formHouseBill.selectedCustomer = { field: 'id', value: this.hblDetail.customerId };
+                            this.formHouseBill.selectedShipper = { field: 'id', value: this.hblDetail.shipperId };
+                            this.formHouseBill.selectedConsignee = { field: 'id', value: this.hblDetail.consigneeId };
+                            this.formHouseBill.selectedNotifyParty = { field: 'id', value: this.hblDetail.notifyPartyId };
+                            this.formHouseBill.selectedAlsoNotifyParty = { field: 'id', value: this.hblDetail.alsoNotifyPartyId };
+                            this.formHouseBill.selectedPortOfLoading = { field: 'id', value: this.hblDetail.pol };
+                            this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: this.hblDetail.pod };
+                            this.formHouseBill.selectedSupplier = { field: 'id', value: this.hblDetail.coloaderId };
+                            this.formHouseBill.selectedPlaceOfIssued = { field: 'id', value: this.hblDetail.issueHblplace };
                         }, 500);
                     }
 
                     // * Dispatch to save containers.
-                    this._store.dispatch(new fromStore.SaveContainerAction(res.data.csMawbcontainers || []));
+                    this._store.dispatch(new fromStore.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
 
                     // * Dispatch to get container's shipment.
                     this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.jobId }));
@@ -278,7 +279,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         this.selectedTab = tabName;
     }
     onPreview(type: string) {
-        //Preview Delivery Order
+        // Preview Delivery Order
         if (type === 'DELIVERY_ORDER') {
             this._documentationRepo.previewDeliveryOrder(this.hblId)
                 .pipe(
@@ -297,10 +298,10 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 );
         }
 
-        //Preview Arrival Notice
-        if(type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND'){
+        // Preview Arrival Notice
+        if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
             const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
-            this._documentationRepo.previewArrivalNotice({hblId: this.hblId, currency: _currency})
+            this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency })
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => { })
@@ -316,5 +317,59 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 );
         }
 
+        // PREVIEW PROOF OF DELIVERY
+        if (type === 'PROOF_OF_DELIVERY') {
+            this._documentationRepo.previewProofofDelivery(this.hblId)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { })
+                )
+                .subscribe(
+                    (res: any) => {
+                        this.dataReport = res;
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+
+                    },
+                );
+        }
+        if (type === 'E_MANIFEST') {
+            this.exportEManifest();
+        }
+        if (type === 'GOODS_DECLARE') {
+            this.exportGoodsDeclare();
+        }
+        if (type === 'DANGEROUS_GOODS') {
+            this.exportDangerousGoods();
+        }
+    }
+    exportDangerousGoods() {
+        this._exportRepository.exportDangerousGoods(this.hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                },
+            );
+    }
+    exportGoodsDeclare() {
+        this._exportRepository.exportGoodDeclare(this.hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                },
+            );
+    }
+    exportEManifest() {
+        this._exportRepository.exportEManifest(this.hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
+                },
+            );
     }
 }

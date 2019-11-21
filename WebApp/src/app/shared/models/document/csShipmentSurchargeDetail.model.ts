@@ -16,7 +16,6 @@ export class CsShipmentSurchargeDetail  extends CsShipmentSurcharge{
     partnerShortName: string = "";
     receiverShortName: string  = "";
     payerShortName: string = "";
-    
     constructor(object?: any) {
         super();
         const self = this;

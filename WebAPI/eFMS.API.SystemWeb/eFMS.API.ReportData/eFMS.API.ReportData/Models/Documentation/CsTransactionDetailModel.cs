@@ -31,6 +31,7 @@ namespace eFMS.API.ReportData.Models.Documentation
         public string PickupPlace { get; set; }
         public DateTime? Etd { get; set; }
         public DateTime? Eta { get; set; }
+        public DateTime? ShipmentEta { get; set; }
         public Guid Pol { get; set; }
         public Guid Pod { get; set; }
         public string DeliveryPlace { get; set; }

@@ -14,8 +14,7 @@ import { FormsModule } from '@angular/forms';
         CommonModule,
         ModalModule.forRoot(),
         SharedModule,
-        FormsModule
-
+        FormsModule,
     ],
     exports: [],
     declarations: [
