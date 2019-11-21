@@ -837,7 +837,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
                 dc.SaveChanges();
-                return new HandleState();
+                return hs;
             }
             catch (Exception ex)
             {
@@ -855,6 +855,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
 
                 var settlementCurrent = DataContext.Get(x => x.Id == settlement.Id).FirstOrDefault();
+                if (settlementCurrent == null) return new HandleState("Not found settlement payment");
                 settlement.DatetimeCreated = settlementCurrent.DatetimeCreated;
                 settlement.UserCreated = settlementCurrent.UserCreated;
 
@@ -942,7 +943,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //End --Phí hiện trường (IsFromShipment = false)--
                 }
                 dc.SaveChanges();
-                return new HandleState();
+                return hs;
             }
             catch (Exception ex)
             {
@@ -1133,7 +1134,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var parameter = new AscSettlementPaymentRequestReportParams();
             parameter = GetFirstShipmentOfSettlement(settlementNo);
-            parameter.SettleRequester = settlement != null && !string.IsNullOrEmpty(settlement.Requester) ? GetEmployeeByUserId(settlement.Requester).EmployeeNameVn : string.Empty;
+            parameter.SettleRequester = settlement != null && !string.IsNullOrEmpty(settlement.Requester) ? GetEmployeeByUserId(settlement.Requester)?.EmployeeNameVn : string.Empty;
             parameter.SettleRequestDate = settlement.RequestDate != null ? settlement.RequestDate.Value.ToString("dd/MM/yyyy") : string.Empty;
 
             //Lấy thông tin các User Approve Settlement
@@ -1209,14 +1210,16 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 //Lấy ra brandId của user 
-                var brandOfUser = GetEmployeeByUserId(userCurrent).WorkPlaceId;
+                var brandOfUser = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
 
                 //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
                 acctApprove.Leader = GetLeaderIdOfUser(userCurrent);
                 acctApprove.Manager = GetManagerIdOfUser(userCurrent, brandOfUser.ToString());
+                if (string.IsNullOrEmpty(acctApprove.Manager)) return new HandleState("Not found department manager of user");
                 acctApprove.Accountant = GetAccountantId(brandOfUser.ToString());
+                if (string.IsNullOrEmpty(acctApprove.Accountant)) return new HandleState("Not found accountant manager");
                 acctApprove.Buhead = GetBUHeadId(brandOfUser.ToString());
-
 
                 var checkExistsApproveBySettlementNo = acctApproveSettlementRepo.Get(x => x.SettlementNo == acctApprove.SettlementNo && x.IsDeputy == false).FirstOrDefault();
                 if (checkExistsApproveBySettlementNo == null) //Insert AcctApproveSettlement
@@ -1247,7 +1250,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //Lấy ra employeeId của managerIdOfUser
                     var employeeIdOfUserManager = GetEmployeeIdOfUser(userLeaderOrManager);
                     //Lấy ra email của Manager
-                    emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserManager).Email;
+                    emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserManager)?.Email;
                 }
                 else
                 {
@@ -1255,14 +1258,14 @@ namespace eFMS.API.Accounting.DL.Services
                     //Lấy ra employeeId của managerIdOfUser
                     var employeeIdOfUserLeader = GetEmployeeIdOfUser(userLeaderOrManager);
                     //Lấy ra email của Leader (hiện tại chưa có nên gán rỗng)
-                    emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserLeader).Email;
+                    emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserLeader)?.Email;
                 }
 
                 if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not Found Leader or Manager");
 
                 var sendMailResult = SendMailSuggestApproval(acctApprove.SettlementNo, userLeaderOrManager, emailLeaderOrManager);
 
-                return !sendMailResult ? new HandleState("Send Mail Suggest Approval Fail") : new HandleState();
+                return !sendMailResult ? new HandleState("Send mail suggest Approval Failed") : new HandleState();
             }
             catch (Exception ex)
             {
@@ -1287,13 +1290,16 @@ namespace eFMS.API.Accounting.DL.Services
             if (approve == null) return new HandleState("Not Found Settlement Approval by SettlementNo is " + settlement.SettlementNo);
 
             //Lấy ra brandId của user requester
-            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester).WorkPlaceId;
+            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester)?.WorkPlaceId;
+            if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
+
             //Lấy ra brandId của userId
-            var brandOfUserId = GetEmployeeByUserId(userCurrent).WorkPlaceId;
+            var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+            if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
 
             //Lấy ra dept code của userApprove dựa vào userApprove
-            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString()).Code;
-
+            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
+            if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
 
             //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
             var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
@@ -1308,7 +1314,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //Lấy email của Department Manager
                     userAprNext = GetManagerIdOfUser(userCurrent, brandOfUserId.ToString());
                     var userAprNextId = GetEmployeeIdOfUser(userAprNext);
-                    emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId).Email;
+                    emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
                 }
                 else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
@@ -1319,7 +1325,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //Lấy email của Accountant Manager
                     userAprNext = GetAccountantId(brandOfUserId.ToString());
                     var userAprNextId = GetEmployeeIdOfUser(userAprNext);
-                    emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId).Email;
+                    emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
                 }
                 else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
@@ -1351,7 +1357,7 @@ namespace eFMS.API.Accounting.DL.Services
                 //Send mail đề nghị approve
                 var sendMailResult = SendMailSuggestApproval(settlement.SettlementNo, userAprNext, emailUserAprNext);
 
-                return sendMailResult ? new HandleState() : new HandleState("Send Mail Suggest Approval Fail");
+                return sendMailResult ? new HandleState() : new HandleState("Send mail Suggest Approval Failed");
             }
         }
 
@@ -1368,12 +1374,16 @@ namespace eFMS.API.Accounting.DL.Services
             if (approve == null) return new HandleState("Not Found Approve Settlement by SettlementNo " + settlement.SettlementNo);
 
             //Lấy ra brandId của user requester
-            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester).WorkPlaceId;
+            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester)?.WorkPlaceId;
+            if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
+
             //Lấy ra brandId của userId
-            var brandOfUserId = GetEmployeeByUserId(userCurrent).WorkPlaceId;
+            var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+            if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
 
             //Lấy ra dept code của userApprove dựa vào userApprove
-            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString()).Code;
+            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
+            if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
 
             //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
             var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
@@ -1412,7 +1422,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Send mail denied approval
             var sendMailResult = SendMailDeniedApproval(settlement.SettlementNo, comment, DateTime.Now);
-            return sendMailResult ? new HandleState() : new HandleState("Send Mail Denie Approval Fail");
+            return sendMailResult ? new HandleState() : new HandleState("Send mail Deny Approval Failed");
         }
 
         public AcctApproveSettlementModel GetInfoApproveSettlementBySettlementNo(string settlementNo)
@@ -1428,11 +1438,11 @@ namespace eFMS.API.Accounting.DL.Services
                 //Kiểm tra User đăng nhập vào có thuộc các user Approve Settlement không, nếu không thuộc bất kỳ 1 user nào thì gán cờ IsApproved bằng true
                 //Kiểm tra xem dept đã approve chưa, nếu dept của user đó đã approve thì gán cờ IsApproved bằng true           
                 aprSettlementMap.IsApproved = CheckUserInApproveSettlementAndDeptApproved(userCurrent, aprSettlementMap);
-                aprSettlementMap.RequesterName = string.IsNullOrEmpty(aprSettlementMap.Requester) ? null : GetEmployeeByUserId(aprSettlementMap.Requester).EmployeeNameVn;
-                aprSettlementMap.LeaderName = string.IsNullOrEmpty(aprSettlementMap.Leader) ? null : GetEmployeeByUserId(aprSettlementMap.Leader).EmployeeNameVn;
-                aprSettlementMap.ManagerName = string.IsNullOrEmpty(aprSettlementMap.Manager) ? null : GetEmployeeByUserId(aprSettlementMap.Manager).EmployeeNameVn;
-                aprSettlementMap.AccountantName = string.IsNullOrEmpty(aprSettlementMap.Accountant) ? null : GetEmployeeByUserId(aprSettlementMap.Accountant).EmployeeNameVn;
-                aprSettlementMap.BUHeadName = string.IsNullOrEmpty(aprSettlementMap.Buhead) ? null : GetEmployeeByUserId(aprSettlementMap.Buhead).EmployeeNameVn;
+                aprSettlementMap.RequesterName = string.IsNullOrEmpty(aprSettlementMap.Requester) ? null : GetEmployeeByUserId(aprSettlementMap.Requester)?.EmployeeNameVn;
+                aprSettlementMap.LeaderName = string.IsNullOrEmpty(aprSettlementMap.Leader) ? null : GetEmployeeByUserId(aprSettlementMap.Leader)?.EmployeeNameVn;
+                aprSettlementMap.ManagerName = string.IsNullOrEmpty(aprSettlementMap.Manager) ? null : GetEmployeeByUserId(aprSettlementMap.Manager)?.EmployeeNameVn;
+                aprSettlementMap.AccountantName = string.IsNullOrEmpty(aprSettlementMap.Accountant) ? null : GetEmployeeByUserId(aprSettlementMap.Accountant)?.EmployeeNameVn;
+                aprSettlementMap.BUHeadName = string.IsNullOrEmpty(aprSettlementMap.Buhead) ? null : GetEmployeeByUserId(aprSettlementMap.Buhead)?.EmployeeNameVn;
             }
             else
             {
@@ -1685,10 +1695,10 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy ra groupId của User
-        private int GetGroupIdOfUser(string userId)
+        private int? GetGroupIdOfUser(string userId)
         {
             //Lấy ra groupId của user
-            var grpIdOfUser = sysUserGroupRepo.Get(x => x.UserId == userId).FirstOrDefault().GroupId;
+            var grpIdOfUser = sysUserGroupRepo.Get(x => x.UserId == userId).FirstOrDefault()?.GroupId;
             return grpIdOfUser;
         }
 
@@ -1704,7 +1714,7 @@ namespace eFMS.API.Accounting.DL.Services
         //BrandId = "27d26acb-e247-47b7-961e-afa7b3d7e11e"
         private CatDepartment GetInfoDeptOfUser(string userId, string idBranch)
         {
-            var deptIdOfUser = GetInfoGroupOfUser(userId).DepartmentId;
+            var deptIdOfUser = GetInfoGroupOfUser(userId)?.DepartmentId;
             var deptOfUser = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault();
             return deptOfUser;
         }
@@ -1713,7 +1723,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Leader đây chính là ManagerID của Group
         private string GetLeaderIdOfUser(string userId)
         {
-            var leaderIdOfUser = GetInfoGroupOfUser(userId).ManagerId;
+            var leaderIdOfUser = GetInfoGroupOfUser(userId)?.ManagerId;
             return leaderIdOfUser;
         }
 
@@ -1722,9 +1732,9 @@ namespace eFMS.API.Accounting.DL.Services
         private string GetManagerIdOfUser(string userId, string idBranch)
         {
             //Lấy ra deptId của User
-            var deptIdOfUser = GetInfoGroupOfUser(userId).DepartmentId;
+            var deptIdOfUser = GetInfoGroupOfUser(userId)?.DepartmentId;
             //Lấy ra mangerId của User
-            var managerIdOfUser = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault().ManagerId;
+            var managerIdOfUser = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault()?.ManagerId;
             return managerIdOfUser;
         }
 
@@ -1732,7 +1742,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetAccountantId(string idBranch)
         {
-            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == Constants.DEPT_CODE_ACCOUNTANT).FirstOrDefault().ManagerId;
+            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == Constants.DEPT_CODE_ACCOUNTANT).FirstOrDefault()?.ManagerId;
             return accountantManagerId;
         }
 
@@ -1740,14 +1750,14 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetBUHeadId(string idBranch)
         {
-            var buHeadId = sysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
+            var buHeadId = sysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault()?.ManagerId;
             return buHeadId;
         }
 
         //Lấy ra employeeId của User
         private string GetEmployeeIdOfUser(string UserId)
         {
-            return sysUserRepo.Get(x => x.Id == UserId).FirstOrDefault().EmployeeId;
+            return sysUserRepo.Get(x => x.Id == UserId).FirstOrDefault()?.EmployeeId;
         }
 
         //Lấy info Employee của User dựa vào employeeId
@@ -1800,9 +1810,12 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             //Lấy ra brandId của user requester
-            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester).WorkPlaceId;
+            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester)?.WorkPlaceId;
+            if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
+
             //Lấy ra brandId của userId
-            var brandOfUserId = GetEmployeeByUserId(userId).WorkPlaceId;
+            var brandOfUserId = GetEmployeeByUserId(userId)?.WorkPlaceId;
+            if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
 
             //Trường hợp không có Leader
             if (string.IsNullOrEmpty(acctApprove.Leader))
@@ -1813,7 +1826,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (GetInfoGroupOfUser(userId).DepartmentId != GetInfoGroupOfUser(settlement.Requester).DepartmentId)
+                    if (GetInfoGroupOfUser(userId)?.DepartmentId != GetInfoGroupOfUser(settlement.Requester)?.DepartmentId)
                     {
                         result = new HandleState("Not in the same department");
                     }
@@ -1874,7 +1887,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (GetInfoGroupOfUser(userId).DepartmentId != GetInfoGroupOfUser(settlement.Requester).DepartmentId)
+                    if (GetInfoGroupOfUser(userId)?.DepartmentId != GetInfoGroupOfUser(settlement.Requester)?.DepartmentId)
                     {
                         result = new HandleState("Not in the same department");
                     }
@@ -1908,7 +1921,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (GetInfoGroupOfUser(userId).DepartmentId != GetInfoGroupOfUser(settlement.Requester).DepartmentId)
+                    if (GetInfoGroupOfUser(userId)?.DepartmentId != GetInfoGroupOfUser(settlement.Requester)?.DepartmentId)
                     {
                         result = new HandleState("Not in the same department");
                     }
@@ -1981,18 +1994,12 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
-            var requesterName = GetEmployeeByEmployeeId(requesterId).EmployeeNameVn;
-            var emailRequester = GetEmployeeByEmployeeId(requesterId).Email;
+            var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameVn;
+            var emailRequester = GetEmployeeByEmployeeId(requesterId)?.Email;
 
             //Lấy ra thông tin JobId dựa vào SettlementNo
             var listJobId = GetJobIdBySettlementNo(settlementNo);
             string jobIds = string.Empty;
-            //foreach (var jobId in listJobId)
-            //{
-            //    jobIds += !string.IsNullOrEmpty(jobId) ? jobId + "; " : string.Empty;
-            //}
-            //jobIds += ")";
-            //jobIds = jobIds.Replace("; )", string.Empty).Replace(")", string.Empty);
             jobIds = String.Join("; ", listJobId.ToList());
 
             var totalAmount = surcharge
@@ -2047,9 +2054,9 @@ namespace eFMS.API.Accounting.DL.Services
             };
 
             //Lấy ra brandId của userId
-            var brandOfUserIReciver = GetEmployeeByUserId(userReciver).WorkPlaceId;
+            var brandOfUserIReciver = GetEmployeeByUserId(userReciver)?.WorkPlaceId;
             //Lấy ra email của các User được ủy quyền của group của User Approve
-            var deptCodeOfUserReciver = GetInfoDeptOfUser(userReciver, brandOfUserIReciver.ToString()).Code;
+            var deptCodeOfUserReciver = GetInfoDeptOfUser(userReciver, brandOfUserIReciver.ToString())?.Code;
             var usersDeputy = GetListUserDeputyByDept(deptCodeOfUserReciver);
             if (usersDeputy.Count > 0)
             {
@@ -2058,7 +2065,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //Lấy ra employeeId của user
                     var employeeIdOfUser = GetEmployeeIdOfUser(userId);
                     //Lấy ra email của user
-                    var emailUser = GetEmployeeByEmployeeId(employeeIdOfUser).Email;
+                    var emailUser = GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
                     emailCCs.Add(emailUser);
                 }
             }
@@ -2079,18 +2086,12 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
-            var requesterName = GetEmployeeByEmployeeId(requesterId).EmployeeNameVn;
-            var emailRequester = GetEmployeeByEmployeeId(requesterId).Email;
+            var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameVn;
+            var emailRequester = GetEmployeeByEmployeeId(requesterId)?.Email;
 
             //Lấy ra thông tin JobId dựa vào SettlementNo
             var listJobId = GetJobIdBySettlementNo(settlementNo);
             string jobIds = string.Empty;
-            //foreach (var jobId in listJobId)
-            //{
-            //    jobIds += !string.IsNullOrEmpty(jobId) ? jobId + "; " : string.Empty;
-            //}
-            //jobIds += ")";
-            //jobIds = jobIds.Replace("; )", string.Empty).Replace(")", string.Empty);
             jobIds = String.Join("; ", listJobId.ToList());
 
             var totalAmount = surcharge
@@ -2158,18 +2159,12 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
-            var requesterName = GetEmployeeByEmployeeId(requesterId).EmployeeNameVn;
-            var emailRequester = GetEmployeeByEmployeeId(requesterId).Email;
+            var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameVn;
+            var emailRequester = GetEmployeeByEmployeeId(requesterId)?.Email;
 
             //Lấy ra thông tin JobId dựa vào SettlementNo
             var listJobId = GetJobIdBySettlementNo(settlementNo);
             string jobIds = string.Empty;
-            //foreach (var jobId in listJobId)
-            //{
-            //    jobIds += !string.IsNullOrEmpty(jobId) ? jobId + "; " : string.Empty;
-            //}
-            //jobIds += ")";
-            //jobIds = jobIds.Replace("; )", string.Empty).Replace(")", string.Empty);
             jobIds = String.Join("; ", listJobId.ToList());
 
             var totalAmount = surcharge
