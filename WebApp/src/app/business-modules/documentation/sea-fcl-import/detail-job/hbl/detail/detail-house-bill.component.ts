@@ -5,7 +5,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
 import { CreateHouseBillComponent } from '../create/create-house-bill.component';
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
@@ -57,6 +57,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _store: Store<fromStore.ISeaFCLImportState>,
+        private _exportRepository: ExportRepo
     ) {
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
     }
@@ -278,7 +279,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         this.selectedTab = tabName;
     }
     onPreview(type: string) {
-        //Preview Delivery Order
+        // Preview Delivery Order
         if (type === 'DELIVERY_ORDER') {
             this._documentationRepo.previewDeliveryOrder(this.hblId)
                 .pipe(
@@ -297,7 +298,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 );
         }
 
-        //Preview Arrival Notice
+        // Preview Arrival Notice
         if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
             const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
             this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency })
@@ -316,7 +317,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 );
         }
 
-        //PREVIEW PROOF OF DELIVERY
+        // PREVIEW PROOF OF DELIVERY
         if (type === 'PROOF_OF_DELIVERY') {
             this._documentationRepo.previewProofofDelivery(this.hblId)
                 .pipe(
@@ -334,7 +335,41 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     },
                 );
         }
-
-
+        if (type === 'E_MANIFEST') {
+            this.exportEManifest();
+        }
+        if (type === 'GOODS_DECLARE') {
+            this.exportGoodsDeclare();
+        }
+        if (type === 'DANGEROUS_GOODS') {
+            this.exportDangerousGoods();
+        }
+    }
+    exportDangerousGoods() {
+        this._exportRepository.exportDangerousGoods(this.hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                },
+            );
+    }
+    exportGoodsDeclare() {
+        this._exportRepository.exportGoodDeclare(this.hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                },
+            );
+    }
+    exportEManifest() {
+        this._exportRepository.exportEManifest(this.hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
+                },
+            );
     }
 }
