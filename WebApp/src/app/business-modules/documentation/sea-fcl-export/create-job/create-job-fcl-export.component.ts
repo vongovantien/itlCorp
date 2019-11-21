@@ -12,4 +12,8 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     ngOnInit() { }
-};
+
+    onCreateJob() {
+
+    }
+}

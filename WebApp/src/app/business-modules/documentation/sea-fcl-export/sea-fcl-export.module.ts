@@ -15,6 +15,7 @@ import { effects, reducers } from './store';
 import { SeaFCLExportCreateJobComponent } from './create-job/create-job-fcl-export.component';
 import { TabsModule } from 'ngx-bootstrap';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { SeaFCLExportFormCreateComponent } from './components/form-create/form-create-fcl-export.component';
 
 const routing: Routes = [
     {
@@ -44,7 +45,8 @@ const LIB = [
 ];
 
 const COMPONENTS = [
-    SeaFCLExportFormSearchComponent
+    SeaFCLExportFormSearchComponent,
+    SeaFCLExportFormCreateComponent
 ];
 
 @NgModule({
