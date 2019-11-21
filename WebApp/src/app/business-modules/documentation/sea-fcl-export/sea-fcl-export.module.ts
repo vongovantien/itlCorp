@@ -4,10 +4,14 @@ import { SeaFCLExportComponent } from './sea-fcl-export.component';
 import { Routes, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { SeaFCLExportFormSearchComponent } from './components/form-search/form-search-sea-fcl-export.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { effects, reducers } from './store';
 
 const routing: Routes = [
     {
@@ -24,8 +28,8 @@ const LIB = [
 ];
 
 const COMPONENTS = [
-
-]
+    SeaFCLExportFormSearchComponent
+];
 
 @NgModule({
     imports: [
@@ -33,11 +37,15 @@ const COMPONENTS = [
         SharedModule,
         RouterModule.forChild(routing),
         FormsModule,
+        ReactiveFormsModule,
+        StoreModule.forFeature('seaFCLExport', reducers),
+        EffectsModule.forFeature(effects),
         ...LIB
     ],
     exports: [],
     declarations: [
-        SeaFCLExportComponent
+        SeaFCLExportComponent,
+        ...COMPONENTS
     ],
     providers: [],
     bootstrap: [

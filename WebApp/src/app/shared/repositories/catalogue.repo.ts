@@ -87,8 +87,8 @@ export class CatalogueRepo {
         }
 
     }
-    getPartnersByType(type) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetBy`, { partnerGroup: type }).pipe(
+    getPartnersByType(type, active: boolean = true) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetBy`, { partnerGroup: type, active: active }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;

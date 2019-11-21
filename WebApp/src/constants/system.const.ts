@@ -73,6 +73,7 @@ export class SystemConstants {
         CHARGE: 'efms:charge',
         UNIT: 'efms:unit',
         CUSTOMER: 'efms:customer',
+        CONSIGNEE: 'efms:consignee',
         PORT: 'efms:port',
         AGENT: 'efms:agent',
         SUPPLIER: 'efms:supplier',
@@ -85,6 +86,7 @@ export class SystemConstants {
         SHIPPER: 'efms:shipper',
         SHIPMENT_COMMON_DATA: 'efms:shipment-common-data',
         OPS_COMMON_DATA: 'efms:ops-common-data',
+        SALE: 'efms:sale'
 
     };
 
