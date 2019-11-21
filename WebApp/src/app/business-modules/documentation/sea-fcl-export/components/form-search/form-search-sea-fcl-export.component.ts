@@ -122,13 +122,8 @@ export class SeaFCLExportFormSearchComponent extends AppForm {
     }
 
     getCustomer() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CUSTOMER)) {
-            this.customers = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CUSTOMER);
-        } else {
-            this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
 
-            this._dataService.setDataService(SystemConstants.CSTORAGE.CUSTOMER, this.customers);
-        }
     }
 
     getSaleMan() {

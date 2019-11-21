@@ -1,7 +1,6 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-            routerLink="/home/documentation/sea-fcl-export-create">
+        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="['new']">
             <span>
                 <i class="la la-plus"></i>
                 <span>
@@ -49,7 +48,8 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a class="text-underline pointer">{{shipment.jobNo}}</a>
+                                    <a class="text-underline pointer"
+                                        [routerLink]="[shipment.id]">{{shipment.jobNo}}</a>
                                 </td>
                                 <td>{{shipment.mawb}}</td>
                                 <td>{{shipment.etd | date: 'dd/MM/yyyy'}}</td>

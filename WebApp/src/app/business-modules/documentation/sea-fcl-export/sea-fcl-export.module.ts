@@ -12,19 +12,35 @@ import { SeaFCLExportFormSearchComponent } from './components/form-search/form-s
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { effects, reducers } from './store';
+import { SeaFCLExportCreateJobComponent } from './create-job/create-job-fcl-export.component';
+import { TabsModule } from 'ngx-bootstrap';
+import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 
 const routing: Routes = [
     {
-        path: '', pathMatch: 'full', component: SeaFCLExportComponent,
-        data: { name: "Sea FCL Export", path: "sea-fcl-export", level: 2 }
+        path: '', pathMatch: 'full', component: SeaFCLExportComponent, data: {
+            name: "Sea FCL Export", path: "sea-fcl-export", level: 2
+        },
     },
+    {
+        path: 'new', component: SeaFCLExportCreateJobComponent, data: {
+            name: "Create New Job", path: "sea-fcl-export", level: 3
+        }
+    },
+    {
+        path: ':id', component: SeaFCLExportComponent, data: {
+            name: "Sea FCL Export", path: "sea-fcl-export", level: 3
+        }
+    }
 
 ];
 
 const LIB = [
     SelectModule,
     NgxDaterangepickerMd.forRoot(),
-    PerfectScrollbarModule
+    PerfectScrollbarModule,
+    TabsModule.forRoot(),
+
 ];
 
 const COMPONENTS = [
@@ -34,10 +50,11 @@ const COMPONENTS = [
 @NgModule({
     imports: [
         CommonModule,
-        SharedModule,
         RouterModule.forChild(routing),
         FormsModule,
         ReactiveFormsModule,
+        SharedModule,
+        ShareBussinessModule,
         StoreModule.forFeature('seaFCLExport', reducers),
         EffectsModule.forFeature(effects),
         ...LIB
@@ -45,6 +62,7 @@ const COMPONENTS = [
     exports: [],
     declarations: [
         SeaFCLExportComponent,
+        SeaFCLExportCreateJobComponent,
         ...COMPONENTS
     ],
     providers: [],

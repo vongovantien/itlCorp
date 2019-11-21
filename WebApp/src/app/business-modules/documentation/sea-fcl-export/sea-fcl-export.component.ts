@@ -20,7 +20,6 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
     selector: 'app-sea-fcl-export',
     templateUrl: './sea-fcl-export.component.html',
-    styleUrls: ['./sea-fcl-export.component.scss']
 })
 export class SeaFCLExportComponent extends AppList {
 
