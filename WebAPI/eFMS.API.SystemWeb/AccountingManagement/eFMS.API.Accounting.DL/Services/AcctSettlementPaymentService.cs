@@ -1509,13 +1509,43 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (var charge in criteria.charges)
                 {
                     var chargeCopy = new ShipmentChargeSettlement();
-                    chargeCopy = charge;
                     chargeCopy.Id = Guid.Empty;
                     chargeCopy.JobId = shipment.JobId;
                     chargeCopy.HBL = shipment.HBL;
                     chargeCopy.MBL = shipment.MBL;
+                    chargeCopy.ChargeCode = charge.ChargeCode;
                     chargeCopy.Hblid = shipment.HBLID;//Lấy HBLID của shipment gán cho surcharge
+                    chargeCopy.Type = charge.Type;
+                    chargeCopy.ChargeId = charge.ChargeId;
+                    chargeCopy.ChargeName = charge.ChargeName;
+                    chargeCopy.Quantity = charge.Quantity;
+                    chargeCopy.UnitId = charge.UnitId;
+                    chargeCopy.UnitName = charge.UnitName;
+                    chargeCopy.UnitPrice = charge.UnitPrice;
+                    chargeCopy.CurrencyId = charge.CurrencyId;
+                    chargeCopy.Vatrate = charge.Vatrate;
+                    chargeCopy.Total = charge.Total;
+                    chargeCopy.PayerId = charge.PayerId;
+                    chargeCopy.Payer = charge.Payer;
+                    chargeCopy.ObjectBePaid = charge.ObjectBePaid;
+                    chargeCopy.PaymentObjectId = charge.PaymentObjectId;
+                    chargeCopy.OBHPartnerName = charge.OBHPartnerName;
+                    chargeCopy.Notes = charge.Notes;
                     chargeCopy.SettlementCode = null;
+                    chargeCopy.InvoiceNo = charge.InvoiceNo;
+                    chargeCopy.InvoiceDate = charge.InvoiceDate;
+                    chargeCopy.SeriesNo = charge.SeriesNo;
+                    chargeCopy.PaymentRequestType = charge.PaymentRequestType;
+                    chargeCopy.ClearanceNo = charge.ClearanceNo;
+                    chargeCopy.ContNo = charge.ContNo;
+                    chargeCopy.Soaclosed = charge.Soaclosed;
+                    chargeCopy.Cdclosed = charge.Cdclosed;
+                    chargeCopy.CreditNo = charge.CreditNo;
+                    chargeCopy.DebitNo = charge.DebitNo;
+                    chargeCopy.Soano = charge.Soano;
+                    chargeCopy.IsFromShipment = charge.IsFromShipment;
+                    chargeCopy.PaySoano = charge.PaySoano;
+                    chargeCopy.TypeOfFee = charge.TypeOfFee;
 
                     chargesCopy.Add(chargeCopy);
                 }
