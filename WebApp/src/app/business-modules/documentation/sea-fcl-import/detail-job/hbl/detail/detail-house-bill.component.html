@@ -22,12 +22,18 @@
                             <span class="caret"></span>
                         </a>
                         <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">
-                            <li role="menuitem"><a class="dropdown-item" (click)="onPreview('ARRIVAL_ORIGINAL')">Arrival Notice (Original Currency)</a></li>
-                            <li role="menuitem"><a class="dropdown-item" (click)="onPreview('ARRIVAL_VND')">Arrival Notice (VND)</a></li>
+                            <li role="menuitem"><a class="dropdown-item" (click)="onPreview('ARRIVAL_ORIGINAL')">Arrival
+                                    Notice (Original Currency)</a></li>
+                            <li role="menuitem"><a class="dropdown-item" (click)="onPreview('ARRIVAL_VND')">Arrival
+                                    Notice (VND)</a></li>
                         </ul>
                     </li>
-                    <li role="menuitem"><a class="dropdown-item" (click)="onPreview('DELIVERY_ORDER')">Delivery Order</a></li>
-                    <li role="menuitem"><a class="dropdown-item" (click)="onPreview('PROOF_OF_DELIVERY')">Proof of Delivery</a></li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="onPreview('DELIVERY_ORDER')">Delivery
+                            Order</a></li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="onPreview('PROOF_OF_DELIVERY')">Proof of
+                            Delivery</a></li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="onPreview('MANIFEST')">Manifest</a>
+                    </li>
                 </ul>
             </div>
             <app-default-button (click)="onUpdateHblDetail()" [buttonSetting]="saveButtonSetting"></app-default-button>

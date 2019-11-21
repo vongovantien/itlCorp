@@ -321,11 +321,15 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                 {
                     var resultPartner = catPartnerRepo.Get(x => x.Id == detail.CustomerId).FirstOrDefault();
                     var resultNoti = catPartnerRepo.Get(x => x.Id == detail.NotifyPartyId).FirstOrDefault();
-                    var resultSaleman = sysUserRepo.Get(x => x.Id.ToString() == detail.SaleManId).FirstOrDefault();
+                    var resultSaleman = sysUserRepo.Get(x => x.Id == detail.SaleManId).FirstOrDefault();
+                    var pol = catPlaceRepo.Get(x => x.Id == detail.Pol).FirstOrDefault();
+                    var pod = catPlaceRepo.Get(x => x.Id == detail.Pod).FirstOrDefault();
                     detail.CustomerName = resultPartner?.PartnerNameEn;
                     detail.CustomerNameVn = resultPartner?.PartnerNameVn;
-                    detail.SaleManId = resultSaleman?.Id.ToString();
+                    detail.SaleManId = resultSaleman?.Id;
                     detail.NotifyParty = resultNoti?.PartnerNameEn;
+                    detail.POLName = pol?.NameEn;
+                    detail.PODName = pod?.NameEn;
                     return detail;
             }
         }

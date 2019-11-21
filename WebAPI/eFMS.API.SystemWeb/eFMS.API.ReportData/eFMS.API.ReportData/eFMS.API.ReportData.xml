@@ -7,6 +7,11 @@
         <member name="T:eFMS.API.ReportData.Consts.ResourceConsts">
             <summary>Supports all classes in the .NET Framework class hierarchy and provides low-level services to derived classes. This is the ultimate base class of all classes in the .NET Framework; it is the root of the type hierarchy.</summary>
         </member>
+        <member name="T:eFMS.API.ReportData.Controllers.AccountingReportController">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             Contructor controller Accounting Report
@@ -26,6 +31,17 @@
             </summary>
             <param name="settlementPaymentCriteria"></param>
             <returns></returns>
+        </member>
+        <member name="T:eFMS.API.ReportData.Controllers.DocumentationController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
+            <summary>
+            Contructor controller Accounting Report
+            </summary>
+            <param name="appSettings"></param>
         </member>
         <member name="T:eFMS.API.ReportData.Controllers.ReportDataController">
             <summary>
