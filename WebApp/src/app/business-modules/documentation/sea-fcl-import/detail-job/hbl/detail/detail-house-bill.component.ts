@@ -7,7 +7,7 @@ import moment from 'moment/moment';
 
 import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
 import { CreateHouseBillComponent } from '../create/create-house-bill.component';
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { SeaFClImportArrivalNoteComponent } from '../components/arrival-note/arrival-note.component';
@@ -57,6 +57,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _store: Store<fromStore.ISeaFCLImportState>,
+        private _exportRepository: ExportRepo
     ) {
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
     }
@@ -334,7 +335,41 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     },
                 );
         }
-
-
+        if (type === 'E_MANIFEST') {
+            this.exportEManifest();
+        }
+        if (type === 'GOODS_DECLARE') {
+            this.exportGoodsDeclare();
+        }
+        if (type === 'DANGEROUS_GOODS') {
+            this.exportDangerousGoods();
+        }
+    }
+    exportDangerousGoods() {
+        this._exportRepository.exportDangerousGoods(this.hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                },
+            );
+    }
+    exportGoodsDeclare() {
+        this._exportRepository.exportGoodDeclare(this.hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                },
+            );
+    }
+    exportEManifest() {
+        this._exportRepository.exportEManifest(this.hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
+                },
+            );
     }
 }
