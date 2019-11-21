@@ -286,10 +286,10 @@ namespace eFMS.API.Documentation.Controllers
                 {
                     var hs = dataSearch[i].listCharges.Remove(charge[j]);
                 }
-                if (dataTmp[i].listCharges.Count() == 0)
-                {
-                    var hs = dataSearch.Remove(dataTmp[i]);
-                }
+                //if (dataTmp[i].listCharges.Count() == 0)
+                //{
+                //    var hs = dataSearch.Remove(dataTmp[i]);
+                //}
             }
 
             return dataSearch;

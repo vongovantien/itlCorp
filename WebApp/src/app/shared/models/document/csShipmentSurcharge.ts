@@ -63,6 +63,7 @@ export class CsShipmentSurcharge {
 
     isRemaining: boolean = null;
     isSelected: boolean = null;
+    isDeleted: boolean = null;
     voucherId: string = null;
     voucherIddate: string = null;
     voucherIdre: string = null;
