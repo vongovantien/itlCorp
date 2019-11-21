@@ -15,6 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 import * as fromStore from './../store';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
@@ -29,7 +30,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
-
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    
     id: string;
     selectedTab: TAB | string = 'SHIPMENT';
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
@@ -37,6 +39,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     fclImportDetail: any; // TODO Model.
     containers: Container[] = [];
     action: any = {};
+
+    dataReport: any = null;
 
     constructor(
         protected _router: Router,
@@ -287,5 +291,19 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     gotoList() {
         this._router.navigate(["home/documentation/sea-fcl-import"]);
+    }
+
+    previewPLsheet(currency: string){
+        this._documenRepo.previewSIFPLsheet(this.id, currency)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.previewPopup.frm.nativeElement.submit();
+                        this.previewPopup.show();
+                    }, 1000);
+                },
+            );
     }
 }

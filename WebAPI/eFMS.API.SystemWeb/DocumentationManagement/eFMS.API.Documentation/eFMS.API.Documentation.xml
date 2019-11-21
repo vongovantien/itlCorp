@@ -386,6 +386,14 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.PreviewSIFPLsheet(System.Guid,System.String)">
+            <summary>
+            Preview PLsheet of Sea FCL Import
+            </summary>
+            <param name="jobId"></param>
+            <param name="currency"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.ReviewProofOfDelivery(System.Guid)">
             <summary>
             preview proof
