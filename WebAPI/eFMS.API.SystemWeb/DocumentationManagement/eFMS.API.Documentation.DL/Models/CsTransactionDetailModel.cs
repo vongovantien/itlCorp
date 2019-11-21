@@ -11,6 +11,8 @@ namespace eFMS.API.Documentation.DL.Models
         public List<CsMawbcontainerModel> CsMawbcontainers { get; set; }
         public string CustomerName { get; set; }
         public string SaleManName { get; set; }
+        public string ShipperName { get; set; }
+        public string ConsigneeName { get; set; }
         public string CustomerNameVn { get; set; }
         public string SaleManNameVn { get; set; }
         public string ForwardingAgentName { get; set; }

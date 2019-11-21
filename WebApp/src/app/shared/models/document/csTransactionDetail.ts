@@ -95,6 +95,9 @@ export class CsTransactionDetail {
   pono: string = '';
   typeOfService: string = '';
   notes: string = '';
+  shipperName: string = '';
+  consigneeName: string = '';
+
   constructor(object?: any) {
     const self = this;
     for (const key in object) {

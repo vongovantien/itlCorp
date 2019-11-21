@@ -117,21 +117,20 @@ export class SeaFCLImportManagementComponent extends AppList {
         if (this.tmpIndex == index) {
             this.housebills = this.tmpHouseBills;
         } else {
-        this._progressRef.start();
-        this._documentationRepo.getListHouseBillOfJob({ jobId: jobId })
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { 
-                    this._progressRef.complete(); 
-                 })
-            ).subscribe(
-                (res: CsTransactionDetail[]) => {
-                    this.housebills = (res || []).map((item: CsTransactionDetail) => new CsTransactionDetail(item));
-                    console.log(this.housebills);
-                    this.tmpHouseBills = this.housebills;
-                    this.tmpIndex = index;
-                },
-            );
+            this._progressRef.start();
+            this._documentationRepo.getListHouseBillOfJob({ jobId: jobId })
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => {
+                        this._progressRef.complete();
+                    })
+                ).subscribe(
+                    (res: CsTransactionDetail[]) => {
+                        this.housebills = (res || []).map((item: CsTransactionDetail) => new CsTransactionDetail(item));
+                        this.tmpHouseBills = this.housebills;
+                        this.tmpIndex = index;
+                    },
+                );
         }
     }
 
