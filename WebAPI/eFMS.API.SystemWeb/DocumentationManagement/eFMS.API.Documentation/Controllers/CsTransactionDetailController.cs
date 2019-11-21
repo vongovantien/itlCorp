@@ -57,8 +57,7 @@ namespace eFMS.API.Documentation.Controllers
             if(resultMaw.Count() > 0) {
                 hbl.CsMawbcontainers = resultMaw;
             }
-            ResultHandle hs = new ResultHandle { Data = hbl , Status = true };
-            return Ok(hs);
+            return Ok(hbl);
         }
 
         [HttpGet]

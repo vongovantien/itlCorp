@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.NoSql;
@@ -15,7 +11,6 @@ using eFMS.API.Accounting.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
@@ -128,7 +123,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            if(model.AdvanceRequests.Count > 0)
+            if (model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
                 if (model.PaymentMethod.Equals(Constants.PAYMENT_METHOD_CASH))
@@ -330,7 +325,7 @@ namespace eFMS.API.Accounting.Controllers
         [Route("SaveAndSendRequest")]
         public IActionResult SaveAndSendRequest(AcctAdvancePaymentModel model)
         {
-            if (!ModelState.IsValid) return BadRequest();           
+            if (!ModelState.IsValid) return BadRequest();
 
             if (model.AdvanceRequests.Count > 0)
             {
@@ -362,7 +357,7 @@ namespace eFMS.API.Accounting.Controllers
                 //        return BadRequest(_result);
                 //    }
                 //}
-            }           
+            }
 
             HandleState hs;
             if (string.IsNullOrEmpty(model.AdvanceNo))//Insert Advance Payment
@@ -401,7 +396,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return Ok(result);
             }
-            return Ok(result);           
+            return Ok(result);
         }
 
         /// <summary>
@@ -440,11 +435,11 @@ namespace eFMS.API.Accounting.Controllers
             ResultHandle _result;
             if (!denieApproval.Success)
             {
-                _result  = new ResultHandle { Status = denieApproval.Success, Message = denieApproval.Exception.Message };
+                _result = new ResultHandle { Status = denieApproval.Success, Message = denieApproval.Exception.Message };
             }
             else
             {
-                _result = new ResultHandle { Status = denieApproval.Success };               
+                _result = new ResultHandle { Status = denieApproval.Success };
             }
             return Ok(_result);
         }

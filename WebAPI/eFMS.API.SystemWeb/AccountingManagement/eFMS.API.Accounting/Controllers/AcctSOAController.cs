@@ -42,17 +42,6 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
-        /// get the list of SOA
-        /// </summary>
-        /// <returns></returns>
-        /*[HttpGet]
-        public IActionResult Get()
-        {
-            var results = acctSOAService.Get();
-            return Ok(results);
-        }*/
-
-        /// <summary>
         /// add new SOA
         /// </summary>
         /// <param name="model">object to add</param>
@@ -165,17 +154,6 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
-        /// get list services
-        /// </summary>
-        /// <returns></returns>
-        /*[HttpGet("GetListServices")]
-        public IActionResult GetListServices()
-        {
-            var results = acctSOAService.GetListServices();
-            return Ok(results);
-        }*/
-
-        /// <summary>
         /// get list status of soa
         /// </summary>
         /// <returns></returns>
@@ -196,7 +174,7 @@ namespace eFMS.API.Accounting.Controllers
         public ActionResult GetShipmentsAndCDdNotesNotExistInResultFilter(MoreChargeShipmentCriteria criteria)
         {
             var data = acctSOAService.GetListMoreCharge(criteria);//acctSOAService.GetListMoreChargeByCondition(criteria);
-            
+
             //Danh sách shipment
             var listShipment = data
                 .GroupBy(x => new { x.JobId, x.HBL, x.MBL })
@@ -206,7 +184,7 @@ namespace eFMS.API.Accounting.Controllers
                     HBL = x.Key.HBL,
                     MBL = x.Key.MBL
                 }).ToList();
-            
+
             //Danh sách CreditDebitNote
             var listCdNote = data
                 .Where(x => x.CreditDebitNo != null)
@@ -232,7 +210,7 @@ namespace eFMS.API.Accounting.Controllers
         [Route("GetListMoreChargeByCondition")]
         public IActionResult GetListMoreChargeByCondition(MoreChargeShipmentCriteria criteria)
         {
-            var data = acctSOAService.GetListMoreCharge(criteria);//acctSOAService.GetListMoreChargeByCondition(criteria);
+            var data = acctSOAService.GetListMoreCharge(criteria);
             return Ok(data);
         }
 
@@ -258,7 +236,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpGet("GetDataExportSOABySOANo")]
         public IActionResult GetDataExportSOABySOANo(string soaNo, string currencyLocal)
         {
-            if(string.IsNullOrEmpty(currencyLocal))
+            if (string.IsNullOrEmpty(currencyLocal))
                 currencyLocal = Constants.CURRENCY_LOCAL;
             var data = acctSOAService.GetDataExportSOABySOANo(soaNo, currencyLocal);
             return Ok(data);
@@ -279,13 +257,6 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        /*[HttpGet("GetChargeShipmentDocAndOperation")]
-        public IActionResult GetChargeShipmentDocAndOperation()
-        {
-            var data = acctSOAService.GetChargeShipmentDocAndOperation();
-            return Ok(data);
-        }*/
-
         /// <summary>
         /// Get list charge shipment by conditions
         /// </summary>
@@ -299,6 +270,6 @@ namespace eFMS.API.Accounting.Controllers
             var data = acctSOAService.GetListChargeShipment(criteria);
             return data;
         }
-        
+
     }
 }

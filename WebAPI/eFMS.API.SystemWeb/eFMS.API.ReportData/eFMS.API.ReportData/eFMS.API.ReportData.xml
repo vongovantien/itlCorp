@@ -7,6 +7,11 @@
         <member name="T:eFMS.API.ReportData.Consts.ResourceConsts">
             <summary>Supports all classes in the .NET Framework class hierarchy and provides low-level services to derived classes. This is the ultimate base class of all classes in the .NET Framework; it is the root of the type hierarchy.</summary>
         </member>
+        <member name="T:eFMS.API.ReportData.Controllers.AccountingReportController">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             Contructor controller Accounting Report
@@ -25,6 +30,38 @@
             Export Settlement Payment
             </summary>
             <param name="settlementPaymentCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.ReportData.Controllers.DocumentationController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
+            <summary>
+            Contructor controller Accounting Report
+            </summary>
+            <param name="appSettings"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportEManifest(System.Guid)">
+            <summary>
+            Export E-Manifest of a housebill
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportGoodsDeclare(System.String)">
+            <summary>
+            Export goods declare by house bill id
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportDangerousGoods(System.String)">
+            <summary>
+            export dangerous goods
+            </summary>
+            <param name="hblid"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Controllers.ReportDataController">
