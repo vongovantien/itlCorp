@@ -2,24 +2,24 @@ import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
+import moment from 'moment/moment';
 
 import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
 import { CreateHouseBillComponent } from '../create/create-house-bill.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
-import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { SeaFClImportArrivalNoteComponent } from '../components/arrival-note/arrival-note.component';
-
-import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
-
-import * as fromStore from './../../../store';
-import moment from 'moment/moment';
 import { SeaFClImportDeliveryOrderComponent } from '../components/delivery-order/delivery-order.component';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
+import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
+
+import * as fromStore from './../../../store';
+import * as fromShareBussiness from './../../../../../share-business/store';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -36,7 +36,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
-    @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
+    @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(SeaFClImportArrivalNoteComponent, { static: false }) arrivalNoteComponent: SeaFClImportArrivalNoteComponent;
     @ViewChild(SeaFClImportDeliveryOrderComponent, { static: false }) deliveryComponent: SeaFClImportDeliveryOrderComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
@@ -78,7 +78,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     }
 
     getListContainer() {
-        this._store.select<any>(fromStore.getContainerSaveState)
+        this._store.select<any>(fromShareBussiness.getContainerSaveState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
             )
@@ -262,10 +262,10 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     }
 
                     // * Dispatch to save containers.
-                    this._store.dispatch(new fromStore.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
+                    this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
 
                     // * Dispatch to get container's shipment.
-                    this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.jobId }));
+                    this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
 
                     // * Get container to update model
                     this.getListContainer();
@@ -278,7 +278,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         this.selectedTab = tabName;
     }
     onPreview(type: string) {
-        //Preview Delivery Order
+        // Preview Delivery Order
         if (type === 'DELIVERY_ORDER') {
             this._documentationRepo.previewDeliveryOrder(this.hblId)
                 .pipe(
@@ -297,7 +297,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 );
         }
 
-        //Preview Arrival Notice
+        // Preview Arrival Notice
         if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
             const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
             this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency })
@@ -316,7 +316,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 );
         }
 
-        //PREVIEW PROOF OF DELIVERY
+        // PREVIEW PROOF OF DELIVERY
         if (type === 'PROOF_OF_DELIVERY') {
             this._documentationRepo.previewProofofDelivery(this.hblId)
                 .pipe(

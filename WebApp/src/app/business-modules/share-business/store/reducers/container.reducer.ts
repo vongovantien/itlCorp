@@ -4,14 +4,13 @@ import { ContainerActionTypes, ContainerAction } from "../actions/container.acti
 
 export interface IContainerState {
     containers: Container[];
-    isSave?: boolean;
 }
 
-export const initialState: IContainerState = {
+export const initialContainerState: IContainerState = {
     containers: new Array<Container>()
 };
 
-export function ContainerReducer(state = initialState, action: ContainerAction): IContainerState {
+export function ContainerReducer(state = initialContainerState, action: ContainerAction): IContainerState {
     switch (action.type) {
         case ContainerActionTypes.INIT_CONTAINER: {
             return {

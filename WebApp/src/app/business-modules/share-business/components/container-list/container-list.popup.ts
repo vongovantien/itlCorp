@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { PopupBase } from 'src/app/popup.base';
@@ -9,21 +9,23 @@ import { Unit } from 'src/app/shared/models';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
-import * as fromStore from './../../../store';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { DataService, SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
-import { ShareContainerImportComponent } from 'src/app/business-modules/share-business';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+
+import * as fromStore from '../../store';
+import { ShareContainerImportComponent } from '..';
 
 
 @Component({
     selector: 'container-list-popup',
     templateUrl: './container-list.popup.html',
 })
-export class SeaFCLImportContainerListPopupComponent extends PopupBase {
+export class ShareBussinessContainerListPopupComponent extends PopupBase implements OnInit {
 
     @ViewChild(ShareContainerImportComponent, { static: false }) containerImportPopup: ShareContainerImportComponent;
+
 
     mblid: string = null;
     hblid: string = null;
