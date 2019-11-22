@@ -18,6 +18,7 @@ export class ImportHouseBillDetailComponent extends PopupBase {
     selected = -1;
     selectedHbl: any = {};
     isCheckHbl: boolean = false;
+    pageChecked: number = 0;
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -78,11 +79,21 @@ export class ImportHouseBillDetailComponent extends PopupBase {
         );
     }
 
+    onSelected(index: number) {
+        this.selected = index;
+        this.pageChecked = this.page;
+
+    }
+
     onImportHbl() {
         if (this.selected === -1) {
             this.isCheckHbl = false;
             return;
         } else {
+            if (this.pageChecked !== this.page) {
+                return;
+            }
+
             this.isCheckHbl = true;
             this.selectedHbl = this.houseBill[this.selected];
             this.onImport.emit(this.selectedHbl);

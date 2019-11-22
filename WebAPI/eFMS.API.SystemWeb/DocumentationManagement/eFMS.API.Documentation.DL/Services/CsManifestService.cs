@@ -60,7 +60,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         item.DatetimeModified = DateTime.Now;
                         item.UserModified = manifest.UserCreated;
-                        var tranDetail = mapper.Map<CsTransactionDetailAddManifest>(item);
+                        var tranDetail = mapper.Map<CsTransactionDetail>(item);
                         transactionDetailRepository.Update(tranDetail, x => x.Id == tranDetail.Id);
                     }
                     transactionDetailRepository.SubmitChanges();
