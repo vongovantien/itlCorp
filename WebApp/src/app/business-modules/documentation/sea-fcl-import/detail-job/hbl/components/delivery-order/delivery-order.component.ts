@@ -47,7 +47,7 @@ export class SeaFClImportDeliveryOrderComponent extends AppForm {
                 catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
                 switchMap((hblDetail: any) => {
-                    return this._documentRepo.getDeliveryOrder(hblDetail.data.id || SystemConstants.EMPTY_GUID, CommonEnum.TransactionTypeEnum.SeaFCLImport);
+                    return this._documentRepo.getDeliveryOrder(hblDetail.id || SystemConstants.EMPTY_GUID, CommonEnum.TransactionTypeEnum.SeaFCLImport);
 
                 }) // * Get deliveryOrder info.
             )
