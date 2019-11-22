@@ -4,7 +4,6 @@ import { ModalModule, BsDropdownModule, PaginationModule, TooltipModule } from '
 import { FormsModule } from '@angular/forms';
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
-import { ShareBussinessBuyingChargeComponent } from './components';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { NgxCurrencyModule } from 'ngx-currency';
 import { ShareContainerImportComponent } from './components/container-import/container-import.component';
@@ -15,13 +14,18 @@ import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { ShareBussinessSellingChargeComponent } from './components/selling-charge/selling-charge.component';
 import { ShareBussinessOBHChargeComponent } from './components/obh-charge/obh-charge.component';
 import { ShareBussinessProfitSummaryComponent } from './components/profit-summary/profit-summary.component';
+import { ShareBussinessBuyingChargeComponent } from '.';
+import { ShareBussinessShipmentGoodSummaryComponent } from './components/shipment-good-summary/shipment-good-summary.component';
+import { ShareBussinessContainerListPopupComponent } from './components/container-list/container-list.popup';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
     ShareBussinessSellingChargeComponent,
     ShareBussinessOBHChargeComponent,
     ShareContainerImportComponent,
-    ShareBussinessProfitSummaryComponent
+    ShareBussinessProfitSummaryComponent,
+    ShareBussinessShipmentGoodSummaryComponent,
+    ShareBussinessContainerListPopupComponent
 ];
 
 const customCurrencyMaskConfig = {

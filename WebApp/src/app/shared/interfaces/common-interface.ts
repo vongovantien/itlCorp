@@ -28,6 +28,13 @@ namespace CommonInterface {
         status: boolean;
     }
 
+    export interface IResponsePaging {
+        data: any;
+        page: number;
+        size: number;
+        totalItems: number;
+    }
+
     export interface ICommonTitleValue {
         title: string;
         value: any;
@@ -55,6 +62,17 @@ namespace CommonInterface {
         sortField: string;
         order: boolean;
     }
+
+    export interface INg2Select {
+        id: string;
+        text: string;
+    }
+
+    export interface IComboGridDisplayField {
+        field: string;
+        label: string;
+    }
+
 }
 
 

@@ -1,26 +1,27 @@
 import { Component, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
-import { SeaFCLImportContainerListPopupComponent } from '../popup/container-list/container-list.popup';
-
-import * as fromStore from './../../store/index';
+import { Params } from '@angular/router';
 import { ActionsSubject, Store } from '@ngrx/store';
+
+import { AppForm } from 'src/app/app.form';
 import { Container } from 'src/app/shared/models/document/container.model';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { getParamsRouterState } from 'src/app/store';
 
 import _uniqBy from 'lodash/uniqBy';
 import _groupBy from 'lodash/groupBy';
 import { takeUntil } from 'rxjs/operators';
-import { Params } from '@angular/router';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { getParamsRouterState } from 'src/app/store';
+
+import * as fromStore from './../../store';
+import { ShareBussinessContainerListPopupComponent } from '../container-list/container-list.popup';
 
 
 @Component({
     selector: 'shipment-good-summary',
     templateUrl: './shipment-good-summary.component.html',
 })
-export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
+export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
 
-    @ViewChild(SeaFCLImportContainerListPopupComponent, { static: false }) containerPopup: SeaFCLImportContainerListPopupComponent;
+    @ViewChild(ShareBussinessContainerListPopupComponent, { static: false }) containerPopup: ShareBussinessContainerListPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmRefresh: ConfirmPopupComponent;
 
     mblid: string = null;
@@ -88,13 +89,13 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (this.description != null) {
+        if (!this.description) {
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
 
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
 
-        if (this.commodities != null) {
+        if (!this.commodities) {
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
                 .reduce((acc: string, curr: any) => acc += curr + "\n", '');
@@ -160,4 +161,5 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
         this.commodities = '';
         this.updateData(this.containers);
     }
+
 }

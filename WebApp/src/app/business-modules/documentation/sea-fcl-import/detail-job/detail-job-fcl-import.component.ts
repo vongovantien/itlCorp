@@ -1,21 +1,21 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
-
 import { Router, ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
 
 import { SeaFCLImportCreateJobComponent } from '../create-job/create-job-fcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SeaFClImportFormCreateComponent } from '../components/form-create/form-create-sea-fcl-import.component';
 import { Container } from 'src/app/shared/models/document/container.model';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 import { combineLatest, of } from 'rxjs';
 import { map, tap, switchMap, skip, catchError, takeUntil, finalize } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
 
 import * as fromStore from './../store';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { NgProgress } from '@ngx-progressbar/core';
-
+import * as fromShareBussiness from './../../../share-business/store';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -29,7 +29,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
-
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    
     id: string;
     selectedTab: TAB | string = 'SHIPMENT';
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
@@ -37,6 +38,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     fclImportDetail: any; // TODO Model.
     containers: Container[] = [];
     action: any = {};
+
+    dataReport: any = null;
 
     constructor(
         protected _router: Router,
@@ -78,7 +81,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             (jobId: string) => {
                 this.id = jobId;
                 this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(jobId));
-                this._store.dispatch(new fromStore.GetContainerAction({ mblid: jobId }));
+                this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
                 this._store.dispatch(new fromStore.SeaFCLImportGetProfitAction(jobId));
 
 
@@ -118,7 +121,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     }
 
     getListContainer() {
-        this._store.select<any>(fromStore.getContainerSaveState)
+        this._store.select<any>(fromShareBussiness.getContainerSaveState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
             )
@@ -199,7 +202,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                         this.id = res.data.id;
                         this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.id));
 
-                        this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.id }));
+                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.id }));
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
@@ -223,7 +226,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                         // * get detail & container list.
                         this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.id));
 
-                        this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.id }));
+                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.id }));
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -287,5 +290,19 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     gotoList() {
         this._router.navigate(["home/documentation/sea-fcl-import"]);
+    }
+
+    previewPLsheet(currency: string){
+        this._documenRepo.previewSIFPLsheet(this.id, currency)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.previewPopup.frm.nativeElement.submit();
+                        this.previewPopup.show();
+                    }, 1000);
+                },
+            );
     }
 }

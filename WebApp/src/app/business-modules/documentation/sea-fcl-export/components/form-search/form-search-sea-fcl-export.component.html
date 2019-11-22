@@ -1,0 +1,172 @@
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div class="m-form m-form--state" [formGroup]="formSearch">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Search text
+                        </label>
+                        <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                            name="searchString" placeholder="Search text" formControlName="searchText">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Select filter
+                        </label>
+                        <ng-select [items]="searchFilters" placeholder="Select filter" formControlName="filterType">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Shipment date: From - To
+                        </label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [locale]="{format: 'DD/MM/YYYY'}" [ranges]="ranges" [autoApply]="true"
+                                [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
+                                placeholder="From date - to date" readonly formControlName="rangeDate" />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="collapse" id="advance-search-of-job">
+                <div class="div-inside bg-secondary">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    HBL No.
+                                </label>
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search"
+                                        formControlName="hblNo">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Cont No.
+                                </label>
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search"
+                                        formControlName="contNo">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Seal No.
+                                </label>
+                                <div class="m-input-icon m-input-icon--left">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search"
+                                        formControlName="sealNo">
+                                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Customer
+                                </label>
+                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
+                                    [currentActiveItemId]="{ field: 'id', value: customer.value}"
+                                    [selectedDisplayFields]="['partnerNameEn']" [dataSources]="customers | async"
+                                    [displayFields]="displayFieldsCustomer">
+                                </app-combo-grid-virtual-scroll>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Notify party
+                                </label>
+                                <app-combo-grid-virtual-scroll [selectedDisplayFields]="['partnerNameEn']"
+                                    [currentActiveItemId]="{ field: 'id', value: notifyParty.value}"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'party')"
+                                    [dataSources]="notifyPartries | async" [displayFields]="displayFieldsCustomer">
+                                </app-combo-grid-virtual-scroll>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Saleman
+                                </label>
+                                <app-combo-grid-virtual-scroll [selectedDisplayFields]="['employeeNameVn']"
+                                    [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'saleman')"
+                                    [dataSources]="salemans | async" [displayFields]="displayFieldsSaleMan">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse"
+                            href="#advance-search-of-job" role="button" aria-expanded="false"
+                            aria-controls="advance-search-of-job">
+                            <span>
+                                <i class="la la-angle-up"></i>
+                                <span>Advance search</span>
+                            </span>
+                        </a>
+                    </div>
+                    <div class="col-lg-6 m--align-right">
+                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="search()">
+                            <span>
+                                <i class="la la-search"></i>
+                                <span>
+                                    Search
+                                </span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="reset()">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Reset
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

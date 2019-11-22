@@ -69,7 +69,7 @@ export class SeaFCLImportManagementComponent extends AppList {
         this.headerHouseBills = [
             { title: 'HBL No', field: 'hwbno', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
-            { title: 'SaleMan', field: 'saleManName', sortable: true },
+            { title: 'SalesMan', field: 'saleManName', sortable: true },
             { title: 'Notify Party', field: 'notifyParty', sortable: true },
             { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
             { title: 'Containers', field: 'containers', sortable: true },

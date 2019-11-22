@@ -62,7 +62,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
     ) {
         super();
         this.selectedNoteType = "DEBIT";
-        console.log(this.selectedNoteType);
         this.requestSort = this.sortCdNoteCharge;
     }
 
@@ -90,7 +89,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this.partnerCurrent = {};
         this.listChargePartner = [];
         this.initGroup = [];
-        console.log(this.selectedPartner);
     }
 
     getListSubjectPartner(mblId: any) {
@@ -127,22 +125,22 @@ export class CdNoteAddPopupComponent extends PopupBase {
                 (dataCharges: any) => {
                     this.listChargePartner = dataCharges;
                     this.initGroup = dataCharges;
-                    console.log(this.listChargePartner)
                     //Tính toán Amount Credit, Debit, Balance
-                    this.calculatorAmount();
+                    this.calculatorAmount(this.listChargePartner);
                 },
             );
     }
 
     onSelectDataFormInfo(data: any) {
         this.selectedPartner = { field: "id", value: data.id };
-        console.log(this.selectedPartner)
-        if (this.partnerCurrent.value !== this.selectedPartner.value && this.listChargePartner.length > 0) {
-            this.changePartnerPopup.show();
-        } else {
+        //if (this.partnerCurrent.value !== this.selectedPartner.value && this.listChargePartner.length > 0) {
+        //    this.changePartnerPopup.show();
+        //} else {
             this.getListCharges(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, "");
             this.partnerCurrent = Object.assign({}, this.selectedPartner);
-        }
+            this.keyword = '';
+            this.isCheckAllCharge = false;
+        //}
     }
 
     onSubmitChangePartnerPopup() {
@@ -150,7 +148,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this.isCheckAllCharge = false;
         //Gán this.selectedPartner cho this.partnerCurrent
         this.partnerCurrent = Object.assign({}, this.selectedPartner);
-        //console.log(this.partnerCurrent)
         this.getListCharges(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, "");
         this.changePartnerPopup.hide();
     }
@@ -158,7 +155,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
     onCancelChangePartnerPopup() {
         //Gán this.partnerCurrent cho this.selectedPartner
         this.selectedPartner = Object.assign({}, this.partnerCurrent);
-        //console.log(this.selectedPartner)
     }
 
     onSubmitNotExistsChargePopup() {
@@ -177,7 +173,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
     onChangeCheckBoxGrpCharge(charges: any) {
         this.isCheckAllCharge = this.listChargePartner.every((item: any) => item.isSelected);
         for (const charge of charges.listCharges) {
-            charge.isSelected = this.isCheckAllCharge;
+            charge.isSelected = charges.isSelected;
         }
     }
 
@@ -187,36 +183,48 @@ export class CdNoteAddPopupComponent extends PopupBase {
     }
 
     removeCharge() {
-        //console.log(this.listChargePartner.filter(group => group.isSelected));
-        let chargesNotSelected = [];
-        let grpNotSelectedChargeResult = [];
-
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
-                chargesNotSelected = charges.listCharges.filter(group => !group.isSelected);
-                if (chargesNotSelected.length > 0) {
-                    grpNotSelectedChargeResult.push({ id: charges.id, hwbno: charges.hwbno, listCharges: chargesNotSelected });
+                for(const charge of charges.listCharges.filter(group => group.isSelected)){
+                    charge.isDeleted = true;
+                }
+                if(charges.isSelected) charges.isDeleted = true;
+            }
+        }
+        //Tính toán Amount Credit, Debit, Balance
+        var listCharge = this.getGroupChargeNotDelete(this.listChargePartner);
+        this.calculatorAmount(listCharge);
+    }
+
+    getGroupChargeNotDelete(listCharge: ChargeCdNote[]){
+        let chargesNotDeleted = [];
+        let grpChargesNotDeleted = [];
+        
+        if (listCharge.length > 0) {
+            for (const charges of listCharge) {
+                chargesNotDeleted = charges.listCharges.filter(group => !group.isDeleted);   
+                if (chargesNotDeleted.length > 0) {
+                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, isDeleted: charges.isDeleted, listCharges: chargesNotDeleted });
+                } else {
+                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, isDeleted: charges.isDeleted, listCharges: [] });
                 }
             }
         }
-
-        this.listChargePartner = grpNotSelectedChargeResult;
-        //Tính toán Amount Credit, Debit, Balance
-        this.calculatorAmount();
+        return grpChargesNotDeleted;
     }
 
     saveCDNote() {
-        //console.log(this.selectedNoteType)
-        console.log(this.listChargePartner)
+        //Lấy danh sách group charge chưa delete
+        this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner)
 
         //Không được phép create khi chưa có charge
         if (this.listChargePartner.length == 0) {
             this.notExistsChargePopup.show();
         } else {
-            this.CDNote.jobId = this.currentMBLId;//"03EA44D1-6DC1-4BD4-AFFD-8C5A5C192D22";
+            this.CDNote.jobId = this.currentMBLId;
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
-            this.CDNote.currencyId = "USD" // in the future , this id must be local currency of each country
+            this.CDNote.currencyId = "VND" // in the future , this id must be local currency of each country
             this.CDNote.transactionTypeEnum = TransactionTypeEnum.SeaFCLImport;
             var arrayCharges = [];
             for (const charges of this.listChargePartner) {
@@ -227,15 +235,11 @@ export class CdNoteAddPopupComponent extends PopupBase {
             this.CDNote.listShipmentSurcharge = arrayCharges;
             const _totalCredit = arrayCharges.filter(f => (f.type === 'BUY' || (f.type === 'OBH' && this.selectedPartner.value === f.payerId))).reduce((credit, charge) => credit + charge.total * charge.exchangeRate, 0);
             const _totalDebit = arrayCharges.filter(f => (f.type === 'SELL' || (f.type === 'OBH' && this.selectedPartner.value === f.paymentObjectId))).reduce((debit, charge) => debit + charge.total * charge.exchangeRate, 0);;
-            console.log(_totalCredit);
-            console.log(_totalDebit);
             const _balance = _totalDebit - _totalCredit;
             this.CDNote.total = _balance;
-            console.log(_balance);
-            if (_balance > 99999999999999 || _balance < -99999999999999) {
+            if (Math.abs(_balance) > 99999999999999) {
                 this._toastService.error('Balance amount field exceeds numeric storage size');
             } else {
-                console.log(this.CDNote);
                 if (this.action == "create") {
                     this._documentationRepo.addCdNote(this.CDNote)
                         .pipe(catchError(this.catchError))
@@ -269,11 +273,11 @@ export class CdNoteAddPopupComponent extends PopupBase {
         }
     }
 
-    calculatorAmount() {
+    calculatorAmount(listChargePartner: ChargeCdNote[]) {
         //List currency có trong listCharges
         const listCurrency = [];
         const listCharge = [];
-        for (const charges of this.listChargePartner) {
+        for (const charges of listChargePartner) {
             for (const currenct of charges.listCharges.map(m => m.currencyId)) {
                 listCurrency.push(currenct)
             }
@@ -283,11 +287,9 @@ export class CdNoteAddPopupComponent extends PopupBase {
         }
         //List currency unique      
         const uniqueCurrency = [...new Set(listCurrency)] // Remove duplicate
-        console.log(uniqueCurrency)
         this.totalCredit = '';
         this.totalDebit = '';
         this.balanceAmount = '';
-        console.log(listCharge)
         for (const currency of uniqueCurrency) {
             const _credit = listCharge.filter(f => (f.type === 'BUY' || (f.type === 'OBH' && this.selectedPartner.value === f.payerId)) && f.currencyId === currency).reduce((credit, charge) => credit + charge.total, 0);
             const _debit = listCharge.filter(f => (f.type === 'SELL' || (f.type === 'OBH' && this.selectedPartner.value === f.paymentObjectId)) && f.currencyId === currency).reduce((debit, charge) => debit + charge.total, 0);
@@ -311,7 +313,10 @@ export class CdNoteAddPopupComponent extends PopupBase {
         );
     }
 
-    openPopupAddCharge() {
+    openPopupAddCharge() {   
+        this.isCheckAllCharge = false;
+
+        this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);
         this.addRemainChargePopup.partner = this.selectedPartner.value;
         this.addRemainChargePopup.listChargePartner = this.listChargePartner;
 
@@ -331,7 +336,9 @@ export class CdNoteAddPopupComponent extends PopupBase {
     }
 
     sortCdNoteCharge(sort: string): void {
-        this.listChargePartner = this._sortService.sort(this.listChargePartner, sort, this.order);
+        this.listChargePartner.forEach(element => {
+            element.listCharges = this._sortService.sort(element.listCharges, sort, this.order);
+        });
     }
 
     onAddMoreCharge(data: ChargeCdNote[]) {
@@ -339,7 +346,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this.listChargePartner = data;
         this.initGroup = data;
         //Tính toán giá trị amount, balance
-        this.calculatorAmount();
+        this.calculatorAmount(this.listChargePartner);
     }
 
     //Charge keyword search
@@ -356,7 +363,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
                 for (const group of this.listChargePartner) {
                     const data = group.listCharges.filter((item: any) => item.chargeCode.toLowerCase().toString().search(keyword) !== -1 || item.nameEn.toLowerCase().toString().search(keyword) !== -1)
                     if (data.length > 0) {
-                        arrayCharge.push({ id: group.id, hwbno: group.hwbno, listCharges: data });
+                        arrayCharge.push({ id: group.id, hwbno: group.hwbno, isSelected: group.isSelected, isDeleted: group.isDeleted, listCharges: data });
                     }
                 }
                 dataGrp = arrayCharge;

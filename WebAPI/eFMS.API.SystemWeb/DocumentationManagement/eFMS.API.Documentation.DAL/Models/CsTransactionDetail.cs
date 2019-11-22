@@ -37,7 +37,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string FreightPayment { get; set; }
         public string PlaceFreightPay { get; set; }
         public DateTime? ClosingDate { get; set; }
-        public DateTime SailingDate { get; set; }
+        public DateTime? SailingDate { get; set; }
         public string ForwardingAgentDescription { get; set; }
         public string ForwardingAgentId { get; set; }
         public string GoodsDeliveryDescription { get; set; }

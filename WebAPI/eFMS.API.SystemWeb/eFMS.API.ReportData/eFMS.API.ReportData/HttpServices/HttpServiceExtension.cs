@@ -28,7 +28,24 @@ namespace eFMS.API.ReportData.HttpServices
                 HttpResponseMessage response = await client.PostAsync(url, content);
                 return response;
             }
-            catch(Exception ex)
+            catch (Exception e)
+            {
+
+            }
+            return null;
+        }
+        public async static Task<HttpResponseMessage> GetApi(string url)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage response = await client.GetAsync(url);
+                return response;
+            }
+            catch (Exception e)
             {
 
             }

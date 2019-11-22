@@ -120,7 +120,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
                 dc.SaveChanges();
-                return new HandleState();
+                return hs;
             }
             catch (Exception ex)
             {
@@ -195,7 +195,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 dc.SaveChanges();
 
-                return new HandleState();
+                return hs;
             }
             catch (Exception ex)
             {

@@ -65,11 +65,19 @@ export class ApiService {
     }
 
     downloadfile(url: string, data?: any, params?: any, headers?: any) {
-        return this._http.post(this.setUrl(url), data, {
-            params,
-            headers: Object.assign({}, this._headers, headers),
-            responseType: 'arraybuffer'
-        });
+        if (data !== null) {
+            return this._http.post(this.setUrl(url), data, {
+                params,
+                headers: Object.assign({}, this._headers, headers),
+                responseType: 'arraybuffer'
+            });
+        } else {
+            return this._http.get(this.setUrl(url), {
+                params,
+                headers: Object.assign({}, this._headers, headers),
+                responseType: 'arraybuffer'
+            });
+        }
     }
 
     get(url: string = '', params?: any, headers: any = {}) {

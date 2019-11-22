@@ -9,16 +9,15 @@ import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactio
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
+import { getParamsRouterState } from 'src/app/store';
 
 import * as fromStore from './../../store';
 import * as fromShareBussiness from './../../../../share-business/store';
 
 import { catchError, finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { getParamsRouterState } from 'src/app/store';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -76,7 +75,7 @@ export class SeaFCLImportHBLComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
 
-        this.containers = this._store.select(fromStore.getContainerSaveState);
+        this.containers = this._store.select(fromShareBussiness.getContainerSaveState);
         this.selectedShipment = this._store.select(fromStore.seaFCLImportTransactionState);
     }
 
@@ -142,7 +141,7 @@ export class SeaFCLImportHBLComponent extends AppList {
 
     getHourseBill(id: string) {
         this.isLoading = true;
-        this._documentRepo.getListHourseBill({ jobId: this.jobId }).pipe(
+        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
             catchError(this.catchError),
             finalize(() => { this.isLoading = false; }),
         ).subscribe(
@@ -162,7 +161,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.selectedHbl = new CsTransactionDetail(hbl);
 
         // * Get container, Job detail, Surcharge with hbl id, JobId.
-        this._store.dispatch(new fromStore.GetContainerAction({ hblid: hbl.id }));
+        this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: hbl.id }));
         this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
         this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
 
@@ -186,7 +185,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.selectedTabSurcharge = tabName;
 
         if (!!this.selectedHbl) {
-            this._store.dispatch(new fromStore.GetContainerAction({ hblid: this.selectedHbl.id }));
+            this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: this.selectedHbl.id }));
             this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.selectedHbl.jobId));
             this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
 

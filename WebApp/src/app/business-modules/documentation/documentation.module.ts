@@ -59,7 +59,7 @@ import { TabsModule } from 'ngx-bootstrap';
     // TwoDigitDecimaNumberDirective,
     AirExportComponent,
     AirImportComponent,
-    SeaFCLExportComponent,
+    // SeaFCLExportComponent,
     SeaLCLExportComponent,
     SeaConsolExportComponent,
     SeaLCLImportComponent,

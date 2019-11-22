@@ -85,7 +85,20 @@ namespace eFMS.API.Documentation.Controllers
         [Route("PreviewFCLManifest")]
         public IActionResult PreviewFCLManifest(ManifestReportModel model)
         {
-            var result = manifestService.Preview(model);
+            var result = manifestService.PreviewFCLExportManifest(model);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// preview FCL Import Manifest
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewFCLImportManifest")]
+        public IActionResult PreviewFCLImportManifest(ManifestReportModel model)
+        {
+            var result = manifestService.PreviewFCLImportManifest(model);
             return Ok(result);
         }
     }

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using eFMS.API.Common;
 using eFMS.API.ReportData.Helpers;
 using eFMS.API.ReportData.HttpServices;
 using eFMS.API.ReportData.Models;
@@ -11,6 +10,9 @@ using Microsoft.Extensions.Options;
 
 namespace eFMS.API.ReportData.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     [ApiController]

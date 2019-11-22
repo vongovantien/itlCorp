@@ -14,7 +14,7 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group">
-                        <label class="form-control-label" >
+                        <label class="form-control-label">
                             Select filter
                         </label>
                         <select class="form-control" formControlName="filterType">
@@ -24,8 +24,7 @@
                 </div>
             </div>
             <!--begin::Advance-search-->
-            <div class="collapse" [collapse]="isCollapsed" [isAnimated]="true" 
-                (collapsed)="collapsed()"
+            <div class="collapse" [collapse]="isCollapsed" [isAnimated]="true" (collapsed)="collapsed()"
                 (expanded)="expanded()">
                 <div class="div-inside bg-secondary">
                     <div class="row">
@@ -73,7 +72,7 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
-                                    Saleman
+                                    Salesman
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedSaleman"
                                     (itemSelected)="onSelectDataFormInfo($event, 'saleman')"
@@ -115,7 +114,7 @@
             <div class="form-actions">
                 <div class="row">
                     <div class="col-lg-6">
-                        <a class="btn btn-link collapsed collapse-toggle" role="button" 
+                        <a class="btn btn-link collapsed collapse-toggle" role="button"
                             (click)="isCollapsed = !isCollapsed">
                             <span>
                                 <i class="la la-angle-up"></i>

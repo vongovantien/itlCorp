@@ -3,22 +3,23 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ActionsSubject, Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { AppForm } from 'src/app/app.form';
 import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
-import { FCLImportAddModel } from 'src/app/shared/models';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
 import { ImportHouseBillDetailComponent } from '../popup/import-house-bill-detail/import-house-bill-detail.component';
+import { Container } from 'src/app/shared/models/document/container.model';
+import { SystemConstants } from 'src/constants/system.const';
+import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
-import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError, takeUntil } from 'rxjs/operators';
 
 import * as fromStore from '../../../store';
-import { SystemConstants } from 'src/constants/system.const';
-import { Container } from 'src/app/shared/models/document/container.model';
+import * as fromShareBussiness from './../../../../../share-business/store';
+
 
 @Component({
     selector: 'app-create-house-bill',
@@ -28,7 +29,7 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
-    @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
+    @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ImportHouseBillDetailComponent;
 
     jobId: string = '';
@@ -57,8 +58,8 @@ export class CreateHouseBillComponent extends AppForm {
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
-                (action: fromStore.ContainerAction) => {
-                    if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
+                (action: fromShareBussiness.ContainerAction) => {
+                    if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
 
                         this.containers = action.payload;
                     }

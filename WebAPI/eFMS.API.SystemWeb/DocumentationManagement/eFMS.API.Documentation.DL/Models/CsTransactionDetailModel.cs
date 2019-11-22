@@ -18,6 +18,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string ForwardingAgentName { get; set; }
         public string NotifyParty { get; set; }
         public string PODName { get; set; }
+        public string POLName { get; set; }
         public string ContainerNames { get; set; }
         public string PackageTypes { get; set; }
         public decimal? CBM { get; set; }
@@ -25,5 +26,6 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? GW { get; set; }
         public string Packages { get; set; }
         public string Containers { get; set; }
+        public DateTime? ShipmentEta { get; set; }
     }
 }
