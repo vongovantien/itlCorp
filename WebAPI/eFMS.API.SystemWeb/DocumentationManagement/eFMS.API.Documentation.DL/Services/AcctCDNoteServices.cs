@@ -891,8 +891,9 @@ namespace eFMS.API.Documentation.DL.Services
                 //Loop qua ds charge từ detail cdnote
                 foreach (var item in data.ListSurcharges)
                 {
+                    var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
                     //Exchange Rate theo Currency truyền vào
-                    var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                     //decimal? _exchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
                     decimal? _exchangeRate;
                     if ((exchangeRate != null && exchangeRate.Rate != 0))
@@ -902,7 +903,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         //Exchange Rate ngược
-                        var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                         _exchangeRate = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1 / exchangeRateReverse.Rate : 1;
                     }
 

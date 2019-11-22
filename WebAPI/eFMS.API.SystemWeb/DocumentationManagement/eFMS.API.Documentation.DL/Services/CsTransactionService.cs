@@ -990,6 +990,7 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = null;
             var _currentUser = currentUser.UserID;
             var shipment = DataContext.First(x => x.Id == jobId);
+            if (shipment == null) return result;
             var agent = catPartnerRepo.Get(x => x.Id == shipment.AgentId).FirstOrDefault();
             var supplier = catPartnerRepo.Get(x => x.Id == shipment.ColoaderId).FirstOrDefault();
 
@@ -1007,6 +1008,14 @@ namespace eFMS.API.Documentation.DL.Services
             if (pod != null)
             {
                 podCountry = catCountryRepo.Get(x => x.Id == pod.CountryId).FirstOrDefault()?.NameEn;
+            }
+
+            CsMawbcontainerCriteria contCriteria = new CsMawbcontainerCriteria { Mblid = jobId };
+            var containerList = containerService.Query(contCriteria);
+            var containerNoList = string.Empty;
+            if (containerList.Count() > 0)
+            {
+                containerNoList = String.Join("\r\n", containerList.Select(x => string.IsNullOrEmpty(x.ContainerNo) && string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
             }
 
             var listCharge = new List<FormPLsheetReport>();
@@ -1055,6 +1064,22 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         saleProfit = cost + revenue;
 
+                        var exchargeDateSurcharge = surcharge.ExchangeDate == null ? DateTime.Now : surcharge.ExchangeDate;
+                        //Exchange Rate theo Currency truyền vào
+                        var exchangeRate = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == surcharge.CurrencyId && x.CurrencyToId == "USD" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        //decimal? _exchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
+                        decimal _exchangeRateUSD;
+                        if ((exchangeRate != null && exchangeRate.Rate != 0))
+                        {
+                            _exchangeRateUSD = exchangeRate.Rate;
+                        }
+                        else
+                        {
+                            //Exchange Rate ngược
+                            var exchangeRateReverse = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == surcharge.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                            _exchangeRateUSD = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1 / exchangeRateReverse.Rate : 1;
+                        }
+
                         var charge = new FormPLsheetReport();
                         charge.COSTING = "COSTING";
                         charge.TransID = shipment.JobNo; //JobNo of shipment
@@ -1074,13 +1099,13 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Agent = agent?.PartnerNameEn;
                         charge.ATTN = shipper; //Shipper đầu tiên của list housebill
                         charge.Consignee = consignee; //Consignee đầu tiên của list housebill
-                        charge.ContainerNo = "ContainerNo"; //Danh sách container của Shipment (Format: contNo/SealNo)
+                        charge.ContainerNo = containerNoList; //Danh sách container của Shipment (Format: contNo/SealNo)
                         charge.OceanVessel = shipment.FlightVesselName; //Tên chuyến bay
-                        charge.LocalVessel = "";//shipment.FlightVesselName; //Tên chuyến bay
+                        charge.LocalVessel = shipment.FlightVesselName; //Tên chuyến bay
                         charge.FlightNo = shipment.VoyNo; //Mã chuyến bay
                         charge.SeaImpVoy = string.Empty;//Gán rỗng
                         charge.LoadingDate = shipment.Etd != null ? shipment.Etd.Value.ToString("dd MMM yyyy") : string.Empty; //ETD
-                        charge.ArrivalDate = shipment.Eta.Value.ToString("dd MMM yyyy"); //ETA
+                        charge.ArrivalDate = shipment.Eta != null ? shipment.Eta.Value.ToString("dd MMM yyyy") : string.Empty; //ETA
                         charge.FreightCustomer = "0"; //NOT USE
                         charge.FreightColoader = 0; //NOT USE
                         charge.PayableAccount = surcharge.PartnerName;//Partner name of charge
@@ -1090,9 +1115,9 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.VATAmount = 0; //NOT USE
                         charge.Cost = cost; //Phí chi của charge
                         charge.Revenue = revenue; //Phí thu của charge
-                        charge.Exchange = 1;
+                        charge.Exchange = currency == "USD" ? _exchangeRateUSD * saleProfit : 0; //Exchange phí của charge về USD
                         charge.VNDExchange = surcharge.ExchangeRate.Value;
-                        charge.Paid = revenue > 0 && cost < 0 && isOBH == false ? false : true;
+                        charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.DatePaid = DateTime.Now; //NOT USE
                         charge.Docs = surcharge.InvoiceNo; //InvoiceNo of charge
                         charge.Notes = surcharge.Notes;
@@ -1133,6 +1158,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
             }
+
             var parameter = new FormPLsheetReportParameter();
             parameter.Contact = _currentUser;//Get user login
             parameter.CompanyName = Constants.COMPANY_NAME;
@@ -1146,7 +1172,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             result = new Crystal
             {
-                ReportName = "FormPLsheet.rpt",//"SIFFormPLsheet.rpt",
+                ReportName = "FormPLsheet.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };

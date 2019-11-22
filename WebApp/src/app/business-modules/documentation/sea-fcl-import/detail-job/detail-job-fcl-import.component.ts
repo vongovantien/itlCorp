@@ -298,7 +298,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    if(res.dataSource.length > 0){
+                    if(this.dataReport != null && res.dataSource.length > 0){
                         setTimeout(() => {
                             this.previewPopup.frm.nativeElement.submit();
                             this.previewPopup.show();
