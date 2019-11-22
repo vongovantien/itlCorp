@@ -78,7 +78,7 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
             detail.UserModified = detail.UserCreated;
             detail.DatetimeModified = detail.DatetimeCreated = DateTime.Now;
             detail.Active = true;
-            detail.SailingDate = DateTime.Now;
+            //detail.SailingDate = DateTime.Now;
             try
             {
                 var hs = DataContext.Add(detail);
