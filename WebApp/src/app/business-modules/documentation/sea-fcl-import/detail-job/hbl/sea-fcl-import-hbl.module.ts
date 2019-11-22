@@ -8,7 +8,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CreateHouseBillComponent } from './create/create-house-bill.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { FormAddHouseBillComponent } from './components/form-add-house-bill/form-add-house-bill.component';
-import { FCLImportShareModule } from '../../share-fcl-import.module';
 import { DetailHouseBillComponent } from './detail/detail-house-bill.component';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 import { ImportHouseBillDetailComponent } from './popup/import-house-bill-detail/import-house-bill-detail.component';
@@ -63,7 +62,6 @@ const LIB = [
         FormsModule,
         ReactiveFormsModule,
         RouterModule.forChild(routing),
-        FCLImportShareModule,
         ...LIB
 
     ],

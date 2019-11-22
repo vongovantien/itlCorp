@@ -19,6 +19,8 @@ using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common;
 using Microsoft.Extensions.Localization;
+using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Models.ReportResults;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -970,5 +972,110 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
+        #region -- PREVIEW --
+        public Crystal PreviewSIFFormPLsheet(Guid jobId, string currency)
+        {
+            Crystal result = null;
+            var _currentUser = currentUser.UserID;
+            var listCharge = new List<SIFFormPLsheetReport>();
+            var charge = new SIFFormPLsheetReport();
+            charge.COSTING = "COSTING";
+            charge.TransID = "TransID";
+            charge.TransDate = DateTime.Now;
+            charge.HWBNO = "HWBNO";
+            charge.MAWB = "MAWB";
+            charge.PartnerName = "PartnerName";
+            charge.ContactName = "ContactName";
+            charge.ShipmentType = "ShipmentType";
+            charge.NominationParty = "NominationParty";
+            charge.Nominated = true;
+            charge.POL = "POL";
+            charge.POD = "POD";
+            charge.Commodity = "Commodity";
+            charge.Volumne = "Volumne";
+            charge.Carrier = "Carrier";
+            charge.Agent = "Agent";
+            charge.ATTN = "ATTN";
+            charge.Consignee = "Consignee";
+            charge.ContainerNo = "ContainerNo";
+            charge.OceanVessel = "OceanVessel";
+            charge.LocalVessel = "LocalVessel";
+            charge.FlightNo = "FlightNo";
+            charge.SeaImpVoy = "SeaImpVoy";
+            charge.LoadingDate = "LoadingDate";
+            charge.ArrivalDate = "ArrivalDate";
+            charge.FreightCustomer = 0;
+            charge.FreightColoader = 0;
+            charge.PayableAccount = "PayableAccount";
+            charge.Description = "Description";
+            charge.Curr = "Curr";
+            charge.VAT = 0;
+            charge.VATAmount = 0;
+            charge.Cost = 0;
+            charge.Revenue = 0;
+            charge.Exchange = 0;
+            charge.VNDExchange = 0;
+            charge.Paid = true;
+            charge.DatePaid = DateTime.Now;
+            charge.Docs = "Docs";
+            charge.Notes = "Notes";
+            charge.InputData = "InputData";
+            charge.SalesProfit = 0;
+            charge.Quantity = 0;
+            charge.UnitPrice = 0;
+            charge.Unit = "Unit";
+            charge.LastRevised = "LastRevised";
+            charge.OBH = true;
+            charge.ExtRateVND = 0;
+            charge.KBck = true;
+            charge.NoInv = true;
+            charge.Approvedby = "Approvedby";
+            charge.ApprovedDate = DateTime.Now;
+            charge.SalesCurr = "SalesCurr";
+            charge.GW = 0;
+            charge.MCW = 0;
+            charge.HCW = 0;
+            charge.PaymentTerm = "PaymentTerm";
+            charge.DetailNotes = "DetailNotes";
+            charge.ExpressNotes = "ExpressNotes";
+            charge.InvoiceNo = "InvoiceNo";
+            charge.CodeVender = "CodeVender";
+            charge.CodeCus = "CodeCus";
+            charge.Freight = true;
+            charge.Collect = true;
+            charge.FreightPayableAt = "FreightPayableAt";
+            charge.PaymentTime = 0;
+            charge.PaymentTimeCus = 0;
+            charge.Noofpieces = 0;
+            charge.UnitPieces = "UnitPieces";
+            charge.TypeofService = "TypeofService";
+            charge.ShipmentSource = "ShipmentSource";
+            charge.RealCost = true;
+
+            listCharge.Add(charge);
+
+            var parameter = new SIFFormPLsheetReportParams();
+            parameter.Contact = _currentUser;//Get user login
+            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyDescription = string.Empty;
+            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.CurrDecimalNo = 2;
+            parameter.DecimalNo = 2;
+            parameter.HBLList = "HBList";
+
+            result = new Crystal
+            {
+                ReportName = "SIFFormPLsheet.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listCharge);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
+        #endregion -- PREVIEW --
     }
 }

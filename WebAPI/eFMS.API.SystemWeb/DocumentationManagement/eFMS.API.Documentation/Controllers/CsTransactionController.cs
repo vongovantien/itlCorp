@@ -232,6 +232,20 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Preview PLsheet of Sea FCL Import
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <param name="currency"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("PreviewSIFPLsheet")]
+        public IActionResult PreviewSIFPLsheet(Guid jobId, string currency)
+        {
+            var result = csTransactionService.PreviewSIFFormPLsheet(jobId, currency);
+            return Ok(result);
+        }
+
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {

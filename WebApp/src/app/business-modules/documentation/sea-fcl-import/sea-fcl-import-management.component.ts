@@ -69,7 +69,7 @@ export class SeaFCLImportManagementComponent extends AppList {
         this.headerHouseBills = [
             { title: 'HBL No', field: 'hwbno', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
-            { title: 'SaleMan', field: 'saleManName', sortable: true },
+            { title: 'SalesMan', field: 'saleManName', sortable: true },
             { title: 'Notify Party', field: 'notifyParty', sortable: true },
             { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
             { title: 'Containers', field: 'containers', sortable: true },
@@ -117,21 +117,21 @@ export class SeaFCLImportManagementComponent extends AppList {
         if (this.tmpIndex == index) {
             this.housebills = this.tmpHouseBills;
         } else {
-        this._progressRef.start();
-        this._documentationRepo.getListHouseBillOfJob({ jobId: jobId })
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { 
-                    this._progressRef.complete(); 
-                 })
-            ).subscribe(
-                (res: CsTransactionDetail[]) => {
-                    this.housebills = (res || []).map((item: CsTransactionDetail) => new CsTransactionDetail(item));
-                    console.log(this.housebills);
-                    this.tmpHouseBills = this.housebills;
-                    this.tmpIndex = index;
-                },
-            );
+            this._progressRef.start();
+            this._documentationRepo.getListHouseBillOfJob({ jobId: jobId })
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => {
+                        this._progressRef.complete();
+                    })
+                ).subscribe(
+                    (res: CsTransactionDetail[]) => {
+                        this.housebills = (res || []).map((item: CsTransactionDetail) => new CsTransactionDetail(item));
+                        console.log(this.housebills);
+                        this.tmpHouseBills = this.housebills;
+                        this.tmpIndex = index;
+                    },
+                );
         }
     }
 
