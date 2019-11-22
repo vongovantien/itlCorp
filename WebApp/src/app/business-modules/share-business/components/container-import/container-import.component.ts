@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
 import { UploadAlertComponent } from 'src/app/shared/common/popup/upload-alert/upload-alert.component';
 import { Store } from '@ngrx/store';
-import { GetContainerAction, SaveContainerAction, AddContainersAction } from 'src/app/business-modules/documentation/sea-fcl-import/store';
 
+import * as fromStore from './../../store';
 @Component({
     selector: 'app-container-import',
     templateUrl: './container-import.component.html'
@@ -24,9 +24,12 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
     importedData: any[] = [];
     mblid: string = null;
     hblid: string = null;
-    constructor(private _docRepo: DocumentationRepo,
+
+    constructor(
+        private _docRepo: DocumentationRepo,
         private _store: Store<any>,
-        private _progressService: NgProgress) {
+        private _progressService: NgProgress
+    ) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestList = this.getData;
@@ -134,7 +137,7 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
             this.importAlert.show();
         } else {
             console.log("container from import excel", this.data);
-            this._store.dispatch(new AddContainersAction(this.data));
+            this._store.dispatch(new fromStore.AddContainersAction(this.data));
             this.hide();
         }
     }

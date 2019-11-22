@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { SeaFCLImportActionTypes, SeaFCLImportGetDetailSuccessAction, SeaFCLImportGetDetailFailAction, SeaFCLImportActions, ContainerActionTypes, ContainerAction, GetContainerSuccessAction, GetContainerFailAction, SeaFCLImportUpdateSuccessAction, SeaFCLImportUpdateFailAction, HouseBillActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, SeaFCLImportGetProfitSuccessAction, SeaFCLImportGetProfitFailFailAction } from '../actions';
+import { SeaFCLImportActionTypes, SeaFCLImportGetDetailSuccessAction, SeaFCLImportGetDetailFailAction, SeaFCLImportActions, SeaFCLImportUpdateSuccessAction, SeaFCLImportUpdateFailAction, HouseBillActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, SeaFCLImportGetProfitSuccessAction, SeaFCLImportGetProfitFailFailAction } from '../actions';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { IProfit } from '../reducers';
@@ -30,23 +30,9 @@ export class SeaFCLImportEffects {
         );
 
     @Effect()
-    getListContainerEffect$: Observable<Action> = this.actions$
-        .pipe(
-            ofType<ContainerAction>(ContainerActionTypes.GET_CONTAINER),
-            map((payload: any) => payload.payload), // jobId
-            switchMap(
-                (param: any) => this._documentRepo.getListContainersOfJob(param)
-                    .pipe(
-                        map((data: any) => new GetContainerSuccessAction(data)),
-                        catchError(err => of(new GetContainerFailAction(err)))
-                    )
-            )
-        );
-
-    @Effect()
     updateCSTransaction$: Observable<Action> = this.actions$
         .pipe(
-            ofType<ContainerAction>(SeaFCLImportActionTypes.UPDATE),
+            ofType<SeaFCLImportActions>(SeaFCLImportActionTypes.UPDATE),
             map((payload: any) => payload.payload),
             switchMap(
                 (param: any) => this._documentRepo.updateCSTransaction(param)
@@ -60,7 +46,7 @@ export class SeaFCLImportEffects {
     @Effect()
     getDetailHBL$: Observable<Action> = this.actions$
         .pipe(
-            ofType<ContainerAction>(HouseBillActionTypes.GET_DETAIL),
+            ofType<SeaFCLImportActions>(HouseBillActionTypes.GET_DETAIL),
             map((payload: any) => payload.payload),
             switchMap(
                 (id: string) => this._documentRepo.getDetailHbl(id)
@@ -74,7 +60,7 @@ export class SeaFCLImportEffects {
     @Effect()
     getTotalProfitShipmentL$: Observable<Action> = this.actions$
         .pipe(
-            ofType<ContainerAction>(SeaFCLImportActionTypes.GET_PROFIT),
+            ofType<SeaFCLImportActions>(SeaFCLImportActionTypes.GET_PROFIT),
             map((payload: any) => payload.payload),
             switchMap(
                 (jobId: string) => this._documentRepo.getShipmentTotalProfit(jobId)

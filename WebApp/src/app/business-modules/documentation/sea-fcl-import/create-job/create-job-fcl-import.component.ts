@@ -2,20 +2,22 @@ import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 import { AppForm } from 'src/app/app.form';
 import { FCLImportAddModel } from 'src/app/shared/models';
 import { SeaFClImportFormCreateComponent } from '../components/form-create/form-create-sea-fcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 
-import * as fromStore from './../store/index';
-import { SeaFCLImportShipmentGoodSummaryComponent } from '../components/shipment-good-summary/shipment-good-summary.component';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { ToastrService } from 'ngx-toastr';
-import { catchError, takeUntil } from 'rxjs/operators';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
+
+import { catchError, takeUntil } from 'rxjs/operators';
+
+import * as fromShareBussiness from './../../../share-business/store';
+import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
 @Component({
     selector: 'app-create-job-fcl-import',
@@ -25,7 +27,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 export class SeaFCLImportCreateJobComponent extends AppForm {
 
     @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
-    @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
+    @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
 
     containers: Container[] = [];
@@ -45,8 +47,8 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
-                (action: fromStore.ContainerAction) => {
-                    if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
+                (action: fromShareBussiness.ContainerAction) => {
+                    if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
                     }
                 });

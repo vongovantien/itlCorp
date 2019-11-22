@@ -65,12 +65,12 @@
                 </tab>
                 <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')"
                     [active]="selectedTab === 'CDNOTE'" [disabled]="ACTION === 'COPY'">
-                    <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="cd">
+                    <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="SeaFCLImport_cdNote">
                     </ng-container>
                 </tab>
                 <tab heading="Asignment" (selectTab)="onSelectTab('assignment')" [active]="selectedTab === 'ASSIGNMENT'"
                     [disabled]="ACTION === 'copy'">
-                    <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="assignment">
+                    <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="SeaFCLImport_assignment">
                     </ng-container>
                 </tab>
             </tabset>

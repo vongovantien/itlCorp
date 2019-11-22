@@ -76,7 +76,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     setDataSource(data: any[]) {
-        if (data !== undefined && data.length > 0) {
+        if (!!data && data.length > 0) {
             data = this.sortService.sort(data, this.displayFields[0].field, true);
             this.DataSources = data;
             this.ConstDataSources = cloneDeep(data);
@@ -118,12 +118,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     setCurrentActiveItemId(data: any) {
         if (data.value != null) {
             this.CurrentActiveItemIdObj = data;
-            const context = this;
-
-            // const itemIndex = findIndex(this.ConstDataSources, function (o) {
-            //     const val = context.getValue(o, data.field);
-            //     return val === data.value;
-            // });
 
             const itemIndex = this.ConstDataSources.findIndex(i => i[data.field] === data.value);
 
@@ -136,6 +130,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                 this.displaySelectedStr = data.hardValue;
             }
         } else {
+            this.indexSelected = -1;
             this.displaySelectedStr = null;
         }
     }

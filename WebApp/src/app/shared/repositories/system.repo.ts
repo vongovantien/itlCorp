@@ -95,8 +95,17 @@ export class SystemRepo {
         );
     }
 
-    getListSystemUser() {
+    getListSystemUser(body: any = {}) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
+    getSystemUsers(body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser/Query`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;

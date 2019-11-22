@@ -16,9 +16,9 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators';
 
-import { getContainerSaveState, getHBLState } from '../../../../store';
+import { getHBLState } from '../../../../store';
 
-
+import * as fromShareBussiness from './../../../../../../share-business/store';
 @Component({
     selector: 'sea-fcl-import-hbl-arrival-note',
     templateUrl: './arrival-note.component.html',
@@ -85,7 +85,7 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
 
 
         // * Get container's shipment from Store.
-        this._store.select(getContainerSaveState).subscribe(
+        this._store.select(fromShareBussiness.getContainerSaveState).subscribe(
             (res: Container[] | any[]) => {
                 this.containersShipment = res || [];
             }
