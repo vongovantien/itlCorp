@@ -23,14 +23,16 @@ using eFMS.API.Common;
 using System.IO;
 using System.Reflection;
 using System;
+using StackExchange.Redis;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
     public static class ServiceRegister
     {
 
-        public static void Register(IServiceCollection services)
+        public static void Register(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")));
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();

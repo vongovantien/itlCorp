@@ -29,12 +29,10 @@ namespace eFMS.API.Catalogue.DL.Services
     public class CatCountryService : RepositoryBase<CatCountry, CatCountryModel>, ICatCountryService
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
-        public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
+        public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
-            cache = distributedCache;
             currentUser = user;
             SetChildren<CatPlace>("Id", "CountryId");
             SetChildren<CatPartner>("Id", "CountryId");
@@ -50,11 +48,6 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.Active = true;
             var country = mapper.Map<CatCountry>(entity);
             var hs = DataContext.Add(country);
-            if (hs.Success)
-            {
-                cache.Remove(Templates.CatCountry.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
-            }
             return hs;
         }
         public HandleState Update(CatCountryModel model)
@@ -67,34 +60,19 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.InactiveOn = DateTime.Now;
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
-            if (hs.Success)
-            {
-                cache.Remove(Templates.CatCountry.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
-            }
             return hs;
         }
         public HandleState Delete(short id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
-            if (hs.Success)
-            {
-                cache.Remove(Templates.CatCountry.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
-            }
             return hs;
         }
         #endregion
 
         public List<CatCountryViewModel> GetByLanguage()
         {
-            IQueryable<CatCountry> data = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName);
-            if (data == null)
-            {
-                data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, data);
-            }
+            var data = DataContext.Get();
             return GetDataByLanguage(data);
         }
         
@@ -140,7 +118,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     DataContext.Add(country, false);
                 }
                 DataContext.SubmitChanges();
-                cache.Remove(Templates.CatCountry.NameCaching.ListName);
 
                 return new HandleState();
             }
@@ -214,15 +191,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                                                 || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null", StringComparison.OrdinalIgnoreCase) > -1)
                                                                 && (x.Active == criteria.Active || criteria.Active == null);
             }
-            IQueryable<CatCountry> data = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName);
-            if (data == null)
-            {
-                data = DataContext.Get(query);
-            }
-            else
-            {
-                data = data.Where(query);
-            }
+            var data = DataContext.Get(query);
             return data;
         }
 

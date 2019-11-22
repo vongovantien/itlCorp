@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-  <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
   <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
   <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />   
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
