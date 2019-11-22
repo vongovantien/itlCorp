@@ -127,7 +127,6 @@ export class SeaFCLImportManagementComponent extends AppList {
                 ).subscribe(
                     (res: CsTransactionDetail[]) => {
                         this.housebills = (res || []).map((item: CsTransactionDetail) => new CsTransactionDetail(item));
-                        console.log(this.housebills);
                         this.tmpHouseBills = this.housebills;
                         this.tmpIndex = index;
                     },

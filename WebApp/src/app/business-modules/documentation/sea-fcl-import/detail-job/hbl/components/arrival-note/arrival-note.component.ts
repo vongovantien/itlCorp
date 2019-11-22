@@ -96,8 +96,8 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
                 catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
                 tap((res: any) => {
-                    this.hblArrivalNote.hblid = res.data.id || SystemConstants.EMPTY_GUID;
-                    this.containersHBL = res.data.csMawbcontainers || []; // * Get container from HBL detail.
+                    this.hblArrivalNote.hblid = res.id || SystemConstants.EMPTY_GUID;
+                    this.containersHBL = res.csMawbcontainers || []; // * Get container from HBL detail.
                 }),
                 switchMap(() => this._documentRepo.getArrivalInfo(this.hblArrivalNote.hblid, CommonEnum.TransactionTypeEnum.SeaFCLImport)) // * Get arrival info.
             )
