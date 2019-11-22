@@ -26,9 +26,9 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public bool SeaLCL { get; set; }
         public string Description { get; set; }
         public string NoPieces { get; set; }
-        public decimal GrossWeight { get; set; }
+        public decimal? GrossWeight { get; set; }
         public string Unit { get; set; }
-        public decimal CBM { get; set; }
+        public decimal? CBM { get; set; }
         public DateTime? HBLDate { get; set; }
         public string AlsoNotify { get; set; }
         public DateTime? ManifestDate { get; set; }

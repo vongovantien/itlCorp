@@ -128,6 +128,13 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewFCLImportManifest(eFMS.API.Documentation.DL.Models.ManifestReportModel)">
+            <summary>
+            preview FCL Import Manifest
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsMawbcontainerController">
             <summary>
             

@@ -1,0 +1,9 @@
+Qty	Number		
+ContType	String	50	
+ContainerNo	String	255	
+SealNo	String	255	
+TotalPackages	Number		
+UnitPack	String	50	
+GrossWeight	Number		
+CBM	Number		
+DecimalNo	Number		
