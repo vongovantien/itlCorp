@@ -1,0 +1,32 @@
+TransID	String	50	
+LoadingDate	Date		
+LocalVessel	String	150	
+ContSealNo	String	255	
+DateConfirm	Date		
+FlightDate	Date		
+DepartureAirport	String	150	
+PortofDischarge	String	150	
+PlaceDelivery	String	150	
+ForCarrier	String	255	
+HWBNO	String	50	
+ATTN	String	255	
+Consignee	String	250	
+Notify	String	255	
+TotalPackages	String	50	
+ShippingMarkImport	Memo		
+SpeacialNote	String	255	
+SeaLCL	Boolean		
+Description	Memo		
+NoPieces	String	150	
+GrossWeight	Number		
+Unit	String	50	
+CBM	Number		
+HBLDate	Date		
+AlsoNotify	String	250	
+ManifestDate	Date		
+ETD	Date		
+TotalQty	String	255	
+Liner	String	255	
+TransMode	String	255	
+SCName	String	255	
+OverseasAgent	String	255	

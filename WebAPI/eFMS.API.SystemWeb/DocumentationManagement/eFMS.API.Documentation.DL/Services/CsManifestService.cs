@@ -85,7 +85,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }       
 
-        public Crystal Preview(ManifestReportModel model)
+        public Crystal PreviewFCLExportManifest(ManifestReportModel model)
         {
             if (model == null)
             {
@@ -186,17 +186,9 @@ namespace eFMS.API.Documentation.DL.Services
                         BillType = item.ServiceType ?? string.Empty,
                         NW = item.NetWeight ?? (decimal)item.NetWeight,
                         PortofDischarge = item.PODName, 
-                        
-                        
-
-                        
-
-                        
                     };
                     manifests.Add(manifest);
                 }
-                //freightManifests = new List<FreightManifest> {
-                //};
             }
             else
             {
@@ -210,9 +202,13 @@ namespace eFMS.API.Documentation.DL.Services
             };
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            //result.AddSubReport("FreightManifest", freightManifests);
             result.SetParameter(parameter);
             return result;
+        }
+
+        public Crystal PreviewFCLImportManifest(ManifestReportModel model)
+        {
+            throw new NotImplementedException();
         }
     }
 }
