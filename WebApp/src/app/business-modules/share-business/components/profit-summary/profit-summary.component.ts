@@ -13,7 +13,7 @@ import { map } from 'rxjs/operators';
 
 export class ShareBussinessProfitSummaryComponent extends AppPage {
 
-    hblProfit$: Observable<fromStore.IProfit>;
+    hblProfit$: Observable<fromStore.ISurchargeProfit>;
     totalUSD$: Observable<number>;
     totalVND$: Observable<number>;
 

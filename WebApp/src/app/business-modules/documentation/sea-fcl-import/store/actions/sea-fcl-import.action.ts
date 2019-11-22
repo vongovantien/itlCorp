@@ -14,10 +14,6 @@ export enum SeaFCLImportActionTypes {
     UPDATE_SUCCESS = '[CSTransaction] Update Success',
     UPDATE_FAIL = '[CSTransaction] Update Fail',
 
-    GET_PROFIT = '[CSTransaction] Get Profit',
-    GET_PROFIT_SUCCESS = '[CSTransaction] Get Profit Success',
-    GET_PROFIT_FAIL = '[CSTransaction] Get Profit Fail',
-
 }
 
 /**
@@ -57,21 +53,6 @@ export class SeaFCLImportUpdateFailAction implements Action {
     constructor(public payload: any) { }
 }
 
-export class SeaFCLImportGetProfitAction implements Action {
-    readonly type = SeaFCLImportActionTypes.GET_PROFIT;
-
-    constructor(public payload: any) { }
-}
-export class SeaFCLImportGetProfitSuccessAction implements Action {
-    readonly type = SeaFCLImportActionTypes.GET_PROFIT_SUCCESS;
-
-    constructor(public payload: any) { }
-}
-export class SeaFCLImportGetProfitFailFailAction implements Action {
-    readonly type = SeaFCLImportActionTypes.GET_PROFIT_FAIL;
-
-    constructor(public payload: any) { }
-}
 
 /**
  * Export a type alias of all actions in this action group
@@ -83,7 +64,4 @@ export type SeaFCLImportActions =
     | SeaFCLImportUpdateFailAction
     | SeaFCLImportGetDetailAction
     | SeaFCLImportGetDetailSuccessAction
-    | SeaFCLImportGetDetailFailAction
-    | SeaFCLImportGetProfitAction
-    | SeaFCLImportGetProfitSuccessAction
-    | SeaFCLImportGetProfitFailFailAction;
+    | SeaFCLImportGetDetailFailAction;
