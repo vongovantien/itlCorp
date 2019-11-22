@@ -9,6 +9,7 @@ import { SortService } from 'src/app/shared/services';
 
 export class AddHblToManifestComponent extends PopupBase {
     houseBills: any[] = [];
+    houseBillsRemove: any[] = [];
     checkAll = false;
     headers: CommonInterface.IHeaderTable[];
     @Output() onAdd: EventEmitter<any> = new EventEmitter<any>();
@@ -51,13 +52,8 @@ export class AddHblToManifestComponent extends PopupBase {
     }
 
     OnAdd() {
-        const houseBillsSelected = this.houseBills.filter(item => item.isChecked === true);
-        if (houseBillsSelected.length > 0) {
-            this.onAdd.emit(houseBillsSelected);
-            this.hide();
-            console.log(houseBillsSelected);
-        }
-
+        this.onAdd.emit('');
+        this.hide();
     }
 
     checkAllChange() {

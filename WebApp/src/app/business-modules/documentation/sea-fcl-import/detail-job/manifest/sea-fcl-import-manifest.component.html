@@ -4,7 +4,8 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-default-button [buttonSetting]="saveButtonSetting" [dataTarget]="saveButtonSetting.dataTarget">
+            <app-default-button (click)="AddOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
+                [dataTarget]="saveButtonSetting.dataTarget">
             </app-default-button>
             <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
@@ -30,6 +31,15 @@
                 </div>
                 <div class="col-lg-8">
                     <div class="form-group">
+                        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="OnRemove()">
+                            <span>
+                                <i class="la la-trash"></i>
+                                <span>
+                                    Remove selected
+                                </span>
+                            </span>
+                        </button>
                         <button (click)="showPopupAddHbl()" type="button" style="float:right"
                             class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                             <span>
@@ -48,19 +58,23 @@
                     <thead app-table-header [headers]="headers" (onClick)="sortHouseBills($event)">
                         <th class="m--w-50 first table-actions-col">
                             <label class="m-checkbox">
-                                <input type="checkbox">
+                                <input type="checkbox" name="" [checked]="checkAll"
+                                    (change)="checkAll=!checkAll; checkAllChange()">
                                 <span></span>
                             </label>
                         </th>
                     </thead>
                     <tbody>
-                        <ng-container *ngIf="!!housebills.length">
-                            <tr
-                                *ngFor="let housebill of housebills | filter : keyword : ['hwbno','packages','gw','cbm','podName','shipperName','consigneeName','desOfGoods']; let j = index; trackBy: trackByFn">
+
+                        <tr
+                            *ngFor="let housebill of housebills | filter : keyword : ['hwbno','packages','gw','cbm','podName','shipperName','consigneeName','desOfGoods']; let j = index; trackBy: trackByFn">
+
+                            <ng-container *ngIf="!!housebills.length && housebill.isRemoved == false">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <label class="m-checkbox">
-                                            <input type="checkbox">
+                                            <input type="checkbox" name="" [checked]="housebill.isChecked"
+                                                (change)="housebill.isChecked=!housebill.isChecked; removeAllChecked();">
                                             <span></span>
 
                                         </label>
@@ -93,8 +107,9 @@
                                 <td>
                                     <span></span>
                                 </td>
-                            </tr>
-                        </ng-container>
+                            </ng-container>
+                        </tr>
+
                         <tr *ngIf="!isLoading && !housebills.length" app-table-none-record [colspan]="headers.length">
                         </tr>
                     </tbody>
