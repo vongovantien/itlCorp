@@ -886,62 +886,64 @@ namespace eFMS.API.Documentation.DL.Services
 
             var listCharge = new List<SeaDebitAgentsNewReport>();
             var data = GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
-            //Loop qua ds charge từ detail cdnote
-            foreach (var item in data.ListSurcharges)
+            if (data != null)
             {
-                //Exchange Rate theo Currency truyền vào
-                var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                //decimal? _exchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
-                decimal? _exchangeRate;
-                if ((exchangeRate != null && exchangeRate.Rate != 0))
+                //Loop qua ds charge từ detail cdnote
+                foreach (var item in data.ListSurcharges)
                 {
-                    _exchangeRate = exchangeRate.Rate;
+                    //Exchange Rate theo Currency truyền vào
+                    var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    //decimal? _exchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
+                    decimal? _exchangeRate;
+                    if ((exchangeRate != null && exchangeRate.Rate != 0))
+                    {
+                        _exchangeRate = exchangeRate.Rate;
+                    }
+                    else
+                    {
+                        //Exchange Rate ngược
+                        var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        _exchangeRate = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1 / exchangeRateReverse.Rate : 1;
+                    }
+
+                    var charge = new SeaDebitAgentsNewReport();
+                    //Thông tin Partner
+                    charge.PartnerID = data.PartnerId;
+                    charge.PartnerName = data.PartnerNameEn;
+                    charge.Address = data.PartnerShippingAddress;
+                    charge.Workphone = data.PartnerTel;
+                    charge.Fax = data.PartnerFax;
+                    charge.Taxcode = data.PartnerTaxcode;
+                    charge.PersonalContact = data.PartnerPersonalContact;
+
+                    //Thông tin Shipment
+                    charge.TransID = data.JobNo;
+                    charge.DepartureAirport = data.Pol + ", " + data.PolCountry; //POL
+                    charge.PlaceDelivery = data.Pod + ", " + data.PodCountry; //POD
+                    charge.LoadingDate = data.Etd.Value; //ETD
+                    charge.ETA = data.Eta.Value; //ETA
+                    charge.ATTN = data.HbShippers;//Shipper -- lấy từ Housebill
+                    charge.LocalVessel = data.Vessel;//Vessel
+                    charge.MAWB = data.MbLadingNo; //MBLNO
+                    charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
+                    charge.ContainerSize = data.HbPackages; //Quantity Cont
+                    charge.GrossWeight = data.HbGrossweight.Value;//Total GW of HBL
+                    charge.CBM = data.Volum.Value; //Total CBM of HBL
+                    charge.SealNo = data.HbSealNo; //Cont/Seal No
+                    charge.HWBNO = data.HbLadingNo; //HBLNOs
+
+                    //Thông tin list charge
+                    charge.Subject = "LOCAL CHARGES";
+                    charge.Description = item.NameEn;//Charge name
+                    charge.Quantity = item.Quantity;
+                    charge.Unit = item.Unit;
+                    charge.UnitPrice = item.UnitPrice * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
+                    charge.VAT = item.Vatrate;
+                    charge.Credit = (item.Type == Constants.CHARGE_BUY_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
+                    charge.Debit = (item.Type == Constants.CHARGE_SELL_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? item.Total * _exchangeRate : 0;
+                    listCharge.Add(charge);
                 }
-                else
-                {
-                    //Exchange Rate ngược
-                    var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    _exchangeRate = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1/exchangeRateReverse.Rate : 1;
-                }
-
-                var charge = new SeaDebitAgentsNewReport();
-                //Thông tin Partner
-                charge.PartnerID = data.PartnerId;
-                charge.PartnerName = data.PartnerNameEn;
-                charge.Address = data.PartnerShippingAddress;
-                charge.Workphone = data.PartnerTel;
-                charge.Fax = data.PartnerFax;
-                charge.Taxcode = data.PartnerTaxcode;
-                charge.PersonalContact = data.PartnerPersonalContact;
-
-                //Thông tin Shipment
-                charge.TransID = data.JobNo;
-                charge.DepartureAirport = data.Pol + ", " + data.PolCountry; //POL
-                charge.PlaceDelivery = data.Pod + ", " + data.PodCountry; //POD
-                charge.LoadingDate = data.Etd.Value; //ETD
-                charge.ETA = data.Eta.Value; //ETA
-                charge.ATTN = data.HbShippers;//Shipper -- lấy từ Housebill
-                charge.LocalVessel = data.Vessel;//Vessel
-                charge.MAWB = data.MbLadingNo; //MBLNO
-                charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
-                charge.ContainerSize = data.HbPackages; //Quantity Cont
-                charge.GrossWeight = data.HbGrossweight.Value;//Total GW of HBL
-                charge.CBM = data.Volum.Value; //Total CBM of HBL
-                charge.SealNo = data.HbSealNo; //Cont/Seal No
-                charge.HWBNO = data.HbLadingNo; //HBLNOs
-
-                //Thông tin list charge
-                charge.Subject = "LOCAL CHARGES";
-                charge.Description = item.NameEn;//Charge name
-                charge.Quantity = item.Quantity;
-                charge.Unit = item.Unit;
-                charge.UnitPrice = item.UnitPrice * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
-                charge.VAT = item.Vatrate;
-                charge.Credit = (item.Type == Constants.CHARGE_BUY_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
-                charge.Debit = (item.Type == Constants.CHARGE_SELL_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? item.Total * _exchangeRate : 0;
-                listCharge.Add(charge);
             }
-
             var parameter = new SeaDebitAgentsNewReportParams();
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
@@ -951,7 +953,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyDescription = string.Empty;
 
             parameter.DebitNo = criteria.CreditDebitNo;
-            parameter.IssuedDate = data.CDNote.DatetimeCreated.Value.ToString("dd/MM/yyyy");//Lấy ngày tạo CDNote
+            parameter.IssuedDate = data != null ? data.CDNote.DatetimeCreated.Value.ToString("dd/MM/yyyy") : string.Empty;//Lấy ngày tạo CDNote
             parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
             parameter.ReviseNotice = "Revised: " + DateTime.Now.ToString("dd/MM/yyyy");
 
