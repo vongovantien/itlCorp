@@ -18,5 +18,6 @@ namespace eFMS.API.Documentation.DL.Models
         public int? SumCont { get; set; }
         public int? SumPackage { get; set; }
         public Guid? HblId { get; set; }
+        public string PlaceDeliveryName { get; set; }
     }
 }

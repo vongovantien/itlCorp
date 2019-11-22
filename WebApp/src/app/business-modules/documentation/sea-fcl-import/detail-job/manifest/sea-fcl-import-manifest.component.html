@@ -4,6 +4,9 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
+            <button id="button-nested" dropdownToggle type="button" class="btn btn-success" (click)="previewManifest()">
+                <i class="la la-print"></i> Preview<span class="caret"></span>
+            </button>
             <app-default-button (click)="AddOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
                 [dataTarget]="saveButtonSetting.dataTarget">
             </app-default-button>
@@ -119,3 +122,6 @@
     </div>
 </form-manifest-sea-fcl-import>
 <add-hbl-to-manifest-popup (onAdd)="OnAdd($event)"></add-hbl-to-manifest-popup>
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>

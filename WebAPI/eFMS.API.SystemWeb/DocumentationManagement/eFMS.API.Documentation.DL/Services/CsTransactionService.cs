@@ -354,8 +354,9 @@ namespace eFMS.API.Documentation.DL.Services
                 var result = mapper.Map<CsTransactionModel>(data);
                 if (result.ColoaderId != null) result.SupplierName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.PartnerNameEn;
                 if (result.AgentId != null) result.AgentName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId)?.PartnerNameEn;
-                if (result.Pod != null) result.PODName = catPlaceRepo.Get().FirstOrDefault(x => x.Id == result.Pod)?.NameEn;
-                if (result.Pol != null) result.POLName = catPlaceRepo.Get().FirstOrDefault(x => x.Id == result.Pol)?.NameEn;
+                if (result.Pod != null) result.PODName = catPlaceRepo.Get(x => x.Id == result.Pod)?.FirstOrDefault().NameEn;
+                if (result.Pol != null) result.POLName = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault().NameEn;
+                if (result.DeliveryPlace != null) result.PlaceDeliveryName = catPlaceRepo.Get(x => x.Id == result.DeliveryPlace)?.FirstOrDefault().NameEn;
                 return result;
             }
         }
