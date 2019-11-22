@@ -34,6 +34,21 @@ export namespace CommonEnum {
         SeaLCLImport = 9
     }
 
+    export enum PlaceTypeEnum {
+        BorderGate = 1,
+        Branch = 2,
+        Depot = 3,
+        District = 4,
+        Hub = 5,
+        IndustrialZone = 6,
+        Other = 7,
+        Port = 8,
+        Province = 9,
+        Station = 10,
+        Ward = 11,
+        Warehouse = 12
+    }
+
     export enum ButtonType {
         add = "add",
         edit = "edit",
@@ -81,6 +96,15 @@ export namespace CommonEnum {
         OBH = "OBH", // * OBH - Phí thu hộ
     }
 
+    export enum TRANSPORT_MODE {
+        AIR = 'AIR',
+        SEA = 'SEA',
+        INLAND = 'INLAND',
+        AIR_SEA = 'AIR - SEA',
+        INLAND_SEA = 'INLAND - SEA',
+        AIR_INLAND = 'AIR - INLAND',
+        INALAND_AIR_SEA = 'INLAND - AIR - SEA'
+    }
 }
 
 
