@@ -20,6 +20,7 @@ import { SeaFCLImportLazyLoadModule } from './sea-fcl-import-lazy-load.module';
 import { SeaFclImportManifestComponent } from './detail-job/manifest/sea-fcl-import-manifest.component';
 import { FormManifestSeaFclImportComponent } from './detail-job/manifest/components/form-manifest/form-manifest-sea-fcl-import.component';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { AddHblToManifestComponent } from './detail-job/manifest/popup/add-hbl-to-manifest.popup';
 
 const routing: Routes = [
 
@@ -49,7 +50,8 @@ const routing: Routes = [
 const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
-    SeaFCLImportGrantTotalProfitComponent
+    SeaFCLImportGrantTotalProfitComponent,
+    AddHblToManifestComponent
 
 ];
 
