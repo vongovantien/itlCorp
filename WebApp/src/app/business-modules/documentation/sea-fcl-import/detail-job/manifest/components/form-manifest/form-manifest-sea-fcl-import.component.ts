@@ -100,6 +100,7 @@ export class FormManifestSeaFclImportComponent extends AppList {
             );
     }
 
+
     getShipmentDetail(id: any) {
         this._documentRepo.getDetailTransaction(id).subscribe(
             (res: any) => {
@@ -136,7 +137,8 @@ export class FormManifestSeaFclImportComponent extends AppList {
             deconsolidator: [],
             weight: [],
             volume: [],
-            agent: []
+            agent: [''
+                , Validators.required]
 
         });
         this.referenceNo = this.formGroup.controls['referenceNo'];

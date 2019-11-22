@@ -4,6 +4,15 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
+            <button type="button" (click)="showRefreshPopup()"
+                class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-refresh"></i>
+                    <span>
+                        Refresh
+                    </span>
+                </span>
+            </button>
             <app-default-button (click)="AddOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
                 [dataTarget]="saveButtonSetting.dataTarget">
             </app-default-button>
@@ -29,26 +38,29 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-8">
+                <div class="col-lg-8 m--align-right">
                     <div class="form-group">
-                        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="OnRemove()">
-                            <span>
-                                <i class="la la-trash"></i>
+                        <div class="c-button-actions">
+                            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="OnRemove()">
                                 <span>
-                                    Remove selected
+                                    <i class="la la-trash"></i>
+                                    <span>
+                                        Remove selected
+                                    </span>
                                 </span>
-                            </span>
-                        </button>
-                        <button (click)="showPopupAddHbl()" type="button" style="float:right"
-                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                            <span>
-                                <i class="la la-plus"></i>
+                            </button>
+                            <button (click)="showPopupAddHbl()" type="button" style="float:right"
+                                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                                 <span>
-                                    Add HBL
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        Add HBL
+                                    </span>
                                 </span>
-                            </span>
-                        </button>
+                            </button>
+                        </div>
+
                     </div>
 
                 </div>
@@ -69,7 +81,8 @@
                         <tr
                             *ngFor="let housebill of housebills | filter : keyword : ['hwbno','packages','gw','cbm','podName','shipperName','consigneeName','desOfGoods']; let j = index; trackBy: trackByFn">
 
-                            <ng-container *ngIf="!!housebills.length && housebill.isRemoved == false">
+                            <ng-container
+                                *ngIf="!!housebills.length && housebill.manifestRefNo != null || housebill.isRemoved == false">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <label class="m-checkbox">
@@ -119,3 +132,7 @@
     </div>
 </form-manifest-sea-fcl-import>
 <add-hbl-to-manifest-popup (onAdd)="OnAdd($event)"></add-hbl-to-manifest-popup>
+
+<confirm-popup [body]="'All manually entered data will be refresh. Are you sure you want to perform this action?'"
+    [labelCancel]="'No'" (onSubmit)="onRefresh()">
+</confirm-popup>

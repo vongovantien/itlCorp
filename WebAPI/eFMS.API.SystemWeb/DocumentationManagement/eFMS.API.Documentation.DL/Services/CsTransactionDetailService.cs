@@ -422,7 +422,8 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                           ShipperName = shipper.ShortName,
                           ConsigneeName = consignee.ShortName,
                           DesOfGoods = detail.DesOfGoods,
-                          PODName = pod.NameEn
+                          PODName = pod.NameEn,
+                          ManifestRefNo = detail.ManifestRefNo
                           
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
