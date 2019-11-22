@@ -75,15 +75,6 @@ export class FormManifestSeaFclImportComponent extends AppList {
             ]
         }, { selectedDisplayFields: ['nameEn'], });
 
-        this._store.select(getParamsRouterState)
-            .subscribe((param: Params) => {
-                if (param.id) {
-                    this.jobId = param.id;
-                    this.getShipmentDetail(this.jobId);
-                }
-            }
-
-            );
 
         this.initForm();
     }

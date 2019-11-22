@@ -64,11 +64,17 @@ export class SeaFclImportManifestComponent extends AppList {
 
         ];
 
+    }
+    ngAfterViewInit() {
         this._store.select(getParamsRouterState)
             .subscribe((param: Params) => {
                 if (param.id) {
                     this.jobId = param.id;
+                    this.formManifest.jobId = this.jobId;
+                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
                     this.getHblList(this.jobId);
+                    this.getManifest(this.jobId);
+
                 }
             });
     }
@@ -80,6 +86,28 @@ export class SeaFclImportManifestComponent extends AppList {
     }
     removeAllChecked() {
         this.checkAll = false;
+    }
+
+    getManifest(id: string) {
+        this._documentationRepo.getManifest(id).subscribe(
+            (res: any) => {
+                if (!!res) {
+                    setTimeout(() => {
+                        this.formManifest.supplier.setValue(res.supplier);
+                        this.formManifest.referenceNo.setValue(res.refNo);
+                        this.formManifest.attention.setValue(res.attention);
+                        this.formManifest.marksOfNationality.setValue(res.masksOfRegistration);
+                        this.formManifest.vesselNo.setValue(res.voyNo);
+                        !!res.invoiceDate ? this.formManifest.date.setValue({ startDate: new Date(res.invoiceDate), endDate: new Date(res.invoiceDate) }) : this.formManifest.date.setValue(null);
+                        this.formManifest.selectedPortOfLoading = { field: 'id', value: res.pol };
+                        this.formManifest.selectedPortOfDischarge = { field: 'id', value: res.pod };
+                        this.formManifest.freightCharge.value.selectedItem = { id: res.paymentTerm, text: res.paymentTerm }
+
+                    }, 500);
+
+                }
+            }
+        );
     }
 
     AddOrUpdateManifest() {
