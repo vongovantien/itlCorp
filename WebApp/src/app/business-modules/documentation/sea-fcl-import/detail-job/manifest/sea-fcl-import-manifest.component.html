@@ -16,10 +16,10 @@
                     </span>
                 </span>
             </button>
-            <app-default-button (click)="AddOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
+            <app-default-button (click)="addOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
                 [dataTarget]="saveButtonSetting.dataTarget">
             </app-default-button>
-            <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
+            <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </div>
 </div>
@@ -44,29 +44,29 @@
                 <div class="col-lg-8 m--align-right">
                     <div class="form-group">
                         <div class="c-button-actions">
-                        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="OnRemove()">
-                            <span>
-                                <i class="la la-trash"></i>
+                            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="onRemove()">
                                 <span>
-                                    Remove selected
+                                    <i class="la la-trash"></i>
+                                    <span>
+                                        Remove selected
+                                    </span>
                                 </span>
-                            </span>
-                        </button>
-                        <button (click)="showPopupAddHbl()" type="button" style="float:right"
-                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                            <span>
-                                <i class="la la-plus"></i>
+                            </button>
+                            <button (click)="showPopupAddHbl()" type="button" style="float:right"
+                                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                                 <span>
-                                    Add HBL
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        Add HBL
+                                    </span>
                                 </span>
-                            </span>
-                        </button>
+                            </button>
+                        </div>
+
                     </div>
 
                 </div>
-
-            </div>
             </div>
             <div class="table-wrapper table-scrollable" id="masterbill-list-table">
                 <table class="table table-hover table-brand dataTable">
@@ -134,7 +134,7 @@
         </div>
     </div>
 </form-manifest-sea-fcl-import>
-<add-hbl-to-manifest-popup (onAdd)="OnAdd($event)"></add-hbl-to-manifest-popup>
+<add-hbl-to-manifest-popup (onAdd)="onAdd($event)"></add-hbl-to-manifest-popup>
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>

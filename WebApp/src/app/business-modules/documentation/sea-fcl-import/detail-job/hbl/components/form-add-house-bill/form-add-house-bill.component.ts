@@ -5,6 +5,9 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { BehaviorSubject } from 'rxjs';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { DataService } from 'src/app/shared/services';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-form-add-house-bill',
@@ -82,6 +85,7 @@ export class FormAddHouseBillComponent extends AppForm {
     headersSaleman: CommonInterface.IHeaderTable[];
     saleManInCustomerFilter: any = {};
     isDetail: boolean = false;
+    serviceTypesString: string[] = [];
     hbOfladingTypes: CommonInterface.ICommonTitleValue[] = [
         { title: 'Copy', value: 'Copy' },
         { title: 'Original', value: 'Original' },
@@ -89,15 +93,18 @@ export class FormAddHouseBillComponent extends AppForm {
         { title: 'Surrendered', value: 'Surrendered' }
     ];
 
-    serviceTypes: CommonInterface.ICommonTitleValue[] = [
-        { title: 'FCL/FCL', value: 'FCL/FCL' },
-        { title: 'LCL/LCL', value: 'LCL/LCL' },
-        { title: 'FCL/LCL', value: 'FCL/LCL' },
-        { title: 'CY/CFS', value: 'CY/CFS' },
-        { title: 'CY/CY', value: 'CY/CY' },
-        { title: 'CFS/CY', value: 'CFS/CY' },
-        { title: 'CFS/CFS', value: 'CFS/CFS' }
-    ];
+    // serviceTypes: CommonInterface.ICommonTitleValue[] = [
+    //     { title: 'FCL/FCL', value: 'FCL/FCL' },
+    //     { title: 'LCL/LCL', value: 'LCL/LCL' },
+    //     { title: 'FCL/LCL', value: 'FCL/LCL' },
+    //     { title: 'CY/CFS', value: 'CY/CFS' },
+    //     { title: 'CY/CY', value: 'CY/CY' },
+    //     { title: 'CFS/CY', value: 'CFS/CY' },
+    //     { title: 'CFS/CFS', value: 'CFS/CFS' }
+    // ];
+
+    serviceTypes: CommonInterface.IValueDisplay[];
+
 
     numberOfOrigins: CommonInterface.ICommonTitleValue[] = [
         { title: 'One(1)', value: 1 },
@@ -108,16 +115,17 @@ export class FormAddHouseBillComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private _documentationRepo: DocumentationRepo,
-        private _systemRepo: SystemRepo
-
-
+        private _documentRepo: DocumentationRepo,
+        private _systemRepo: SystemRepo,
+        private _spinner: NgxSpinnerService,
+        private _dataService: DataService,
     ) {
         super();
     }
 
     ngOnInit() {
         this.getListSaleman();
+        this.getCommonData();
         this.headersSaleman = [
             { title: 'User Name', field: 'username' },
         ];
@@ -208,7 +216,35 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'code', label: 'Code' }
             ],
         }, { selectedDisplayFields: ['name_EN'], });
+
         this.initForm();
+    }
+
+    async getCommonData() {
+        this._spinner.show();
+
+        try {
+            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
+                const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
+                this.serviceTypes = commonData.serviceTypes;
+
+            } else {
+                const commonData: any = await this._documentRepo.getShipmentDataCommon().toPromise();
+
+                this.serviceTypes = commonData.serviceTypes;
+                this.serviceTypesString = this.serviceTypes.map(a => a.displayName);
+
+
+
+                this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
+            }
+
+        } catch (error) {
+        }
+        finally {
+            this._spinner.hide();
+        }
+
     }
 
 

@@ -82,6 +82,7 @@ export class CreateHouseBillComponent extends AppForm {
             );
     }
 
+
     ngAfterViewInit() {
         this.shipmentGoodSummaryComponent.initContainer();
         this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;

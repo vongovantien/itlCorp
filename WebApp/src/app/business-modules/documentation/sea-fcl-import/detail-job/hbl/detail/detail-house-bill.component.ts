@@ -224,7 +224,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                         this.formHouseBill.selectedShipper = { field: 'shortName', value: this.hblDetail.shipperId };
                         this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === this.hblDetail.hbltype)[0]);
-                        this.formHouseBill.servicetype.setValue(this.formHouseBill.serviceTypes.filter(i => i.value === this.hblDetail.serviceType)[0]);
+                        // this.formHouseBill.servicetype.setValue(this.formHouseBill.serviceTypes.filter(i => i.value === this.hblDetail.serviceType)[0]);
                         this.formHouseBill.localVessel.setValue(this.hblDetail.localVessel);
                         this.formHouseBill.localVoyNo.setValue(this.hblDetail.localVoyNo);
                         this.formHouseBill.oceanVessel.setValue(this.hblDetail.oceanVessel);
@@ -250,6 +250,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                                     return;
                                 }
                             });
+                            this.formHouseBill.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.hblDetail.serviceType, text: this.hblDetail.serviceType }]);
+
                             this.formHouseBill.selectedCustomer = { field: 'id', value: this.hblDetail.customerId };
                             this.formHouseBill.selectedShipper = { field: 'id', value: this.hblDetail.shipperId };
                             this.formHouseBill.selectedConsignee = { field: 'id', value: this.hblDetail.consigneeId };

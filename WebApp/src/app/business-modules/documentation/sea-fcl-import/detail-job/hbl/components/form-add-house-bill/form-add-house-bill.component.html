@@ -327,11 +327,14 @@
                             <label class="form-control-label" for="">
                                 Service Type. <span class="m--font-danger">(*)</span>
                             </label>
-                            <select formControlName="serviceType" class="form-control">
+                            <!-- <select formControlName="serviceType" class="form-control">
                                 <option [ngValue]="null">Please Select</option>
-                                <option *ngFor="let item of serviceTypes" [ngValue]="item">
-                                    {{item.title}}</option>
-                            </select>
+                                <option *ngFor="let serviceType of serviceTypes" [ngValue]="serviceType">
+                                    {{serviceType.displayName}}
+                                </option>
+                            </select> -->
+                            <ng-select [items]="serviceTypesString" placeholder="select" formControlName="serviceType">
+                            </ng-select>
                             <div class="form-control-feedback" *ngIf="isSubmited && !servicetype.value">
                                 Service Type is required !
                             </div>
