@@ -181,5 +181,11 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
                 callBack(...args).pipe(takeUntil(source$.pipe(skip(1))))
             )
         )
+
+    createMoment(date: string | Date) {
+        if (!!date) {
+            return moment(date);
+        }
+    }
 }
 

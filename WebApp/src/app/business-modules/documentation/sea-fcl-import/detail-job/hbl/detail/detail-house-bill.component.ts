@@ -3,7 +3,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
-import moment from 'moment/moment';
 
 import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
 import { CreateHouseBillComponent } from '../create/create-house-bill.component';
@@ -240,8 +239,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                             this.formHouseBill.referenceNo.setValue(this.hblDetail.referenceNo);
                         this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.hblDetail.originBlnumber)[0]);
-                        this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? moment(this.hblDetail.etd) : null;
-                        this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? moment(this.hblDetail.eta) : null;
+                        this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? this.createMoment(this.hblDetail.etd) : null;
+                        this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? this.createMoment(this.hblDetail.eta) : null;
 
                         setTimeout(() => {
                             this.formHouseBill.saleMans.forEach(item => {
@@ -309,7 +308,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 .subscribe(
                     (res: any) => {
                         this.dataReport = res;
-                        if(this.dataReport.dataSource.length > 0){
+                        if (this.dataReport.dataSource.length > 0) {
                             setTimeout(() => {
                                 this.reportPopup.frm.nativeElement.submit();
                                 this.reportPopup.show();

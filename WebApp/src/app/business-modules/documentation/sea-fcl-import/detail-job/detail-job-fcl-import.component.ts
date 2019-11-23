@@ -19,6 +19,8 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
+
+
 @Component({
     selector: 'app-detail-job-fcl-import',
     templateUrl: './detail-job-fcl-import.component.html',
@@ -48,10 +50,10 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         protected _store: Store<fromStore.ISeaFCLImportState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
-        private cdr: ChangeDetectorRef,
+        protected cdr: ChangeDetectorRef,
         private _ngProgressService: NgProgress
     ) {
-        super(_router, _documentRepo, _actionStoreSubject, _toastService);
+        super(_router, _documentRepo, _actionStoreSubject, _toastService, cdr);
 
         this._progressRef = this._ngProgressService.ref();
     }
@@ -111,9 +113,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     setTimeout(() => {
                         this.updateForm();
                     }, 200);
-
-                    // this.formCreateComponent.fclImportDetail = this.fclImportDetail;
-                    // this.formCreateComponent.initFormUpdate();
                 },
 
             );
@@ -152,6 +151,11 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             typeOfService: (this.formCreateComponent.serviceTypes || []).filter(type => type.value === this.fclImportDetail.typeOfService)[0].value, // * select
             personIncharge: this.fclImportDetail.personIncharge,  // * select
         });
+
+        if (!!this.formCreateComponent.formCreate.value.etd) {
+            this.formCreateComponent.minDateETA = this.createMoment(this.fclImportDetail.etd);
+        }
+
 
         // * Combo grid
         this.formCreateComponent.selectedPortDestination = { field: 'id', value: this.fclImportDetail.pod };
@@ -297,7 +301,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    if(this.dataReport != null && res.dataSource.length > 0){
+                    if (this.dataReport != null && res.dataSource.length > 0) {
                         setTimeout(() => {
                             this.previewPopup.frm.nativeElement.submit();
                             this.previewPopup.show();
