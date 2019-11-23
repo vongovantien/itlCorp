@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { SeaFCLImportActionTypes, SeaFCLImportGetDetailSuccessAction, SeaFCLImportGetDetailFailAction, SeaFCLImportActions, SeaFCLImportUpdateSuccessAction, SeaFCLImportUpdateFailAction, HouseBillActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, SeaFCLImportGetProfitSuccessAction, SeaFCLImportGetProfitFailFailAction } from '../actions';
+import { SeaFCLImportActionTypes, SeaFCLImportGetDetailSuccessAction, SeaFCLImportGetDetailFailAction, SeaFCLImportActions, SeaFCLImportUpdateSuccessAction, SeaFCLImportUpdateFailAction, HouseBillActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction } from '../actions';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { IProfit } from '../reducers';
 
 @Injectable()
 export class SeaFCLImportEffects {
@@ -56,21 +55,6 @@ export class SeaFCLImportEffects {
                     )
             )
         );
-
-    @Effect()
-    getTotalProfitShipmentL$: Observable<Action> = this.actions$
-        .pipe(
-            ofType<SeaFCLImportActions>(SeaFCLImportActionTypes.GET_PROFIT),
-            map((payload: any) => payload.payload),
-            switchMap(
-                (jobId: string) => this._documentRepo.getShipmentTotalProfit(jobId)
-                    .pipe(
-                        map((data: IProfit[]) => new SeaFCLImportGetProfitSuccessAction(data)),
-                        catchError(err => of(new SeaFCLImportGetProfitFailFailAction(err)))
-                    )
-            )
-        );
-
 
 }
 

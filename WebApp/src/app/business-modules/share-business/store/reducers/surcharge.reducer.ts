@@ -1,7 +1,7 @@
 import { CsShipmentSurcharge } from "src/app/shared/models";
 import { SurchargeAction, SurchargeActionTypes } from "../actions";
 
-export interface IProfit {
+export interface ISurchargeProfit {
     hblid: string;
     hblNo: string;
     houseBillTotalCharge: {
@@ -20,7 +20,7 @@ export interface ISurcharge {
     buyings: CsShipmentSurcharge[];
     sellings: CsShipmentSurcharge[];
     obhs: CsShipmentSurcharge[];
-    profit: IProfit;
+    profit: ISurchargeProfit;
 }
 
 export const initialState: ISurcharge = {

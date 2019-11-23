@@ -48,8 +48,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a class="text-underline pointer"
-                                        [routerLink]="[shipment.id]">{{shipment.jobNo}}</a>
+                                    <a class="text-underline pointer" [routerLink]="shipment.id">{{shipment.jobNo}}</a>
                                 </td>
                                 <td>{{shipment.mawb}}</td>
                                 <td>{{shipment.etd | date: 'dd/MM/yyyy'}}</td>
