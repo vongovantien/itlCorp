@@ -75,15 +75,6 @@ export class FormManifestSeaFclImportComponent extends AppList {
             ]
         }, { selectedDisplayFields: ['nameEn'], });
 
-        this._store.select(getParamsRouterState)
-            .subscribe((param: Params) => {
-                if (param.id) {
-                    this.jobId = param.id;
-                    this.getShipmentDetail(this.jobId);
-                }
-            }
-
-            );
 
         this.initForm();
     }
@@ -108,6 +99,7 @@ export class FormManifestSeaFclImportComponent extends AppList {
                 }
             );
     }
+
 
     getShipmentDetail(id: any) {
         this._documentRepo.getDetailTransaction(id).subscribe(
@@ -145,7 +137,8 @@ export class FormManifestSeaFclImportComponent extends AppList {
             deconsolidator: [],
             weight: [],
             volume: [],
-            agent: []
+            agent: [''
+                , Validators.required]
 
         });
         this.referenceNo = this.formGroup.controls['referenceNo'];

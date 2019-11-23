@@ -30,7 +30,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    
+
     id: string;
     selectedTab: TAB | string = 'SHIPMENT';
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
@@ -76,13 +76,12 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this.cdr.detectChanges();
             }),
             switchMap(() => of(this.id))
-            // switchMap((param: any) => this._documentRepo.getDetailTransaction(param.id)) // ? Using Effects or common way.
         ).subscribe(
             (jobId: string) => {
                 this.id = jobId;
                 this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(jobId));
                 this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
-                this._store.dispatch(new fromStore.SeaFCLImportGetProfitAction(jobId));
+                this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
 
 
                 this.getDetailSeaFCLImport();
@@ -292,16 +291,20 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         this._router.navigate(["home/documentation/sea-fcl-import"]);
     }
 
-    previewPLsheet(currency: string){
+    previewPLsheet(currency: string) {
         this._documenRepo.previewSIFPLsheet(this.id, currency)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.previewPopup.frm.nativeElement.submit();
-                        this.previewPopup.show();
-                    }, 1000);
+                    if(this.dataReport != null && res.dataSource.length > 0){
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
                 },
             );
     }

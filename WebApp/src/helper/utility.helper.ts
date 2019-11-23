@@ -1,7 +1,7 @@
 export class UtilityHelper {
-    prepareNg2SelectData(dataSource: any[], id: any, text: any) {
+    prepareNg2SelectData(dataSource: any[], id: any, text: any): CommonInterface.INg2Select[] {
         return dataSource.map((item: any) => {
-            return { id: item[id], text: item[text] }
+            return { id: item[id], text: item[text] };
         });
     }
 

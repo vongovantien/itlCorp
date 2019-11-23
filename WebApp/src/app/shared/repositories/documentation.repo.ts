@@ -17,7 +17,11 @@ export class DocumentationRepo {
         );
     }
 
-
+    getManifest(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest`, { jobId: id }).pipe(
+            map((data: any) => data)
+        );
+    }
 
     updateHbl(body: any) {
         return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/Update`, body).pipe(
@@ -44,6 +48,11 @@ export class DocumentationRepo {
     createTransaction(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction`, body);
     }
+
+    AddOrUpdateManifest(body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsManifest/AddOrUpdateManifest`, body);
+    }
+
 
     getDetailTransaction(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/${id}`);
@@ -437,4 +446,9 @@ export class DocumentationRepo {
         );
     }
 
+    previewFCLImportManifest(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewFCLImportManifest`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }

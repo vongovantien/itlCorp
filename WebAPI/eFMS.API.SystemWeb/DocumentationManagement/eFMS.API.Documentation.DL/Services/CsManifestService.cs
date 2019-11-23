@@ -20,15 +20,18 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsTransactionDetail> transactionDetailRepository;
         readonly IContextBase<CatPlace> placeRepository;
         readonly ICsMawbcontainerService containerService;
+        readonly ICsTransactionService csTransactionService;
         public CsManifestService(IContextBase<CsManifest> repository, 
             IMapper mapper,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
             IContextBase<CatPlace> placeRepo,
-            ICsMawbcontainerService contService) : base(repository, mapper)
+            ICsMawbcontainerService contService,
+            ICsTransactionService transactionService) : base(repository, mapper)
         {
             transactionDetailRepository = transactionDetailRepo;
             placeRepository = placeRepo;
             containerService = contService;
+            csTransactionService = transactionService;
         }
 
         public HandleState AddOrUpdateManifest(CsManifestEditModel model)
@@ -60,8 +63,8 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         item.DatetimeModified = DateTime.Now;
                         item.UserModified = manifest.UserCreated;
-                        var tranDetail = mapper.Map<CsTransactionDetailAddManifest>(item);
-                        transactionDetailRepository.Update(tranDetail, x => x.Id == tranDetail.Id);
+                        var tranDetail = mapper.Map<CsTransactionDetail>(item);
+                        var s = transactionDetailRepository.Update(tranDetail, x => x.Id == tranDetail.Id);
                     }
                     transactionDetailRepository.SubmitChanges();
                     DataContext.SubmitChanges();
@@ -79,12 +82,12 @@ namespace eFMS.API.Documentation.DL.Services
         public CsManifestModel GetById(Guid jobId)
         {
             var manifests = DataContext.Get(x => x.JobId == jobId);
-            if (manifests == null) return null;
+            if (manifests.Count() == 0 ) return null;
             var manifest = manifests.First();
             var places = placeRepository.Get(x => x.PlaceTypeId.Contains("port"));
             var result = mapper.Map<CsManifestModel>(manifest);
-            result.PolName = places.FirstOrDefault(x => x.Id == manifest.Pol)?.DisplayName;
-            result.PodName = places.FirstOrDefault(x => x.Id == manifest.Pod)?.DisplayName;
+            result.PolName = places.FirstOrDefault(x => x.Id == manifest.Pol)?.NameEn;
+            result.PodName = places.FirstOrDefault(x => x.Id == manifest.Pod)?.NameEn;
             return result;
         }       
 
@@ -185,6 +188,7 @@ namespace eFMS.API.Documentation.DL.Services
             string noPieces = string.Empty;
             string totalPackages = string.Empty;
             var containers = new List<SeaImportCargoManifestContainer>();
+            var transaction = csTransactionService.GetById(model.JobId);
             if (model.CsTransactionDetails.Count > 0)
             {
                 foreach(var item in model.CsTransactionDetails)
@@ -217,11 +221,12 @@ namespace eFMS.API.Documentation.DL.Services
 
                     var manifest = new ManifestFCLImportReport
                     {
-                        LoadingDate = item.Etd,
-                        LocalVessel = item.LocalVessel,
-                        ContSealNo = item.LocalVoyNo,
+                        DateConfirm = model.InvoiceDate,
+                        LoadingDate = transaction.Etd,
+                        LocalVessel = transaction.FlightVesselName,
+                        ContSealNo = transaction.VoyNo,
                         PortofDischarge = model.PodName,
-                        PlaceDelivery = model.PolName,
+                        PlaceDelivery = transaction.PlaceDeliveryName,
                         HWBNO = item.Hwbno,
                         ATTN = item.ShipperDescription,
                         Consignee = item.ConsigneeDescription,
@@ -232,16 +237,18 @@ namespace eFMS.API.Documentation.DL.Services
                         NoPieces = noPieces,
                         GrossWeight = item.GrossWeight,
                         CBM = item.CBM,
-                        Liner = item.ColoaderId
+                        Liner = item.ColoaderId,
+                        OverseasAgent = transaction.AgentName
                     };
                     manifests.Add(manifest);
                 }
             }
-
+            if (manifests.Count == 0)
+                return result;
             var parameter = new ManifestFCLImportReportParameter
             {
                 SumCarton = string.Empty,
-                MBL = string.Empty,
+                MBL = transaction.Mawb,
                 LCL = "FCL",
                 CompanyName = "Indo Trans",
                 CompanyAddress1 = "52, Trường Sơn, Phường 2, Tân Bình",

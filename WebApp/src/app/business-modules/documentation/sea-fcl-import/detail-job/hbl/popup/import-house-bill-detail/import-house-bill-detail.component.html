@@ -28,8 +28,8 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <label class="m-checkbox">
-                                                <input [checked]="selected === i" (change)="selected = i"
-                                                    type="checkbox">
+                                                <input [checked]="selected === i &&  pageChecked === page"
+                                                    (change)="onSelected(i)" type="checkbox">
                                                 <span></span>
 
                                             </label>
@@ -77,11 +77,11 @@
                     </div>
                 </div>
                 <div class="form-actions">
-                    <div class="row">
+                    <!-- <div class="row">
                         <span *ngIf="isCheckHbl === false" [ngClass]="{'has-danger': isCheckHbl === false}">
                             Please choose one hbl!!
                         </span>
-                    </div>
+                    </div> -->
                     <div class="row">
                         <div class="col-lg-6"></div>
                         <div class="col-lg-6 m--align-right">

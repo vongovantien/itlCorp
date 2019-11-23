@@ -15,11 +15,11 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { StoreModule } from '@ngrx/store';
 import { reducers, effects } from './store';
 import { EffectsModule } from '@ngrx/effects';
-import { SeaFCLImportGrantTotalProfitComponent } from './components/grant-total-profit/grant-total-profit.component';
 import { SeaFCLImportLazyLoadModule } from './sea-fcl-import-lazy-load.module';
 import { SeaFclImportManifestComponent } from './detail-job/manifest/sea-fcl-import-manifest.component';
 import { FormManifestSeaFclImportComponent } from './detail-job/manifest/components/form-manifest/form-manifest-sea-fcl-import.component';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { AddHblToManifestComponent } from './detail-job/manifest/popup/add-hbl-to-manifest.popup';
 
 const routing: Routes = [
 
@@ -49,8 +49,7 @@ const routing: Routes = [
 const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
-    SeaFCLImportGrantTotalProfitComponent
-
+    AddHblToManifestComponent
 ];
 
 const LIB = [

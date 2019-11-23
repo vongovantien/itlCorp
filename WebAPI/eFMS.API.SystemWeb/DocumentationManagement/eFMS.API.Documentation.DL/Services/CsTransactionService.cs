@@ -36,7 +36,11 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
         readonly IContextBase<CsTransaction> transactionRepository;
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
+        readonly IContextBase<CatUnit> catUnitRepo;
+        readonly IContextBase<CatCountry> catCountryRepo;
         readonly ICsMawbcontainerService containerService;
+        readonly ICsShipmentSurchargeService surchargeService;
+        readonly ICsTransactionDetailService transactionDetailService;
         private readonly IStringLocalizer stringLocalizer;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
@@ -52,7 +56,11 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<CatCurrencyExchange> currencyExchangeRepo,
-            ICsMawbcontainerService contService) : base(repository, mapper)
+            IContextBase<CatUnit> catUnit,
+            IContextBase<CatCountry> catCountry,
+            ICsMawbcontainerService contService,
+            ICsShipmentSurchargeService surService,
+            ICsTransactionDetailService tranDetailService) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -66,6 +74,10 @@ namespace eFMS.API.Documentation.DL.Services
             transactionRepository = transactionRepo;
             currencyExchangeRepository = currencyExchangeRepo;
             containerService = contService;
+            catUnitRepo = catUnit;
+            surchargeService = surService;
+            catCountryRepo = catCountry;
+            transactionDetailService = tranDetailService;
         }
 
         #region -- INSERT & UPDATE --
@@ -332,7 +344,7 @@ namespace eFMS.API.Documentation.DL.Services
                     job.CurrentStatus = TermData.Canceled;
                     job.DatetimeModified = DateTime.Now;
                     job.UserModified = currentUser.UserID;
-                    hs = DataContext.Update(job, x => x.Id == jobId);                    
+                    hs = DataContext.Update(job, x => x.Id == jobId);
                 }
             }
             catch (Exception ex)
@@ -354,8 +366,9 @@ namespace eFMS.API.Documentation.DL.Services
                 var result = mapper.Map<CsTransactionModel>(data);
                 if (result.ColoaderId != null) result.SupplierName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.PartnerNameEn;
                 if (result.AgentId != null) result.AgentName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId)?.PartnerNameEn;
-                if (result.Pod != null) result.PODName = catPlaceRepo.Get().FirstOrDefault(x => x.Id == result.Pod)?.NameEn;
-                if (result.Pol != null) result.POLName = catPlaceRepo.Get().FirstOrDefault(x => x.Id == result.Pol)?.NameEn;
+                if (result.Pod != null) result.PODName = catPlaceRepo.Get(x => x.Id == result.Pod)?.FirstOrDefault().NameEn;
+                if (result.Pol != null) result.POLName = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault().NameEn;
+                if (result.DeliveryPlace != null) result.PlaceDeliveryName = catPlaceRepo.Get(x => x.Id == result.DeliveryPlace)?.FirstOrDefault().NameEn;
                 return result;
             }
         }
@@ -365,7 +378,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<CsTransactionModel> GetTransaction(string transactionType, bool isSearch)
         {
             var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled);
-            
+
             var coloaders = catPartnerRepo.Get();
             var agents = catPartnerRepo.Get();
             var pols = catPlaceRepo.Get();
@@ -977,84 +990,177 @@ namespace eFMS.API.Documentation.DL.Services
         {
             Crystal result = null;
             var _currentUser = currentUser.UserID;
-            var listCharge = new List<SIFFormPLsheetReport>();
-            var charge = new SIFFormPLsheetReport();
-            charge.COSTING = "COSTING";
-            charge.TransID = "TransID";
-            charge.TransDate = DateTime.Now;
-            charge.HWBNO = "HWBNO";
-            charge.MAWB = "MAWB";
-            charge.PartnerName = "PartnerName";
-            charge.ContactName = "ContactName";
-            charge.ShipmentType = "ShipmentType";
-            charge.NominationParty = "NominationParty";
-            charge.Nominated = true;
-            charge.POL = "POL";
-            charge.POD = "POD";
-            charge.Commodity = "Commodity";
-            charge.Volumne = "Volumne";
-            charge.Carrier = "Carrier";
-            charge.Agent = "Agent";
-            charge.ATTN = "ATTN";
-            charge.Consignee = "Consignee";
-            charge.ContainerNo = "ContainerNo";
-            charge.OceanVessel = "OceanVessel";
-            charge.LocalVessel = "LocalVessel";
-            charge.FlightNo = "FlightNo";
-            charge.SeaImpVoy = "SeaImpVoy";
-            charge.LoadingDate = "LoadingDate";
-            charge.ArrivalDate = "ArrivalDate";
-            charge.FreightCustomer = 0;
-            charge.FreightColoader = 0;
-            charge.PayableAccount = "PayableAccount";
-            charge.Description = "Description";
-            charge.Curr = "Curr";
-            charge.VAT = 0;
-            charge.VATAmount = 0;
-            charge.Cost = 0;
-            charge.Revenue = 0;
-            charge.Exchange = 0;
-            charge.VNDExchange = 0;
-            charge.Paid = true;
-            charge.DatePaid = DateTime.Now;
-            charge.Docs = "Docs";
-            charge.Notes = "Notes";
-            charge.InputData = "InputData";
-            charge.SalesProfit = 0;
-            charge.Quantity = 0;
-            charge.UnitPrice = 0;
-            charge.Unit = "Unit";
-            charge.LastRevised = "LastRevised";
-            charge.OBH = true;
-            charge.ExtRateVND = 0;
-            charge.KBck = true;
-            charge.NoInv = true;
-            charge.Approvedby = "Approvedby";
-            charge.ApprovedDate = DateTime.Now;
-            charge.SalesCurr = "SalesCurr";
-            charge.GW = 0;
-            charge.MCW = 0;
-            charge.HCW = 0;
-            charge.PaymentTerm = "PaymentTerm";
-            charge.DetailNotes = "DetailNotes";
-            charge.ExpressNotes = "ExpressNotes";
-            charge.InvoiceNo = "InvoiceNo";
-            charge.CodeVender = "CodeVender";
-            charge.CodeCus = "CodeCus";
-            charge.Freight = true;
-            charge.Collect = true;
-            charge.FreightPayableAt = "FreightPayableAt";
-            charge.PaymentTime = 0;
-            charge.PaymentTimeCus = 0;
-            charge.Noofpieces = 0;
-            charge.UnitPieces = "UnitPieces";
-            charge.TypeofService = "TypeofService";
-            charge.ShipmentSource = "ShipmentSource";
-            charge.RealCost = true;
+            var shipment = DataContext.First(x => x.Id == jobId);
+            if (shipment == null) return result;
+            var agent = catPartnerRepo.Get(x => x.Id == shipment.AgentId).FirstOrDefault();
+            var supplier = catPartnerRepo.Get(x => x.Id == shipment.ColoaderId).FirstOrDefault();
 
-            listCharge.Add(charge);
+            var units = catUnitRepo.Get();
+            var pol = catPlaceRepo.Get(x => x.Id == shipment.Pol).FirstOrDefault();
+            var pod = catPlaceRepo.Get(x => x.Id == shipment.Pod).FirstOrDefault();
+            var polName = pol?.NameEn;
+            var podName = pod?.NameEn;
+            var polCountry = string.Empty;
+            var podCountry = string.Empty;
+            if (pol != null)
+            {
+                polCountry = catCountryRepo.Get(x => x.Id == pol.CountryId).FirstOrDefault()?.NameEn;
+            }
+            if (pod != null)
+            {
+                podCountry = catCountryRepo.Get(x => x.Id == pod.CountryId).FirstOrDefault()?.NameEn;
+            }
 
-            var parameter = new SIFFormPLsheetReportParams();
+            CsMawbcontainerCriteria contCriteria = new CsMawbcontainerCriteria { Mblid = jobId };
+            var containerList = containerService.Query(contCriteria);
+            var containerNoList = string.Empty;
+            if (containerList.Count() > 0)
+            {
+                containerNoList = String.Join("\r\n", containerList.Select(x => string.IsNullOrEmpty(x.ContainerNo) && string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
+            }
+
+            var listCharge = new List<FormPLsheetReport>();
+
+            CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
+            var listHousebill = transactionDetailService.GetByJob(criteria);
+            var hblNoList = string.Empty;
+            if (listHousebill.Count > 0)
+            {
+                hblNoList = String.Join(";", listHousebill.Select(x => x.Hwbno));
+
+                var housebillFirst = listHousebill.First();
+                var userSaleman = sysUserRepo.Get(x => x.Id == housebillFirst.SaleManId).FirstOrDefault();
+                var shipper = catPartnerRepo.Get(x => x.Id == housebillFirst.ShipperId).FirstOrDefault()?.PartnerNameEn;
+                var consignee = catPartnerRepo.Get(x => x.Id == housebillFirst.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
+                
+                var surcharges = new List<CsShipmentSurchargeDetailsModel>();
+                foreach (var housebill in listHousebill)
+                {
+                    var surcharge = surchargeService.GetByHB(housebill.Id);
+                    surcharges.AddRange(surcharge);                   
+                }
+
+                if (surcharges.Count > 0)
+                {
+                    foreach(var surcharge in surcharges)
+                    {
+                        var unitCode = units.FirstOrDefault(x => x.Id == surcharge.UnitId)?.Code;
+                        bool isOBH = false;
+                        decimal cost = 0;
+                        decimal revenue = 0;
+                        decimal saleProfit = 0;
+                        string partnerName = string.Empty;
+                        if (surcharge.Type == Constants.CHARGE_OBH_TYPE)
+                        {
+                            isOBH = true;
+                            partnerName = surcharge.PayerName;
+                        }
+                        if (surcharge.Type == Constants.CHARGE_BUY_TYPE)
+                        {
+                            cost = surcharge.Total;
+                        }
+                        if (surcharge.Type == Constants.CHARGE_SELL_TYPE)
+                        {
+                            revenue = surcharge.Total;
+                        }
+                        saleProfit = cost + revenue;
+
+                        var exchargeDateSurcharge = surcharge.ExchangeDate == null ? DateTime.Now : surcharge.ExchangeDate;
+                        //Exchange Rate theo Currency truyền vào
+                        var exchangeRate = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == surcharge.CurrencyId && x.CurrencyToId == "USD" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        //decimal? _exchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
+                        decimal _exchangeRateUSD;
+                        if ((exchangeRate != null && exchangeRate.Rate != 0))
+                        {
+                            _exchangeRateUSD = exchangeRate.Rate;
+                        }
+                        else
+                        {
+                            //Exchange Rate ngược
+                            var exchangeRateReverse = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == surcharge.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                            _exchangeRateUSD = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1 / exchangeRateReverse.Rate : 1;
+                        }
+
+                        var charge = new FormPLsheetReport();
+                        charge.COSTING = "COSTING";
+                        charge.TransID = shipment.JobNo; //JobNo of shipment
+                        charge.TransDate = shipment.DatetimeCreated.Value; //CreatedDate of shipment
+                        charge.HWBNO = surcharge.Hwbno;
+                        charge.MAWB = shipment.Mawb; //MasterBill of shipment
+                        charge.PartnerName = "PartnerName"; //NOT USE
+                        charge.ContactName = userSaleman?.Username; //Saleman đầu tiên của list housebill
+                        charge.ShipmentType = "Import (Sea FCL) " + shipment.TypeOfService;
+                        charge.NominationParty = string.Empty;
+                        charge.Nominated = true; //Gán cứng
+                        charge.POL = polName + ", " + polCountry;
+                        charge.POD = podName + ", " + podCountry;
+                        charge.Commodity = shipment.Commodity;
+                        charge.Volumne = string.Empty; //Gán rỗng
+                        charge.Carrier = supplier?.PartnerNameEn;
+                        charge.Agent = agent?.PartnerNameEn;
+                        charge.ATTN = shipper; //Shipper đầu tiên của list housebill
+                        charge.Consignee = consignee; //Consignee đầu tiên của list housebill
+                        charge.ContainerNo = containerNoList; //Danh sách container của Shipment (Format: contNo/SealNo)
+                        charge.OceanVessel = shipment.FlightVesselName; //Tên chuyến bay
+                        charge.LocalVessel = shipment.FlightVesselName; //Tên chuyến bay
+                        charge.FlightNo = shipment.VoyNo; //Mã chuyến bay
+                        charge.SeaImpVoy = string.Empty;//Gán rỗng
+                        charge.LoadingDate = shipment.Etd != null ? shipment.Etd.Value.ToString("dd MMM yyyy") : string.Empty; //ETD
+                        charge.ArrivalDate = shipment.Eta != null ? shipment.Eta.Value.ToString("dd MMM yyyy") : string.Empty; //ETA
+                        charge.FreightCustomer = "0"; //NOT USE
+                        charge.FreightColoader = 0; //NOT USE
+                        charge.PayableAccount = surcharge.PartnerName;//Partner name of charge
+                        charge.Description = surcharge.ChargeNameEn; //Charge name of charge
+                        charge.Curr = surcharge.CurrencyId; //Currency of charge
+                        charge.VAT = 0; //NOT USE
+                        charge.VATAmount = 0; //NOT USE
+                        charge.Cost = cost; //Phí chi của charge
+                        charge.Revenue = revenue; //Phí thu của charge
+                        charge.Exchange = currency == "USD" ? _exchangeRateUSD * saleProfit : 0; //Exchange phí của charge về USD
+                        charge.VNDExchange = surcharge.ExchangeRate.Value;
+                        charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
+                        charge.DatePaid = DateTime.Now; //NOT USE
+                        charge.Docs = surcharge.InvoiceNo; //InvoiceNo of charge
+                        charge.Notes = surcharge.Notes;
+                        charge.InputData = string.Empty; //Gán rỗng
+                        charge.SalesProfit = saleProfit;
+                        charge.Quantity = surcharge.Quantity;
+                        charge.UnitPrice = surcharge.UnitPrice.Value;
+                        charge.Unit = unitCode;
+                        charge.LastRevised = DateTime.Now.ToString("dd MMMM yyyy");
+                        charge.OBH = isOBH;
+                        charge.ExtRateVND = 0; //NOT USE
+                        charge.KBck = true; //NOT USE
+                        charge.NoInv = true; //NOT USE
+                        charge.Approvedby = string.Empty; //Gán rỗng
+                        charge.ApproveDate = DateTime.Now; //NOT USE
+                        charge.SalesCurr = currency;
+                        charge.GW = shipment.GrossWeight;
+                        charge.MCW = shipment.NetWeight.Value;//Đang lấy NetWeight của Shipment
+                        charge.HCW = shipment.ChargeWeight;
+                        charge.PaymentTerm = "PaymentTerm"; //NOT USE
+                        charge.DetailNotes = string.Empty; //Gán rỗng
+                        charge.ExpressNotes = string.Empty; //Gán rỗng
+                        charge.InvoiceNo = "InvoiceNo"; //NOT USE
+                        charge.CodeVender = "CodeVender"; //NOT USE
+                        charge.CodeCus = "CodeCus"; //NOT USE
+                        charge.Freight = true; //NOT USE
+                        charge.Collect = true; //NOT USE
+                        charge.FreightPayableAt = "FreightPayableAt"; //NOT USE
+                        charge.PaymentTime = 0; //NOT USE
+                        charge.PaymentTimeCus = 0; //NOT USE
+                        charge.Noofpieces = 0; //NOT USE
+                        charge.UnitPieaces = "UnitPieces"; //NOT USE
+                        charge.TpyeofService = "TpyeofService"; //NOT USE
+                        charge.ShipmentSource = shipment.ShipmentType;
+                        charge.RealCost = true;
+
+                        listCharge.Add(charge);
+                    }
+                }
+            }
+
+            var parameter = new FormPLsheetReportParameter();
             parameter.Contact = _currentUser;//Get user login
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyDescription = string.Empty;
@@ -1063,11 +1169,11 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.Website = Constants.COMPANY_WEBSITE;
             parameter.CurrDecimalNo = 2;
             parameter.DecimalNo = 2;
-            parameter.HBLList = "HBList";
+            parameter.HBLList = hblNoList;
 
             result = new Crystal
             {
-                ReportName = "SIFFormPLsheet.rpt",
+                ReportName = "FormPLsheet.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };

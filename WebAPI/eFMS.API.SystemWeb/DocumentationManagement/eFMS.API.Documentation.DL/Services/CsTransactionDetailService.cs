@@ -78,7 +78,7 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
             detail.UserModified = detail.UserCreated;
             detail.DatetimeModified = detail.DatetimeCreated = DateTime.Now;
             detail.Active = true;
-            detail.SailingDate = DateTime.Now;
+            //detail.SailingDate = DateTime.Now;
             try
             {
                 var hs = DataContext.Add(detail);
@@ -378,10 +378,16 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                       join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                       join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                       from cus in customers.DefaultIfEmpty()
+                      join shipper in catPartnerRepo.Get() on detail.ShipperId equals shipper.Id into shippers
+                      from shipper in shippers.DefaultIfEmpty()
+                      join consignee in catPartnerRepo.Get() on detail.ConsigneeId equals consignee.Id into consignees
+                      from consignee in consignees.DefaultIfEmpty()
                       join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id into salemans
                       from sale in salemans.DefaultIfEmpty()
                       join notify in catPartnerRepo.Get() on detail.NotifyPartyId equals notify.Id into notifys
                       from notify in notifys.DefaultIfEmpty()
+                      join port in catPlaceRepo.Get() on detail.Pod equals port.Id into portDetail
+                      from pod in portDetail.DefaultIfEmpty()
                       select new CsTransactionDetailModel {
                           Id = detail.Id,
                           JobId = detail.JobId,
@@ -389,7 +395,7 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                           Mawb = detail.Mawb,
                           SaleManId = detail.SaleManId,
                           SaleManName = sale.Username,
-                          CustomerId =  detail.CustomerId,
+                          CustomerId = detail.CustomerId,
                           CustomerName = cus.ShortName,
                           NotifyPartyId = detail.NotifyPartyId,
                           NotifyParty = notify.ShortName,
@@ -410,9 +416,15 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                           ColoaderId = detail.ColoaderId,
                           LocalVoyNo = detail.LocalVoyNo,
                           LocalVessel = detail.LocalVessel,
-                          OceanVessel = detail.OceanVessel, 
+                          OceanVessel = detail.OceanVessel,
                           OceanVoyNo = detail.OceanVoyNo,
-                          OriginBlnumber = detail.OriginBlnumber 
+                          OriginBlnumber = detail.OriginBlnumber,
+                          ShipperName = shipper.ShortName,
+                          ConsigneeName = consignee.ShortName,
+                          DesOfGoods = detail.DesOfGoods,
+                          PODName = pod.NameEn,
+                          ManifestRefNo = detail.ManifestRefNo
+                          
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.ToList();

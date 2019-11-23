@@ -91,7 +91,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmited && !selectedPortOfLoading.value }">
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedPortOfLoading.value }">
                             <label class="form-control-label">
                                 Port of Loading <span class="m--font-danger">(*)</span>
                             </label>
@@ -108,7 +108,7 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmited  && (!selectedPortOfDischarge.value || PortChargeLikePortLoading == true) }">
+                            [ngClass]="{'m-form__group has-danger': isSubmitted  && (!selectedPortOfDischarge.value) }">
                             <label class="form-control-label">
                                 Port of Discharge <span class="m--font-danger">(*)</span>
                             </label>
@@ -165,7 +165,7 @@
                                     <label class="form-control-label" for="">
                                         Weight(Kgs)
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square"
+                                    <input type="text" class="form-control m-input m-input--square" disabled
                                         formControlName="weight">
                                 </div>
                             </div>
@@ -174,7 +174,7 @@
                                     <label class="form-control-label" for="">
                                         Volume(CBM)
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square"
+                                    <input type="text" class="form-control m-input m-input--square" disabled
                                         formControlName="volume">
                                 </div>
                             </div>
@@ -198,4 +198,7 @@
             </div>
         </div>
     </form>
+    <ng-content>
+
+    </ng-content>
 </div>

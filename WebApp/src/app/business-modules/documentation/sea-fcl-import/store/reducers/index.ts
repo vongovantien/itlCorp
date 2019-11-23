@@ -17,7 +17,6 @@ export const fclImportstate = createFeatureSelector<ISeaFCLImportState>('seaFClI
 export const seaFCLImportTransactionState = createSelector(fclImportstate, (state: ISeaFCLImportState) => state.csTransaction.cstransaction);
 
 export const getHBLState = createSelector(fclImportstate, (state: ISeaFCLImportState) => state.houseBill.hbl);
-export const getShipmentProfitState = createSelector(fclImportstate, (state: ISeaFCLImportState) => state.csTransaction.profits);
 
 export const reducers: ActionReducerMap<ISeaFCLImportState> = {
     csTransaction: CSTransactionReducer,

@@ -2,8 +2,11 @@ import { AppPage } from './app.base';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn } from '@angular/forms';
 import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.model';
 import { ButtonType } from './shared/enums/type-button.enum';
+import { SelectComponent } from 'ng2-select';
+import { ViewChildren, QueryList } from '@angular/core';
 
 export abstract class AppForm extends AppPage {
+    @ViewChildren(SelectComponent) selectElements: QueryList<SelectComponent>;
 
     requestSearch: any = null;
     requestReset: any = null;
@@ -84,4 +87,14 @@ export abstract class AppForm extends AppPage {
         this.requestReset($event);
     }
 
+    closeOtherSelects(element: { optionsOpened: any; }) {
+        if (element.optionsOpened) {
+            const elementsToclose = this.selectElements.filter((el: any) => el !== element && el.optionsOpened);
+            elementsToclose.forEach((e: SelectComponent) => {
+                e.clickedOutside();
+            });
+        }
+    }
 }
+
+
