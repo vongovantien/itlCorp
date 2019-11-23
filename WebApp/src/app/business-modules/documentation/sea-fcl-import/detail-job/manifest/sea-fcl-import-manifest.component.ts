@@ -17,18 +17,23 @@ import { formatDate } from '@angular/common';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ToastrService } from 'ngx-toastr';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
     selector: 'app-sea-fcl-import-manifest',
     templateUrl: './sea-fcl-import-manifest.component.html'
 })
 export class SeaFclImportManifestComponent extends AppList {
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
+
     @ViewChild(FormManifestSeaFclImportComponent, { static: false }) formManifest: FormManifestSeaFclImportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(AddHblToManifestComponent, { static: false }) AddHblToManifestPopup: AddHblToManifestComponent;
     housebills: any[] = [];
     housebillsRoot: any[] = [];
     housebillsChange: any[] = [];
+    manifest: any = {};
     saveButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.save
     };
@@ -39,12 +44,16 @@ export class SeaFclImportManifestComponent extends AppList {
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
     checkAll = false;
-
+    totalGW = 0;
+    totalCBM = 0;
+    fistOpen: boolean = true;
     constructor(
         protected _store: Store<fromStore.ISeaFCLImportState>,
         private _progressService: NgProgress,
         private _documentationRepo: DocumentationRepo,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _toastService: ToastrService
+
 
 
     ) {
@@ -66,11 +75,17 @@ export class SeaFclImportManifestComponent extends AppList {
 
         ];
 
+    }
+    ngAfterViewInit() {
         this._store.select(getParamsRouterState)
             .subscribe((param: Params) => {
                 if (param.id) {
                     this.jobId = param.id;
+                    this.formManifest.jobId = this.jobId;
+                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
                     this.getHblList(this.jobId);
+                    this.getManifest(this.jobId);
+
                 }
             });
     }
@@ -82,6 +97,64 @@ export class SeaFclImportManifestComponent extends AppList {
     }
     removeAllChecked() {
         this.checkAll = false;
+    }
+
+    refreshManifest() {
+        this.getManifest(this.jobId);
+        this.getHblList(this.jobId);
+    }
+
+    onRefresh() {
+        this.confirmCreatePopup.hide();
+        this.refreshManifest();
+    }
+
+    showRefreshPopup() {
+        this.confirmCreatePopup.show();
+    }
+
+    getTotalWeight() {
+        this.totalCBM = 0;
+        this.totalGW = 0;
+        this.housebills.forEach(x => {
+            if (x.isRemoved === false) {
+                this.totalGW = this.totalGW + x.gw;
+                this.totalCBM = this.totalCBM + x.cbm;
+            }
+        });
+        this.manifest.weight = this.totalGW;
+        this.manifest.volume = this.totalCBM;
+        this.formManifest.volume.setValue(this.manifest.volume);
+        this.formManifest.weight.setValue(this.manifest.weight);
+
+    }
+
+    getManifest(id: string) {
+        this._documentationRepo.getManifest(id).subscribe(
+            (res: any) => {
+                if (!!res) {
+                    this.manifest = res;
+                    setTimeout(() => {
+                        this.formManifest.supplier.setValue(res.supplier);
+                        this.formManifest.referenceNo.setValue(res.refNo);
+                        this.formManifest.attention.setValue(res.attention);
+                        this.formManifest.marksOfNationality.setValue(res.masksOfRegistration);
+                        this.formManifest.vesselNo.setValue(res.voyNo);
+                        !!res.invoiceDate ? this.formManifest.date.setValue({ startDate: new Date(res.invoiceDate), endDate: new Date(res.invoiceDate) }) : this.formManifest.date.setValue(null);
+                        this.formManifest.selectedPortOfLoading = { field: 'id', value: res.pol };
+                        this.formManifest.selectedPortOfDischarge = { field: 'id', value: res.pod };
+                        this.formManifest.freightCharge.setValue([<CommonInterface.INg2Select>{ id: res.paymentTerm, text: res.paymentTerm }]);
+                        this.formManifest.consolidator.setValue(res.consolidator);
+                        this.formManifest.deconsolidator.setValue(res.deConsolidator);
+                        this.formManifest.agent.setValue(res.manifestIssuer);
+                        this.formManifest.weight.setValue(res.weight);
+                        this.formManifest.volume.setValue(res.volume);
+
+                    }, 500);
+
+                }
+            }
+        );
     }
 
     AddOrUpdateManifest() {
@@ -112,10 +185,9 @@ export class SeaFclImportManifestComponent extends AppList {
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-                            console.log(res);
-
+                            this._toastService.success(res.message, '');
                         } else {
-
+                            this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                         }
                     }
                 );
@@ -129,19 +201,24 @@ export class SeaFclImportManifestComponent extends AppList {
             if (x.isChecked) {
                 x.isRemoved = true;
                 x.isChecked = false;
+                x.manifestRefNo = null;
             }
+
         });
+        this.getTotalWeight();
         this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
         this.AddHblToManifestPopup.checkAll = false;
     }
 
     OnAdd() {
+
         this.housebills.forEach(x => {
             if (x.isChecked) {
                 x.isRemoved = false;
                 x.isChecked = false;
             }
         });
+        this.getTotalWeight();
         this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
     }
 
@@ -184,6 +261,7 @@ export class SeaFclImportManifestComponent extends AppList {
                         }
                     });
                     this.housebills = res;
+                    console.log(this.housebills);
                     this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
                 },
             );

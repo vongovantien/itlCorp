@@ -82,7 +82,7 @@ namespace eFMS.API.Documentation.DL.Services
         public CsManifestModel GetById(Guid jobId)
         {
             var manifests = DataContext.Get(x => x.JobId == jobId);
-            if (manifests == null) return null;
+            if (manifests.Count() == 0 ) return null;
             var manifest = manifests.First();
             var places = placeRepository.Get(x => x.PlaceTypeId.Contains("port"));
             var result = mapper.Map<CsManifestModel>(manifest);

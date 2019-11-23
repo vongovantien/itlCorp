@@ -17,7 +17,11 @@ export class DocumentationRepo {
         );
     }
 
-
+    getManifest(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest`, { jobId: id }).pipe(
+            map((data: any) => data)
+        );
+    }
 
     updateHbl(body: any) {
         return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/Update`, body).pipe(
