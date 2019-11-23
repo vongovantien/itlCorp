@@ -18,6 +18,7 @@ import * as fromShareBussiness from './../../../../share-business/store';
 
 import { catchError, finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -26,7 +27,7 @@ import { Observable } from 'rxjs';
 export class SeaFCLImportHBLComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
-
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
@@ -39,7 +40,7 @@ export class SeaFCLImportHBLComponent extends AppList {
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
 
     selectedTabSurcharge: string = 'BUY';
-
+    dataReport: any = null;
     constructor(
         private _router: Router,
         private _sortService: SortService,
@@ -235,6 +236,24 @@ export class SeaFCLImportHBLComponent extends AppList {
                         this._toastService.success(respone.message, 'Delete Success !');
 
                         this.gotoList();
+                    }
+                },
+            );
+    }
+
+    previewPLsheet(currency: string) {
+        this._documentRepo.previewSIFPLsheet(this.jobId, currency)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if(this.dataReport != null && res.dataSource.length > 0){
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
