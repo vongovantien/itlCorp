@@ -298,10 +298,14 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.previewPopup.frm.nativeElement.submit();
-                        this.previewPopup.show();
-                    }, 1000);
+                    if(this.dataReport != null && res.dataSource.length > 0){
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
                 },
             );
     }
