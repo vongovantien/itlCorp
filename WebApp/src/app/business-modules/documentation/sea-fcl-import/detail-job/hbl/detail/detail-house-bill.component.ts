@@ -281,63 +281,18 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     onPreview(type: string) {
         // Preview Delivery Order
         if (type === 'DELIVERY_ORDER') {
-            this._documentationRepo.previewDeliveryOrder(this.hblId)
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => { })
-                )
-                .subscribe(
-                    (res: any) => {
-                        this.dataReport = res;
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
-
-                    },
-                );
+            this.previewDeliveryOrder();
         }
 
         // Preview Arrival Notice
         if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
             const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
-            this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency })
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => { })
-                )
-                .subscribe(
-                    (res: any) => {
-                        this.dataReport = res;
-                        if(this.dataReport.dataSource.length > 0){
-                            setTimeout(() => {
-                                this.reportPopup.frm.nativeElement.submit();
-                                this.reportPopup.show();
-                            }, 1000);
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
-                    },
-                );
+            this.previewArrivalNotice(_currency);
         }
 
         // PREVIEW PROOF OF DELIVERY
         if (type === 'PROOF_OF_DELIVERY') {
-            this._documentationRepo.previewProofofDelivery(this.hblId)
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => { })
-                )
-                .subscribe(
-                    (res: any) => {
-                        this.dataReport = res;
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
-
-                    },
-                );
+            this.previewProofOfDelivery();
         }
         if (type === 'E_MANIFEST') {
             this.exportEManifest();
@@ -348,6 +303,61 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         if (type === 'DANGEROUS_GOODS') {
             this.exportDangerousGoods();
         }
+    }
+    previewProofOfDelivery() {
+        this._documentationRepo.previewProofofDelivery(this.hblId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.reportPopup.frm.nativeElement.submit();
+                        this.reportPopup.show();
+                    }, 1000);
+
+                },
+            );
+    }
+    previewArrivalNotice(_currency: string) {
+        this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+    previewDeliveryOrder() {
+        this._documentationRepo.previewDeliveryOrder(this.hblId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res != null) {
+                        this.dataReport = res;
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    }
+                },
+            );
     }
     exportDangerousGoods() {
         this._exportRepository.exportDangerousGoods(this.hblId)
