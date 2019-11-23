@@ -155,23 +155,28 @@
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <label class="form-control-label" for="">
-                                    ETA <span class="m--font-danger">(*)</span>
-                                </label>
-                                <div class="m-input-icon">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                        [minDate]="mindateEta" [singleDatePicker]="true" formControlName="eta"
-                                        readonly />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.valid) || (isSubmited && !eta.valid)}">
+                                    <label class="form-control-label" for="">
+                                        ETA <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <div class="m-input-icon">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [autoApply]="true"
+                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [minDate]="mindateEta"
+                                            [singleDatePicker]="true" formControlName="eta" readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
                                         </span>
-                                    </span>
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmited && (eta.errors | equalError: 'required') || (eta.errors | equalError: 'required') && eta.dirty">
+                                        Estimated Time of Arrival is required !
+                                    </div>
                                 </div>
-                                <div class="form-control-feedback" *ngIf="isSubmited && ( !eta.value )">
-                                    Estimated Time of Arrival is required !
-                                </div>
+
                             </div>
 
                         </div>

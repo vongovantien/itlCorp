@@ -40,7 +40,7 @@ const routing: Routes = [
     },
     {
         path: ':id/manifest', component: SeaFclImportManifestComponent,
-        data: { name: "Manifest", path: ":id", level: 3 },
+        data: { name: "Manifest", path: ":id", level: 4 },
     },
 
 
