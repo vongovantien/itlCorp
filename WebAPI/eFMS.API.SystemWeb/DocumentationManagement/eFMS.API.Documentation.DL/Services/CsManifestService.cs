@@ -221,7 +221,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     var manifest = new ManifestFCLImportReport
                     {
-                        DateConfirm = transaction.Eta,
+                        DateConfirm = model.InvoiceDate,
                         LoadingDate = transaction.Etd,
                         LocalVessel = transaction.FlightVesselName,
                         ContSealNo = transaction.VoyNo,
@@ -243,6 +243,8 @@ namespace eFMS.API.Documentation.DL.Services
                     manifests.Add(manifest);
                 }
             }
+            if (manifests.Count == 0)
+                return result;
             var parameter = new ManifestFCLImportReportParameter
             {
                 SumCarton = string.Empty,
