@@ -76,7 +76,7 @@ export class TariffDetailComponent extends TariffAddComponent {
 
         // * Update Form Group.
         this.formAddTariffComponent.formAdd.controls['tariff'].setValue(objectTariffForm);
-        this.formAddTariffComponent.minDateExpired = this.createMoment(this.tariff.setTariff.effectiveDate);
+        this.formAddTariffComponent.minDateExpired = this.formAddTariffComponent.createMoment(this.tariff.setTariff.effectiveDate);
 
         // * Update comboGrid.
         this.formAddTariffComponent.selectedOffice = <CommonInterface.IComboGridData>{ field: 'id', value: this.tariff.setTariff.officeId };

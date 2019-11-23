@@ -89,26 +89,10 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             );
     }
 
-    updateHbl(body: any) {
+    onSaveHBLDetail() {
         switch (this.selectedTab) {
             case HBL_TAB.DETAIL:
-                if (this.formHouseBill.formGroup.valid) {
-                    this._progressRef.start();
-                    this._documentationRepo.updateHbl(body)
-                        .pipe(
-                            catchError(this.catchError),
-                            finalize(() => this._progressRef.complete())
-                        )
-                        .subscribe(
-                            (res: CommonInterface.IResult) => {
-                                if (res.status) {
-                                    this._toastService.success(res.message);
-                                } else {
-                                    this._toastService.error(res.message);
-                                }
-                            }
-                        );
-                }
+                this.onUpdateHblDetail();
                 break;
 
             // * Update Arrival Note.    
@@ -182,6 +166,24 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
 
         this.updateHbl(modelUpdate);
+    }
+
+    updateHbl(body: any) {
+        this._progressRef.start();
+        this._documentationRepo.updateHbl(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
     }
 
     getDetailHbl() {
@@ -277,6 +279,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
+
     onPreview(type: string) {
         // Preview Delivery Order
         if (type === 'DELIVERY_ORDER') {
@@ -348,6 +351,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             this.exportDangerousGoods();
         }
     }
+
     exportDangerousGoods() {
         this._exportRepository.exportDangerousGoods(this.hblId)
             .pipe(catchError(this.catchError))
@@ -357,6 +361,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 },
             );
     }
+
     exportGoodsDeclare() {
         this._exportRepository.exportGoodDeclare(this.hblId)
             .pipe(catchError(this.catchError))
@@ -366,6 +371,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 },
             );
     }
+
     exportEManifest() {
         this._exportRepository.exportEManifest(this.hblId)
             .pipe(catchError(this.catchError))

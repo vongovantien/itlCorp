@@ -31,9 +31,9 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
     containers: Container[] = [];
 
     constructor(
-        private _toastService: ToastrService,
-        private _documenRepo: DocumentationRepo,
-        private _router: Router,
+        protected _toastService: ToastrService,
+        protected _documenRepo: DocumentationRepo,
+        protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
 
     ) {
@@ -105,7 +105,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
         return valid;
     }
 
-    onCreateJob() {
+    onSaveJob() {
         this.formCreateComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
@@ -119,10 +119,10 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
 
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model
-        this.createJob(modelAdd);
+        this.saveJob(modelAdd);
     }
 
-    createJob(body: any) {
+    saveJob(body: any) {
         this._documenRepo.createTransaction(body)
             .pipe(
                 catchError(this.catchError)

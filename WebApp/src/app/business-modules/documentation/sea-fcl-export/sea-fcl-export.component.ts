@@ -53,8 +53,8 @@ export class SeaFCLExportComponent extends AppList {
 
         this.dataSearch = {
             transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport,
-            fromDate: this.ranges['This Month'][0],
-            toDate: this.ranges['This Month'][1],
+            fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            toDate: new Date(),
         };
 
     }
@@ -127,12 +127,7 @@ export class SeaFCLExportComponent extends AppList {
                         this.shipments[index].houseBillList = res;
                     }
                 );
-
         }
-    }
-
-    showDetail(item: { id: any; }) {
-        this._router.navigate(["/home/documentation/sea-fcl-export-create/", { id: item.id }]);
     }
 
     onSearchShipment($event: any) {
@@ -164,7 +159,7 @@ export class SeaFCLExportComponent extends AppList {
         this.confirmDeletePopup.hide();
         this._progressRef.start();
 
-        this._documentRepo.checkMasterBillAllowToDelete(this.itemToDelete.id)
+        this._documentRepo.deleteMasterBill(this.itemToDelete.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {

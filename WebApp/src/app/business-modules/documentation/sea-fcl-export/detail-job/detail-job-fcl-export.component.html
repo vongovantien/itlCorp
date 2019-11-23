@@ -19,7 +19,7 @@
                 </span>
             </button>
 
-            <app-default-button [buttonSetting]="saveButtonSetting">
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveJob()">
             </app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
@@ -32,6 +32,8 @@
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
             <tab heading="Shipment Detail">
+
+                <form-create-sea-fcl-export></form-create-sea-fcl-export>
 
                 <shipment-good-summary></shipment-good-summary>
 

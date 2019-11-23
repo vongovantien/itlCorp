@@ -271,7 +271,7 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        // * Dispatch for detail HBL.
+                        // * Dispatch for detail HBL to update HBL state.
                         this._store.dispatch(new GetDetailHBLAction(this.hblArrivalNote.hblid));
                     }
                 }
