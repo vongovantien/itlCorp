@@ -1,16 +1,18 @@
 import { Component, ViewEncapsulation } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
+
 import { AppForm } from 'src/app/app.form';
 import { DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
-import { forkJoin } from 'rxjs';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { catchError, distinctUntilChanged, takeUntil, finalize, skip } from 'rxjs/operators';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { User } from 'src/app/shared/models';
 import { BaseService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
-import { NgxSpinnerService } from 'ngx-spinner';
-import { Store } from '@ngrx/store';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
+
+import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 
@@ -28,12 +30,6 @@ export class SeaFClImportFormCreateComponent extends AppForm {
 
     configComboGridPartner: CommonInterface.IComboGirdConfig;
     configComboGridPort: CommonInterface.IComboGirdConfig;
-
-    selectedSupplier: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedAgent: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedPortLoading: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedPortDestination: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedPortDelivery: Partial<CommonInterface.IComboGridData | any> = {};
 
     carries: any[] = [];
     agents: any[] = [];
@@ -55,11 +51,18 @@ export class SeaFClImportFormCreateComponent extends AppForm {
     notes: AbstractControl;
     subColoader: AbstractControl;
 
+    agentId: AbstractControl;
+    pol: AbstractControl;
+    pod: AbstractControl;
+    coloader: AbstractControl;
+    deliveryPlace: AbstractControl;
+
     userLogged: User;
 
 
     fclImportDetail: any; // TODO model;
     minDateETA: any;
+
 
     constructor(
         protected _documentRepo: DocumentationRepo,
@@ -110,7 +113,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
                         this.fclImportDetail = res;
 
                         this.formCreate.setValue({
-                            jobId: this.fclImportDetail.jobNo, // * disabled
+                            jobId: this.fclImportDetail.jobNo,
                             mawb: this.fclImportDetail.mawb,
                             subColoader: this.fclImportDetail.subColoader,
                             flightVesselName: this.fclImportDetail.flightVesselName,
@@ -118,26 +121,25 @@ export class SeaFClImportFormCreateComponent extends AppForm {
                             pono: this.fclImportDetail.pono,
                             notes: this.fclImportDetail.notes,
 
-                            etd: !!this.fclImportDetail.etd ? { startDate: new Date(this.fclImportDetail.etd), endDate: new Date(this.fclImportDetail.etd) } : null, // * Date
-                            eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null, // * Date
+                            etd: !!this.fclImportDetail.etd ? { startDate: new Date(this.fclImportDetail.etd), endDate: new Date(this.fclImportDetail.etd) } : null,
+                            eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null,
                             serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
 
-                            mbltype: (this.ladingTypes || []).find(type => type.value === this.fclImportDetail.mbltype).value, // * select
-                            shipmentType: (this.shipmentTypes || []).find(type => type.value === this.fclImportDetail.shipmentType).value, // * select
-                            typeOfService: (this.serviceTypes || []).find(type => type.value === this.fclImportDetail.typeOfService).value, // * select
-                            personIncharge: this.fclImportDetail.personIncharge,  // * select
+                            mbltype: (this.ladingTypes || []).find(type => type.value === this.fclImportDetail.mbltype).value,
+                            shipmentType: (this.shipmentTypes || []).find(type => type.value === this.fclImportDetail.shipmentType).value,
+                            typeOfService: (this.serviceTypes || []).find(type => type.value === this.fclImportDetail.typeOfService).value,
+                            personIncharge: this.fclImportDetail.personIncharge,
+
+                            pod: this.fclImportDetail.pod,
+                            pol: this.fclImportDetail.pol,
+                            agentId: this.fclImportDetail.agentId,
+                            coloader: this.fclImportDetail.coloaderId,
+                            deliveryPlace: this.fclImportDetail.deliveryPlace
                         });
 
                         if (!!this.formCreate.value.etd) {
                             this.minDateETA = this.createMoment(this.fclImportDetail.etd);
                         }
-
-                        // * Combo grid
-                        this.selectedPortDestination = { field: 'id', value: this.fclImportDetail.pod };
-                        this.selectedPortDelivery = { field: 'id', value: this.fclImportDetail.deliveryPlace };
-                        this.selectedPortLoading = { field: 'id', value: this.fclImportDetail.pol };
-                        this.selectedAgent = { field: 'id', value: this.fclImportDetail.agentId };
-                        this.selectedSupplier = { field: 'id', value: this.fclImportDetail.coloaderId };
                     }
                 }
             );
@@ -145,20 +147,32 @@ export class SeaFClImportFormCreateComponent extends AppForm {
 
     initForm() {
         this.formCreate = this._fb.group({
+
             jobId: [{ value: null, disabled: true }], // * disabled
-            etd: [], // * Date
-            eta: [null, Validators.required], // * Date
-            mawb: ['', Validators.required],
-            mbltype: [null, Validators.required], // * select
-            shipmentType: [null, Validators.required], // * select
+
+            // * Date
+            etd: [],
+            eta: [null, Validators.required],
+            serviceDate: [],
+
             subColoader: [],
             flightVesselName: [],
             voyNo: [],
             pono: [],
+            mawb: ['', Validators.required],
+
+            mbltype: [null, Validators.required], // * select
+            shipmentType: [null, Validators.required], // * select
             typeOfService: [null, Validators.required], // * select
-            serviceDate: [],
             personIncharge: [],  // * select
             notes: [],
+
+            // * Combogrid.
+            agentId: [],
+            pol: [],
+            pod: [],
+            coloader: [],
+            deliveryPlace: [],
         });
 
         this.jobId = this.formCreate.controls["jobId"];
@@ -175,6 +189,11 @@ export class SeaFClImportFormCreateComponent extends AppForm {
         this.notes = this.formCreate.controls["notes"];
         this.serviceDate = this.formCreate.controls["serviceDate"];
         this.subColoader = this.formCreate.controls["subColoader"];
+        this.agentId = this.formCreate.controls["agentId"];
+        this.pol = this.formCreate.controls["pol"];
+        this.pod = this.formCreate.controls["pod"];
+        this.coloader = this.formCreate.controls["coloader"];
+        this.deliveryPlace = this.formCreate.controls["deliveryPlace"];
 
         // * Handle etd, eta change.
 
@@ -214,51 +233,6 @@ export class SeaFClImportFormCreateComponent extends AppForm {
         this.personIncharge.disable();
     }
 
-    getMasterData() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER)) {
-            this.carries = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER);
-        } if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT)) {
-            this.agents = this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT);
-        } if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
-            this.configComboGridPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
-        } if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
-            const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-            this.serviceTypes = commonData.serviceTypes;
-            this.ladingTypes = commonData.billOfLadings;
-            this.shipmentTypes = commonData.shipmentTypes;
-        } else {
-            this._spinner.show();
-            this.isLoading = true;
-
-            forkJoin([
-                this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER),
-                this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT),
-                this._documentRepo.getShipmentDataCommon(),
-                this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port })
-
-            ]).pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
-                .subscribe(
-                    ([carries, agents, commonData, ports]: any = [[], [], [], []]) => {
-                        this.carries = carries;
-                        this.agents = agents;
-                        this.configComboGridPort.dataSource = ports || [];
-                        this.serviceTypes = commonData.serviceTypes;
-                        this.ladingTypes = commonData.billOfLadings;
-                        this.shipmentTypes = commonData.shipmentTypes;
-
-                        // * Set Default
-                        this.shipmentType.setValue(this.shipmentTypes[0].value);
-
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.AGENT, agents);
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, carries);
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
-
-                        this.isLoading = false;
-                    }
-                );
-        }
-    }
 
     async getCarrier() {
         this._spinner.show();
@@ -304,7 +278,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
             if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
                 this.configComboGridPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
             } else {
-                const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port }).toPromise();
+                const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }).toPromise();
                 this.configComboGridPort.dataSource = ports || [];
                 this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
             }
@@ -349,19 +323,19 @@ export class SeaFClImportFormCreateComponent extends AppForm {
     onSelectDataFormInfo(data: any, key: string | any) {
         switch (key) {
             case 'supplier':
-                this.selectedSupplier = { field: 'id', value: data.id, data: data };
+                this.coloader.setValue(data.id);
                 break;
             case 'agent':
-                this.selectedAgent = { field: 'id', value: data.id, data: data };
+                this.agentId.setValue(data.id);
                 break;
             case 'port-loading':
-                this.selectedPortLoading = { field: 'id', value: data.id, data: data };
+                this.pol.setValue(data.id);
                 break;
             case 'port-destination':
-                this.selectedPortDestination = { field: 'id', value: data.id, data: data };
+                this.pod.setValue(data.id);
                 break;
             case 'port-delivery':
-                this.selectedPortDelivery = { field: 'id', value: data.id, data: data };
+                this.deliveryPlace.setValue(data.id);
                 break;
             default:
                 break;

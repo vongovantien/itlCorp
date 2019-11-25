@@ -72,7 +72,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Supplier/Co-Loader</label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedSupplier"
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: coloader.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [selectedDisplayFields]="configComboGridPartner.selectedDisplayFields"
                                 [dataSources]="carries" [displayFields]="configComboGridPartner.displayFields"
@@ -90,7 +90,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Agent</label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedAgent"
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: agentId.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                                 [selectedDisplayFields]="configComboGridPartner.selectedDisplayFields"
                                 [dataSources]="agents" [displayFields]="configComboGridPartner.displayFields"
@@ -101,7 +101,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Port of Loading</label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortLoading"
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: pol.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-loading')"
                                 [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
                                 [dataSources]="configComboGridPort.dataSource"
@@ -110,10 +110,9 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedPortDestination.value}">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !pod.value}">
                             <label required>Port of Destination</label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortDestination"
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: pod.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-destination')"
                                 [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
                                 [dataSources]="configComboGridPort.dataSource"
@@ -124,7 +123,8 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Place of Delivery</label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortDelivery"
+                            <app-combo-grid-virtual-scroll
+                                [currentActiveItemId]="{field: 'id', value: deliveryPlace.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-delivery')"
                                 [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
                                 [dataSources]="configComboGridPort.dataSource"

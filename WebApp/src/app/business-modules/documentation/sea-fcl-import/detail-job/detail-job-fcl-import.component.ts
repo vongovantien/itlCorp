@@ -9,13 +9,13 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SeaFClImportFormCreateComponent } from '../components/form-create/form-create-sea-fcl-import.component';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import { combineLatest, of } from 'rxjs';
 import { map, tap, switchMap, skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 
 import * as fromStore from './../store';
 import * as fromShareBussiness from './../../../share-business/store';
-import { ReportPreviewComponent } from 'src/app/shared/common';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -149,13 +149,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             this.formCreateComponent.minDateETA = this.createMoment(this.fclImportDetail.etd);
         }
 
-
-        // * Combo grid
-        this.formCreateComponent.selectedPortDestination = { field: 'id', value: this.fclImportDetail.pod };
-        this.formCreateComponent.selectedPortDelivery = { field: 'id', value: this.fclImportDetail.deliveryPlace };
-        this.formCreateComponent.selectedPortLoading = { field: 'id', value: this.fclImportDetail.pol };
-        this.formCreateComponent.selectedAgent = { field: 'id', value: this.fclImportDetail.agentId };
-        this.formCreateComponent.selectedSupplier = { field: 'id', value: this.fclImportDetail.coloaderId };
     }
 
     onUpdateShipmenetDetail() {
