@@ -1016,7 +1016,7 @@ namespace eFMS.API.Documentation.DL.Services
             var containerNoList = string.Empty;
             if (containerList.Count() > 0)
             {
-                containerNoList = String.Join("\r\n", containerList.Select(x => string.IsNullOrEmpty(x.ContainerNo) && string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
+                containerNoList = String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) && !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
             }
 
             var listCharge = new List<FormPLsheetReport>();
@@ -1065,10 +1065,10 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         saleProfit = cost + revenue;
 
+                        //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
                         var exchargeDateSurcharge = surcharge.ExchangeDate == null ? DateTime.Now : surcharge.ExchangeDate;
                         //Exchange Rate theo Currency truyền vào
                         var exchangeRate = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == surcharge.CurrencyId && x.CurrencyToId == "USD" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                        //decimal? _exchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
                         decimal _exchangeRateUSD;
                         if ((exchangeRate != null && exchangeRate.Rate != 0))
                         {

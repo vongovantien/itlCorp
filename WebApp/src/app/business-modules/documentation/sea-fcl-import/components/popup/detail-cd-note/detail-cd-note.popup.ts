@@ -1,4 +1,4 @@
-import { Component, ViewChild, Output, EventEmitter } from "@angular/core";
+import { Component, ViewChild, Output, EventEmitter, ElementRef } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
 import { DocumentationRepo } from "src/app/shared/repositories";
 import { CdNoteAddPopupComponent } from "../add-cd-note/add-cd-note.popup";
@@ -7,6 +7,10 @@ import { SortService } from "src/app/shared/services";
 import { ToastrService } from "ngx-toastr";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
 import { ReportPreviewComponent } from "src/app/shared/common";
+import { DomSanitizer } from "@angular/platform-browser";
+import { API_MENU } from "src/constants/api-menu.const";
+import { ModalDirective } from "ngx-bootstrap";
+import { Crystal } from "src/app/shared/models/report/crystal.model";
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -16,7 +20,9 @@ export class CdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(CdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: CdNoteAddPopupComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    //@ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild('formPL', { static: false }) formPL: ElementRef;
+    @ViewChild("popupReport", { static: false }) popupReport: ModalDirective;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
 
     jobId: string = null;
@@ -46,6 +52,8 @@ export class CdNoteDetailPopupComponent extends PopupBase {
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
+        private sanitizer: DomSanitizer,
+        private api_menu: API_MENU,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -167,14 +175,46 @@ export class CdNoteDetailPopupComponent extends PopupBase {
         this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
+                (res: Crystal) => {
+                    // this.dataReport = res;
+                    // setTimeout(() => {
+                    //     this.previewPopup.frm.nativeElement.submit();
+                    //     this.previewPopup.show();
+                    // }, 1000);
+                    this.dataReport = JSON.stringify(res);
+
                     setTimeout(() => {
-                        this.previewPopup.frm.nativeElement.submit();
-                        this.previewPopup.show();
+                        if (!this.popupReport.isShown) {
+                            this.popupReport.config = this.options;
+                            this.popupReport.show();
+                        }
+                        this.submitFormPreview();
                     }, 1000);
                 },
             );
+    }
+
+    get scr() {
+        // http://localhost:51830/Default.aspx
+        return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
+    }
+
+    ngAfterViewInit() {
+        if (!!this.dataReport) {
+            this.formPL.nativeElement.submit();
+        }
+    }
+
+    submitFormPreview() {
+        this.formPL.nativeElement.submit();
+    }
+
+    onSubmitForm(f) {
+        return true;
+    }
+
+    hidePreview() {
+        this.popupReport.hide();
     }
 
 }
