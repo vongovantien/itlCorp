@@ -70,40 +70,48 @@ export class CreateHouseBillComponent extends AppForm {
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.id) {
                 this.jobId = param.id;
+                this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.jobId));
             }
         });
-
-
-        this._store.select(fromStore.seaFCLImportTransactionState)
-            .subscribe(
-                (res: any) => {
-                    this.shipmentDetail = res;
-                }
-            );
     }
 
+    getShipmentDetail() {
+
+
+    }
 
     ngAfterViewInit() {
         this.shipmentGoodSummaryComponent.initContainer();
         this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
 
-        this.formHouseBill.mtBill.setValue(this.shipmentDetail.mawb);
-        if (this.shipmentDetail.typeOfService != null) {
-            this.formHouseBill.servicetype.setValue(this.formHouseBill.serviceTypes.filter(i => i.value === this.shipmentDetail.typeOfService)[0]);
+        this._store.select(fromStore.seaFCLImportTransactionState)
+            .subscribe(
+                (res: any) => {
+                    console.log(res);
+                    this.shipmentDetail = res;
 
-        }
+                    this.formHouseBill.mtBill.setValue(this.shipmentDetail.mawb);
 
+                    this.formHouseBill.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
+                    this.formHouseBill.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
+                }
+            );
     }
 
     checkValidateForm() {
+        let valid: boolean = true;
         if (this.formHouseBill.selectedPortOfLoading.value !== undefined && this.formHouseBill.selectedPortOfDischarge.value !== undefined) {
             if (this.formHouseBill.selectedPortOfLoading.value === this.formHouseBill.selectedPortOfDischarge.value) {
                 this.formHouseBill.PortChargeLikePortLoading = true;
+
             } else {
                 this.formHouseBill.PortChargeLikePortLoading = false;
+
             }
         }
-        let valid: boolean = true;
+        else {
+            valid = false;
+        }
         if (!this.formHouseBill.formGroup.valid) {
             valid = false;
         }
@@ -118,8 +126,7 @@ export class CreateHouseBillComponent extends AppForm {
         this.formHouseBill.isSubmited = true;
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
-        }
-        else {
+        } else {
             const body = this.onsubmitData();
             this.createHbl(body);
         }
@@ -139,9 +146,6 @@ export class CreateHouseBillComponent extends AppForm {
             this.formHouseBill.localVoyNo.setValue(this.selectedHbl.localVoyNo);
             this.formHouseBill.oceanVessel.setValue(this.selectedHbl.oceanVessel);
             this.formHouseBill.oceanVoyNo.setValue(this.selectedHbl.oceanVoyNo);
-
-
-
             this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.selectedHbl.originBlnumber)[0]);
             this.formHouseBill.alsonotifyPartyDescription.setValue(this.selectedHbl.alsoNotifyPartyDescription);
             this.formHouseBill.selectedCustomer = { field: 'id', value: this.selectedHbl.customerId };
@@ -152,7 +156,7 @@ export class CreateHouseBillComponent extends AppForm {
             this.formHouseBill.selectedPortOfLoading = { field: 'id', value: this.selectedHbl.pol };
             this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: this.selectedHbl.pod };
             this.formHouseBill.selectedAlsoNotifyParty = { field: 'id', value: this.selectedHbl.alsoNotifyPartyId };
-            this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === this.selectedHbl.hbltype)[0]);
+            this.formHouseBill.hbltype.setValue([<CommonInterface.INg2Select>{ id: this.selectedHbl.hbltype, text: this.selectedHbl.hbltype }]);
             this.formHouseBill.selectedSupplier = { field: 'id', value: this.selectedHbl.coloaderId };
 
         }
@@ -208,9 +212,9 @@ export class CreateHouseBillComponent extends AppForm {
             alsoNotifyPartyId: !!this.formHouseBill.selectedAlsoNotifyParty.value ? this.formHouseBill.selectedAlsoNotifyParty.value : null,
             alsoNotifyPartyDescription: this.formHouseBill.alsoNotifyPartyDescriptionModel !== undefined ? this.formHouseBill.alsoNotifyPartyDescriptionModel : this.formHouseBill.alsonotifyPartyDescription.value,
             hwbno: this.formHouseBill.hwbno.value,
-            hbltype: this.formHouseBill.hbltype.value != null ? this.formHouseBill.hbltype.value.value : null,
-            servicetype: this.formHouseBill.servicetype.value != null ? this.formHouseBill.servicetype.value.value : null,
-            etd: !!this.formHouseBill.etd.value ? formatDate(this.formHouseBill.etd.value.startDate !== undefined ? this.formHouseBill.etd.value.startDate : this.formHouseBill.etd.value, 'yyyy-MM-dd', 'en') : null,
+            hbltype: this.formHouseBill.hbltype.value[0].text,
+            servicetype: this.formHouseBill.servicetype.value[0].text,
+            etd: !!this.formHouseBill.etd.value && this.formHouseBill.etd.value.startDate != null ? formatDate(this.formHouseBill.etd.value.startDate !== undefined ? this.formHouseBill.etd.value.startDate : this.formHouseBill.etd.value, 'yyyy-MM-dd', 'en') : null,
             eta: !!this.formHouseBill.eta.value ? formatDate(this.formHouseBill.eta.value.startDate !== undefined ? this.formHouseBill.eta.value.startDate : this.formHouseBill.eta.value, 'yyyy-MM-dd', 'en') : null,
             pickupPlace: this.formHouseBill.pickupPlace.value,
             pol: this.formHouseBill.selectedPortOfLoading.value,
