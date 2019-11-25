@@ -1,24 +1,24 @@
 import { Component, Input, ViewChild } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { formatDate } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, CsTransactionDetail } from 'src/app/shared/models';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { AppList } from 'src/app/app.list';
 
-
-import { forkJoin } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
-
-import * as fromStore from './../../store';
-import { Store } from '@ngrx/store';
-import { formatDate } from '@angular/common';
-import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { GetBuyingSurchargeAction } from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ChargeConstants } from 'src/constants/charge.const';
+
+import { forkJoin } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+
+import * as fromStore from './../../store';
 
 @Component({
     selector: 'buying-charge',
@@ -114,8 +114,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         ];
 
         this.getMasterData();
-
-
     }
 
     configHeader() {
@@ -172,7 +170,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     onSelectDataFormInfo(data: Charge | any, type: string, chargeItem: CsShipmentSurcharge) {
-
         [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
 
         switch (type) {
@@ -209,19 +206,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.voucherIdre = null;
         newSurCharge.voucherIdredate = null;
 
-        switch (type) {
-            case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
-                this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newSurCharge));
-                break;
-            case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
-                this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
-                break;
-            case CommonEnum.SurchargeTypeEnum.OBH:
-                this._store.dispatch(new fromStore.AddOBHSurchargeAction(newSurCharge));
-                break;
-            default:
-                break;
-        }
+        this.addSurcharges(type, newSurCharge);
     }
 
     duplicate(index: number, type: CommonEnum.SurchargeTypeEnum | string) {
@@ -239,20 +224,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.voucherIdre = null;
         newSurCharge.voucherIdredate = null;
 
-        switch (type) {
-            case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
-                this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newSurCharge));
-                break;
-            case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
-                this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
-                break;
-            case CommonEnum.SurchargeTypeEnum.OBH:
-                this._store.dispatch(new fromStore.AddOBHSurchargeAction(newSurCharge));
-                break;
-            default:
-                break;
-        }
-
+        this.addSurcharges(type, newSurCharge);
     }
 
     deleteCharge(charge: CsShipmentSurcharge, index: number, type: CommonEnum.SurchargeTypeEnum | string) {
@@ -293,19 +265,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-                            switch (type) {
-                                case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
-                                    this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE, hblId: this.hbl.id }));
-                                    break;
-                                case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
-                                    this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE, hblId: this.hbl.id }));
-                                    break;
-                                case CommonEnum.SurchargeTypeEnum.OBH:
-                                    this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.OBH, hblId: this.hbl.id }));
-                                    break;
-                                default:
-                                    break;
-                            }
+
+                            this.getSurcharges(type);
                         } else {
                             this._toastService.error(res.message);
                         }
@@ -345,7 +306,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     }
 
-    saveBuyingCharge() {
+    saveBuyingCharge(type: CommonEnum.SurchargeTypeEnum | string) {
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;
@@ -365,6 +326,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
                         // * Get Profit
                         this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
+
+                        this.getSurcharges(type);
+
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -484,5 +448,37 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     }
 
+    getSurcharges(type: string) {
+        switch (type) {
+            case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
+                this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE, hblId: this.hbl.id }));
+                break;
+            case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
+                this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE, hblId: this.hbl.id }));
+                break;
+            case CommonEnum.SurchargeTypeEnum.OBH:
+                this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.OBH, hblId: this.hbl.id }));
+                break;
+            default:
+                break;
+        }
+    }
+
+    addSurcharges(type, newcharge: CsShipmentSurcharge) {
+        switch (type) {
+            case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
+                this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newcharge));
+                break;
+            case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
+                this._store.dispatch(new fromStore.AddSellingSurchargeAction(newcharge));
+                break;
+            case CommonEnum.SurchargeTypeEnum.OBH:
+                this._store.dispatch(new fromStore.AddOBHSurchargeAction(newcharge));
+                break;
+            default:
+                break;
+        }
+
+    }
 
 }

@@ -32,7 +32,8 @@
                 </span>
             </button>
 
-            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onUpdateShipmenetDetail()">
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onUpdateShipmenetDetail()"
+                [disabled]="selectedTab !== 'SHIPMENT'">
             </app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
@@ -70,8 +71,8 @@
                     <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="SeaFCLImport_cdNote">
                     </ng-container>
                 </tab>
-                <tab heading="Asignment" (selectTab)="onSelectTab('assignment')" [active]="selectedTab === 'ASSIGNMENT'"
-                    [disabled]="ACTION === 'copy'">
+                <tab heading="Assignment" (selectTab)="onSelectTab('assignment')"
+                    [active]="selectedTab === 'ASSIGNMENT'" [disabled]="ACTION === 'copy'">
                     <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="SeaFCLImport_assignment">
                     </ng-container>
                 </tab>
