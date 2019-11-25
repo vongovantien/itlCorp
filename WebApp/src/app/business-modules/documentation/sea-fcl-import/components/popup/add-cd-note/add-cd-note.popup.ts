@@ -38,6 +38,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
     CDNote: AcctCDNote = new AcctCDNote();
     listChargePartner: ChargeCdNote[] = [];
     initGroup: ChargeCdNote[] = [];
+    listCharges: any[] = [];
 
     selectedPartner: any = {};
     partnerCurrent: any = {};
@@ -125,6 +126,12 @@ export class CdNoteAddPopupComponent extends PopupBase {
                 (dataCharges: any) => {
                     this.listChargePartner = dataCharges;
                     this.initGroup = dataCharges;
+                    this.listCharges = [];
+                    for (const charges of this.listChargePartner) {
+                        for (const charge of charges.listCharges) {
+                            this.listCharges.push(charge);
+                        }
+                    }
                     //Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount(this.listChargePartner);
                 },
@@ -136,10 +143,10 @@ export class CdNoteAddPopupComponent extends PopupBase {
         //if (this.partnerCurrent.value !== this.selectedPartner.value && this.listChargePartner.length > 0) {
         //    this.changePartnerPopup.show();
         //} else {
-            this.getListCharges(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, "");
-            this.partnerCurrent = Object.assign({}, this.selectedPartner);
-            this.keyword = '';
-            this.isCheckAllCharge = false;
+        this.getListCharges(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, "");
+        this.partnerCurrent = Object.assign({}, this.selectedPartner);
+        this.keyword = '';
+        this.isCheckAllCharge = false;
         //}
     }
 
@@ -185,10 +192,10 @@ export class CdNoteAddPopupComponent extends PopupBase {
     removeCharge() {
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
-                for(const charge of charges.listCharges.filter(group => group.isSelected)){
+                for (const charge of charges.listCharges.filter(group => group.isSelected)) {
                     charge.isDeleted = true;
                 }
-                if(charges.isSelected) charges.isDeleted = true;
+                if (charges.isSelected) charges.isDeleted = true;
             }
         }
         //Tính toán Amount Credit, Debit, Balance
@@ -196,13 +203,13 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this.calculatorAmount(listCharge);
     }
 
-    getGroupChargeNotDelete(listCharge: ChargeCdNote[]){
+    getGroupChargeNotDelete(listCharge: ChargeCdNote[]) {
         let chargesNotDeleted = [];
         let grpChargesNotDeleted = [];
-        
+
         if (listCharge.length > 0) {
             for (const charges of listCharge) {
-                chargesNotDeleted = charges.listCharges.filter(group => !group.isDeleted);   
+                chargesNotDeleted = charges.listCharges.filter(group => !group.isDeleted);
                 if (chargesNotDeleted.length > 0) {
                     grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, isDeleted: charges.isDeleted, listCharges: chargesNotDeleted });
                 } else {
@@ -218,7 +225,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner)
 
         //Không được phép create khi chưa có charge
-        if (this.listChargePartner.length == 0) {
+        if (this.listChargePartner.length === 0) {
             this.notExistsChargePopup.show();
         } else {
             this.CDNote.jobId = this.currentMBLId;
@@ -231,6 +238,10 @@ export class CdNoteAddPopupComponent extends PopupBase {
                 for (const charge of charges.listCharges) {
                     arrayCharges.push(charge);
                 }
+            }
+            if (arrayCharges.length === 0) {
+                this.notExistsChargePopup.show();
+                return;
             }
             this.CDNote.listShipmentSurcharge = arrayCharges;
             const _totalCredit = arrayCharges.filter(f => (f.type === 'BUY' || (f.type === 'OBH' && this.selectedPartner.value === f.payerId))).reduce((credit, charge) => credit + charge.total * charge.exchangeRate, 0);
@@ -313,7 +324,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
         );
     }
 
-    openPopupAddCharge() {   
+    openPopupAddCharge() {
         this.isCheckAllCharge = false;
 
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);

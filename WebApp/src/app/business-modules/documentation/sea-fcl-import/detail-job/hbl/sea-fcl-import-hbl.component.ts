@@ -247,7 +247,7 @@ export class SeaFCLImportHBLComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    if(this.dataReport != null && res.dataSource.length > 0){
+                    if(res != null && res.dataSource.length > 0){
                         setTimeout(() => {
                             this.previewPopup.frm.nativeElement.submit();
                             this.previewPopup.show();
