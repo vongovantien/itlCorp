@@ -15,10 +15,9 @@ namespace eFMS.API.Catalogue.DL.IService
     {
         List<CatCountryViewModel> GetByLanguage();
         IQueryable<CatCountryModel> GetCountries(CatCountryCriteria criteria, int page, int size, out int rowsCount);
-        IQueryable<CatCountry> Query(CatCountryCriteria criteria);
+        IQueryable<CatCountryModel> Query(CatCountryCriteria criteria);
         List<CatCountryImportModel> CheckValidImport(List<CatCountryImportModel> list);
         HandleState Import(List<CatCountryImportModel> data);
-        HandleState Update(CatCountryModel model);
         HandleState Delete(short id);
     }
 }
