@@ -11,7 +11,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatCountryService : IRepositoryBase<CatCountry, CatCountryModel>
+    public interface ICatCountryService : IRepositoryBaseCache<CatCountry, CatCountryModel>
     {
         List<CatCountryViewModel> GetByLanguage();
         IQueryable<CatCountryModel> GetCountries(CatCountryCriteria criteria, int page, int size, out int rowsCount);

@@ -24,6 +24,9 @@ using System.IO;
 using System.Reflection;
 using System;
 using StackExchange.Redis;
+using ITL.NetCore.Connection.Caching;
+using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Catalogue.Infrastructure.Common;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -32,13 +35,17 @@ namespace eFMS.API.Catalogue.Infrastructure
 
         public static void Register(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")));
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            
+            services.AddSingleton<ICacheServiceBase<CatCountry>>(x =>
+            new CacheServiceBase<CatCountry>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatCountry)));
 
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ICatBranchService, CatBranchService>();

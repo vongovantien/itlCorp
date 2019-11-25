@@ -10,6 +10,6 @@ namespace eFMS.API.Catalogue.Infrastructure.Common
     /// </summary>
     public enum CacheEntity
     {
-        catUnit
+        CatCountry
     }
 }

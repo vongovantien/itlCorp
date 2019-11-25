@@ -13,6 +13,7 @@ using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
@@ -26,11 +27,16 @@ using System.Threading;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatCountryService : RepositoryBase<CatCountry, CatCountryModel>, ICatCountryService
+    public class CatCountryService : RepositoryBaseCache<CatCountry, CatCountryModel>, ICatCountryService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
-        public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user) : base(repository, mapper)
+
+        public CatCountryService(IContextBase<CatCountry> repository, 
+            ICacheServiceBase<CatCountry> cacheService, 
+            IMapper mapper,
+            IStringLocalizer<LanguageSub> localizer,
+            ICurrentUser user) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -39,6 +45,34 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CatPartner>("Id", "CountryShippingId");
             SetChildren<CsTransactionDetail>("Id", "OriginCountryId");
         }
+
+        //public CatCountryService(IContextBase<CatCountry> repository,
+        //    IStringLocalizer<LanguageSub> localizer,
+        //    ICacheServiceBase<CatCountry> cacheService,
+        //    ICurrentUser user,
+        //    IMapper mapper) : base(repository, cacheService, mapper)
+        //{
+        //    stringLocalizer = localizer;
+        //    currentUser = user;
+        //    SetChildren<CatPlace>("Id", "CountryId");
+        //    SetChildren<CatPartner>("Id", "CountryId");
+        //    SetChildren<CatPartner>("Id", "CountryShippingId");
+        //    SetChildren<CsTransactionDetail>("Id", "OriginCountryId");
+        //}
+
+        //public CatCountryService(IContextBase<CatCountry> repository, 
+        //    IMapper mapper, 
+        //    IStringLocalizer<LanguageSub> localizer, 
+        //    ICurrentUser user,
+        //    ICacheServiceBase<CatCountry> cacheService) : base(repository, mapper)
+        //{
+        //    stringLocalizer = localizer;
+        //    currentUser = user;
+        //    SetChildren<CatPlace>("Id", "CountryId");
+        //    SetChildren<CatPartner>("Id", "CountryId");
+        //    SetChildren<CatPartner>("Id", "CountryShippingId");
+        //    SetChildren<CsTransactionDetail>("Id", "OriginCountryId");
+        //}
 
         #region CRUD
         public override HandleState Add(CatCountryModel entity)
