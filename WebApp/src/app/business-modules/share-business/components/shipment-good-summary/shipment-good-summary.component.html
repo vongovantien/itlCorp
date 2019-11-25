@@ -1,7 +1,9 @@
 <div class="m-portlet">
     <div class="alert-block__heading">
         <div class="d-flex justify-content-between align-items-center">
-            <h3 class="alert-block__title">Shipment List of Container </h3>
+            <h3 class="alert-block__title">
+                <ng-content></ng-content>
+            </h3>
             <div>
                 <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
                     (click)="refresh()" title="Refresh">

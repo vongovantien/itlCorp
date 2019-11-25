@@ -3,13 +3,16 @@ import { AppForm } from 'src/app/app.form';
 import { DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { forkJoin } from 'rxjs';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { catchError, distinctUntilChanged, takeUntil, finalize } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, takeUntil, finalize, skip } from 'rxjs/operators';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { User } from 'src/app/shared/models';
 import { BaseService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { Store } from '@ngrx/store';
+
+import * as fromStore from './../../store';
 
 
 @Component({
@@ -64,12 +67,12 @@ export class SeaFClImportFormCreateComponent extends AppForm {
         protected _fb: FormBuilder,
         protected _baseService: BaseService,
         private _dataService: DataService,
-        private _spinner: NgxSpinnerService
+        private _spinner: NgxSpinnerService,
+        private _store: Store<any>
 
     ) {
         super();
     }
-
 
     ngOnInit(): void {
         this.configComboGridPartner = Object.assign({}, this.configComoBoGrid, {
@@ -92,12 +95,52 @@ export class SeaFClImportFormCreateComponent extends AppForm {
 
         this.initForm();
         this.getUserLogged();
-        // this.getMasterData();
 
         this.getCarrier();
         this.getAgent();
         this.getPort();
         this.getCommonData();
+
+        // * Subscribe state to update form.
+        this._store.select(fromStore.seaFCLImportTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe), skip(1))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.fclImportDetail = res;
+
+                        this.formCreate.setValue({
+                            jobId: this.fclImportDetail.jobNo, // * disabled
+                            mawb: this.fclImportDetail.mawb,
+                            subColoader: this.fclImportDetail.subColoader,
+                            flightVesselName: this.fclImportDetail.flightVesselName,
+                            voyNo: this.fclImportDetail.voyNo,
+                            pono: this.fclImportDetail.pono,
+                            notes: this.fclImportDetail.notes,
+
+                            etd: !!this.fclImportDetail.etd ? { startDate: new Date(this.fclImportDetail.etd), endDate: new Date(this.fclImportDetail.etd) } : null, // * Date
+                            eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null, // * Date
+                            serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
+
+                            mbltype: (this.ladingTypes || []).find(type => type.value === this.fclImportDetail.mbltype).value, // * select
+                            shipmentType: (this.shipmentTypes || []).find(type => type.value === this.fclImportDetail.shipmentType).value, // * select
+                            typeOfService: (this.serviceTypes || []).find(type => type.value === this.fclImportDetail.typeOfService).value, // * select
+                            personIncharge: this.fclImportDetail.personIncharge,  // * select
+                        });
+
+                        if (!!this.formCreate.value.etd) {
+                            this.minDateETA = this.createMoment(this.fclImportDetail.etd);
+                        }
+
+                        // * Combo grid
+                        this.selectedPortDestination = { field: 'id', value: this.fclImportDetail.pod };
+                        this.selectedPortDelivery = { field: 'id', value: this.fclImportDetail.deliveryPlace };
+                        this.selectedPortLoading = { field: 'id', value: this.fclImportDetail.pol };
+                        this.selectedAgent = { field: 'id', value: this.fclImportDetail.agentId };
+                        this.selectedSupplier = { field: 'id', value: this.fclImportDetail.coloaderId };
+                    }
+                }
+            );
     }
 
     initForm() {
@@ -165,39 +208,10 @@ export class SeaFClImportFormCreateComponent extends AppForm {
             });
     }
 
-    initFormUpdate() {
-        this.formCreate.setValue({
-            jobId: this.fclImportDetail.jobNo, // * disabled
-            mawb: this.fclImportDetail.mawb,
-            subColoader: this.fclImportDetail.subColoader,
-            flightVesselName: this.fclImportDetail.flightVesselName,
-            voyNo: this.fclImportDetail.voyNo,
-            pono: this.fclImportDetail.pono,
-            notes: this.fclImportDetail.notes,
-
-            etd: !!this.fclImportDetail.etd ? { startDate: new Date(this.fclImportDetail.etd), endDate: new Date(this.fclImportDetail.etd) } : null, // * Date
-            eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null, // * Date
-            serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
-
-            mbltype: (this.ladingTypes || []).filter(type => type.value === this.fclImportDetail.mbltype)[0].value, // * select
-            shipmentType: ((this.shipmentTypes || []).filter(type => type.value === this.fclImportDetail.shipmentType)[0]).value, // * select
-            typeOfService: ((this.serviceTypes || []).filter(type => type.value === this.fclImportDetail.typeOfService)[0]).value, // * select
-            personIncharge: this.fclImportDetail.personIncharge,  // * select
-        });
-
-        // * Combo grid
-        this.selectedPortDestination = { field: 'id', value: this.fclImportDetail.pod };
-        this.selectedPortDelivery = { field: 'id', value: this.fclImportDetail.deliveryPlace };
-        this.selectedPortLoading = { field: 'id', value: this.fclImportDetail.pol };
-        this.selectedAgent = { field: 'id', value: this.fclImportDetail.agentId };
-        this.selectedSupplier = { field: 'id', value: this.fclImportDetail.coloaderId };
-    }
-
     getUserLogged() {
         this.userLogged = this._baseService.getUserLogin();
         this.personIncharge.setValue(this.userLogged.id);
         this.personIncharge.disable();
-
     }
 
     getMasterData() {

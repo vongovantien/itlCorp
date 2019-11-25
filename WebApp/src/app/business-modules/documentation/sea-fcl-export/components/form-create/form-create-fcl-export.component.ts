@@ -91,7 +91,6 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
         this.getCommonData();
         this.getUserLogged();
 
-
         // * Subscribe state to update form.
         this._store.select(fromStore.getSeaFCLShipmentDetail)
             .pipe(takeUntil(this.ngUnsubscribe), skip(1))

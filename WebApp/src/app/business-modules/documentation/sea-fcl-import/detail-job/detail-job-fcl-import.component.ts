@@ -58,10 +58,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         this._progressRef = this._ngProgressService.ref();
     }
 
-    ngOnInit(): void {
-
-    }
-
     ngAfterViewInit() {
         combineLatest([
             this._activedRoute.params,
@@ -101,6 +97,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             .subscribe(
                 (res: any) => {
                     this.fclImportDetail = res; // TODO Model.
+
                     // * Update Good Summary.
                     this.shipmentGoodSummaryComponent.containerDetail = this.fclImportDetail.packageContainer;
                     this.shipmentGoodSummaryComponent.commodities = this.fclImportDetail.commodity;
@@ -109,10 +106,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.shipmentGoodSummaryComponent.netWeight = this.fclImportDetail.netWeight;
                     this.shipmentGoodSummaryComponent.totalChargeWeight = this.fclImportDetail.chargeWeight;
                     this.shipmentGoodSummaryComponent.totalCBM = this.fclImportDetail.cbm;
-
-                    setTimeout(() => {
-                        this.updateForm();
-                    }, 200);
                 },
 
             );
@@ -193,6 +186,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             this.duplicateJob(modelUpdate);
         }
     }
+
     duplicateJob(body: any) {
         this._documenRepo.importCSTransaction(body)
             .pipe(
