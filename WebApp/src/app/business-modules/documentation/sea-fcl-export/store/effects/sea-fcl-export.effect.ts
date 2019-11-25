@@ -4,7 +4,8 @@ import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { SeaFCLExportActions, SeaFCLExportTypes, SeaFCLExportLoadSuccessAction, SeaFCLExportLoadFailAction } from '../actions/sea-fcl-export.action';
+import { SeaFCLExportLoadSuccessAction, SeaFCLExportActions, SeaFCLExportTypes, SeaFCLExportLoadFailAction, SeaFCLExportGetDetailSuccessAction, SeaFCLExportGetDetailFailAction } from '../actions';
+
 
 @Injectable()
 export class SeaFCLExportEffects {
@@ -15,7 +16,7 @@ export class SeaFCLExportEffects {
     ) { }
 
     @Effect()
-    getDetailSeaFCLImportEffect$: Observable<Action> = this.actions$.
+    getListSeaFCLExportEffect$: Observable<Action> = this.actions$.
         pipe(
             ofType<SeaFCLExportActions>(SeaFCLExportTypes.LOAD_LIST),
             map((payload: any) => payload.payload),
@@ -27,4 +28,19 @@ export class SeaFCLExportEffects {
                     )
             )
         );
+
+    @Effect()
+    getDetailFCLExportEffect: Observable<Action> = this.actions$.
+        pipe(
+            ofType<SeaFCLExportActions>(SeaFCLExportTypes.GET_DETAIL),
+            map((payload: any) => payload.payload),
+            switchMap(
+                (id: string) => this._documentRepo.getDetailTransaction(id)
+                    .pipe(
+                        map((data: any) => new SeaFCLExportGetDetailSuccessAction(data)),
+                        catchError(err => of(new SeaFCLExportGetDetailFailAction(err)))
+                    )
+            )
+        );
+
 }

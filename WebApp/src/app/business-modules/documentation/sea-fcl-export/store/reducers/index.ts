@@ -15,6 +15,7 @@ export const getSeaFCLExportTransactionState = createSelector(seaFCLExportState,
 export const getSeaFCLExportShipment = createSelector(seaFCLExportState, (state: ISeaFCLExport) => state.csTransaction.shipments);
 export const getSeaFCLShipmentLoading = createSelector(seaFCLExportState, (state: ISeaFCLExport) => state.csTransaction.isLoading);
 export const getSeaFCLShipmentLoaded = createSelector(seaFCLExportState, (state: ISeaFCLExport) => state.csTransaction.isLoaded);
+export const getSeaFCLShipmentDetail = createSelector(seaFCLExportState, (state: ISeaFCLExport) => state.csTransaction.detail);
 
 export const reducers: ActionReducerMap<ISeaFCLExport> = {
     csTransaction: SeaFCLExportReducer,

@@ -9,7 +9,6 @@ import { TariffAdd } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SystemConstants } from 'src/constants/system.const';
 import { combineLatest } from 'rxjs';
-import moment from 'moment/moment';
 
 @Component({
     selector: 'app-detail-tariff',
@@ -77,7 +76,7 @@ export class TariffDetailComponent extends TariffAddComponent {
 
         // * Update Form Group.
         this.formAddTariffComponent.formAdd.controls['tariff'].setValue(objectTariffForm);
-        this.formAddTariffComponent.minDateExpired = moment(this.tariff.setTariff.effectiveDate);
+        this.formAddTariffComponent.minDateExpired = this.formAddTariffComponent.createMoment(this.tariff.setTariff.effectiveDate);
 
         // * Update comboGrid.
         this.formAddTariffComponent.selectedOffice = <CommonInterface.IComboGridData>{ field: 'id', value: this.tariff.setTariff.officeId };

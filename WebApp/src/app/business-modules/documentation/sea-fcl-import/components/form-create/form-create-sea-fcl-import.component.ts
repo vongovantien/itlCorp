@@ -56,6 +56,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
 
 
     fclImportDetail: any; // TODO model;
+    minDateETA: any;
 
     constructor(
         protected _documentRepo: DocumentationRepo,
@@ -140,7 +141,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
-                this.minDate = value.startDate; // * Update min date
+                this.minDateETA = value.startDate; // * Update min date
 
                 this.isSubmitted = false;
                 this.resetFormControl(this.formCreate.controls["eta"]);

@@ -4,9 +4,22 @@ import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.
 import { ButtonType } from './shared/enums/type-button.enum';
 import { SelectComponent } from 'ng2-select';
 import { ViewChildren, QueryList } from '@angular/core';
+import moment from "moment/moment";
 
 export abstract class AppForm extends AppPage {
     @ViewChildren(SelectComponent) selectElements: QueryList<SelectComponent>;
+    ranges: any = {
+        "Today": [new Date(), new Date()],
+        "Yesterday": [new Date(new Date().setDate(new Date().getDate() - 1)), new Date(new Date().setDate(new Date().getDate() - 1))],
+        "Last 7 Days": [new Date(new Date().setDate(new Date().getDate() - 6)), new Date()],
+        "Last 30 Days": [new Date(new Date().setDate(new Date().getDate() - 29)), new Date()],
+        // "This Month": [new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)],
+        "This Month": [new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date()],
+        "Last Month": [new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1), new Date(new Date().getFullYear(), new Date().getMonth(), 0)]
+    };
+
+    maxDate: any = moment();
+    minDate: any = moment();
 
     requestSearch: any = null;
     requestReset: any = null;
@@ -93,6 +106,15 @@ export abstract class AppForm extends AppPage {
             elementsToclose.forEach((e: SelectComponent) => {
                 e.clickedOutside();
             });
+        }
+    }
+
+
+    createMoment(date?: any) {
+        if (!!date) {
+            return moment(date);
+        } else {
+            return moment();
         }
     }
 }
