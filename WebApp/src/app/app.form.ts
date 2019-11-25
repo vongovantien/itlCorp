@@ -8,6 +8,7 @@ import { ViewChildren, QueryList } from '@angular/core';
 export abstract class AppForm extends AppPage {
     @ViewChildren(SelectComponent) selectElements: QueryList<SelectComponent>;
 
+
     requestSearch: any = null;
     requestReset: any = null;
 
@@ -95,6 +96,8 @@ export abstract class AppForm extends AppPage {
             });
         }
     }
+
+
 }
 
 

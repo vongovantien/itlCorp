@@ -3,8 +3,6 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import cloneDeep from 'lodash/cloneDeep';
 import filter from 'lodash/filter';
-import moment from 'moment/moment';
-import { Subject } from 'rxjs';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { AppPage } from 'src/app/app.base';
 import { OpsModuleCreditDebitNoteAddnewComponent } from './ops-module-credit-debit-note-addnew/ops-module-credit-debit-note-addnew.component';
@@ -17,6 +15,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SortService } from 'src/app/shared/services';
 import { ActivatedRoute } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-ops-module-credit-debit-note',
@@ -208,7 +207,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             }
             const listSOA: any[] = []
             for (let i = 0; i < x.listSOA.length; i++) {
-                const date = moment(x.listSOA[i].soa.datetimeCreated).format('DD/MM/YYYY');
+                const date = formatDate(x.listSOA[i].soa.datetimeCreated, 'DD/MM/YYYY', 'en');
                 if (x.listSOA[i].soa.type.toLowerCase().includes(search_key) ||
                     x.listSOA[i].total_charge.toString().toLowerCase() === search_key ||
                     x.listSOA[i].soa.total.toString().toLowerCase().includes(search_key) ||

@@ -3,7 +3,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
-import moment from 'moment/moment';
 
 import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
 import { CreateHouseBillComponent } from '../create/create-house-bill.component';
@@ -90,26 +89,10 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             );
     }
 
-    updateHbl(body: any) {
+    onSaveHBLDetail() {
         switch (this.selectedTab) {
             case HBL_TAB.DETAIL:
-                if (this.formHouseBill.formGroup.valid) {
-                    this._progressRef.start();
-                    this._documentationRepo.updateHbl(body)
-                        .pipe(
-                            catchError(this.catchError),
-                            finalize(() => this._progressRef.complete())
-                        )
-                        .subscribe(
-                            (res: CommonInterface.IResult) => {
-                                if (res.status) {
-                                    this._toastService.success(res.message);
-                                } else {
-                                    this._toastService.error(res.message);
-                                }
-                            }
-                        );
-                }
+                this.onUpdateHblDetail();
                 break;
 
             // * Update Arrival Note.    
@@ -185,6 +168,24 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         this.updateHbl(modelUpdate);
     }
 
+    updateHbl(body: any) {
+        this._progressRef.start();
+        this._documentationRepo.updateHbl(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+
     getDetailHbl() {
         this.formHouseBill.isDetail = true;
         this._progressRef.start();
@@ -240,8 +241,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                             this.formHouseBill.referenceNo.setValue(this.hblDetail.referenceNo);
                         this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.hblDetail.originBlnumber)[0]);
-                        this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? moment(this.hblDetail.etd) : null;
-                        this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? moment(this.hblDetail.eta) : null;
+                        this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? this.createMoment(this.hblDetail.etd) : null;
+                        this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? this.createMoment(this.hblDetail.eta) : null;
 
                         setTimeout(() => {
                             this.formHouseBill.saleMans.forEach(item => {
@@ -280,6 +281,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
+
     onPreview(type: string) {
         // Preview Delivery Order
         if (type === 'DELIVERY_ORDER') {
@@ -370,6 +372,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 },
             );
     }
+
     exportGoodsDeclare() {
         this._exportRepository.exportGoodDeclare(this.hblId)
             .pipe(catchError(this.catchError))
@@ -379,6 +382,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 },
             );
     }
+
     exportEManifest() {
         this._exportRepository.exportEManifest(this.hblId)
             .pipe(catchError(this.catchError))

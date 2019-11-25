@@ -1,15 +1,6 @@
 <div class="sea-fcl-detail-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="onPreview()">
-                <span>
-                    <i class="la la-print"></i>
-                    <span>
-                        Preview
-                    </span>
-                </span>
-            </button> -->
             <div class="btn-group" autoClose="false" dropdown container="body">
                 <button id="button-nested" dropdownToggle type="button" class="btn btn-success dropdown-toggle"
                     aria-controls="dropdown-nested">
@@ -45,7 +36,7 @@
                     </li>
                 </ul>
             </div>
-            <app-default-button (click)="onUpdateHblDetail()" [buttonSetting]="saveButtonSetting"></app-default-button>
+            <app-default-button (click)="onSaveHBLDetail()" [buttonSetting]="saveButtonSetting"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </app-sub-header>

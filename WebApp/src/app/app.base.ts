@@ -6,13 +6,11 @@ import { UtilityHelper } from "src/helper";
 import { NgProgressRef } from "@ngx-progressbar/core";
 import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.model";
 import { ButtonType } from "./shared/enums/type-button.enum";
-import moment from "moment/moment";
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil, skip } from "rxjs/operators";
+import moment from "moment/moment";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
-    ngUnsubscribe: Subject<any> = new Subject();
-    keyword: string = '';
     ranges: any = {
         "Today": [new Date(), new Date()],
         "Yesterday": [new Date(new Date().setDate(new Date().getDate() - 1)), new Date(new Date().setDate(new Date().getDate() - 1))],
@@ -25,6 +23,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
     maxDate: any = moment();
     minDate: any = moment();
+    ngUnsubscribe: Subject<any> = new Subject();
+    keyword: string = '';
 
     utility: UtilityHelper = new UtilityHelper();
 
@@ -181,5 +181,13 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
                 callBack(...args).pipe(takeUntil(source$.pipe(skip(1))))
             )
         )
+
+    createMoment(date?: any) {
+        if (!!date) {
+            return moment(date);
+        } else {
+            return moment();
+        }
+    }
 }
 

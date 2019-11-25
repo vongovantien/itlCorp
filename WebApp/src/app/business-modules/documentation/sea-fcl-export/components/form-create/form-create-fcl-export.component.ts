@@ -1,6 +1,7 @@
-import { Component, OnInit, QueryList, ViewChildren, ElementRef, TemplateRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { Store } from '@ngrx/store';
 
 import { AppForm } from 'src/app/app.form';
 import { SystemConstants } from 'src/constants/system.const';
@@ -11,10 +12,10 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { User } from 'src/app/shared/models';
 
-import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
-
+import * as fromStore from './../../store';
 
 @Component({
     selector: 'form-create-sea-fcl-export',
@@ -22,7 +23,6 @@ import { Observable } from 'rxjs';
 })
 
 export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
-
 
     formCreateFCLExport: FormGroup;
     jobID: AbstractControl;
@@ -69,14 +69,13 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
 
     userLogged: User;
 
-
-
     constructor(
         private _spinner: NgxSpinnerService,
         private _dataService: DataService,
         private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
-        private _fb: FormBuilder
+        private _fb: FormBuilder,
+        private _store: Store<fromStore.SeaFCLExportActions>
 
     ) {
         super();
@@ -92,6 +91,36 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
         this.getCommonData();
         this.getUserLogged();
 
+
+        // * Subscribe state to update form.
+        this._store.select(fromStore.getSeaFCLShipmentDetail)
+            .pipe(takeUntil(this.ngUnsubscribe), skip(1))
+            .subscribe(
+                (res: ISeaFCLExportDetail) => {
+                    if (!!res) {
+                        this.formCreateFCLExport.setValue({
+                            jobID: res.jobNo,
+                            etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
+                            eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
+                            mawb: res.mawb,
+                            mbltype: [this.ladingTypes.find(type => type.id === res.mbltype)],
+                            coloader: res.coloaderId,
+                            bookingNo: res.bookingNo,
+                            typeOfService: [this.serviceTypes.find(type => type.id === res.typeOfService)],
+                            serviceDate: !!res.serviceDate ? { startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) } : null,
+                            pol: res.pol,
+                            pod: res.pod,
+                            agent: res.agentId,
+                            flightVesselName: res.flightVesselName,
+                            voyNo: res.voyNo,
+                            term: [this.termTypes.find(type => type.id === res.paymentTerm)],
+                            shipmentType: [this.shipmentTypes.find(type => type.id === res.shipmentType)],
+                            personalIncharge: res.personIncharge,
+                            notes: res.notes
+                        });
+                    }
+                }
+            );
     }
 
     initForm() {
@@ -215,3 +244,60 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
     }
 
 }
+
+interface ISeaFCLExportDetail {
+    active: boolean;
+    agentId: string;
+    agentName: string;
+    bookingNo: string;
+    branchId: string;
+    cbm: number;
+    chargeWeight: number;
+    coloaderId: string;
+    commodity: string;
+    creatorName: null
+    currentStatus: string;
+    customerId: null
+    datetimeCreated: string;
+    datetimeModified: string;
+    deliveryPlace: null
+    desOfGoods: string;
+    eta: string;
+    etd: string;
+    flightVesselName: string;
+    grossWeight: number;
+    hblId: string;
+    hwbNo: string;
+    id: string;
+    inactiveOn: string;
+    isLocked: false
+    jobNo: string;
+    lockedDate: string;
+    mawb: string;
+    mbltype: string;
+    netWeight: number;
+    notes: string;
+    notifyPartyId: string;
+    packageContainer: string;
+    paymentTerm: string;
+    personIncharge: string;
+    placeDeliveryName: string;
+    pod: string;
+    podName: string;
+    pol: string;
+    polName: string;
+    pono: string;
+    saleManId: string;
+    serviceDate: string;
+    shipmentType: string;
+    subColoader: string;
+    sumCont: string;
+    sumPackage: string;
+    supplierName: string;
+    transactionType: string;
+    typeOfService: string;
+    userCreated: string;
+    userModified: string;
+    voyNo: string;
+}
+

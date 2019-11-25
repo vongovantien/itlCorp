@@ -1,6 +1,7 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="['new']">
+        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="gotoCreateJob()">
             <span>
                 <i class="la la-plus"></i>
                 <span>
@@ -24,77 +25,83 @@
                         </th>
                     </thead>
                     <tbody>
-                        <ng-container *ngFor="let shipment of shipments; let i = index; trackBy: trackByFn">
-                            <tr *ngIf="!!shipments.length" class="collapse-toggle-row">
-                                <td class="table-actions-col">
-                                    <div class="table-actions" style="width: 100px">
-                                        <button type="button"
-                                            class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
-                                            data-toggle="collapse" [attr.data-target]="'#id-00' + (i+1)"
-                                            title="Collapse" (click)="getListHouseBill(shipment.id,i)">
-                                            <i class="la la-angle-up"></i>
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Edit" routerLink="/home/documentation/sea-fcl-export-create"
-                                            (click)="showDetail(shipment)">
-                                            <i class="la la-edit"></i>
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" (click)="confirmDelete(shipment)">
-                                            <i class="la la-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a class="text-underline pointer" [routerLink]="shipment.id">{{shipment.jobNo}}</a>
-                                </td>
-                                <td>{{shipment.mawb}}</td>
-                                <td>{{shipment.etd | date: 'dd/MM/yyyy'}}</td>
-                                <td>{{shipment.eta | date: 'dd/MM/yyyy'}}</td>
-                                <td>{{shipment.supplierName}}</td>
-                                <td>{{shipment.agentName}}</td>
-                                <td>{{shipment.polName}}</td>
-                                <td>{{shipment.podName}}</td>
-                                <td>{{shipment.sumCont}}</td>
-                                <td>{{shipment.cbm}}</td>
-                                <td class="text-success">{{shipment.userCreated}}</td>
-                                <td>{{shipment.datetimeCreated | date: 'dd/MM/yyyy'}}</td>
-                                <td>{{shipment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
-                            </tr>
-                            <tr class="collapse-panel-row">
-                                <td colspan="14">
-                                    <div class="detail-panel-block collapse" id="id-00{{(i+1)}}"
-                                        data-parent="#sea-fcl-export-table">
-                                        <div class="table-inside-block">
-                                            <perfect-scrollbar style="max-height: 180px">
-                                                <table class="table table-secondary dataTable">
-                                                    <thead app-table-header [headers]="headersHBL"
-                                                        (onClick)="sortHBL($event.sortField, $event.order)">
-                                                    </thead>
-                                                    <tbody>
-                                                        <ng-container *ngIf="!!houseBills.length">
-                                                            <tr *ngFor="let hbl of houseBills; trackBy: trackByFn">
-                                                                <td *ngFor="let header of headersHBL;  trackBy: trackByFn"
-                                                                    class="text-right">
-                                                                    <app-table-cell [item]="hbl"
-                                                                        [type]="header.dataType" [field]="header.field">
-                                                                    </app-table-cell>
-                                                                </td>
-                                                            </tr>
-                                                        </ng-container>
-                                                        <tr app-table-none-record *ngIf="!houseBills.length"></tr>
-                                                    </tbody>
-                                                </table>
-                                            </perfect-scrollbar>
+                        <ng-container *ngIf="!!shipments.length">
+                            <ng-container *ngFor="let shipment of shipments; let i = index; trackBy: trackByFn">
+                                <tr class="collapse-toggle-row">
+                                    <td class="table-actions-col">
+                                        <div class="table-actions" style="width: 100px">
+                                            <button type="button"
+                                                class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                                data-toggle="collapse" [attr.data-target]="'#id-00' + (i+1)"
+                                                title="Collapse" (click)="getListHouseBill(shipment.id,i)">
+                                                <i class="la la-angle-up"></i>
+                                            </button>
+                                            <button type="button"
+                                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                title="Edit"
+                                                [routerLink]="['/home/documentation/sea-fcl-export/' + shipment.id]">
+                                                <i class="la la-edit"></i>
+                                            </button>
+                                            <button type="button"
+                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                title="Remove" (click)="confirmDelete(shipment)">
+                                                <i class="la la-trash"></i>
+                                            </button>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td>
+                                        <a class="text-underline pointer"
+                                            [routerLink]="shipment.id">{{shipment.jobNo}}</a>
+                                    </td>
+                                    <td>{{shipment.mawb}}</td>
+                                    <td>{{shipment.etd | date: 'dd/MM/yyyy'}}</td>
+                                    <td>{{shipment.eta | date: 'dd/MM/yyyy'}}</td>
+                                    <td>{{shipment.supplierName}}</td>
+                                    <td>{{shipment.agentName}}</td>
+                                    <td>{{shipment.polName}}</td>
+                                    <td>{{shipment.podName}}</td>
+                                    <td>{{shipment.sumCont}}</td>
+                                    <td>{{shipment.cbm}}</td>
+                                    <td class="text-success">{{shipment.userCreated}}</td>
+                                    <td>{{shipment.datetimeCreated | date: 'dd/MM/yyyy'}}</td>
+                                    <td>{{shipment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
+                                </tr>
+                                <tr class="collapse-panel-row">
+                                    <td colspan="14">
+                                        <div class="detail-panel-block collapse" id="id-00{{(i+1)}}"
+                                            data-parent="#sea-fcl-export-table">
+                                            <div class="table-inside-block">
+                                                <perfect-scrollbar style="max-height: 180px">
+                                                    <table class="table table-secondary dataTable">
+                                                        <thead app-table-header [headers]="headersHBL"
+                                                            (onClick)="sortHBL($event.sortField, $event.order)">
+                                                        </thead>
+                                                        <tbody>
+                                                            <ng-container *ngIf="!!houseBills.length">
+                                                                <tr *ngFor="let hbl of houseBills; trackBy: trackByFn">
+                                                                    <td *ngFor="let header of headersHBL;  trackBy: trackByFn"
+                                                                        class="text-right">
+                                                                        <app-table-cell [item]="hbl"
+                                                                            [type]="header.dataType"
+                                                                            [field]="header.field">
+                                                                        </app-table-cell>
+                                                                    </td>
+                                                                </tr>
+                                                            </ng-container>
+                                                            <tr app-table-none-record *ngIf="!houseBills.length"></tr>
+                                                        </tbody>
+                                                    </table>
+                                                </perfect-scrollbar>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
                         </ng-container>
+
                         <tr app-table-none-record *ngIf="!shipments.length"></tr>
                         <tr app-table-row-loading *ngIf="isLoading | async"></tr>
+
                     </tbody>
                 </table>
             </div>
