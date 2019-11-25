@@ -3,12 +3,14 @@ import { SeaFCLExportActions, SeaFCLExportTypes } from "../actions/sea-fcl-expor
 
 export interface ISeaFCLExportShipmentState {
     shipments: CsTransaction[];
+    detail: any;
     isLoading: boolean;
     isLoaded: boolean;
 }
 
 export const initialState: ISeaFCLExportShipmentState = {
     shipments: new Array<CsTransaction>(),
+    detail: null,
     isLoaded: false,
     isLoading: false
 };
@@ -30,6 +32,34 @@ export function SeaFCLExportReducer(state = initialState, action: SeaFCLExportAc
                 isLoading: false,
                 isLoaded: true
             };
+        }
+
+        case SeaFCLExportTypes.GET_DETAIL: {
+            return {
+                ...state,
+                isLoading: true,
+            };
+        }
+
+        case SeaFCLExportTypes.GET_DETAIL_SUCCESS: {
+            return {
+                ...state,
+                ...state.detail,
+                detail: action.payload,
+                isLoading: false,
+                isLoaded: true
+            };
+        }
+
+        case SeaFCLExportTypes.UPDATE: {
+            return {
+                ...state,
+                isLoading: true,
+            };
+        }
+
+        case SeaFCLExportTypes.UPDATE_SUCCESS: {
+            return { ...state, ...action.payload };
         }
 
         default: {

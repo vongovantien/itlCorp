@@ -16,7 +16,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators';
 
-import { getHBLState } from '../../../../store';
+import { getHBLState, GetDetailHBLAction } from '../../../../store';
 
 import * as fromShareBussiness from './../../../../../../share-business/store';
 @Component({
@@ -270,6 +270,9 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // * Dispatch for detail HBL to update HBL state.
+                        this._store.dispatch(new GetDetailHBLAction(this.hblArrivalNote.hblid));
                     }
                 }
             );

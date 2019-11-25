@@ -6,25 +6,12 @@ import { UtilityHelper } from "src/helper";
 import { NgProgressRef } from "@ngx-progressbar/core";
 import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.model";
 import { ButtonType } from "./shared/enums/type-button.enum";
-import moment from "moment/moment";
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil, skip } from "rxjs/operators";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
     ngUnsubscribe: Subject<any> = new Subject();
     keyword: string = '';
-    ranges: any = {
-        "Today": [new Date(), new Date()],
-        "Yesterday": [new Date(new Date().setDate(new Date().getDate() - 1)), new Date(new Date().setDate(new Date().getDate() - 1))],
-        "Last 7 Days": [new Date(new Date().setDate(new Date().getDate() - 6)), new Date()],
-        "Last 30 Days": [new Date(new Date().setDate(new Date().getDate() - 29)), new Date()],
-        // "This Month": [new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)],
-        "This Month": [new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date()],
-        "Last Month": [new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1), new Date(new Date().getFullYear(), new Date().getMonth(), 0)]
-    };
-
-    maxDate: any = moment();
-    minDate: any = moment();
 
     utility: UtilityHelper = new UtilityHelper();
 
@@ -181,5 +168,6 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
                 callBack(...args).pipe(takeUntil(source$.pipe(skip(1))))
             )
         )
+
 }
 

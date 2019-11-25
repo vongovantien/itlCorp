@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
@@ -8,6 +8,7 @@ import { AppForm } from 'src/app/app.form';
 import { FCLImportAddModel } from 'src/app/shared/models';
 import { SeaFClImportFormCreateComponent } from '../components/form-create/form-create-sea-fcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
+import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
@@ -17,7 +18,6 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { catchError, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
-import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
 @Component({
     selector: 'app-create-job-fcl-import',
@@ -37,6 +37,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
         protected _documenRepo: DocumentationRepo,
         protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
+        protected _cd: ChangeDetectorRef
     ) {
         super();
     }
@@ -58,6 +59,8 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
         // * Init container
         this.shipmentGoodSummaryComponent.initContainer();
         this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
+        this._cd.detectChanges();
+
     }
 
     onSubmitData() {

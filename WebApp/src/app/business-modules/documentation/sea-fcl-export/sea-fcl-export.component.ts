@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
 
 import { SortService } from 'src/app/shared/services/sort.service';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
@@ -11,10 +12,9 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CsTransactionDetail } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromStore from './store';
-import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -35,7 +35,7 @@ export class SeaFCLExportComponent extends AppList {
     itemToDelete: any = null;
 
     constructor(
-        private router: Router,
+        private _router: Router,
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _documentRepo: DocumentationRepo,
@@ -53,8 +53,8 @@ export class SeaFCLExportComponent extends AppList {
 
         this.dataSearch = {
             transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport,
-            fromDate: this.ranges['This Month'][0],
-            toDate: this.ranges['This Month'][1],
+            fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            toDate: new Date(),
         };
 
     }
@@ -93,11 +93,13 @@ export class SeaFCLExportComponent extends AppList {
 
     getShipments() {
         this._store.select(fromStore.getSeaFCLExportShipment)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+            )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
                     this.shipments = res.data || [];
                     this.totalItems = res.totalItems;
-                    console.log(this.shipments);
                 }
             );
     }
@@ -125,12 +127,7 @@ export class SeaFCLExportComponent extends AppList {
                         this.shipments[index].houseBillList = res;
                     }
                 );
-
         }
-    }
-
-    showDetail(item: { id: any; }) {
-        this.router.navigate(["/home/documentation/sea-fcl-export-create/", { id: item.id }]);
     }
 
     onSearchShipment($event: any) {
@@ -162,7 +159,7 @@ export class SeaFCLExportComponent extends AppList {
         this.confirmDeletePopup.hide();
         this._progressRef.start();
 
-        this._documentRepo.checkMasterBillAllowToDelete(this.itemToDelete.id)
+        this._documentRepo.deleteMasterBill(this.itemToDelete.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -175,5 +172,9 @@ export class SeaFCLExportComponent extends AppList {
                     }
                 }
             );
+    }
+
+    gotoCreateJob() {
+        this._router.navigate(['home/documentation/sea-fcl-export/new']);
     }
 }

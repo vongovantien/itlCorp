@@ -7,7 +7,7 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { getHBLState } from '../../../../store';
+import { getHBLState, GetDetailHBLAction } from '../../../../store';
 import { catchError, takeUntil, switchMap, finalize } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
@@ -27,6 +27,7 @@ export class SeaFClImportDeliveryOrderComponent extends AppForm {
     footer: string = '';
 
     userLogged: User;
+    hblid: string;
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -47,6 +48,7 @@ export class SeaFClImportDeliveryOrderComponent extends AppForm {
                 catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
                 switchMap((hblDetail: any) => {
+                    this.hblid = hblDetail.id;
                     return this._documentRepo.getDeliveryOrder(hblDetail.id || SystemConstants.EMPTY_GUID, CommonEnum.TransactionTypeEnum.SeaFCLImport);
 
                 }) // * Get deliveryOrder info.
@@ -103,6 +105,9 @@ export class SeaFClImportDeliveryOrderComponent extends AppForm {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // * Dispatch for detail HBL to update HBL state.
+                        this._store.dispatch(new GetDetailHBLAction(this.hblid));
                     } else {
                         this._toastService.error(res.message);
                     }

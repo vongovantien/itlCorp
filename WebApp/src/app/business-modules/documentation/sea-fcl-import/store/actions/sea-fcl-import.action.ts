@@ -6,13 +6,13 @@ import { Action } from '@ngrx/store';
  */
 
 export enum SeaFCLImportActionTypes {
-    GET_DETAIL = '[CSTransaction] Get Detail',
-    GET_DETAIL_SUCCESS = '[CSTransaction] Get Detail Success',
-    GET_DETAIL_FAIL = '[CSTransaction] Get Detail Fail',
+    GET_DETAIL = '[FCL Import] Get Detail',
+    GET_DETAIL_SUCCESS = '[FCL Import] Get Detail Success',
+    GET_DETAIL_FAIL = '[FCL Import] Get Detail Fail',
 
-    UPDATE = '[CSTransaction] Update',
-    UPDATE_SUCCESS = '[CSTransaction] Update Success',
-    UPDATE_FAIL = '[CSTransaction] Update Fail',
+    UPDATE = '[FCL Import] Update',
+    UPDATE_SUCCESS = '[FCL Import] Update Success',
+    UPDATE_FAIL = '[FCL Import] Update Fail',
 
 }
 
