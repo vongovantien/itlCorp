@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-8">
                 <div class="m--align-right">
-                    <ng-container *ngIf="!charges.length">
+                    <ng-container *ngIf="!!charges && !charges.length">
                         <button type="button"
                             class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
                             (click)="syncFreightCharge()">
@@ -51,7 +51,7 @@
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
                         <tr *ngFor="let charge of charges  | filter: keyword: ['partnerName','invoiceNo','notes','invoiceNo','seriesNo','soano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
-                            class="m-form m-form--state">
+                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''">
                             <td class="table-actions-col fixed-side">
                                 <div class="table-actions">
                                     <button (click)="duplicate(i, 'SELL')"
@@ -61,7 +61,6 @@
                                     <button type="button" (click)="deleteCharge(charge, i, 'SELL')" appLoadingButton
                                         [state]="
                                     !!charge.soano 
-                                    || !!charge.creditNo
                                     || !!charge.debitNo
                                     || !!charge.settlementCode
                                     || !!charge.voucherId
@@ -77,7 +76,8 @@
                                     [tooltip]="charge.partnerName"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerName }">
                                     <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
-                                        [(ngModel)]="charge.partnerName" placeholder="Partner Name">
+                                        [(ngModel)]="charge.partnerName" placeholder="Partner Name"
+                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                     <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
                                         <div class="d-flex justify-content-end dropdown-partner__header">
                                             <a class="text-primary text-underline m--margin-right-20 pointer"
@@ -100,7 +100,8 @@
                                         (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                         [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
                                         [dataSources]="listCharges"
-                                        [displayFields]="configComboGridCharge.displayFields" [height]="150">
+                                        [displayFields]="configComboGridCharge.displayFields" [height]="150"
+                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </td>
@@ -111,11 +112,13 @@
                                         <div class="col-md-6 p-r-none">
                                             <input type="text" class="form-control" [(ngModel)]="charge.quantity"
                                                 currencyMask placeholder="Quantity"
-                                                (ngModelChange)="onChangeQuantity($event, charge)">
+                                                (ngModelChange)="onChangeQuantity($event, charge)"
+                                                [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                         </div>
                                         <div class="col-md-6 p-l-none">
                                             <select class="form-control border" [(ngModel)]="charge.quantityType"
-                                                (ngModelChange)="onChangeQuantityHint($event, charge)">
+                                                (ngModelChange)="onChangeQuantityHint($event, charge)"
+                                                [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                                 <option value="null" disabled></option>
                                                 <option *ngFor="let hint of quantityHints" [ngValue]="hint.value">
                                                     {{hint.displayName}}</option>
@@ -126,7 +129,8 @@
                             </td>
                             <td>
                                 <div class="form-group ">
-                                    <select class="form-control" [(ngModel)]="charge.unitId">
+                                    <select class="form-control" [(ngModel)]="charge.unitId"
+                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                         <option value="null" disabled>Please select</option>
                                         <option *ngFor="let unit of listUnits" [ngValue]="unit.id">{{unit.code}}
                                         </option>
@@ -137,13 +141,15 @@
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice === null || (!!charge.unitPrice && charge.unitPrice < 0)}">
                                     <input type="number" class="form-control" [(ngModel)]="charge.unitPrice"
-                                        (ngModelChange)="onChangeUnitPrice($event, charge)" placeholder="Unit Price">
+                                        (ngModelChange)="onChangeUnitPrice($event, charge)" placeholder="Unit Price"
+                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                 </div>
                             </td>
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.currencyId)}">
-                                    <select class="form-control" [(ngModel)]="charge.currencyId">
+                                    <select class="form-control" [(ngModel)]="charge.currencyId"
+                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                         <option *ngFor="let currency of listCurrency" [ngValue]="currency.id">
                                             {{currency.id}}
                                         </option>
@@ -154,7 +160,8 @@
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (charge.vatrate === null || charge.vatrate > 100) }">
                                     <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
-                                        (ngModelChange)="onChangeVat($event, charge)" placeholder="%">
+                                        (ngModelChange)="onChangeVat($event, charge)" placeholder="%"
+                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                 </div>
                             </td>
                             <td class="disabled">
@@ -166,7 +173,8 @@
                             <td>
                                 <div class="form-group ">
                                     <input type="text" class="form-control" [(ngModel)]="charge.notes"
-                                        placeholder="Note">
+                                        placeholder="Note"
+                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                 </div>
                             </td>
                             <td class="disabled">
@@ -177,13 +185,13 @@
                             <td>
                                 <div class="form-group">
                                     <input type="text" class="form-control text-primary" disabled
-                                        [value]="(!!charge.creditNo ? charge.creditNo + ' /' : '_/') + (!!charge.debitNo ? charge.debitNo : '_ ')">
+                                        [value]="charge.debitNo">
                                 </div>
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" [(ngModel)]="charge.settlementCode" disabled
-                                        readonly>
+                                    <input type="text" class="form-control text-primary"
+                                        [(ngModel)]="charge.settlementCode" disabled readonly>
                                 </div>
                             </td>
 
@@ -194,7 +202,8 @@
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
                                             [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                            [(ngModel)]="charge.exchangeDate" />
+                                            [(ngModel)]="charge.exchangeDate"
+                                            [attr.disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null" />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
@@ -207,7 +216,7 @@
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateInvoice}">
                                     <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
-                                        placeholder="Invoice No" (ngModelChange)="isDuplicateInvoice = false">
+                                        placeholder="Invoice No" (ngModelChange)="isDuplicateInvoice = false" disabled>
                                 </div>
                             </td>
                             <td>
@@ -217,7 +226,7 @@
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
                                             [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                            [(ngModel)]="charge.invoiceDate" />
+                                            [(ngModel)]="charge.invoiceDate" disabled />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>

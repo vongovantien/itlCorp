@@ -1,18 +1,18 @@
 import { Component } from '@angular/core';
+import { NgProgress } from '@ngx-progressbar/core';
+import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
 
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-
-import { Store } from '@ngrx/store';
-import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { ChargeConstants } from 'src/constants/charge.const';
 
-import { takeUntil, catchError } from 'rxjs/operators';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { CsShipmentSurcharge, Partner } from 'src/app/shared/models';
 
 import * as fromStore from './../../store';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { ChargeConstants } from 'src/constants/charge.const';
 
 @Component({
     selector: 'obh-charge',
@@ -28,9 +28,11 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         protected _sortService: SortService,
-    ) {
-        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService);
+        protected _ngProgressService: NgProgress
 
+    ) {
+        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService);
+        this._progressRef = this._ngProgressService.ref();
     }
 
     getSurcharge() {
@@ -144,14 +146,15 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         if (!this.checkValidate()) {
             return;
         }
-        if (!this.checkDuplicate) {
+        if (!this.checkDuplicate()) {
             return;
         }
 
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.OBH);
 
+        this._progressRef.start();
         this._documentRepo.addShipmentSurcharges(this.charges)
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {

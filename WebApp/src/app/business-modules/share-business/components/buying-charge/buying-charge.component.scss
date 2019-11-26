@@ -81,6 +81,11 @@
                         }
                     }
                 }
+                .bg-warning {
+                    .form-control {
+                        background: inherit;
+                    }
+                }
             }
 
             .quantity-hint {

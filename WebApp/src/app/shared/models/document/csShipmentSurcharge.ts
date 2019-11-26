@@ -60,7 +60,7 @@ export class CsShipmentSurcharge {
     unlockedSoasaleMan: string = null;
     unlockedSoasaleManDate: any = null;
     unlockedSoasaleManStatus: string = null;
-
+    isFromShipment: boolean = true;
     isRemaining: boolean = null;
     isSelected: boolean = null;
     isDeleted: boolean = null;
