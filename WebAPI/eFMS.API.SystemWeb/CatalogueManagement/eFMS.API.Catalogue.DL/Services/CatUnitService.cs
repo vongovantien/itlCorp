@@ -20,15 +20,17 @@ using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatUnitService: RepositoryBase<CatUnit,CatUnitModel>,ICatUnitService
+    public class CatUnitService: RepositoryBaseCache<CatUnit,CatUnitModel>, ICatUnitService
     {
         private readonly ICurrentUser currentUser;
-        private readonly IDistributedCache cache;
-        public CatUnitService(IContextBase<CatUnit> repository, IMapper mapper, IDistributedCache distributedCache, ICurrentUser user) : base(repository,mapper)
+
+        public CatUnitService(IContextBase<CatUnit> repository, 
+            ICacheServiceBase<CatUnit> cacheService, 
+            IMapper mapper,
+            ICurrentUser user) : base(repository, cacheService, mapper)
         {
             currentUser = user;
-            cache = distributedCache;
-            SetChildren<CatCharge>("Id", "UnitId"); 
+            SetChildren<CatCharge>("Id", "UnitId");
             SetChildren<CsMawbcontainer>("Id", "ContainerTypeId");
             SetChildren<CsMawbcontainer>("Id", "UnitOfMeasureId");
             SetChildren<CsShipmentSurcharge>("Id", "UnitId");
@@ -44,8 +46,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Add(unit);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatUnit.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, DataContext.Get());
+                ClearCache();
+                Get();
             }
             return hs;
         }
@@ -61,8 +63,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatUnit.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, DataContext.Get());
+                ClearCache();
+                Get();
             }
             return hs;
         }
@@ -72,8 +74,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatUnit.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, DataContext.Get());
+                ClearCache();
+                Get();
             }
             return hs;
         }
@@ -88,16 +90,20 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             IQueryable<CatUnitModel> returnList = null;
             var data = GetBy(criteria);
+            if(data == null)
+            {
+                rowsCount = 0;
+                return data;
+            }
             rowsCount = data.Count();
-            if (rowsCount == 0) return returnList;
-            else data = data.OrderByDescending(x => x.DatetimeModified);
+            data = data.OrderByDescending(x => x.DatetimeModified);
             if (pageSize > 1)
             {
                 if (pageNumber < 1)
                 {
                     pageNumber = 1;
                 }
-                returnList = data.Skip((pageNumber - 1) * pageSize).Take(pageSize).ProjectTo<CatUnitModel>(mapper.ConfigurationProvider);
+                returnList = data.Skip((pageNumber - 1) * pageSize).Take(pageSize);
             }
             return returnList;
         }
@@ -105,12 +111,11 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatUnitModel> Query(CatUnitCriteria criteria)
         {
             var data = GetBy(criteria);
-            if (data == null) return null;
-            return data.ProjectTo<CatUnitModel>(mapper.ConfigurationProvider);
+            return data;
         }
-        private IQueryable<CatUnit> GetBy(CatUnitCriteria criteria)
+        private IQueryable<CatUnitModel> GetBy(CatUnitCriteria criteria)
         {
-            Expression<Func<CatUnit, bool>> query = null;
+            Expression<Func<CatUnitModel, bool>> query = null;
             if (criteria.All == null)
             {
                 query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -128,26 +133,12 @@ namespace eFMS.API.Catalogue.DL.Services
                                                                 || (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                                                 && (x.Active == criteria.Active || criteria.Active == null);
             }
-            IQueryable<CatUnit> data = RedisCacheHelper.Get<CatUnit>(cache, Templates.CatUnit.NameCaching.ListName);
-            if (data == null)
-            {
-                data = DataContext.Get(query);
-            }
-            else
-            {
-                data = data.Where(query);
-            }
+            var data = Get().Where(query);
             return data;
         }
-        public IQueryable<CatUnit> GetAll()
+        public IQueryable<CatUnitModel> GetAll()
         {
-            IQueryable<CatUnit> data = RedisCacheHelper.Get<CatUnit>(cache, Templates.CatUnit.NameCaching.ListName);
-            if (data == null)
-            {
-                data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, data);
-            }
-            return data;
+            return Get();
         }
 
         public CatUnitModel GetDetail(short id)

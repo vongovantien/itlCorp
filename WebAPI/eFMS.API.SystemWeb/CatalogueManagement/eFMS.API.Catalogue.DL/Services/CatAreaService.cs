@@ -6,6 +6,7 @@ using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Helpers;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
@@ -18,17 +19,15 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatAreaService : RepositoryBase<CatArea, CatAreaModel>, ICatAreaService
+    public class CatAreaService : RepositoryBaseCache<CatArea, CatAreaModel>, ICatAreaService
     {
-        private readonly IDistributedCache cache;
-        public CatAreaService(IContextBase<CatArea> repository, IMapper mapper, IDistributedCache distributedCache) : base(repository, mapper)
+        public CatAreaService(IContextBase<CatArea> repository, ICacheServiceBase<CatArea> cacheService, IMapper mapper) : base(repository, cacheService, mapper)
         {
-            cache = distributedCache;
         }
 
         public List<CatAreaViewModel> GetByLanguage()
         {
-            var data = GetAll();
+            var data = Get();
             if (data == null) return null;
             else
             {
@@ -36,25 +35,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 return GetDataByLanguage(data);
             }
         }
-
-        private IQueryable<CatArea> GetAll()
-        {
-            var lstCatArea = RedisCacheHelper.GetObject<List<CatArea>>(cache, Templates.CatArea.NameCaching.ListName);
-            IQueryable<CatArea> data = null;
-            if (lstCatArea != null)
-            {
-                data = lstCatArea.AsQueryable();
-            }
-            else
-            {
-                data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatArea.NameCaching.ListName, data.ToList());
-            }
-            return data;
-            //var data = RedisCacheHelper.GetAll(cache, Templates.CatArea.NameCaching.ListName, DataContext.Get());
-            //return data;
-        }
-        private List<CatAreaViewModel> GetDataByLanguage(IQueryable<CatArea> data)
+        private List<CatAreaViewModel> GetDataByLanguage(IQueryable<CatAreaModel> data)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var results = new List<CatAreaViewModel>();

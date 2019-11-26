@@ -16,7 +16,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map, } from 'rxjs/operators';
 import _map from 'lodash/map';
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
@@ -46,6 +46,7 @@ export class CustomerComponent extends AppList {
         private _progressService: NgProgress,
         private sortService: SortService,
         private _catalogueRepo: CatalogueRepo,
+        private _exportRepository: ExportRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -76,10 +77,9 @@ export class CustomerComponent extends AppList {
             { title: 'Status', field: 'active', sortable: true },
 
         ];
-        this.getService();
     }
     async getPartnerData(pager: PagerSetting, criteria?: any) {
-        if (criteria != undefined) {
+        if (criteria !== undefined) {
             this.criteria = criteria;
         }
         const responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
@@ -131,64 +131,73 @@ export class CustomerComponent extends AppList {
         }
     }
     async exportCustomers() {
-        var customers = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, this.criteria);
-        if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-            customers = _map(customers, function (cus, index) {
-                return [
-                    index + 1,
-                    cus['id'],
-                    cus['partnerNameEn'],
-                    cus['shortName'],
-                    cus['addressEn'],
-                    cus['taxCode'],
-                    cus['tel'],
-                    cus['fax'],
-                    cus['userCreatedName'],
-                    cus['datetimeModified'],
-                    (cus['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-                ]
-            });
-        }
-        if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-            customers = _map(customers, function (cus, index) {
-                return [
-                    index + 1,
-                    cus['id'],
-                    cus['partnerNameVn'],
-                    cus['shortName'],
-                    cus['addressVn'],
-                    cus['taxCode'],
-                    cus['tel'],
-                    cus['fax'],
-                    cus['userCreatedName'],
-                    cus['datetimeModified'],
-                    (cus['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
-                ]
-            });
-        }
+        // var customers = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, this.criteria);
+        // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+        //     customers = _map(customers, function (cus, index) {
+        //         return [
+        //             index + 1,
+        //             cus['id'],
+        //             cus['partnerNameEn'],
+        //             cus['shortName'],
+        //             cus['addressEn'],
+        //             cus['taxCode'],
+        //             cus['tel'],
+        //             cus['fax'],
+        //             cus['userCreatedName'],
+        //             cus['datetimeModified'],
+        //             (cus['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+        //         ]
+        //     });
+        // }
+        // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+        //     customers = _map(customers, function (cus, index) {
+        //         return [
+        //             index + 1,
+        //             cus['id'],
+        //             cus['partnerNameVn'],
+        //             cus['shortName'],
+        //             cus['addressVn'],
+        //             cus['taxCode'],
+        //             cus['tel'],
+        //             cus['fax'],
+        //             cus['userCreatedName'],
+        //             cus['datetimeModified'],
+        //             (cus['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+        //         ]
+        //     });
+        // }
 
 
-        const exportModel: ExportExcel = new ExportExcel();
-        exportModel.title = "Partner Data - Customers";
-        exportModel.sheetName = "Customers"
-        const currrently_user = localStorage.getItem('currently_userName');
-        exportModel.author = currrently_user;
-        exportModel.header = [
-            { name: "No.", width: 10 },
-            { name: "Partner ID", width: 20 },
-            { name: "Full Name", width: 60 },
-            { name: "Short Name", width: 20 },
-            { name: "Billing Address", width: 60 },
-            { name: "Tax Code", width: 20 },
-            { name: "Tel", width: 30 },
-            { name: "Fax", width: 30 },
-            { name: "Creator", width: 30 },
-            { name: "Modify", width: 30 },
-            { name: "Inactive", width: 20 }
-        ]
-        exportModel.data = customers;
-        exportModel.fileName = "Partner Data - Customers";
-        this.excelService.generateExcel(exportModel);
+        // const exportModel: ExportExcel = new ExportExcel();
+        // exportModel.title = "Partner Data - Customers";
+        // exportModel.sheetName = "Customers"
+        // const currrently_user = localStorage.getItem('currently_userName');
+        // exportModel.author = currrently_user;
+        // exportModel.header = [
+        //     { name: "No.", width: 10 },
+        //     { name: "Partner ID", width: 20 },
+        //     { name: "Full Name", width: 60 },
+        //     { name: "Short Name", width: 20 },
+        //     { name: "Billing Address", width: 60 },
+        //     { name: "Tax Code", width: 20 },
+        //     { name: "Tel", width: 30 },
+        //     { name: "Fax", width: 30 },
+        //     { name: "Creator", width: 30 },
+        //     { name: "Modify", width: 30 },
+        //     { name: "Inactive", width: 20 }
+        // ]
+        // exportModel.data = customers;
+        // exportModel.fileName = "Partner Data - Customers";
+        // this.excelService.generateExcel(exportModel);
+        this.criteria.author = localStorage.getItem("currently_userName");
+        this.criteria.partnerType = "Customers";
+        this._exportRepository.exportPartner(this.criteria)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                },
+            );
     }
 
     getService() {

@@ -10,6 +10,16 @@ namespace eFMS.API.Catalogue.Infrastructure.Common
     /// </summary>
     public enum CacheEntity
     {
-        catUnit
+        CatCountry,
+        CatArea,
+        CatCurrency,
+        CatCharge,
+        CatChargeDefaultAccount,
+        CatPartner,
+        CatCommodityGroup,
+        CatCommodity,
+        CatPlace,
+        CatStage,
+        CatUnit
     }
 }

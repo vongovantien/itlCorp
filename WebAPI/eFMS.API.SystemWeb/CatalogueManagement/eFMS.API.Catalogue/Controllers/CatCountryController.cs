@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Catalogue.DL.Common;
@@ -10,6 +11,7 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,16 +31,19 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCountryService catCountryService;
+        private readonly ICurrentUser currentUser;
 
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="localizer">inject IStringLocalizer</param>
         /// <param name="service">inject ICatCountryService serrvice</param>
-        public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service)
+        /// <param name="user"></param>
+        public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catCountryService = service;
+            currentUser = user;
         }
 
         /// <summary>
@@ -91,7 +96,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getAll")]
         public IActionResult GetAll()
         {
-            var data = catCountryService.Get();
+            var data = catCountryService.GetByLanguage();
             return Ok(data);
         }
 
@@ -111,6 +116,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+            
             var hs = catCountryService.Add(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -137,6 +143,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+
             var hs = catCountryService.Update(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -144,6 +151,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(result);
             }
+            catCountryService.ClearCache();
             return Ok(result);
         }
 

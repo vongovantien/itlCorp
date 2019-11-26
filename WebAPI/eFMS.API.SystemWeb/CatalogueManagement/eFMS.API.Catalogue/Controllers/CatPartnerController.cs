@@ -126,6 +126,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// check tax code
+        /// </summary>
+        /// <param name="taxcode"></param>
+        /// <returns></returns>
         [HttpGet("CheckTaxCode")]
         public IActionResult CheckTaxCode(string taxcode)
         {

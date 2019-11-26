@@ -32,6 +32,103 @@
             <param name="settlementPaymentCriteria"></param>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
+            <summary>
+            constructor
+            </summary>
+            <param name="appSettings"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCountry(eFMS.API.ReportData.Models.CatCountryCriteria)">
+            <summary>
+            export country
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportWareHouse(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export warehouse
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportPortIndex(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export portindex
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportPartner(eFMS.API.ReportData.Models.CatPartnerCriteria)">
+            <summary>
+            export partnerdata
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCommodityList(eFMS.API.ReportData.Models.CatCommodityCriteria)">
+            <summary>
+            export commodity list
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCommodityGroup(eFMS.API.ReportData.Models.CatCommodityGroupCriteria)">
+            <summary>
+            export commodity group
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportStage(eFMS.API.ReportData.Models.CatStageCriteria)">
+            <summary>
+            export stage
+            </summary>
+            <returns></returns>
+            
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportUnit(eFMS.API.ReportData.Models.CatUnitCriteria)">
+            <summary>
+            export unit
+            </summary> 
+            <returns></returns>
+             
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportProvince(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export province
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportDistrict(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export district
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportTownWard(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export town-ward
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCharge(eFMS.API.ReportData.Models.CatChargeCriteria)">
+            <summary>
+            export charge
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCurrency(eFMS.API.ReportData.Models.CatCurrrencyCriteria)">
+            <summary>
+            export currency
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCustomClearance(eFMS.API.ReportData.Models.CustomsDeclarationCriteria)">
+            <summary>
+            export Custom Clearance
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.DocumentationController">
             <summary>
             
@@ -62,103 +159,6 @@
             export dangerous goods
             </summary>
             <param name="hblid"></param>
-            <returns></returns>
-        </member>
-        <member name="T:eFMS.API.ReportData.Controllers.ReportDataController">
-            <summary>
-            A base class for an MVC controller without view support.
-            </summary>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
-            <summary>
-            constructor
-            </summary>
-            <param name="appSettings"></param>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCountry(eFMS.API.ReportData.Models.CatCountryCriteria)">
-            <summary>
-            export country
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportWareHouse(eFMS.API.ReportData.Models.CatPlaceCriteria)">
-            <summary>
-            export warehouse
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportPortIndex(eFMS.API.ReportData.Models.CatPlaceCriteria)">
-            <summary>
-            export portindex
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportPartner(eFMS.API.ReportData.Models.CatPartnerCriteria)">
-            <summary>
-            export partnerdata
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCommodityList(eFMS.API.ReportData.Models.CatCommodityCriteria)">
-            <summary>
-            export commodity list
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCommodityGroup(eFMS.API.ReportData.Models.CatCommodityGroupCriteria)">
-            <summary>
-            export commodity group
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportStage(eFMS.API.ReportData.Models.CatStageCriteria)">
-            <summary>
-            export stage
-            </summary>
-            <returns></returns>
-            
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportUnit(eFMS.API.ReportData.Models.CatUnitCriteria)">
-            <summary>
-            export unit
-            </summary> 
-            <returns></returns>
-             
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportProvince(eFMS.API.ReportData.Models.CatPlaceCriteria)">
-            <summary>
-            export province
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportDistrict(eFMS.API.ReportData.Models.CatPlaceCriteria)">
-            <summary>
-            export district
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportTownWard(eFMS.API.ReportData.Models.CatPlaceCriteria)">
-            <summary>
-            export town-ward
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCharge(eFMS.API.ReportData.Models.CatChargeCriteria)">
-            <summary>
-            export charge
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCurrency(eFMS.API.ReportData.Models.CatCurrrencyCriteria)">
-            <summary>
-            export currency
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCustomClearance(eFMS.API.ReportData.Models.CustomsDeclarationCriteria)">
-            <summary>
-            export Custom Clearance
-            </summary>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">

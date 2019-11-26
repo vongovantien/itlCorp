@@ -15,100 +15,120 @@ using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using AutoMapper.QueryableExtensions;
+using ITL.NetCore.Connection.Caching;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatChargeService  :RepositoryBase<CatCharge,CatChargeModel>,ICatChargeService
+    public class CatChargeService  : RepositoryBaseCache<CatCharge,CatChargeModel>, ICatChargeService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepository;
-        private readonly IContextBase<CatCurrency> currencyRepository;
-        private readonly IContextBase<CatUnit> unitRepository;
-        public CatChargeService(IContextBase<CatCharge> repository,
-            IMapper mapper, 
-            IStringLocalizer<LanguageSub> localizer, 
+        private readonly ICatCurrencyService currencyService;
+        private readonly ICatUnitService catUnitService;
+
+        public CatChargeService(IContextBase<CatCharge> repository, 
+            ICacheServiceBase<CatCharge> cacheService, 
+            IMapper mapper,
+            IStringLocalizer<LanguageSub> localizer,
             ICurrentUser user,
             IContextBase<CatChargeDefaultAccount> chargeDefaultRepo,
-            IContextBase<CatCurrency> currencyRepo,
-            IContextBase<CatUnit> unitRepo
-            ) :base(repository,mapper)
+            ICatCurrencyService currService,
+            ICatUnitService unitService) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             chargeDefaultRepository = chargeDefaultRepo;
-            currencyRepository = currencyRepo;
+            currencyService = currService;
             currentUser = user;
-            unitRepository = unitRepo;
+            catUnitService = unitService;
             SetChildren<CsShipmentSurcharge>("Id", "ChargeId");
         }
 
         public HandleState AddCharge(CatChargeAddOrUpdateModel model)
         {
-            Guid chargeId = Guid.NewGuid();
-            model.Charge.Id = chargeId;
-            model.Charge.Active = true;
-            model.Charge.UserCreated = model.Charge.UserModified = currentUser.UserID;
-            model.Charge.DatetimeCreated = DateTime.Now;
-
-            try
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                DataContext.Add(model.Charge, false);
+                Guid chargeId = Guid.NewGuid();
+                model.Charge.Id = chargeId;
+                model.Charge.Active = true;
+                model.Charge.UserCreated = model.Charge.UserModified = currentUser.UserID;
+                model.Charge.DatetimeCreated = DateTime.Now;
 
-                foreach (var x in model.ListChargeDefaultAccount)
+                try
                 {
-                    x.ChargeId = chargeId;
-                    x.Active = true;
-                    x.UserCreated = x.UserModified = currentUser.UserID;
-                    x.DatetimeCreated = DateTime.Now;
-                    chargeDefaultRepository.Add(x, false);
+                    var hs = DataContext.Add(model.Charge, false);
+                    if (hs.Success == false) return hs;
+                    foreach (var x in model.ListChargeDefaultAccount)
+                    {
+                        x.ChargeId = chargeId;
+                        x.Active = true;
+                        x.UserCreated = x.UserModified = currentUser.UserID;
+                        x.DatetimeCreated = DateTime.Now;
+                        chargeDefaultRepository.Add(x, false);
+                    }
+                    chargeDefaultRepository.SubmitChanges();
+                    DataContext.SubmitChanges();
+                    ClearCache();
+                    Get();
+                    trans.Commit();
+                    return hs;
                 }
-                chargeDefaultRepository.SubmitChanges();
-                DataContext.SubmitChanges();
-                var hs = new HandleState();
-                return hs;
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
-            catch (Exception ex)
-            {
-                var hs = new HandleState(ex.Message);
-                return hs;
-            }
-            
         }
 
         public HandleState UpdateCharge(CatChargeAddOrUpdateModel model)
         {
-            model.Charge.UserModified = currentUser.UserID;
-            model.Charge.DatetimeModified = DateTime.Now;
-            try
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                DataContext.Update(model.Charge, x => x.Id == model.Charge.Id, false);
-                foreach(var item in model.ListChargeDefaultAccount)
+                try
                 {
-                    if(item.Id == 0)
+                    model.Charge.UserModified = currentUser.UserID;
+                    model.Charge.DatetimeModified = DateTime.Now;
+                    var hs = DataContext.Update(model.Charge, x => x.Id == model.Charge.Id, false);
+                    if (hs.Success == false) return hs;
+                    foreach (var item in model.ListChargeDefaultAccount)
                     {
-                        item.ChargeId = model.Charge.Id;
-                        item.UserCreated = item.UserModified= currentUser.UserID;
-                        item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
-                        chargeDefaultRepository.Add(item, false);
+                        if (item.Id == 0)
+                        {
+                            item.ChargeId = model.Charge.Id;
+                            item.UserCreated = item.UserModified = currentUser.UserID;
+                            item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                            chargeDefaultRepository.Add(item, false);
+                        }
+                        else
+                        {
+                            item.UserModified = currentUser.UserID;
+                            item.DatetimeModified = DateTime.Now;
+                            chargeDefaultRepository.Update(item, x => x.Id == item.Id, false);
+                        }
                     }
-                    else
-                    {
-                        item.UserModified = currentUser.UserID;
-                        item.DatetimeModified = DateTime.Now;
-                        chargeDefaultRepository.Update(item, x => x.Id == item.Id, false);
-                    }
+                    chargeDefaultRepository.SubmitChanges();
+                    DataContext.SubmitChanges();
+                    trans.Commit();
+                    ClearCache();
+                    Get();
+                    return hs;
                 }
-                chargeDefaultRepository.SubmitChanges();
-                DataContext.SubmitChanges();
-                var hs = new HandleState();
-                return hs;
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
-            catch(Exception ex)
-            {
-                var hs = new HandleState(ex.Message);
-                return hs;
-            }
-            
         }
 
         public CatChargeAddOrUpdateModel GetChargeById(Guid id)
@@ -125,79 +145,95 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatChargeModel> Paging(CatChargeCriteria criteria, int page, int size, out int rowsCount)
         {
-            var list = Query(criteria);
-            list = list.OrderByDescending(x => x.DatetimeModified);
-            rowsCount = list.Count();
-            if (rowsCount == 0) return null;
-            if (size > 1)
+            Expression<Func<CatChargeModel, bool>> query = null;
+            if (criteria.All == null)
             {
-                if (page < 1)
-                {
-                    page = 1;
-                }
-                list = list.Skip((page - 1) * size).Take(size);
-            }
-            return list.ProjectTo<CatChargeModel>(mapper.ConfigurationProvider);
-        }
-
-        public IQueryable<CatCharge> Query(CatChargeCriteria criteria)
-        {
-            var list = DataContext.Where(x => x.Active == criteria.Active || criteria.Active == null);
-            var currencies = currencyRepository.Get();
-            var units = unitRepository.Get();
-            if(criteria.All == null)
-            {
-                list = list.Where(x => ((x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.Type ?? "").IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.ServiceTypeId ?? "").IndexOf(criteria.ServiceTypeId ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                query = x => (x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.Type ?? "").IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.ServiceTypeId ?? "").IndexOf(criteria.ServiceTypeId ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.Active == criteria.Active || criteria.Active == null);
             }
             else
             {
-               list = list.Where(x => ((x.ChargeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               || ((x.ChargeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               || ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               || ((x.Type ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               || ((x.ServiceTypeId ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                query = x => ((x.ChargeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.ChargeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.Type ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.ServiceTypeId ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   && (x.Active == criteria.Active || criteria.Active == null);
             }
+            var data = Paging(query, page, size, out rowsCount);
+            return data;
+        }
+
+        public IQueryable<CatChargeModel> Query(CatChargeCriteria criteria)
+        {
+            Expression<Func<CatChargeModel, bool>> query = null;
+            if (criteria.All == null)
+            {
+                query = x => (x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.Type ?? "").IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.ServiceTypeId ?? "").IndexOf(criteria.ServiceTypeId ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.Active == criteria.Active || criteria.Active == null);
+            }
+            else
+            {
+                query = x => ((x.ChargeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.ChargeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.Type ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.ServiceTypeId ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   && (x.Active == criteria.Active || criteria.Active == null);
+            }
+            var list = Get(query);
             return list;
         }
 
         public HandleState DeleteCharge(Guid id)
         {
-            try
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                ChangeTrackerHelper.currentUser = currentUser.UserID;
-                var hs = DataContext.Delete(x => x.Id == id, false);
-                if (hs.Success)
+                try
                 {
-                    var listChargeDefaultAccount = chargeDefaultRepository.Get(x => x.ChargeId == id).ToList();
-                    foreach (var item in listChargeDefaultAccount)
+                    ChangeTrackerHelper.currentUser = currentUser.UserID;
+                    var hs = DataContext.Delete(x => x.Id == id, false);
+                    if (hs.Success)
                     {
-                        //((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Remove(item);
-                        chargeDefaultRepository.Delete(x => x.Id == item.Id, false);
+                        var listChargeDefaultAccount = chargeDefaultRepository.Get(x => x.ChargeId == id).ToList();
+                        foreach (var item in listChargeDefaultAccount)
+                        {
+                            chargeDefaultRepository.Delete(x => x.Id == item.Id, false);
+                        }
+                        chargeDefaultRepository.SubmitChanges();
+                        DataContext.SubmitChanges();
+                        ClearCache();
+                        Get();
+                        trans.Commit();
                     }
+                    return hs;
+
                 }
-                chargeDefaultRepository.SubmitChanges();
-                DataContext.SubmitChanges();
-                return hs;
-
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
-            catch(Exception ex)
-            {
-                var hs = new HandleState(ex.Message);
-                return hs;
-            }
-
         }
 
         public List<CatChargeImportModel> CheckValidImport(List<CatChargeImportModel> list)
         {
-            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var charges = DataContext.Get().ToList();
-            var units = unitRepository.Get().ToList();
-            var currencies = currencyRepository.Get().ToList();
+            var charges = Get();
+            var units = catUnitService.Get();
+            var currencies = currencyService.Get();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.ChargeNameEn))
@@ -210,20 +246,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.ChargeNameVn = stringLocalizer[LanguageSub.MSG_CHARGE_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
-                //if (item.UnitId<=0)
-                //{
-                //    item.UnitId = -1;
-                //    item.IsValid = false;
-                //}
-                //if (item.UnitId > 0)
-                //{
-                //    var unit = dc.CatUnit.FirstOrDefault(x => x.Id == item.UnitId);
-                //    if (unit == null)
-                //    {
-                //        item.UnitId = -1;
-                //        item.IsValid = false;
-                //    }
-                //}
                 if (string.IsNullOrEmpty(item.UnitCode))
                 {
                     item.UnitCode = stringLocalizer[LanguageSub.MSG_CHARGE_UNIT_EMPTY];
@@ -278,7 +300,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if(!string.IsNullOrEmpty(item.Code))
                 {
-                    var charge = charges.FirstOrDefault(x => x.Code.ToLower() == item.Code?.ToLower());
+                    var charge = charges.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
                     if (charge != null)
                     {
                         item.Code = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_CODE_EXISTED], item.Code);
@@ -299,7 +321,6 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                // eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach(var item in data)
                 {
                     var charge = new CatCharge
@@ -318,10 +339,11 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID
                     };
-                    //dc.CatCharge.Add(charge);
                     DataContext.Add(charge, false);
                 }
                 DataContext.SubmitChanges();
+                ClearCache();
+                Get();
                 return new HandleState();
             }
             catch(Exception ex)

@@ -23,20 +23,69 @@ using eFMS.API.Common;
 using System.IO;
 using System.Reflection;
 using System;
+using StackExchange.Redis;
+using ITL.NetCore.Connection.Caching;
+using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Catalogue.Infrastructure.Common;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
     public static class ServiceRegister
     {
 
-        public static void Register(IServiceCollection services)
+        public static void Register(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            
+            services.AddSingleton<ICacheServiceBase<CatCountry>>(x =>
+            new CacheServiceBase<CatCountry>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatCountry)));
+
+            services.AddSingleton<ICacheServiceBase<CatArea>>(x =>
+            new CacheServiceBase<CatArea>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatArea)));
+
+            services.AddSingleton<ICacheServiceBase<CatCurrency>>(x =>
+            new CacheServiceBase<CatCurrency>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatCurrency)));
+
+            services.AddSingleton<ICacheServiceBase<CatChargeDefaultAccount>>(x =>
+            new CacheServiceBase<CatChargeDefaultAccount>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatCharge)));
+
+            services.AddSingleton<ICacheServiceBase<CatCharge>>(x =>
+            new CacheServiceBase<CatCharge>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatCharge)));
+
+            services.AddSingleton<ICacheServiceBase<CatPartner>>(x =>
+            new CacheServiceBase<CatPartner>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatPartner)));
+
+            services.AddSingleton<ICacheServiceBase<CatCommodityGroup>>(x =>
+            new CacheServiceBase<CatCommodityGroup>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatCommodityGroup)));
+
+            services.AddSingleton<ICacheServiceBase<CatCommodity>>(x =>
+            new CacheServiceBase<CatCommodity>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatCommodity)));
+
+            services.AddSingleton<ICacheServiceBase<CatPlace>>(x =>
+            new CacheServiceBase<CatPlace>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatPlace)));
+
+            services.AddSingleton<ICacheServiceBase<CatStage>>(x =>
+            new CacheServiceBase<CatStage>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatStage)));
+
+            services.AddSingleton<ICacheServiceBase<CatUnit>>(x =>
+            new CacheServiceBase<CatUnit>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatStage)));
 
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ICatBranchService, CatBranchService>();
