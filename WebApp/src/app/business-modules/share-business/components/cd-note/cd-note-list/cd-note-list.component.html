@@ -117,7 +117,7 @@
                                                         {{cdNote.type}}
                                                     </td>
                                                     <td>
-                                                        <a style="cursor: pointer;"
+                                                        <a
                                                             (click)="openPopupDetail(cdNote.jobId, cdNote.code)">{{cdNote.code}}</a>
                                                     </td>
                                                     <td class="text-center">
@@ -150,9 +150,9 @@
     </div>
 </div>
 
-<cd-note-detail-popup (onDeleted)="onDeletedCdNote($event)"></cd-note-detail-popup>
+<!-- <cd-note-detail-popup (onDeleted)="onDeletedCdNote($event)"></cd-note-detail-popup>
 
-<cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"></cd-note-add-popup>
+<cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"></cd-note-add-popup> -->
 
 <confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 

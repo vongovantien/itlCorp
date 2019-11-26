@@ -20,9 +20,6 @@
                             <!-- <a class="dropdown-item" (click)="previewCdNote('USD')">Preview with Original</a> -->
                         </div>
                     </div>
-                    <!-- <select class="form-control" [(ngModel)] = "selectedPreviewMode" (ngModelChange)="onChangePreviewMode($event)">
-                        <option [disabled]="mode.isDisabled" *ngFor="let mode of previewModes" [ngValue]="mode">{{mode.title}}</option>
-                    </select> -->
                 </div>
             </div>
             <div class="modal-body">
@@ -270,10 +267,6 @@
 
 <info-popup [body]="'You can not delete this Credit/Debit Note. Please recheck!'"></info-popup>
 
-<!-- <ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container> -->
-
 <div class="modal fade" role="dialog" bsModal #popupReport="bs-modal" (onHide)="onHide($event)">
     <div class="modal-dialog modal-report" role="document">
         <div class="modal-content">
@@ -285,7 +278,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form #formPL method="POST" [action]="scr" (onsubmit)="onSubmitForm($event)"
+                <form #formPreviewCdNote method="POST" [action]="scr" (onsubmit)="onSubmitForm($event)"
                     (ngSubmit)="onSubmitForm($event)" target="reportFrame">
                     <input name="crystal" [value]="dataReport" type="hidden">
                 </form>

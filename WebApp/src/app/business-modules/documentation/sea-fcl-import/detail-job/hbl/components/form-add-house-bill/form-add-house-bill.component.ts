@@ -2,9 +2,14 @@ import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { BehaviorSubject } from 'rxjs';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { DataService } from 'src/app/shared/services';
+import { SystemConstants } from 'src/constants/system.const';
+import { Store } from '@ngrx/store';
+import * as fromStore from '../../../../store';
 
 @Component({
     selector: 'app-form-add-house-bill',
@@ -82,22 +87,11 @@ export class FormAddHouseBillComponent extends AppForm {
     headersSaleman: CommonInterface.IHeaderTable[];
     saleManInCustomerFilter: any = {};
     isDetail: boolean = false;
-    hbOfladingTypes: CommonInterface.ICommonTitleValue[] = [
-        { title: 'Copy', value: 'Copy' },
-        { title: 'Original', value: 'Original' },
-        { title: 'Waybill', value: 'Waybill' },
-        { title: 'Surrendered', value: 'Surrendered' }
-    ];
-
-    serviceTypes: CommonInterface.ICommonTitleValue[] = [
-        { title: 'FCL/FCL', value: 'FCL/FCL' },
-        { title: 'LCL/LCL', value: 'LCL/LCL' },
-        { title: 'FCL/LCL', value: 'FCL/LCL' },
-        { title: 'CY/CFS', value: 'CY/CFS' },
-        { title: 'CY/CY', value: 'CY/CY' },
-        { title: 'CFS/CY', value: 'CFS/CY' },
-        { title: 'CFS/CFS', value: 'CFS/CFS' }
-    ];
+    serviceTypesString: string[] = [];
+    hbOfladingTypesString: string[] = [];
+    hbOfladingTypes: CommonInterface.IValueDisplay[];
+    serviceTypes: CommonInterface.IValueDisplay[];
+    shipmentDetail: any = {}; // TODO model.
 
     numberOfOrigins: CommonInterface.ICommonTitleValue[] = [
         { title: 'One(1)', value: 1 },
@@ -108,9 +102,11 @@ export class FormAddHouseBillComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private _documentationRepo: DocumentationRepo,
-        private _systemRepo: SystemRepo
-
+        private _documentRepo: DocumentationRepo,
+        private _systemRepo: SystemRepo,
+        private _spinner: NgxSpinnerService,
+        private _dataService: DataService,
+        protected _store: Store<fromStore.ISeaFCLImportState>,
 
     ) {
         super();
@@ -118,6 +114,8 @@ export class FormAddHouseBillComponent extends AppForm {
 
     ngOnInit() {
         this.getListSaleman();
+        this.getCommonData();
+
         this.headersSaleman = [
             { title: 'User Name', field: 'username' },
         ];
@@ -208,7 +206,63 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'code', label: 'Code' }
             ],
         }, { selectedDisplayFields: ['name_EN'], });
+
+
+
         this.initForm();
+        // this._store.select(fromStore.seaFCLImportTransactionState)
+        //     .pipe(skip(1))
+        //     .subscribe(
+        //         (res: any) => {
+        //             console.log(res);
+        //             this.shipmentDetail = res;
+
+        //             this.mtBill.setValue(this.shipmentDetail.mawb);
+
+
+        //             this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
+        //             this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
+        //         }
+        //     );
+
+        this._store.select(fromStore.getHBLState)
+            .subscribe(
+                (res: any) => {
+                    if (!!res.id) {
+                        console.log(res);
+                        this.shipmentDetail = res;
+                        this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
+                        this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
+                    }
+                }
+            );
+    }
+
+
+    async getCommonData() {
+        this._spinner.show();
+        try {
+            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
+                const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
+                this.serviceTypes = commonData.serviceTypes;
+                this.hbOfladingTypes = commonData.billOfLadings;
+                this.hbOfladingTypesString = this.hbOfladingTypes.map(x => x.displayName);
+                this.serviceTypesString = this.serviceTypes.map(a => a.displayName);
+            } else {
+                const commonData: any = await this._documentRepo.getShipmentDataCommon().toPromise();
+                this.serviceTypes = commonData.serviceTypes;
+                this.serviceTypesString = this.serviceTypes.map(a => a.displayName);
+                this.hbOfladingTypes = commonData.billOfLadings;
+                this.hbOfladingTypesString = this.hbOfladingTypes.map(x => x.displayName);
+                this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
+            }
+
+        } catch (error) {
+        }
+        finally {
+            this._spinner.hide();
+        }
+
     }
 
 
@@ -261,7 +315,7 @@ export class FormAddHouseBillComponent extends AppForm {
             ConsigneeDescription: [],
             NotifyPartyDescription: [],
             AlsoNotifyPartyDescription: [],
-            serviceType: [null,
+            serviceType: ['',
                 Validators.required]
 
         });

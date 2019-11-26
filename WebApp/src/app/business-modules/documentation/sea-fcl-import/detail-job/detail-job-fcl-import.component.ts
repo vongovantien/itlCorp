@@ -9,13 +9,13 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SeaFClImportFormCreateComponent } from '../components/form-create/form-create-sea-fcl-import.component';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import { combineLatest, of } from 'rxjs';
 import { map, tap, switchMap, skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 
 import * as fromStore from './../store';
 import * as fromShareBussiness from './../../../share-business/store';
-import { ReportPreviewComponent } from 'src/app/shared/common';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -58,10 +58,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         this._progressRef = this._ngProgressService.ref();
     }
 
-    ngOnInit(): void {
-
-    }
-
     ngAfterViewInit() {
         combineLatest([
             this._activedRoute.params,
@@ -101,6 +97,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             .subscribe(
                 (res: any) => {
                     this.fclImportDetail = res; // TODO Model.
+
                     // * Update Good Summary.
                     this.shipmentGoodSummaryComponent.containerDetail = this.fclImportDetail.packageContainer;
                     this.shipmentGoodSummaryComponent.commodities = this.fclImportDetail.commodity;
@@ -109,10 +106,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.shipmentGoodSummaryComponent.netWeight = this.fclImportDetail.netWeight;
                     this.shipmentGoodSummaryComponent.totalChargeWeight = this.fclImportDetail.chargeWeight;
                     this.shipmentGoodSummaryComponent.totalCBM = this.fclImportDetail.cbm;
-
-                    setTimeout(() => {
-                        this.updateForm();
-                    }, 200);
                 },
 
             );
@@ -130,39 +123,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.shipmentGoodSummaryComponent.containers = this.containers;
                 }
             );
-    }
-
-    updateForm() {
-        this.formCreateComponent.formCreate.setValue({
-            jobId: this.fclImportDetail.jobNo, // * disabled
-            mawb: this.fclImportDetail.mawb,
-            subColoader: this.fclImportDetail.subColoader,
-            flightVesselName: this.fclImportDetail.flightVesselName,
-            voyNo: this.fclImportDetail.voyNo,
-            pono: this.fclImportDetail.pono,
-            notes: this.fclImportDetail.notes,
-
-            etd: !!this.fclImportDetail.etd ? { startDate: new Date(this.fclImportDetail.etd), endDate: new Date(this.fclImportDetail.etd) } : null, // * Date
-            eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null, // * Date
-            serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
-
-            mbltype: (this.formCreateComponent.ladingTypes || []).filter(type => type.value === this.fclImportDetail.mbltype)[0].value, // * select
-            shipmentType: (this.formCreateComponent.shipmentTypes || []).filter(type => type.value === this.fclImportDetail.shipmentType)[0].value, // * select
-            typeOfService: (this.formCreateComponent.serviceTypes || []).filter(type => type.value === this.fclImportDetail.typeOfService)[0].value, // * select
-            personIncharge: this.fclImportDetail.personIncharge,  // * select
-        });
-
-        if (!!this.formCreateComponent.formCreate.value.etd) {
-            this.formCreateComponent.minDateETA = this.createMoment(this.fclImportDetail.etd);
-        }
-
-
-        // * Combo grid
-        this.formCreateComponent.selectedPortDestination = { field: 'id', value: this.fclImportDetail.pod };
-        this.formCreateComponent.selectedPortDelivery = { field: 'id', value: this.fclImportDetail.deliveryPlace };
-        this.formCreateComponent.selectedPortLoading = { field: 'id', value: this.fclImportDetail.pol };
-        this.formCreateComponent.selectedAgent = { field: 'id', value: this.fclImportDetail.agentId };
-        this.formCreateComponent.selectedSupplier = { field: 'id', value: this.fclImportDetail.coloaderId };
     }
 
     onUpdateShipmenetDetail() {
@@ -193,6 +153,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             this.duplicateJob(modelUpdate);
         }
     }
+
     duplicateJob(body: any) {
         this._documenRepo.importCSTransaction(body)
             .pipe(

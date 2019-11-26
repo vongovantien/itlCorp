@@ -1,20 +1,18 @@
-import { Component, OnInit, ViewChild, Input, EventEmitter } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
-import { CsTransactionDetail } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import * as fromStore from '../../store';
 import { getParamsRouterState } from 'src/app/store';
-import { Params } from '@angular/router';
+import { Params, Router } from '@angular/router';
 import { SortService } from 'src/app/shared/services';
 import { AddHblToManifestComponent } from './popup/add-hbl-to-manifest.popup';
 import { FormManifestSeaFclImportComponent } from './components/form-manifest/form-manifest-sea-fcl-import.component';
 import { formatDate } from '@angular/common';
-import { CsManifest } from 'src/app/shared/models/document/manifest.model';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ToastrService } from 'ngx-toastr';
@@ -54,10 +52,8 @@ export class SeaFclImportManifestComponent extends AppList {
         private _progressService: NgProgress,
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
-        private _toastService: ToastrService
-
-
-
+        private _toastService: ToastrService,
+        protected _router: Router
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -115,6 +111,11 @@ export class SeaFclImportManifestComponent extends AppList {
         this.confirmCreatePopup.show();
     }
 
+    combackToHBLList() {
+        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}`]);
+    }
+
+
     getTotalWeight() {
         this.totalCBM = 0;
         this.totalGW = 0;
@@ -159,7 +160,7 @@ export class SeaFclImportManifestComponent extends AppList {
         );
     }
 
-    AddOrUpdateManifest() {
+    addOrUpdateManifest() {
         this.formManifest.isSubmitted = true;
         if (this.formManifest.formGroup.valid) {
 
@@ -198,7 +199,7 @@ export class SeaFclImportManifestComponent extends AppList {
     }
 
 
-    OnRemove() {
+    onRemove() {
         this.housebills.forEach(x => {
             if (x.isChecked) {
                 x.isRemoved = true;
@@ -212,7 +213,7 @@ export class SeaFclImportManifestComponent extends AppList {
         this.AddHblToManifestPopup.checkAll = false;
     }
 
-    OnAdd() {
+    onAdd() {
 
         this.housebills.forEach(x => {
             if (x.isChecked) {

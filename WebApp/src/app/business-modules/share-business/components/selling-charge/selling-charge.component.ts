@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 
 import * as fromStore from './../../store';
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, catchError } from 'rxjs/operators';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -28,10 +28,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         protected _sortService: SortService,
+
     ) {
         super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService);
-
-
     }
 
     getSurcharge() {
@@ -94,6 +93,8 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
                         // * Get Profit
                         this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
+
+                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -102,9 +103,8 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     syncFreightCharge() {
-        this._progressRef.start();
         this._documentRepo.getArrivalInfo(this.hbl.id, CommonEnum.TransactionTypeEnum.SeaFCLImport)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     if (!!res) {

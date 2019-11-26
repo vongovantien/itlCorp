@@ -20,6 +20,8 @@
                     </li>
                     <li role="menuitem"><a class="dropdown-item" (click)="onPreview('DELIVERY_ORDER')">Delivery
                             Order</a></li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="onPreview('PROOF_OF_DELIVERY')">Proof of
+                            Delivery</a></li>
                     <li role="menuitem" dropdown triggers="mouseover" placement="right" container="body">
                         <a dropdownToggle class="dropdown-item dropdown-toggle" (click)="false">Export Manifest
                             <span class="caret"></span>
@@ -47,7 +49,7 @@
                     <ng-container>
                         <app-form-add-house-bill> </app-form-add-house-bill>
 
-                        <shipment-good-summary></shipment-good-summary>
+                        <shipment-good-summary> HBL Good Summary </shipment-good-summary>
 
                     </ng-container>
                 </tab>

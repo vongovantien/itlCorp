@@ -89,12 +89,12 @@
                                                 <div class="table-actions">
                                                     <button type="button"
                                                         class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit" (click)="openDetails(s.cdNote.code)">
+                                                        title="Edit" (click)="openDetails(s.code)">
                                                         <i class="la la-list"></i>
                                                     </button>
                                                     <button type="button"
                                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        (click)="onDeleteCDNote(s.cdNote.id)" title="Remove">
+                                                        (click)="onDeleteCDNote(s.id)" title="Remove">
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </div>
@@ -104,7 +104,7 @@
                                             </td>
                                             <td>
                                                 <a href="javascript:void(0)"
-                                                    (click)="openDetails(s.cdNote.code)">{{s.code}}</a>
+                                                    (click)="openDetails(s.code)">{{s.code}}</a>
                                             </td>
                                             <td class="text-center">
                                                 {{s.total_charge}}

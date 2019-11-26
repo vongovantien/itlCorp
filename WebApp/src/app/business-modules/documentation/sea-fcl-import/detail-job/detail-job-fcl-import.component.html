@@ -1,6 +1,7 @@
 <div class="sea-fcl-import-create-job-page">
     <app-sub-header>
         <div class="c-button-actions">
+
             <div class="dropdown m-dropdown m-dropdown--inline">
                 <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
                     <i class="la la-print"></i>P/L Sheet<span class="caret"></span>
@@ -10,6 +11,7 @@
                     <a class="dropdown-item" (click)="previewPLsheet('VND')">Preview with VND</a>
                 </div>
             </div>
+
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                 (click)="showDuplicateConfirm()" [disabled]="ACTION === 'COPY'">
                 <span>
@@ -30,7 +32,8 @@
                 </span>
             </button>
 
-            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onUpdateShipmenetDetail()">
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onUpdateShipmenetDetail()"
+                [disabled]="selectedTab !== 'SHIPMENT'">
             </app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
@@ -56,7 +59,7 @@
                         </div>
                     </form-create-sea-fcl-import>
 
-                    <shipment-good-summary></shipment-good-summary>
+                    <shipment-good-summary> Shipment Good Summary </shipment-good-summary>
 
                     <grant-total-profit></grant-total-profit>
 
@@ -68,8 +71,8 @@
                     <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="SeaFCLImport_cdNote">
                     </ng-container>
                 </tab>
-                <tab heading="Asignment" (selectTab)="onSelectTab('assignment')" [active]="selectedTab === 'ASSIGNMENT'"
-                    [disabled]="ACTION === 'copy'">
+                <tab heading="Assignment" (selectTab)="onSelectTab('assignment')"
+                    [active]="selectedTab === 'ASSIGNMENT'" [disabled]="ACTION === 'copy'">
                     <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="SeaFCLImport_assignment">
                     </ng-container>
                 </tab>
