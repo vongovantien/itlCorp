@@ -82,11 +82,11 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
             typeOfService: !!form.typeOfService ? form.typeOfService : null,
             mbltype: form.mbltype,
 
-            agentId: !!this.formCreateComponent.selectedAgent.value ? this.formCreateComponent.selectedAgent.value : null,
-            pol: !!this.formCreateComponent.selectedPortLoading.value ? this.formCreateComponent.selectedPortLoading.value : null,
-            pod: !!this.formCreateComponent.selectedPortDestination.value ? this.formCreateComponent.selectedPortDestination.value : null,
-            deliveryPlace: !!this.formCreateComponent.selectedPortDelivery.value ? this.formCreateComponent.selectedPortDelivery.value : null,
-            coloaderId: !!this.formCreateComponent.selectedSupplier.value ? this.formCreateComponent.selectedSupplier.value : null,
+            agentId: form.agentId,
+            pol: form.pol,
+            pod:form.pod,
+            deliveryPlace: form.deliveryPlace,
+            coloaderId: form.coloader,
 
             // * containers summary
             commodity: this.shipmentGoodSummaryComponent.commodities,

@@ -264,8 +264,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     // * Dispatch to save containers.
                     this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
 
-                    // * Dispatch to get container's shipment.
-                    this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+                    // // * Dispatch to get container's shipment.
+                    // this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
 
                     // * Get container to update model
                     this.getListContainer();

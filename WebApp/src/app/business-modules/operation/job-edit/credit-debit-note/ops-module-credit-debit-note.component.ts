@@ -106,17 +106,17 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             (res: any[]) => {
                 if (res instanceof Error) {
                 } else {
-                    if (res != null) {
-                        res.forEach(o => {
-                            o.listCDNote.forEach(element => {
-                                element.type = element.cdNote.type;
-                                element.code = element.cdNote.code;
-                                element.total = element.cdNote.total;
-                                element.userCreated = element.cdNote.userCreated;
-                                element.datetimeCreated = element.cdNote.datetimeCreated;
-                            });
-                        });
-                    }
+                    // if (res != null) {
+                    //     res.forEach(o => {
+                    //         o.listCDNote.forEach(element => {
+                    //             element.type = element.cdNote.type;
+                    //             element.code = element.cdNote.code;
+                    //             element.total = element.cdNote.total;
+                    //             element.userCreated = element.cdNote.userCreated;
+                    //             element.datetimeCreated = element.cdNote.datetimeCreated;
+                    //         });
+                    //     });
+                    // }
                     this.listCDNotes = cloneDeep(res);
                     this.constListCDNotes = cloneDeep(res);
                 }
