@@ -12,6 +12,7 @@ import { tap, map, switchMap, take, catchError, takeUntil, skip } from 'rxjs/ope
 
 import * as fromShareBussiness from './../../../share-business/store';
 import * as fromStore from './../store';
+import { TransactionTypeEnum } from 'src/app/shared/enums';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -48,10 +49,11 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                 //     this.ACTION = param.action.toUpperCase();
                 // }
 
+                console.log(this.selectedTab);
+
                 // this.cdr.detectChanges();
             }),
             switchMap(() => of(this.jobId)),
-            take(1)
         ).subscribe(
             (jobId: string) => {
                 if (!!jobId) {
@@ -133,7 +135,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE', transactionType: TransactionTypeEnum.SeaFCLExport } });
                 break;
             
         }

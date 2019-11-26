@@ -43,7 +43,8 @@
             <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')">
                 hbl list work!
             </tab>
-            <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')">
+            <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')" 
+            [active]="selectedTab === 'CDNOTE'">
                 <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="SeaFCLExport_cdNote">
                 </ng-container>
             </tab>

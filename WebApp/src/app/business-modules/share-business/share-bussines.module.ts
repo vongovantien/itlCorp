@@ -18,6 +18,10 @@ import { ShareBussinessBuyingChargeComponent } from '.';
 import { ShareBussinessShipmentGoodSummaryComponent } from './components/shipment-good-summary/shipment-good-summary.component';
 import { ShareBussinessContainerListPopupComponent } from './components/container-list/container-list.popup';
 import { ShareBussinessGrantTotalProfitComponent } from './components/grant-total-profit/grant-total-profit.component';
+import { CdNoteListComponent } from './components/cd-note/cd-note-list/cd-note-list.component';
+import { CdNoteAddPopupComponent } from './components/cd-note/add-cd-note/add-cd-note.popup';
+import { CdNoteAddRemainingChargePopupComponent } from './components/cd-note/add-remaining-charge/add-remaining-charge.popup';
+import { CdNoteDetailPopupComponent } from './components/cd-note/detail-cd-note/detail-cd-note.popup';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -27,7 +31,11 @@ const COMPONENTS = [
     ShareBussinessProfitSummaryComponent,
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBussinessContainerListPopupComponent,
-    ShareBussinessGrantTotalProfitComponent
+    ShareBussinessGrantTotalProfitComponent,
+    CdNoteListComponent,
+    CdNoteAddPopupComponent,
+    CdNoteAddRemainingChargePopupComponent,
+    CdNoteDetailPopupComponent,
 ];
 
 const customCurrencyMaskConfig = {

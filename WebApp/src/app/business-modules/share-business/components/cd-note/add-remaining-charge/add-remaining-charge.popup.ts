@@ -30,8 +30,8 @@ export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
             { title: 'Unit Price', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
-            { title: "Credit Value", field: 'total', sortable: true },
-            { title: "Debit Value", field: 'total', sortable: true },
+            { title: "Credit Value", field: 'credit', sortable: true },
+            { title: "Debit Value", field: 'debit', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
     }
