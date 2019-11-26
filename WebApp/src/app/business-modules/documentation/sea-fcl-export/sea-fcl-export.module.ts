@@ -33,8 +33,10 @@ const routing: Routes = [
         path: ':jobId', component: SeaFCLExportDetailJobComponent, data: {
             name: "Job Detail", path: "sea-fcl-export", level: 3
         }
-    }
-
+    },
+    {
+        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-export-hbl.module').then(m => m.SeaFCLExportHBLModule),
+    },
 ];
 
 const LIB = [

@@ -121,4 +121,19 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                 }
             );
     }
+
+    onSelectTab(tabName: string) {
+        switch (tabName) {
+            case 'hbl':
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
+                break;
+            case 'shipment':
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                break;
+            case 'cdNote':
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                break;
+
+        }
+    }
 }

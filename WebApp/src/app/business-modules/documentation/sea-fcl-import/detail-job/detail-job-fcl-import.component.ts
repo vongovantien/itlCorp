@@ -125,32 +125,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             );
     }
 
-    updateForm() {
-        this.formCreateComponent.formCreate.setValue({
-            jobId: this.fclImportDetail.jobNo, // * disabled
-            mawb: this.fclImportDetail.mawb,
-            subColoader: this.fclImportDetail.subColoader,
-            flightVesselName: this.fclImportDetail.flightVesselName,
-            voyNo: this.fclImportDetail.voyNo,
-            pono: this.fclImportDetail.pono,
-            notes: this.fclImportDetail.notes,
-
-            etd: !!this.fclImportDetail.etd ? { startDate: new Date(this.fclImportDetail.etd), endDate: new Date(this.fclImportDetail.etd) } : null, // * Date
-            eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null, // * Date
-            serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
-
-            mbltype: (this.formCreateComponent.ladingTypes || []).filter(type => type.value === this.fclImportDetail.mbltype)[0].value, // * select
-            shipmentType: (this.formCreateComponent.shipmentTypes || []).filter(type => type.value === this.fclImportDetail.shipmentType)[0].value, // * select
-            typeOfService: (this.formCreateComponent.serviceTypes || []).filter(type => type.value === this.fclImportDetail.typeOfService)[0].value, // * select
-            personIncharge: this.fclImportDetail.personIncharge,  // * select
-        });
-
-        if (!!this.formCreateComponent.formCreate.value.etd) {
-            this.formCreateComponent.minDateETA = this.createMoment(this.fclImportDetail.etd);
-        }
-
-    }
-
     onUpdateShipmenetDetail() {
         this.formCreateComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {

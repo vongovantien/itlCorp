@@ -159,6 +159,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
 
                         // * Get Profit
                         this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
+
+                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.OBH);
+
                     } else {
                         this._toastService.error(res.message);
                     }

@@ -134,7 +134,6 @@ export class SeaFCLImportHBLComponent extends AppList {
             );
     }
 
-
     onDeleteHbl() {
         this.confirmDeletePopup.hide();
         this.deleteHbl(this.selectedHbl.id);
@@ -247,7 +246,7 @@ export class SeaFCLImportHBLComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    if(res != null && res.dataSource.length > 0){
+                    if (this.dataReport != null && res.dataSource.length > 0) {
                         setTimeout(() => {
                             this.previewPopup.frm.nativeElement.submit();
                             this.previewPopup.show();

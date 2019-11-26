@@ -90,7 +90,7 @@
                                             <a class="text-primary text-underline m--margin-right-20 pointer"
                                                 *ngFor="let type of partnerType; trackBy: trackByFn"
                                                 [title]="type.displayName"
-                                                (click)="selectPartnerTypes(type, charge, 'receiver')">{{type.displayName}}</a>
+                                                (click)="selectPartnerTypes(type, charge, 'payer')">{{type.displayName}}</a>
                                         </div>
                                         <app-combo-grid [headers]="headerPartner" [data]="listPartner"
                                             [fields]="['taxCode','partnerNameEn']" [active]="charge.payerId"

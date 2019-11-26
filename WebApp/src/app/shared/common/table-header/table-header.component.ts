@@ -11,6 +11,8 @@ export class TableHeaderComponent extends AppList {
 
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
     @Input() headers: CommonInterface.IHeaderTable[] = [];
+    @Input() align: string = 'left';
+
     constructor() {
         super();
         this.requestSort = this.sortHeader;
