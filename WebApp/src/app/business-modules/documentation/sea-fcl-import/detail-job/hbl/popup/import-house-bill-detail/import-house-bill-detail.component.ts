@@ -32,10 +32,7 @@ export class ImportHouseBillDetailComponent extends PopupBase {
         this.houseBill = this._sortService.sort(this.houseBill, sort, this.order);
     }
 
-
-
     ngOnInit() {
-
         this.dataSearch.jobId = this.jobId;
         this.headers = [
             { title: 'HBL No', field: 'hwbno', sortable: true },
@@ -45,8 +42,6 @@ export class ImportHouseBillDetailComponent extends PopupBase {
             { title: 'Shipment Date', field: 'etd', sortable: true }
         ];
         this.getHourseBill(this.dataSearch);
-
-
     }
 
     onCancel() {
@@ -82,8 +77,6 @@ export class ImportHouseBillDetailComponent extends PopupBase {
         this.selected = index;
         this.pageChecked = this.page;
         this.selectedHbl = hblSelected;
-
-
     }
 
     onImportHbl() {
@@ -94,7 +87,6 @@ export class ImportHouseBillDetailComponent extends PopupBase {
             if (this.pageChecked !== this.page && this.selected === -1) {
                 return;
             }
-
             this.isCheckHbl = true;
             this.onImport.emit(this.selectedHbl);
             this.hide();
