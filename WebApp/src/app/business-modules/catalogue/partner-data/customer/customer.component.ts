@@ -11,12 +11,10 @@ import { AppPaginationComponent } from 'src/app/shared/common/pagination/paginat
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
-
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, } from 'rxjs/operators';
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
-
 
 @Component({
     selector: 'app-customer',
@@ -49,7 +47,6 @@ export class CustomerComponent extends AppList {
 
     }
 
-
     ngOnInit() {
         this.headerSaleman = [
             { title: 'No', field: '', sortable: true },
@@ -73,6 +70,7 @@ export class CustomerComponent extends AppList {
 
         ];
     }
+
     async getPartnerData(pager: PagerSetting, criteria?: any) {
         if (criteria !== undefined) {
             this.criteria = criteria;
@@ -82,16 +80,17 @@ export class CustomerComponent extends AppList {
         console.log(this.customers);
         this.pager.totalItems = responses.totalItems;
     }
+
     showConfirmDelete(item) {
         this.deleteConfirm.emit(item);
     }
+
     showDetail(item) {
         this.detail.emit(item);
     }
 
     replaceService() {
         for (const item of this.saleMans) {
-
             this.services.forEach(itemservice => {
                 if (item.service === itemservice.id) {
                     item.service = itemservice.text;
