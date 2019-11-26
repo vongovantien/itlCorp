@@ -18,6 +18,7 @@ import { ShareBussinessBuyingChargeComponent } from '.';
 import { ShareBussinessShipmentGoodSummaryComponent } from './components/shipment-good-summary/shipment-good-summary.component';
 import { ShareBussinessContainerListPopupComponent } from './components/container-list/container-list.popup';
 import { ShareBussinessGrantTotalProfitComponent } from './components/grant-total-profit/grant-total-profit.component';
+import { ShareBusinessImportJobDetailPopupComponent } from './components/import-job-detail/import-job-detail.popup';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -27,7 +28,8 @@ const COMPONENTS = [
     ShareBussinessProfitSummaryComponent,
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBussinessContainerListPopupComponent,
-    ShareBussinessGrantTotalProfitComponent
+    ShareBussinessGrantTotalProfitComponent,
+    ShareBusinessImportJobDetailPopupComponent
 ];
 
 const customCurrencyMaskConfig = {
