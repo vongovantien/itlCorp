@@ -424,7 +424,7 @@ namespace eFMS.API.Operation.DL.Services
                 //get from view data
                 var list = GetCustomClearanceViewList(string.Empty);
                 customClearances = mapper.Map<List<CustomsDeclarationModel>>(list);
-                RedisCacheHelper.SetObject(cache, Templates.CustomDeclaration.NameCaching.ListName, customClearances);
+                //RedisCacheHelper.SetObject(cache, Templates.CustomDeclaration.NameCaching.ListName, customClearances);
             }
             else
             {

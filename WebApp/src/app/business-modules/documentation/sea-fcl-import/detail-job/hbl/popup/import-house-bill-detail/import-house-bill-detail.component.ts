@@ -6,8 +6,7 @@ import { SortService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
 @Component({
     selector: 'popup-import-house-bill-detail',
-    templateUrl: './import-house-bill-detail.component.html',
-    styleUrls: ['./import-house-bill-detail.component.scss']
+    templateUrl: './import-house-bill-detail.component.html'
 })
 export class ImportHouseBillDetailComponent extends PopupBase {
     @Output() onImport: EventEmitter<any> = new EventEmitter<any>();
@@ -79,9 +78,11 @@ export class ImportHouseBillDetailComponent extends PopupBase {
         );
     }
 
-    onSelected(index: number) {
+    onSelected(index: number, hblSelected: any) {
         this.selected = index;
         this.pageChecked = this.page;
+        this.selectedHbl = hblSelected;
+
 
     }
 
@@ -90,12 +91,11 @@ export class ImportHouseBillDetailComponent extends PopupBase {
             this.isCheckHbl = false;
             return;
         } else {
-            if (this.pageChecked !== this.page) {
+            if (this.pageChecked !== this.page && this.selected === -1) {
                 return;
             }
 
             this.isCheckHbl = true;
-            this.selectedHbl = this.houseBill[this.selected];
             this.onImport.emit(this.selectedHbl);
             this.hide();
         }

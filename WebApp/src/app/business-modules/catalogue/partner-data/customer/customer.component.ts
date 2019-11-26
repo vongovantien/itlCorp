@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
@@ -11,7 +11,6 @@ import { AppPaginationComponent } from 'src/app/shared/common/pagination/paginat
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
-
 import { NgProgress } from '@ngx-progressbar/core';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
@@ -20,7 +19,6 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map, } from 'rxjs/operators';
 import _map from 'lodash/map';
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
-
 
 @Component({
     selector: 'app-customer',
@@ -53,7 +51,6 @@ export class CustomerComponent extends AppList {
 
     }
 
-
     ngOnInit() {
         this.headerSaleman = [
             { title: 'No', field: '', sortable: true },
@@ -78,6 +75,7 @@ export class CustomerComponent extends AppList {
         ];
         this.getService();
     }
+
     async getPartnerData(pager: PagerSetting, criteria?: any) {
         if (criteria != undefined) {
             this.criteria = criteria;
@@ -87,16 +85,17 @@ export class CustomerComponent extends AppList {
         console.log(this.customers);
         this.pager.totalItems = responses.totalItems;
     }
+
     showConfirmDelete(item) {
         this.deleteConfirm.emit(item);
     }
+
     showDetail(item) {
         this.detail.emit(item);
     }
 
     replaceService() {
         for (const item of this.saleMans) {
-
             this.services.forEach(itemservice => {
                 if (item.service === itemservice.id) {
                     item.service = itemservice.text;

@@ -61,6 +61,7 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
                 this.pagerMaster.currentPage = 1;
                 this.pagerMaster.totalItems = 0;
                 this.getShipmentDetails(this.jobId);
+
             }
         });
     }
@@ -76,10 +77,12 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
                 }),
                 switchMap(() => // * get list cd imported in job
                     this._operationRepo.getListImportedInJob(this.currentJob.jobNo)
+
                 )
             ).subscribe(
                 (response: any) => {
                     this.getListCleranceNotImported();
+                    this.getCustomClearanesOfJob(this.currentJob.jobNo);
                 },
             );
     }
@@ -99,6 +102,7 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
                     this.importedData = [];
                 }
                 this.dataImportedSearch = this.importedData;
+                this.customClearances = this.importedData;
                 this.setPageMaster(this.pagerMaster);
             }
         );
@@ -198,6 +202,7 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
     }
 
     showPopupAdd() {
+        this.poupAddMore.getListCleranceNotImported();
         this.poupAddMore.show();
 
     }

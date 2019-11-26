@@ -1,10 +1,6 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
-import { ToastrService } from 'ngx-toastr';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { NgForm } from '@angular/forms';
-import { SortService } from 'src/app/shared/services/sort.service';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError } from "rxjs/operators";
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
@@ -19,7 +15,6 @@ import { formatDate } from '@angular/common';
 export class SalemanPopupComponent extends PopupBase {
     @Output() onCreate = new EventEmitter();
     @Output() onDelete = new EventEmitter();
-
     saleMans: Saleman[] = [];
     headerSaleman: CommonInterface.IHeaderTable[];
     services: any[] = [];
@@ -39,24 +34,18 @@ export class SalemanPopupComponent extends PopupBase {
     selectedDataSaleMan: any;
     selectedDataOffice: any;
     index: number = 0;
-
     @Input() popupData: Saleman;
-
-
     constructor(
         private baseService: BaseService,
         private api_menu: API_MENU,
-        private router: Router,
         private _catalogueRepo: CatalogueRepo,
-        private sortService: SortService,
-        private toastr: ToastrService,
     ) {
 
         super();
     }
+
     ngOnInit() {
         this.getComboboxData();
-        console.log(this.saleManToView);
     }
 
     showSaleman(saleman: Saleman) {
@@ -65,7 +54,6 @@ export class SalemanPopupComponent extends PopupBase {
         if (this.saleManToView.effectDate.startDate !== undefined) {
             this.saleManToView.effectDate = this.saleManToView.effectDate.startDate;
         }
-        console.log(this.saleManToView);
     }
 
     onDeleteSaleman() {
@@ -112,16 +100,6 @@ export class SalemanPopupComponent extends PopupBase {
     ApplyToList() {
         this.isSave = true;
         this.OnCreate();
-
-        // if (this.saleManToAdd.saleman_ID.length > 0 && this.saleManToAdd.office.length > 0) {
-        //     this.OnCreate();
-        // if (!this.isDup) {
-        //     this.onCreate.emit(this.saleManToAdd);
-        //     this.hide();
-        // }
-
-        // }
-
     }
 
     getOffice() {
@@ -155,12 +133,11 @@ export class SalemanPopupComponent extends PopupBase {
         this.selectedDataSaleMan = saleMan;
     }
 
-
-
     onSelectOffice(office: any) {
         this.strOfficeCurrent = { field: 'abbrCompany', value: office.abbrCompany };
         this.selectedDataOffice = office;
     }
+
     OnCreate() {
         if (this.strOfficeCurrent.value !== undefined && this.strSalemanCurrent.value !== undefined) {
             const salemaneffectdate = this.saleManToAdd.effectDate.startDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en');

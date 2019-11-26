@@ -139,7 +139,7 @@ export class CatalogueRepo {
 
     getListSaleman(partnerId: string) {
         // const header: HttpHeaders = new HttpHeaders();
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/SysUser/GetBy`, { partnerId: partnerId })
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { partnerId: partnerId })
             .pipe(
                 map((data: any) => data)
             );
