@@ -17,6 +17,7 @@ import { TabsModule } from 'ngx-bootstrap';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { SeaFCLExportFormCreateComponent } from './components/form-create/form-create-fcl-export.component';
 import { SeaFCLExportDetailJobComponent } from './detail-job/detail-job-fcl-export.component';
+import { SeaFCLExportLazyLoadModule } from './sea-fcl-export-lazy-load.module';
 
 const routing: Routes = [
     {
@@ -62,7 +63,8 @@ const COMPONENTS = [
         ShareBussinessModule,
         StoreModule.forFeature('seaFCLExport', reducers),
         EffectsModule.forFeature(effects),
-        ...LIB
+        ...LIB,
+        SeaFCLExportLazyLoadModule // ?  Lazy loading module with  tab component (CD Note)
     ],
     exports: [],
     declarations: [

@@ -13,6 +13,7 @@ import { tap, map, switchMap, take, catchError, takeUntil, skip } from 'rxjs/ope
 import * as fromShareBussiness from './../../../share-business/store';
 import * as fromStore from './../store';
 
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 @Component({
     selector: 'app-detail-job-fcl-export',
@@ -22,7 +23,8 @@ import * as fromStore from './../store';
 export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobComponent implements OnInit {
 
     jobId: string;
-
+    selectedTab: TAB | string = 'SHIPMENT';
+    action: any = {};
     constructor(
         private _store: Store<fromShareBussiness.TransactionActions>,
         protected _toastService: ToastrService,
@@ -40,7 +42,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param: any) => {
-                // this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
+                this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
                 this.jobId = !!param.jobId ? param.jobId : '';
                 // if (param.action) {
                 //     this.ACTION = param.action.toUpperCase();
@@ -124,16 +126,16 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
     onSelectTab(tabName: string) {
         switch (tabName) {
-            case 'hbl':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
-                break;
+            // case 'hbl':
+            //     this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
+            //     break;
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
-
+            
         }
     }
 }

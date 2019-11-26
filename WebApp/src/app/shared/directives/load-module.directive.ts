@@ -22,7 +22,6 @@ export class LoadModuleDirective implements OnInit {
 
     async ngOnInit() {
         let ref = this._loadModuleService.moduleRefs[this.moduleName];
-
         let refPromise = null;
         if (ref) {
             refPromise = Promise.resolve(ref);

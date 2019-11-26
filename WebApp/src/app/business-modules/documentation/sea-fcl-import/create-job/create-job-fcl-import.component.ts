@@ -84,7 +84,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
 
             agentId: form.agentId,
             pol: form.pol,
-            pod: form.pod,
+            pod:form.pod,
             deliveryPlace: form.deliveryPlace,
             coloaderId: form.coloader,
 

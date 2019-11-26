@@ -31,7 +31,7 @@
 <div class="m-content">
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
-            <tab heading="Shipment Detail">
+            <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')">
 
                 <form-create-sea-fcl-export></form-create-sea-fcl-export>
 
@@ -43,8 +43,9 @@
             <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')">
                 hbl list work!
             </tab>
-            <tab heading="Debit Note & Credit Note">
-                cd note work!
+            <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')">
+                <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="SeaFCLExport_cdNote">
+                </ng-container>
             </tab>
         </tabset>
     </div>
