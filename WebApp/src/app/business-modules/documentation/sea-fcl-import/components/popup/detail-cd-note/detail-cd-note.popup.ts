@@ -6,7 +6,6 @@ import { catchError, finalize } from "rxjs/operators";
 import { SortService } from "src/app/shared/services";
 import { ToastrService } from "ngx-toastr";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
-import { ReportPreviewComponent } from "src/app/shared/common";
 import { DomSanitizer } from "@angular/platform-browser";
 import { API_MENU } from "src/constants/api-menu.const";
 import { ModalDirective } from "ngx-bootstrap";
@@ -20,8 +19,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(CdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: CdNoteAddPopupComponent;
-    //@ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild('formPL', { static: false }) formPL: ElementRef;
+    @ViewChild('formPreviewCdNote', { static: false }) formPreviewCdNote: ElementRef;
     @ViewChild("popupReport", { static: false }) popupReport: ModalDirective;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
 
@@ -38,15 +36,6 @@ export class CdNoteDetailPopupComponent extends PopupBase {
     balanceAmount: string = '';
 
     dataReport: any = null;
-
-    // previewModes: any[] = 
-    // [
-    //     { title: 'Preview', value: "", isDisabled: true },
-    //     { title: 'Preview with USD', value: "USD", isDisabled: false },
-    //     { title: 'Preview with Local', value: "VND", isDisabled: false },
-    //     { title: 'Preview with Original', value: "USD", isDisabled: false }
-    // ];
-    // selectedPreviewMode: any;//CommonInterface.ICommonTitleValue;
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -73,7 +62,6 @@ export class CdNoteDetailPopupComponent extends PopupBase {
             { title: "Debit Value (Local)", field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
-        //this.selectedPreviewMode = this.previewModes[0];
     }
 
     getDetailCdNote(jobId: string, cdNote: string) {
@@ -82,10 +70,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
                 catchError(this.catchError),
             ).subscribe(
                 (dataCdNote: any) => {
-                    console.log('CdNote detail')
-                    console.log(dataCdNote);
                     this.CdNoteDetail = dataCdNote;
-
                     //Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount();
                 },
@@ -112,7 +97,6 @@ export class CdNoteDetailPopupComponent extends PopupBase {
     }
 
     closePopup() {
-        //this.selectedPreviewMode = this.previewModes[0];
         this.hide();
     }
 
@@ -176,40 +160,37 @@ export class CdNoteDetailPopupComponent extends PopupBase {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: Crystal) => {
-                    // this.dataReport = res;
-                    // setTimeout(() => {
-                    //     this.previewPopup.frm.nativeElement.submit();
-                    //     this.previewPopup.show();
-                    // }, 1000);
                     this.dataReport = JSON.stringify(res);
-
-                    setTimeout(() => {
-                        if (!this.popupReport.isShown) {
-                            this.popupReport.config = this.options;
-                            this.popupReport.show();
-                        }
-                        this.submitFormPreview();
-                    }, 1000);
+                    if(res != null && res.dataSource.length > 0){
+                        setTimeout(() => {
+                            if (!this.popupReport.isShown) {
+                                this.popupReport.config = this.options;
+                                this.popupReport.show();
+                            }
+                            this.submitFormPreview();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
                 },
             );
     }
 
     get scr() {
-        // http://localhost:51830/Default.aspx
         return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
     }
 
     ngAfterViewInit() {
         if (!!this.dataReport) {
-            this.formPL.nativeElement.submit();
+            this.formPreviewCdNote.nativeElement.submit();
         }
     }
 
     submitFormPreview() {
-        this.formPL.nativeElement.submit();
+        this.formPreviewCdNote.nativeElement.submit();
     }
 
-    onSubmitForm(f) {
+    onSubmitForm(event) {
         return true;
     }
 

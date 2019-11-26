@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { CdNoteAddPopupComponent } from '../../components/popup/add-cd-note/add-cd-note.popup';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, map, finalize } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -103,7 +103,6 @@ export class SeaFCLImportCDNoteComponent extends AppList {
                 (res: any) => {
                     if (res) {
                         this.selectedCdNoteId = id;
-                        console.log(this.selectedCdNoteId)
                         this.deleteMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
                         this.confirmDeleteCdNotePopup.show();
                     } else {
@@ -114,7 +113,6 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     }
 
     onDeleteCdNote() {
-        console.log(this.selectedCdNoteId)
         this._progressRef.start();
         this._documentationRepo.deleteCdNote(this.selectedCdNoteId)
             .pipe(
