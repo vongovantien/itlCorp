@@ -17,7 +17,7 @@ export class UtilityHelper {
         return total;
     }
 
-    checkDuplicateInObject(propertyName: string | number, inputArray: { map: (arg0: (item: any) => void) => void; }) {
+    checkDuplicateInObject(propertyName: string | number, inputArray: { map: (arg0: (item: any) => void) => void; }): boolean {
         let seenDuplicate = false;
         const testObject = {};
 

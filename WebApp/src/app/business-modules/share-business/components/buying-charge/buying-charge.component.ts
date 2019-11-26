@@ -2,24 +2,23 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, CsTransactionDetail } from 'src/app/shared/models';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { AppList } from 'src/app/app.list';
-
 import { SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { GetBuyingSurchargeAction } from './../../store';
+import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ChargeConstants } from 'src/constants/charge.const';
 
 import { forkJoin } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil, finalize } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
-
 @Component({
     selector: 'buying-charge',
     templateUrl: './buying-charge.component.html',
@@ -63,9 +62,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         protected _sortService: SortService,
+        protected _ngProgressService: NgProgress
+
     ) {
         super();
         this.requestSort = this.sortSurcharge;
+        this._progressRef = this._ngProgressService.ref();
 
         this.getSurcharge();
     }
@@ -144,13 +146,14 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getMasterData() {
+        this._progressRef.start();
         forkJoin([
             this.getCharge(),
             this._catalogueRepo.getUnit({ active: true }),
             this._catalogueRepo.getCurrencyBy({ active: true }),
             this._catalogueRepo.getListPartner(null, null, { active: true })
         ])
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 ([charges, units, currencies, partners]: any[] = [[], [], [], []]) => {
                     this.listCharges = charges;
@@ -205,6 +208,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.voucherIddate = null;
         newSurCharge.voucherIdre = null;
         newSurCharge.voucherIdredate = null;
+        newSurCharge.isFromShipment = true;
 
         this.addSurcharges(type, newSurCharge);
     }
@@ -223,11 +227,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.voucherIddate = null;
         newSurCharge.voucherIdre = null;
         newSurCharge.voucherIdredate = null;
+        newSurCharge.isFromShipment = true;
 
         this.addSurcharges(type, newSurCharge);
     }
 
     deleteCharge(charge: CsShipmentSurcharge, index: number, type: CommonEnum.SurchargeTypeEnum | string) {
+        this.isSubmitted = false;
         if (charge.id === SystemConstants.EMPTY_GUID) {
             switch (type) {
                 case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
@@ -258,14 +264,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     onDeleteShipmentSurcharge(type: CommonEnum.SurchargeTypeEnum | string) {
         this.confirmDeletePopup.hide();
+
         if (!!this.selectedSurcharge && this.selectedSurcharge.id !== SystemConstants.EMPTY_GUID) {
+            this._progressRef.start();
             this._documentRepo.deleteShipmentSurcharge(this.selectedSurcharge.id)
-                .pipe(catchError(this.catchError))
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
 
+                            console.log(type);
                             this.getSurcharges(type);
                         } else {
                             this._toastService.error(res.message);
@@ -316,9 +325,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
 
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
-
+        this._progressRef.start();
         this._documentRepo.addShipmentSurcharges(this.charges)
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -377,7 +386,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             chargeItem.partnerName = partnerData.shortName;
             chargeItem.paymentObjectId = partnerData.id;
             chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
-
         }
     }
 
@@ -424,28 +432,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     checkDuplicate() {
+
         let valid: boolean = true;
-        if (this.utility.checkDuplicateInObject("chargeId", this.charges)) {
+        if (this.utility.checkDuplicateInObject("chargeId", this.charges) && this.utility.checkDuplicateInObject("invoiceNo", this.charges)) {
             this.isDuplicateChargeCode = true;
+            this.isDuplicateInvoice = true;
             valid = false;
-            this._toastService.warning("The Charge code is duplicated");
+            this._toastService.warning("The Charge code and InvoiceNo is duplicated");
             return;
         } else {
             valid = true;
             this.isDuplicateChargeCode = false;
-        }
-        if (this.utility.checkDuplicateInObject("invoiceNo", this.charges)) {
-            valid = false;
-            this._toastService.warning("The Invoice is duplicated");
-            this.isDuplicateInvoice = true;
-            return;
-        } else {
-            valid = true;
             this.isDuplicateInvoice = false;
         }
-
         return valid;
-
     }
 
     getSurcharges(type: string) {
@@ -454,17 +454,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE, hblId: this.hbl.id }));
                 break;
             case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
-                this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE, hblId: this.hbl.id }));
+                this._store.dispatch(new GetSellingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE, hblId: this.hbl.id }));
                 break;
             case CommonEnum.SurchargeTypeEnum.OBH:
-                this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.OBH, hblId: this.hbl.id }));
+                this._store.dispatch(new GetOBHSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.OBH, hblId: this.hbl.id }));
                 break;
             default:
                 break;
         }
     }
 
-    addSurcharges(type, newcharge: CsShipmentSurcharge) {
+    addSurcharges(type: string, newcharge: CsShipmentSurcharge) {
         switch (type) {
             case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
                 this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newcharge));

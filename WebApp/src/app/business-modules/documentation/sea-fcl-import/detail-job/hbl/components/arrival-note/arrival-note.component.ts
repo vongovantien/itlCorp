@@ -19,6 +19,8 @@ import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators'
 import { getHBLState, GetDetailHBLAction } from '../../../../store';
 
 import * as fromShareBussiness from './../../../../../../share-business/store';
+import { ChargeConstants } from 'src/constants/charge.const';
+import { Observable } from 'rxjs';
 @Component({
     selector: 'sea-fcl-import-hbl-arrival-note',
     templateUrl: './arrival-note.component.html',
@@ -36,9 +38,11 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
     userLogged: User = new User();
 
     freightCharges: ArrivalFreightCharge[] = new Array<ArrivalFreightCharge>();
-    listCharges: Charge[] = [];
-    listUnits: Unit[] = [];
-    listCurrency: Currency[] = [];
+
+    listCharges: Observable<Charge[]>;
+    listUnits: Observable<Unit[]>;
+    listCurrency: Observable<Currency[]>;
+
     quantityTypes: CommonInterface.IValueDisplay[];
     containersShipment: Container[] = [];
     containersHBL: Container[] = [];
@@ -185,47 +189,18 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
     }
 
     getCharge() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE)) {
-            this.listCharges = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE);
-        } else {
-            this._catalogueRepo.getCharges({ active: true }).pipe(
-                catchError(this.catchError)
-            ).subscribe(
-                (charges: Charge[]) => {
-                    this.listCharges = charges;
-                    if (!!charges.length) {
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.CHARGE, this.listCharges);
-                    }
-                }
-            );
-        }
+        this.listCharges = this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.CREDIT })
+            .pipe(catchError(this.catchError));
     }
 
     getCurrency() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
-            this.listCurrency = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY);
-        } else {
-            this._catalogueRepo.getCurrencyBy({ active: true }).pipe(
-                catchError(this.catchError)
-            ).subscribe(
-                (currencies: Currency[]) => {
-                    this.listCurrency = currencies;
-                    if (!!currencies.length) {
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.CURRENCY, this.listCurrency);
-                    }
-                }
-            );
-        }
+        this.listCurrency = this._catalogueRepo.getCurrencyBy({ active: true })
+            .pipe(catchError(this.catchError));
     }
 
     getUnit() {
-        this._catalogueRepo.getUnit({ active: true }).pipe(
-            catchError(this.catchError)
-        ).subscribe(
-            (units: Unit[]) => {
-                this.listUnits = units;
-            }
-        );
+        this.listUnits = this._catalogueRepo.getUnit({ active: true })
+            .pipe(catchError(this.catchError));
     }
 
     async getExchangeRate(currency: any, date: string) {

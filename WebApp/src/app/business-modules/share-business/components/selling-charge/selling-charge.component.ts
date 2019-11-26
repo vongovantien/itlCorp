@@ -1,18 +1,20 @@
 import { Component } from '@angular/core';
+import { NgProgress } from '@ngx-progressbar/core';
+import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
 
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-
-import { Store } from '@ngrx/store';
-import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
-
-import * as fromStore from './../../store';
-import { takeUntil, catchError } from 'rxjs/operators';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ChargeConstants } from 'src/constants/charge.const';
+
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
+
+import * as fromStore from './../../store';
+
 
 @Component({
     selector: 'selling-charge',
@@ -28,9 +30,12 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         protected _sortService: SortService,
+        protected _ngProgressService: NgProgress
 
     ) {
-        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService);
+        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService);
+        this._progressRef = this._ngProgressService.ref();
+
     }
 
     getSurcharge() {
@@ -73,6 +78,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
     saveSellingSurCharge() {
         // * Update data 
+        this._progressRef.start();
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;
@@ -85,7 +91,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
 
         this._documentRepo.addShipmentSurcharges(this.charges)
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -103,20 +109,30 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     syncFreightCharge() {
+        this._progressRef.start();
+
         this._documentRepo.getArrivalInfo(this.hbl.id, CommonEnum.TransactionTypeEnum.SeaFCLImport)
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        for (const freightCharge of res.csArrivalFrieghtCharges) {
-                            const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge(freightCharge);
-                            newSurCharge.id = SystemConstants.EMPTY_GUID;
+                        if (!res.csArrivalFrieghtCharges.length) {
+                            this._toastService.warning("Not found freight charge");
+                        } else {
+                            for (const freightCharge of res.csArrivalFrieghtCharges) {
+                                const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge(freightCharge);
+                                newSurCharge.id = SystemConstants.EMPTY_GUID;
+                                newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
+                                newSurCharge.invoiceDate = null;
 
-                            newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
-                            newSurCharge.invoiceDate = null;
+                                // * Default get partner = customer name's hbl.
+                                newSurCharge.partnerName = this.hbl.customerName;
+                                newSurCharge.paymentObjectId = this.hbl.customerId;
 
-                            this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
+                                this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
+                            }
                         }
+
                     }
                 }
             );
