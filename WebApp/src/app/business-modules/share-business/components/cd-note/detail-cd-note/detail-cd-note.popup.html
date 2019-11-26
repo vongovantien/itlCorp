@@ -1,5 +1,5 @@
-<div id="detail-cd-note-modal" class="modal fade" role="dialog" bsModal #popup="bs-modal" aria-hidden="true" (onHide)="onHide($event)"
-(onShow)="onShow($event)">
+<div id="detail-cd-note-modal" class="modal fade" role="dialog" bsModal #popup="bs-modal" aria-hidden="true"
+    (onHide)="onHide($event)" (onShow)="onShow($event)">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content" *ngIf="CdNoteDetail">
             <div class="modal-header">
@@ -194,12 +194,10 @@
                                         <span>{{item.vatrate}}</span>
                                     </td>
                                     <td>
-                                        <span class="credit-value"
-                                            *ngIf="item.type==='BUY' || (item.type==='OBH' && CdNoteDetail.partnerId===item.payerId)">{{item.total*item.exchangeRate | number:'1.3-3'}}</span>
+                                        <span>{{item.credit | number:'1.3-3'}}</span>
                                     </td>
                                     <td>
-                                        <span class="debit-value"
-                                            *ngIf="item.type==='SELL' || (item.type==='OBH' && CdNoteDetail.partnerId===item.paymentObjectId)">{{item.total*item.exchangeRate | number:'1.3-3'}}</span>
+                                        <span>{{item.debit | number:'1.3-3'}}</span>
                                     </td>
                                     <td>
                                         <span>{{item.notes}}</span>
@@ -272,8 +270,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Preview</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                    (click)="hidePreview()">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hidePreview()">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -282,8 +279,8 @@
                     (ngSubmit)="onSubmitForm($event)" target="reportFrame">
                     <input name="crystal" [value]="dataReport" type="hidden">
                 </form>
-                <iframe name="reportFrame" src="" type="application/pdf" height="1200px" width="100%"
-                    allowfullscreen frameborder="0"></iframe>
+                <iframe name="reportFrame" src="" type="application/pdf" height="1200px" width="100%" allowfullscreen
+                    frameborder="0"></iframe>
             </div>
         </div>
     </div>

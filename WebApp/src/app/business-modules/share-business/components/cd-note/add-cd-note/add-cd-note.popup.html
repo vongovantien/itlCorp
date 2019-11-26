@@ -167,16 +167,18 @@
                                                     <span>{{charge.vatrate}}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="credit-value"
+                                                    <!-- <span class="credit-value"
                                                         *ngIf="charge.type==='BUY' || (charge.type==='OBH' && selectedPartner.value===charge.payerId)">
                                                         {{charge.total | number:'1.3-3'}}
-                                                    </span>
+                                                    </span> -->
+                                                    <span>{{charge.credit | number:'1.3-3'}}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="debit-value"
+                                                    <!-- <span class="debit-value"
                                                         *ngIf="charge.type==='SELL' || (charge.type==='OBH' && selectedPartner.value===charge.paymentObjectId)">
                                                         {{charge.total | number:'1.3-3'}}
-                                                    </span>
+                                                    </span> -->
+                                                    <span>{{charge.debit | number:'1.3-3'}}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{charge.notes}}</span>

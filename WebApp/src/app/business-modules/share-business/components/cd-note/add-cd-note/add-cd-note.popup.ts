@@ -31,6 +31,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
     action: string = 'create';
     cdNoteCode: string = '';
     cdNoteId: string = '';
+    transactionType: TransactionTypeEnum = 0;
 
     currentMBLId: string = '';
     selectedNoteType: string = '';
@@ -76,8 +77,8 @@ export class CdNoteAddPopupComponent extends PopupBase {
             { title: 'Unit Price', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
-            { title: "Credit Value", field: 'total', sortable: true },
-            { title: "Debit Value", field: 'total', sortable: true },
+            { title: "Credit Value", field: 'credit', sortable: true },
+            { title: "Debit Value", field: 'debit', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
     }
@@ -124,6 +125,12 @@ export class CdNoteAddPopupComponent extends PopupBase {
                 })
             ).subscribe(
                 (dataCharges: any) => {
+                    dataCharges.forEach(element => {
+                        element.listCharges.forEach(ele => {
+                            ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && partnerId === ele.paymentObjectId)) ? ele.total : null;
+                            ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;  
+                        });                                                                                                
+                    });
                     this.listChargePartner = dataCharges;
                     this.initGroup = dataCharges;
                     this.listCharges = [];
@@ -140,14 +147,10 @@ export class CdNoteAddPopupComponent extends PopupBase {
 
     onSelectDataFormInfo(data: any) {
         this.selectedPartner = { field: "id", value: data.id };
-        //if (this.partnerCurrent.value !== this.selectedPartner.value && this.listChargePartner.length > 0) {
-        //    this.changePartnerPopup.show();
-        //} else {
         this.getListCharges(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, "");
         this.partnerCurrent = Object.assign({}, this.selectedPartner);
         this.keyword = '';
         this.isCheckAllCharge = false;
-        //}
     }
 
     onSubmitChangePartnerPopup() {
@@ -232,7 +235,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
             this.CDNote.currencyId = "VND" // in the future , this id must be local currency of each country
-            this.CDNote.transactionTypeEnum = TransactionTypeEnum.SeaFCLImport;
+            this.CDNote.transactionTypeEnum = this.transactionType;
             var arrayCharges = [];
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges) {
@@ -244,8 +247,8 @@ export class CdNoteAddPopupComponent extends PopupBase {
                 return;
             }
             this.CDNote.listShipmentSurcharge = arrayCharges;
-            const _totalCredit = arrayCharges.filter(f => (f.type === 'BUY' || (f.type === 'OBH' && this.selectedPartner.value === f.payerId))).reduce((credit, charge) => credit + charge.total * charge.exchangeRate, 0);
-            const _totalDebit = arrayCharges.filter(f => (f.type === 'SELL' || (f.type === 'OBH' && this.selectedPartner.value === f.paymentObjectId))).reduce((debit, charge) => debit + charge.total * charge.exchangeRate, 0);;
+            const _totalCredit = arrayCharges.reduce((credit, charge) => credit + charge.credit * charge.exchangeRate, 0);
+            const _totalDebit = arrayCharges.reduce((debit, charge) => debit + charge.debit * charge.exchangeRate, 0);;
             const _balance = _totalDebit - _totalCredit;
             this.CDNote.total = _balance;
             if (Math.abs(_balance) > 99999999999999) {
@@ -302,8 +305,8 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this.totalDebit = '';
         this.balanceAmount = '';
         for (const currency of uniqueCurrency) {
-            const _credit = listCharge.filter(f => (f.type === 'BUY' || (f.type === 'OBH' && this.selectedPartner.value === f.payerId)) && f.currencyId === currency).reduce((credit, charge) => credit + charge.total, 0);
-            const _debit = listCharge.filter(f => (f.type === 'SELL' || (f.type === 'OBH' && this.selectedPartner.value === f.paymentObjectId)) && f.currencyId === currency).reduce((debit, charge) => debit + charge.total, 0);
+            const _credit = listCharge.filter(f => f.currencyId === currency).reduce((credit, charge) => credit + charge.credit, 0);
+            const _debit = listCharge.filter(f => f.currencyId === currency).reduce((debit, charge) => debit + charge.debit, 0);
             const _balance = _debit - _credit;
             this.totalCredit += this.formatNumberCurrency(_credit) + ' ' + currency + ' | ';
             this.totalDebit += this.formatNumberCurrency(_debit) + ' ' + currency + ' | ';
@@ -336,6 +339,12 @@ export class CdNoteAddPopupComponent extends PopupBase {
                 catchError(this.catchError),
             ).subscribe(
                 (dataCharges: any) => {
+                    dataCharges.forEach(element => {
+                        element.listCharges.forEach(ele => {
+                            ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && this.selectedPartner.value === ele.paymentObjectId)) ? ele.total : null;
+                            ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && this.selectedPartner.value === ele.payerId)) ? ele.total : null;  
+                        });                                                                                                
+                    });
                     this.addRemainChargePopup.listChargePartnerAddMore = dataCharges;
                     this.addRemainChargePopup.show();
                 },

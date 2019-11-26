@@ -10,6 +10,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { API_MENU } from "src/constants/api-menu.const";
 import { ModalDirective } from "ngx-bootstrap";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
+import { TransactionTypeEnum } from "src/app/shared/enums";
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -27,6 +28,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
     cdNote: string = null;
     deleteMessage: string = '';
     isHouseBillID: boolean = false;
+    transactionType: TransactionTypeEnum = 0;
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -58,8 +60,8 @@ export class CdNoteDetailPopupComponent extends PopupBase {
             { title: 'Unit Price', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
-            { title: "Credit Value (Local)", field: 'total', sortable: true },
-            { title: "Debit Value (Local)", field: 'total', sortable: true },
+            { title: "Credit Value (Local)", field: 'credit', sortable: true },
+            { title: "Debit Value (Local)", field: 'debit', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
     }
@@ -70,6 +72,10 @@ export class CdNoteDetailPopupComponent extends PopupBase {
                 catchError(this.catchError),
             ).subscribe(
                 (dataCdNote: any) => {
+                    dataCdNote.listSurcharges.forEach(element => {
+                        element.debit = (element.type === 'SELL' || (element.type === 'OBH' && this.CdNoteDetail.partnerId === element.paymentObjectId)) ? element.total * element.exchangeRate : null;
+                        element.credit = (element.type === 'BUY' || (element.type === 'OBH' && this.CdNoteDetail.partnerId === element.payerId)) ? element.total * element.exchangeRate  : null;
+                    });
                     this.CdNoteDetail = dataCdNote;
                     //Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount();
@@ -81,8 +87,8 @@ export class CdNoteDetailPopupComponent extends PopupBase {
         this.totalCredit = '';
         this.totalDebit = '';
         this.balanceAmount = '';
-        const _credit = this.CdNoteDetail.listSurcharges.filter(f => (f.type === 'BUY' || (f.type === 'OBH' && this.CdNoteDetail.partnerId === f.payerId))).reduce((credit, charge) => credit + charge.total * charge.exchangeRate, 0);
-        const _debit = this.CdNoteDetail.listSurcharges.filter(f => (f.type === 'SELL' || (f.type === 'OBH' && this.CdNoteDetail.partnerId === f.paymentObjectId))).reduce((debit, charge) => debit + charge.total * charge.exchangeRate, 0);
+        const _credit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
+        const _debit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
         const _balance = _debit - _credit;
         this.totalCredit = this.formatNumberCurrency(_credit);
         this.totalDebit = this.formatNumberCurrency(_debit);
@@ -136,6 +142,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
 
     openPopupEdit() {
         this.cdNoteEditPopupComponent.action = 'update';
+        this.cdNoteEditPopupComponent.transactionType = this.transactionType;
         this.cdNoteEditPopupComponent.selectedPartner = { field: "id", value: this.CdNoteDetail.partnerId };
         this.cdNoteEditPopupComponent.selectedNoteType = this.CdNoteDetail.cdNote.type;
         this.cdNoteEditPopupComponent.CDNote = this.CdNoteDetail.cdNote;
@@ -161,7 +168,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
             .subscribe(
                 (res: Crystal) => {
                     this.dataReport = JSON.stringify(res);
-                    if(res != null && res.dataSource.length > 0){
+                    if (res != null && res.dataSource.length > 0) {
                         setTimeout(() => {
                             if (!this.popupReport.isShown) {
                                 this.popupReport.config = this.options;

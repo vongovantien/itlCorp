@@ -11,9 +11,7 @@
                 <!--begin::Form-->
                 <div class="m-form m-form--state">
                     <!--begin::m-portlet -->
-                    <div class="col-6">
-                        <h3 class="c-block-title m--margin-left-10">Remaining Charges</h3>
-                    </div>
+                    <h5 class="m--margin-left-15">Remaining Charges</h5>
                     <!--begin: Datatable-->
                     <div class="table-wrapper fit-height-div">
                         <table class="table table-striped table-brand dataTable">
@@ -76,17 +74,10 @@
                                             <span>{{charge.vatrate}}</span>
                                         </td>
                                         <td>
-                                            <span class="credit-value"
-                                            *ngIf="charge.type==='BUY' || (charge.type==='OBH' && partner===charge.payerId)">
-                                                
-                                                {{charge.total | number:'1.3-3'}}
-                                            </span>
+                                            <span>{{charge.credit | number:'1.3-3'}}</span>
                                         </td>
                                         <td>
-                                            <span class="debit-value"
-                                                *ngIf="charge.type==='SELL' || (charge.type==='OBH' && partner===charge.paymentObjectId)">
-                                                {{charge.total | number:'1.3-3'}}
-                                            </span>
+                                            <span>{{charge.debit | number:'1.3-3'}}</span>
                                         </td>
                                         <td>
                                             <span>{{charge.notes}}</span>
