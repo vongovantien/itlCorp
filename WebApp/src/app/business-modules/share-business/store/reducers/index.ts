@@ -29,6 +29,7 @@ export const getContainerSaveState = createSelector(shareBussinessState, (state:
 
 export const getTransactionState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.transaction);
 export const getTransactionProfitState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.transaction && state.transaction.profits);
+export const getTransactionProfitLoadingState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.transaction && state.transaction.isLoading);
 
 export const reducers: ActionReducerMap<IShareBussinessState> = {
     surcharge: SurchargeReducer,

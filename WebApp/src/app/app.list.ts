@@ -13,6 +13,11 @@ export abstract class AppList extends AppPage {
     requestList: any = null;
     requestSort: any = null;
     dataSearch: any = {};
+
+    // * header table.
+    right: string = 'right';
+    left: string = 'left';
+
     constructor() {
         super();
     }

@@ -84,7 +84,7 @@ export class SeaFCLImportManagementComponent extends AppList {
     }
 
     searchList(dataSearch?: any) {
-        if (dataSearch == undefined) {
+        if (dataSearch === undefined) {
             dataSearch = {
                 transactionType: TransactionTypeEnum.SeaFCLImport
             };
@@ -99,7 +99,6 @@ export class SeaFCLImportManagementComponent extends AppList {
                     this._progressRef.complete();
                 }),
                 map((data: any) => {
-                    console.log(data);
                     return {
                         data: data.data.map((item: any) => new CsTransaction(item)),
                         totalItems: data.totalItems,
@@ -114,7 +113,7 @@ export class SeaFCLImportManagementComponent extends AppList {
     }
 
     showHblList(jobId: string, index: number) {
-        if (this.tmpIndex == index) {
+        if (this.tmpIndex === index) {
             this.housebills = this.tmpHouseBills;
         } else {
             this._progressRef.start();
@@ -141,7 +140,6 @@ export class SeaFCLImportManagementComponent extends AppList {
     }
 
     onSearchMasterBills(data: any) {
-        console.log(data);
         this.page = 1; // reset page.
         this.searchList(data);
     }
