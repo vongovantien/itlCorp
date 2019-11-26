@@ -11,10 +11,10 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatCommodityGroupService : IRepositoryBase<CatCommodityGroup, CatCommodityGroupModel>
+    public interface ICatCommodityGroupService : IRepositoryBaseCache<CatCommodityGroup, CatCommodityGroupModel>
     {
         IQueryable<CatCommodityGroupModel> Query(CatCommodityGroupCriteria criteria);
-        List<CatCommodityGroupModel> Paging(CatCommodityGroupCriteria criteria, int page, int size, out int rowsCount);
+        IQueryable<CatCommodityGroupModel> Paging(CatCommodityGroupCriteria criteria, int page, int size, out int rowsCount);
         List<CatCommodityGroupViewModel> GetByLanguage();
         List<CommodityGroupImportModel> CheckValidImport(List<CommodityGroupImportModel> list);
         HandleState Import(List<CommodityGroupImportModel> data);

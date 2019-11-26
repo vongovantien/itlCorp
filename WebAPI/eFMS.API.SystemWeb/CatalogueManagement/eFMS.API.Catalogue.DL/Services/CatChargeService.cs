@@ -69,6 +69,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     chargeDefaultRepository.SubmitChanges();
                     DataContext.SubmitChanges();
+                    ClearCache();
+                    Get();
                     trans.Commit();
                     return hs;
                 }
@@ -79,8 +81,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 finally
                 {
-                    ClearCache();
-                    Get();
                     trans.Dispose();
                 }
             }
@@ -115,6 +115,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     chargeDefaultRepository.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();
+                    ClearCache();
+                    Get();
                     return hs;
                 }
                 catch (Exception ex)
@@ -124,8 +126,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 finally
                 {
-                    ClearCache();
-                    Get();
                     trans.Dispose();
                 }
             }
@@ -210,6 +210,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         chargeDefaultRepository.SubmitChanges();
                         DataContext.SubmitChanges();
+                        ClearCache();
+                        Get();
                         trans.Commit();
                     }
                     return hs;
@@ -222,8 +224,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 finally
                 {
-                    ClearCache();
-                    Get();
                     trans.Dispose();
                 }
             }

@@ -15,52 +15,62 @@ using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Common.NoSql;
 using Microsoft.Extensions.Caching.Distributed;
 using eFMS.API.Common.Helpers;
+using ITL.NetCore.Connection.Caching;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatStageService : RepositoryBase<CatStage, CatStageModel>, ICatStageService
+    public class CatStageService : RepositoryBaseCache<CatStage, CatStageModel>, ICatStageService
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly IDistributedCache cache;
         private readonly IContextBase<CatDepartment> departmentRepository;
         public CatStageService(IContextBase<CatStage> repository, 
-            IMapper mapper, 
-            IStringLocalizer<LanguageSub> localizer, 
-            IDistributedCache distributedCache,
-            IContextBase<CatDepartment> departmentRepo) : base(repository, mapper)
+            ICacheServiceBase<CatStage> cacheService, 
+            IMapper mapper,
+            IStringLocalizer<LanguageSub> localizer,
+            IContextBase<CatDepartment> departmentRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
-            cache = distributedCache;
             departmentRepository = departmentRepo;
             SetChildren<OpsStageAssigned>("Id", "StageId");
-        }        
-        
+        }
+
         public IQueryable<CatStageModel> GetAll()
         {
-            IQueryable<CatStage> data = RedisCacheHelper.Get<CatStage>(cache, Templates.CatStage.NameCaching.ListName);
-            if(data == null)
-            {
-                data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatStage.NameCaching.ListName, data);
-            }
-            return data?.OrderBy(x => x.Code).Select(x => mapper.Map<CatStageModel>(x));
+            var data = Get();
+            return data;
         } 
 
         public HandleState AddStage(CatStageModel catStage)
         {
-            return DataContext.Add(catStage);
+            var hs = DataContext.Add(catStage);
+            if (hs.Success)
+            {
+                ClearCache();
+                Get();
+            }
+            return hs;
         }
       
         public HandleState DeleteStage(int id)
         {
-            return DataContext.Delete(x => x.Id == id);
+            var hs = DataContext.Delete(x => x.Id == id);
+            if (hs.Success)
+            {
+                ClearCache();
+                Get();
+            }
+            return hs;
         }
 
         public IQueryable<CatStageModel> Paging(CatStageCriteria criteria, int page, int size, out int rowsCount)
         {
             IQueryable<CatStageModel> returnList = Query(criteria);
+
+            if (returnList == null) {
+                rowsCount = 0;
+                return returnList;
+            }
             rowsCount = returnList.Count();
-            if (rowsCount == 0) return returnList;
             if (size > 1)
             {
                 if (page < 1)
@@ -77,20 +87,18 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatStageModel> Query(CatStageCriteria criteria)
         {
             IQueryable<CatStageModel> results = null;
-            var stages = DataContext.Get();
+            var stages = Get();
             var departments = departmentRepository.Get();
             if (criteria.All == null)
             {
-                var query = stages.Join(departments, x => x.DepartmentId, y => y.Id, (x, y) => new { Stage = x, Department = y })
+                results = stages.Join(departments, x => x.DepartmentId, y => y.Id, (x, y) => new { Stage = x, Department = y })
                     .Where(x => x.Stage.Code.IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                              && x.Stage.StageNameEn.IndexOf(criteria.StageNameEn ??"", StringComparison.OrdinalIgnoreCase) > -1
                              && x.Stage.StageNameVn.IndexOf(criteria.StageNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                              && (x.Stage.Id == criteria.Id || criteria.Id == 0)
                              && (x.Stage.Active == criteria.Active || criteria.Active == null)
                              && x.Department.DeptName.IndexOf(criteria.DepartmentName ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                    );
-                if (query == null) return results;
-                results = query.Select(x => new CatStageModel
+                    ).Select(x => new CatStageModel
                     {   Id = x.Stage.Id,
                         Code = x.Stage.Code,
                         StageNameVn = x.Stage.StageNameVn,
@@ -110,44 +118,47 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             else
             {
-                var query = stages.Join(departments, x => x.DepartmentId, y => y.Id, (x, y) => new { Stage = x, Department = y })
+                results = stages.Join(departments, x => x.DepartmentId, y => y.Id, (x, y) => new { Stage = x, Department = y })
                     .Where(x => (x.Stage.Code.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                              || x.Stage.StageNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                              || x.Stage.StageNameVn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                              || x.Department.DeptName.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                             && (x.Stage.Active == criteria.Active || criteria.Active == null)
-                    );
-                if (query == null) return results;
-                results = query.Select(x => new CatStageModel
-                {
-                    Id = x.Stage.Id,
-                    Code = x.Stage.Code,
-                    StageNameVn = x.Stage.StageNameVn,
-                    StageNameEn = x.Stage.StageNameEn,
-                    DepartmentId = x.Stage.DepartmentId,
-                    DescriptionVn = x.Stage.DescriptionVn,
-                    DescriptionEn = x.Stage.DescriptionEn,
-                    UserCreated = x.Stage.UserCreated,
-                    DatetimeCreated = x.Stage.DatetimeCreated,
-                    UserModified = x.Stage.UserModified,
-                    DatetimeModified = x.Stage.DatetimeModified,
-                    Active = x.Stage.Active,
-                    InactiveOn = x.Stage.InactiveOn,
-                    DeptCode = x.Department.Code,
-                    DeptName = x.Department.DeptName
-                });
+                    ).Select(x => new CatStageModel
+                    {
+                        Id = x.Stage.Id,
+                        Code = x.Stage.Code,
+                        StageNameVn = x.Stage.StageNameVn,
+                        StageNameEn = x.Stage.StageNameEn,
+                        DepartmentId = x.Stage.DepartmentId,
+                        DescriptionVn = x.Stage.DescriptionVn,
+                        DescriptionEn = x.Stage.DescriptionEn,
+                        UserCreated = x.Stage.UserCreated,
+                        DatetimeCreated = x.Stage.DatetimeCreated,
+                        UserModified = x.Stage.UserModified,
+                        DatetimeModified = x.Stage.DatetimeModified,
+                        Active = x.Stage.Active,
+                        InactiveOn = x.Stage.InactiveOn,
+                        DeptCode = x.Department.Code,
+                        DeptName = x.Department.DeptName
+                    });
             }
             return results;
         }
 
         public HandleState UpdateStage(CatStageModel catStage)
         {
-            return DataContext.Update(catStage, x => x.Id == catStage.Id);
+            var hs = DataContext.Update(catStage, x => x.Id == catStage.Id);
+            if (hs.Success)
+            {
+                ClearCache();
+                Get();
+            }
+            return hs;
         }
 
         public List<CatStageImportModel> CheckValidImport(List<CatStageImportModel> list)
         {
-            var stages = DataContext.Get().ToList();
+            var stages = Get();
             list.ForEach(item =>
             {
                
@@ -214,8 +225,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     DataContext.Add(stage, false);
                 }
                 DataContext.SubmitChanges();
-
-                cache.Remove(Templates.CatStage.NameCaching.ListName);
+                ClearCache();
+                Get();
                 return new HandleState();
             }
             catch(Exception ex)

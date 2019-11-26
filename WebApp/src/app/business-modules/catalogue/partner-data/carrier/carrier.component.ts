@@ -22,7 +22,7 @@ import _map from 'lodash/map';
 })
 export class CarrierComponent implements OnInit {
   carriers: Array<Partner>;
-  //carrier: Partner;
+  // carrier: Partner;
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CARRIER };
@@ -40,15 +40,15 @@ export class CarrierComponent implements OnInit {
   ngOnInit() {
   }
   async getPartnerData(pager: PagerSetting, criteria?: any) {
-    if (criteria != undefined) {
+    if (criteria !== undefined) {
       this.criteria = criteria;
     }
-    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
+    const responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
     this.carriers = responses.data;
     this.pager.totalItems = responses.totalItems;
   }
   onSortChange(column) {
-    let property = column.primaryKey;
+    const property = column.primaryKey;
     this.isDesc = !this.isDesc;
     this.carriers = this.sortService.sort(this.carriers, property, this.isDesc);
   }

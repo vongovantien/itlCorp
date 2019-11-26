@@ -575,7 +575,7 @@ namespace eFMS.API.ReportData
         #endregion
 
         #region Partner
-        public Stream CreatePartnerExcelFile(List<CatPartner> listObj, Stream stream = null)
+        public Stream CreatePartnerExcelFile(List<CatPartner> listObj, string partnerType, string author, Stream stream = null)
         {
             try
             {
@@ -584,7 +584,9 @@ namespace eFMS.API.ReportData
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    workSheet.Cells["A1"].Value = "Partner Data - " + partnerType;
+                    workSheet.Cells["A2"].Value = "Export By: " + author;
+                    //workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForPartnerExcel(workSheet, list);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -600,40 +602,40 @@ namespace eFMS.API.ReportData
         public void BindingFormatForPartnerExcel(ExcelWorksheet worksheet, List<CatPartner> listItems)
         {
             // Tạo header
-            worksheet.Cells[1, 1].Value = "Partner ID";
-            worksheet.Cells[1, 2].Value = "Full Name";
-            worksheet.Cells[1, 3].Value = "Short Name";
-            worksheet.Cells[1, 4].Value = "Billing Address";
-            worksheet.Cells[1, 5].Value = "Tax Code";
-            worksheet.Cells[1, 6].Value = "Tel";
-            worksheet.Cells[1, 7].Value = "Fax";
-            worksheet.Cells[1, 8].Value = "Creator";
-            worksheet.Cells[1, 9].Value = "Modify";
-            worksheet.Cells[1, 10].Value = "Inactive";
+            worksheet.Cells[5, 1].Value = "No.";
+            worksheet.Cells[5, 2].Value = "Partner ID";
+            worksheet.Cells[5, 3].Value = "Full Name";
+            worksheet.Cells[5, 4].Value = "Short Name";
+            worksheet.Cells[5, 5].Value = "Billing Address";
+            worksheet.Cells[5, 6].Value = "Tax Code";
+            worksheet.Cells[5, 7].Value = "Tel";
+            worksheet.Cells[5, 8].Value = "Fax";
+            worksheet.Cells[5, 9].Value = "Creator";
+            worksheet.Cells[5, 10].Value = "Modify";
+            worksheet.Cells[5, 11].Value = "Inactive";
             worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
             worksheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            int indexNo = 0;
             for (int i = 0; i < listItems.Count; i++)
             {
+                indexNo = indexNo + 1;
                 var item = listItems[i];
-                worksheet.Cells[i + 2, 1].Value = item.Id;
-                worksheet.Cells[i + 2, 2].Value = item.FullName;
-                worksheet.Cells[i + 2, 3].Value = item.ShortName;
-                worksheet.Cells[i + 2, 4].Value = item.AddressVN;
-                worksheet.Cells[i + 2, 5].Value = item.TaxCode;
-                worksheet.Cells[i + 2, 6].Value = item.Tel;
-                worksheet.Cells[i + 2, 7].Value = item.Fax;
-                worksheet.Cells[i + 2, 8].Value = item.UserCreatedName;
-                worksheet.Cells[i + 2, 9].Value = item.DatetimeModified;
-                string inactivechar = "";
-                if (item.Inactive == true)
-                {
-                    inactivechar = "Active";
-                }
-                else
+                worksheet.Cells[i + 6, 1].Value = indexNo;
+                worksheet.Cells[i + 6, 2].Value = item.Id;
+                worksheet.Cells[i + 6, 3].Value = item.FullName;
+                worksheet.Cells[i + 6, 4].Value = item.ShortName;
+                worksheet.Cells[i + 6, 5].Value = item.AddressVN;
+                worksheet.Cells[i + 6, 6].Value = item.TaxCode;
+                worksheet.Cells[i + 6, 7].Value = item.Tel;
+                worksheet.Cells[i + 6, 8].Value = item.Fax;
+                worksheet.Cells[i + 6, 9].Value = item.UserCreatedName;
+                worksheet.Cells[i + 6, 10].Value = item.DatetimeModified;
+                string inactivechar = "Active";
+                if (item.Inactive == false)
                 {
                     inactivechar = "Inactive";
                 }
-                worksheet.Cells[i + 2, 10].Value = inactivechar;
+                worksheet.Cells[i + 6, 11].Value = inactivechar;
             }
         }
         #endregion

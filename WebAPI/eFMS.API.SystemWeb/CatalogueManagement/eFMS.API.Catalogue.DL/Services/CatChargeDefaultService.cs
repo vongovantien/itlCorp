@@ -118,6 +118,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
                 DataContext.SubmitChanges();
+                ClearCache();
+                Get();
                 
                 return new HandleState();
             }

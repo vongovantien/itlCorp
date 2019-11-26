@@ -16,27 +16,26 @@ using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.Helpers;
+using ITL.NetCore.Connection.Caching;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatCommodityService : RepositoryBase<CatCommodity, CatCommodityModel>, ICatCommodityService
+    public class CatCommodityService : RepositoryBaseCache<CatCommodity, CatCommodityModel>, ICatCommodityService
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly IContextBase<CatCommodityGroup> catCommonityGroupRepo;
-        private readonly IDistributedCache cache;
+        private readonly ICatCommodityGroupService catCommodityGroupService;
         private readonly ICurrentUser currentUser;
-
         public CatCommodityService(IContextBase<CatCommodity> repository, 
-            IMapper mapper, 
-            IContextBase<CatCommodityGroup> catCommonityGroup, 
-            IStringLocalizer<LanguageSub> localizer, 
-            IDistributedCache distributedCache,
-            ICurrentUser user) : base(repository, mapper)
+            ICacheServiceBase<CatCommodity> cacheService, 
+            IMapper mapper,
+            IStringLocalizer<LanguageSub> localizer,
+            ICatCommodityGroupService commodityGroupService,
+            ICurrentUser user) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
-            cache = distributedCache;
             SetChildren<CsMawbcontainer>("Id", "CommodityId");
-            catCommonityGroupRepo = catCommonityGroup;
+            catCommodityGroupService = commodityGroupService;
             currentUser = user;
         }
 
@@ -46,15 +45,8 @@ namespace eFMS.API.Catalogue.DL.Services
         /// <returns></returns>
         public IQueryable<CatCommodityModel> GetAll()
         {
-            IQueryable<CatCommodity> data = RedisCacheHelper.Get<CatCommodity>(cache, Templates.CatCommodity.NameCaching.ListName);
-            if (data == null)
-            {
-                data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatCommodity.NameCaching.ListName, data);
-            }
-            if (data == null) return null;
-            var results = data.Select(x => mapper.Map<CatCommodityModel>(x));
-            return results;
+            var data = Get();
+            return data;
         }
 
         public List<CatCommodityModel> Paging(CatCommodityCriteria criteria, int page, int size, out int rowsCount)
@@ -80,46 +72,50 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public IQueryable<CatCommodityModel> Query(CatCommodityCriteria criteria)
         {
-            IQueryable<CatCommodityModel> results = null;
-            var commodities = GetCommodities(criteria);
-            var catCommonityGroups = catCommonityGroupRepo.Get();
-            var query = from com in commodities
-                        join grCom in catCommonityGroups on com.CommodityGroupId equals grCom.Id into grpComs
-                        from grp in grpComs.DefaultIfEmpty()
-                        select new CatCommodityModel {
-                            Id = com.Id,
-                            Code = com.Code,
-                            CommodityNameVn = com.CommodityNameVn,
-                            CommodityNameEn = com.CommodityNameEn,
-                            CommodityGroupId = com.CommodityGroupId,
-                            Note = com.Note,
-                            UserCreated = com.UserCreated,
-                            DatetimeCreated = com.DatetimeCreated,
-                            UserModified = com.UserModified,
-                            DatetimeModified = com.DatetimeModified,
-                            Active = com.Active,
-                            InactiveOn = com.InactiveOn,
-                            CommodityGroupNameEn = grp != null? grp.GroupNameEn: string.Empty,
-                            CommodityGroupNameVn = grp != null? grp.GroupNameVn: string.Empty
-                        };
+            Expression<Func<CatCommodityModel, bool>> query = null;
+
+            var commodities = Get();
+            var catCommonityGroups = catCommodityGroupService.Get();
+            IQueryable<CatCommodityModel> results = from com in commodities
+                      join grCom in catCommonityGroups on com.CommodityGroupId equals grCom.Id into grpComs
+                      from grp in grpComs.DefaultIfEmpty()
+                      select new CatCommodityModel
+                      {
+                          Id = com.Id,
+                          Code = com.Code,
+                          CommodityNameVn = com.CommodityNameVn,
+                          CommodityNameEn = com.CommodityNameEn,
+                          CommodityGroupId = com.CommodityGroupId,
+                          Note = com.Note,
+                          UserCreated = com.UserCreated,
+                          DatetimeCreated = com.DatetimeCreated,
+                          UserModified = com.UserModified,
+                          DatetimeModified = com.DatetimeModified,
+                          Active = com.Active,
+                          InactiveOn = com.InactiveOn,
+                          CommodityGroupNameEn = grp != null ? grp.GroupNameEn : string.Empty,
+                          CommodityGroupNameVn = grp != null ? grp.GroupNameVn : string.Empty
+                      };
             if (criteria.All == null)
             {
-                results = query.Where(x => (x.CommodityNameVn ?? "").IndexOf(criteria.CommodityNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                              && (x.CommodityNameEn ?? "").IndexOf(criteria.CommodityNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                              && (x.CommodityGroupNameEn ?? "").IndexOf(criteria.CommodityGroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                              && (x.CommodityGroupNameVn ?? "").IndexOf(criteria.CommodityGroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                              && (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                              );
+                query = x => (x.CommodityNameVn ?? "").IndexOf(criteria.CommodityNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            && (x.CommodityNameEn ?? "").IndexOf(criteria.CommodityNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            && (x.CommodityGroupNameEn ?? "").IndexOf(criteria.CommodityGroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            && (x.CommodityGroupNameVn ?? "").IndexOf(criteria.CommodityGroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            && (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            && (x.Active == criteria.Active || criteria.Active == null);
             }
             else
             {
-                results = query.Where(x => (x.CommodityNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                              || (x.CommodityNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                              || (x.CommodityGroupNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                              || (x.CommodityGroupNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                              || (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                              );
+                query = x => ((x.CommodityNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.CommodityNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.CommodityGroupNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.CommodityGroupNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                            && (x.Active == criteria.Active || criteria.Active == null);
             }
+            if (results == null) return results;
+            results = results.Where(query);
             return results;
         }
         
@@ -133,7 +129,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var result = DataContext.Add(commonity);
             if (result.Success)
             {
-                cache.Remove(Templates.CatCommodity.NameCaching.ListName);
+                ClearCache();
+                Get();
             }
             return result;
         }
@@ -149,7 +146,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatCommodity.NameCaching.ListName);
+                ClearCache();
+                Get();
             }
             return hs;
         }
@@ -159,7 +157,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatCommodity.NameCaching.ListName);
+                ClearCache();
+                Get();
             }
             return hs;
         }
@@ -189,7 +188,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     DataContext.Add(commodity, false);
                 }
                 DataContext.SubmitChanges();
-                cache.Remove(Templates.CatCommodity.NameCaching.ListName);
+                ClearCache();
+                Get();
                 return new HandleState();
             }
             catch(Exception ex)
@@ -199,8 +199,8 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public List<CommodityImportModel> CheckValidImport(List<CommodityImportModel> list)
         {
-            var commodities = DataContext.Get().ToList();
-            var commodityGroups = catCommonityGroupRepo.Get().ToList();
+            var commodities = Get();
+            var commodityGroups = catCommodityGroupService.Get();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.Code))
@@ -253,22 +253,5 @@ namespace eFMS.API.Catalogue.DL.Services
             return list;
         }
         #endregion
-
-        private IQueryable<CatCommodity> GetCommodities(CatCommodityCriteria criteria)
-        {
-            var commonitiesCaching = RedisCacheHelper.GetObject<List<CatCommodity>>(cache, Templates.CatCommodity.NameCaching.ListName);
-            IQueryable<CatCommodity> commodities = null;
-            if (commonitiesCaching == null)
-            {
-                RedisCacheHelper.SetObject(cache, Templates.CatCommodity.NameCaching.ListName, DataContext.Get());
-                commodities = DataContext.Get(x => x.Active == criteria.Active || criteria.Active == null);
-            }
-            else
-            {
-                commodities = commonitiesCaching.Where(x => x.Active == criteria.Active || criteria.Active == null).AsQueryable();
-            }
-            return commodities;
-        }
-
     }
 }

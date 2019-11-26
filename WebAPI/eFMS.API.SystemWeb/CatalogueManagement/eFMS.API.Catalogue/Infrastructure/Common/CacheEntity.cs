@@ -12,7 +12,14 @@ namespace eFMS.API.Catalogue.Infrastructure.Common
     {
         CatCountry,
         CatArea,
+        CatCurrency,
         CatCharge,
-        CatPartner
+        CatChargeDefaultAccount,
+        CatPartner,
+        CatCommodityGroup,
+        CatCommodity,
+        CatPlace,
+        CatStage,
+        CatUnit
     }
 }

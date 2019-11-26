@@ -40,11 +40,6 @@ namespace eFMS.API.Catalogue
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper();
-            //services.AddDistributedRedisCache(options =>
-            //{
-            //    options.InstanceName = "Catalogue";
-            //    options.Configuration = Configuration.GetConnectionString("Redis");
-            //});
             services.AddSession();
             services.AddAuthorize(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -113,7 +108,6 @@ namespace eFMS.API.Catalogue
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();
-            //app.UseRequestLocalization();
         }
     }
 }

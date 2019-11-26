@@ -11,7 +11,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatCommodityService : IRepositoryBase<CatCommodity, CatCommodityModel>
+    public interface ICatCommodityService : IRepositoryBaseCache<CatCommodity, CatCommodityModel>
     {
         IQueryable<CatCommodityModel> GetAll();
         IQueryable<CatCommodityModel> Query(CatCommodityCriteria criteria);
