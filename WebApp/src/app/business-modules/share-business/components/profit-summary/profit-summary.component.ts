@@ -1,17 +1,17 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
 
 import * as fromStore from './../../store';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
 @Component({
     selector: 'hbl-profit-summary',
     templateUrl: './profit-summary.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class ShareBussinessProfitSummaryComponent extends AppPage {
+export class ShareBussinessProfitSummaryComponent extends AppList {
 
     hblProfit$: Observable<fromStore.ISurchargeProfit>;
     totalUSD$: Observable<number>;
