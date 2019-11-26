@@ -15,14 +15,14 @@ namespace eFMS.API.ReportData.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     [ApiController]
-    public class ReportDataController : ControllerBase
+    public class CatalogueController : ControllerBase
     {
         private readonly APIs aPis;
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="appSettings"></param>
-        public ReportDataController(IOptions<APIs> appSettings)
+        public CatalogueController(IOptions<APIs> appSettings)
         {
             this.aPis = appSettings.Value;
         }
@@ -31,7 +31,7 @@ namespace eFMS.API.ReportData.Controllers
         /// export country
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportCountry")]
+        [Route("ExportCountry")]
         [HttpPost]
         public async Task<IActionResult> ExportCountry(CatCountryCriteria catCountryCriteria)
         {
@@ -45,7 +45,7 @@ namespace eFMS.API.ReportData.Controllers
         /// export warehouse
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportWareHouse")]
+        [Route("ExportWareHouse")]
         [HttpPost]
         public async Task<IActionResult> ExportWareHouse(CatPlaceCriteria catPlaceCriteria)
         {
@@ -59,7 +59,7 @@ namespace eFMS.API.ReportData.Controllers
         /// export portindex
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportPortIndex")]
+        [Route("ExportPortIndex")]
         [HttpPost]
         public async Task<IActionResult> ExportPortIndex(CatPlaceCriteria catPlaceCriteria)
         {
@@ -73,21 +73,23 @@ namespace eFMS.API.ReportData.Controllers
         /// export partnerdata
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportPartnerData")]
+        [Route("ExportPartnerData")]
         [HttpPost]
         public async Task<IActionResult> ExportPartner(CatPartnerCriteria catPartnerCriteria)
         {
+            var author = Request.Headers["author"];
+            var partnerType = Request.Headers["partnerType"];
             Helper helper = new Helper();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPartnerCriteria, aPis.HostStaging + Urls.Catelogue.CatPartnerUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatPartner>>();  
-            var stream = helper.CreatePartnerExcelFile(dataObjects.Result);
+            var stream = helper.CreatePartnerExcelFile(dataObjects.Result, partnerType, author);
             return new FileHelper().ExportExcel(stream, FilesNames.PartnerData);
         }
         /// <summary>
         /// export commodity list
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportCommodityList")]
+        [Route("ExportCommodityList")]
         [HttpPost]
         public async Task<IActionResult> ExportCommodityList(CatCommodityCriteria catCommodityCriteria)
         {
@@ -101,7 +103,7 @@ namespace eFMS.API.ReportData.Controllers
         /// export commodity group
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportCommodityGroup")]
+        [Route("ExportCommodityGroup")]
         [HttpPost]
         public async Task<IActionResult> ExportCommodityGroup(CatCommodityGroupCriteria catCommodityGroupCriteria)
         {
@@ -116,7 +118,7 @@ namespace eFMS.API.ReportData.Controllers
         /// </summary>
         /// <returns></returns>
         /// 
-        [Route("Catalogue/ExportStage")]
+        [Route("ExportStage")]
         [HttpPost]
         public async Task<IActionResult> ExportStage(CatStageCriteria catStageCriteria)
         {
@@ -132,7 +134,7 @@ namespace eFMS.API.ReportData.Controllers
         /// </summary> 
         /// <returns></returns>
         ///  
-        [Route("Catalogue/ExportUnit")]
+        [Route("ExportUnit")]
         [HttpPost]
         public async Task<IActionResult> ExportUnit(CatUnitCriteria catUnitCriteria)
         {
@@ -146,7 +148,7 @@ namespace eFMS.API.ReportData.Controllers
         /// export province
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportProvince")]
+        [Route("ExportProvince")]
         [HttpPost]
         public async Task<IActionResult> ExportProvince(CatPlaceCriteria catPlaceCriteria)
         {
@@ -161,7 +163,7 @@ namespace eFMS.API.ReportData.Controllers
         /// export district
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportDistrict")]
+        [Route("ExportDistrict")]
         [HttpPost]
         public async Task<IActionResult> ExportDistrict(CatPlaceCriteria catPlaceCriteria)
         {
@@ -176,7 +178,7 @@ namespace eFMS.API.ReportData.Controllers
         /// export town-ward
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportTownWard")]
+        [Route("ExportTownWard")]
         [HttpPost]
         public async Task<IActionResult> ExportTownWard(CatPlaceCriteria catPlaceCriteria)
         {
@@ -191,7 +193,7 @@ namespace eFMS.API.ReportData.Controllers
         /// export charge
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportCharge")]
+        [Route("ExportCharge")]
         [HttpPost]
         public async Task<IActionResult> ExportCharge(CatChargeCriteria catChargeCriteria)
         {
@@ -205,7 +207,7 @@ namespace eFMS.API.ReportData.Controllers
         /// export currency
         /// </summary>
         /// <returns></returns>
-        [Route("Catalogue/ExportCurrency")]
+        [Route("ExportCurrency")]
         [HttpPost]
         public async Task<IActionResult> ExportCurrency(CatCurrrencyCriteria catCurrrencyCriteria)
         {

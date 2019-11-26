@@ -10,10 +10,10 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatCurrencyService:IRepositoryBase<CatCurrency,CatCurrencyModel>
+    public interface ICatCurrencyService: IRepositoryBaseCache<CatCurrency,CatCurrencyModel>
     {
         IQueryable<CatCurrencyModel> GetAll();
-        IQueryable<CatCurrencyModel> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount, out int totalPages);
+        IQueryable<CatCurrencyModel> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount);
         HandleState Update(CatCurrencyModel model);
         HandleState Delete(string id);
 

@@ -13,6 +13,7 @@ using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
@@ -23,32 +24,31 @@ using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatPartnerService : RepositoryBase<CatPartner, CatPartnerModel>, ICatPartnerService
+    public class CatPartnerService : RepositoryBaseCache<CatPartner, CatPartnerModel>, ICatPartnerService
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IContextBase<CatSaleman> salemanRepository;
-        private readonly IContextBase<CatPlace> placeRepository;
-        private readonly IContextBase<CatCountry> countryRepository;
+        private readonly ICatPlaceService placeService;
+        private readonly ICatCountryService countryService;
+
         public CatPartnerService(IContextBase<CatPartner> repository, 
-            IMapper mapper, 
-            IStringLocalizer<LanguageSub> localizer, 
-            IDistributedCache distributedCache, 
+            ICacheServiceBase<CatPartner> cacheService, 
+            IMapper mapper,
+            IStringLocalizer<LanguageSub> localizer,
             ICurrentUser user,
             IContextBase<SysUser> sysUserRepo,
-            IContextBase<CatPlace> placeRepo,
-            IContextBase<CatCountry> countryRepo,
-IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
+            ICatPlaceService place,
+            ICatCountryService country,
+            IContextBase<CatSaleman> salemanRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
-            cache = distributedCache;
             currentUser = user;
-            placeRepository = placeRepo;
+            placeService = place;
             salemanRepository = salemanRepo;
             sysUserRepository = sysUserRepo;
-            countryRepository = countryRepo;
+            countryService = country;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -63,21 +63,9 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             SetChildren<CsManifest>("Id", "Supplier");
         }
 
-        public IQueryable<CatPartner> GetPartners()
+        public IQueryable<CatPartnerModel> GetPartners()
         {
-            var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
-            IQueryable<CatPartner> data = null;
-            if (lstPartner != null)
-            {
-                data = lstPartner.AsQueryable();
-            }
-            else
-            {
-                data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatPartner.NameCaching.ListName, data);
-            }
-            var results = data?.Select(x => mapper.Map<CatPartnerModel>(x));
-            return results;
+            return Get();
         }
         public List<DepartmentPartner> GetDepartments()
         {
@@ -90,8 +78,7 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             var partner = mapper.Map<CatPartner>(entity);
             partner.DatetimeCreated = DateTime.Now;
             partner.DatetimeModified = DateTime.Now;
-            //partner.UserCreated = partner.UserModified = currentUser.UserID;
-            partner.UserCreated = partner.UserModified = "admin";
+            partner.UserCreated = partner.UserModified = currentUser.UserID;
             partner.Active = true;
             if(!String.IsNullOrEmpty(partner.InternalReferenceNo))
             {
@@ -104,18 +91,18 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             var hs = DataContext.Add(partner, false);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatPartner.NameCaching.ListName);
-                //RedisCacheHelper.SetObject(cache, Templates.CatPartner.NameCaching.ListName, DataContext.Get().ToList());
                 var salemans = mapper.Map<List<CatSaleman>>(entity.SaleMans);
                 salemans.ForEach(x => {
                     x.PartnerId = partner.Id;
                     x.CreateDate = DateTime.Now;
-                    //x.UserCreated = currentUser.UserID;
+                    x.UserCreated = currentUser.UserID;
                 });
                 salemanRepository.Add(salemans, false);
+                DataContext.SubmitChanges();
+                salemanRepository.SubmitChanges();
+                ClearCache();
+                Get();
             }
-            DataContext.SubmitChanges();
-            salemanRepository.SubmitChanges();
             return hs;
         }
         public HandleState Update(CatPartnerModel model)
@@ -130,7 +117,8 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatPartner.NameCaching.ListName);
+                ClearCache();
+                Get();
             }
             return hs;
         }
@@ -140,30 +128,30 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatPartner.NameCaching.ListName);
+                ClearCache();
+                Get();
             }
             return hs;
         }
         #endregion
         
-        public List<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
-            List<CatPartnerViewModel> results = null;
-            var list = Query(criteria);
-            if (list == null)
+            var data = Query(criteria);
+            if (data == null)
             {
                 rowsCount = 0;
-                return results;
+                return null;
             }
-            list = list.OrderByDescending(x => x.DatetimeModified).ToList();
-            rowsCount = list.ToList().Count;
+            rowsCount = data.Count();
+            IQueryable<CatPartnerViewModel> results = null;
             if (size > 1)
             {
                 if (page < 1)
                 {
                     page = 1;
                 }
-                results = list.Skip((page - 1) * size).Take(size).ToList();
+                results = data.Skip((page - 1) * size).Take(size).AsQueryable();
             }
             return results;
         }
@@ -204,7 +192,7 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
         {
             string partnerGroup = criteria != null? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup): null;
             var sysUsers = sysUserRepository.Get();
-            var partners = GetPartners().Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var query = (from partner in partners
                          join user in sysUsers on partner.UserCreated equals user.Id
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
@@ -230,16 +218,16 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             {
                 query = query.Where(x =>
                            (
-                           (x.partner.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.partner.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.partner.PartnerNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.partner.PartnerNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.partner.AddressVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.partner.TaxCode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.partner.Tel ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           (x.partner.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           || (x.partner.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           || (x.partner.PartnerNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           || (x.partner.PartnerNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           || (x.partner.AddressVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           || (x.partner.TaxCode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           || (x.partner.Tel ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            )
                            && (x.partner.Active == criteria.Active || criteria.Active == null));
             }
@@ -274,7 +262,8 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
                     DataContext.Add(partner, false);
                 }
                 DataContext.SubmitChanges();
-                cache.Remove(Templates.CatPartner.NameCaching.ListName);
+                ClearCache();
+                Get();
                 return new HandleState();
             }
             catch (Exception ex)
@@ -284,15 +273,12 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
         }
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
         {
-            var partners = GetPartners()?.ToList();
-            var users = sysUserRepository.Get().ToList();
-            var countries = RedisCacheHelper.GetObject<List<CatCountry>>(cache, Templates.CatCountry.NameCaching.ListName)?.AsQueryable();
-            if(countries == null)
-            {
-                countries = countryRepository.Get();
-            }
-            var provinces = placeRepository.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
-            var branchs = placeRepository.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch));
+            var partners = Get();
+            var users = sysUserRepository.Get();
+            var countries = countryService.Get();
+            var places = placeService.Get();
+            var provinces = places.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
+            var branchs = places.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch));
             var salemans = sysUserRepository.Get();
 
             var allGroup = DataEnums.PARTNER_GROUP;
@@ -306,17 +292,11 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
                 }
                 else
                 {
-                    //bool isNumeric = int.TryParse(item.TaxCode, out int n);
                     if (list.Count(x => x.TaxCode.ToLower() == item.TaxCode.ToLower()) > 1)
                     {
                         item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
                     }
-                    //if (isNumeric == false || n <0)
-                    //{
-                    //    item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_NOT_NUMBER]);
-                    //    item.IsValid = false;
-                    //}
                     else
                     {
                         if (partners.Any(x => x.TaxCode.ToLower() == item.TaxCode.ToLower()))
@@ -370,7 +350,6 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
                                         item.SalePersonId = salePerson.Id;
                                     }
                                 }
-                                //}
                             }
                         }
                     }
@@ -425,19 +404,6 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
                     item.AddressShippingEn = stringLocalizer[LanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND];
                     item.IsValid = false;
                 }
-                //if (!string.IsNullOrEmpty(item.Profile))
-                //{
-                //    var workplace = branchs.FirstOrDefault(i => i.NameEn.ToLower() == item.Profile);
-                //    if (workplace == null)
-                //    {
-                //        item.CityBilling = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_WORKPLACE_NOT_FOUND], item.Profile);
-                //        item.IsValid = false;
-                //    }
-                //    else
-                //    {
-                //        item.WorkPlaceId = workplace.Id;
-                //    }
-                //}
                 if (string.IsNullOrEmpty(item.AddressShippingVn))
                 {
                     item.AddressShippingVn = stringLocalizer[LanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND];
@@ -495,51 +461,11 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
         }
         #endregion
 
-        private Expression<Func<CatPartnerModel, bool>> GetQueryExpression(CatPartnerCriteria criteria)
-        {
-            Expression<Func<CatPartnerModel, bool>> query = null;
-            string partnerGroup = PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup);
-            if (criteria.All == null)
-            {
-                query = x => ((x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.AddressVn ?? "").IndexOf(criteria.AddressVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.TaxCode ?? "").IndexOf(criteria.TaxCode ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.Tel ?? "").IndexOf(criteria.Tel ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.Fax ?? "").IndexOf(criteria.Fax ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.UserCreated ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           );
-            }
-            else
-            {
-                query = x => ((x.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.AddressVn ?? "").IndexOf(criteria.AddressVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.TaxCode ?? "").IndexOf(criteria.TaxCode ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.Tel ?? "").IndexOf(criteria.Tel ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.Fax ?? "").IndexOf(criteria.Fax ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           || (x.UserCreated ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           ) && ((x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
-            }
-            return query;
-        }
-
         public IQueryable<CatPartnerModel> GetBy(CatPartnerGroupEnum partnerGroup)
         {
             string group = PlaceTypeEx.GetPartnerGroup(partnerGroup);
-            var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
-            IQueryable<CatPartner> data = null;
-            if (lstPartner != null)
-            {
-                data = lstPartner.Where(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0).AsQueryable();
-            }
-            else
-            {
-                data = DataContext.Get(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
-            }
-            if (data.Count() == 0) return null;
-            return data.ProjectTo<CatPartnerModel>(mapper.ConfigurationProvider);
+            IQueryable<CatPartnerModel> data = Get().Where(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            return data;
         }
     }
 }

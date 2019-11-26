@@ -23,28 +23,28 @@ using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.Helpers;
+using ITL.NetCore.Connection.Caching;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatPlaceService : RepositoryBase<CatPlace, CatPlaceModel>, ICatPlaceService
+    public class CatPlaceService : RepositoryBaseCache<CatPlace, CatPlaceModel>, ICatPlaceService
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
-        private readonly IContextBase<CatCountry> countryRepository;
+        private readonly ICatCountryService countryService;
         private readonly IContextBase<CatArea> areaRepository;
+
         public CatPlaceService(IContextBase<CatPlace> repository, 
-            IMapper mapper, 
-            IStringLocalizer<LanguageSub> localizer, 
-            IDistributedCache distributedCache, 
+            ICacheServiceBase<CatPlace> cacheService, 
+            IMapper mapper,
+            IStringLocalizer<LanguageSub> localizer,
             ICurrentUser user,
-            IContextBase<CatCountry> countryRepo,
-            IContextBase<CatArea> areaRepo) : base(repository, mapper)
+            ICatCountryService country,
+            IContextBase<CatArea> areaRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
-            cache = distributedCache;
             currentUser = user;
-            countryRepository = countryRepo;
+            countryService = country;
             areaRepository = areaRepo;
             SetChildren<CatCountry>("Id", "CountryId");
             SetChildren<CatPlace>("Id", "ProvinceId");
@@ -73,7 +73,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var result = DataContext.Add(entity, true);
             if (result.Success)
             {
-                cache.Remove(Templates.CatPlace.NameCaching.ListName);
+                ClearCache();
+                Get();
             }
             return result;
         }
@@ -89,7 +90,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var result = DataContext.Update(entity, x => x.Id == model.Id);
             if (result.Success)
             {
-                cache.Remove(Templates.CatPlace.NameCaching.ListName);
+                ClearCache();
+                Get();
             }
             return result;
         }
@@ -99,7 +101,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatPlace.NameCaching.ListName);
+                ClearCache();
+                Get();
             }
             return hs;
         }
@@ -107,18 +110,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPlaceModel> GetCatPlaces()
         {
-            var places = RedisCacheHelper.GetObject<List<CatPlace>>(cache, Templates.CatPlace.NameCaching.ListName);
-            IQueryable<CatPlace> data = null;
-            if (places != null)
-            {
-                data = places.AsQueryable();
-            }
-            else
-            {
-                data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, data);
-            }
-            var results = data?.Select(x => mapper.Map<CatPlaceModel>(x));
+            var results = Get();
             return results;
         }
 
@@ -200,27 +192,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private IQueryable<sp_GetCatPlace> GetBy(string placeTypeID)
         {
-            IQueryable<sp_GetCatPlace> data = null;
-            data = RedisCacheHelper.Get<sp_GetCatPlace>(cache, Templates.CatPlace.NameCaching.ListName);
-            if (string.IsNullOrEmpty(placeTypeID))
-            {
-                if (data == null)
-                {
-                    data = GetView(placeTypeID).AsQueryable();
-                    RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, data);
-                }
-            }
-            else
-            {
-                if(data == null)
-                {
-                    data = GetView(placeTypeID).AsQueryable();
-                }
-                else
-                {
-                    data = data.Where(x => x.PlaceTypeID == placeTypeID);
-                }
-            }
+            var data = GetView(placeTypeID).AsQueryable();
             return data;
         }
         private IQueryable<CatPlaceViewModel> GetCulturalData(IQueryable<sp_GetCatPlace> list)
@@ -351,10 +323,11 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private List<CatPlaceImportModel> CheckWardValidImport(List<CatPlaceImportModel> list, string placeTypeName)
         {
-            var countries = countryRepository.Get().ToList();
-            var provinces = DataContext.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
-            var districts = DataContext.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.District)).ToList();
-            var wards = DataContext.Get(x => x.PlaceTypeId == placeTypeName);
+            var countries = countryService.Get();
+            var places = Get();
+            var provinces = places.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
+            var districts = places.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.District)).ToList();
+            var wards = places.Where(x => x.PlaceTypeId == placeTypeName);
             var results = new List<CatPlaceImportModel>();
             list.ForEach(item =>
             {
@@ -441,9 +414,10 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private List<CatPlaceImportModel> CheckDistrictValidImport(List<CatPlaceImportModel> list, string placeTypeName)
         {
-            var countries = countryRepository.Get().ToList();
-            var provinces = DataContext.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
-            var districts = DataContext.Get(x => x.PlaceTypeId == placeTypeName).ToList();
+            var countries = countryService.Get();
+            var places = Get();
+            var provinces = places.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
+            var districts = places.Where(x => x.PlaceTypeId == placeTypeName).ToList();
             list.ForEach(item =>
             {
                 item.PlaceTypeId = placeTypeName;
@@ -519,7 +493,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private List<CatPlaceImportModel> CheckProvinceValidImport(List<CatPlaceImportModel> list, string placeTypeName)
         {
-            var countries = countryRepository.Get().ToList();
+            var countries = countryService.Get();
             var provinces = DataContext.Get(x => x.PlaceTypeId == placeTypeName).ToList();
             var results = new List<CatPlaceImportModel>();
             foreach (var item in list)
@@ -591,7 +565,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private List<CatPlaceImportModel> CheckPortIndexValidImport(List<CatPlaceImportModel> list, string placeTypeName)
         {
-            var countries = countryRepository.Get().ToList();
+            var countries = countryService.Get();
             var areas = areaRepository.Get().ToList();
             var modes = DataEnums.ModeOfTransportData;
             var portIndexs = DataContext.Get(x => x.PlaceTypeId == placeTypeName).ToList();
@@ -658,7 +632,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private List<CatPlaceImportModel> CheckWarehouseValidImport(List<CatPlaceImportModel> list, string placeTypeName)
         {
-            var countries = countryRepository.Get().ToList();
+            var countries = countryService.Get();
             var provinces = DataContext.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
             var districts = DataContext.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.District)).ToList();
             var warehouses = DataContext.Get(x => x.PlaceTypeId == placeTypeName).ToList();
@@ -759,7 +733,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     DataContext.Add(catPlace, false);
                 }
                 DataContext.SubmitChanges();
-                cache.Remove(Templates.CatPlace.NameCaching.ListName);
+                ClearCache();
+                Get();
                 return new HandleState();
             }
             catch (Exception ex)

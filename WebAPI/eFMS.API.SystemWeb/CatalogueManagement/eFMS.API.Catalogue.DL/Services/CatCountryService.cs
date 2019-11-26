@@ -13,6 +13,7 @@ using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
@@ -26,15 +27,18 @@ using System.Threading;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatCountryService : RepositoryBase<CatCountry, CatCountryModel>, ICatCountryService
+    public class CatCountryService : RepositoryBaseCache<CatCountry, CatCountryModel>, ICatCountryService
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
-        public CatCountryService(IContextBase<CatCountry> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
+
+        public CatCountryService(IContextBase<CatCountry> repository, 
+            ICacheServiceBase<CatCountry> cacheService, 
+            IMapper mapper,
+            IStringLocalizer<LanguageSub> localizer,
+            ICurrentUser user) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
-            cache = distributedCache;
             currentUser = user;
             SetChildren<CatPlace>("Id", "CountryId");
             SetChildren<CatPartner>("Id", "CountryId");
@@ -49,39 +53,23 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.UserCreated = entity.UserModified = currentUser.UserID;
             entity.Active = true;
             var country = mapper.Map<CatCountry>(entity);
-            var hs = DataContext.Add(country);
-            if (hs.Success)
+            var result = DataContext.Add(country);
+            if (result.Success)
             {
-                cache.Remove(Templates.CatCountry.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
+                ClearCache();
+                Get();
             }
-            return hs;
+            return result;
         }
-        public HandleState Update(CatCountryModel model)
-        {
-            var entity = mapper.Map<CatCountry>(model);
-            entity.DatetimeModified = DateTime.Now;
-            entity.UserModified = currentUser.UserID;
-            if (entity.Active == false)
-            {
-                entity.InactiveOn = DateTime.Now;
-            }
-            var hs = DataContext.Update(entity, x => x.Id == model.Id);
-            if (hs.Success)
-            {
-                cache.Remove(Templates.CatCountry.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
-            }
-            return hs;
-        }
+
         public HandleState Delete(short id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatCountry.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
+                ClearCache();
+                Get();
             }
             return hs;
         }
@@ -89,32 +77,29 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCountryViewModel> GetByLanguage()
         {
-            IQueryable<CatCountry> data = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName);
-            if (data == null)
-            {
-                data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, data);
-            }
+            var data = Get();
             return GetDataByLanguage(data);
         }
         
         public IQueryable<CatCountryModel> GetCountries(CatCountryCriteria criteria, int page, int size, out int rowsCount)
         {
-            IQueryable<CatCountryModel> returnList = null;
-            var data = GetBy(criteria);
-            rowsCount = data.Count();
-            if (rowsCount == 0)
-                return returnList;
-            else data = data.OrderByDescending(x => x.DatetimeModified);
-            if (size > 1)
+            Expression<Func<CatCountryModel, bool>> query = null;
+            if (criteria.condition == SearchCondition.AND)
             {
-                if (page < 1)
-                {
-                    page = 1;
-                }
-                returnList = data.Skip((page - 1) * size).Take(size).ProjectTo<CatCountryModel>(mapper.ConfigurationProvider);
+                query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                        && (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                        && (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                        && (x.Active == criteria.Active || criteria.Active == null);
             }
-            return returnList;        
+            else
+            {
+                query = x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                                                || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "null", StringComparison.OrdinalIgnoreCase) > -1
+                                                                || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null", StringComparison.OrdinalIgnoreCase) > -1)
+                                                                && (x.Active == criteria.Active || criteria.Active == null);
+            }
+            var data = Paging(query, page, size, out rowsCount);
+            return data;    
         }
 
         #region Import
@@ -140,8 +125,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     DataContext.Add(country, false);
                 }
                 DataContext.SubmitChanges();
-                cache.Remove(Templates.CatCountry.NameCaching.ListName);
-
+                ClearCache();
+                Get();
                 return new HandleState();
             }
             catch (Exception ex)
@@ -152,8 +137,7 @@ namespace eFMS.API.Catalogue.DL.Services
         
         public List<CatCountryImportModel> CheckValidImport(List<CatCountryImportModel> list)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var countries = dc.CatCountry.ToList();
+            var countries = Get();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.NameEn))
@@ -190,16 +174,15 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         #endregion
 
-        public IQueryable<CatCountry> Query(CatCountryCriteria criteria)
+        public IQueryable<CatCountryModel> Query(CatCountryCriteria criteria)
         {
-            IQueryable<CatCountry> data = GetBy(criteria);
-            if (data == null) return null;
-            return data.ProjectTo<CatCountryModel>(mapper.ConfigurationProvider);
+            IQueryable<CatCountryModel> data = GetBy(criteria);
+            return data;
         }
 
-        private IQueryable<CatCountry> GetBy(CatCountryCriteria criteria)
+        private IQueryable<CatCountryModel> GetBy(CatCountryCriteria criteria)
         {
-            Expression<Func<CatCountry, bool>> query = null;
+            Expression<Func<CatCountryModel, bool>> query = null;
             if (criteria.condition == SearchCondition.AND)
             {
                 query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -210,19 +193,11 @@ namespace eFMS.API.Catalogue.DL.Services
             else
             {
                 query = x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                                                || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "null", StringComparison.OrdinalIgnoreCase) > -1
-                                                                || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null", StringComparison.OrdinalIgnoreCase) > -1)
-                                                                && (x.Active == criteria.Active || criteria.Active == null);
+                            || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                            && (x.Active == criteria.Active || criteria.Active == null);
             }
-            IQueryable<CatCountry> data = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName);
-            if (data == null)
-            {
-                data = DataContext.Get(query);
-            }
-            else
-            {
-                data = data.Where(query);
-            }
+            var data = Get(query);
             return data;
         }
 
@@ -267,6 +242,25 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             }
             return results;
+        }
+
+        public HandleState Update(CatCountryModel model)
+        {
+
+            model.DatetimeModified = DateTime.Now;
+            model.UserModified = currentUser.UserID;
+            if (model.Active == false)
+            {
+                model.InactiveOn = DateTime.Now;
+            }
+            var country = mapper.Map<CatCountry>(model);
+            var result = DataContext.Add(country);
+            if (result.Success)
+            {
+                ClearCache();
+                Get();
+            }
+            return result;
         }
     }
 }

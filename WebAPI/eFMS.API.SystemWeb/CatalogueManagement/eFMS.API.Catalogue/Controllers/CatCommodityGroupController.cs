@@ -134,6 +134,8 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(result);
             }
+            catComonityGroupService.ClearCache();
+            catComonityGroupService.Get();
             return Ok(result);
         }
 
@@ -168,6 +170,8 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(result);
             }
+            catComonityGroupService.ClearCache();
+            catComonityGroupService.Get();
             return Ok(result);
         }
 
@@ -188,6 +192,8 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(result);
             }
+            catComonityGroupService.ClearCache();
+            catComonityGroupService.Get();
             return Ok(result);
         }
         private string CheckExist(short id, CatCommodityGroupEditModel model)

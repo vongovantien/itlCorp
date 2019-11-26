@@ -32,10 +32,10 @@ export class DetailChargeComponent implements OnInit {
         { id: "Loại-Khác", text: "Loại Khác" }
     ];
 
-    activeUnit: any = null;
-    activeCurrency: any = null;
-    activeType: any = null;
-    activeServices: any = null;
+    activeUnit: any = [];
+    activeCurrency: any = [];
+    activeType: any = [];
+    activeServices: any = [];
 
     /**
      * Need to update ngDataServices by get data from databse after implement documentation module
@@ -82,10 +82,15 @@ export class DetailChargeComponent implements OnInit {
                 const indexCurrentCurrency = findIndex(this.ngDataCurrency, function (o) { return o['id'] === idCurrency; });
                 const indexType = findIndex(this.ngDataType, function (o) { return o.id === type; });
 
-                this.activeUnit = [this.ngDataUnit[indexCurrentUnit]];
-                this.activeType = [this.ngDataType[indexType]];
-                this.activeCurrency = [this.ngDataCurrency[indexCurrentCurrency]];
-
+                if (indexCurrentUnit > 0) {
+                    this.activeUnit = [this.ngDataUnit[indexCurrentUnit]];
+                }
+                if (indexCurrentCurrency > 0) {
+                    this.activeCurrency = [this.ngDataCurrency[indexCurrentCurrency]];
+                }
+                if (indexType > 0) {
+                    this.activeType = [this.ngDataType[indexType]];
+                }
             });
         } catch (error) {
             this.toastr.error("Cannot Get Charge Details !");

@@ -13,6 +13,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Common.NoSql;
+using System;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -27,16 +28,19 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCurrencyService catCurrencyService;
+        private readonly ICurrentUser currentUser;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICatCurrencyService</param>
-        public CatCurrencyController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyService service)
+        public CatCurrencyController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyService service,
+            ICurrentUser currUser)
         {
             stringLocalizer = localizer;
             catCurrencyService = service;
+            currentUser = currUser;
         }
 
         /// <summary>
@@ -75,8 +79,8 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("paging")]
         public IActionResult Get(CatCurrrencyCriteria criteria, int page, int size)
         {
-            var data = catCurrencyService.Paging(criteria, page, size, out int rowCount, out int totalPages);
-            var result = new { data, totalItems = rowCount, totalPages, page, size };
+            var data = catCurrencyService.Paging(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
 

@@ -21,31 +21,17 @@ namespace eFMS.API.Catalogue.DL.Services
     public class CatSalemanService : RepositoryBase<CatSaleman, CatSaleManModel>, ICatSaleManService
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
 
-        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
+        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
-            cache = distributedCache;
             currentUser = user;
         }
 
         public IQueryable<CatSaleman> GetSaleMan()
         {
-            var lstSaleMan = RedisCacheHelper.GetObject<List<CatSaleman>>(cache, Templates.CatSaleMan.NameCaching.ListName);
-            IQueryable<CatSaleman> data = null;
-            if (lstSaleMan != null)
-            {
-                data = lstSaleMan.AsQueryable();
-            }
-            else
-            {
-                data = DataContext.Get();
-                //RedisCacheHelper.SetObject(cache, Templates.CatSaleMan.NameCaching.ListName, data);
-            }
-            var results = data?.Select(x => mapper.Map<CatSaleManModel>(x));
-            return results;
+            return DataContext.Get();
         }
 
         public List<CatSaleManModel> GetBy(string partnerId)

@@ -11,14 +11,14 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatCountryService : IRepositoryBase<CatCountry, CatCountryModel>
+    public interface ICatCountryService : IRepositoryBaseCache<CatCountry, CatCountryModel>
     {
         List<CatCountryViewModel> GetByLanguage();
         IQueryable<CatCountryModel> GetCountries(CatCountryCriteria criteria, int page, int size, out int rowsCount);
-        IQueryable<CatCountry> Query(CatCountryCriteria criteria);
+        IQueryable<CatCountryModel> Query(CatCountryCriteria criteria);
         List<CatCountryImportModel> CheckValidImport(List<CatCountryImportModel> list);
         HandleState Import(List<CatCountryImportModel> data);
-        HandleState Update(CatCountryModel model);
         HandleState Delete(short id);
+        HandleState Update(CatCountryModel model);
     }
 }
