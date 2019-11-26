@@ -9,7 +9,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatChargeDefaultAccountService:IRepositoryBase<CatChargeDefaultAccount,CatChargeDefaultAccountModel>
+    public interface ICatChargeDefaultAccountService:IRepositoryBaseCache<CatChargeDefaultAccount,CatChargeDefaultAccountModel>
     {  
         List<CatChargeDefaultAccountImportModel> CheckValidImport(List<CatChargeDefaultAccountImportModel> list);
         HandleState Import(List<CatChargeDefaultAccountImportModel> data);

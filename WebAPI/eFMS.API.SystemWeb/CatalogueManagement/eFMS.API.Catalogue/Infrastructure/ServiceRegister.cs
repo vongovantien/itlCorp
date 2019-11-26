@@ -47,6 +47,18 @@ namespace eFMS.API.Catalogue.Infrastructure
             new CacheServiceBase<CatCountry>(x.GetRequiredService<IConnectionMultiplexer>()
             , Enum.GetName(typeof(CacheEntity), CacheEntity.CatCountry)));
 
+            services.AddSingleton<ICacheServiceBase<CatArea>>(x =>
+            new CacheServiceBase<CatArea>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatArea)));
+
+            services.AddSingleton<ICacheServiceBase<CatCharge>>(x =>
+            new CacheServiceBase<CatCharge>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatArea)));
+
+            services.AddSingleton<ICacheServiceBase<CatPartner>>(x =>
+            new CacheServiceBase<CatPartner>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatPartner)));
+
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ICatBranchService, CatBranchService>();
             services.AddTransient<ICatPlaceService, CatPlaceService>();

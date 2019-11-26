@@ -23,23 +23,26 @@ using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.Helpers;
+using ITL.NetCore.Connection.Caching;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatPlaceService : RepositoryBase<CatPlace, CatPlaceModel>, ICatPlaceService
+    public class CatPlaceService : RepositoryBaseCache<CatPlace, CatPlaceModel>, ICatPlaceService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<CatCountry> countryRepository;
         private readonly IContextBase<CatArea> areaRepository;
+
         public CatPlaceService(IContextBase<CatPlace> repository, 
-            IMapper mapper, 
-            IStringLocalizer<LanguageSub> localizer, 
-            IDistributedCache distributedCache, 
+            ICacheServiceBase<CatPlace> cacheService, 
+            IMapper mapper,
+            IStringLocalizer<LanguageSub> localizer,
+            IDistributedCache distributedCache,
             ICurrentUser user,
             IContextBase<CatCountry> countryRepo,
-            IContextBase<CatArea> areaRepo) : base(repository, mapper)
+            IContextBase<CatArea> areaRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             cache = distributedCache;

@@ -17,17 +17,20 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
 using System.Linq.Expressions;
+using ITL.NetCore.Connection.Caching;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatCurrencyService : RepositoryBase<CatCurrency, CatCurrencyModel>, ICatCurrencyService
+    public class CatCurrencyService : RepositoryBaseCache<CatCurrency, CatCurrencyModel>, ICatCurrencyService
     {
-        private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
-        public CatCurrencyService(IContextBase<CatCurrency> repository, IMapper mapper, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
+
+        public CatCurrencyService(IContextBase<CatCurrency> repository, 
+            ICacheServiceBase<CatCurrency> cacheService, 
+            IMapper mapper,
+            ICurrentUser currUser) : base(repository, cacheService, mapper)
         {
-            currentUser = user;
-            cache = distributedCache;
+            currentUser = currUser;
             SetChildren<CatCharge>("Id", "CurrencyId");
             SetChildren<CatCurrencyExchange>("Id", "CurrencyFromId");
             SetChildren<CatCurrencyExchange>("Id", "CurrencyToId");
@@ -42,19 +45,17 @@ namespace eFMS.API.Catalogue.DL.Services
         #region CRUD
         public override HandleState Add(CatCurrencyModel entity)
         {
-            var currency = mapper.Map<CatCurrency>(entity);
-            currency.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
-            currency.Active = true;
-            currency.UserCreated = currentUser.UserID;
-            var result = DataContext.Add(currency, true);
+            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
+            entity.Active = true;
+            entity.UserCreated = currentUser.UserID;
+            var result = DataContext.Add(entity);
             if (result.Success)
             {
-                cache.Remove(Templates.CatCurrency.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatCurrency.NameCaching.ListName, DataContext.Get());
+                ClearCache();
+                Get();
             }
             return result;
         }
-
         public HandleState Update(CatCurrencyModel model)
         {
             HandleState result = new HandleState();
@@ -80,10 +81,10 @@ namespace eFMS.API.Catalogue.DL.Services
                             DataContext.Update(item, x => x.Id == item.Id, false);
                         }
                     }
+                    DataContext.SubmitChanges();
+                    ClearCache();
+                    Get();
                 }
-                DataContext.SubmitChanges();
-                cache.Remove(Templates.CatCurrency.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatCurrency.NameCaching.ListName, DataContext.Get());
             }
             catch (Exception ex)
             {
@@ -96,50 +97,18 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
-            if (hs.Success)
+            if(hs.Success == true)
             {
-                cache.Remove(Templates.CatCurrency.NameCaching.ListName);
-                RedisCacheHelper.SetObject(cache, Templates.CatCurrency.NameCaching.ListName, DataContext.Get());
+                ClearCache();
+                Get();
             }
             return hs;
         }
         #endregion
 
-        public IQueryable<CatCurrencyModel> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount, out int totalPages)
+        public IQueryable<CatCurrencyModel> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount)
         {
-            var data = GetBy(criteria);
-            IQueryable<CatCurrencyModel> results = null;
-            if (data == null)
-            {
-                rowsCount = 0;
-                totalPages = 0;
-            }
-            else
-            {
-                rowsCount = data.Count();
-                data = data.OrderByDescending(x => x.DatetimeModified);
-                totalPages = (rowsCount % pageSize == 0) ? rowsCount / pageSize : (rowsCount / pageSize) + 1;
-                if (pageSize > 1)
-                {
-                    if (pageNumber < 1)
-                    {
-                        pageNumber = 1;
-                    }
-                    results = data.Skip((pageNumber - 1) * pageSize).Take(pageSize).ProjectTo<CatCurrencyModel>(mapper.ConfigurationProvider);
-                }
-            }
-            return results;
-        }
-        public IQueryable<CatCurrencyModel> Query(CatCurrrencyCriteria criteria)
-        {
-            IQueryable<CatCurrency> data = GetBy(criteria);
-            if (data == null) return null;
-            return data.ProjectTo<CatCurrencyModel>(mapper.ConfigurationProvider);
-        }
-
-        private IQueryable<CatCurrency> GetBy(CatCurrrencyCriteria criteria)
-        {
-            Expression<Func<CatCurrency, bool>> query;
+            Expression<Func<CatCurrencyModel, bool>> query;
             if (criteria.All == null)
             {
                 query = (x => (x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -150,27 +119,33 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = (x => (x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.CurrencyName ?? "").IndexOf(criteria.CurrencyName ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }
-            IQueryable<CatCurrency> data = RedisCacheHelper.Get<CatCurrency>(cache, Templates.CatCurrency.NameCaching.ListName);
-            if(data == null)
+            var data = Paging(query, pageNumber, pageSize, out rowsCount);
+            return data;
+        }
+        public IQueryable<CatCurrencyModel> Query(CatCurrrencyCriteria criteria)
+        {
+            return GetBy(criteria);
+        }
+
+        private IQueryable<CatCurrencyModel> GetBy(CatCurrrencyCriteria criteria)
+        {
+            Expression<Func<CatCurrencyModel, bool>> query;
+            if (criteria.All == null)
             {
-                data = DataContext.Get(query);
+                query = (x => (x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                       && (x.CurrencyName ?? "").IndexOf(criteria.CurrencyName ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }
             else
             {
-                data = data.Where(query);
+                query = (x => (x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.CurrencyName ?? "").IndexOf(criteria.CurrencyName ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }
-            return data;
+            return Get(query);
         }
 
         public IQueryable<CatCurrencyModel> GetAll()
         {
-            IQueryable<CatCurrency> data = RedisCacheHelper.Get<CatCurrency>(cache, Templates.CatCurrency.NameCaching.ListName);
-            if (data == null)
-            {
-                data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatCurrency.NameCaching.ListName, DataContext.Get());
-            }
-            return data.ProjectTo<CatCurrencyModel>(mapper.ConfigurationProvider);
+            return Get();
         }
     }
 }

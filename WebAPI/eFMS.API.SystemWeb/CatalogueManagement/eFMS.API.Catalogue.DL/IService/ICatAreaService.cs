@@ -8,7 +8,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatAreaService : IRepositoryBase<CatArea, CatAreaModel>
+    public interface ICatAreaService : IRepositoryBaseCache<CatArea, CatAreaModel>
     {
         List<CatAreaViewModel> GetByLanguage();
     }

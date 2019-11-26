@@ -116,10 +116,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-
-            catCountry.DatetimeCreated = catCountry.DatetimeModified = DateTime.Now;
-            catCountry.UserCreated = catCountry.UserModified = currentUser.UserID;
-            catCountry.Active = true;
+            
             var hs = catCountryService.Add(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -127,7 +124,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(result);
             }
-            catCountryService.ClearCache();
             return Ok(result);
         }
 
@@ -148,13 +144,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
 
-            catCountry.DatetimeModified = DateTime.Now;
-            catCountry.UserModified = currentUser.UserID;
-            if (catCountry.Active == false)
-            {
-                catCountry.InactiveOn = DateTime.Now;
-            }
-            var hs = catCountryService.Update(catCountry, x => x.Id == catCountry.Id);
+            var hs = catCountryService.Update(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

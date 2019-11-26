@@ -19,5 +19,6 @@ namespace eFMS.API.Catalogue.DL.IService
         List<CatCountryImportModel> CheckValidImport(List<CatCountryImportModel> list);
         HandleState Import(List<CatCountryImportModel> data);
         HandleState Delete(short id);
+        HandleState Update(CatCountryModel model);
     }
 }

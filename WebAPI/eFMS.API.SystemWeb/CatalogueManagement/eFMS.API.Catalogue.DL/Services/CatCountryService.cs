@@ -47,6 +47,21 @@ namespace eFMS.API.Catalogue.DL.Services
         }
 
         #region CRUD
+        public override HandleState Add(CatCountryModel entity)
+        {
+            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
+            entity.UserCreated = entity.UserModified = currentUser.UserID;
+            entity.Active = true;
+            var country = mapper.Map<CatCountry>(entity);
+            var result = DataContext.Add(country);
+            if (result.Success)
+            {
+                ClearCache();
+                Get();
+            }
+            return result;
+        }
+
         public HandleState Delete(short id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
@@ -54,6 +69,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 ClearCache();
+                Get();
             }
             return hs;
         }
@@ -110,7 +126,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 DataContext.SubmitChanges();
                 ClearCache();
-
+                Get();
                 return new HandleState();
             }
             catch (Exception ex)
@@ -177,9 +193,9 @@ namespace eFMS.API.Catalogue.DL.Services
             else
             {
                 query = x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                                                || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "null", StringComparison.OrdinalIgnoreCase) > -1
-                                                                || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null", StringComparison.OrdinalIgnoreCase) > -1)
-                                                                && (x.Active == criteria.Active || criteria.Active == null);
+                            || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                            && (x.Active == criteria.Active || criteria.Active == null);
             }
             var data = Get(query);
             return data;
@@ -226,6 +242,25 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             }
             return results;
+        }
+
+        public HandleState Update(CatCountryModel model)
+        {
+
+            model.DatetimeModified = DateTime.Now;
+            model.UserModified = currentUser.UserID;
+            if (model.Active == false)
+            {
+                model.InactiveOn = DateTime.Now;
+            }
+            var country = mapper.Map<CatCountry>(model);
+            var result = DataContext.Add(country);
+            if (result.Success)
+            {
+                ClearCache();
+                Get();
+            }
+            return result;
         }
     }
 }
