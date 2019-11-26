@@ -16,10 +16,10 @@
                     </span>
                 </span>
             </button>
-            <app-default-button (click)="AddOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
+            <app-default-button (click)="addOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
                 [dataTarget]="saveButtonSetting.dataTarget">
             </app-default-button>
-            <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
+            <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </div>
 </div>
@@ -45,7 +45,7 @@
                     <div class="form-group">
                         <div class="c-button-actions">
                             <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                                (click)="OnRemove()">
+                                (click)="onRemove()">
                                 <span>
                                     <i class="la la-trash"></i>
                                     <span>
@@ -134,7 +134,7 @@
         </div>
     </div>
 </form-manifest-sea-fcl-import>
-<add-hbl-to-manifest-popup (onAdd)="OnAdd()"></add-hbl-to-manifest-popup>
+<add-hbl-to-manifest-popup (onAdd)="onAdd()"></add-hbl-to-manifest-popup>
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>

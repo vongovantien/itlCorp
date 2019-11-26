@@ -61,12 +61,13 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
     }
 
+    ngOnInit() { }
+
     ngAfterViewInit() {
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.hblId) {
                 this.hblId = param.hblId;
                 this.jobId = param.id;
-
                 this._store.dispatch(new fromStore.GetDetailHBLAction(this.hblId));
 
                 this.getDetailHbl();
@@ -216,34 +217,27 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                         this.formHouseBill.consigneeDescription.setValue(this.hblDetail.consigneeDescription);
                         this.formHouseBill.notifyPartyDescription.setValue(this.hblDetail.notifyPartyDescription);
                         this.formHouseBill.alsonotifyPartyDescription.setValue(this.hblDetail.alsoNotifyPartyDescription);
-
                         this.formHouseBill.hwbno.setValue(this.hblDetail.hwbno);
                         this.formHouseBill.pickupPlace.setValue(this.hblDetail.pickupPlace);
-                        // this.formHouseBill.eta.setValue(this.hblDetail.eta);
                         !!this.hblDetail.eta ? this.formHouseBill.eta.setValue({ startDate: new Date(this.hblDetail.eta), endDate: new Date(this.hblDetail.eta) }) : this.formHouseBill.eta.setValue(null), // * Date;
                             this.formHouseBill.finalDestinationPlace.setValue(this.hblDetail.finalDestinationPlace);
-
                         this.formHouseBill.selectedShipper = { field: 'shortName', value: this.hblDetail.shipperId };
-                        this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === this.hblDetail.hbltype)[0]);
-                        this.formHouseBill.servicetype.setValue(this.formHouseBill.serviceTypes.filter(i => i.value === this.hblDetail.serviceType)[0]);
+
                         this.formHouseBill.localVessel.setValue(this.hblDetail.localVessel);
                         this.formHouseBill.localVoyNo.setValue(this.hblDetail.localVoyNo);
                         this.formHouseBill.oceanVessel.setValue(this.hblDetail.oceanVessel);
                         this.formHouseBill.oceanVoyNo.setValue(this.hblDetail.oceanVoyNo);
                         !!this.hblDetail.documentDate ? this.formHouseBill.documentDate.setValue({ startDate: new Date(this.hblDetail.documentDate), endDate: new Date(this.hblDetail.documentDate) }) : this.formHouseBill.documentDate.setValue(null), // * Date;
-
                             this.formHouseBill.documentNo.setValue(this.hblDetail.documentNo);
                         !!this.hblDetail.etawarehouse ? this.formHouseBill.etawarehouse.setValue({ startDate: new Date(this.hblDetail.etawarehouse), endDate: new Date(this.hblDetail.etawarehouse) }) : this.formHouseBill.etawarehouse.setValue(null), // * Date;
                             this.formHouseBill.warehouseNotice.setValue(this.hblDetail.warehouseNotice);
                         this.formHouseBill.shippingMark.setValue(this.hblDetail.shippingMark);
                         this.formHouseBill.remark.setValue(this.hblDetail.remark);
                         !!this.hblDetail.issueHbldate ? this.formHouseBill.issueHBLDate.setValue({ startDate: new Date(this.hblDetail.issueHbldate), endDate: new Date(this.hblDetail.issueHbldate) }) : this.formHouseBill.issueHBLDate.setValue(null), // * Date;
-
                             this.formHouseBill.referenceNo.setValue(this.hblDetail.referenceNo);
                         this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.hblDetail.originBlnumber)[0]);
                         this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? this.createMoment(this.hblDetail.etd) : null;
                         this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? this.createMoment(this.hblDetail.eta) : null;
-
                         setTimeout(() => {
                             this.formHouseBill.saleMans.forEach(item => {
                                 if (item.id === this.hblDetail.saleManId) {
@@ -260,7 +254,11 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                             this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: this.hblDetail.pod };
                             this.formHouseBill.selectedSupplier = { field: 'id', value: this.hblDetail.coloaderId };
                             this.formHouseBill.selectedPlaceOfIssued = { field: 'id', value: this.hblDetail.issueHblplace };
+                            this.formHouseBill.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.hblDetail.serviceType, text: this.hblDetail.serviceType }]);
+                            this.formHouseBill.hbltype.setValue([<CommonInterface.INg2Select>{ id: this.hblDetail.hbltype, text: this.hblDetail.hbltype }]);
+
                         }, 500);
+
                     }
 
                     // * Dispatch to save containers.
