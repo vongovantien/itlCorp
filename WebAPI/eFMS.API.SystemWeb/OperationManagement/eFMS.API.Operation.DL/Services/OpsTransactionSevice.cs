@@ -15,34 +15,18 @@ using Microsoft.Extensions.Caching.Distributed;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using ITL.NetCore.Connection.Caching;
 
 namespace eFMS.API.Operation.DL.Services
 {
     public class OpsTransactionSevice : RepositoryBase<OpsTransaction, OpsTransactionModel>, IOpsTransactionService
     {
         private readonly ICurrentUser currentUser;
-        private readonly IDistributedCache cache;
-
-        public OpsTransactionSevice(IContextBase<OpsTransaction> repository, IMapper mapper, ICurrentUser user, IDistributedCache distributedCache) : base(repository, mapper)
+        public OpsTransactionSevice(IContextBase<OpsTransaction> repository,
+            IMapper mapper,
+            ICurrentUser user) : base(repository, mapper)
         {
             currentUser = user;
-            cache = distributedCache;
-        }
-        
-        public IQueryable<OpsTransaction> Get()
-        {
-            var clearanceCaching = RedisCacheHelper.GetObject<List<OpsTransaction>>(cache, Templates.OpsTransaction.NameCaching.ListName);
-            IQueryable<OpsTransaction> opsTransactions = null;
-            if (clearanceCaching == null)
-            {
-                opsTransactions = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.OpsTransaction.NameCaching.ListName, opsTransactions);
-            }
-            else
-            {
-                opsTransactions = clearanceCaching.AsQueryable();
-            }
-            return opsTransactions;
         }
 
         public OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount)

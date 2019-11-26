@@ -8,12 +8,12 @@ using System.Linq;
 
 namespace eFMS.API.Operation.DL.IService
 {
-    public interface ICustomsDeclarationService : IRepositoryBase<CustomsDeclaration, CustomsDeclarationModel>
+    public interface ICustomsDeclarationService : IRepositoryBaseCache<CustomsDeclaration, CustomsDeclarationModel>
     {
         IQueryable<CustomsDeclarationModel> GetAll();
         object GetClearanceTypeData();
         HandleState ImportClearancesFromEcus();
-        List<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount);
+        IQueryable<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount);
         List<CustomsDeclarationModel> GetCustomDeclaration(string keysearch, string customerNo, bool impPorted, int pageNumber, int pageSize, out int rowsCount);
         IQueryable<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria);
         List<CustomsDeclarationModel> GetBy(string jobNo);

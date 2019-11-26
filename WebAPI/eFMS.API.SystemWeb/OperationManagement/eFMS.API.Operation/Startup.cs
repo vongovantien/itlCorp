@@ -41,17 +41,12 @@ namespace eFMS.API.Operation
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper();
-            services.AddDistributedRedisCache(options =>
-            {
-                options.InstanceName = "Operation";
-                options.Configuration = Configuration.GetConnectionString("Redis");
-            });
             services.AddSession();
             services.AddAuthorize(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
-            ServiceRegister.Register(services);
+            ServiceRegister.Register(services, Configuration);
             services.AddCrossOrigin();
             services.AddApiVersioning(config =>
             {

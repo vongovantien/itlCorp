@@ -19,6 +19,7 @@ namespace eFMS.API.Operation.Infrastructure
             CreateMap<CustomsDeclaration, CustomsDeclarationModel>();
             CreateMap<CustomsDeclarationModel, CustomsDeclaration>();
             CreateMap<sp_GetCustomDeclaration, CustomsDeclarationModel>();
+            CreateMap<OpsTransaction, OpsTransactionModel>();
         }
     }
 }

@@ -344,6 +344,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (item.Id == Guid.Empty)
                     {
                         item.Id = Guid.NewGuid();
+                        item.ExchangeDate = DateTime.Now;
                         DataContext.Add(item, false);
                     }
                     else

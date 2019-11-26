@@ -77,12 +77,10 @@ namespace eFMS.API.ReportData.Controllers
         [HttpPost]
         public async Task<IActionResult> ExportPartner(CatPartnerCriteria catPartnerCriteria)
         {
-            var author = Request.Headers["author"];
-            var partnerType = Request.Headers["partnerType"];
             Helper helper = new Helper();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPartnerCriteria, aPis.HostStaging + Urls.Catelogue.CatPartnerUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatPartner>>();  
-            var stream = helper.CreatePartnerExcelFile(dataObjects.Result, partnerType, author);
+            var stream = helper.CreatePartnerExcelFile(dataObjects.Result, catPartnerCriteria.PartnerType, catPartnerCriteria.Author);
             return new FileHelper().ExportExcel(stream, FilesNames.PartnerData);
         }
         /// <summary>
