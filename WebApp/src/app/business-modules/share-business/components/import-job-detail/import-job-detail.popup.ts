@@ -8,6 +8,8 @@ import { PopupBase } from 'src/app/popup.base';
 
 export class ShareBusinessImportJobDetailPopupComponent extends PopupBase implements OnInit {
     headers: CommonInterface.IHeaderTable[];
+    dataSearch: any = {};
+
     constructor() {
         super();
 

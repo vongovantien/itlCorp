@@ -483,16 +483,12 @@ export class FormAddHouseBillComponent extends AppForm {
     }
 
     bindSalemanImport(data: string) {
-
         this.saleMans.forEach(item => {
             if (item.id === data) {
                 this.selectedSaleman = item;
             }
         });
     }
-
-
-
 
     getListCustomer() {
         this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER })

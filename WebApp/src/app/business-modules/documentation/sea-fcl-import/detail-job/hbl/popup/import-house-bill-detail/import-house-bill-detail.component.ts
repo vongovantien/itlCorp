@@ -36,7 +36,6 @@ export class ImportHouseBillDetailComponent extends PopupBase {
 
 
     ngOnInit() {
-
         this.dataSearch.jobId = this.jobId;
         this.headers = [
             { title: 'HBL No', field: 'hwbno', sortable: true },
