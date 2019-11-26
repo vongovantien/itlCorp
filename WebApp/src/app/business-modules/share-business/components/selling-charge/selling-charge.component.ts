@@ -122,9 +122,12 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                             for (const freightCharge of res.csArrivalFrieghtCharges) {
                                 const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge(freightCharge);
                                 newSurCharge.id = SystemConstants.EMPTY_GUID;
-
                                 newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
                                 newSurCharge.invoiceDate = null;
+
+                                // * Default get partner = customer name's hbl.
+                                newSurCharge.partnerName = this.hbl.customerName;
+                                newSurCharge.paymentObjectId = this.hbl.customerId;
 
                                 this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
                             }

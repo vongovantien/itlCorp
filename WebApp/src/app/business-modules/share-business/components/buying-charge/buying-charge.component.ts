@@ -386,7 +386,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             chargeItem.partnerName = partnerData.shortName;
             chargeItem.paymentObjectId = partnerData.id;
             chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
-
         }
     }
 
