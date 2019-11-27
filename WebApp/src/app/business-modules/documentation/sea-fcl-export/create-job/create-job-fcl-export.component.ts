@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -35,6 +35,8 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
+        protected _cdr: ChangeDetectorRef,
+
 
     ) {
         super();
@@ -51,6 +53,13 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
                         this.containers = action.payload;
                     }
                 });
+    }
+
+    ngAfterViewInit() {
+        // * Init container
+        this.shipmentGoodSummaryComponent.initContainer();
+        this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
+        this._cdr.detectChanges();
     }
 
     onSubmitData() {
@@ -87,7 +96,6 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             grossWeight: this.shipmentGoodSummaryComponent.grossWeight,
             chargeWeight: this.shipmentGoodSummaryComponent.totalChargeWeight,
             cbm: this.shipmentGoodSummaryComponent.totalCBM,
-
         };
 
 
@@ -132,8 +140,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        // TODO goto detail.
-                        // this._router.navigate([`home/documentation/sea-fcl-export/${res.model.id}`]);
+                        this._router.navigate([`home/documentation/sea-fcl-export/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }

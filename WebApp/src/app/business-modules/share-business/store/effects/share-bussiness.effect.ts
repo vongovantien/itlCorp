@@ -8,7 +8,7 @@ import { Observable, of } from "rxjs";
 
 import { switchMap, catchError, map } from "rxjs/operators";
 import {
-    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction
+    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction, TransactionLoadListSuccessAction, TransactionLoadListFailAction
 } from "../actions";
 import { ITransactionProfit } from "../reducers";
 
@@ -20,6 +20,20 @@ export class ShareBussinessEffects {
         private _documentRepo: DocumentationRepo
     ) { }
 
+
+    @Effect()
+    getListShipmentEffect$: Observable<Action> = this.actions$.
+        pipe(
+            ofType<TransactionActions>(TransactionActionTypes.LOAD_LIST),
+            map((payload: any) => payload.payload),
+            switchMap(
+                (param: any) => this._documentRepo.getListShipmentDocumentation(param.page, param.size, param.dataSearch)
+                    .pipe(
+                        map((data: any) => new TransactionLoadListSuccessAction(data)),
+                        catchError(err => of(new TransactionLoadListFailAction(err)))
+                    )
+            )
+        );
 
     @Effect()
     getDetailSeaFCLImportEffect$: Observable<Action> = this.actions$.

@@ -15,7 +15,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import * as fromShareBussiness from './../../../../share-business/store';
 
-import { catchError, finalize, take, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -183,10 +183,6 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.selectedTabSurcharge = tabName;
 
         if (!!this.selectedHbl) {
-            // this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: this.selectedHbl.id }));
-            // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.selectedHbl.jobId));
-            // this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
-
             switch (this.selectedTabSurcharge) {
                 case 'BUY':
                     this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));

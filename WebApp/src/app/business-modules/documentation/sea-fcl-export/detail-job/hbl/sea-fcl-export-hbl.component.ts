@@ -35,7 +35,7 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
 
     constructor(
         private _router: Router,
-        private _store: Store<fromStore.ISeaFCLExport>,
+        private _store: Store<fromShareBussiness.IShareBussinessState>,
         private _documentRepo: DocumentationRepo
     ) {
         super();
@@ -87,7 +87,7 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
 
         // * Get container, Job detail, Surcharge with hbl id, JobId.
         this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: hbl.id }));
-        this._store.dispatch(new fromStore.SeaFCLExportGetDetailAction(hbl.jobId));
+        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(hbl.jobId));
         this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
         switch (this.selectedTabSurcharge) {
@@ -109,10 +109,6 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
         this.selectedTabSurcharge = tabName;
 
         if (!!this.selectedHbl) {
-            this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: this.selectedHbl.id }));
-            this._store.dispatch(new fromStore.SeaFCLExportGetDetailAction(this.selectedHbl.jobId));
-            this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
-
             switch (this.selectedTabSurcharge) {
                 case 'BUY':
                     this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));

@@ -19,6 +19,7 @@ export interface ITransactionProfit {
 export interface ITransactionState {
     profits: ITransactionProfit[];
     cstransaction: CsTransaction;
+    cstransactions: CsTransaction[],
     isLoading: boolean;
     isLoaded: boolean;
 }
@@ -26,6 +27,7 @@ export interface ITransactionState {
 export const initState: ITransactionState = {
     profits: [],
     cstransaction: new CsTransaction(),
+    cstransactions: [],
     isLoading: false,
     isLoaded: false
 };
@@ -33,13 +35,21 @@ export const initState: ITransactionState = {
 
 export function TransactionReducer(state = initState, action: TransactionActions): ITransactionState {
     switch (action.type) {
+
+        case TransactionActionTypes.LOAD_LIST: {
+            return { ...state, isLoading: true, isLoaded: false };
+        }
+
+        case TransactionActionTypes.LOAD_LIST_SUCCESS: {
+            return { ...state, cstransactions: action.payload, isLoading: false, isLoaded: true };
+        }
+
         case TransactionActionTypes.GET_PROFIT: {
             return { ...state, isLoaded: false, isLoading: true };
         }
+
         case TransactionActionTypes.GET_PROFIT_SUCCESS: {
-            return {
-                ...state, profits: [...action.payload], isLoaded: true, isLoading: false
-            };
+            return { ...state, profits: [...action.payload], isLoaded: true, isLoading: false };
         }
 
         case TransactionActionTypes.GET_DETAIL: {

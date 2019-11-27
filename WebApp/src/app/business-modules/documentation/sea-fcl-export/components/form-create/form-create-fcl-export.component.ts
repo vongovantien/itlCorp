@@ -15,7 +15,7 @@ import { User } from 'src/app/shared/models';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
-import * as fromStore from './../../store';
+import * as fromShare from './../../../../share-business/store';
 
 @Component({
     selector: 'form-create-sea-fcl-export',
@@ -75,7 +75,7 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
         private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
         private _fb: FormBuilder,
-        private _store: Store<fromStore.SeaFCLExportActions>
+        private _store: Store<fromShare.IShareBussinessState>
 
     ) {
         super();
@@ -92,10 +92,10 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
         this.getUserLogged();
 
         // * Subscribe state to update form.
-        this._store.select(fromStore.getSeaFCLShipmentDetail)
+        this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), skip(1))
             .subscribe(
-                (res: ISeaFCLExportDetail) => {
+                (res: ISeaFCLExportDetail | any) => {
                     if (!!res) {
                         this.formCreateFCLExport.setValue({
                             jobID: res.jobNo,
@@ -254,12 +254,12 @@ interface ISeaFCLExportDetail {
     chargeWeight: number;
     coloaderId: string;
     commodity: string;
-    creatorName: null
+    creatorName: null;
     currentStatus: string;
-    customerId: null
+    customerId: null;
     datetimeCreated: string;
     datetimeModified: string;
-    deliveryPlace: null
+    deliveryPlace: null;
     desOfGoods: string;
     eta: string;
     etd: string;
@@ -269,7 +269,7 @@ interface ISeaFCLExportDetail {
     hwbNo: string;
     id: string;
     inactiveOn: string;
-    isLocked: false
+    isLocked: false;
     jobNo: string;
     lockedDate: string;
     mawb: string;

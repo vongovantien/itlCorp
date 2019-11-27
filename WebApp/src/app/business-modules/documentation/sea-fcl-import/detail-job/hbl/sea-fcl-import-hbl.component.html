@@ -143,13 +143,19 @@
                                 <div class="m-portlet__body">
                                     <tabset class="custom-class-tab">
                                         <tab heading="Buying" (selectTab)="onSelectTabSurcharge('BUY')">
-                                            <buying-charge></buying-charge>
+                                            <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
+                                                <buying-charge></buying-charge>
+                                            </ng-container>
                                         </tab>
                                         <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
-                                            <selling-charge></selling-charge>
+                                            <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
+                                                <selling-charge></selling-charge>
+                                            </ng-container>
                                         </tab>
                                         <tab heading="OBH" (selectTab)="onSelectTabSurcharge('OBH')">
-                                            <obh-charge></obh-charge>
+                                            <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
+                                                <obh-charge></obh-charge>
+                                            </ng-container>
                                         </tab>
                                     </tabset>
                                 </div>

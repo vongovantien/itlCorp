@@ -76,6 +76,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this._store.select(fromRoot.getDataRouterState).subscribe(
             (dataParam: CommonInterface.IDataParam) => {
                 this.serviceTypeId = dataParam.serviceId;
+                console.log(this.serviceTypeId);
             }
         );
     }
@@ -201,6 +202,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (hbl: any) => {
                     this.hbl = hbl;
+                    console.log("detail hbl", this.hbl);
                 }
             );
     }

@@ -2,6 +2,10 @@ import { Action } from '@ngrx/store';
 
 
 export enum TransactionActionTypes {
+    LOAD_LIST = '[Transaction] Load List',
+    LOAD_LIST_SUCCESS = '[Transaction] Load Success',
+    LOAD_LIST_FAIL = '[Transaction] Load Fail',
+
     GET_DETAIL = '[Transaction] Get Detail',
     GET_DETAIL_SUCCESS = '[Transaction] Get Detail Success',
     GET_DETAIL_FAIL = '[Transaction] Get Detail Fail',
@@ -13,6 +17,23 @@ export enum TransactionActionTypes {
     GET_PROFIT = '[Transaction] Get Profit',
     GET_PROFIT_SUCCESS = '[Transaction] Get Profit Success',
     GET_PROFIT_FAIL = '[Transaction] Get Profit Fail',
+}
+
+export class TransactionLoadListAction implements Action {
+    readonly type = TransactionActionTypes.LOAD_LIST;
+    constructor(public payload: any) { }
+}
+
+export class TransactionLoadListSuccessAction implements Action {
+    readonly type = TransactionActionTypes.LOAD_LIST_SUCCESS;
+    constructor(public payload: any) { }
+}
+
+
+export class TransactionLoadListFailAction implements Action {
+    readonly type = TransactionActionTypes.LOAD_LIST_FAIL;
+
+    constructor(public payload: any) { }
 }
 
 export class TransactionGetDetailAction implements Action {
@@ -68,7 +89,10 @@ export class TransactionGetProfitFailFailAction implements Action {
 }
 
 export type TransactionActions =
-    TransactionGetProfitAction
+    TransactionLoadListAction
+    | TransactionLoadListSuccessAction
+    | TransactionLoadListFailAction
+    | TransactionGetProfitAction
     | TransactionGetProfitSuccessAction
     | TransactionGetProfitFailFailAction
     | TransactionGetDetailAction

@@ -7,14 +7,13 @@ import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { AppList } from 'src/app/app.list';
-import { SeaFCLExportLoadAction } from './store/actions/sea-fcl-export.action';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CsTransactionDetail } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
-import * as fromStore from './store';
+import * as fromShare from './../../share-business/store';
 
 
 @Component({
@@ -40,7 +39,7 @@ export class SeaFCLExportComponent extends AppList {
         private _sortService: SortService,
         private _documentRepo: DocumentationRepo,
         private _ngProgessService: NgProgress,
-        private _store: Store<fromStore.ISeaFCLExport>
+        private _store: Store<fromShare.IShareBussinessState>
     ) {
         super();
 
@@ -49,7 +48,7 @@ export class SeaFCLExportComponent extends AppList {
         this.requestList = this.requestSearchShipment;
         this.requestSort = this.sortShipment;
 
-        this.isLoading = <any>this._store.select(fromStore.getSeaFCLShipmentLoading);
+        this.isLoading = <any>this._store.select(fromShare.getTransationLoading);
 
         this.dataSearch = {
             transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport,
@@ -92,7 +91,7 @@ export class SeaFCLExportComponent extends AppList {
 
 
     getShipments() {
-        this._store.select(fromStore.getSeaFCLExportShipment)
+        this._store.select(fromShare.getTransactionListShipment)
             .pipe(
                 takeUntil(this.ngUnsubscribe),
             )
@@ -136,7 +135,7 @@ export class SeaFCLExportComponent extends AppList {
     }
 
     requestSearchShipment() {
-        this._store.dispatch(new SeaFCLExportLoadAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+        this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     confirmDelete(item: { id: string; }) {
@@ -166,7 +165,7 @@ export class SeaFCLExportComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        this._store.dispatch(new SeaFCLExportLoadAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+                        this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
                     } else {
                         this._toastService.error(res.message);
                     }
