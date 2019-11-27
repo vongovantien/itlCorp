@@ -49,6 +49,11 @@ namespace eFMS.API.Operation.Infrastructure
             new CacheServiceBase<CustomsDeclaration>(x.GetRequiredService<IConnectionMultiplexer>()
             , Enum.GetName(typeof(CacheEntity), CacheEntity.CustomsDeclaration)));
 
+            services.AddSingleton<ICacheServiceBase<SetEcusconnection>>(x =>
+            new CacheServiceBase<SetEcusconnection>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.SetEcusconnection)));
+
+
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<IOpsStageAssignedService, OpsStageAssignedService>();
             services.AddTransient<IEcusConnectionService, EcusConnectionService>();

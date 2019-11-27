@@ -7,7 +7,7 @@ import { SortService } from "src/app/shared/services";
     selector: 'add-remaining-charge-popup',
     templateUrl: './add-remaining-charge.popup.html'
 })
-export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
+export class ShareBussinessCdNoteAddRemainingChargePopupComponent extends PopupBase {
     @Output() onAddCharge: EventEmitter<any> = new EventEmitter<any>();
 
     headers: CommonInterface.IHeaderTable[];

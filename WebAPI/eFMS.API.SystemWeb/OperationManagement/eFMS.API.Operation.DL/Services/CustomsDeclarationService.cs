@@ -36,6 +36,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly ICatCommodityApiService commodityApi;
         private readonly ICurrentUser currentUser;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly IContextBase<CatCommodity> commodityRepository;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, 
             ICacheServiceBase<CustomsDeclaration> cacheService, 
@@ -46,7 +47,8 @@ namespace eFMS.API.Operation.DL.Services
             , ICatCountryApiService country
             , ICatCommodityApiService commodity
             , ICurrentUser user,
-            IStringLocalizer<LanguageSub> localizer) : base(repository, cacheService, mapper)
+            IStringLocalizer<LanguageSub> localizer,
+            IContextBase<CatCommodity> commodityRepo) : base(repository, cacheService, mapper)
         {
             ecusCconnectionService = ecusCconnection;
             catPartnerApi = catPartner;
@@ -55,6 +57,7 @@ namespace eFMS.API.Operation.DL.Services
             commodityApi = commodity;
             currentUser = user;
             stringLocalizer = localizer;
+            commodityRepository = commodityRepo;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -65,8 +68,7 @@ namespace eFMS.API.Operation.DL.Services
         public HandleState ImportClearancesFromEcus()
         {
             string userId = currentUser.UserID;
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var connections = dc.SetEcusconnection.Where(x => x.UserId == userId);
+            var connections = ecusCconnectionService.Get(x => x.UserId == userId);
             var result = new HandleState();
             var lists = new List<CustomsDeclaration>();
             foreach (var item in connections)
@@ -78,7 +80,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
                 else
                 {
-                    var clearances = dc.CustomsDeclaration.ToList();
+                    var clearances = DataContext.Get();
                     foreach (var clearance in clearanceEcus)
                     {
                         var clearanceNo = clearance.SOTK?.ToString().Trim();
@@ -97,8 +99,11 @@ namespace eFMS.API.Operation.DL.Services
             {
                 if (lists.Count > 0)
                 {
-                    dc.CustomsDeclaration.AddRange(lists);
-                    dc.SaveChanges();
+                    foreach(var item in lists)
+                    {
+                        DataContext.Add(item, false);
+                    }
+                    DataContext.SubmitChanges();
                     result = new HandleState(true, lists.Count + stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS]);
                     ClearCache();
                     Get();
@@ -321,7 +326,6 @@ namespace eFMS.API.Operation.DL.Services
         public List<CustomsDeclarationModel> GetBy(string jobNo)
         {
             List<CustomsDeclarationModel> results = null;
-            //var data = DataContext.Get(x => x.JobNo == jobNo);
             var data = GetCustomClearanceViewList(jobNo);
             if (data.Count == 0) return results;
             results = mapper.Map<List<CustomsDeclarationModel>>(data);
@@ -348,7 +352,9 @@ namespace eFMS.API.Operation.DL.Services
                     var clearance = mapper.Map<CustomsDeclaration>(item);
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
-                DataContext.DC.SaveChanges();
+                DataContext.SubmitChanges();
+                ClearCache();
+                Get();
             }
             catch (Exception ex)
             {
@@ -424,9 +430,13 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                dc.CustomsDeclaration.RemoveRange(customs);
-                dc.SaveChanges();
+                foreach(var item in customs)
+                {
+                    var hs = Delete(x => x.Id == item.Id, false);
+                }
+                DataContext.SubmitChanges();
+                ClearCache();
+                Get();
             }
             catch (Exception ex)
             {
@@ -444,7 +454,7 @@ namespace eFMS.API.Operation.DL.Services
             bool isInt = false;
             bool isDate = false;
 
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             list.ForEach(item =>
             {
                 //Check empty ClearanceNo
@@ -776,7 +786,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.CommodityValid = true;
                 if (!string.IsNullOrEmpty(_commodity))
                 {
-                    var isFound = dc.CatCommodity.Any(x => x.Code == _commodity);
+                    var isFound = commodityRepository.Any(x => x.Code == _commodity);
                     if (!isFound)
                     {
                         item.CommodityName = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
@@ -785,7 +795,7 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.CommodityName = dc.CatCommodity.Where(x => x.Code == _commodity).First().CommodityNameEn;
+                        item.CommodityName = commodityRepository.Get(x => x.Code == _commodity)?.First().CommodityNameEn;
                     }
                 }
 
@@ -911,7 +921,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
 
                 //Check exist ClearanceNo & ClearanceDate
-                if (dc.CustomsDeclaration.Any(x => x.ClearanceNo == item.ClearanceNo && x.ClearanceDate == item.ClearanceDate))
+                if (DataContext.Any(x => x.ClearanceNo == item.ClearanceNo && x.ClearanceDate == item.ClearanceDate))
                 {
                     item.ClearanceNo = item.ClearanceDateStr = string.Format(stringLocalizer[LanguageSub.MSG_CLEARANCENO_EXISTED].Value, item.ClearanceNo);
                     item.IsValid = false;
