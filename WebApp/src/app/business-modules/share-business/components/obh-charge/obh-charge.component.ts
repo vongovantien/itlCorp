@@ -41,7 +41,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
                     this.charges = buyings;
-                    console.log("get obh charge from store", this.charges);
                 }
             );
     }
@@ -160,9 +159,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        // * Get Profit
-                        this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
-
+                        this.getProfit();
                         this.getSurcharges(CommonEnum.SurchargeTypeEnum.OBH);
 
                     } else {

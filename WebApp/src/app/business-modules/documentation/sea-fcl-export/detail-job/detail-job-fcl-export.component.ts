@@ -8,11 +8,11 @@ import { SeaFCLExportCreateJobComponent } from '../create-job/create-job-fcl-exp
 import { DocumentationRepo } from 'src/app/shared/repositories';
 
 import { combineLatest, of } from 'rxjs';
-import { tap, map, switchMap, take, catchError, takeUntil, skip } from 'rxjs/operators';
+import { tap, map, switchMap, catchError, takeUntil, skip, take } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 import * as fromStore from './../store';
-import { TransactionTypeEnum } from 'src/app/shared/enums';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -49,14 +49,14 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                 //     this.ACTION = param.action.toUpperCase();
                 // }
 
-                console.log(this.selectedTab);
-
                 // this.cdr.detectChanges();
             }),
             switchMap(() => of(this.jobId)),
+            take(1)
         ).subscribe(
             (jobId: string) => {
                 if (!!jobId) {
+                    console.log(jobId);
                     this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
                     this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
                     this._store.dispatch(new fromStore.SeaFCLExportGetDetailAction(jobId));
@@ -128,16 +128,16 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
     onSelectTab(tabName: string) {
         switch (tabName) {
-            // case 'hbl':
-            //     this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
-            //     break;
+            case 'hbl':
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
+                break;
             case 'shipment':
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE', transactionType: TransactionTypeEnum.SeaFCLExport } });
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE', transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport } });
                 break;
-            
+
         }
     }
 }

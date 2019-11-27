@@ -3,8 +3,7 @@
         <div class="m-portlet__head-caption">
             <div class="m-portlet__head-title w-100">
                 <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse" data-target="#data-summary">
-                    <i class="la la-angle-up m--margin-right-5"></i> Grant Total Profit {{isLoading | async}}
-                    {{isLoading}}
+                    <i class="la la-angle-up m--margin-right-5"></i> Grant Total Profit
                 </h3>
             </div>
         </div>
@@ -34,7 +33,6 @@
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(shipmentProfits$ | async).length">
                         </tr>
-                        <tr app-table-row-loading *ngIf="(isLoading | async)"></tr>
                     </tbody>
                 </table>
             </div>

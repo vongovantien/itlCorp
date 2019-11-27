@@ -44,7 +44,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
                     this.charges = buyings;
-                    console.log("get selling charge from store", this.charges);
                 }
             );
     }
@@ -97,8 +96,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        // * Get Profit
-                        this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
+                        this.getProfit();
 
                         this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
                     } else {

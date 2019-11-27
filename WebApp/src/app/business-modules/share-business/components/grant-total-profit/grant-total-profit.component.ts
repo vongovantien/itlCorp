@@ -21,7 +21,6 @@ export class ShareBussinessGrantTotalProfitComponent extends AppList {
     totalVND$: Observable<number>;
 
     headers: CommonInterface.IHeaderTable[];
-    isLoading: Observable<boolean>;
 
     constructor(
         private _store: Store<fromStore.IShareBussinessState>,
@@ -31,8 +30,6 @@ export class ShareBussinessGrantTotalProfitComponent extends AppList {
 
     ngOnInit() {
         this.shipmentProfits$ = this._store.select(fromStore.getTransactionProfitState);
-
-        this.isLoading = this._store.select(fromStore.getTransactionProfitLoadingState);
 
         this.totalUSD$ = this.shipmentProfits$.pipe(
             map((profits: any[]) => (profits || []).reduce((acc: number, curr: any) => acc += curr.profitUSD, 0))

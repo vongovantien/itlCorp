@@ -1,33 +1,16 @@
 import { CsShipmentSurcharge } from "src/app/shared/models";
 import { SurchargeAction, SurchargeActionTypes } from "../actions";
 
-export interface ISurchargeProfit {
-    hblid: string;
-    hblNo: string;
-    houseBillTotalCharge: {
-        totalBuyingUSD: number,
-        totalSellingUSD: number,
-        totalOBHUSD: number,
-        totalBuyingLocal: number,
-        totalSellingLocal: number,
-        totalOBHLocal: number
-    };
-    profitLocal: number;
-    profitUSD: number;
-}
-
 export interface ISurcharge {
     buyings: CsShipmentSurcharge[];
     sellings: CsShipmentSurcharge[];
     obhs: CsShipmentSurcharge[];
-    profit: ISurchargeProfit;
 }
 
 export const initialState: ISurcharge = {
     buyings: [],
     sellings: [],
     obhs: [],
-    profit: null
 };
 
 
@@ -110,6 +93,7 @@ export function SurchargeReducer(state = initialState, action: SurchargeAction):
             };
 
         }
+
         case SurchargeActionTypes.DELETE_OBH: {
             return { ...state, obhs: [...state.obhs.slice(0, action.payload), ...state.obhs.slice(action.payload + 1)] };
         }
@@ -119,14 +103,7 @@ export function SurchargeReducer(state = initialState, action: SurchargeAction):
                 ...state,
                 obhs: action.payload
             };
-
         }
-
-        // Profit
-        case SurchargeActionTypes.GET_PROFIT_SUCCESS: {
-            return { ...state, ...state.profit, profit: action.payload };
-        }
-
 
         default: {
             return state;

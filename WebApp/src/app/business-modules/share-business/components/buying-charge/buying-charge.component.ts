@@ -78,7 +78,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
                     this.charges = buyings;
-                    console.log("get buying charge from store", this.charges);
                 }
             );
     }
@@ -274,8 +273,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         if (res.status) {
                             this._toastService.success(res.message);
 
-                            console.log(type);
                             this.getSurcharges(type);
+                            this.getProfit();
                         } else {
                             this._toastService.error(res.message);
                         }
@@ -333,9 +332,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        // * Get Profit
-                        this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
-
+                        this.getProfit();
                         this.getSurcharges(type);
 
                     } else {
@@ -462,6 +459,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             default:
                 break;
         }
+    }
+
+    getProfit() {
+        this._store.dispatch(new fromStore.GetProfitHBLAction(this.hbl.id));
     }
 
     addSurcharges(type: string, newcharge: CsShipmentSurcharge) {

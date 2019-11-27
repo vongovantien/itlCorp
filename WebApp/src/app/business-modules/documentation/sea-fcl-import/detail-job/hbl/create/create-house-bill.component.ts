@@ -87,7 +87,6 @@ export class CreateHouseBillComponent extends AppForm {
         this._store.select(fromStore.seaFCLImportTransactionState)
             .subscribe(
                 (res: any) => {
-                    console.log(res);
                     this.shipmentDetail = res;
 
                     this.formHouseBill.mtBill.setValue(this.shipmentDetail.mawb);

@@ -61,14 +61,15 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+    }
 
     ngAfterViewInit() {
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.hblId) {
                 this.hblId = param.hblId;
                 this.jobId = param.id;
-                this._store.dispatch(new fromStore.GetDetailHBLAction(this.hblId));
+                this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
 
                 this.getDetailHbl();
 
@@ -190,7 +191,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     getDetailHbl() {
         this.formHouseBill.isDetail = true;
         this._progressRef.start();
-        this._store.select(fromStore.getHBLState)
+        this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete()),
@@ -263,9 +264,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                     // * Dispatch to save containers.
                     this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
-
-                    // // * Dispatch to get container's shipment.
-                    // this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
 
                     // * Get container to update model
                     this.getListContainer();
