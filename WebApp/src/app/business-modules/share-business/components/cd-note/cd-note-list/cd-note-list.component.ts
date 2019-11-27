@@ -10,7 +10,7 @@ import { CdNoteAddPopupComponent } from '../add-cd-note/add-cd-note.popup';
 import { CdNoteDetailPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
 import { Store } from '@ngrx/store';
 import { TransactionActions } from '../../../store';
-import { getParamsRouterState, getQueryParamsRouterState } from 'src/app/store';
+import { getParamsRouterState, getDataRouterState } from 'src/app/store';
 import { combineLatest } from 'rxjs';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
 
@@ -50,13 +50,13 @@ export class CdNoteListComponent extends AppList {
     ngOnInit(): void {
         combineLatest([
             this._store.select(getParamsRouterState),
-            this._store.select(getQueryParamsRouterState),
+            this._store.select(getDataRouterState),
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
         ).subscribe(
             (params: any) => {
-                const jobId = params.id || params.jobId;                
-                if(jobId){
+                const jobId = params.id || params.jobId;
+                if (jobId) {
                     this.transactionType = parseInt(params.transactionType) || 0;
                     this.idMasterBill = jobId;
                     this.getListCdNote(this.idMasterBill);
@@ -162,11 +162,11 @@ export class CdNoteListComponent extends AppList {
     //     });
     // }
 
-    onRequestCdNoteChange(data: any) {
+    onRequestCdNoteChange() {
         this.getListCdNote(this.idMasterBill);
     }
 
-    onDeletedCdNote(data: any) {
+    onDeletedCdNote() {
         this.getListCdNote(this.idMasterBill);
     }
 
