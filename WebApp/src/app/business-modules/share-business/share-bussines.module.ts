@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalModule, BsDropdownModule, PaginationModule, TooltipModule } from 'ngx-bootstrap';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -19,6 +19,7 @@ import { ShareBussinessShipmentGoodSummaryComponent } from './components/shipmen
 import { ShareBussinessContainerListPopupComponent } from './components/container-list/container-list.popup';
 import { ShareBussinessGrantTotalProfitComponent } from './components/grant-total-profit/grant-total-profit.component';
 import { ShareBusinessImportJobDetailPopupComponent } from './components/import-job-detail/import-job-detail.popup';
+import { ShareBusinessFormSearchImportJobComponent } from './components/import-job-detail/components/form-search-import/form-search-import-job-detail.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -29,7 +30,8 @@ const COMPONENTS = [
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBussinessContainerListPopupComponent,
     ShareBussinessGrantTotalProfitComponent,
-    ShareBusinessImportJobDetailPopupComponent
+    ShareBusinessImportJobDetailPopupComponent,
+    ShareBusinessFormSearchImportJobComponent
 ];
 
 const customCurrencyMaskConfig = {
@@ -52,6 +54,7 @@ const customCurrencyMaskConfig = {
         CommonModule,
         CommonComponentModule,
         FormsModule,
+        ReactiveFormsModule,
         ModalModule.forRoot(),
         NgxDaterangepickerMd.forRoot(),
         DirectiveModule,

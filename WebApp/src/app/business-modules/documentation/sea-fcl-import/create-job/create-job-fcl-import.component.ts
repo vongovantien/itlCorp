@@ -18,6 +18,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { catchError, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
+import { ShareBusinessImportJobDetailPopupComponent } from 'src/app/business-modules/share-business/components/import-job-detail/import-job-detail.popup';
 
 @Component({
     selector: 'app-create-job-fcl-import',
@@ -25,13 +26,12 @@ import * as fromShareBussiness from './../../../share-business/store';
     styleUrls: ['./create-job-fcl-import.component.scss']
 })
 export class SeaFCLImportCreateJobComponent extends AppForm {
-
     @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-
+    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
     containers: Container[] = [];
-
+    selectedJob: any = {}; // TODO model.
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
@@ -84,7 +84,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
 
             agentId: form.agentId,
             pol: form.pol,
-            pod:form.pod,
+            pod: form.pod,
             deliveryPlace: form.deliveryPlace,
             coloaderId: form.coloader,
 
@@ -105,6 +105,11 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
 
         return fclImportAddModel;
 
+    }
+
+    onImport(selectedData: any) {
+        this.selectedJob = selectedData;
+        console.log(this.selectedJob);
     }
 
     checkValidateForm() {
@@ -149,6 +154,10 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
                     }
                 }
             );
+    }
+
+    showImportPopup() {
+        this.formImportJobDetailPopup.show();
     }
 }
 

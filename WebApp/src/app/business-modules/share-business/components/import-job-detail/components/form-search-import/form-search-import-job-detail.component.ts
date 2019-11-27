@@ -1,14 +1,15 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
+import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { formatDate } from '@angular/common';
 
 @Component({
-    selector: 'form-search-house-bill',
-    templateUrl: './form-search-house-bill.component.html'
+    selector: 'form-search-import-job',
+    templateUrl: 'form-search-import-job-detail.component.html'
 })
-export class FormSearchHouseBillComponent extends AppForm {
-    @Output() onSearch: EventEmitter<ISearchDataHbl> = new EventEmitter<ISearchDataHbl>();
+
+export class ShareBusinessFormSearchImportJobComponent extends AppForm {
+    @Output() onSearch: EventEmitter<ISearchDataJobDetail> = new EventEmitter<ISearchDataJobDetail>();
     filterTypes: CommonInterface.ICommonTitleValue[];
     formSearch: FormGroup;
     searchText: AbstractControl;
@@ -19,16 +20,42 @@ export class FormSearchHouseBillComponent extends AppForm {
     ) {
         super();
     }
-
     ngOnInit() {
         this.initFormSearch();
         this.filterTypes = [
-            { title: 'HBL', value: 'hwbno' },
+            { title: 'Job ID', value: 'jobNo' },
             { title: 'MBL', value: 'mawb' },
-            { title: 'Customer', value: 'customerName' },
-            { title: 'Saleman', value: 'saleManName' }
+            { title: 'Supplier', value: 'supplierName' },
         ];
         this.filterType.setValue(this.filterTypes[0]);
+    }
+
+    searchJob() {
+        const body: ISearchDataJobDetail = {
+            all: null,
+            jobNo: this.filterType.value.value === 'jobNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            mawb: this.filterType.value.value === 'mawb' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            fromDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            toDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            supplierName: this.filterType.value.value === 'supplierName' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+        };
+        this.onSearch.emit(body);
+    }
+
+
+    resetSearch() {
+        const body: ISearchDataJobDetail = {
+            all: null,
+            jobNo: null,
+            mawb: null,
+            supplierName: null,
+            fromDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            toDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null
+        };
+        // this.formSearch.reset();
+        this.searchText.reset();
+        this.filterType.setValue(this.filterTypes[0]);
+        this.onSearch.emit(body);
     }
 
     initFormSearch() {
@@ -47,44 +74,14 @@ export class FormSearchHouseBillComponent extends AppForm {
         this.filterType = this.formSearch.controls['filterType'];
         this.serviceDate = this.formSearch.controls['serviceDate'];
     }
-
-    searchHbl() {
-        const body: ISearchDataHbl = {
-            all: null,
-            mawb: this.filterType.value.value === 'mawb' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            hwbno: this.filterType.value.value === 'hwbno' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            fromDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            toDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerName: this.filterType.value.value === 'customerName' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            salemanName: this.filterType.value.value === 'saleManName' ? (this.searchText.value ? this.searchText.value.trim() : '') : null
-        };
-        this.onSearch.emit(body);
-    }
-
-    resetSearch() {
-        const body: ISearchDataHbl = {
-            all: null,
-            mawb: null,
-            hwbno: null,
-            customerName: null,
-            salemanName: null,
-            fromDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            toDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null
-        };
-        // this.formSearch.reset();
-        this.searchText.reset();
-        this.filterType.setValue(this.filterTypes[0]);
-        this.onSearch.emit(body);
-    }
-
 }
-interface ISearchDataHbl {
+
+interface ISearchDataJobDetail {
     all: string;
+    jobNo: string;
     mawb: string;
-    hwbno: string;
-    customerName: string;
-    salemanName: string;
     fromDate: string;
     toDate: string;
+    supplierName: string;
 }
 
