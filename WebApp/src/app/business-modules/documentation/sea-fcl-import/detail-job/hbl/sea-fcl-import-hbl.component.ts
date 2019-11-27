@@ -13,7 +13,6 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 
-import * as fromStore from './../../store';
 import * as fromShareBussiness from './../../../../share-business/store';
 
 import { catchError, finalize, take, takeUntil } from 'rxjs/operators';
@@ -46,7 +45,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
-        private _store: Store<fromStore.ISeaFCLImportState>,
+        private _store: Store<fromShareBussiness.ITransactionState>,
         private cdr: ChangeDetectorRef,
         private _activedRoute: ActivatedRoute
     ) {
@@ -79,7 +78,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         ];
 
         this.containers = this._store.select(fromShareBussiness.getHBLContainersState);
-        this.selectedShipment = this._store.select(fromStore.seaFCLImportTransactionState);
+        this.selectedShipment = this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState);
     }
 
     ngAfterViewInit() {
@@ -159,8 +158,9 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.selectedHbl = new CsTransactionDetail(hbl);
 
         // * Get container, Job detail, Surcharge with hbl id, JobId.
+        this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
         this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
-        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
+        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(hbl.jobId));
         this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
         switch (this.selectedTabSurcharge) {
@@ -183,9 +183,9 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.selectedTabSurcharge = tabName;
 
         if (!!this.selectedHbl) {
-            this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: this.selectedHbl.id }));
-            this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.selectedHbl.jobId));
-            this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
+            // this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: this.selectedHbl.id }));
+            // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.selectedHbl.jobId));
+            // this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
             switch (this.selectedTabSurcharge) {
                 case 'BUY':

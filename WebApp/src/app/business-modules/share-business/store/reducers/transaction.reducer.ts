@@ -1,4 +1,5 @@
 import { TransactionActions, TransactionActionTypes } from "../actions";
+import { CsTransaction } from "src/app/shared/models";
 
 export interface ITransactionProfit {
     hblid: string;
@@ -17,12 +18,14 @@ export interface ITransactionProfit {
 
 export interface ITransactionState {
     profits: ITransactionProfit[];
+    cstransaction: CsTransaction;
     isLoading: boolean;
     isLoaded: boolean;
 }
 
 export const initState: ITransactionState = {
     profits: [],
+    cstransaction: new CsTransaction(),
     isLoading: false,
     isLoaded: false
 };
@@ -31,21 +34,28 @@ export const initState: ITransactionState = {
 export function TransactionReducer(state = initState, action: TransactionActions): ITransactionState {
     switch (action.type) {
         case TransactionActionTypes.GET_PROFIT: {
-            return {
-                ...state,
-                isLoaded: false,
-                isLoading: true
-            };
+            return { ...state, isLoaded: false, isLoading: true };
         }
         case TransactionActionTypes.GET_PROFIT_SUCCESS: {
             return {
-                ...state,
-                ...state.profits,
-                profits: [...action.payload],
-                isLoaded: true,
-                isLoading: false
-
+                ...state, profits: [...action.payload], isLoaded: true, isLoading: false
             };
+        }
+
+        case TransactionActionTypes.GET_DETAIL: {
+            return { ...state, isLoaded: false, isLoading: true };
+        }
+
+        case TransactionActionTypes.GET_DETAIL_SUCCESS: {
+            return { ...state, cstransaction: action.payload };
+        }
+
+        case TransactionActionTypes.UPDATE: {
+            return { ...state, isLoaded: false, isLoading: true };
+        }
+
+        case TransactionActionTypes.UPDATE_SUCCESS: {
+            return { ...state, ...state.cstransaction, cstransaction: action.payload };
         }
 
         default: {

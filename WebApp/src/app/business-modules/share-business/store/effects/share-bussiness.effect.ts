@@ -7,7 +7,9 @@ import { DocumentationRepo } from "src/app/shared/repositories";
 import { Observable, of } from "rxjs";
 
 import { switchMap, catchError, map } from "rxjs/operators";
-import { TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction } from "../actions";
+import {
+    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction
+} from "../actions";
 import { ITransactionProfit } from "../reducers";
 
 @Injectable()
@@ -17,6 +19,35 @@ export class ShareBussinessEffects {
         private actions$: Actions,
         private _documentRepo: DocumentationRepo
     ) { }
+
+
+    @Effect()
+    getDetailSeaFCLImportEffect$: Observable<Action> = this.actions$.
+        pipe(
+            ofType<TransactionActions>(TransactionActionTypes.GET_DETAIL),
+            map((payload: any) => payload.payload),
+            switchMap(
+                (id: string) => this._documentRepo.getDetailTransaction(id)
+                    .pipe(
+                        map((data: any) => new TransactionGetDetailSuccessAction(data)),
+                        catchError(err => of(new TransactionGetDetailFailAction(err)))
+                    )
+            )
+        );
+
+    @Effect()
+    updateCSTransaction$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<TransactionActions>(TransactionActionTypes.UPDATE),
+            map((payload: any) => payload.payload),
+            switchMap(
+                (param: any) => this._documentRepo.updateCSTransaction(param)
+                    .pipe(
+                        map((data: CommonInterface.IResult) => new TransactionUpdateSuccessAction(data.data)),
+                        catchError(err => of(new TransactionUpdateFailAction(err)))
+                    )
+            )
+        );
 
     @Effect()
     getListContainerEffect$: Observable<Action> = this.actions$

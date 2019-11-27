@@ -12,7 +12,6 @@ import { SystemConstants } from 'src/constants/system.const';
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 
-import * as fromStore from '../../../../store';
 import * as fromShare from './../../../../../../share-business/store';
 
 @Component({
@@ -110,7 +109,7 @@ export class FormAddHouseBillComponent extends AppForm {
         private _systemRepo: SystemRepo,
         private _spinner: NgxSpinnerService,
         private _dataService: DataService,
-        protected _store: Store<fromStore.ISeaFCLImportState>,
+        protected _store: Store<fromShare.ITransactionState>,
 
     ) {
         super();

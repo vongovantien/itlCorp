@@ -17,7 +17,6 @@ import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-mod
 
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
-import * as fromStore from './../../../store';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 enum HBL_TAB {
@@ -55,7 +54,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         protected _activedRoute: ActivatedRoute,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _store: Store<fromStore.ISeaFCLImportState>,
+        protected _store: Store<fromShareBussiness.ITransactionState>,
         private _exportRepository: ExportRepo
     ) {
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);

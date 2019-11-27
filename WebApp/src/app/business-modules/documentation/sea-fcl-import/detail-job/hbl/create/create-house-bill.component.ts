@@ -17,7 +17,6 @@ import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-mod
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError, takeUntil } from 'rxjs/operators';
 
-import * as fromStore from '../../../store';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 
@@ -46,7 +45,7 @@ export class CreateHouseBillComponent extends AppForm {
         protected _activedRoute: ActivatedRoute,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _store: Store<fromStore.ISeaFCLImportState>,
+        protected _store: Store<fromShareBussiness.ITransactionState>,
 
 
     ) {
@@ -70,7 +69,7 @@ export class CreateHouseBillComponent extends AppForm {
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.id) {
                 this.jobId = param.id;
-                this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.jobId));
+                this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
             }
         });
     }
@@ -84,7 +83,7 @@ export class CreateHouseBillComponent extends AppForm {
         this.shipmentGoodSummaryComponent.initContainer();
         this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
 
-        this._store.select(fromStore.seaFCLImportTransactionState)
+        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
             .subscribe(
                 (res: any) => {
                     this.shipmentDetail = res;

@@ -16,11 +16,12 @@ import { FormSearchHouseBillComponent } from './components/form-search-house-bil
 import { SeaFClImportArrivalNoteComponent } from './components/arrival-note/arrival-note.component';
 import { FroalaViewModule, FroalaEditorModule } from 'angular-froala-wysiwyg';
 import { SeaFClImportDeliveryOrderComponent } from './components/delivery-order/delivery-order.component';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 const routing: Routes = [
     {
         path: '', component: SeaFCLImportHBLComponent,
-        data: { name: 'House Bill List', path: 'hbl', level: 4 }
+        data: <CommonInterface.IDataParam>{ name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.SFI_CODE }
     },
     {
         path: 'new', component: CreateHouseBillComponent,

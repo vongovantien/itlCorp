@@ -53,12 +53,12 @@ export function HBLReducer(state = initHBlState, action: HBLActions): IHBLState 
 
         // Profit
         case HBLActionTypes.GET_PROFIT_SUCCESS: {
-            return { ...state, ...state.profit, profit: action.payload, isLoading: false, isLoaded: true };
+            return { ...state, profit: action.payload, isLoading: false, isLoaded: true };
         }
 
         // Container
         case HBLActionTypes.GET_CONTAINERS_SUCCESS: {
-            return { ...state, ...state.containers, containers: action.payload, isLoading: false, isLoaded: true };
+            return { ...state, containers: action.payload, isLoading: false, isLoaded: true };
         }
 
         default: {
