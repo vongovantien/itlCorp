@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ModalModule } from 'ngx-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
-import { CdNoteListComponent } from 'src/app/business-modules/share-business/components/cd-note/cd-note-list/cd-note-list.component';
+import { ShareBussinessCdNoteListComponent } from 'src/app/business-modules/share-business/components/cd-note/cd-note-list/cd-note-list.component';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 
 @NgModule({
@@ -19,9 +19,9 @@ import { ShareBussinessModule } from 'src/app/business-modules/share-business/sh
     ],
     providers: [],
     entryComponents: [
-        CdNoteListComponent
+        ShareBussinessCdNoteListComponent
     ]
 })
 export class SeaFCLImportCDNoteModule {
-    static rootComponent = CdNoteListComponent;
+    static rootComponent = ShareBussinessCdNoteListComponent;
 }

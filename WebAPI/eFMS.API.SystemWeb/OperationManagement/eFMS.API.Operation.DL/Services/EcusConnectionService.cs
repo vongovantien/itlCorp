@@ -7,54 +7,52 @@ using eFMS.API.Operation.DL.Models.Ecus;
 using eFMS.API.Operation.Service.Contexts;
 using eFMS.API.Operation.Service.Models;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Operation.DL.Services
 {
-    public class EcusConnectionService : RepositoryBase<SetEcusconnection, SetEcusConnectionModel>, IEcusConnectionService
+    public class EcusConnectionService : RepositoryBaseCache<SetEcusconnection, SetEcusConnectionModel>, IEcusConnectionService
     {
-        //private ICatAreaApiService catAreaApi;
-        public EcusConnectionService(IContextBase<SetEcusconnection> repository, IMapper mapper) : base(repository, mapper)
+        private readonly IContextBase<SysUser> userRepository;
+        private readonly IContextBase<SysEmployee> employeeRepository;
+        public EcusConnectionService(IContextBase<SetEcusconnection> repository, 
+            ICacheServiceBase<SetEcusconnection> cacheService, 
+            IMapper mapper,
+            IContextBase<SysUser> userRepo,
+            IContextBase<SysEmployee> employeeRepo) : base(repository, cacheService, mapper)
         {
-            //catAreaApi = apiService;
+            userRepository = userRepo;
+            employeeRepository = employeeRepo;
         }
 
         public SetEcusConnectionModel GetConnectionDetails(int id)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            SetEcusConnectionModel EcusConnection = new SetEcusConnectionModel();
-            var con = dc.SetEcusconnection.Where(x => x.Id == id).FirstOrDefault();
-            if (con == null)
-            {
-                return null;
-            }
-            else
-            {
-                EcusConnection = mapper.Map<SetEcusConnectionModel>(con);
-                var user = dc.SysUser.Where(x => x.Id == con.UserId).FirstOrDefault();
-                var user_created = dc.SysUser.Where(x => x.Id == con.UserCreated).FirstOrDefault();
-                var user_modified = dc.SysUser.Where(x => x.Id == con.UserModified).FirstOrDefault();
-                EcusConnection.Username = user?.Username;
-                EcusConnection.UserCreatedName = user_created?.Username;
-                EcusConnection.UserModifiedName = user_modified?.Username;
-
-            }
-            return EcusConnection;
+            var data = Get(x => x.Id == id);
+            if (data == null) return null;
+            var result = data.FirstOrDefault();
+            var users = userRepository.Get();
+            result.Username = users.FirstOrDefault(x => x.Id == result.UserId)?.Username;
+            result.UserCreatedName = users.FirstOrDefault(x => x.Id == result.UserCreated)?.Username;
+            result.UserModifiedName = users.FirstOrDefault(x => x.Id == result.UserModified)?.Username;
+            return result;
         }
 
         public List<SetEcusConnectionModel> GetConnections()
         {
             List<SetEcusConnectionModel> returnList = new List<SetEcusConnectionModel>();
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var cons = DataContext.Get().ToList();
+            var cons = Get().ToList();
+            var users = userRepository.Get();
+            var employees = employeeRepository.Get();
             var query = (from con in cons
-                         join user in dc.SysUser on con.UserId equals user.Id into users
+                         join user in users on con.UserId equals user.Id into userGrps
                          from u in users
-                         join em in dc.SysEmployee on u.EmployeeId equals em.Id
+                         join em in employees on u.EmployeeId equals em.Id
 
                          select new { con, u, em }
                 );
@@ -64,7 +62,7 @@ namespace eFMS.API.Operation.DL.Services
             }
             foreach (var item in query)
             {
-                SetEcusConnectionModel ecus = mapper.Map<SetEcusConnectionModel>(item.con);
+                SetEcusConnectionModel ecus = item.con;
                 ecus.Username = item.u.Username;
                 ecus.Fullname = item.em.EmployeeNameEn;
                 returnList.Add(ecus);
@@ -72,44 +70,49 @@ namespace eFMS.API.Operation.DL.Services
             return returnList;
         }
 
-        public List<SetEcusConnectionModel> Paging(SetEcusConnectionCriteria criteria, int pageNumber, int pageSize, out int totalItems)
+        public IQueryable<SetEcusConnectionModel> Paging(SetEcusConnectionCriteria criteria, int pageNumber, int pageSize, out int totalItems)
         {
             var list = Query(criteria);
-            totalItems = list.Count;
+            if(list == null)
+            {
+                totalItems = 0;
+                return null;
+            }
+            totalItems = list.Count();
             if (pageSize > 1)
             {
                 if (pageNumber < 1)
                 {
                     pageNumber = 1;
                 }
-                list = list.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+                list = list.Skip((pageNumber - 1) * pageSize).Take(pageSize);
             }
             return list;
         }
 
-        private List<SetEcusConnectionModel> Query(SetEcusConnectionCriteria criteria)
+        private IQueryable<SetEcusConnectionModel> Query(SetEcusConnectionCriteria criteria)
         {
-            List<SetEcusConnectionModel> list = GetConnections();
+            IQueryable<SetEcusConnectionModel> results = null;
+            var list = GetConnections();
             if (criteria.All == null)
             {
-                list = list.Where(x => (x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                && (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                && (x.ServerName ?? "").IndexOf(criteria.ServerName ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                && (x.Dbname ?? "").IndexOf(criteria.Dbname ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                && (x.Fullname ?? "").IndexOf(criteria.Fullname ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                ).ToList();
+                results = list.Where(x => (x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    && (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    && (x.ServerName ?? "").IndexOf(criteria.ServerName ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    && (x.Dbname ?? "").IndexOf(criteria.Dbname ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    && (x.Fullname ?? "").IndexOf(criteria.Fullname ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    )?.AsQueryable();
             }
             else
             {
-                list = list.Where(x => (x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                 || (x.Name ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                 || (x.ServerName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                 || (x.Dbname ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                 || (x.Fullname ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-               ).ToList();
+                results = list.Where(x => (x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                     || (x.Name ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                     || (x.ServerName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                     || (x.Dbname ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                     || (x.Fullname ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    )?.AsQueryable();
             }
-
-            return list;
+            return results;
         }
 
         public List<DTOKHAIMD> GetDataEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string database)

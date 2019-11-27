@@ -17,6 +17,7 @@ import { SeaFclImportManifestComponent } from './detail-job/manifest/sea-fcl-imp
 import { FormManifestSeaFclImportComponent } from './detail-job/manifest/components/form-manifest/form-manifest-sea-fcl-import.component';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { AddHblToManifestComponent } from './detail-job/manifest/popup/add-hbl-to-manifest.popup';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 const routing: Routes = [
 
@@ -30,7 +31,7 @@ const routing: Routes = [
     },
     {
         path: ':id', component: SeaFCLImportDetailJobComponent,
-        data: { name: "Job Detail", path: ":id", level: 3 },
+        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport },
     },
     {
         path: ':id/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),

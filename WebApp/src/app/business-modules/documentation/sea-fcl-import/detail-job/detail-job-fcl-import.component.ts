@@ -15,7 +15,6 @@ import { combineLatest, of } from 'rxjs';
 import { map, tap, switchMap, skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
-import { TransactionTypeEnum } from 'src/app/shared/enums';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -207,7 +206,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'CDNOTE', transactionType: TransactionTypeEnum.SeaFCLImport } });
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'ASSIGNMENT' } });

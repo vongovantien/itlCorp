@@ -150,9 +150,9 @@
     </div>
 </div>
 
-<cd-note-detail-popup (onDeleted)="onDeletedCdNote($event)"></cd-note-detail-popup>
+<cd-note-detail-popup (onDeleted)="onDeletedCdNote()"></cd-note-detail-popup>
 
-<cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"></cd-note-add-popup>
+<cd-note-add-popup (onRequest)="onRequestCdNoteChange()"></cd-note-add-popup>
 
 <confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 

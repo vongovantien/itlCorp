@@ -1,16 +1,16 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, take } from 'rxjs/operators';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
-import { CdNoteAddPopupComponent } from '../add-cd-note/add-cd-note.popup';
-import { CdNoteDetailPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
+import { ShareBussinessCdNoteAddPopupComponent } from '../add-cd-note/add-cd-note.popup';
+import { ShareBussinessCdNoteDetailPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
 import { Store } from '@ngrx/store';
 import { TransactionActions } from '../../../store';
-import { getParamsRouterState, getQueryParamsRouterState } from 'src/app/store';
+import { getParamsRouterState, getDataRouterState } from 'src/app/store';
 import { combineLatest } from 'rxjs';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
 
@@ -18,11 +18,11 @@ import { TransactionTypeEnum } from 'src/app/shared/enums';
     selector: 'cd-note-list',
     templateUrl: './cd-note-list.component.html',
 })
-export class CdNoteListComponent extends AppList {
-    @ViewChild(CdNoteAddPopupComponent, { static: false }) cdNoteAddPopupComponent: CdNoteAddPopupComponent;
+export class ShareBussinessCdNoteListComponent extends AppList {
+    @ViewChild(ShareBussinessCdNoteAddPopupComponent, { static: false }) cdNoteAddPopupComponent: ShareBussinessCdNoteAddPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(CdNoteDetailPopupComponent, { static: false }) cdNoteDetailPopupComponent: CdNoteDetailPopupComponent;
+    @ViewChild(ShareBussinessCdNoteDetailPopupComponent, { static: false }) cdNoteDetailPopupComponent: ShareBussinessCdNoteDetailPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';
@@ -50,13 +50,14 @@ export class CdNoteListComponent extends AppList {
     ngOnInit(): void {
         combineLatest([
             this._store.select(getParamsRouterState),
-            this._store.select(getQueryParamsRouterState),
+            this._store.select(getDataRouterState),
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
+            take(1)
         ).subscribe(
             (params: any) => {
-                const jobId = params.id || params.jobId;                
-                if(jobId){
+                const jobId = params.id || params.jobId;
+                if (jobId) {
                     this.transactionType = parseInt(params.transactionType) || 0;
                     this.idMasterBill = jobId;
                     this.getListCdNote(this.idMasterBill);

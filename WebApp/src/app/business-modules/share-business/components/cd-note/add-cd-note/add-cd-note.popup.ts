@@ -3,7 +3,7 @@ import { Component, ViewChild, EventEmitter, Output } from "@angular/core";
 import { DocumentationRepo } from "src/app/shared/repositories";
 import { catchError, map } from "rxjs/operators";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
-import { CdNoteAddRemainingChargePopupComponent } from "../add-remaining-charge/add-remaining-charge.popup";
+import { ShareBussinessCdNoteAddRemainingChargePopupComponent } from "../add-remaining-charge/add-remaining-charge.popup";
 import { SortService } from "src/app/shared/services";
 import { ChargeCdNote } from "src/app/shared/models/document/chargeCdNote.model";
 import { ToastrService } from "ngx-toastr";
@@ -13,12 +13,12 @@ import { TransactionTypeEnum } from "src/app/shared/enums/transaction-type.enum"
     selector: 'cd-note-add-popup',
     templateUrl: './add-cd-note.popup.html'
 })
-export class CdNoteAddPopupComponent extends PopupBase {
+export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild('changePartnerPopup', { static: false }) changePartnerPopup: ConfirmPopupComponent;
     @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
-    @ViewChild(CdNoteAddRemainingChargePopupComponent, { static: false }) addRemainChargePopup: CdNoteAddRemainingChargePopupComponent;
+    @ViewChild(ShareBussinessCdNoteAddRemainingChargePopupComponent, { static: false }) addRemainChargePopup: ShareBussinessCdNoteAddRemainingChargePopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
 
