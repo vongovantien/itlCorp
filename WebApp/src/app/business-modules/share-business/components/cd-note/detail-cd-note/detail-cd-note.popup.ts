@@ -1,7 +1,7 @@
 import { Component, ViewChild, Output, EventEmitter, ElementRef } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
 import { DocumentationRepo } from "src/app/shared/repositories";
-import { CdNoteAddPopupComponent } from "../add-cd-note/add-cd-note.popup";
+import { ShareBussinessCdNoteAddPopupComponent } from "../add-cd-note/add-cd-note.popup";
 import { catchError, finalize } from "rxjs/operators";
 import { SortService } from "src/app/shared/services";
 import { ToastrService } from "ngx-toastr";
@@ -16,10 +16,10 @@ import { TransactionTypeEnum } from "src/app/shared/enums";
     selector: 'cd-note-detail-popup',
     templateUrl: './detail-cd-note.popup.html'
 })
-export class CdNoteDetailPopupComponent extends PopupBase {
+export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(CdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: CdNoteAddPopupComponent;
+    @ViewChild(ShareBussinessCdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: ShareBussinessCdNoteAddPopupComponent;
     @ViewChild('formPreviewCdNote', { static: false }) formPreviewCdNote: ElementRef;
     @ViewChild("popupReport", { static: false }) popupReport: ModalDirective;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
