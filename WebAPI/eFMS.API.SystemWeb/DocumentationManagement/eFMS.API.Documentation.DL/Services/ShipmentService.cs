@@ -164,7 +164,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     &&
                                         searchOption.Equals("Hwbno") ? keywords.Contains(ops.Hwbno) : true
                                     &&
-                                        searchOption.Equals("Mblno") ? keywords.Contains(ops.Mblno) : true
+                                        searchOption.Equals("Mawb") ? keywords.Contains(ops.Mblno) : true
                                     &&
                                         searchOption.Equals("ClearanceNo") ? keywords.Contains(sur.ClearanceNo) : true
                                     select new ShipmentsCopy

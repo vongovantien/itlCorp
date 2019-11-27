@@ -1,25 +1,27 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OpsModuleCreditDebitNoteComponent } from './ops-module-credit-debit-note.component';
 import { JobEditShareModule } from '../job-edit-share.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { OpsCDNoteComponent } from './ops-cd-note-list.component';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
     declarations: [
-        OpsModuleCreditDebitNoteComponent,
+        OpsCDNoteComponent,
     ],
     imports: [
         CommonModule,
         SharedModule,
+        FormsModule,
         JobEditShareModule // ? Share with Job Edit
     ],
     exports: [],
     providers: [],
     entryComponents: [
-        OpsModuleCreditDebitNoteComponent
+        OpsCDNoteComponent
     ]
 })
-export class CreditDebitNoteModule {
-    static rootComponent = OpsModuleCreditDebitNoteComponent;
+export class OpsCDNoteModule {
+    static rootComponent = OpsCDNoteComponent;
 }

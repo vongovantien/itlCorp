@@ -98,10 +98,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    var houseBill = tranDetailRepository.Get(x => x.Id == id).FirstOrDefault();
+                    var hblid = opsTransRepository.Get(x => x.Id == id).FirstOrDefault()?.Hblid;
                     List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
 
-                    listCharges = Query(id, null);
+                    listCharges = Query(hblid.Value, null);
 
                     foreach (var c in listCharges)
                     {
@@ -164,8 +164,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                var houseBill = opsTransRepository.Get(x => x.Hblid == id).FirstOrDefault();
-                listCharges = Query(id, null);
+                var houseBill = opsTransRepository.Get(x => x.Id == id).FirstOrDefault();
+                listCharges = Query(houseBill.Hblid, null);
                 listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == "OBH") || x.PaymentObjectId == partnerId)).ToList();
                 if (!string.IsNullOrEmpty(cdNoteCode))
                 {

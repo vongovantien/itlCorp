@@ -121,11 +121,7 @@ export class DocumentationRepo {
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
-    }
-
-    getListCDNoteByHouseBill(houseBillId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: houseBillId, IsHouseBillID: true });
-    }
+    }    
 
     getShipmentByPartnerOrService(partnerId: string, services: string[]) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentsCreditPayer`, { partner: partnerId, productServices: services }).pipe(
@@ -278,11 +274,8 @@ export class DocumentationRepo {
         );
     }
 
-    getListCdNoteByMasterBill(id: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Get`, { Id: id, IsHouseBillID: false }).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
+    getListCDNote(jobId: string, isShipmentOperation: boolean){
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: jobId, IsShipmentOperation: isShipmentOperation });
     }
 
     checkCdNoteAllowToDelete(id: string) {

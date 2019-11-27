@@ -1,34 +1,31 @@
-import { Component, ViewChild, Output, EventEmitter, ElementRef } from "@angular/core";
-import { PopupBase } from "src/app/popup.base";
-import { DocumentationRepo } from "src/app/shared/repositories";
-import { CdNoteAddPopupComponent } from "../add-cd-note/add-cd-note.popup";
-import { catchError, finalize } from "rxjs/operators";
-import { SortService } from "src/app/shared/services";
-import { ToastrService } from "ngx-toastr";
-import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
-import { DomSanitizer } from "@angular/platform-browser";
-import { API_MENU } from "src/constants/api-menu.const";
-import { ModalDirective } from "ngx-bootstrap";
-import { Crystal } from "src/app/shared/models/report/crystal.model";
-import { TransactionTypeEnum } from "src/app/shared/enums";
+import { Component, ViewChild, EventEmitter, Output } from '@angular/core';
+import { BaseService } from 'src/app/shared/services/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { PopupBase } from 'src/app/popup.base';
+import { SortService } from 'src/app/shared/services';
+import { DocumentationRepo } from 'src/app/shared/repositories';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
+import { DomSanitizer } from '@angular/platform-browser';
+import { catchError, finalize } from 'rxjs/operators';
+import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { OpsCdNoteAddPopupComponent } from '../ops-cd-note-add/ops-cd-note-add.popup';
 
 @Component({
-    selector: 'cd-note-detail-popup',
-    templateUrl: './detail-cd-note.popup.html'
+    selector: 'ops-cd-note-detail',
+    templateUrl: './ops-cd-note-detail.popup.html'
 })
-export class CdNoteDetailPopupComponent extends PopupBase {
+export class OpsCdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(CdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: CdNoteAddPopupComponent;
-    @ViewChild('formPreviewCdNote', { static: false }) formPreviewCdNote: ElementRef;
-    @ViewChild("popupReport", { static: false }) popupReport: ModalDirective;
-    @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(OpsCdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: OpsCdNoteAddPopupComponent; @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
 
     jobId: string = null;
     cdNote: string = null;
     deleteMessage: string = '';
-    isHouseBillID: boolean = false;
-    transactionType: TransactionTypeEnum = 0;
+    isHouseBillID: boolean = true;
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -43,8 +40,6 @@ export class CdNoteDetailPopupComponent extends PopupBase {
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
-        private sanitizer: DomSanitizer,
-        private api_menu: API_MENU,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -72,9 +67,10 @@ export class CdNoteDetailPopupComponent extends PopupBase {
                 catchError(this.catchError),
             ).subscribe(
                 (dataCdNote: any) => {
+                    console.log(dataCdNote)
                     dataCdNote.listSurcharges.forEach(element => {
                         element.debit = (element.type === 'SELL' || (element.type === 'OBH' && dataCdNote.partnerId === element.paymentObjectId)) ? element.total * element.exchangeRate : null;
-                        element.credit = (element.type === 'BUY' || (element.type === 'OBH' && dataCdNote.partnerId === element.payerId)) ? element.total * element.exchangeRate  : null;
+                        element.credit = (element.type === 'BUY' || (element.type === 'OBH' && dataCdNote.partnerId === element.payerId)) ? element.total * element.exchangeRate : null;
                     });
                     this.CdNoteDetail = dataCdNote;
                     //Tính toán Amount Credit, Debit, Balance
@@ -142,7 +138,6 @@ export class CdNoteDetailPopupComponent extends PopupBase {
 
     openPopupEdit() {
         this.cdNoteEditPopupComponent.action = 'update';
-        this.cdNoteEditPopupComponent.transactionType = this.transactionType;
         this.cdNoteEditPopupComponent.selectedPartner = { field: "id", value: this.CdNoteDetail.partnerId };
         this.cdNoteEditPopupComponent.selectedNoteType = this.CdNoteDetail.cdNote.type;
         this.cdNoteEditPopupComponent.CDNote = this.CdNoteDetail.cdNote;
@@ -162,47 +157,21 @@ export class CdNoteDetailPopupComponent extends PopupBase {
         }
     }
 
-    previewCdNote(data: string) {
-        this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
-            .pipe(catchError(this.catchError))
+    preview() {
+        this._documentationRepo.previewCDNote(this.CdNoteDetail)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
             .subscribe(
-                (res: Crystal) => {
-                    this.dataReport = JSON.stringify(res);
-                    if (res != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            if (!this.popupReport.isShown) {
-                                this.popupReport.config = this.options;
-                                this.popupReport.show();
-                            }
-                            this.submitFormPreview();
-                        }, 1000);
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.reportPopup.show();
+                    }, 1000);
+
                 },
             );
     }
-
-    get scr() {
-        return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
-    }
-
-    ngAfterViewInit() {
-        if (!!this.dataReport) {
-            this.formPreviewCdNote.nativeElement.submit();
-        }
-    }
-
-    submitFormPreview() {
-        this.formPreviewCdNote.nativeElement.submit();
-    }
-
-    onSubmitForm(event) {
-        return true;
-    }
-
-    hidePreview() {
-        this.popupReport.hide();
-    }
-
+    
 }

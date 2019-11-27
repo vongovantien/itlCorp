@@ -264,8 +264,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var containers = containerRepository.Get(x => x.Hblid == criteria.HblId);
 
-                var polName = placeRepository.Get(x => x.Id == houserBill.Pol).FirstOrDefault().NameEn;
-                var podName = placeRepository.Get(x => x.Id == houserBill.Pod).FirstOrDefault().NameEn;
+                var polName = placeRepository.Get(x => x.Id == houserBill.Pol).FirstOrDefault()?.NameEn;
+                var podName = placeRepository.Get(x => x.Id == houserBill.Pod).FirstOrDefault()?.NameEn;
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
                 {
                     foreach (var frieght in arrival.CsArrivalFrieghtCharges)
@@ -301,20 +301,20 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.TotalPackages = container.Quantity.ToString();// Quantity of container                    
                             charge.Description = container.Description;// Description of container
                             charge.NoPieces = container.PackageQuantity.ToString();
-                            charge.GrossWeight = container.Gw.Value; //GrossWeight of container
-                            charge.CBM = container.Cbm.Value; //CBM of container
+                            charge.GrossWeight = container.Gw != null ? container.Gw.Value : 0; //GrossWeight of container
+                            charge.CBM = container.Cbm != null ? container.Cbm.Value : 0; //CBM of container
                             charge.Unit = unitRepository.Get(x => x.Id == container.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn; //Unit name of container
                         }
 
-                        charge.blnShow = frieght.IsShow.Value; //isShow of charge arrival
-                        charge.blnStick = frieght.IsTick.Value;//isStick of charge arrival
-                        charge.blnRoot = frieght.IsFull.Value; //isRoot of charge arrival
+                        charge.blnShow = frieght.IsShow != null ? frieght.IsShow.Value : false; //isShow of charge arrival
+                        charge.blnStick = frieght.IsTick != null ? frieght.IsTick.Value : false;//isStick of charge arrival
+                        charge.blnRoot = frieght.IsFull != null ? frieght.IsFull.Value : false; //isRoot of charge arrival
                         charge.FreightCharges = chargeRepository.Get(x => x.Id == frieght.ChargeId).FirstOrDefault()?.ChargeNameEn;//Charge name of charge arrival
-                        charge.Qty = frieght.Quantity.Value;//Quantity of charge arrival
+                        charge.Qty = frieght.Quantity != null ? frieght.Quantity.Value : 0;//Quantity of charge arrival
                         charge.QUnit = frieght.UnitName;//Unit name of charge arrival
-                        charge.TotalValue = frieght.UnitPrice.Value;//Unit price of charge arrival
+                        charge.TotalValue = frieght.UnitPrice != null ? frieght.UnitPrice.Value : 0;//Unit price of charge arrival
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
-                        charge.VAT = frieght.Vatrate.Value; //VAT of charge arrival
+                        charge.VAT = frieght.Vatrate != null ? frieght.Vatrate.Value : 0; //VAT of charge arrival
                         charge.Notes = frieght.Notes;//Note of charge arrival
                         charge.ArrivalFooterNoitice = arrival.ArrivalFooter;//Footer of arrival
                         charge.SeaFCL = true; //Đang gán cứng lấy hàng nguyên công
@@ -323,7 +323,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.insurAmount = "insurAmount";
                         charge.BillType = houserBill.Hbltype; // House Bill of Lading Type
                         charge.DOPickup = DateTime.Now;
-                        charge.ExVND = frieght.ExchangeRate.Value;
+                        charge.ExVND = frieght.ExchangeRate != null ? frieght.ExchangeRate.Value : 0;
                         charge.DecimalSymbol = ",";//Dấu phân cách phần ngàn
                         charge.DigitSymbol = ".";//Dấu phân cách phần thập phân
                         charge.DecimalNo = 0;

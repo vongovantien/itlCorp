@@ -9,8 +9,8 @@ import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSu
 import { BaseService, SortService, DataService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
-import { OpsModuleCreditDebitNoteDetailComponent } from '../../credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { SystemConstants } from 'src/constants/system.const';
+import { OpsCdNoteDetailPopupComponent } from '../popup/ops-cd-note-detail/ops-cd-note-detail.popup';
 
 @Component({
     selector: 'job-management-selling-rate',
@@ -22,8 +22,7 @@ export class JobManagementSellingRateComponent extends AppList {
     @ViewChild(AddSellingRatePopupComponent, { static: false }) addSellingRatePopup: AddSellingRatePopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCharge: ConfirmPopupComponent;
     @ViewChild(EditSellingRatePopupComponent, { static: false }) editSellingRatePopup: EditSellingRatePopupComponent;
-    @ViewChild(OpsModuleCreditDebitNoteDetailComponent, { static: false }) detailCDPopup: OpsModuleCreditDebitNoteDetailComponent;
-
+    @ViewChild(OpsCdNoteDetailPopupComponent, { static: false }) detailCDPopup: OpsCdNoteDetailPopupComponent;
     @Input() data: any = [];
     @Input() opsTransaction: OpsTransaction = null;
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
@@ -86,25 +85,11 @@ export class JobManagementSellingRateComponent extends AppList {
         this.confirmDeleteCharge.show();
     }
 
-    async openCreditDebitNote(cdNo: string) {
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.opsTransaction.id + "&cdNo=" + cdNo);
-        if (this.CDNoteDetails != null) {
-            if (this.CDNoteDetails.listSurcharges != null) {
-                this.totalCreditDebitCalculate();
-            }
-            if (this.CDNoteDetails.cdNote.type === 'CREDIT') {
-                this.CDNoteDetails.cdNote.type = 'Credit';
-            }
-            if (this.CDNoteDetails.cdNote.type === 'DEBIT') {
-                this.CDNoteDetails.cdNote.type = 'Debit';
-            }
-            if (this.CDNoteDetails.cdNote.type === 'INVOICE') {
-                this.CDNoteDetails.cdNote.type = 'Invoice';
-            }
-
-            this.detailCDPopup.currentJob = this.opsTransaction;
-            this.detailCDPopup.show();
-        }
+    openCreditDebitNote(cdNo: string) {
+        this.detailCDPopup.jobId = this.opsTransaction.id;
+        this.detailCDPopup.cdNote = cdNo;
+        this.detailCDPopup.getDetailCdNote(this.opsTransaction.id, cdNo);
+        this.detailCDPopup.show();
     }
 
     onSaveNewSellingRate(event: any) {

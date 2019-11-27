@@ -277,7 +277,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        public List<object> GroupCDNoteByPartner(Guid id, bool IsHouseBillID)
+        public List<object> GroupCDNoteByPartner(Guid id, bool IsShipmentOperation)
         {
             try
             {
@@ -285,15 +285,12 @@ namespace eFMS.API.Documentation.DL.Services
                 List<CatPartner> listPartners = new List<CatPartner>();
                 List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
 
-                if (IsHouseBillID == false)
+                if (IsShipmentOperation == false)
                 {
-                    //List<Guid> lst_Hbid = trandetailRepositoty.Get(x => x.JobId == id);//((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == id).ToList().Select(x => x.Id).ToList();
                     List<CsTransactionDetail> housebills = trandetailRepositoty.Get(x => x.JobId == id).ToList();
                     List<CsShipmentSurchargeDetailsModel> _listCharges = new List<CsShipmentSurchargeDetailsModel>();
                     foreach (var housebill in housebills)
                     {
-                        //var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == _id).FirstOrDefault();
-                        //List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
                         if (housebill != null)
                         {
                             _listCharges = Query(housebill.Id);
@@ -302,12 +299,12 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 if (c.PaymentObjectId != null)
                                 {
-                                    var partner = partnerRepositoty.Get(x => x.Id == c.PaymentObjectId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
+                                    var partner = partnerRepositoty.Get(x => x.Id == c.PaymentObjectId).FirstOrDefault();
                                     if (partner != null) listPartners.Add(partner);
                                 }
                                 if (c.PayerId != null)
                                 {
-                                    var partner = partnerRepositoty.Get(x => x.Id == c.PayerId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
+                                    var partner = partnerRepositoty.Get(x => x.Id == c.PayerId).FirstOrDefault();
                                     if (partner != null) listPartners.Add(partner);
                                 }
                             }
@@ -317,19 +314,19 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    //List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-                    listCharges = Query(id);
+                    var hblid = opstransRepository.Get(x => x.Id == id).FirstOrDefault()?.Hblid;
+                    listCharges = Query(hblid.Value);
 
                     foreach (var c in listCharges)
                     {
                         if (c.PaymentObjectId != null)
                         {
-                            var partner = partnerRepositoty.Get(x => x.Id == c.PaymentObjectId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
+                            var partner = partnerRepositoty.Get(x => x.Id == c.PaymentObjectId).FirstOrDefault();
                             if (partner != null) listPartners.Add(partner);
                         }
                         if (c.PayerId != null)
                         {
-                            var partner = partnerRepositoty.Get(x => x.Id == c.PayerId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
+                            var partner = partnerRepositoty.Get(x => x.Id == c.PayerId).FirstOrDefault();
                             if (partner != null) listPartners.Add(partner);
                         }
                     }
@@ -338,15 +335,14 @@ namespace eFMS.API.Documentation.DL.Services
                 listPartners = listPartners.Distinct().ToList();
                 foreach (var item in listPartners)
                 {
-                    var jobId = IsHouseBillID == true ? opstransRepository.Get(x => x.Hblid == id).FirstOrDefault()?.Id : id;
-                    var cdNotes = DataContext.Where(x => x.PartnerId == item.Id && x.JobId == jobId).ToList();
+                    //var jobId = isShipmentOperation == true ? opstransRepository.Get(x => x.Hblid == id).FirstOrDefault()?.Id : id;
+                    var cdNotes = DataContext.Where(x => x.PartnerId == item.Id && x.JobId == id).ToList();
                     var cdNotesModel = mapper.Map<List<AcctCdnoteModel>>(cdNotes);
                     List<object> listCDNote = new List<object>();
                     foreach (var cdNote in cdNotesModel)
                     {
                         // -to continue
-                        //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
-                        var chargesOfCDNote = listCharges.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);//((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
+                        var chargesOfCDNote = listCharges.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
                         decimal totalDebit = 0;
                         decimal totalCredit = 0;
                         foreach (var charge in chargesOfCDNote)
@@ -365,7 +361,6 @@ namespace eFMS.API.Documentation.DL.Services
                         cdNote.Total = totalDebit - totalCredit;
                         cdNote.soaNo = String.Join(",", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
                         cdNote.total_charge = chargesOfCDNote.Count();
-                        //listCDNote.Add(new { cdNote, total_charge= chargesOfCDNote.Count()});
                         listCDNote.Add(cdNote);
                     }
 
@@ -431,6 +426,7 @@ namespace eFMS.API.Documentation.DL.Services
             var places = placeRepository.Get();
             AcctCDNoteDetailsModel soaDetails = new AcctCDNoteDetailsModel();
             var cdNote = DataContext.Where(x => x.Code == cdNo).FirstOrDefault();
+            if (cdNote == null) return soaDetails;
             var partner = partnerRepositoty.Get(x => x.Id == cdNote.PartnerId).FirstOrDefault();
 
             CatPlace pol = new CatPlace();

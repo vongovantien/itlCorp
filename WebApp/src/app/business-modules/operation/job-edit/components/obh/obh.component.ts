@@ -6,10 +6,9 @@ import { BaseService, SortService, DataService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
-import { OpsModuleCreditDebitNoteDetailComponent } from '../../credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
-import cloneDeep from 'lodash/cloneDeep';
 import { EditObhRatePopupComponent } from '../../charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 import { SystemConstants } from 'src/constants/system.const';
+import { OpsCdNoteDetailPopupComponent } from '../popup/ops-cd-note-detail/ops-cd-note-detail.popup';
 
 @Component({
     selector: 'job-management-obh',
@@ -20,8 +19,7 @@ export class JobManagementOBHComponent extends AppList {
 
     @ViewChild(AddObhRatePopupComponent, { static: false }) addOHBRatePopup: AddObhRatePopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCharge: ConfirmPopupComponent;
-    @ViewChild(OpsModuleCreditDebitNoteDetailComponent, { static: false }) poupDetail: OpsModuleCreditDebitNoteDetailComponent;
-    @ViewChild(EditObhRatePopupComponent, { static: false }) editOHBRatePopup: EditObhRatePopupComponent;
+    @ViewChild(OpsCdNoteDetailPopupComponent, { static: false }) detailCDPopup: OpsCdNoteDetailPopupComponent;@ViewChild(EditObhRatePopupComponent, { static: false }) editOHBRatePopup: EditObhRatePopupComponent;
 
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
     @Input() data: any = [];
@@ -106,25 +104,11 @@ export class JobManagementOBHComponent extends AppList {
         this.onChange.emit($event);
     }
 
-    async openCreditDebitNote(cdNo: string) {
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.opsTransaction.id + "&cdNo=" + cdNo);
-        if (this.CDNoteDetails != null) {
-            if (this.CDNoteDetails.listSurcharges != null) {
-                this.totalCreditDebitCalculate();
-            }
-            if (this.CDNoteDetails.cdNote.type === 'CREDIT') {
-                this.CDNoteDetails.cdNote.type = 'Credit';
-            }
-            if (this.CDNoteDetails.cdNote.type === 'DEBIT') {
-                this.CDNoteDetails.cdNote.type = 'Debit';
-            }
-            if (this.CDNoteDetails.cdNote.type === 'INVOICE') {
-                this.CDNoteDetails.cdNote.type = 'Invoice';
-            }
-            this.poupDetail.currentJob = this.opsTransaction;
-            this.poupDetail.show({ backdrop: 'static' });
-            this.poupDetail.show({ backdrop: 'static' });
-        }
+    openCreditDebitNote(cdNo: string) {
+        this.detailCDPopup.jobId = this.opsTransaction.id;
+        this.detailCDPopup.cdNote = cdNo;
+        this.detailCDPopup.getDetailCdNote(this.opsTransaction.id, cdNo);
+        this.detailCDPopup.show();
     }
 
     totalCreditDebitCalculate() {

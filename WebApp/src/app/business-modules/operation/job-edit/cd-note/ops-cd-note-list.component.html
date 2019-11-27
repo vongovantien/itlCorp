@@ -17,7 +17,7 @@
                 </div>
                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                     <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="openPopupAdd()">
+                    (click)="openPopupAdd()">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -150,9 +150,9 @@
     </div>
 </div>
 
-<cd-note-detail-popup (onDeleted)="onDeletedCdNote($event)"></cd-note-detail-popup>
+<ops-cd-note-detail (onDeleted)="onDeletedCdNote()"></ops-cd-note-detail>
 
-<cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"></cd-note-add-popup>
+<ops-cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"></ops-cd-note-add-popup>
 
 <confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
