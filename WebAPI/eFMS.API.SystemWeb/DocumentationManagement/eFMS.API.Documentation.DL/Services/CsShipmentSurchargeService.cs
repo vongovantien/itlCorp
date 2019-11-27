@@ -128,9 +128,11 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        public List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hbID, string type)
+        public IQueryable<CsShipmentSurchargeDetailsModel> GetByHB(Guid hbID, string type)
         {
-            return Query(hbID, type);
+            var data = Query(hbID, type);
+            if (data == null) return null;
+            return data.OrderBy(x => x.DatetimeCreated).AsQueryable();
         }
 
         public List<GroupChargeModel> GroupChargeByHB(Guid id, string partnerId, bool isHouseBillID, string cdNoteCode)
