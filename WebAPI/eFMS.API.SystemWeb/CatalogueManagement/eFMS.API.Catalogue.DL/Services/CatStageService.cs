@@ -16,6 +16,7 @@ using eFMS.API.Common.NoSql;
 using Microsoft.Extensions.Caching.Distributed;
 using eFMS.API.Common.Helpers;
 using ITL.NetCore.Connection.Caching;
+using AutoMapper.QueryableExtensions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -36,8 +37,12 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatStageModel> GetAll()
         {
-            var data = Get();
-            return data;
+            //var data = Get();
+            //return data;
+            var data = DataContext.Get();
+            if (data == null) return null;
+            var results = data.ProjectTo<CatStageModel>(mapper.ConfigurationProvider);
+            return results;
         } 
 
         public HandleState AddStage(CatStageModel catStage)
@@ -87,7 +92,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatStageModel> Query(CatStageCriteria criteria)
         {
             IQueryable<CatStageModel> results = null;
-            var stages = Get();
+            var stages = DataContext.Get();
             var departments = departmentRepository.Get();
             if (criteria.All == null)
             {

@@ -346,12 +346,14 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             )
             .subscribe(
                 (res: any) => {
-                    if (res != null) {
+                    if (this.dataReport.dataSource.length > 0) {
                         this.dataReport = res;
                         setTimeout(() => {
                             this.reportPopup.frm.nativeElement.submit();
                             this.reportPopup.show();
                         }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
