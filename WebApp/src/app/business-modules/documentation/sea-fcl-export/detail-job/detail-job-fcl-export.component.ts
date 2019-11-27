@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -8,11 +8,9 @@ import { SeaFCLExportCreateJobComponent } from '../create-job/create-job-fcl-exp
 import { DocumentationRepo } from 'src/app/shared/repositories';
 
 import { combineLatest, of } from 'rxjs';
-import { tap, map, switchMap, take, catchError, takeUntil, skip } from 'rxjs/operators';
+import { tap, map, switchMap, catchError, takeUntil, skip, take } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
-import * as fromStore from './../store';
-import { TransactionTypeEnum } from 'src/app/shared/enums';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -26,14 +24,19 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
+
+    shipmentDetail: any;
+
     constructor(
         private _store: Store<fromShareBussiness.TransactionActions>,
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
+        protected _cd: ChangeDetectorRef
+
     ) {
-        super(_toastService, _documenRepo, _router, _actionStoreSubject);
+        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
     }
 
     ngAfterViewInit() {
@@ -49,17 +52,16 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                 //     this.ACTION = param.action.toUpperCase();
                 // }
 
-                console.log(this.selectedTab);
-
                 // this.cdr.detectChanges();
             }),
             switchMap(() => of(this.jobId)),
+            take(1)
         ).subscribe(
             (jobId: string) => {
                 if (!!jobId) {
                     this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
                     this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
-                    this._store.dispatch(new fromStore.SeaFCLExportGetDetailAction(jobId));
+                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
 
                     this.getListContainer();
                     this.getDetailSeaFCLImport();
@@ -69,7 +71,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     }
 
     getDetailSeaFCLImport() {
-        this._store.select<any>(fromStore.getSeaFCLShipmentDetail)
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
             .pipe(
                 skip(1),
                 takeUntil(this.ngUnsubscribe)
@@ -77,6 +79,8 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             .subscribe(
                 (res: any) => {
                     if (!!res) {
+                        this.shipmentDetail = res;
+
                         // * Update Good Summary.
                         this.shipmentGoodSummaryComponent.containerDetail = res.packageContainer;
                         this.shipmentGoodSummaryComponent.commodities = res.commodity;
@@ -90,8 +94,34 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             );
     }
 
+    onSaveJob() {
+        this.formCreateComponent.isSubmitted = true;
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
+
+        if (!this.containers.length) {
+            this._toastService.warning('Please add container to create new job');
+            return;
+        }
+
+        const modelAdd = this.onSubmitData();
+        modelAdd.csMawbcontainers = this.containers; // * Update containers model
+
+        //  * Update field
+        modelAdd.csMawbcontainers = this.containers;
+        modelAdd.id = this.jobId;
+        modelAdd.branchId = this.shipmentDetail.branchId;
+        modelAdd.transactionType = this.shipmentDetail.transactionType;
+        modelAdd.jobNo = this.shipmentDetail.jobNo;
+        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
+        modelAdd.userCreated = this.shipmentDetail.userCreated;
+
+        this.saveJob(modelAdd);
+    }
+
     saveJob(body: any) {
-        body.id = this.jobId;
         this._documenRepo.updateCSTransaction(body)
             .pipe(
                 catchError(this.catchError)
@@ -102,7 +132,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                         this._toastService.success(res.message);
 
                         // * get detail & container list.
-                        this._store.dispatch(new fromStore.SeaFCLExportGetDetailFailAction(this.jobId));
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                     } else {
@@ -128,16 +158,15 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
     onSelectTab(tabName: string) {
         switch (tabName) {
-            // case 'hbl':
-            //     this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
-            //     break;
+            case 'hbl':
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
+                break;
             case 'shipment':
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE', transactionType: TransactionTypeEnum.SeaFCLExport } });
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
-            
         }
     }
 }

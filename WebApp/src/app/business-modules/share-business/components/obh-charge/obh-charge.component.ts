@@ -7,7 +7,6 @@ import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-cha
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { ChargeConstants } from 'src/constants/charge.const';
 
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { CsShipmentSurcharge, Partner } from 'src/app/shared/models';
@@ -41,7 +40,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
                     this.charges = buyings;
-                    console.log("get obh charge from store", this.charges);
                 }
             );
     }
@@ -74,7 +72,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     }
 
     getCharge() {
-        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.OBH });
+        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.OBH });
     }
 
     selectPartnerTypes(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge, type: string) {
@@ -160,9 +158,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        // * Get Profit
-                        this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
-
+                        this.getProfit();
                         this.getSurcharges(CommonEnum.SurchargeTypeEnum.OBH);
 
                     } else {

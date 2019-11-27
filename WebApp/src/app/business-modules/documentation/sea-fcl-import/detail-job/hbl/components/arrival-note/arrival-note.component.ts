@@ -16,7 +16,6 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators';
 
-import { getHBLState, GetDetailHBLAction } from '../../../../store';
 
 import * as fromShareBussiness from './../../../../../../share-business/store';
 import { ChargeConstants } from 'src/constants/charge.const';
@@ -95,7 +94,7 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
             }
         );
 
-        this._store.select(getHBLState)
+        this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
                 catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
@@ -247,7 +246,7 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
                         this._toastService.success(res.message);
 
                         // * Dispatch for detail HBL to update HBL state.
-                        this._store.dispatch(new GetDetailHBLAction(this.hblArrivalNote.hblid));
+                        this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblArrivalNote.hblid));
                     }
                 }
             );

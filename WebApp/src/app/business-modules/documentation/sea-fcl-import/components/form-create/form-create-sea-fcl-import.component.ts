@@ -14,8 +14,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 
-import * as fromStore from './../../store';
-
+import * as fromShare from './../../../../share-business/store';
 
 @Component({
     selector: 'form-create-sea-fcl-import',
@@ -71,7 +70,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
         protected _baseService: BaseService,
         private _dataService: DataService,
         private _spinner: NgxSpinnerService,
-        private _store: Store<any>
+        private _store: Store<fromShare.ITransactionState>
 
     ) {
         super();
@@ -105,7 +104,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
         this.getCommonData();
 
         // * Subscribe state to update form.
-        this._store.select(fromStore.seaFCLImportTransactionState)
+        this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), skip(1))
             .subscribe(
                 (res: any) => {

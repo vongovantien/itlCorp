@@ -39,6 +39,7 @@
                 <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')" [active]="true">
                     <div class="m-portlet">
                         <div class="m-portlet__body">
+
                             <div class="m-portlet">
                                 <div class="alert-block__heading">
                                     <h3 class="alert-block__title"> HBL List</h3>
@@ -130,28 +131,15 @@
                                 <div class="m-portlet__body">
                                     <tabset class="custom-class-tab">
                                         <tab heading="Buying" (selectTab)="onSelectTabSurcharge('BUY')">
-                                            <ng-container
-                                                *ngIf="!!(selectedShipment |async ) && !!selectedHbl && !!(containers | async); else placeholder">
-                                                <buying-charge [containers]="containers | async"
-                                                    [shipment]="selectedShipment | async" [hbl]="selectedHbl">
-                                                </buying-charge>
+                                            <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
+                                                <buying-charge></buying-charge>
                                             </ng-container>
                                         </tab>
                                         <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
-                                            <ng-container
-                                                *ngIf="!!(selectedShipment |async ) && !!selectedHbl && !!(containers | async); else placeholder">
-                                                <selling-charge [containers]="containers | async"
-                                                    [shipment]="selectedShipment | async" [hbl]="selectedHbl">
-                                                </selling-charge>
-                                            </ng-container>
+                                            <selling-charge></selling-charge>
                                         </tab>
                                         <tab heading="OBH" (selectTab)="onSelectTabSurcharge('OBH')">
-                                            <ng-container
-                                                *ngIf="!!(selectedShipment |async ) && !!selectedHbl && !!(containers | async); else placeholder">
-                                                <obh-charge [containers]="containers | async"
-                                                    [shipment]="selectedShipment | async" [hbl]="selectedHbl">
-                                                </obh-charge>
-                                            </ng-container>
+                                            <obh-charge></obh-charge>
                                         </tab>
                                     </tabset>
                                 </div>

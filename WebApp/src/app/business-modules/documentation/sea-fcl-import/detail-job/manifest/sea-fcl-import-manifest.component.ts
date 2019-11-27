@@ -6,7 +6,6 @@ import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import * as fromStore from '../../store';
 import { getParamsRouterState } from 'src/app/store';
 import { Params, Router } from '@angular/router';
 import { SortService } from 'src/app/shared/services';
@@ -48,7 +47,7 @@ export class SeaFclImportManifestComponent extends AppList {
     dataReport: Crystal;
 
     constructor(
-        protected _store: Store<fromStore.ISeaFCLImportState>,
+        protected _store: Store<any>,
         private _progressService: NgProgress,
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,

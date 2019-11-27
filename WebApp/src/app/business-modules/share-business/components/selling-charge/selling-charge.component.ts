@@ -9,7 +9,6 @@ import { SortService } from 'src/app/shared/services';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { ChargeConstants } from 'src/constants/charge.const';
 
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
@@ -44,7 +43,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
                     this.charges = buyings;
-                    console.log("get selling charge from store", this.charges);
                 }
             );
     }
@@ -73,7 +71,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     getCharge() {
-        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.CREDIT });
+        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT });
     }
 
     saveSellingSurCharge() {
@@ -97,8 +95,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        // * Get Profit
-                        this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
+                        this.getProfit();
 
                         this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
                     } else {

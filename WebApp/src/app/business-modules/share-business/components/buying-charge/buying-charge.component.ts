@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -13,12 +13,13 @@ import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { ChargeConstants } from 'src/constants/charge.const';
 
 import { forkJoin } from 'rxjs';
-import { catchError, takeUntil, finalize } from 'rxjs/operators';
+import { catchError, takeUntil, finalize, take } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
+import * as fromRoot from 'src/app/store';
+
 @Component({
     selector: 'buying-charge',
     templateUrl: './buying-charge.component.html',
@@ -29,9 +30,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
-    @Input() containers: Container[] = [];
-    @Input() shipment: any;
-    @Input() hbl: CsTransactionDetail;
+    serviceTypeId: string;
+    containers: Container[] = [];
+    shipment: any;
+    hbl: CsTransactionDetail;
 
     headers: CommonInterface.IHeaderTable[] = [];
     headerPartner: CommonInterface.IHeaderTable[] = [];
@@ -70,6 +72,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this._progressRef = this._ngProgressService.ref();
 
         this.getSurcharge();
+
+        this._store.select(fromRoot.getDataRouterState).subscribe(
+            (dataParam: CommonInterface.IDataParam) => {
+                this.serviceTypeId = dataParam.serviceId;
+                console.log(this.serviceTypeId);
+            }
+        );
     }
 
     getSurcharge() {
@@ -78,7 +87,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
                     this.charges = buyings;
-                    console.log("get buying charge from store", this.charges);
                 }
             );
     }
@@ -116,6 +124,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         ];
 
         this.getMasterData();
+        this.getShipmentContainer();
+        this.getShipmentDetail();
+        this.getDetailHBL();
+
     }
 
     configHeader() {
@@ -164,8 +176,39 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             );
     }
 
+    getShipmentContainer() {
+        this._store.select(fromStore.getHBLContainersState)
+            .pipe(catchError(this.catchError), takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (containers: any[]) => {
+                    this.containers = containers;
+                }
+            );
+    }
+
+    getShipmentDetail() {
+        this._store.select(fromStore.getTransactionDetailCsTransactionState)
+            .pipe(catchError(this.catchError), takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (shipment: any) => {
+                    this.shipment = shipment;
+                }
+            );
+    }
+
+    getDetailHBL() {
+        this._store.select(fromStore.getDetailHBlState)
+            .pipe(catchError(this.catchError), takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (hbl: any) => {
+                    this.hbl = hbl;
+                    console.log("detail hbl", this.hbl);
+                }
+            );
+    }
+
     getCharge() {
-        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.DEBIT });
+        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.DEBIT });
     }
 
     sortSurcharge() {
@@ -274,8 +317,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         if (res.status) {
                             this._toastService.success(res.message);
 
-                            console.log(type);
                             this.getSurcharges(type);
+                            this.getProfit();
                         } else {
                             this._toastService.error(res.message);
                         }
@@ -333,9 +376,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        // * Get Profit
-                        this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
-
+                        this.getProfit();
                         this.getSurcharges(type);
 
                     } else {
@@ -462,6 +503,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             default:
                 break;
         }
+    }
+
+    getProfit() {
+        this._store.dispatch(new fromStore.GetProfitHBLAction(this.hbl.id));
     }
 
     addSurcharges(type: string, newcharge: CsShipmentSurcharge) {

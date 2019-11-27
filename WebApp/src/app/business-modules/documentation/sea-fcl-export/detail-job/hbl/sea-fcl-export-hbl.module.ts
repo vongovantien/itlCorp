@@ -6,12 +6,13 @@ import { PaginationModule, TabsModule, ModalModule } from 'ngx-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 
 const routing: Routes = [
     {
         path: '', component: SeaFCLExportHBLComponent,
-        data: { name: 'House Bill List', path: 'hbl', level: 4 }
+        data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.SFE_CODE }
     },
     {
         path: 'new', component: SeaFCLExportHBLComponent,

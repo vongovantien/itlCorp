@@ -73,6 +73,12 @@ namespace CommonInterface {
         label: string;
     }
 
+    export interface IDataParam {
+        level: number;
+        name: string;
+        path: string;
+        [name: string]: any;
+    }
 }
 
 

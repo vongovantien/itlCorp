@@ -1,19 +1,17 @@
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Routes, RouterModule } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { TabsModule } from 'ngx-bootstrap';
+import { SelectModule } from 'ng2-select';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 import { SeaFCLExportComponent } from './sea-fcl-export.component';
-import { Routes, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SelectModule } from 'ng2-select';
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { SeaFCLExportFormSearchComponent } from './components/form-search/form-search-sea-fcl-export.component';
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
-import { effects, reducers } from './store';
 import { SeaFCLExportCreateJobComponent } from './create-job/create-job-fcl-export.component';
-import { TabsModule } from 'ngx-bootstrap';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { SeaFCLExportFormCreateComponent } from './components/form-create/form-create-fcl-export.component';
 import { SeaFCLExportDetailJobComponent } from './detail-job/detail-job-fcl-export.component';
@@ -61,8 +59,6 @@ const COMPONENTS = [
         ReactiveFormsModule,
         SharedModule,
         ShareBussinessModule,
-        StoreModule.forFeature('seaFCLExport', reducers),
-        EffectsModule.forFeature(effects),
         ...LIB,
         SeaFCLExportLazyLoadModule // ?  Lazy loading module with  tab component (CD Note)
     ],

@@ -13,7 +13,7 @@ import { AppList } from 'src/app/app.list';
 
 export class ShareBussinessProfitSummaryComponent extends AppList {
 
-    hblProfit$: Observable<fromStore.ISurchargeProfit>;
+    hblProfit$: Observable<fromStore.IHBLProfit>;
     totalUSD$: Observable<number>;
     totalVND$: Observable<number>;
 
@@ -32,7 +32,8 @@ export class ShareBussinessProfitSummaryComponent extends AppList {
         );
         this.totalVND$ = this.hblProfit$.pipe(
             map(data => data.profitLocal)
-        )
+        );
+
         this.headers = [
             { title: 'USD', field: 'profitUSD', dataType: 'CURRENCY' },
             { title: 'Local (VND)', field: 'profitLocal', dataType: 'CURRENCY' }

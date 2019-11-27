@@ -14,7 +14,6 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { combineLatest, of } from 'rxjs';
 import { map, tap, switchMap, skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 
-import * as fromStore from './../store';
 import * as fromShareBussiness from './../../../share-business/store';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
@@ -47,7 +46,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         protected _router: Router,
         protected _documentRepo: DocumentationRepo,
         protected _activedRoute: ActivatedRoute,
-        protected _store: Store<fromStore.ISeaFCLImportState>,
+        protected _store: Store<fromShareBussiness.ITransactionState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
         protected cdr: ChangeDetectorRef,
@@ -77,7 +76,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         ).subscribe(
             (jobId: string) => {
                 this.id = jobId;
-                this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(jobId));
+                this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
                 this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
                 this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
 
@@ -89,7 +88,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     }
 
     getDetailSeaFCLImport() {
-        this._store.select<any>(fromStore.seaFCLImportTransactionState)
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
             .pipe(
                 skip(1),
                 takeUntil(this.ngUnsubscribe)
@@ -164,7 +163,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.id = res.data.id;
-                        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.id));
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.id));
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.id }));
                         // * get detail & container list.
@@ -188,7 +187,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                         this._toastService.success(res.message);
 
                         // * get detail & container list.
-                        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.id));
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.id));
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.id }));
                     } else {
