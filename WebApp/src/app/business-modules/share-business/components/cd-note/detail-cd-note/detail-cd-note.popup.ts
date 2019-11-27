@@ -151,7 +151,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
         this.cdNoteEditPopupComponent.show();
     }
 
-    onUpdateCdNote(dataRequest: any) {
+    onUpdateCdNote(data: any) {
         this.onDeleted.emit();
         this.getDetailCdNote(this.jobId, this.cdNote);
     }

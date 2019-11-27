@@ -162,11 +162,11 @@ export class CdNoteListComponent extends AppList {
     //     });
     // }
 
-    onRequestCdNoteChange() {
+    onRequestCdNoteChange(data: any) {
         this.getListCdNote(this.idMasterBill);
     }
 
-    onDeletedCdNote() {
+    onDeletedCdNote(data: any) {
         this.getListCdNote(this.idMasterBill);
     }
 
