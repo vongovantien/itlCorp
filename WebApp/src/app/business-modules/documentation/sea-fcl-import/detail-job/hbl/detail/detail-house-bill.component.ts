@@ -346,8 +346,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             )
             .subscribe(
                 (res: any) => {
+                    this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        this.dataReport = res;
                         setTimeout(() => {
                             this.reportPopup.frm.nativeElement.submit();
                             this.reportPopup.show();

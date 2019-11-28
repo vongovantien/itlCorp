@@ -16,6 +16,7 @@ import { ShareBussinessModule } from '../../share-business/share-bussines.module
 import { SeaFCLExportFormCreateComponent } from './components/form-create/form-create-fcl-export.component';
 import { SeaFCLExportDetailJobComponent } from './detail-job/detail-job-fcl-export.component';
 import { SeaFCLExportLazyLoadModule } from './sea-fcl-export-lazy-load.module';
+import { SeaFclExportShippingInstructionComponent } from './detail-job/shipping-instruction/sea-fcl-export-shipping-instruction.component';
 
 const routing: Routes = [
     {
@@ -36,6 +37,11 @@ const routing: Routes = [
     {
         path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-export-hbl.module').then(m => m.SeaFCLExportHBLModule),
     },
+    {
+        path: ':jobId/si', component: SeaFclExportShippingInstructionComponent, data: {
+            name: "Shipping Instructions", path: "sea-fcl-export", level: 4
+        }
+    }
 ];
 
 const LIB = [
@@ -67,6 +73,7 @@ const COMPONENTS = [
         SeaFCLExportComponent,
         SeaFCLExportCreateJobComponent,
         SeaFCLExportDetailJobComponent,
+        SeaFclExportShippingInstructionComponent,
         ...COMPONENTS
     ],
     providers: [],
