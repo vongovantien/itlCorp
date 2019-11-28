@@ -82,9 +82,10 @@ namespace eFMS.API.Documentation.Controllers
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             model.UserCreated = currentUser.UserID;
             model.DatetimeCreated = DateTime.Now;
+            model.Id = Guid.NewGuid();
             var hs = csTransactionDetailService.AddTransactionDetail(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model.Id };
             if (!hs.Success)
             {
                 return BadRequest(result);

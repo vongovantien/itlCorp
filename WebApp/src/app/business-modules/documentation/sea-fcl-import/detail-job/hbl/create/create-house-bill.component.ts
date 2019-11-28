@@ -18,7 +18,16 @@ import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
+import { SeaFClImportArrivalNoteComponent } from '../components/arrival-note/arrival-note.component';
+import { SeaFClImportDeliveryOrderComponent } from '../components/delivery-order/delivery-order.component';
+import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
+import { DeliveryOrder } from 'src/app/shared/models';
+enum HBL_TAB {
+    DETAIL = 'DETAIL',
+    ARRIVAL = 'ARRIVAL',
+    DELIVERY = 'DELIVERY'
 
+}
 
 @Component({
     selector: 'app-create-house-bill',
@@ -30,13 +39,14 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ImportHouseBillDetailComponent;
+    @ViewChild(SeaFClImportArrivalNoteComponent, { static: false }) arrivalNoteComponent: SeaFClImportArrivalNoteComponent;
+    @ViewChild(SeaFClImportDeliveryOrderComponent, { static: false }) deliveryComponent: SeaFClImportDeliveryOrderComponent;
 
     jobId: string = '';
-
     shipmentDetail: any = {}; // TODO model.
     selectedHbl: any = {}; // TODO model.
-
     containers: Container[] = [];
+    selectedTab: string = HBL_TAB.DETAIL;
 
     constructor(
         protected _progressService: NgProgress,
@@ -70,28 +80,42 @@ export class CreateHouseBillComponent extends AppForm {
             if (param.id) {
                 this.jobId = param.id;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
+
             }
         });
+
+
     }
 
     getShipmentDetail() {
-
-
     }
+
+    onSelectTab(tabName: HBL_TAB | string) {
+        this.selectedTab = tabName;
+    }
+
 
     ngAfterViewInit() {
         this.shipmentGoodSummaryComponent.initContainer();
         this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
 
+        this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
+
+        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
+        this.deliveryComponent.deliveryOrder = new DeliveryOrder();
+
         this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
             .subscribe(
                 (res: any) => {
+
                     this.shipmentDetail = res;
-
                     this.formHouseBill.mtBill.setValue(this.shipmentDetail.mawb);
-
                     this.formHouseBill.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
                     this.formHouseBill.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
+                    this.formHouseBill.selectedSupplier = { field: 'id', value: this.shipmentDetail.coloaderId };
+                    this.formHouseBill.selectedPortOfLoading = { field: 'id', value: this.shipmentDetail.pol };
+                    this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: this.shipmentDetail.pod };
                 }
             );
     }
@@ -122,14 +146,19 @@ export class CreateHouseBillComponent extends AppForm {
     oncreate() {
         this.confirmCreatePopup.hide();
         this.formHouseBill.isSubmited = true;
-        if (!this.checkValidateForm()) {
+        if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
+            this.arrivalNoteComponent.isSubmitted = true;
+            this.deliveryComponent.isSubmitted = true;
             this.infoPopup.show();
         } else {
             const body = this.onsubmitData();
             this.createHbl(body);
+
+
         }
 
     }
+
     onImport(selectedData: any) {
         this.selectedHbl = selectedData;
 
@@ -173,8 +202,11 @@ export class CreateHouseBillComponent extends AppForm {
 
     }
 
-    createHbl(body: any) {
+    onSaveHBLDetail() {
 
+    }
+
+    createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
             this._progressRef.start();
             this._documentationRepo.createHousebill(body)
@@ -185,7 +217,13 @@ export class CreateHouseBillComponent extends AppForm {
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
+                            this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
+                            this.arrivalNoteComponent.saveArrivalNote();
+                            this.deliveryComponent.hblid = res.data;
+                            this.deliveryComponent.deliveryOrder.hblid = res.data;
+                            this.deliveryComponent.saveDeliveryOrder();
                             this._toastService.success(res.message, '');
+                            this.combackToHBLList();
                         } else {
 
                         }
