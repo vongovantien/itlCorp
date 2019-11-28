@@ -7,14 +7,9 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using eFMS.API.Documentation.Service.ViewModels;
-using ITL.NetCore.Connection;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Common;
-using System.Data.SqlClient;
-using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common;
@@ -375,7 +370,7 @@ namespace eFMS.API.Documentation.DL.Services
         #endregion -- DETAILS --
 
         #region -- LIST & PAGING --
-        private IQueryable<CsTransactionModel> GetTransaction(string transactionType, bool isSearch)
+        private IQueryable<CsTransactionModel> GetTransaction(string transactionType)
         {
             var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled);
 
@@ -384,137 +379,75 @@ namespace eFMS.API.Documentation.DL.Services
             var pols = catPlaceRepo.Get();
             var pods = catPlaceRepo.Get();
             var creators = sysUserRepo.Get();
+            var houseBills = csTransactionDetailRepo.Get();
             IQueryable<CsTransactionModel> query = null;
-            if (isSearch)
-            {
-                var houseBills = csTransactionDetailRepo.Get();
-                query = from masterBill in masterBills
-                        join houseBill in houseBills on masterBill.Id equals houseBill.JobId into houseBill2
-                        from houseBill in houseBill2.DefaultIfEmpty()
-                        join coloader in coloaders on masterBill.ColoaderId equals coloader.Id into coloader2
-                        from coloader in coloader2.DefaultIfEmpty()
-                        join agent in agents on masterBill.AgentId equals agent.Id into agent2
-                        from agent in agent2.DefaultIfEmpty()
-                        join pod in pods on masterBill.Pod equals pod.Id into pod2
-                        from pod in pod2.DefaultIfEmpty()
-                        join pol in pols on masterBill.Pol equals pol.Id into pol2
-                        from pol in pol2.DefaultIfEmpty()
-                        join creator in creators on masterBill.UserCreated equals creator.Id into creator2
-                        from creator in creator2.DefaultIfEmpty()
-                        select new CsTransactionModel
-                        {
-                            Id = masterBill.Id,
-                            BranchId = masterBill.BranchId,
-                            JobNo = masterBill.JobNo,
-                            Mawb = masterBill.Mawb,
-                            TypeOfService = masterBill.TypeOfService,
-                            Etd = masterBill.Etd,
-                            Eta = masterBill.Eta,
-                            ServiceDate = masterBill.ServiceDate,
-                            Mbltype = masterBill.Mbltype,
-                            ColoaderId = masterBill.ColoaderId,
-                            SubColoader = masterBill.SubColoader,
-                            BookingNo = masterBill.BookingNo,
-                            AgentId = masterBill.AgentId,
-                            Pol = masterBill.Pol,
-                            Pod = masterBill.Pod,
-                            DeliveryPlace = masterBill.DeliveryPlace,
-                            PaymentTerm = masterBill.PaymentTerm,
-                            FlightVesselName = masterBill.FlightVesselName,
-                            VoyNo = masterBill.VoyNo,
-                            ShipmentType = masterBill.ShipmentType,
-                            Commodity = masterBill.Commodity,
-                            DesOfGoods = masterBill.DesOfGoods,
-                            PackageContainer = masterBill.PackageContainer,
-                            Pono = masterBill.Pono,
-                            PersonIncharge = masterBill.PersonIncharge,
-                            NetWeight = masterBill.NetWeight,
-                            GrossWeight = masterBill.GrossWeight,
-                            ChargeWeight = masterBill.ChargeWeight,
-                            Cbm = masterBill.Cbm,
-                            Notes = masterBill.Notes,
-                            TransactionType = masterBill.TransactionType,
-                            UserCreated = masterBill.UserCreated,
-                            IsLocked = masterBill.IsLocked,
-                            LockedDate = masterBill.LockedDate,
-                            DatetimeCreated = masterBill.DatetimeCreated,
-                            UserModified = masterBill.UserModified,
-                            DatetimeModified = masterBill.DatetimeModified,
-                            Active = masterBill.Active,
-                            InactiveOn = masterBill.InactiveOn,
-                            SupplierName = coloader.ShortName,
-                            AgentName = agent.ShortName,
-                            HWBNo = houseBill.Hwbno,
-                            CustomerId = houseBill.CustomerId,
-                            NotifyPartyId = houseBill.NotifyPartyId,
-                            SaleManId = houseBill.SaleManId,
-                            PODName = pod.NameEn,
-                            POLName = pol.NameEn,
-                            CreatorName = creator.Username,
-                            HblId = houseBill.Id == Guid.Empty || houseBill.Id == null ? Guid.Empty : houseBill.Id,
-                        };
-            }
-            else
-            {
-                query = from masterBill in masterBills
-                        join coloader in coloaders on masterBill.ColoaderId equals coloader.Id into coloader2
-                        from coloader in coloader2.DefaultIfEmpty()
-                        join agent in agents on masterBill.AgentId equals agent.Id into agent2
-                        from agent in agent2.DefaultIfEmpty()
-                        join pod in pods on masterBill.Pod equals pod.Id into pod2
-                        from pod in pod2.DefaultIfEmpty()
-                        join pol in pols on masterBill.Pol equals pol.Id into pol2
-                        from pol in pol2.DefaultIfEmpty()
-                        join creator in creators on masterBill.UserCreated equals creator.Id into creator2
-                        from creator in creator2.DefaultIfEmpty()
-                        select new CsTransactionModel
-                        {
-                            Id = masterBill.Id,
-                            BranchId = masterBill.BranchId,
-                            JobNo = masterBill.JobNo,
-                            Mawb = masterBill.Mawb,
-                            TypeOfService = masterBill.TypeOfService,
-                            Etd = masterBill.Etd,
-                            Eta = masterBill.Eta,
-                            ServiceDate = masterBill.ServiceDate,
-                            Mbltype = masterBill.Mbltype,
-                            ColoaderId = masterBill.ColoaderId,
-                            SubColoader = masterBill.SubColoader,
-                            BookingNo = masterBill.BookingNo,
-                            AgentId = masterBill.AgentId,
-                            Pol = masterBill.Pol,
-                            Pod = masterBill.Pod,
-                            DeliveryPlace = masterBill.DeliveryPlace,
-                            PaymentTerm = masterBill.PaymentTerm,
-                            FlightVesselName = masterBill.FlightVesselName,
-                            VoyNo = masterBill.VoyNo,
-                            ShipmentType = masterBill.ShipmentType,
-                            Commodity = masterBill.Commodity,
-                            DesOfGoods = masterBill.DesOfGoods,
-                            PackageContainer = masterBill.PackageContainer,
-                            Pono = masterBill.Pono,
-                            PersonIncharge = masterBill.PersonIncharge,
-                            NetWeight = masterBill.NetWeight,
-                            GrossWeight = masterBill.GrossWeight,
-                            ChargeWeight = masterBill.ChargeWeight,
-                            Cbm = masterBill.Cbm,
-                            Notes = masterBill.Notes,
-                            TransactionType = masterBill.TransactionType,
-                            UserCreated = masterBill.UserCreated,
-                            IsLocked = masterBill.IsLocked,
-                            LockedDate = masterBill.LockedDate,
-                            DatetimeCreated = masterBill.DatetimeCreated,
-                            UserModified = masterBill.UserModified,
-                            DatetimeModified = masterBill.DatetimeModified,
-                            Active = masterBill.Active,
-                            InactiveOn = masterBill.InactiveOn,
-                            SupplierName = coloader.ShortName,
-                            AgentName = agent.ShortName,
-                            PODName = pod.NameEn,
-                            POLName = pol.NameEn,
-                            CreatorName = creator.Username,
-                        };
-            }
+
+            query = from masterBill in masterBills
+                    join houseBill in houseBills on masterBill.Id equals houseBill.JobId into houseBill2
+                    from houseBill in houseBill2.DefaultIfEmpty()
+                    join coloader in coloaders on masterBill.ColoaderId equals coloader.Id into coloader2
+                    from coloader in coloader2.DefaultIfEmpty()
+                    join agent in agents on masterBill.AgentId equals agent.Id into agent2
+                    from agent in agent2.DefaultIfEmpty()
+                    join pod in pods on masterBill.Pod equals pod.Id into pod2
+                    from pod in pod2.DefaultIfEmpty()
+                    join pol in pols on masterBill.Pol equals pol.Id into pol2
+                    from pol in pol2.DefaultIfEmpty()
+                    join creator in creators on masterBill.UserCreated equals creator.Id into creator2
+                    from creator in creator2.DefaultIfEmpty()
+                    select new CsTransactionModel
+                    {
+                        Id = masterBill.Id,
+                        BranchId = masterBill.BranchId,
+                        JobNo = masterBill.JobNo,
+                        Mawb = masterBill.Mawb,
+                        TypeOfService = masterBill.TypeOfService,
+                        Etd = masterBill.Etd,
+                        Eta = masterBill.Eta,
+                        ServiceDate = masterBill.ServiceDate,
+                        Mbltype = masterBill.Mbltype,
+                        ColoaderId = masterBill.ColoaderId,
+                        SubColoader = masterBill.SubColoader,
+                        BookingNo = masterBill.BookingNo,
+                        AgentId = masterBill.AgentId,
+                        Pol = masterBill.Pol,
+                        Pod = masterBill.Pod,
+                        DeliveryPlace = masterBill.DeliveryPlace,
+                        PaymentTerm = masterBill.PaymentTerm,
+                        FlightVesselName = masterBill.FlightVesselName,
+                        VoyNo = masterBill.VoyNo,
+                        ShipmentType = masterBill.ShipmentType,
+                        Commodity = masterBill.Commodity,
+                        DesOfGoods = masterBill.DesOfGoods,
+                        PackageContainer = masterBill.PackageContainer,
+                        Pono = masterBill.Pono,
+                        PersonIncharge = masterBill.PersonIncharge,
+                        NetWeight = masterBill.NetWeight,
+                        GrossWeight = masterBill.GrossWeight,
+                        ChargeWeight = masterBill.ChargeWeight,
+                        Cbm = masterBill.Cbm,
+                        Notes = masterBill.Notes,
+                        TransactionType = masterBill.TransactionType,
+                        UserCreated = masterBill.UserCreated,
+                        IsLocked = masterBill.IsLocked,
+                        LockedDate = masterBill.LockedDate,
+                        DatetimeCreated = masterBill.DatetimeCreated,
+                        UserModified = masterBill.UserModified,
+                        DatetimeModified = masterBill.DatetimeModified,
+                        Active = masterBill.Active,
+                        InactiveOn = masterBill.InactiveOn,
+                        SupplierName = coloader.ShortName,
+                        AgentName = agent.ShortName,
+                        HWBNo = houseBill.Hwbno,
+                        CustomerId = houseBill.CustomerId,
+                        NotifyPartyId = houseBill.NotifyPartyId,
+                        SaleManId = houseBill.SaleManId,
+                        PODName = pod.NameEn,
+                        POLName = pol.NameEn,
+                        CreatorName = creator.Username,
+                        HblId = houseBill.Id == Guid.Empty || houseBill.Id == null ? Guid.Empty : houseBill.Id,
+                    };
+
             return query;
         }
 
@@ -549,8 +482,7 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<CsTransactionModel> Query(CsTransactionCriteria criteria)
         {
             var transactionType = DataTypeEx.GetType(criteria.TransactionType);
-            var listSearch = GetTransaction(transactionType, true);
-            var listData = GetTransaction(transactionType, false);
+            var listSearch = GetTransaction(transactionType);
             if (listSearch == null || listSearch.Any() == false) return null;
 
             IQueryable<CsTransactionModel> results = null;
@@ -558,31 +490,31 @@ namespace eFMS.API.Documentation.DL.Services
             switch (criteria.TransactionType)
             {
                 case TransactionTypeEnum.InlandTrucking:
-                    //results = QueryIT(criteria, listSearch, listData);
+                    //results = QueryIT(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.AirExport:
-                    //results = QueryAE(criteria, listSearch, listData);
+                    //results = QueryAE(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.AirImport:
-                    //results = QueryAI(criteria, listSearch, listData);
+                    //results = QueryAI(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.SeaConsolExport:
-                    //results = QuerySEC(criteria, listSearch, listData);
+                    //results = QuerySEC(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.SeaConsolImport:
-                    //results = QuerySIC(criteria, listSearch, listData);
+                    //results = QuerySIC(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.SeaFCLExport:
-                    results = QuerySEF(criteria, listSearch, listData);
+                    results = QuerySEF(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.SeaFCLImport:
-                    results = QuerySIF(criteria, listSearch, listData);
+                    results = QuerySIF(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.SeaLCLExport:
-                    //results = QuerySEL(criteria, listSearch, listData);
+                    //results = QuerySEL(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.SeaLCLImport:
-                    //results = QuerySIL(criteria, listSearch, listData);
+                    //results = QuerySIL(criteria, listSearch);
                     break;
                 default:
                     break;
@@ -596,7 +528,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QueryIT(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
+        private IQueryable<CsTransactionModel> QueryIT(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
             return null;
         }
@@ -607,7 +539,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QueryAE(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
+        private IQueryable<CsTransactionModel> QueryAE(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
             return null;
         }
@@ -618,7 +550,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QueryAI(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
+        private IQueryable<CsTransactionModel> QueryAI(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
             return null;
         }
@@ -629,7 +561,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySEC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
+        private IQueryable<CsTransactionModel> QuerySEC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
             return null;
         }
@@ -640,7 +572,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySIC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
+        private IQueryable<CsTransactionModel> QuerySIC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
             return null;
         }
@@ -651,7 +583,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySEF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
+        private IQueryable<CsTransactionModel> QuerySEF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
             var containers = csMawbcontainerRepo.Get();
             var query = (from transaction in listSearch
@@ -678,7 +610,6 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null))
                     && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null))
                     );
-                //query = query.OrderByDescending(x => x.transaction.ModifiedDate);//.ThenByDescending(x => x.transaction.CreatedDate);
             }
             else
             {
@@ -694,11 +625,8 @@ namespace eFMS.API.Documentation.DL.Services
                              || (x.ContainerNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                              && ((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null) && (x.transaction.Etd ?? null) <= (criteria.ToDate ?? null))
                     );
-                //query = query.OrderByDescending(x => x.transaction.ModifiedDate);//.ThenByDescending(x => x.transaction.CreatedDate);
             }
-            //return query.Select(x => x.transaction).Distinct();
-            var jobNos = query.Select(s => s.transaction.JobNo).Distinct();
-            var result = listData.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.DatetimeModified);
+            var result = query.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault()).OrderByDescending(o => o.DatetimeModified);
             return result;
         }
 
@@ -708,7 +636,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySIF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
+        private IQueryable<CsTransactionModel> QuerySIF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
             var containers = csMawbcontainerRepo.Get();
             var surcharges = csShipmentSurchargeRepo.Get();
@@ -755,7 +683,6 @@ namespace eFMS.API.Documentation.DL.Services
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
-                //query = query.OrderByDescending(x => x.transaction.ModifiedDate);
             }
             else
             {
@@ -784,10 +711,8 @@ namespace eFMS.API.Documentation.DL.Services
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
-                //query = query.OrderByDescending(x => x.transaction.ModifiedDate);
             }
-            var jobNos = query.Select(s => s.transaction.JobNo).Distinct();
-            var result = listData.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.DatetimeModified);
+            var result = query.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault()).OrderByDescending(o => o.DatetimeModified);
             return result;
         }
 
@@ -797,7 +722,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySEL(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
+        private IQueryable<CsTransactionModel> QuerySEL(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
             return null;
         }
@@ -808,7 +733,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySIL(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
+        private IQueryable<CsTransactionModel> QuerySIL(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
             return null;
         }
@@ -1033,17 +958,17 @@ namespace eFMS.API.Documentation.DL.Services
                 var userSaleman = sysUserRepo.Get(x => x.Id == housebillFirst.SaleManId).FirstOrDefault();
                 var shipper = catPartnerRepo.Get(x => x.Id == housebillFirst.ShipperId).FirstOrDefault()?.PartnerNameEn;
                 var consignee = catPartnerRepo.Get(x => x.Id == housebillFirst.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
-                
+
                 var surcharges = new List<CsShipmentSurchargeDetailsModel>();
                 foreach (var housebill in listHousebill)
                 {
                     var surcharge = surchargeService.GetByHB(housebill.Id);
-                    surcharges.AddRange(surcharge);                   
+                    surcharges.AddRange(surcharge);
                 }
 
                 if (surcharges.Count > 0)
                 {
-                    foreach(var surcharge in surcharges)
+                    foreach (var surcharge in surcharges)
                     {
                         var unitCode = units.FirstOrDefault(x => x.Id == surcharge.UnitId)?.Code;
                         bool isOBH = false;
@@ -1090,7 +1015,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.MAWB = shipment.Mawb; //MasterBill of shipment
                         charge.PartnerName = "PartnerName"; //NOT USE
                         charge.ContactName = userSaleman?.Username; //Saleman đầu tiên của list housebill
-                        charge.ShipmentType = _shipmentType ; //"Import (Sea FCL) " + shipment.TypeOfService;
+                        charge.ShipmentType = _shipmentType; //"Import (Sea FCL) " + shipment.TypeOfService;
                         charge.NominationParty = string.Empty;
                         charge.Nominated = true; //Gán cứng
                         charge.POL = polName + ", " + polCountry;
@@ -1231,4 +1156,8 @@ namespace eFMS.API.Documentation.DL.Services
         }
         #endregion -- PREVIEW --
     }
+
+
 }
+
+
