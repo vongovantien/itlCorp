@@ -212,6 +212,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var country = new CatCountryViewModel
                     {
                         Id = item.Id,
+                        Code = item.Code,
                         Name = item.NameVn,
                         UserCreated = item.UserCreated,
                         DatetimeCreated = item.DatetimeCreated,
@@ -230,6 +231,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var country = new CatCountryViewModel
                     {
                         Id = item.Id,
+                        Code = item.Code,
                         Name = item.NameEn,
                         UserCreated = item.UserCreated,
                         DatetimeCreated = item.DatetimeCreated,

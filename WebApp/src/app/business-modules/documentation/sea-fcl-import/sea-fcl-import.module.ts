@@ -2,24 +2,22 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
+import { SelectModule } from 'ng2-select';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { TabsModule, PaginationModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
 
 import { SharedModule } from 'src/app/shared/shared.module';
-import { TabsModule, PaginationModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
-import { SelectModule } from 'ng2-select';
 import { SeaFCLImportManagementComponent } from './sea-fcl-import-management.component';
 import { SeaFCLImportCreateJobComponent } from './create-job/create-job-fcl-import.component';
 import { SeaFCLImportDetailJobComponent } from './detail-job/detail-job-fcl-import.component';
 import { SeaFCLImportManagementFormSearchComponent } from './components/form-search/form-search-fcl-import.component';
 import { SeaFClImportFormCreateComponent } from './components/form-create/form-create-sea-fcl-import.component';
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { StoreModule } from '@ngrx/store';
-import { reducers, effects } from './store';
-import { EffectsModule } from '@ngrx/effects';
 import { SeaFCLImportLazyLoadModule } from './sea-fcl-import-lazy-load.module';
 import { SeaFclImportManifestComponent } from './detail-job/manifest/sea-fcl-import-manifest.component';
 import { FormManifestSeaFclImportComponent } from './detail-job/manifest/components/form-manifest/form-manifest-sea-fcl-import.component';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { AddHblToManifestComponent } from './detail-job/manifest/popup/add-hbl-to-manifest.popup';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 const routing: Routes = [
 
@@ -33,7 +31,7 @@ const routing: Routes = [
     },
     {
         path: ':id', component: SeaFCLImportDetailJobComponent,
-        data: { name: "Job Detail", path: ":id", level: 3 },
+        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport },
     },
     {
         path: ':id/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),
@@ -78,8 +76,6 @@ const LIB = [
         FormsModule,
         ReactiveFormsModule,
         ...LIB,
-        StoreModule.forFeature('seaFClImport', reducers),
-        EffectsModule.forFeature(effects),
         SeaFCLImportLazyLoadModule, // ?  Lazy loading module with  tab component (CD Note, Assignment).
         ShareBussinessModule
 

@@ -17,7 +17,6 @@ import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-mod
 
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
-import * as fromStore from './../../../store';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 enum HBL_TAB {
@@ -55,20 +54,21 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         protected _activedRoute: ActivatedRoute,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _store: Store<fromStore.ISeaFCLImportState>,
+        protected _store: Store<fromShareBussiness.ITransactionState>,
         private _exportRepository: ExportRepo
     ) {
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+    }
 
     ngAfterViewInit() {
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.hblId) {
                 this.hblId = param.hblId;
                 this.jobId = param.id;
-                this._store.dispatch(new fromStore.GetDetailHBLAction(this.hblId));
+                this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
 
                 this.getDetailHbl();
 
@@ -190,7 +190,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     getDetailHbl() {
         this.formHouseBill.isDetail = true;
         this._progressRef.start();
-        this._store.select(fromStore.getHBLState)
+        this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete()),
@@ -263,9 +263,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                     // * Dispatch to save containers.
                     this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
-
-                    // // * Dispatch to get container's shipment.
-                    // this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
 
                     // * Get container to update model
                     this.getListContainer();
@@ -349,12 +346,14 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             )
             .subscribe(
                 (res: any) => {
-                    if (res != null) {
+                    if (this.dataReport.dataSource.length > 0) {
                         this.dataReport = res;
                         setTimeout(() => {
                             this.reportPopup.frm.nativeElement.submit();
                             this.reportPopup.show();
                         }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
                     }
                 },
             );

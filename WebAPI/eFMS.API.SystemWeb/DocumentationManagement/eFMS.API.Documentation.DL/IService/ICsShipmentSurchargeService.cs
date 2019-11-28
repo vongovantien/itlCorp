@@ -5,6 +5,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace eFMS.API.Documentation.DL.IService
@@ -12,7 +13,7 @@ namespace eFMS.API.Documentation.DL.IService
     public interface ICsShipmentSurchargeService : IRepositoryBase<CsShipmentSurcharge, CsShipmentSurchargeModel>
     {
         List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hblid);
-        List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hbID,string type);
+        IQueryable<CsShipmentSurchargeDetailsModel> GetByHB(Guid hbID,string type);
         HandleState DeleteCharge(Guid chargeId);
         List<GroupChargeModel> GroupChargeByHB(Guid id,string partnerId,bool isHouseBillID, string cdNoteCode);
         List<CatPartner> GetAllParner(Guid id,bool isHouseBillID);

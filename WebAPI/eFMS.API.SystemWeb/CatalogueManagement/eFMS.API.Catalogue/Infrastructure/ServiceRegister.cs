@@ -36,6 +36,7 @@ namespace eFMS.API.Catalogue.Infrastructure
         public static void Register(IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
+
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();

@@ -3,7 +3,7 @@ import { LAZY_MODULES_MAP, ILazyModules } from "src/app/load-module-map";
 
 export const lazyModulesJobEditMap: ILazyModules = {
     cd: () => import('./custom-declaration/custom-declaration.module').then(m => m.CustomDeclarationModule),
-    cdNote: () => import('./credit-debit-note/credit-debit-note.module').then(m => m.CreditDebitNoteModule),
+    cdNote: () => import('./cd-note/ops-cd-note.module').then(m => m.OpsCDNoteModule),
     stageManagement: () => import('./stage-management/stage-management.module').then(m => m.StateManagmentModule)
 };
 

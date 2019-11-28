@@ -1,15 +1,18 @@
 import { Component } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
-import { BehaviorSubject } from 'rxjs';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
-import { Store } from '@ngrx/store';
-import * as fromStore from '../../../../store';
+
+import { BehaviorSubject } from 'rxjs';
+import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
+
+import * as fromShare from './../../../../../../share-business/store';
 
 @Component({
     selector: 'app-form-add-house-bill',
@@ -106,7 +109,7 @@ export class FormAddHouseBillComponent extends AppForm {
         private _systemRepo: SystemRepo,
         private _spinner: NgxSpinnerService,
         private _dataService: DataService,
-        protected _store: Store<fromStore.ISeaFCLImportState>,
+        protected _store: Store<fromShare.ITransactionState>,
 
     ) {
         super();
@@ -210,26 +213,10 @@ export class FormAddHouseBillComponent extends AppForm {
 
 
         this.initForm();
-        // this._store.select(fromStore.seaFCLImportTransactionState)
-        //     .pipe(skip(1))
-        //     .subscribe(
-        //         (res: any) => {
-        //             console.log(res);
-        //             this.shipmentDetail = res;
-
-        //             this.mtBill.setValue(this.shipmentDetail.mawb);
-
-
-        //             this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
-        //             this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-        //         }
-        //     );
-
-        this._store.select(fromStore.getHBLState)
+        this._store.select(fromShare.getDetailHBlState)
             .subscribe(
                 (res: any) => {
                     if (!!res.id) {
-                        console.log(res);
                         this.shipmentDetail = res;
                         this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
                         this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
@@ -262,14 +249,6 @@ export class FormAddHouseBillComponent extends AppForm {
         finally {
             this._spinner.hide();
         }
-
-    }
-
-
-
-
-    update(formdata: any) {
-        // this.formGroup.patchValue(formdata);
     }
 
     initForm() {

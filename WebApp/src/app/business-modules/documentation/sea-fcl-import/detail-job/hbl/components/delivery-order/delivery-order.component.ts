@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
+import { formatDate } from '@angular/common';
 
 import { AppForm } from 'src/app/app.form';
 import { DeliveryOrder, User } from 'src/app/shared/models';
@@ -7,13 +10,10 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { getHBLState, GetDetailHBLAction } from '../../../../store';
 import { catchError, takeUntil, switchMap, finalize } from 'rxjs/operators';
-import { NgProgress } from '@ngx-progressbar/core';
-import { ToastrService } from 'ngx-toastr';
-import { formatDate } from '@angular/common';
 
 
+import * as fromShare from './../../../../../../share-business/store';
 @Component({
     selector: 'sea-fcl-import-hbl-delivery-order',
     templateUrl: './delivery-order.component.html'
@@ -43,7 +43,7 @@ export class SeaFClImportDeliveryOrderComponent extends AppForm {
     ngOnInit() {
         // * Get User logged.
         this.userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
-        this._store.select(getHBLState)
+        this._store.select(fromShare.getDetailHBlState)
             .pipe(
                 catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
@@ -107,7 +107,7 @@ export class SeaFClImportDeliveryOrderComponent extends AppForm {
                         this._toastService.success(res.message);
 
                         // * Dispatch for detail HBL to update HBL state.
-                        this._store.dispatch(new GetDetailHBLAction(this.hblid));
+                        this._store.dispatch(new fromShare.GetDetailHBLAction(this.hblid));
                     } else {
                         this._toastService.error(res.message);
                     }

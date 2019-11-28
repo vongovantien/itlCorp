@@ -93,7 +93,7 @@
                                                         [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                                         (itemSelected)="onSelectCharge($event,charge)"
                                                         [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                                        [dataSources]="listCharges"
+                                                        [dataSources]="listCharges | async"
                                                         [displayFields]="configComboGridCharge.displayFields"
                                                         [height]="200">
                                                     </app-combo-grid-virtual-scroll>
@@ -123,7 +123,8 @@
                                             <td>
                                                 <div class="form-group">
                                                     <select [(ngModel)]="charge.unitId" class="form-control">
-                                                        <option *ngFor="let unit of listUnits" [ngValue]="unit.id">
+                                                        <option *ngFor="let unit of (listUnits | async)"
+                                                            [ngValue]="unit.id">
                                                             {{unit.code}}</option>
                                                     </select>
                                                 </div>
@@ -140,7 +141,7 @@
                                                 <div class="form-group">
                                                     <select [(ngModel)]="charge.currencyId" class="form-control"
                                                         (ngModelChange)="onChangeCurrency($event, charge)">
-                                                        <option *ngFor="let currency of listCurrency"
+                                                        <option *ngFor="let currency of (listCurrency | async)"
                                                             [ngValue]="currency.id">{{currency.id}}</option>
                                                     </select>
                                                 </div>

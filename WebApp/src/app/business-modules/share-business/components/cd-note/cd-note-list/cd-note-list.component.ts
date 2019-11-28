@@ -1,24 +1,28 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, map, finalize } from 'rxjs/operators';
+import { catchError, finalize, map, take } from 'rxjs/operators';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { ActivatedRoute, Params } from '@angular/router';
 import { SortService } from 'src/app/shared/services';
-import { CdNoteAddPopupComponent } from 'src/app/business-modules/documentation/sea-fcl-import/components/popup/add-cd-note/add-cd-note.popup';
-import { CdNoteDetailPopupComponent } from 'src/app/business-modules/documentation/sea-fcl-import/components/popup/detail-cd-note/detail-cd-note.popup';
+import { ShareBussinessCdNoteAddPopupComponent } from '../add-cd-note/add-cd-note.popup';
+import { ShareBussinessCdNoteDetailPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
+import { Store } from '@ngrx/store';
+import { TransactionActions } from '../../../store';
+import { getParamsRouterState, getDataRouterState } from 'src/app/store';
+import { combineLatest } from 'rxjs';
+import { TransactionTypeEnum } from 'src/app/shared/enums';
 
 @Component({
     selector: 'cd-note-list',
     templateUrl: './cd-note-list.component.html',
 })
-export class CdNoteListComponent extends AppList {
-    @ViewChild(CdNoteAddPopupComponent, { static: false }) cdNoteAddPopupComponent: CdNoteAddPopupComponent;
+export class ShareBussinessCdNoteListComponent extends AppList {
+    @ViewChild(ShareBussinessCdNoteAddPopupComponent, { static: false }) cdNoteAddPopupComponent: ShareBussinessCdNoteAddPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(CdNoteDetailPopupComponent, { static: false }) cdNoteDetailPopupComponent: CdNoteDetailPopupComponent;
+    @ViewChild(ShareBussinessCdNoteDetailPopupComponent, { static: false }) cdNoteDetailPopupComponent: ShareBussinessCdNoteDetailPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';
@@ -26,6 +30,7 @@ export class CdNoteListComponent extends AppList {
     initGroup: any[] = [];
     deleteMessage: string = '';
     selectedCdNoteId: string = '';
+    transactionType: TransactionTypeEnum = 0;
 
     isDesc = true;
     sortKey: string = '';
@@ -34,27 +39,37 @@ export class CdNoteListComponent extends AppList {
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
-        private _activedRoute: ActivatedRoute,
         private _sortService: SortService,
+        private _store: Store<TransactionActions>,
     ) {
         super();
         this._progressRef = this._progressService.ref();
+        //this.requestSort = this.sortCdNotes;
     }
 
     ngOnInit(): void {
-        this._activedRoute.params.subscribe((param: Params) => {
-            console.log('alakd', param.id)
-            //if (param.id) {
-                //console.log(param.id);
-                this.idMasterBill = "9f479944-8b9d-4c23-aa03-07252a372c05";//param.id;
-                this.getListCdNote(this.idMasterBill);
-            //}
-        });
+        combineLatest([
+            this._store.select(getParamsRouterState),
+            this._store.select(getDataRouterState),
+        ]).pipe(
+            map(([params, qParams]) => ({ ...params, ...qParams })),
+            take(1)
+        ).subscribe(
+            (params: any) => {
+                const jobId = params.id || params.jobId;
+                if (jobId) {
+                    this.transactionType = parseInt(params.transactionType) || 0;
+                    this.idMasterBill = jobId;
+                    this.getListCdNote(this.idMasterBill);
+                }
+            }
+        );
+
         this.headers = [
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Note No', field: 'code', sortable: true },
-            { title: 'Charges Count', field: 'total_charge', sortable: true,  },
-            { title: 'Balance Amount', field: 'total', sortable: true, width: 220},
+            { title: 'Charges Count', field: 'total_charge', sortable: true, },
+            { title: 'Balance Amount', field: 'total', sortable: true, width: 220 },
             { title: 'Creator', field: 'userCreated', sortable: true },
             { title: 'Create Date', field: 'datetimeCreated', sortable: true },
             { title: 'SOA', field: 'soaNo', sortable: true },
@@ -68,6 +83,7 @@ export class CdNoteListComponent extends AppList {
 
     openPopupAdd() {
         this.cdNoteAddPopupComponent.action = 'create';
+        this.cdNoteAddPopupComponent.transactionType = this.transactionType;
         this.cdNoteAddPopupComponent.currentMBLId = this.idMasterBill;
         this.cdNoteAddPopupComponent.show();
     }
@@ -75,13 +91,15 @@ export class CdNoteListComponent extends AppList {
     openPopupDetail(jobId: string, cdNote: string) {
         this.cdNoteDetailPopupComponent.jobId = jobId;
         this.cdNoteDetailPopupComponent.cdNote = cdNote;
+        this.cdNoteDetailPopupComponent.transactionType = this.transactionType;
         this.cdNoteDetailPopupComponent.getDetailCdNote(jobId, cdNote);
         this.cdNoteDetailPopupComponent.show();
     }
 
     getListCdNote(id: string) {
         this.isLoading = true;
-        this._documentationRepo.getListCdNoteByMasterBill(id)
+        const isShipmentOperation = false;
+        this._documentationRepo.getListCDNote(id, isShipmentOperation)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; }),
@@ -104,7 +122,6 @@ export class CdNoteListComponent extends AppList {
                 (res: any) => {
                     if (res) {
                         this.selectedCdNoteId = id;
-                        console.log(this.selectedCdNoteId)
                         this.deleteMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
                         this.confirmDeleteCdNotePopup.show();
                     } else {
@@ -115,7 +132,6 @@ export class CdNoteListComponent extends AppList {
     }
 
     onDeleteCdNote() {
-        console.log(this.selectedCdNoteId)
         this._progressRef.start();
         this._documentationRepo.deleteCdNote(this.selectedCdNoteId)
             .pipe(
@@ -142,11 +158,17 @@ export class CdNoteListComponent extends AppList {
         });
     }
 
-    onRequestCdNoteChange(dataRequest: any) {
+    // sortCdNotes(sort: string): void {
+    //     this.cdNoteGroups.forEach(element => {
+    //         element.listCDNote = this._sortService.sort(element.listCDNote, sort, this.order);
+    //     });
+    // }
+
+    onRequestCdNoteChange() {
         this.getListCdNote(this.idMasterBill);
     }
 
-    onDeletedCdNote(data: any) {
+    onDeletedCdNote() {
         this.getListCdNote(this.idMasterBill);
     }
 

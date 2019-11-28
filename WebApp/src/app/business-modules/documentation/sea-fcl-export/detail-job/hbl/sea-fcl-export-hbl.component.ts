@@ -5,13 +5,14 @@ import { Store } from '@ngrx/store';
 import { AppList } from 'src/app/app.list';
 import { getParamsRouterState } from 'src/app/store';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 import { CsTransactionDetail } from 'src/app/shared/models';
 
 import * as fromShareBussiness from './../../../../share-business/store';
 import * as fromStore from './../../store';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { Observable } from 'rxjs';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 
 @Component({
@@ -34,7 +35,7 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
 
     constructor(
         private _router: Router,
-        private _store: Store<fromStore.ISeaFCLExport>,
+        private _store: Store<fromShareBussiness.IShareBussinessState>,
         private _documentRepo: DocumentationRepo
     ) {
         super();
@@ -42,6 +43,7 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
 
     ngOnInit() {
         this._store.select(getParamsRouterState)
+            .pipe(takeUntil(this.ngUnsubscribe), take(1))
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
@@ -61,7 +63,7 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
 
-        this.containers = this._store.select(fromShareBussiness.getContainerSaveState);
+        this.containers = this._store.select(fromShareBussiness.getHBLContainersState);
         this.selectedShipment = this._store.select(fromStore.getSeaFCLShipmentDetail);
     }
 
@@ -85,8 +87,8 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
 
         // * Get container, Job detail, Surcharge with hbl id, JobId.
         this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: hbl.id }));
-        this._store.dispatch(new fromStore.SeaFCLExportGetDetailAction(hbl.jobId));
-        this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
+        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(hbl.jobId));
+        this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
         switch (this.selectedTabSurcharge) {
             case 'BUY':
@@ -107,10 +109,6 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
         this.selectedTabSurcharge = tabName;
 
         if (!!this.selectedHbl) {
-            this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: this.selectedHbl.id }));
-            this._store.dispatch(new fromStore.SeaFCLExportGetDetailAction(this.selectedHbl.jobId));
-            this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
-
             switch (this.selectedTabSurcharge) {
                 case 'BUY':
                     this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
@@ -134,7 +132,7 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE', transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport } });
                 break;
             case 'assignment':
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });

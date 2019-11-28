@@ -1,5 +1,5 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Router, Params } from '@angular/router';
+import { Router, Params, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -11,14 +11,12 @@ import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
-import { getParamsRouterState } from 'src/app/store';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
-import * as fromStore from './../../store';
 import * as fromShareBussiness from './../../../../share-business/store';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { ReportPreviewComponent } from 'src/app/shared/common';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -47,8 +45,9 @@ export class SeaFCLImportHBLComponent extends AppList {
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
-        private _store: Store<fromStore.ISeaFCLImportState>,
-        private cdr: ChangeDetectorRef
+        private _store: Store<fromShareBussiness.ITransactionState>,
+        private cdr: ChangeDetectorRef,
+        private _activedRoute: ActivatedRoute
     ) {
         super();
         this.requestSort = this.sortLocal;
@@ -57,13 +56,15 @@ export class SeaFCLImportHBLComponent extends AppList {
     }
 
     ngOnInit(): void {
-        this._store.select(getParamsRouterState).subscribe((param: Params) => {
-            if (param.id) {
-                this.jobId = param.id;
-                this.getHourseBill(this.jobId);
+        this._activedRoute.params
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((param: Params) => {
+                if (param.id) {
+                    this.jobId = param.id;
+                    this.getHourseBill(this.jobId);
+                }
+            });
 
-            }
-        });
         this.headers = [
             { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
             { title: 'Customer', field: 'customerName', sortable: true },
@@ -76,13 +77,12 @@ export class SeaFCLImportHBLComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
 
-        this.containers = this._store.select(fromShareBussiness.getContainerSaveState);
-        this.selectedShipment = this._store.select(fromStore.seaFCLImportTransactionState);
+        this.containers = this._store.select(fromShareBussiness.getHBLContainersState);
+        this.selectedShipment = this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState);
     }
 
     ngAfterViewInit() {
         this.cdr.detectChanges();
-
     }
 
     onSelectTab(tabName: string) {
@@ -150,9 +150,6 @@ export class SeaFCLImportHBLComponent extends AppList {
                 if (!!this.houseBill.length) {
                     this.selectHBL(this.houseBill[0]);
                 }
-
-                // this._store.dispatch(new fromShareBussiness.GetProfitAction(''));
-
             },
         );
     }
@@ -161,9 +158,10 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.selectedHbl = new CsTransactionDetail(hbl);
 
         // * Get container, Job detail, Surcharge with hbl id, JobId.
-        this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: hbl.id }));
-        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
-        this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
+        this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
+        this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
+        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(hbl.jobId));
+        this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
         switch (this.selectedTabSurcharge) {
             case 'BUY':
@@ -185,10 +183,6 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.selectedTabSurcharge = tabName;
 
         if (!!this.selectedHbl) {
-            this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: this.selectedHbl.id }));
-            this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.selectedHbl.jobId));
-            this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
-
             switch (this.selectedTabSurcharge) {
                 case 'BUY':
                     this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));

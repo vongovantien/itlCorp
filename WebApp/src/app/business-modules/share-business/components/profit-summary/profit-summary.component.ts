@@ -1,19 +1,19 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
 
 import * as fromStore from './../../store';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
 @Component({
     selector: 'hbl-profit-summary',
     templateUrl: './profit-summary.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class ShareBussinessProfitSummaryComponent extends AppPage {
+export class ShareBussinessProfitSummaryComponent extends AppList {
 
-    hblProfit$: Observable<fromStore.ISurchargeProfit>;
+    hblProfit$: Observable<fromStore.IHBLProfit>;
     totalUSD$: Observable<number>;
     totalVND$: Observable<number>;
 
@@ -32,7 +32,8 @@ export class ShareBussinessProfitSummaryComponent extends AppPage {
         );
         this.totalVND$ = this.hblProfit$.pipe(
             map(data => data.profitLocal)
-        )
+        );
+
         this.headers = [
             { title: 'USD', field: 'profitUSD', dataType: 'CURRENCY' },
             { title: 'Local (VND)', field: 'profitLocal', dataType: 'CURRENCY' }

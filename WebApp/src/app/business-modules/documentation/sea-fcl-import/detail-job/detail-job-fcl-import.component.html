@@ -72,15 +72,14 @@
                     </ng-container>
                 </tab>
                 <tab heading="Assignment" (selectTab)="onSelectTab('assignment')"
-                    [active]="selectedTab === 'ASSIGNMENT'" [disabled]="ACTION === 'copy'">
+                    [active]="selectedTab === 'ASSIGNMENT'" [disabled]="ACTION === 'COPY'">
                     <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="SeaFCLImport_assignment">
                     </ng-container>
                 </tab>
             </tabset>
         </div>
-
     </div>
-    <ul class="m-nav-sticky fms-shipment-sidebar">
+    <ul class="m-nav-sticky fms-shipment-sidebar" *ngIf="ACTION !== 'COPY'">
         <li class="m-nav-sticky__item">
             <a title="Preview Manifest" [routerLink]="['./manifest']">MNF</a>
         </li>

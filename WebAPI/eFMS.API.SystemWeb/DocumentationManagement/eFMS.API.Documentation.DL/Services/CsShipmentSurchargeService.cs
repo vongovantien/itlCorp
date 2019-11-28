@@ -6,6 +6,7 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
@@ -28,13 +29,15 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<OpsTransaction> opsTransRepository;
         private readonly IContextBase<CatCurrencyExchange> currentExchangeRateRepository;
         private readonly IContextBase<CsTransaction> csTransactionRepository;
+        private readonly ICurrentUser currentUser;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
             IContextBase<CatPartner> partnerRepo,
             IContextBase<OpsTransaction> opsTransRepo,
             IContextBase<CatCurrencyExchange> currentExchangeRateRepo,
-            IContextBase<CsTransaction> csTransactionRepo) : base(repository, mapper)
+            IContextBase<CsTransaction> csTransactionRepo,
+            ICurrentUser currUser) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             tranDetailRepository = tranDetailRepo;
@@ -42,6 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
             opsTransRepository = opsTransRepo;
             currentExchangeRateRepository = currentExchangeRateRepo;
             csTransactionRepository = csTransactionRepo;
+            currentUser = currUser;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -98,10 +102,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    var houseBill = tranDetailRepository.Get(x => x.Id == id).FirstOrDefault();
+                    var hblid = opsTransRepository.Get(x => x.Id == id).FirstOrDefault()?.Hblid;
                     List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
 
-                    listCharges = Query(id, null);
+                    listCharges = Query(hblid.Value, null);
 
                     foreach (var c in listCharges)
                     {
@@ -128,9 +132,11 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        public List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hbID, string type)
+        public IQueryable<CsShipmentSurchargeDetailsModel> GetByHB(Guid hbID, string type)
         {
-            return Query(hbID, type);
+            var data = Query(hbID, type);
+            if (data == null) return null;
+            return data.OrderBy(x => x.DatetimeCreated).AsQueryable();
         }
 
         public List<GroupChargeModel> GroupChargeByHB(Guid id, string partnerId, bool isHouseBillID, string cdNoteCode)
@@ -164,8 +170,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                var houseBill = opsTransRepository.Get(x => x.Hblid == id).FirstOrDefault();
-                listCharges = Query(id, null);
+                var houseBill = opsTransRepository.Get(x => x.Id == id).FirstOrDefault();
+                listCharges = Query(houseBill.Hblid, null);
                 listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == "OBH") || x.PaymentObjectId == partnerId)).ToList();
                 if (!string.IsNullOrEmpty(cdNoteCode))
                 {
@@ -343,11 +349,16 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (item.Id == Guid.Empty)
                     {
+                        item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                        item.UserCreated = currentUser.UserID;
                         item.Id = Guid.NewGuid();
+                        item.ExchangeDate = DateTime.Now;
                         DataContext.Add(item, false);
                     }
                     else
                     {
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserModified = currentUser.UserID;
                         DataContext.Update(item, x => x.Id == item.Id, false);
                     }
                 }

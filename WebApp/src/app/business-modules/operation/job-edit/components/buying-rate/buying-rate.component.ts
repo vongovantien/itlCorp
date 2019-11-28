@@ -5,11 +5,11 @@ import { BaseService, SortService, DataService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 import { EditBuyingRatePopupComponent } from '../../charge-list/edit-buying-rate-popup/edit-buying-rate-popup.component';
-import { OpsModuleCreditDebitNoteDetailComponent } from '../../credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { AddBuyingRatePopupComponent } from '../../charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
 import { SystemConstants } from 'src/constants/system.const';
+import { OpsCdNoteDetailPopupComponent } from '../popup/ops-cd-note-detail/ops-cd-note-detail.popup';
 
 @Component({
     selector: 'job-management-buying-rate',
@@ -19,7 +19,7 @@ import { SystemConstants } from 'src/constants/system.const';
 export class JobManagementBuyingRateComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCharge: ConfirmPopupComponent;
     @ViewChild(EditBuyingRatePopupComponent, { static: false }) editBuyingRatePopup: EditBuyingRatePopupComponent;
-    @ViewChild(OpsModuleCreditDebitNoteDetailComponent, { static: false }) detailCDPopup: OpsModuleCreditDebitNoteDetailComponent;
+    @ViewChild(OpsCdNoteDetailPopupComponent, { static: false }) detailCDPopup: OpsCdNoteDetailPopupComponent;
     @ViewChild(AddBuyingRatePopupComponent, { static: false }) addBuyingRatePopup: AddBuyingRatePopupComponent;
 
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
@@ -99,25 +99,11 @@ export class JobManagementBuyingRateComponent extends AppList {
         }
     }
 
-    async openCreditDebitNote(cdNo: string) {
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.opsTransaction.id + "&cdNo=" + cdNo);
-        if (this.CDNoteDetails != null) {
-            if (this.CDNoteDetails.listSurcharges != null) {
-                this.totalCreditDebitCalculate();
-            }
-            if (this.CDNoteDetails.cdNote.type === 'CREDIT') {
-                this.CDNoteDetails.cdNote.type = 'Credit';
-            }
-            if (this.CDNoteDetails.cdNote.type === 'DEBIT') {
-                this.CDNoteDetails.cdNote.type = 'Debit';
-            }
-            if (this.CDNoteDetails.cdNote.type === 'INVOICE') {
-                this.CDNoteDetails.cdNote.type = 'Invoice';
-            }
-
-            this.detailCDPopup.currentJob = this.opsTransaction;
-            this.detailCDPopup.show();
-        }
+    openCreditDebitNote(cdNo: string) {        
+        this.detailCDPopup.jobId = this.opsTransaction.id;
+        this.detailCDPopup.cdNote = cdNo;
+        this.detailCDPopup.getDetailCdNote(this.opsTransaction.id, cdNo);
+        this.detailCDPopup.show();
     }
 
     totalCreditDebitCalculate() {

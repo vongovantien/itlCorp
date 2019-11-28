@@ -23,50 +23,52 @@ using System.Text.RegularExpressions;
 using eFMS.API.Operation.Service.ViewModels;
 using System.Data.Common;
 using ITL.NetCore.Connection;
+using ITL.NetCore.Connection.Caching;
 
 namespace eFMS.API.Operation.DL.Services
 {
-    public class CustomsDeclarationService : RepositoryBase<CustomsDeclaration, CustomsDeclarationModel>, ICustomsDeclarationService
+    public class CustomsDeclarationService : RepositoryBaseCache<CustomsDeclaration, CustomsDeclarationModel>, ICustomsDeclarationService
     {
         private readonly ICatPartnerApiService catPartnerApi;
         private readonly ICatPlaceApiService catPlaceApi;
         private readonly IEcusConnectionService ecusCconnectionService;
         private readonly ICatCountryApiService countryApi;
         private readonly ICatCommodityApiService commodityApi;
-        private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly IContextBase<CatCommodity> commodityRepository;
 
-        public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
+        public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, 
+            ICacheServiceBase<CustomsDeclaration> cacheService, 
+            IMapper mapper,
             IEcusConnectionService ecusCconnection
             , ICatPartnerApiService catPartner
             , ICatPlaceApiService catPlace
             , ICatCountryApiService country
-            , IDistributedCache distributedCache
             , ICatCommodityApiService commodity
-            , ICurrentUser user
-            , IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+            , ICurrentUser user,
+            IStringLocalizer<LanguageSub> localizer,
+            IContextBase<CatCommodity> commodityRepo) : base(repository, cacheService, mapper)
         {
             ecusCconnectionService = ecusCconnection;
             catPartnerApi = catPartner;
             catPlaceApi = catPlace;
             countryApi = country;
-            cache = distributedCache;
             commodityApi = commodity;
             currentUser = user;
             stringLocalizer = localizer;
+            commodityRepository = commodityRepo;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
         {
-            return GetAllData().AsQueryable();
+            return Get();
         }
 
         public HandleState ImportClearancesFromEcus()
         {
             string userId = currentUser.UserID;
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var connections = dc.SetEcusconnection.Where(x => x.UserId == userId);
+            var connections = ecusCconnectionService.Get(x => x.UserId == userId);
             var result = new HandleState();
             var lists = new List<CustomsDeclaration>();
             foreach (var item in connections)
@@ -78,7 +80,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
                 else
                 {
-                    var clearances = dc.CustomsDeclaration.ToList();
+                    var clearances = DataContext.Get();
                     foreach (var clearance in clearanceEcus)
                     {
                         var clearanceNo = clearance.SOTK?.ToString().Trim();
@@ -97,10 +99,14 @@ namespace eFMS.API.Operation.DL.Services
             {
                 if (lists.Count > 0)
                 {
-                    dc.CustomsDeclaration.AddRange(lists);
-                    dc.SaveChanges();
+                    foreach(var item in lists)
+                    {
+                        DataContext.Add(item, false);
+                    }
+                    DataContext.SubmitChanges();
                     result = new HandleState(true, lists.Count + stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS]);
-                    cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
+                    ClearCache();
+                    Get();
                 }
                 else
                 {
@@ -208,9 +214,9 @@ namespace eFMS.API.Operation.DL.Services
             return serviceType;
         }
 
-        public List<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount)
         {
-            Expression<Func<CustomsDeclaration, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+            Expression<Func<CustomsDeclarationModel, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                                                                     && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
                                                                                     && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
@@ -226,11 +232,9 @@ namespace eFMS.API.Operation.DL.Services
             {
                 query = query.And(x => x.JobNo == null);
             }
-            Expression<Func<CustomsDeclaration, object>> orderByProperty = x => x.DatetimeModified;
-            var list = DataContext.Paging(query, page, size, orderByProperty, false, out rowsCount);
-            if (rowsCount == 0) return new List<CustomsDeclarationModel>();
-            var results = MapClearancesToClearanceModels(list);
-            return results;
+            Expression<Func<CustomsDeclarationModel, object>> orderByProperty = x => x.DatetimeModified;
+            var list = Paging(query, page, size, orderByProperty, false, out rowsCount);
+            return list;
         }
 
 
@@ -262,7 +266,7 @@ namespace eFMS.API.Operation.DL.Services
             || (x.ExportCountryCode != null && x.ExportCountryCode.ToLower().Contains(keySearch)) || (x.ImportCountryCode != null && x.ImportCountryCode.ToLower().Contains(keySearch)) || (x.CommodityCode != null && x.CommodityCode.ToLower().Contains(keySearch))
             || (x.Note != null && x.Note.ToLower().Contains(keySearch))|| (x.FirstClearanceNo != null && x.FirstClearanceNo.ToLower().Contains(keySearch)) || (x.QtyCont != null && x.QtyCont.ToString().Contains(keySearch)) || string.IsNullOrEmpty(keySearch));
             
-            var data = GetAllData().Where(query);
+            var data = Get().Where(query);
             if (Imported == true)
             {
                 data = data.Where(x => x.JobNo != null);
@@ -322,7 +326,6 @@ namespace eFMS.API.Operation.DL.Services
         public List<CustomsDeclarationModel> GetBy(string jobNo)
         {
             List<CustomsDeclarationModel> results = null;
-            //var data = DataContext.Get(x => x.JobNo == jobNo);
             var data = GetCustomClearanceViewList(jobNo);
             if (data.Count == 0) return results;
             results = mapper.Map<List<CustomsDeclarationModel>>(data);
@@ -349,7 +352,9 @@ namespace eFMS.API.Operation.DL.Services
                     var clearance = mapper.Map<CustomsDeclaration>(item);
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
-                DataContext.DC.SaveChanges();
+                DataContext.SubmitChanges();
+                ClearCache();
+                Get();
             }
             catch (Exception ex)
             {
@@ -359,8 +364,7 @@ namespace eFMS.API.Operation.DL.Services
         }
         public CustomsDeclaration GetById(int id)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var result = dc.CustomsDeclaration.Where(x => x.Id == id).FirstOrDefault();
+            var result = DataContext.Get(x => x.Id == id).FirstOrDefault();
             return result;
         }
         public IQueryable<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria)
@@ -372,7 +376,7 @@ namespace eFMS.API.Operation.DL.Services
                                                                                        && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
                                                                                        && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
                                                                                        && (x.DatetimeCreated <= criteria.ToImportDate || criteria.ToImportDate == null);
-            var results = GetAllData().Where(query);
+            var results = Get().Where(query);
             if (criteria.ImPorted == true)
             {
                 results = results.Where(x => x.JobNo != null);
@@ -390,7 +394,7 @@ namespace eFMS.API.Operation.DL.Services
 
             Expression<Func<CustomsDeclarationModel, object>> orderByProperty = x => x.DatetimeModified;
             List <CustomsDeclarationModel> returnList = null;
-            var results = GetAllData().Where(query);
+            var results = Get().Where(query);
             rowsCount = results.Count();
             if (rowsCount == 0) return returnList;
             else results = results.OrderByDescending(x => x.DatetimeModified);
@@ -412,26 +416,6 @@ namespace eFMS.API.Operation.DL.Services
             }
             return returnList;
         }
-
-
-        private List<CustomsDeclarationModel> GetAllData()
-        {
-            //get from cache
-            var clearanceCaching = RedisCacheHelper.GetObject<List<CustomsDeclarationModel>>(cache, Templates.CustomDeclaration.NameCaching.ListName);
-            List<CustomsDeclarationModel> customClearances = null;
-            if (clearanceCaching == null)
-            {
-                //get from view data
-                var list = GetCustomClearanceViewList(string.Empty);
-                customClearances = mapper.Map<List<CustomsDeclarationModel>>(list);
-                RedisCacheHelper.SetObject(cache, Templates.CustomDeclaration.NameCaching.ListName, customClearances);
-            }
-            else
-            {
-                customClearances = clearanceCaching;
-            }
-            return customClearances;
-        }
         private List<sp_GetCustomDeclaration> GetCustomClearanceViewList(string jobNo)
         {
             DbParameter[] parameters =
@@ -446,9 +430,13 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                dc.CustomsDeclaration.RemoveRange(customs);
-                dc.SaveChanges();
+                foreach(var item in customs)
+                {
+                    var hs = Delete(x => x.Id == item.Id, false);
+                }
+                DataContext.SubmitChanges();
+                ClearCache();
+                Get();
             }
             catch (Exception ex)
             {
@@ -466,7 +454,7 @@ namespace eFMS.API.Operation.DL.Services
             bool isInt = false;
             bool isDate = false;
 
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             list.ForEach(item =>
             {
                 //Check empty ClearanceNo
@@ -798,7 +786,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.CommodityValid = true;
                 if (!string.IsNullOrEmpty(_commodity))
                 {
-                    var isFound = dc.CatCommodity.Any(x => x.Code == _commodity);
+                    var isFound = commodityRepository.Any(x => x.Code == _commodity);
                     if (!isFound)
                     {
                         item.CommodityName = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
@@ -807,7 +795,7 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.CommodityName = dc.CatCommodity.Where(x => x.Code == _commodity).First().CommodityNameEn;
+                        item.CommodityName = commodityRepository.Get(x => x.Code == _commodity)?.First().CommodityNameEn;
                     }
                 }
 
@@ -933,7 +921,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
 
                 //Check exist ClearanceNo & ClearanceDate
-                if (dc.CustomsDeclaration.Any(x => x.ClearanceNo == item.ClearanceNo && x.ClearanceDate == item.ClearanceDate))
+                if (DataContext.Any(x => x.ClearanceNo == item.ClearanceNo && x.ClearanceDate == item.ClearanceDate))
                 {
                     item.ClearanceNo = item.ClearanceDateStr = string.Format(stringLocalizer[LanguageSub.MSG_CLEARANCENO_EXISTED].Value, item.ClearanceNo);
                     item.IsValid = false;
@@ -949,11 +937,13 @@ namespace eFMS.API.Operation.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                dc.CustomsDeclaration.AddRange(data);
-                cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
-                dc.SaveChanges();
-                return new HandleState();
+                var hs = Add(data);
+                if (hs.Success)
+                {
+                    ClearCache();
+                    Get();
+                }
+                return hs;
             }
             catch (Exception ex)
             {

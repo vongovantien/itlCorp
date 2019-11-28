@@ -16,20 +16,19 @@ import * as fromStore from './../../store';
 
 export class ShareBussinessGrantTotalProfitComponent extends AppList {
 
-    shipmentProfits$: Observable<fromStore.ITransactionProfit[]> = new Observable<fromStore.ITransactionProfit[]>();
+    shipmentProfits$: Observable<fromStore.ITransactionProfit[]>;
     totalUSD$: Observable<number>;
     totalVND$: Observable<number>;
 
     headers: CommonInterface.IHeaderTable[];
 
     constructor(
-        private _store: Store<fromStore.IShareBussinessState>
+        private _store: Store<fromStore.IShareBussinessState>,
     ) {
         super();
     }
 
     ngOnInit() {
-
         this.shipmentProfits$ = this._store.select(fromStore.getTransactionProfitState);
 
         this.totalUSD$ = this.shipmentProfits$.pipe(
@@ -43,6 +42,5 @@ export class ShareBussinessGrantTotalProfitComponent extends AppList {
             { title: 'USD', field: 'profitUSD', dataType: 'CURRENCY' },
             { title: 'Local (VND)', field: 'profitLocal', dataType: 'CURRENCY' }
         ];
-
     }
 }

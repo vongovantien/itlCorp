@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { AppList } from 'src/app/app.list';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { Store } from '@ngrx/store';
-import * as fromStore from '../../../../store';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { forkJoin } from 'rxjs';
@@ -11,8 +9,6 @@ import { finalize, catchError } from 'rxjs/operators';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
-import { getParamsRouterState } from 'src/app/store';
-import { Params } from '@angular/router';
 
 @Component({
     selector: 'form-manifest-sea-fcl-import',
@@ -45,7 +41,6 @@ export class FormManifestSeaFclImportComponent extends AppList {
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        protected _store: Store<fromStore.ISeaFCLImportState>,
         private _dataService: DataService,
         private _spinner: NgxSpinnerService,
         private _documentRepo: DocumentationRepo

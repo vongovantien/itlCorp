@@ -1,13 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SeaFCLImportCDNoteComponent } from './sea-fcl-import-cd-note.component';
-import { CdNoteAddPopupComponent } from '../../components/popup/add-cd-note/add-cd-note.popup';
-import { CdNoteDetailPopupComponent } from '../../components/popup/detail-cd-note/detail-cd-note.popup';
-import { CdNoteAddRemainingChargePopupComponent } from '../../components/popup/add-remaining-charge/add-remaining-charge.popup';
 import { ModalModule } from 'ngx-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
-
+import { ShareBussinessCdNoteListComponent } from 'src/app/business-modules/share-business/components/cd-note/cd-note-list/cd-note-list.component';
+import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 
 @NgModule({
     imports: [
@@ -15,20 +12,16 @@ import { FormsModule } from '@angular/forms';
         ModalModule.forRoot(),
         SharedModule,
         FormsModule,
+        ShareBussinessModule
     ],
     exports: [],
     declarations: [
-        SeaFCLImportCDNoteComponent,
-        CdNoteAddPopupComponent,
-        CdNoteDetailPopupComponent,
-        CdNoteAddRemainingChargePopupComponent,
-
     ],
     providers: [],
     entryComponents: [
-        SeaFCLImportCDNoteComponent
+        ShareBussinessCdNoteListComponent
     ]
 })
 export class SeaFCLImportCDNoteModule {
-    static rootComponent = SeaFCLImportCDNoteComponent;
+    static rootComponent = ShareBussinessCdNoteListComponent;
 }

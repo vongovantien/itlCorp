@@ -30,9 +30,9 @@
         </div>
         <div class="table-wrapper table-scrollable" id="">
             <table class="table table-striped table-brand table-collapse-group dataTable">
-                <!-- <thead app-table-header [headers]="headers">
+                <!-- <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
                     <th class="table-actions-col no-sorting first">
-                        Action
+                        <span>Action</span>
                     </th>
                 </thead> -->
                 <thead>
@@ -71,7 +71,7 @@
                             <span>Create Date</span>
                         </th>
                         <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeCreated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeCreated') }"
+                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'soaNo'), 'sorting_desc': (!isDesc && sortKey == 'soaNo') }"
                             (click)="sortCdNotes('soaNo')">
                             <span>SOA</span>
                         </th>
@@ -117,7 +117,7 @@
                                                         {{cdNote.type}}
                                                     </td>
                                                     <td>
-                                                        <a
+                                                        <a style="cursor: pointer;"
                                                             (click)="openPopupDetail(cdNote.jobId, cdNote.code)">{{cdNote.code}}</a>
                                                     </td>
                                                     <td class="text-center">
@@ -150,9 +150,9 @@
     </div>
 </div>
 
-<!-- <cd-note-detail-popup (onDeleted)="onDeletedCdNote($event)"></cd-note-detail-popup>
+<cd-note-detail-popup (onDeleted)="onDeletedCdNote()"></cd-note-detail-popup>
 
-<cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"></cd-note-add-popup> -->
+<cd-note-add-popup (onRequest)="onRequestCdNoteChange()"></cd-note-add-popup>
 
 <confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 

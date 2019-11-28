@@ -5,7 +5,11 @@ import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'form-search-house-bill',
+<<<<<<< HEAD
     templateUrl: './form-search-house-bill.component.html'
+=======
+    templateUrl: './form-search-house-bill.component.html',
+>>>>>>> dev
 })
 export class FormSearchHouseBillComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataHbl> = new EventEmitter<ISearchDataHbl>();

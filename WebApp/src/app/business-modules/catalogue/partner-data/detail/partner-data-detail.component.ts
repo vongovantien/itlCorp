@@ -147,8 +147,8 @@ export class PartnerDataDetailComponent extends AppList {
                 await this.getComboboxData();
                 await this.getParnerDetails();
                 this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
+                this.isRequiredSaleman = this.checkRequireSaleman(this.partner.partnerGroup);
             }
-
         });
         this.getDataCombobox();
 
@@ -391,17 +391,17 @@ export class PartnerDataDetailComponent extends AppList {
                     this.partner.partnerGroup.substring(0, (this.partner.partnerGroup.length - 1));
                 }
             }
-            this.isRequiredSaleman = this.checkRequireSaleman(this.partner.partnerGroup);
         }
+        this.isRequiredSaleman = this.checkRequireSaleman(this.partner.partnerGroup);
     }
+
     checkRequireSaleman(partnerGroup: string): boolean {
         this.isShowSaleMan = false;
         if (partnerGroup != null) {
             if (partnerGroup.includes('CUSTOMER')) {
                 this.isShowSaleMan = true;
             }
-        }
-        else {
+        } else {
             this.isShowSaleMan = false;
         }
         if (partnerGroup == null) {
@@ -412,6 +412,7 @@ export class PartnerDataDetailComponent extends AppList {
             return false;
         }
     }
+
     getEmployee(employeeId: any) {
         this._systemRepo.getEmployeeByemployeeid(employeeId)
             .pipe(
@@ -423,20 +424,6 @@ export class PartnerDataDetailComponent extends AppList {
                 },
             );
     }
-
-    // getEmployee(employeeId: any): any {
-    //     this.baseService.post(this.api_menu.System.Employee.query, { id: employeeId }).subscribe((responses: any) => {
-    //         if (responses.length > 0) {
-    //             this.employee = responses[0];
-    //         }
-    //         else {
-    //             this.employee = {};
-    //         }
-    //         console.log(this.employee);
-    //     }, err => {
-    //         this.baseService.handleError(err);
-    //     });
-    // }
 
     public removed(value: any, selectName?: string): void {
         if (selectName == 'billingCountry') {
@@ -527,11 +514,10 @@ export class PartnerDataDetailComponent extends AppList {
                     this.saleMandetail = (res.data || []).map((item: Saleman) => new Saleman(item));
                     console.log(this.saleMandetail);
                     if (this.saleMandetail.length > 0) {
-                        for (let it of this.saleMandetail) {
+                        for (const it of this.saleMandetail) {
                             if (it.status === true) {
                                 it.statusString = "Active";
-                            }
-                            else {
+                            } else {
                                 it.statusString = "InActive";
                             }
                             this.services.forEach(item => {
@@ -548,7 +534,6 @@ export class PartnerDataDetailComponent extends AppList {
 
 
     onCreateSaleman(ngform: NgForm) {
-
         if (this.strSalemanCurrent.length > 0 && this.strOfficeCurrent.length > 0) {
             this.baseService.spinnerShow();
             const body = {

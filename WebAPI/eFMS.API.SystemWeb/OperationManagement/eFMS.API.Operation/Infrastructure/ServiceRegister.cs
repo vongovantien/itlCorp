@@ -25,19 +25,34 @@ using eFMS.API.Operation.DL.Services;
 using eFMS.API.Provider.Services.ServiceImpl;
 using eFMS.API.Provider.Services.IService;
 using eFMS.IdentityServer.DL.UserManager;
+using StackExchange.Redis;
+using eFMS.API.Operation.Service.Models;
+using ITL.NetCore.Connection.Caching;
+using eFMS.API.Operation.Infrastructure.Common;
 
 namespace eFMS.API.Operation.Infrastructure
 {
     public static class ServiceRegister
     {
 
-        public static void Register(IServiceCollection services)
+        public static void Register(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
+
             services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+            services.AddSingleton<ICacheServiceBase<CustomsDeclaration>>(x =>
+            new CacheServiceBase<CustomsDeclaration>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CustomsDeclaration)));
+
+            services.AddSingleton<ICacheServiceBase<SetEcusconnection>>(x =>
+            new CacheServiceBase<SetEcusconnection>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.SetEcusconnection)));
+
 
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<IOpsStageAssignedService, OpsStageAssignedService>();

@@ -585,8 +585,11 @@ namespace eFMS.API.ReportData
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
                     workSheet.Cells["A1"].Value = "Partner Data - " + partnerType;
-                    workSheet.Cells["A2"].Value = "Export By: " + author;
-                    //workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    workSheet.Cells["A1"].Style.Font.Bold = true;
+                    workSheet.Cells[1, 1, 2, 4].Merge = true;
+                    workSheet.Cells["A3"].Value = "Export By: " + author;
+                    workSheet.Cells["A3"].Style.Font.Bold = true;
+                    workSheet.Cells[3, 1, 3, 2].Merge = true;
                     BindingFormatForPartnerExcel(workSheet, list);
                     excelPackage.Save();
                     return excelPackage.Stream;

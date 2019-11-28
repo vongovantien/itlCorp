@@ -35,18 +35,24 @@
 
                 <form-create-sea-fcl-export></form-create-sea-fcl-export>
 
-                <shipment-good-summary></shipment-good-summary>
+                <shipment-good-summary> Shipment Goods Summary </shipment-good-summary>
 
                 <grant-total-profit></grant-total-profit>
 
             </tab>
-            <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')">
-                hbl list work!
-            </tab>
-            <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')">
+            <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')"
+                [active]="selectedTab === 'CDNOTE'">
                 <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="SeaFCLExport_cdNote">
                 </ng-container>
             </tab>
         </tabset>
     </div>
+    <ul class="m-nav-sticky fms-shipment-sidebar">
+        <li class="m-nav-sticky__item">
+            <a title="Preview Manifest" [routerLink]="['./manifest']">MNF</a>
+        </li>
+        <li class="m-nav-sticky__item">
+            <a title="Preview Shipping Instruction" [routerLink]="['./manifest']">SI</a>
+        </li>
+    </ul>
 </div>

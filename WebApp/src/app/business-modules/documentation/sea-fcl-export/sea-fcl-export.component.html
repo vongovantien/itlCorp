@@ -80,7 +80,7 @@
                                                             <ng-container *ngIf="!!houseBills.length">
                                                                 <tr *ngFor="let hbl of houseBills; trackBy: trackByFn">
                                                                     <td *ngFor="let header of headersHBL;  trackBy: trackByFn"
-                                                                        class="text-right">
+                                                                        class="text-left">
                                                                         <app-table-cell [item]="hbl"
                                                                             [type]="header.dataType"
                                                                             [field]="header.field">

@@ -9,7 +9,6 @@ namespace eFMS.API.Operation.DL.IService
 {
     public interface IOpsTransactionService : IRepositoryBase<OpsTransaction, OpsTransactionModel>
     {
-        IQueryable<OpsTransaction> Get();
 
         OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount);
     }

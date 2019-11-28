@@ -143,28 +143,18 @@
                                 <div class="m-portlet__body">
                                     <tabset class="custom-class-tab">
                                         <tab heading="Buying" (selectTab)="onSelectTabSurcharge('BUY')">
-
-                                            <ng-container
-                                                *ngIf="!!(selectedShipment |async ) && !!selectedHbl && !!(containers | async); else placeholder">
-                                                <buying-charge [containers]="containers | async"
-                                                    [shipment]="selectedShipment | async" [hbl]="selectedHbl">
-                                                </buying-charge>
+                                            <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
+                                                <buying-charge></buying-charge>
                                             </ng-container>
                                         </tab>
                                         <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
-                                            <ng-container
-                                                *ngIf="!!(selectedShipment |async ) && !!selectedHbl && !!(containers | async); else placeholder">
-                                                <selling-charge [containers]="containers | async"
-                                                    [shipment]="selectedShipment | async" [hbl]="selectedHbl">
-                                                </selling-charge>
+                                            <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
+                                                <selling-charge></selling-charge>
                                             </ng-container>
                                         </tab>
                                         <tab heading="OBH" (selectTab)="onSelectTabSurcharge('OBH')">
-                                            <ng-container
-                                                *ngIf="!!(selectedShipment |async ) && !!selectedHbl && !!(containers | async); else placeholder">
-                                                <obh-charge [containers]="containers | async"
-                                                    [shipment]="selectedShipment | async" [hbl]="selectedHbl">
-                                                </obh-charge>
+                                            <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
+                                                <obh-charge></obh-charge>
                                             </ng-container>
                                         </tab>
                                     </tabset>
