@@ -1,0 +1,62 @@
+<!--begin:: m-portlet-->
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <!--begin: Datatable-->
+        <div class="table-wrapper table-scrollable">
+            <table class="table table-striped table-brand dataTable">
+                <thead>
+                    <tr>
+                        <th class="no-sorting">
+                            <span>HBL No</span>
+                        </th>
+                        <th class="no-sorting">
+                            <span>Description</span>
+                        </th>
+                        <th class="no-sorting">
+                            <span>Shipping Marks</span>
+                        </th>
+                        <th class="no-sorting">
+                            <span>Containers</span>
+                        </th>
+                        <!-- <th class="no-sorting">
+                            <span>Packages</span>
+                        </th> -->
+                        <th class="no-sorting">
+                            <span>G.W</span>
+                        </th>
+                        <th class="no-sorting">
+                            <span>CBM</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="tbody-group">
+                    <tr class="" *ngFor="let housebill of housebills;let i = index;">
+                        <td>
+                            <span>{{ housebill.hwbno }}</span>
+                        </td>
+                        <td>
+                            <span>{{ housebill.desOfGoods }}</span>
+                        </td>
+                        <td>
+                            <span>{{ housebill.shippingMark }}</span>
+                        </td>
+                        <td>
+                            <span>{{ housebill.packageContainer }}</span>
+                        </td>
+                        <!-- <td>
+                            <span>text</span>
+                        </td> -->
+                        <td>
+                            <span>{{ housebill.gw }}</span>
+                        </td>
+                        <td>
+                            <span>{{ housebill.cbm }}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!--end: Datatable-->
+    </div>
+</div>
+<!--end:: m-portlet-->

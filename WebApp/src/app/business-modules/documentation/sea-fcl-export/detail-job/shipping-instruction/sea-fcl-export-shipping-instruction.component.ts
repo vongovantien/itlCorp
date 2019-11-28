@@ -6,4 +6,10 @@ import { AppList } from 'src/app/app.list';
     templateUrl: './sea-fcl-export-shipping-instruction.component.html'
 })
 export class SeaFclExportShippingInstructionComponent extends AppList {
+
+    constructor() {
+        super();
+    }
+    refresh() { }
 }
+

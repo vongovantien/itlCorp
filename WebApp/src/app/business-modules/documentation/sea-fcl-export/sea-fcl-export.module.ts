@@ -17,6 +17,8 @@ import { SeaFCLExportFormCreateComponent } from './components/form-create/form-c
 import { SeaFCLExportDetailJobComponent } from './detail-job/detail-job-fcl-export.component';
 import { SeaFCLExportLazyLoadModule } from './sea-fcl-export-lazy-load.module';
 import { SeaFclExportShippingInstructionComponent } from './detail-job/shipping-instruction/sea-fcl-export-shipping-instruction.component';
+import { SeaFclExportBillInstructionComponent } from './detail-job/shipping-instruction/bill-instruction/sea-fcl-export-bill-instruction.component';
+import { SeaFclExportBillDetailComponent } from './detail-job/shipping-instruction/bill-detail/sea-fcl-export-bill-detail.component';
 
 const routing: Routes = [
     {
@@ -39,7 +41,7 @@ const routing: Routes = [
     },
     {
         path: ':jobId/si', component: SeaFclExportShippingInstructionComponent, data: {
-            name: "Shipping Instructions", path: "sea-fcl-export", level: 4
+            name: "Shipping Instructions", path: ":jobId", level: 4
         }
     }
 ];
@@ -74,6 +76,8 @@ const COMPONENTS = [
         SeaFCLExportCreateJobComponent,
         SeaFCLExportDetailJobComponent,
         SeaFclExportShippingInstructionComponent,
+        SeaFclExportBillInstructionComponent,
+        SeaFclExportBillDetailComponent,
         ...COMPONENTS
     ],
     providers: [],
