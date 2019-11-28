@@ -1,6 +1,15 @@
 <div class="sea-fcl-import-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
+            <div class="dropdown m-dropdown m-dropdown--inline">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    <i class="la la-print"></i>P/L Sheet<span class="caret"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" (click)="previewPLsheet('USD')">Preview with USD</a>
+                    <a class="dropdown-item" (click)="previewPLsheet('VND')">Preview with VND</a>
+                </div>
+            </div>
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="la la-search-plus"></i>
@@ -163,3 +172,7 @@
         <span class="no-data-text">No records found</span>
     </div>
 </ng-template>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>

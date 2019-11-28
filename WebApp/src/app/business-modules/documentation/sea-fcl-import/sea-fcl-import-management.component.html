@@ -23,7 +23,7 @@
                             <th class="table-actions-col no-sorting first">Actions</th>
                         </thead>
                         <tbody class="tbody-group">
-                            <ng-container *ngIf="!isLoading && !!masterbills.length">
+                            <ng-container *ngIf="!!masterbills.length">
                                 <ng-container *ngFor="let item of masterbills; let i = index; trackBy: trackByFn">
                                     <tr class="collapse-toggle-row">
                                         <td class="table-actions-col">

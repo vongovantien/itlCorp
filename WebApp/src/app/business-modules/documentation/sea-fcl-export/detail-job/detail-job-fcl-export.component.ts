@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -11,6 +11,7 @@ import { combineLatest, of } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, take } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -20,13 +21,14 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 })
 
 export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobComponent implements OnInit {
-
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
 
     shipmentDetail: any;
-
+    dataReport: any = null;
     constructor(
         private _store: Store<fromShareBussiness.TransactionActions>,
         protected _toastService: ToastrService,
@@ -167,5 +169,23 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
         }
+    }
+
+    previewPLsheet(currency: string) {
+        this._documenRepo.previewSIFPLsheet(this.jobId, currency)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
     }
 }

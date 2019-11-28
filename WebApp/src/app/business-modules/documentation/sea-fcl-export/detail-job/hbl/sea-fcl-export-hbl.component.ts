@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 
@@ -13,6 +13,8 @@ import * as fromStore from './../../store';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { Observable } from 'rxjs';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -21,7 +23,8 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 })
 
 export class SeaFCLExportHBLComponent extends AppList implements OnInit {
-
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    
     jobId: string;
     headers: CommonInterface.IHeaderTable[];
     houseBills: any[] = [];
@@ -33,10 +36,13 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
     containers: Observable<Container[]>;
     selectedShipment: Observable<any>;
 
+    dataReport: any = null;
+
     constructor(
         private _router: Router,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
-        private _documentRepo: DocumentationRepo
+        private _documentRepo: DocumentationRepo,
+        protected _toastService: ToastrService,
     ) {
         super();
     }
@@ -138,5 +144,23 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
+    }
+
+    previewPLsheet(currency: string) {
+        this._documentRepo.previewSIFPLsheet(this.jobId, currency)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
     }
 }

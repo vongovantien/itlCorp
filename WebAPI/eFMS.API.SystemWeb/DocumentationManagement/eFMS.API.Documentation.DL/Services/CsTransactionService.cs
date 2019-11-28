@@ -1024,6 +1024,7 @@ namespace eFMS.API.Documentation.DL.Services
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
             var listHousebill = transactionDetailService.GetByJob(criteria);
             var hblNoList = string.Empty;
+            var _shipmentType = GetShipmentTypeForPreviewPL(shipment.TransactionType) + shipment.TypeOfService;
             if (listHousebill.Count > 0)
             {
                 hblNoList = String.Join(";", listHousebill.Select(x => x.Hwbno));
@@ -1084,12 +1085,12 @@ namespace eFMS.API.Documentation.DL.Services
                         var charge = new FormPLsheetReport();
                         charge.COSTING = "COSTING";
                         charge.TransID = shipment.JobNo; //JobNo of shipment
-                        charge.TransDate = shipment.DatetimeCreated.Value; //CreatedDate of shipment
+                        charge.TransDate = shipment.DatetimeCreated != null ? shipment.DatetimeCreated.Value : DateTime.Now; //CreatedDate of shipment
                         charge.HWBNO = surcharge.Hwbno;
                         charge.MAWB = shipment.Mawb; //MasterBill of shipment
                         charge.PartnerName = "PartnerName"; //NOT USE
                         charge.ContactName = userSaleman?.Username; //Saleman đầu tiên của list housebill
-                        charge.ShipmentType = "Import (Sea FCL) " + shipment.TypeOfService;
+                        charge.ShipmentType = _shipmentType ; //"Import (Sea FCL) " + shipment.TypeOfService;
                         charge.NominationParty = string.Empty;
                         charge.Nominated = true; //Gán cứng
                         charge.POL = polName + ", " + polCountry;
@@ -1181,6 +1182,52 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
             return result;
+        }
+
+        public string GetShipmentTypeForPreviewPL(string transactionType)
+        {
+            string shipmentType = string.Empty;
+            if (transactionType == TermData.AirExport)
+            {
+                shipmentType = string.Empty;
+            }
+            if (transactionType == TermData.InlandTrucking)
+            {
+                shipmentType = string.Empty;
+            }
+            if (transactionType == TermData.AirExport)
+            {
+                shipmentType = string.Empty;
+            }
+            if (transactionType == TermData.AirImport)
+            {
+                shipmentType = string.Empty;
+            }
+            if (transactionType == TermData.SeaConsolExport)
+            {
+                shipmentType = string.Empty;
+            }
+            if (transactionType == TermData.SeaConsolImport)
+            {
+                shipmentType = string.Empty;
+            }
+            if (transactionType == TermData.SeaFCLExport)
+            {
+                shipmentType = "Export (Sea FCL) ";
+            }
+            if (transactionType == TermData.SeaFCLImport)
+            {
+                shipmentType = "Import (Sea FCL) ";
+            }
+            if (transactionType == TermData.SeaLCLExport)
+            {
+                shipmentType = string.Empty;
+            }
+            if (transactionType == TermData.SeaLCLImport)
+            {
+                shipmentType = string.Empty;
+            }
+            return shipmentType;
         }
         #endregion -- PREVIEW --
     }
