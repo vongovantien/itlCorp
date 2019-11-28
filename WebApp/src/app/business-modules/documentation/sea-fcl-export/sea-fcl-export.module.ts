@@ -16,6 +16,7 @@ import { ShareBussinessModule } from '../../share-business/share-bussines.module
 import { SeaFCLExportFormCreateComponent } from './components/form-create/form-create-fcl-export.component';
 import { SeaFCLExportDetailJobComponent } from './detail-job/detail-job-fcl-export.component';
 import { SeaFCLExportLazyLoadModule } from './sea-fcl-export-lazy-load.module';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 const routing: Routes = [
     {
@@ -30,7 +31,7 @@ const routing: Routes = [
     },
     {
         path: ':jobId', component: SeaFCLExportDetailJobComponent, data: {
-            name: "Job Detail", path: "sea-fcl-export", level: 3
+            name: "Job Detail", path: "sea-fcl-export", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport 
         }
     },
     {

@@ -55,7 +55,6 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                 // this.cdr.detectChanges();
             }),
             switchMap(() => of(this.jobId)),
-            take(1)
         ).subscribe(
             (jobId: string) => {
                 if (!!jobId) {
