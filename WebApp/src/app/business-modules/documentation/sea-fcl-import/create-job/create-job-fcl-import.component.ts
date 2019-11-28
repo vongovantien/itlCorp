@@ -32,6 +32,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
     containers: Container[] = [];
     selectedJob: any = {}; // TODO model.
+    isImport: boolean = false;
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
@@ -109,7 +110,14 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
 
     onImport(selectedData: any) {
         this.selectedJob = selectedData;
-        console.log(this.selectedJob);
+        this.isImport = true;
+        this.shipmentGoodSummaryComponent.commodities = this.selectedJob.commodity;
+        this.shipmentGoodSummaryComponent.containerDetail = this.selectedJob.packageContainer;
+        this.shipmentGoodSummaryComponent.description = this.selectedJob.desOfGoods;
+        this.shipmentGoodSummaryComponent.grossWeight = this.selectedJob.grossWeight;
+        this.shipmentGoodSummaryComponent.netWeight = this.selectedJob.netWeight;
+        this.shipmentGoodSummaryComponent.totalChargeWeight = this.selectedJob.chargeWeight;
+        this.shipmentGoodSummaryComponent.totalCBM = this.selectedJob.cbm;
     }
 
     checkValidateForm() {
@@ -122,10 +130,14 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
 
     onCreateJob() {
         this.formCreateComponent.isSubmitted = true;
+        if (Object.keys(this.selectedJob).length > 0) {
+            this.containers = this.selectedJob.containers;
+        }
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;
         }
+
         if (!this.containers.length) {
             this._toastService.warning('Please add container to create new job');
             return;
@@ -133,8 +145,31 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
 
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model
+        if (this.isImport === true) {
+            modelAdd.id = this.selectedJob.id;
+            this.importJob(modelAdd);
+        } else {
+            this.createJob(modelAdd);
+        }
 
-        this.createJob(modelAdd);
+    }
+
+    importJob(body: any) {
+        this._documenRepo.importCSTransaction(body)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        // TODO goto detail.
+                        this._router.navigate([`home/documentation/sea-fcl-import/${res.data.id}`]);
+                    } else {
+                        this._toastService.error("Opps", "Something getting error!");
+                    }
+                }
+            );
     }
 
     createJob(body: any) {

@@ -1,9 +1,12 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
 import { catchError, finalize } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import * as fromShareBussiness from './../../../share-business/store';
+import { ShareBussinessShipmentGoodSummaryComponent } from '../shipment-good-summary/shipment-good-summary.component';
 
 @Component({
     selector: 'import-job-detail-popup',
@@ -15,6 +18,7 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
     headers: CommonInterface.IHeaderTable[];
     dataSearch: any = {};
     shippments: any = [];
+    containers: any = [];
     jobId: string = '';
     selected = -1;
     selectedShipment: any = {};
@@ -23,6 +27,7 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
     constructor(
         private _documentRepo: DocumentationRepo,
         private _sortService: SortService,
+        protected _store: Store<fromShareBussiness.ITransactionState>,
 
     ) {
         super();
@@ -92,8 +97,34 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
             if (this.pageChecked !== this.page) {
                 return;
             }
-
+            console.log(this.selectedShipment);
+            const objShipment = Object.assign({}, this.selectedShipment);
+            objShipment.etd = null;
+            objShipment.mawb = null;
+            objShipment.eta = null;
+            objShipment.personIncharge = localStorage.getItem('currently_userName') || 'Admin';
+            this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(objShipment));
             this.isCheckShipment = true;
+            // TODO get container list.
+            this._documentRepo.getListContainersOfJob({ mblid: this.selectedShipment.id }).pipe(
+            ).subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.containers = res;
+                        // updae seal, cont.
+                        console.log(this.containers);
+                        this.containers.forEach(item => {
+                            item.sealNo = null;
+                            item.containerNo = null;
+                            item.markNo = null;
+                        });
+                        this.selectedShipment.containers = this.containers;
+
+                        this._store.dispatch(new fromShareBussiness.GetContainerSuccessAction(this.containers));
+
+                    }
+                }
+            );
             this.onImport.emit(this.selectedShipment);
             this.hide();
         }
