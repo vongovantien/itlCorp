@@ -73,12 +73,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this.getSurcharge();
 
-        this._store.select(fromRoot.getDataRouterState).subscribe(
-            (dataParam: CommonInterface.IDataParam) => {
-                this.serviceTypeId = dataParam.serviceId;
-                console.log(this.serviceTypeId);
-            }
-        );
+        this._store.select(fromRoot.getDataRouterState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (dataParam: CommonInterface.IDataParam) => {
+                    this.serviceTypeId = dataParam.serviceId;
+                }
+            );
     }
 
     getSurcharge() {
@@ -352,7 +353,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             }
 
             // Update HBL ID,Type
-            charge.hblid = this.hbl.id;
+            if (!!this.hbl && !!this.hbl.id) {
+                charge.hblid = this.hbl.id;
+            } else {
+                this._toastService.warning("HBL was not found");
+                return;
+            }
             charge.type = type;
         }
 
@@ -378,7 +384,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
                         this.getProfit();
                         this.getSurcharges(type);
-
                     } else {
                         this._toastService.error(res.message);
                     }

@@ -109,7 +109,11 @@ export class SeaFCLImportHBLComponent extends AppList {
     }
 
 
-    showDeletePopup(hbl: CsTransactionDetail) {
+    showDeletePopup(hbl: CsTransactionDetail, event: Event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+
         this.confirmDeletePopup.show();
         this.selectedHbl = hbl;
 
