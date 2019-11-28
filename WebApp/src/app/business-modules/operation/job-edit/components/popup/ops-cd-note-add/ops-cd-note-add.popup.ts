@@ -124,7 +124,6 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
                 })
             ).subscribe(
                 (dataCharges: any) => {
-                    console.log(dataCharges)
                     dataCharges.forEach(element => {
                         element.listCharges.forEach(ele => {
                             ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && partnerId === ele.paymentObjectId)) ? ele.total : null;

@@ -295,7 +295,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             _listCharges = Query(housebill.Id);
 
-                            foreach (var c in listCharges)
+                            foreach (var c in _listCharges)
                             {
                                 if (c.PaymentObjectId != null)
                                 {
@@ -335,7 +335,6 @@ namespace eFMS.API.Documentation.DL.Services
                 listPartners = listPartners.Distinct().ToList();
                 foreach (var item in listPartners)
                 {
-                    //var jobId = isShipmentOperation == true ? opstransRepository.Get(x => x.Hblid == id).FirstOrDefault()?.Id : id;
                     var cdNotes = DataContext.Where(x => x.PartnerId == item.Id && x.JobId == id).ToList();
                     var cdNotesModel = mapper.Map<List<AcctCdnoteModel>>(cdNotes);
                     List<object> listCDNote = new List<object>();
@@ -347,7 +346,7 @@ namespace eFMS.API.Documentation.DL.Services
                         decimal totalCredit = 0;
                         foreach (var charge in chargesOfCDNote)
                         {
-                            if (charge.Type == Constants.CHARGE_BUY_TYPE || charge.Type == "LOGISTIC" || (charge.Type == Constants.CHARGE_OBH_TYPE && cdNote.PartnerId == charge.PayerId))
+                            if (charge.Type == Constants.CHARGE_BUY_TYPE || (charge.Type == Constants.CHARGE_OBH_TYPE && cdNote.PartnerId == charge.PayerId))
                             {
                                 // calculate total credit
                                 totalCredit += (decimal)(charge.Total * charge.ExchangeRate);
@@ -359,7 +358,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         cdNote.Total = totalDebit - totalCredit;
-                        cdNote.soaNo = String.Join(",", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
+                        cdNote.soaNo = String.Join(", ", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
                         cdNote.total_charge = chargesOfCDNote.Count();
                         listCDNote.Add(cdNote);
                     }
@@ -455,7 +454,6 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             }
             //to continue
-            //var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == CDNoteCode).ToList();
             var charges = surchargeRepository.Get(x => x.CreditNo == cdNo || x.DebitNo == cdNo).ToList();
 
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
@@ -494,7 +492,6 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (transaction != null)
             {
-                //hbOfLadingNo = transaction?.Mawb;
                 soaDetails.MbLadingNo = transaction?.Mawb;
                 hbOfLadingNo = string.Join(", ", HBList.OrderByDescending(x => x.Hwbno).Select(x => x.Hwbno).Distinct());
                 soaDetails.HbLadingNo = hbOfLadingNo;
@@ -518,11 +515,9 @@ namespace eFMS.API.Documentation.DL.Services
             var hbConsignees = string.Empty;
             foreach (var item in HBList)
             {
-                //hbOfLadingNo += (item.Hwbno + ", ");
                 var conts = csMawbcontainerRepository.Get(x => x.Hblid == item.Id).ToList();
                 foreach (var cont in conts)
                 {
-                    //volum += cont.Cbm == null ? 0 : cont.Cbm;
                     var contUnit = unitRepository.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
                     if (contUnit != null)
                     {
@@ -534,21 +529,9 @@ namespace eFMS.API.Documentation.DL.Services
                         hbPackages += (cont.Quantity + "x" + packageUnit.UnitNameEn + ", ");
                     }
                     sealsNo += !string.IsNullOrEmpty(cont.SealNo) ? cont.SealNo + ", " : "";
-                    //hbGw += cont.Gw == null ? 0 : cont.Gw;   
                 }
                 volum += conts.Sum(s => s.Cbm);
                 hbGw += conts.Sum(s => s.Gw);
-
-                //var shipper = partnerRepositoty.Get(x => x.Id == item.ShipperId).FirstOrDefault();
-                //if(shipper != null)
-                //{
-                //    hbShippers += shipper.PartnerNameEn + ",";
-                //}
-                //var consignee = partnerRepositoty.Get(x => x.Id == item.ConsigneeId).FirstOrDefault();
-                //if(consignee != null)
-                //{
-                //    hbConsignees += consignee.PartnerNameEn + ",";
-                //}
             }
             hbConstainers += ".";
             hbConstainers = hbConstainers != "." ? hbConstainers.Replace(", .", ""): string.Empty;
@@ -571,13 +554,11 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.JobId = transaction != null ? transaction.Id : opsTransaction.Id;
             soaDetails.JobNo = transaction != null ? transaction.JobNo : opsTransaction?.JobNo;
             soaDetails.Pol = pol?.NameEn;
-            //if (soaDetails.PolCountry != null)
             if (soaDetails.Pol != null)
             {
                 soaDetails.PolCountry = pol == null ? null : countries.FirstOrDefault(x => x.Id == pol.CountryId)?.NameEn;
             }
             soaDetails.Pod = pod?.NameEn;
-            //if (countries != null)
             if (soaDetails.Pod != null)
             {
                 soaDetails.PodCountry = pod == null ? null : countries.FirstOrDefault(x => x.Id == pod.CountryId)?.NameEn;
@@ -723,11 +704,11 @@ namespace eFMS.API.Documentation.DL.Services
                 DueTo = "N/A",
                 DueToCredit = "N/A",
                 SayWordAll = "N/A",
-                CompanyName = "N/A",
-                CompanyAddress1 = "N/A",
-                CompanyAddress2 = "N/A",
+                CompanyName = Constants.COMPANY_NAME,
+                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎",
                 CompanyDescription = "N/A",
-                Website = "efms.itlvn.com",
+                Website = Constants.COMPANY_WEBSITE,//"efms.itlvn.com",
                 IbanCode = "N/A",
                 AccountName = "N/A",
                 BankName = "N/A",
@@ -740,7 +721,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CurrDecimal = 2,
                 IssueInv = "N/A",
                 InvoiceInfo = "N/A",
-                Contact = "N/A",
+                Contact = currentUser.UserID,
                 IssuedDate = model.CreatedDate,
                 OtherRef = "N/A"
             };
@@ -810,9 +791,9 @@ namespace eFMS.API.Documentation.DL.Services
                         DecimalNo = null,
                         CurrDecimalNo = null,
                         VATInvoiceNo = item.InvoiceNo,
-                        GW = null,
+                        GW = model.GW,
                         NW = null,
-                        SeaCBM = null,
+                        SeaCBM = model.CBM,
                         SOTK = "N/A",
                         NgayDK = null,
                         Cuakhau = port,
