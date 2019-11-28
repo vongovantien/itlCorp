@@ -84,7 +84,7 @@
                                     Supplier <span class="m--font-danger">(*)</span>
                                 </label>
 
-                                <app-combo-grid-virtual-scroll [dataSources]="suppliers | async"
+                                <app-combo-grid-virtual-scroll [dataSources]="suppliers"
                                     [currentActiveItemId]="{field:'id',value: supplier.value}"
                                     (itemSelected)="onSelectDataForm($event, 'supplier')"
                                     [selectedDisplayFields]="['partnerNameEn']"
@@ -130,7 +130,7 @@
                                     Consignee <span class="m--font-danger">(*)</span>
                                 </label>
 
-                                <app-combo-grid-virtual-scroll [dataSources]="consignees | async"
+                                <app-combo-grid-virtual-scroll [dataSources]="consignees"
                                     [currentActiveItemId]="{field:'id',value:consignee.value}"
                                     (itemSelected)="onSelectDataForm($event, 'consignee')"
                                     [selectedDisplayFields]="['partnerNameEn']"
@@ -164,7 +164,7 @@
                                     Real Shipper
                                 </label>
 
-                                <app-combo-grid-virtual-scroll [dataSources]="shippers | async"
+                                <app-combo-grid-virtual-scroll [dataSources]="shippers"
                                     [currentActiveItemId]="{field:'id',value: realShipper.value}"
                                     (itemSelected)="onSelectDataForm($event, 'realshipper')"
                                     [selectedDisplayFields]="['partnerNameEn']"
@@ -182,7 +182,7 @@
                                     Real Consignee
                                 </label>
 
-                                <app-combo-grid-virtual-scroll [dataSources]="consignees | async"
+                                <app-combo-grid-virtual-scroll [dataSources]="consignees"
                                     [currentActiveItemId]="{field:'id',value: realconsignee.value}"
                                     (itemSelected)="onSelectDataForm($event, 'realconsignee')"
                                     [selectedDisplayFields]="['partnerNameEn']"
@@ -237,7 +237,7 @@
                                     Port of Loading <span class="m--font-danger">(*)</span>
                                 </label>
 
-                                <app-combo-grid-virtual-scroll [dataSources]="ports | async"
+                                <app-combo-grid-virtual-scroll [dataSources]="ports"
                                     [currentActiveItemId]="{field:'id',value: pol.value}"
                                     (itemSelected)="onSelectDataForm($event, 'pol')"
                                     [selectedDisplayFields]="['nameEn']"
@@ -257,7 +257,7 @@
                                     Port of Discharge <span class="m--font-danger">(*)</span>
                                 </label>
 
-                                <app-combo-grid-virtual-scroll [dataSources]="ports | async"
+                                <app-combo-grid-virtual-scroll [dataSources]="ports"
                                     [currentActiveItemId]="{field:'id',value: pod.value}"
                                     (itemSelected)="onSelectDataForm($event, 'pod')"
                                     [selectedDisplayFields]=" ['nameEn']"
@@ -389,11 +389,11 @@
                                 <label class="form-control-label" for="">
                                     CBM
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                <input type="number" class="form-control m-input m-input--square" placeholder=""
                                     formControlName="cbm" autocomplete="nope" name="volume" min="0.01">
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
             </div>
         </div>

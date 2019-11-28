@@ -17,10 +17,10 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 export class SeaFclExportBillInstructionComponent extends AppForm {
     formSI: FormGroup;
     userIssues: any[] = [];
-    suppliers: Observable<Customer[]>;
-    consignees: Observable<Customer[]>;
-    shippers: Observable<Customer[]>;
-    ports: Observable<PortIndex[]>;
+    suppliers: any[] = [];
+    consignees: any[] = [];
+    shippers: any[] = [];
+    ports: any[] = [];
     termTypes: CommonInterface.INg2Select[];
 
     siRefNo: AbstractControl;
@@ -125,16 +125,50 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
         this.cbm = this.formSI.controls["cbm"];
     }
     getPorts() {
-        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
+        this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.ports = res;
+                },
+            );
     }
     getShippers() {
-        this.shippers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.SHIPPER);
+        this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.SHIPPER)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.shippers = res;
+                },
+            );
     }
     getConsignees() {
-        this.consignees = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CONSIGNEE);
+        this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CONSIGNEE).pipe(
+            catchError(this.catchError),
+            finalize(() => { })
+        )
+            .subscribe(
+                (res: any) => {
+                    this.consignees = res;
+                },
+            );
     }
     getSuppliers() {
-        this.suppliers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
+        this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER).pipe(
+            catchError(this.catchError),
+            finalize(() => { })
+        )
+            .subscribe(
+                (res: any) => {
+                    this.suppliers = res;
+                },
+            );
     }
     getUserIssuses() {
         this._systemRepo.getSystemUsers()
