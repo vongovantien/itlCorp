@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { AppList } from 'src/app/app.list';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
@@ -11,10 +11,10 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
 
 @Component({
-    selector: 'form-manifest-sea-fcl-import',
-    templateUrl: './form-manifest-sea-fcl-import.component.html'
+    selector: 'form-manifest',
+    templateUrl: './form-manifest.component.html'
 })
-export class FormManifestSeaFclImportComponent extends AppList {
+export class ShareBusinessFormManifestComponent extends AppList {
     formGroup: FormGroup;
     referenceNo: AbstractControl;
     supplier: AbstractControl;
@@ -24,8 +24,8 @@ export class FormManifestSeaFclImportComponent extends AppList {
     date: AbstractControl;
     configPortOfLoading: CommonInterface.IComboGirdConfig | any = {};
     configPortOfDischarge: CommonInterface.IComboGirdConfig | any = {};
-    selectedPortOfLoading: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedPortOfDischarge: Partial<CommonInterface.IComboGridData | any> = {};
+    selectedPortOfLoading: any = {};
+    selectedPortOfDischarge: any = {};
 
     isSubmitted: boolean = false;
     freightCharge: AbstractControl;

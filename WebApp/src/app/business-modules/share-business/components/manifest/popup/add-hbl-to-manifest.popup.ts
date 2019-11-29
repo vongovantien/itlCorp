@@ -1,13 +1,12 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { CsTransactionDetail } from 'src/app/shared/models';
 import { SortService } from 'src/app/shared/services';
 @Component({
-    selector: 'add-hbl-to-manifest-popup',
+    selector: 'add-hbl-to-manifest-popup-share',
     templateUrl: 'add-hbl-to-manifest.popup.html'
 })
 
-export class AddHblToManifestComponent extends PopupBase {
+export class ShareBusinessAddHblToManifestComponent extends PopupBase {
     houseBills: any[] = [];
     houseBillsRemove: any[] = [];
     checkAll = false;
@@ -36,8 +35,6 @@ export class AddHblToManifestComponent extends PopupBase {
             { title: 'Freight Charge', field: '', sortable: true },
 
         ];
-
-
     }
 
 
