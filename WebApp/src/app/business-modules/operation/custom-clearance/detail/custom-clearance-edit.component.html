@@ -223,9 +223,9 @@
                                 </label>
                                 <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{field:'code',value:strCountryExportCurrent,hardValue:''}"
-                                    [selectedDisplayFields]="['name']" [dataSources]="listCountry"
+                                    [selectedDisplayFields]="['nameEn']" [dataSources]="listCountry"
                                     (itemSelected)="strCountryExportCurrent=$event.code"
-                                    [displayFields]="[{'field':'code','label':'Country Code'},{'field':'name','label':'Country Name (EN)'}]">
+                                    [displayFields]="[{'field':'code','label':'Country Code'},{'field':'nameEn','label':'Country Name (EN)'}]">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -236,9 +236,9 @@
                                 </label>
                                 <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{field:'code',value:strCountryImportCurrent,hardValue:''}"
-                                    [selectedDisplayFields]="['name']" [dataSources]="listCountry"
+                                    [selectedDisplayFields]="['nameEn']" [dataSources]="listCountry"
                                     (itemSelected)="strCountryImportCurrent=$event.code"
-                                    [displayFields]="[{'field':'code','label':'Country Code'},{'field':'name','label':'Country Name (EN)'}]">
+                                    [displayFields]="[{'field':'code','label':'Country Code'},{'field':'nameEn','label':'Country Name (EN)'}]">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>

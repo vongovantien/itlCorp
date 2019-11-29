@@ -13,6 +13,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../share-business/store';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 
 @Component({
@@ -24,6 +25,7 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteHBLPopup: ConfirmPopupComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     jobId: string;
     headers: CommonInterface.IHeaderTable[];
@@ -32,6 +34,9 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
     selectedHbl: CsTransactionDetail;
 
     selectedTabSurcharge: string = 'BUY';
+
+
+    dataReport: any = null;
 
     constructor(
         private _router: Router,
@@ -205,5 +210,23 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
+    }
+
+    previewPLsheet(currency: string) {
+        this._documentRepo.previewSIFPLsheet(this.jobId, currency)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
     }
 }

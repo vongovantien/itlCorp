@@ -50,7 +50,6 @@ export class OpsCDNoteComponent extends AppList {
         this._activedRouter.params.subscribe((param: { id: string }) => {
             if (!!param.id) {
                 this.idMasterBill = param.id;
-                console.log(this.idMasterBill)
                 this.getListCdNote(this.idMasterBill);
             }
         });

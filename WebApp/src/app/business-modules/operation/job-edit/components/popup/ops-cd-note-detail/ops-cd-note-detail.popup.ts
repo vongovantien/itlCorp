@@ -158,6 +158,8 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     }
 
     preview() {
+        this.CdNoteDetail.totalCredit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
+        this.CdNoteDetail.totalDebit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
         this._documentationRepo.previewCDNote(this.CdNoteDetail)
             .pipe(
                 catchError(this.catchError),
@@ -165,13 +167,17 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             )
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    setTimeout(() => {
-                        this.reportPopup.show();
-                    }, 1000);
-
+                    if (res != null && res.dataSource.length > 0) {
+                        this.dataReport = res;
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
                 },
             );
     }
-    
+
 }

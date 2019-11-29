@@ -96,7 +96,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getAll")]
         public IActionResult GetAll()
         {
-            var data = catCountryService.GetByLanguage();
+            var data = catCountryService.Get();
             return Ok(data);
         }
 

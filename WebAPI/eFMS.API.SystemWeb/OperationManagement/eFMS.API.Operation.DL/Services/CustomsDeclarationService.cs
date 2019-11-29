@@ -214,16 +214,16 @@ namespace eFMS.API.Operation.DL.Services
             return serviceType;
         }
 
-        public IQueryable<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount)
+        public List<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount)
         {
-            Expression<Func<CustomsDeclarationModel, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+            Expression<Func<CustomsDeclaration, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                                                                     && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
                                                                                     && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
                                                                                     && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
                                                                                     && (x.DatetimeCreated <= criteria.ToImportDate || criteria.ToImportDate == null);
-            //var data = GetCustomClearanceViewList(string.Empty);
+            var data = GetCustomClearanceViewList(string.Empty);
             if (criteria.ImPorted == true)
             {
                 query = query.And(x => x.JobNo != null);
@@ -232,9 +232,12 @@ namespace eFMS.API.Operation.DL.Services
             {
                 query = query.And(x => x.JobNo == null);
             }
-            Expression<Func<CustomsDeclarationModel, object>> orderByProperty = x => x.DatetimeModified;
-            var list = Paging(query, page, size, orderByProperty, false, out rowsCount);
-            return list;
+            Expression<Func<CustomsDeclaration, object>> orderByProperty = x => x.DatetimeModified;
+            var list = DataContext.Paging(query, page, size, orderByProperty, false, out rowsCount);
+            var results = new List<CustomsDeclarationModel>();
+            if (rowsCount == 0) return results;
+            results = MapClearancesToClearanceModels(list);
+            return results;
         }
 
 
@@ -297,27 +300,17 @@ namespace eFMS.API.Operation.DL.Services
             var portCache = catPlaceApi.GetPlaces().Result;
             var customerCache = catPartnerApi.GetPartners().Result;
             var countries = countryCache != null ? countryCache.ToList() : new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
-            var portIndexs = portCache != null ? portCache.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList() : new List<Provider.Models.CatPlaceApiModel>(); //dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
-            var customers = customerCache != null ? customerCache.Where(x => x.PartnerGroup.IndexOf(GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER), StringComparison.OrdinalIgnoreCase) > -1).ToList() : new List<Provider.Models.CatPartnerApiModel>(); //dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
-            var clearances = (from clearance in list
-                              join importCountry in countries on clearance.ImportCountryCode equals importCountry.Code into grpImports
-                              from imCountry in grpImports.DefaultIfEmpty()
-                              join exportCountry in countries on clearance.ExportCountryCode equals exportCountry.Code into grpExports
-                              from exCountry in grpExports.DefaultIfEmpty()
-                              join portIndex in portIndexs on clearance.Gateway equals portIndex.Code into grpPorts
-                              from port in grpPorts.DefaultIfEmpty()
-                              join partner in customers on clearance.PartnerTaxCode equals partner.TaxCode into grpCustomers
-                              from customer in grpCustomers.DefaultIfEmpty()
-                              select new { clearance, ImportCountryName = imCountry.NameEn, ExportCountryName = exCountry.NameEn, GatewayName = port.NameEn, CustomerName = customer.PartnerNameEn }
-                       );
-            if (clearances == null) return results;
-            foreach (var item in clearances)
+            var portIndexs = portCache != null ? portCache.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList() : new List<Provider.Models.CatPlaceApiModel>();
+            var customers = customerCache != null ? customerCache.Where(x => x.PartnerGroup.IndexOf(GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER), StringComparison.OrdinalIgnoreCase) > -1).ToList() : new List<Provider.Models.CatPartnerApiModel>(); 
+            foreach (var item in list)
             {
-                var clearance = mapper.Map<CustomsDeclarationModel>(item.clearance);
-                clearance.ImportCountryName = item.ImportCountryName;
-                clearance.ExportCountryName = item.ExportCountryName;
-                clearance.CustomerName = item.CustomerName;
-                clearance.GatewayName = item.GatewayName;
+                var clearance = mapper.Map<CustomsDeclarationModel>(item);
+                var imCountryCode = item.ImportCountryCode;
+                var exCountryCode = item.ExportCountryCode;
+                clearance.ImportCountryName = countries.FirstOrDefault(x => x.Code == imCountryCode)?.NameEn;
+                clearance.ExportCountryName = countries.FirstOrDefault(x => x.Code == exCountryCode)?.NameEn;
+                clearance.CustomerName = customers.FirstOrDefault(x => x.TaxCode == item.PartnerTaxCode)?.PartnerNameEn;
+                clearance.GatewayName = portIndexs.FirstOrDefault(x => x.Code == item.Gateway)?.NameEn;
                 results.Add(clearance);
             }
             return results;

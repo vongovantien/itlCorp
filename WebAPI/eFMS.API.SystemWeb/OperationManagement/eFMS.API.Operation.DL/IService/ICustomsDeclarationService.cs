@@ -13,7 +13,7 @@ namespace eFMS.API.Operation.DL.IService
         IQueryable<CustomsDeclarationModel> GetAll();
         object GetClearanceTypeData();
         HandleState ImportClearancesFromEcus();
-        IQueryable<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount);
+        List<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount);
         List<CustomsDeclarationModel> GetCustomDeclaration(string keysearch, string customerNo, bool impPorted, int pageNumber, int pageSize, out int rowsCount);
         IQueryable<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria);
         List<CustomsDeclarationModel> GetBy(string jobNo);

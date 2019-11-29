@@ -16,6 +16,10 @@ import { ShareBussinessModule } from '../../share-business/share-bussines.module
 import { SeaFCLExportFormCreateComponent } from './components/form-create/form-create-fcl-export.component';
 import { SeaFCLExportDetailJobComponent } from './detail-job/detail-job-fcl-export.component';
 import { SeaFCLExportLazyLoadModule } from './sea-fcl-export-lazy-load.module';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { SeaFclExportShippingInstructionComponent } from './detail-job/shipping-instruction/sea-fcl-export-shipping-instruction.component';
+import { SeaFclExportBillInstructionComponent } from './detail-job/shipping-instruction/bill-instruction/sea-fcl-export-bill-instruction.component';
+import { SeaFclExportBillDetailComponent } from './detail-job/shipping-instruction/bill-detail/sea-fcl-export-bill-detail.component';
 
 const routing: Routes = [
     {
@@ -30,12 +34,17 @@ const routing: Routes = [
     },
     {
         path: ':jobId', component: SeaFCLExportDetailJobComponent, data: {
-            name: "Job Detail", path: "sea-fcl-export", level: 3
+            name: "Job Detail", path: "sea-fcl-export", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport 
         }
     },
     {
         path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-export-hbl.module').then(m => m.SeaFCLExportHBLModule),
     },
+    {
+        path: ':jobId/si', component: SeaFclExportShippingInstructionComponent, data: {
+            name: "Shipping Instructions", path: ":jobId", level: 4
+        }
+    }
 ];
 
 const LIB = [
@@ -67,6 +76,9 @@ const COMPONENTS = [
         SeaFCLExportComponent,
         SeaFCLExportCreateJobComponent,
         SeaFCLExportDetailJobComponent,
+        SeaFclExportShippingInstructionComponent,
+        SeaFclExportBillInstructionComponent,
+        SeaFclExportBillDetailComponent,
         ...COMPONENTS
     ],
     providers: [],
