@@ -212,11 +212,7 @@ export class CreateHouseBillComponent extends AppForm {
             this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(
-                    map((resultHousebills: any) => {
-                        const res = resultHousebills;
-                        return res;
-                    }),
-                    mergeMap((res) => {
+                    mergeMap((res: any) => {
                         const dateNotice = {
                             arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null,
                             arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
