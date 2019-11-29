@@ -60,7 +60,8 @@ export class FormAddHouseBillComponent extends AppForm {
     configPortOfDischarge: CommonInterface.IComboGirdConfig | any = {};
     configSupplier: CommonInterface.IComboGirdConfig | any = {};
     configPlaceOfIssued: CommonInterface.IComboGirdConfig | any = {};
-
+    configPartner: CommonInterface.IComboGirdConfig | any = {};
+    configPort: CommonInterface.IComboGirdConfig | any = {};
 
     selectedCustomer: any = {};
     selectedSaleman: any = {};
@@ -124,7 +125,7 @@ export class FormAddHouseBillComponent extends AppForm {
             { title: 'User Name', field: 'username' },
         ];
 
-        this.configCustomer = Object.assign({}, this.configComoBoGrid, {
+        this.configPartner = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'id', label: 'Partner ID' },
                 { field: 'shortName', label: 'Name ABBR' },
@@ -133,74 +134,20 @@ export class FormAddHouseBillComponent extends AppForm {
 
             ],
         }, { selectedDisplayFields: ['shortName'], });
+
+        this.configPort = Object.assign({}, this.configComoBoGrid, {
+            displayFields: [
+                { field: 'code', label: 'Port Code' },
+                { field: 'nameEn', label: 'Port Name' },
+                { field: 'countryNameEN', label: 'Country' },
+            ],
+        }, { selectedDisplayFields: ['nameEn'], });
 
         this.configSaleman = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'username', label: 'Username' },
             ],
         }, { selectedDisplayFields: ['username'], });
-
-        this.configShipper = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'id', label: 'Partner ID' },
-                { field: 'shortName', label: 'Name ABBR' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' },
-
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
-
-        this.configConsignee = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'id', label: 'Partner ID' },
-                { field: 'shortName', label: 'Name ABBR' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' }
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
-
-        this.configNotifyParty = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'id', label: 'Partner ID' },
-                { field: 'shortName', label: 'Name ABBR' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' }
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
-
-        this.configAlsoNotifyParty = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'id', label: 'Partner ID' },
-                { field: 'shortName', label: 'Name ABBR' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' }
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
-
-        this.configPortOfLoading = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'code', label: 'Port Code' },
-                { field: 'nameEn', label: 'Port Name' },
-                { field: 'countryNameEN', label: 'Country' },
-            ],
-        }, { selectedDisplayFields: ['nameEn'], });
-
-        this.configPortOfDischarge = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'code', label: 'Port Code' },
-                { field: 'nameEn', label: 'Port Name' },
-                { field: 'countryNameEN', label: 'Country' },
-            ],
-        }, { selectedDisplayFields: ['nameEn'], });
-
-        this.configSupplier = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'id', label: 'Partner ID' },
-                { field: 'shortName', label: 'Name ABBR' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' }
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
 
         this.configPlaceOfIssued = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -210,9 +157,7 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'code', label: 'Code' }
             ],
         }, { selectedDisplayFields: ['name_EN'], });
-
         this.initForm();
-
         this.getPort();
         this._store.select(fromShare.getDetailHBlState)
             .subscribe(
@@ -520,10 +465,6 @@ export class FormAddHouseBillComponent extends AppForm {
 
             });
     }
-
-    // getListPort() {
-    //     this._catalogueRepo.getListPortByTran().subscribe((res: any) => { this.configPortOfLoading.dataSource = res; this.configPortOfDischarge.dataSource = res; });
-    // }
 
     getListProvince() {
         this._catalogueRepo.getAllProvinces().subscribe((res: any) => { this.configPlaceOfIssued.dataSource = res; });

@@ -25,10 +25,10 @@
                                     Customer(Payer) <span class="m--font-danger">(*)</span>
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCustomer"
-                                    [selectedDisplayFields]="configCustomer.selectedDisplayFields"
+                                    [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                     [dataSources]="configCustomer.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'Customer')"
-                                    [displayFields]="configCustomer.displayFields">
+                                    [displayFields]="configPartner.displayFields">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback" *ngIf="isSubmited && !selectedCustomer.value">
                                     Customer is required!
@@ -64,10 +64,10 @@
                                     Shipper
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipper"
-                                    [selectedDisplayFields]="configShipper.selectedDisplayFields"
+                                    [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                     [dataSources]="configShipper.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'Shipper')"
-                                    [displayFields]="configShipper.displayFields">
+                                    [displayFields]="configPartner.displayFields">
                                 </app-combo-grid-virtual-scroll>
                                 <textarea rows="3" class="form-control m-input m-input--square"
                                     formControlName="ShipperDescription"></textarea>
@@ -82,10 +82,10 @@
                                 </label>
 
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedConsignee"
-                                    [selectedDisplayFields]="configConsignee.selectedDisplayFields"
+                                    [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                     [dataSources]="configConsignee.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'Consignee')"
-                                    [displayFields]="configConsignee.displayFields">
+                                    [displayFields]="configPartner.displayFields">
                                 </app-combo-grid-virtual-scroll>
                                 <textarea rows="3" class="form-control m-input m-input--square"
                                     formControlName="ConsigneeDescription"></textarea>
@@ -101,10 +101,10 @@
                                 </label>
 
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedNotifyParty"
-                                    [selectedDisplayFields]="configNotifyParty.selectedDisplayFields"
+                                    [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                     [dataSources]="configNotifyParty.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'NotifyParty')"
-                                    [displayFields]="configNotifyParty.displayFields">
+                                    [displayFields]="configPartner.displayFields">
                                 </app-combo-grid-virtual-scroll>
                                 <textarea rows="3" class="form-control m-input m-input--square"
                                     formControlName="NotifyPartyDescription"></textarea>
@@ -118,10 +118,10 @@
                                     Also Notify Party
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedAlsoNotifyParty"
-                                    [selectedDisplayFields]="configAlsoNotifyParty.selectedDisplayFields"
+                                    [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                     [dataSources]="configAlsoNotifyParty.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'AlsoNotifyParty')"
-                                    [displayFields]="configAlsoNotifyParty.displayFields">
+                                    [displayFields]="configPartner.displayFields">
                                 </app-combo-grid-virtual-scroll>
                                 <textarea rows="3" class="form-control m-input m-input--square"
                                     formControlName="AlsoNotifyPartyDescription"></textarea>
@@ -220,10 +220,10 @@
                                     Port of Loading <span class="m--font-danger">(*)</span>
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfLoading"
-                                    [selectedDisplayFields]="configPortOfLoading.selectedDisplayFields"
+                                    [selectedDisplayFields]="configPort.selectedDisplayFields"
                                     [dataSources]="configPortOfLoading.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'PortOfLoading')"
-                                    [displayFields]="configPortOfLoading.displayFields">
+                                    [displayFields]="configPort.displayFields">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited &&  !selectedPortOfLoading.value  ">
@@ -239,10 +239,10 @@
                                     Port of Discharge <span class="m--font-danger">(*)</span>
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfDischarge"
-                                    [selectedDisplayFields]="configPortOfDischarge.selectedDisplayFields"
+                                    [selectedDisplayFields]="configPort.selectedDisplayFields"
                                     [dataSources]="configPortOfDischarge.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'PortOfDischarge')"
-                                    [displayFields]="configPortOfDischarge.displayFields">
+                                    [displayFields]="configPort.displayFields">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited &&  !selectedPortOfDischarge.value  ">
@@ -273,10 +273,10 @@
                                     Supplier
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedSupplier"
-                                    [selectedDisplayFields]="configSupplier.selectedDisplayFields"
+                                    [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                     [dataSources]="configSupplier.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'Supplier')"
-                                    [displayFields]="configSupplier.displayFields">
+                                    [displayFields]="configPartner.displayFields">
                                 </app-combo-grid-virtual-scroll>
                             </div>
 
