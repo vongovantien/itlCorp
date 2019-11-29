@@ -15,13 +15,14 @@ import { SystemConstants } from 'src/constants/system.const';
 import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
 import { finalize } from 'rxjs/internal/operators/finalize';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil, mergeMap, map } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { SeaFClImportArrivalNoteComponent } from '../components/arrival-note/arrival-note.component';
 import { SeaFClImportDeliveryOrderComponent } from '../components/delivery-order/delivery-order.component';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { DeliveryOrder } from 'src/app/shared/models';
+import { forkJoin } from 'rxjs';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -211,28 +212,33 @@ export class CreateHouseBillComponent extends AppForm {
             this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(
+                    map((resultHousebills: any) => {
+                        const res = resultHousebills;
+                        return res;
+                    }),
+                    mergeMap((res) => {
+                        const dateNotice = {
+                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                            arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
+                        const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
+                        const printedDate = {
+                            deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        this.deliveryComponent.deliveryOrder.hblid = res.data;
+                        const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+                        return forkJoin(arrival, delivery);
+                    }),
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
-                )
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
-                            this.arrivalNoteComponent.saveArrivalNote();
-                            this.deliveryComponent.hblid = res.data;
-                            this.deliveryComponent.deliveryOrder.hblid = res.data;
-                            this.deliveryComponent.saveDeliveryOrder();
-                            this._toastService.success(res.message, '');
-                            this.combackToHBLList();
-                        } else {
-
-                        }
-                    }
+                ).subscribe(result => {
+                    this._toastService.success(result[0].message, '');
+                    this.combackToHBLList();
+                }
                 );
         }
-
     }
-
     onsubmitData() {
         const body: ITransactionDetail = {
             id: SystemConstants.EMPTY_GUID,
