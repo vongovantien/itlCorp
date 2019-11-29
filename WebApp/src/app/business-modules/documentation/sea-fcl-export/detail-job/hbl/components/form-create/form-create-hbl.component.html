@@ -1,0 +1,262 @@
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <form class=" m-form--state m-form" [formGroup]="formCreate">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>Master Bill of Landing</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>Customer (Payer)</label>
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
+                            [currentActiveItemId]="{ field: 'id', value: customer.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
+                            [displayFields]="displayFieldsCustomer" [height]="150">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Saleman In Charge</label>
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'sale')"
+                            [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
+                            [selectedDisplayFields]="['username']" [dataSources]="saleMans"
+                            [displayFields]="[{field: 'username', label: 'User Name'}]" [height]="150"
+                            [disabled]="!customer.value">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row div-inside bg-secondary">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>Shipper</label>
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
+                            [currentActiveItemId]="{ field: 'id', value: shipper.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
+                            [displayFields]="displayFieldsCustomer" [height]="150">
+                        </app-combo-grid-virtual-scroll>
+                        <textarea rows="7" class="form-control m-input m-input--square"
+                            formControlName="shipperDescription"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>Consignee</label>
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consignee')"
+                            [currentActiveItemId]="{ field: 'id', value: consignee.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
+                            [displayFields]="displayFieldsCustomer" [height]="150">
+                        </app-combo-grid-virtual-scroll>
+                        <textarea rows="7" class="form-control m-input m-input--square"
+                            formControlName="consigneeDescription"></textarea>
+                    </div>
+
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Notify Party</label>
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'notify')"
+                            [currentActiveItemId]="{ field: 'id', value: notifyParty.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
+                            [displayFields]="displayFieldsCustomer" [height]="150">
+                        </app-combo-grid-virtual-scroll>
+                        <textarea rows="7" class="form-control m-input m-input--square"
+                            formControlName="notifyPartyDescription"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>House Bill of Landing No</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>House Bill of Landing Type</label>
+                        <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
+                            formControlName="mbltype" (opened)="closeOtherSelects(selectMBL)">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Booking No</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Local Vessel & Voy No</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>Ocean Vessel & Voy No</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Point & Country Origin</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Place of Receipt</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>Port of Loading</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>Port of Discharge</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Place of Delivery</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Final Destination</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>Freight Payment </label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Closing Date</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>Sailing Date</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label required>Freight Payable at </label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row div-inside bg-secondary">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Forwarding Agent</label>
+                        <input type="text" class="form-control">
+                        <textarea rows="7" class="form-control m-input m-input--square"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Number of Origin B/L</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Place and Date of Issue HBL</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Reference No</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Export Reference No</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Forwarding Agent</label>
+                        <input type="text" class="form-control">
+                        <textarea rows="7" class="form-control m-input m-input--square"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Number of Origin B/L</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Place and Date of Issue HBL</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Reference No</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Export Reference No</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row div-inside bg-secondary">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Shipping Mask</label>
+                        <textarea rows="5" class="form-control m-input m-input--square"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>In Word</label>
+                        <textarea rows="5" class="form-control m-input m-input--square"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>On Board Status</label>
+                        <textarea rows="5" class="form-control m-input m-input--square"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -144,6 +144,10 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
         this._router.navigate(["home/documentation/sea-fcl-export"]);
     }
 
+    gotoCreate() {
+        this._router.navigate([`/home/documentation/sea-fcl-export/${this.jobId}/hbl/new`]);
+    }
+
     selectHBL(hbl: CsTransactionDetail) {
         this.selectedHbl = new CsTransactionDetail(hbl);
 

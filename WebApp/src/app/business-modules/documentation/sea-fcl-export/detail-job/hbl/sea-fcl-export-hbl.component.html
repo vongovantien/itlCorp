@@ -62,7 +62,8 @@
                                         <div class="col-lg-8">
                                             <div class="form-group">
                                                 <button type="button"
-                                                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase float-right">
+                                                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase float-right"
+                                                    (click)="gotoCreate()">
                                                     <span>
                                                         <i class="la la-plus"></i>
                                                         <span>
@@ -102,8 +103,10 @@
                                                                 </button>
                                                             </div>
                                                         </td>
-                                                        <td class=" text-primary pointer"><a [routerLink]="house.id">
-                                                                {{house.hwbno}}</a>
+                                                        <td class=" text-primary pointer">
+                                                            <a [routerLink]="house.id">
+                                                                {{house.hwbno}}
+                                                            </a>
                                                         </td>
                                                         <td>{{house.customerName}}</td>
                                                         <td>{{house.saleManName}}</td>
