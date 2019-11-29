@@ -709,5 +709,65 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
 
         }
 
+        public Crystal PreviewSeaHBLofLading(Guid hblId, string reportType)
+        {
+            Crystal result = null;
+
+            object parameter = null;
+            if(reportType == "ITL" || reportType == "ITL_FRAME" || reportType == "ITL_SEKO")
+            {
+                parameter = new SeaHBillofLadingReportParams1() {
+                    Packages = "Packages",
+                    GrossWeight = "GrossWeight",
+                    Measurement = "Measurement"
+                };
+            }
+
+            if(reportType == "ITL_KESCO" || reportType == "ITL_FRAME_KESCO")
+            {
+                parameter = new SeaHBillofLadingReportParams2() {
+                    Packages = "Packages",
+                    GrossWeight = "GrossWeight",
+                    Measurement = "Measurement",
+                    DocumentNo = "DocumentNo"
+                };
+            }
+
+            var housebills = new List<SeaHBillofLadingReport>();
+
+            string _reportName = string.Empty;
+            switch (reportType)
+            {
+                case "ITL":
+                    _reportName = "SeaHBillofLadingITL.rpt";
+                    break;
+                case "ITL_FRAME":
+                    _reportName = "SeaHBillofLadingITLFrame.rpt";
+                    break;
+                case "FBL_FRAME":
+                    _reportName = "SeaHBillofLadingFBLFrame.rpt";
+                    break;
+                case "ITL_KESCO":
+                    _reportName = "SeaHBillofLadingITL_KESCO.rpt";
+                    break;
+                case "ITL_FRAME_KESCO":
+                    _reportName = "SeaHBillofLadingITLFrame_Kesco.rpt";
+                    break;
+                case "ITL_SEKO":
+                    _reportName = "SeaHBillofLadingITL_Seko.rpt";
+                    break;
+            }
+            result = new Crystal
+            {
+                ReportName = _reportName,
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(housebills);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
+
     }
 }
