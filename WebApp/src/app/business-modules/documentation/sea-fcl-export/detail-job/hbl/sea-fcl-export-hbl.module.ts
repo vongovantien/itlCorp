@@ -12,6 +12,7 @@ import { ShareBussinessModule } from 'src/app/business-modules/share-business/sh
 import { ChargeConstants } from 'src/constants/charge.const';
 import { SeaFCLExportCreateHBLComponent } from './create/create-house-bill.component';
 import { SeaFCLExportFormCreateHBLComponent } from './components/form-create/form-create-hbl.component';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 
 const routing: Routes = [
@@ -34,6 +35,7 @@ const LIB = [
     ModalModule.forRoot(),
     TabsModule.forRoot(),
     SelectModule,
+    NgxDaterangepickerMd.forRoot()
 
 ];
 

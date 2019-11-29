@@ -1,13 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
-import { Observable } from 'rxjs';
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { Store } from '@ngrx/store';
+
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { User } from 'src/app/shared/models';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { catchError } from 'rxjs/operators';
-import { DataService } from 'src/app/shared/services';
+import { User, CsTransactionDetail } from 'src/app/shared/models';
+import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
+import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
+import { AppForm } from 'src/app/app.form';
+
+
+import { Observable } from 'rxjs';
+import { catchError, takeUntil, skip } from 'rxjs/operators';
+
+import * as fromShareBussiness from './../../../../../../share-business/store';
+import { SystemConstants } from 'src/constants/system.const';
+import { FormValidators } from 'src/app/shared/validators';
+
 
 @Component({
     selector: 'form-create-hbl-fcl-export',
@@ -24,32 +34,54 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
     consignee: AbstractControl;
     notifyParty: AbstractControl;
     mawb: AbstractControl;
+    hwbno: AbstractControl;
     consigneeDescription: AbstractControl;
     notifyPartyDescription: AbstractControl;
-    hblNo: AbstractControl;
     mbltype: AbstractControl;
     bookingNo: AbstractControl;
+    localVoyNo: AbstractControl;
+    oceanVoyNo: AbstractControl;
     localVessel: AbstractControl;
     oceanVessel: AbstractControl;
     country: AbstractControl;
     placeReceipt: AbstractControl;
+    finalDestinationPlace: AbstractControl;
     pol: AbstractControl;
     pod: AbstractControl;
     placeDelivery: AbstractControl;
-    finalDestination: AbstractControl;
     freightCharge: AbstractControl;
-
-
+    goodsDelivery: AbstractControl;
+    goodsDeliveryDescription: AbstractControl;
+    forwardingAgent: AbstractControl;
+    forwardingAgentDescription: AbstractControl;
+    serviceType: AbstractControl;
+    sailingDate: AbstractControl;
+    closingDate: AbstractControl;
+    freightPayment: AbstractControl;
+    placeFreightPay: AbstractControl;
+    originBlnumber: AbstractControl;
+    issueHblplaceAndDate: AbstractControl;
+    referenceNo: AbstractControl;
+    exportReferenceNo: AbstractControl;
+    moveType: AbstractControl;
+    purchaseOrderNo: AbstractControl;
+    shippingMark: AbstractControl;
+    inWord: AbstractControl;
+    onBoardStatus: AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: User[];
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
-
+    countries: Observable<CountryModel[]>;
+    ports: Observable<PortIndex[]>;
+    agents: Observable<Customer[]>;
 
     serviceTypes: CommonInterface.INg2Select[];
     ladingTypes: CommonInterface.INg2Select[];
     termTypes: CommonInterface.INg2Select[];
+    originNumbers: CommonInterface.INg2Select[];
+    typeOfMoves: CommonInterface.INg2Select[];
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameEn', label: 'Name ABBR' },
@@ -57,23 +89,62 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
         { field: 'taxCode', label: 'Tax Code' },
     ];
 
+    displayFieldsCountry: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Country Code' },
+        { field: 'nameEn', label: 'Name EN' },
+    ];
+
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Port Code' },
+        { field: 'nameEn', label: 'Port Name' },
+        { field: 'countryNameEN', label: 'Country' },
+    ];
+
+
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
-        private _dataService: DataService,
-        private _documentRepo: DocumentationRepo
+        private _documentRepo: DocumentationRepo,
+        private _store: Store<fromShareBussiness.IShareBussinessState>
     ) {
         super();
     }
 
     ngOnInit() {
         this.initForm();
-        this.getCustomer();
         this.getSaleMans();
-        this.getShippers();
-        this.getConsignees();
-        this.getCommonData();
+        this.getDropdownData();
+
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+        this.shipppers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.SHIPPER);
+        this.consignees = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CONSIGNEE);
+        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
+        this.countries = this._catalogueRepo.getCountry();
+        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
+
+        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
+            .subscribe(
+                (shipment: CsTransactionDetail) => {
+
+                    // * set default value for controls from shipment detail.
+                    if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
+                        console.log("detail job from store", shipment);
+
+                        this.formCreate.patchValue({
+                            bookingNo: shipment.bookingNo,
+                            mawb: shipment.mawb,
+                            oceanVoyNo: shipment.flightVesselName + ' - ' + shipment.voyNo,
+                            pod: shipment.pod,
+                            pol: shipment.pol,
+                            purchaseOrderNo: shipment.purchaseOrderNo
+                        });
+                    }
+
+                }
+            );
     }
 
     initForm() {
@@ -84,16 +155,51 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
             shipper: [],
             consignee: [],
             notifyParty: [],
+            country: [],
+            pol: [],
+            pod: [],
+            forwardingAgent: [],
+            goodsDelivery: [],
+
             // * Select
             mbltype: [],
+            serviceType: [],
+            freightPayment: [],
 
+            // * DataService
+            sailingDate: [],
+            closingDate: [],
+
+            // * Input
+            mawb: [],
+            hwbno: [],
+            localVoyNo: [],
+            finalDestinationPlace: [],
+            oceanVoyNo: [],
             shipperDescription: [],
             consigneeDescription: [],
             notifyPartyDescription: [],
-            bookingNo: []
+            bookingNo: [],
+            goodsDeliveryDescription: [],
+            forwardingAgentDescription: [],
+            placeFreightPay: [],
+            originBlnumber: [],
+            issueHblplaceAndDate: [],
+            referenceNo: [],
+            exportReferenceNo: [],
+            moveType: [],
+            purchaseOrderNo: [],
+            placeReceipt: [],
+            placeDelivery: [],
+            shippingMark: [],
+            inWord: [],
+            onBoardStatus: [],
 
-        });
-
+        },
+            { validator: FormValidators.comparePort }
+        );
+        this.mawb = this.formCreate.controls["mawb"];
+        this.hwbno = this.formCreate.controls["hwbno"];
         this.customer = this.formCreate.controls["customer"];
         this.saleMan = this.formCreate.controls["saleMan"];
         this.shipper = this.formCreate.controls["shipper"];
@@ -104,10 +210,34 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
         this.notifyPartyDescription = this.formCreate.controls["notifyPartyDescription"];
         this.mbltype = this.formCreate.controls["mbltype"];
         this.bookingNo = this.formCreate.controls["bookingNo"];
-    }
+        this.localVoyNo = this.formCreate.controls["localVoyNo"];
+        this.oceanVoyNo = this.formCreate.controls["oceanVoyNo"];
+        this.finalDestinationPlace = this.formCreate.controls["finalDestinationPlace"];
+        this.country = this.formCreate.controls["country"];
+        this.pol = this.formCreate.controls["pol"];
+        this.pod = this.formCreate.controls["pod"];
+        this.placeReceipt = this.formCreate.controls["placeReceipt"];
+        this.placeDelivery = this.formCreate.controls["placeDelivery"];
+        this.forwardingAgent = this.formCreate.controls["forwardingAgent"];
+        this.forwardingAgentDescription = this.formCreate.controls["forwardingAgentDescription"];
+        this.goodsDeliveryDescription = this.formCreate.controls["goodsDeliveryDescription"];
+        this.goodsDelivery = this.formCreate.controls["goodsDelivery"];
+        this.serviceType = this.formCreate.controls["serviceType"];
+        this.sailingDate = this.formCreate.controls["sailingDate"];
+        this.closingDate = this.formCreate.controls["closingDate"];
+        this.freightPayment = this.formCreate.controls["freightPayment"];
+        this.placeFreightPay = this.formCreate.controls["placeFreightPay"];
+        this.originBlnumber = this.formCreate.controls["originBlnumber"];
+        this.issueHblplaceAndDate = this.formCreate.controls["issueHblplaceAndDate"];
+        this.referenceNo = this.formCreate.controls["referenceNo"];
+        this.exportReferenceNo = this.formCreate.controls["exportReferenceNo"];
+        this.moveType = this.formCreate.controls["moveType"];
+        this.purchaseOrderNo = this.formCreate.controls["purchaseOrderNo"];
+        this.shippingMark = this.formCreate.controls["shippingMark"];
+        this.onBoardStatus = this.formCreate.controls["onBoardStatus"];
+        this.inWord = this.formCreate.controls["inWord"];
 
-    getCustomer() {
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+
     }
 
     getSaleMans() {
@@ -118,19 +248,13 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
             });
     }
 
-    getShippers() {
-        this.shipppers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.SHIPPER);
-    }
-
-    getConsignees() {
-        this.consignees = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CONSIGNEE);
-    }
-
     getDescription(fullName: string, address: string, tel: string, fax: string) {
         return `${fullName} \n ${address} \n Tel No: ${!!tel ? tel : ''} \n Fax No: ${!!fax ? fax : ''} \n`;
     }
 
-    getCommonData() {
+    getDropdownData() {
+        this.originNumbers = <any>[{ id: 1, text: '1' }, { id: 2, text: '2' }, { id: 3, text: '3' }];
+
         this._documentRepo.getShipmentDataCommon()
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -138,6 +262,7 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
                     this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
                     this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
                     this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
+                    this.typeOfMoves = this.utility.prepareNg2SelectData(commonData.typeOfMoves, 'value', 'displayName');
                 }
             );
     }
@@ -164,10 +289,43 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
                 this.notifyParty.setValue(data.id);
                 this.notifyPartyDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 break;
+            case 'country':
+                this.country.setValue(data.id);
+                break;
+            case 'pol':
+                this.pol.setValue(data.id);
+                break;
+            case 'pod':
+                this.pod.setValue(data.id);
+                break;
+            case 'forwarding':
+                this.forwardingAgent.setValue(data.id);
+                this.forwardingAgentDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                break;
+            case 'deliveryGood':
+                this.goodsDelivery.setValue(data.id);
+                this.goodsDeliveryDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                break;
+            case 'agent':
+                this.forwardingAgent.setValue(data.id);
+                break;
 
+            case 'freightPayment':
+                if (!!data && !!data.length || !!data.id) {
+                    if (data.id === 'Collect') {
+                        this.placeFreightPay.setValue('Destination');
+                    } else {
+                        this.placeFreightPay.setValue('Origin');
+                    }
+                }
+                break;
             default:
                 break;
         }
 
+    }
+
+    saveForm(form: FormGroup) {
+        console.log(form.value);
     }
 }

@@ -377,6 +377,13 @@ export class CatalogueRepo {
             })
         );
     }
+
+    getCountry(body: any = { active: true }) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCountry/Query`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getDetailCountry(id: number) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/getById/` + id)
             .pipe(

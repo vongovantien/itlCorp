@@ -64,8 +64,8 @@ namespace CommonInterface {
     }
 
     export interface INg2Select {
-        id: string;
-        text: string;
+        id: any;
+        text: any;
     }
 
     export interface IComboGridDisplayField {

@@ -1,5 +1,5 @@
 import { AppPage } from './app.base';
-import { AbstractControl, FormControl, FormGroup, ValidatorFn } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.model';
 import { ButtonType } from './shared/enums/type-button.enum';
 import { SelectComponent } from 'ng2-select';
@@ -78,6 +78,10 @@ export abstract class AppForm extends AppPage {
     addValidators(form: FormControl | AbstractControl, validateFn: ValidatorFn | ValidatorFn[]) {
         form.setValidators(validateFn);
         form.updateValueAndValidity();
+    }
+
+    setError(control: FormControl | AbstractControl, err: ValidationErrors = null) {
+        control.setErrors(err);
     }
 
     search($event?: any) {

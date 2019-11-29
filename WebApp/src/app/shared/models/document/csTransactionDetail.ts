@@ -85,7 +85,7 @@ export class CsTransactionDetail {
   packages: string = null;
   containers: string = null;
   issueHblplaceAndDate: any = null;
-
+  bookingNo: string = null;
   // * SEA FCL
   serviceDate: string = '';
   mbltype: string = '';
