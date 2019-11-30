@@ -49,8 +49,8 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string strDesLandPP { get; set; }
         public string strDesLandCC { get; set; }
         public string FreightPayAt { get; set; }
-        public string ExcutedAt { get; set; }
-        public string ExcutedOn { get; set; }
+        public string ExecutedAt { get; set; }
+        public string ExecutedOn { get; set; }
         public string NoofOriginBL { get; set; }
         public string ForCarrier { get; set; }
         public bool SeaLCL { get; set; }

@@ -4,10 +4,12 @@ import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
-import { catchError } from 'rxjs/operators';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { formatDate } from '@angular/common';
 import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
+import { Observable } from 'rxjs';
+import { Customer } from 'src/app/shared/models/catalogue/customer.model';
+import { User } from 'src/app/shared/models';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 @Component({
     selector: 'form-search-fcl-import',
@@ -18,49 +20,34 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
     filterTypes: CommonInterface.ICommonTitleValue[];
 
-    creators: CommonInterface.IValueDisplay[] = [];
-
     formSearch: FormGroup;
     searchText: AbstractControl;
     filterType: AbstractControl;
     serviceDate: AbstractControl;
+    customer: AbstractControl;
+    supplier: AbstractControl;
+    agent: AbstractControl;
+    saleman: AbstractControl;
+    creator: AbstractControl;
 
-    configCustomer: CommonInterface.IComboGirdConfig = {
-        placeholder: 'Please select',
-        displayFields: [],
-        dataSource: [],
-        selectedDisplayFields: [],
-    };
-    configSupplier: CommonInterface.IComboGirdConfig = {
-        placeholder: 'Please select',
-        displayFields: [],
-        dataSource: [],
-        selectedDisplayFields: [],
-    };
-    configAgent: CommonInterface.IComboGirdConfig = {
-        placeholder: 'Please select',
-        displayFields: [],
-        dataSource: [],
-        selectedDisplayFields: [],
-    };
-    configSaleman: CommonInterface.IComboGirdConfig = {
-        placeholder: 'Please select',
-        displayFields: [],
-        dataSource: [],
-        selectedDisplayFields: [],
-    };
-    configCreator: CommonInterface.IComboGirdConfig = {
-        placeholder: 'Please select',
-        displayFields: [],
-        dataSource: [],
-        selectedDisplayFields: [],
-    };
+    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'id', label: 'Partner ID' },
+        { field: 'shortName', label: 'Name ABBR' },
+        { field: 'partnerNameEn', label: 'Name EN' },
+        { field: 'taxCode', label: 'Tax Code' }
+    ];
 
-    selectedCustomer: any = {};
-    selectedSupplier: any = {};
-    selectedAgent: any = {};
-    selectedSaleman: any = {};
-    selectedCreator: any = {};
+    displayFieldsSaleMan: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'username', label: 'User Name' },
+        { field: 'employeeNameVn', label: 'Full Name' },
+        { field: 'role', label: 'Role' },
+    ];
+
+    customers: Observable<Customer[]>;
+    suppliers: Observable<Customer[]>;
+    agents: Observable<Customer[]>;
+    salemans: Observable<User[]>;
+    creators: Observable<User[]>;
 
     constructor(
         private _fb: FormBuilder,
@@ -88,6 +75,7 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
             { title: 'C/D No', value: 'creditDebitNo' },
             { title: 'SOA No', value: 'soaNo' },
         ];
+
         this.filterType.setValue(this.filterTypes[0]);
     }
 
@@ -96,7 +84,18 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
             searchText: [],
             filterType: [],
             serviceDate: [],
+            customer: [],
+            supplier: [],
+            agent: [],
+            saleman: [],
+            creator: [],
         });
+
+        this.customer = this.formSearch.controls['customer'];
+        this.supplier = this.formSearch.controls['supplier'];
+        this.agent = this.formSearch.controls['agent'];
+        this.saleman = this.formSearch.controls['saleman'];
+        this.creator = this.formSearch.controls['creator'];
 
         this.searchText = this.formSearch.controls['searchText'];
         this.filterType = this.formSearch.controls['filterType'];
@@ -105,148 +104,65 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
 
     getCustomer() {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CUSTOMER)) {
-            this.getCustomerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.CUSTOMER));
+            this.customers = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CUSTOMER);
         } else {
-            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER, active: true })
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (dataCustomer: any) => {
-                        //console.log(dataCustomer)
-                        this.getCustomerData(dataCustomer);
-
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.CUSTOMER, dataCustomer);
-
-                    },
-                );
+            this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+            this._dataService.setDataService(SystemConstants.CSTORAGE.CUSTOMER, this.customers);
         }
-    }
-
-    getCustomerData(data: any) {
-        this.configCustomer.dataSource = data;
-        this.configCustomer.displayFields = [
-            { field: 'id', label: 'Partner ID' },
-            { field: 'shortName', label: 'Name ABBR' },
-            { field: 'partnerNameEn', label: 'Name En' },
-            { field: 'taxCode', label: 'Taxcode' },
-        ];
-        this.configCustomer.selectedDisplayFields = ['shortName'];
     }
 
     getSupplier() {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER)) {
-            this.getSupplierData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER));
+            this.suppliers = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER);
         } else {
-            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CARRIER, active: true })
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (dataSupplier: any) => {
-                        //console.log(dataSupplier)
-                        this.getSupplierData(dataSupplier);
-
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, dataSupplier);
-
-                    },
-                );
+            this.suppliers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
+            this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, this.suppliers);
         }
-    }
-
-    getSupplierData(data: any) {
-        this.configSupplier.dataSource = data;
-        this.configSupplier.displayFields = [
-            { field: 'id', label: 'Partner ID' },
-            { field: 'shortName', label: 'Name ABBR' },
-            { field: 'partnerNameEn', label: 'Name En' },
-            { field: 'taxCode', label: 'Taxcode' },
-        ];
-        this.configSupplier.selectedDisplayFields = ['shortName'];
     }
 
     getAgent() {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT)) {
-            this.getAgentData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT));
+            this.agents = this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT);
         } else {
-            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.AGENT, active: true })
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (dataAgent: any) => {
-                        //console.log(dataAgent)
-                        this.getAgentData(dataAgent);
-
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.AGENT, dataAgent);
-                    },
-                );
+            this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
+            this._dataService.setDataService(SystemConstants.CSTORAGE.AGENT, this.agents);
         }
     }
 
-    getAgentData(data: any) {
-        this.configAgent.dataSource = data;
-        this.configAgent.displayFields = [
-            { field: 'id', label: 'Partner ID' },
-            { field: 'shortName', label: 'Name ABBR' },
-            { field: 'partnerNameEn', label: 'Name En' },
-            { field: 'taxCode', label: 'Taxcode' },
-        ];
-        this.configAgent.selectedDisplayFields = ['shortName'];
-    }
-
     getSaleman() {
-        this._systemRepo.getUser(1, 100, { active: true })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (dataUser: any) => {
-                    //console.log(dataUser.data)
-                    this.getSalemanData(dataUser.data);
-                },
-            );
-    }
-
-    getSalemanData(data: any) {
-        this.configSaleman.dataSource = data;
-        this.configSaleman.displayFields = [
-            { field: 'username', label: 'User Name' },
-            { field: 'employeeNameVn', label: 'Full Name' },
-            { field: 'role', label: 'Role' },
-        ];
-        this.configSaleman.selectedDisplayFields = ['employeeNameVn'];
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SALE)) {
+            this.salemans = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SALE);
+        } else {
+            this.salemans = this._systemRepo.getSystemUsers({ active: true });
+            this._dataService.setDataService(SystemConstants.CSTORAGE.SALE, this.salemans);
+        }
     }
 
     getCreator() {
-        this._systemRepo.getUser(1, 100, { active: true })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (dataUser: any) => {
-                    //console.log(dataUser.data)
-                    this.getCreatorData(dataUser.data);
-                },
-            );
-    }
-
-    getCreatorData(data: any) {
-        this.configCreator.dataSource = data;
-        this.configCreator.displayFields = [
-            { field: 'username', label: 'User Name' },
-            { field: 'employeeNameVn', label: 'Full Name' },
-            { field: 'role', label: 'Role' },
-        ];
-        this.configCreator.selectedDisplayFields = ['employeeNameVn'];
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SALE)) {
+            this.creators = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SALE);
+        } else {
+            this.creators = this._systemRepo.getSystemUsers({ active: true });
+            this._dataService.setDataService(SystemConstants.CSTORAGE.SALE, this.creators);
+        }
     }
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
-                this.selectedCustomer = { field: data.partnerNameEn, value: data.id };
+                this.formSearch.controls['customer'].setValue(data.id);
                 break;
             case 'supplier':
-                this.selectedSupplier = { field: data.partnerNameEn, value: data.id };
+                this.formSearch.controls['supplier'].setValue(data.id);
                 break;
             case 'agent':
-                this.selectedAgent = { field: data.partnerNameEn, value: data.id };
+                this.formSearch.controls['agent'].setValue(data.id);
                 break;
             case 'saleman':
-                this.selectedSaleman = { field: data.userName, value: data.id };
+                this.formSearch.controls['saleman'].setValue(data.id);
                 break;
             case 'creator':
-                this.selectedCreator = { field: data.userName, value: data.id };
+                this.formSearch.controls['creator'].setValue(data.id);
                 break;
             default:
                 break;
@@ -264,11 +180,11 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
             markNo: this.filterType.value.value === 'markNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
             creditDebitNo: this.filterType.value.value === 'creditDebitNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
             soaNo: this.filterType.value.value === 'soaNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            customerId: !!this.selectedCustomer.value ? this.selectedCustomer.value : null,
-            coloaderId: !!this.selectedSupplier.value ? this.selectedSupplier.value : null,
-            agentId: !!this.selectedAgent.value ? this.selectedAgent.value : null,
-            saleManId: !!this.selectedSaleman.value ? this.selectedSaleman.value : null,
-            userCreated: !!this.selectedCreator.value ? this.selectedCreator.value : null,
+            customerId: this.customer.value,
+            coloaderId: this.supplier.value,
+            agentId: this.agent.value,
+            saleManId: this.saleman.value,
+            userCreated: this.creator.value,
             fromDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             transactionType: TransactionTypeEnum.SeaFCLImport
@@ -279,21 +195,22 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
 
     resetSearch() {
         this.formSearch.reset();
-        this.selectedCustomer = {};
-        this.selectedSupplier = {};
-        this.selectedAgent = {};
-        this.selectedSaleman = {};
-        this.selectedCreator = {};
+        
+        this.resetFormControl(this.customer);
+        this.resetFormControl(this.supplier);
+        this.resetFormControl(this.agent);
+        this.resetFormControl(this.saleman);
+        this.resetFormControl(this.creator);
         this.filterType.setValue(this.filterTypes[0]);
         this.onSearch.emit(<any>{ transactionType: TransactionTypeEnum.SeaFCLImport });
     }
 
     collapsed() {
-        this.selectedCustomer = {};
-        this.selectedSupplier = {};
-        this.selectedAgent = {};
-        this.selectedSaleman = {};
-        this.selectedCreator = {};
+        this.resetFormControl(this.customer);
+        this.resetFormControl(this.supplier);
+        this.resetFormControl(this.agent);
+        this.resetFormControl(this.saleman);
+        this.resetFormControl(this.creator);
         this.resetFormControl(this.serviceDate);
     }
 
