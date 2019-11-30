@@ -268,6 +268,7 @@ export class SeaFclExportManifestComponent extends AppList {
                 },
             );
     }
+
     previewManifest() {
         const body: any = {
             jobId: this.jobId,
