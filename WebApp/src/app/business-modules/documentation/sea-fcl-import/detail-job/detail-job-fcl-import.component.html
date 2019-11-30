@@ -45,7 +45,6 @@
             <tabset class="custom-class-tab">
                 <tab heading="Shipment Detail" [active]="selectedTab === 'SHIPMENT'"
                     (selectTab)="onSelectTab('shipment')">
-
                     <form-create-sea-fcl-import>
                         <div class="row" *ngIf="!!fclImportDetail">
                             <div class="col-md-4">
@@ -59,7 +58,7 @@
                         </div>
                     </form-create-sea-fcl-import>
 
-                    <shipment-good-summary> Shipment Good Summary </shipment-good-summary>
+                    <shipment-good-summary> Shipment Goods Summary </shipment-good-summary>
 
                     <grant-total-profit></grant-total-profit>
 

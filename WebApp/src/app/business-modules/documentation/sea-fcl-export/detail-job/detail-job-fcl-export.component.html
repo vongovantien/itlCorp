@@ -50,6 +50,10 @@
                 <grant-total-profit></grant-total-profit>
 
             </tab>
+            <tab heading="House Bills List" (selectTab)="onSelectTab('hbl')" [active]="selectedTab === 'HBL'">
+                <ng-container *ngIf="selectedTab === 'HBL'">
+                </ng-container>
+            </tab>
             <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')"
                 [active]="selectedTab === 'CDNOTE'">
                 <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="SeaFCLExport_cdNote">

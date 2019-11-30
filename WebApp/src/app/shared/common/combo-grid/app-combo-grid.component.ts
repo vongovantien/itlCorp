@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, SimpleChange, SimpleChanges } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 
 @Component({
@@ -9,15 +9,13 @@ import { AppList } from 'src/app/app.list';
 export class AppComboGridComponent<T> extends AppList {
 
     @Input() headers: CommonInterface.IHeaderTable[];
-    @Input() data: any = [];
+    @Input() data: any[] = [];
     @Input() height: 200;
     @Input() fields: string[] = [];
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
     @Input() active: any;
 
-
     selectedItem: any = null;
-
 
     constructor() {
         super();

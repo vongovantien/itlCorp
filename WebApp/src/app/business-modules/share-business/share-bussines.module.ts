@@ -29,6 +29,9 @@ import { reducers, effects } from './store';
 import { ShareBusinessAddHblToManifestComponent } from './components/manifest/popup/add-hbl-to-manifest.popup';
 import { ShareBusinessFormManifestComponent } from './components/manifest/form-manifest/components/form-manifest.component';
 import { SelectModule } from 'ng2-select';
+import { ShareBusinessImportJobDetailPopupComponent } from './components/import-job-detail/import-job-detail.popup';
+import { ShareBusinessFormSearchImportJobComponent } from './components/import-job-detail/components/form-search-import/form-search-import-job-detail.component';
+
 
 
 const COMPONENTS = [
@@ -40,6 +43,8 @@ const COMPONENTS = [
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBussinessContainerListPopupComponent,
     ShareBussinessGrantTotalProfitComponent,
+    ShareBusinessImportJobDetailPopupComponent,
+    ShareBusinessFormSearchImportJobComponent,
     ShareBussinessCdNoteListComponent,
     ShareBussinessCdNoteAddPopupComponent,
     ShareBussinessCdNoteAddRemainingChargePopupComponent,

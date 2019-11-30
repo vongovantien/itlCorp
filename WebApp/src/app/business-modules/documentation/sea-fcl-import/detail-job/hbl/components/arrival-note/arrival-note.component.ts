@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
 import { AppList } from 'src/app/app.list';
-import { ArrivalFreightCharge, Surcharge, Unit, Currency, Charge, User } from 'src/app/shared/models';
+import { ArrivalFreightCharge, Unit, Currency, Charge, User } from 'src/app/shared/models';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { DataService, SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
@@ -15,11 +15,12 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators';
-
+import { Observable } from 'rxjs';
 
 import * as fromShareBussiness from './../../../../../../share-business/store';
 import { ChargeConstants } from 'src/constants/charge.const';
-import { Observable } from 'rxjs';
+
+
 @Component({
     selector: 'sea-fcl-import-hbl-arrival-note',
     templateUrl: './arrival-note.component.html',
@@ -38,15 +39,15 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
 
     freightCharges: ArrivalFreightCharge[] = new Array<ArrivalFreightCharge>();
 
-    listCharges: Observable<Charge[]>;
+    listCharges: Charge[] = [];
     listUnits: Observable<Unit[]>;
     listCurrency: Observable<Currency[]>;
 
+    headerCharge: CommonInterface.IHeaderTable[];
     quantityTypes: CommonInterface.IValueDisplay[];
     containersShipment: Container[] = [];
     containersHBL: Container[] = [];
 
-    configComboGridCharge: Partial<CommonInterface.IComboGirdConfig> = {};
 
     defaultExchangeRate: number;
     selectedIndexFreightCharge: number = -1;
@@ -86,7 +87,6 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
             }
         );
 
-
         // * Get container's shipment from Store.
         this._store.select(fromShareBussiness.getContainerSaveState).subscribe(
             (res: Container[] | any[]) => {
@@ -116,15 +116,6 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
     }
 
     configData() {
-        this.configComboGridCharge = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'chargeNameEn', label: 'Name' },
-                { field: 'unitPrice', label: 'Unit Price' },
-                { field: 'unitId', label: 'Unit' },
-                { field: 'code', label: 'Code' },
-            ]
-        }, { selectedDisplayFields: ['chargeNameEn'], });
-
         this.headers = [
             { title: 'Charge', field: 'chargeId', sortable: true, width: 250 },
             { title: 'Quantity', field: 'quantity', sortable: true },
@@ -148,6 +139,14 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
             { displayName: 'Cont', value: CommonEnum.QUANTITY_TYPE.CONT },
             { displayName: 'N.W', value: CommonEnum.QUANTITY_TYPE.NW },
         ];
+
+        this.headerCharge = [
+            { title: 'Name', field: 'chargeNameEn' },
+            { title: 'Unit Price', field: 'unitPrice' },
+            { title: 'Unit', field: 'unitId' },
+            { title: 'Code', field: 'code' },
+        ];
+
     }
 
     addCharge() {
@@ -188,8 +187,13 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
     }
 
     getCharge() {
-        this.listCharges = this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.CREDIT })
-            .pipe(catchError(this.catchError));
+        this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.CREDIT })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (charges: Charge[]) => {
+                    this.listCharges = charges;
+                }
+            );
     }
 
     getCurrency() {
@@ -344,11 +348,15 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
         chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, chargeItem.quantity, chargeItem.unitPrice);
     }
 
-    onSelectCharge(data: Surcharge, chargeItem: ArrivalFreightCharge) {
+    onSelectCharge(data: Charge, chargeItem: ArrivalFreightCharge | any) {
         chargeItem.chargeId = data.id;
+        chargeItem.description = data.chargeNameEn;
 
         // * Update unit Id.
         chargeItem.unitId = data.unitId;
+
+        // * Hide combogrid.
+        chargeItem.isShowCharge = false;
 
     }
 
@@ -373,8 +381,6 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
 
         return valid;
     }
-
-
 }
 
 interface IExchangeRate {

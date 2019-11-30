@@ -24,6 +24,8 @@ export class ShareBusinessFormManifestComponent extends AppList {
     date: AbstractControl;
     configPortOfLoading: CommonInterface.IComboGirdConfig | any = {};
     configPortOfDischarge: CommonInterface.IComboGirdConfig | any = {};
+    configPort: CommonInterface.IComboGirdConfig | any = {};
+
     selectedPortOfLoading: any = {};
     selectedPortOfDischarge: any = {};
 
@@ -52,16 +54,7 @@ export class ShareBusinessFormManifestComponent extends AppList {
 
     ngOnInit() {
         this.getMasterData();
-        this.configPortOfLoading = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'code', label: 'Port Code' },
-                { field: 'nameEn', label: 'Port Name' },
-                { field: 'countryNameEN', label: 'Country' },
-
-            ]
-        }, { selectedDisplayFields: ['nameEn'], });
-
-        this.configPortOfDischarge = Object.assign({}, this.configComoBoGrid, {
+        this.configPort = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'code', label: 'Port Code' },
                 { field: 'nameEn', label: 'Port Name' },
