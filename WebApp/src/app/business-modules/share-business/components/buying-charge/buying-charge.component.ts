@@ -139,7 +139,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Unit', field: 'unitId', required: true, sortable: true },
             { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
             { title: 'Currency', field: 'currencyId', required: true, sortable: true },
-            { title: 'VAT', field: 'vatrate', required: true, sortable: true },
+            { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Total', field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
@@ -333,11 +333,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     onChangeUnitPrice(unitPrice: number, chargeItem: CsShipmentSurcharge) {
-        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, chargeItem.quantity, unitPrice);
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate || 0, chargeItem.quantity, unitPrice);
     }
 
     onChangeQuantity(quantity: number, chargeItem: CsShipmentSurcharge) {
-        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, quantity, chargeItem.unitPrice);
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate || 0, quantity, chargeItem.unitPrice);
     }
 
     updateSurchargeField(type: CommonEnum.SurchargeTypeEnum) {
@@ -418,7 +418,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         // * Update quantityType, total.
         chargeItem.quantityType = hintType;
-        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, chargeItem.quantity, chargeItem.unitPrice);
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate || 0, chargeItem.quantity, chargeItem.unitPrice);
     }
 
     calculateContainer(containers: Container[], key: string): number {
@@ -466,7 +466,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 || !charge.partnerName
                 || charge.unitPrice === null
                 || charge.unitPrice < 0
-                || charge.vatrate === null
                 || charge.vatrate > 100
             ) {
                 valid = false;

@@ -53,7 +53,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             { title: 'Unit', field: 'unitId', required: true, sortable: true },
             { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
             { title: 'Currency', field: 'currencyId', required: true, sortable: true },
-            { title: 'VAT', field: 'vatrate', required: true, sortable: true },
+            { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Total', field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
@@ -181,7 +181,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 || !charge.payerName
                 || charge.unitPrice === null
                 || charge.unitPrice < 0
-                || charge.vatrate === null
                 || charge.vatrate > 100
             ) {
                 valid = false;

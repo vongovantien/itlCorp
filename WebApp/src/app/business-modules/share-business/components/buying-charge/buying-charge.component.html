@@ -147,7 +147,7 @@
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && (charge.vatrate === null || charge.vatrate > 100) }">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && (charge.vatrate > 100) }">
                                     <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
                                         (ngModelChange)="onChangeVat($event, charge)" placeholder="%"
                                         [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">

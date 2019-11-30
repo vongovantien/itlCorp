@@ -55,7 +55,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'Unit', field: 'unitId', required: true, sortable: true },
             { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
             { title: 'Currency', field: 'currencyId', required: true, sortable: true },
-            { title: 'VAT', field: 'vatrate', required: true, sortable: true },
+            { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Total', field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
