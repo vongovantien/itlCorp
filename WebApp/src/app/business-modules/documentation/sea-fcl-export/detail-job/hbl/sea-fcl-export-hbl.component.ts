@@ -1,20 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
 
 import { AppList } from 'src/app/app.list';
 import { getParamsRouterState } from 'src/app/store';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 import { CsTransactionDetail } from 'src/app/shared/models';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+
+import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../share-business/store';
-import * as fromStore from './../../store';
-import { Container } from 'src/app/shared/models/document/container.model';
-import { Observable } from 'rxjs';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ReportPreviewComponent } from 'src/app/shared/common';
-import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -23,8 +22,11 @@ import { ToastrService } from 'ngx-toastr';
 })
 
 export class SeaFCLExportHBLComponent extends AppList implements OnInit {
+
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteHBLPopup: ConfirmPopupComponent;
+    @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    
+
     jobId: string;
     headers: CommonInterface.IHeaderTable[];
     houseBills: any[] = [];
@@ -33,8 +35,6 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
 
     selectedTabSurcharge: string = 'BUY';
 
-    containers: Observable<Container[]>;
-    selectedShipment: Observable<any>;
 
     dataReport: any = null;
 
@@ -42,9 +42,11 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
         private _router: Router,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         private _documentRepo: DocumentationRepo,
-        protected _toastService: ToastrService,
+        private _toastService: ToastrService,
+        private _progressService: NgProgress,
     ) {
         super();
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -68,9 +70,6 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
-
-        this.containers = this._store.select(fromShareBussiness.getHBLContainersState);
-        this.selectedShipment = this._store.select(fromStore.getSeaFCLShipmentDetail);
     }
 
     getHouseBills(id: string) {
@@ -88,11 +87,78 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
         );
     }
 
+    showDeletePopup(hbl: CsTransactionDetail, event: Event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+
+        this.confirmDeleteHBLPopup.show();
+        this.selectedHbl = hbl;
+
+    }
+
+    onDeleteHbl() {
+        this.confirmDeleteHBLPopup.hide();
+        this.deleteHbl(this.selectedHbl.id);
+    }
+
+    deleteHbl(id: string) {
+        this._progressRef.start();
+        this._documentRepo.deleteHbl(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.getHouseBills(this.jobId);
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
+    }
+
+    deleteJob() {
+        this.confirmDeleteJobPopup.show();
+    }
+
+    onDeleteJob() {
+        this._progressRef.start();
+        this._documentRepo.deleteMasterBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                    this.confirmDeleteJobPopup.hide();
+                })
+            ).subscribe(
+                (respone: CommonInterface.IResult) => {
+                    if (respone.status) {
+
+                        this._toastService.success(respone.message, 'Delete Success !');
+
+                        this.gotoList();
+                    }
+                },
+            );
+    }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/sea-fcl-export"]);
+    }
+
+    gotoCreate() {
+        this._router.navigate([`/home/documentation/sea-fcl-export/${this.jobId}/hbl/new`]);
+    }
+
     selectHBL(hbl: CsTransactionDetail) {
         this.selectedHbl = new CsTransactionDetail(hbl);
 
         // * Get container, Job detail, Surcharge with hbl id, JobId.
-        this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: hbl.id }));
+        this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
+        this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
         this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(hbl.jobId));
         this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
@@ -138,7 +204,7 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE', transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport } });
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });

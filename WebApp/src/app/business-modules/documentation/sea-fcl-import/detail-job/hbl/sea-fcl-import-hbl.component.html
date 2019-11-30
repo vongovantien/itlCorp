@@ -96,7 +96,7 @@
                                             </thead>
                                             <tbody class="tbody-group">
                                                 <ng-container *ngIf="!isLoading && !!houseBill.length">
-                                                    <tr (click)="selectHBL(house)" class="pointer"
+                                                    <tr (click)="selectHBL(house, $event)" class="pointer"
                                                         title="Select House Bill"
                                                         [class.selected-row]="selectedHbl.id === house.id"
                                                         *ngFor="let house of houseBill | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
@@ -109,7 +109,8 @@
                                                                 </button>
                                                                 <button type="button"
                                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                    title="Remove" (click)="showDeletePopup(house)">
+                                                                    title="Remove"
+                                                                    (click)="showDeletePopup(house,$event)">
                                                                     <i class="la la-trash"></i>
                                                                 </button>
                                                             </div>
