@@ -1,14 +1,100 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
+import { getParamsRouterState } from 'src/app/store';
+import { tap, switchMap, catchError, finalize, takeUntil, skip, take } from 'rxjs/operators';
+import { of } from 'rxjs/internal/observable/of';
+import { Store } from '@ngrx/store';
+import * as fromShareBussiness from './../../../../share-business/store';
+import { DocumentationRepo } from 'src/app/shared/repositories';
+import { SeaFclExportBillInstructionComponent } from './bill-instruction/sea-fcl-export-bill-instruction.component';
+import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
+import { ToastrService } from 'ngx-toastr';
+import * as fromShare from './../../../../share-business/store';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-sea-fcl-export-shipping-instruction',
     templateUrl: './sea-fcl-export-shipping-instruction.component.html'
 })
 export class SeaFclExportShippingInstructionComponent extends AppList {
+    @ViewChild(SeaFclExportBillInstructionComponent, { static: false }) billInstructionComponent: SeaFclExportBillInstructionComponent;
+    jobId: string;
 
-    constructor() {
+    constructor(private _store: Store<fromShareBussiness.TransactionActions>,
+        private _documentRepo: DocumentationRepo,
+        private _toastService: ToastrService,
+        private _activedRouter: ActivatedRoute) {
         super();
+    }
+
+    ngOnInit() {
+        this._activedRouter.params.subscribe((param: any) => {
+            if (!!param && param.jobId) {
+                this.jobId = param.jobId;
+                this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                this.getBillingInstruction(this.jobId);
+            }
+        });
+    }
+    getBillingInstruction(jobId: string) {
+        this._documentRepo.getShippingInstruction(jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.billInstructionComponent.shippingInstruction = res;
+
+                    this._store.select(fromShare.getTransactionDetailCsTransactionState)
+                        .pipe(takeUntil(this.ngUnsubscribe), take(1))
+                        .subscribe(
+                            (res) => {
+                                if (!!res) {
+                                    console.log(res);
+                                    this.billInstructionComponent.shippingInstruction.refNo = res.jobNo;
+                                    this.billInstructionComponent.setformValue(this.billInstructionComponent.shippingInstruction);
+                                    console.log(this.billInstructionComponent.shippingInstruction);
+                                }
+                            }
+                        );
+                },
+            );
+    }
+    save() {
+        this.billInstructionComponent.isSubmitted = true;
+        if (!this.checkValidateForm()) {
+            return;
+        }
+
+        const data = this.billInstructionComponent.onSubmitForm();
+        data.jobId = this.jobId;
+        this.saveData(data);
+    }
+    saveData(data: CsShippingInstruction) {
+        this._documentRepo.updateShippingInstruction(data).pipe(
+            catchError(this.catchError)
+        )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.getBillingInstruction(this.jobId);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+    checkValidateForm() {
+        let valid: boolean = true;
+        if (!this.billInstructionComponent.formSI.valid
+            || (!!this.billInstructionComponent.loadingDate.value && !this.billInstructionComponent.loadingDate.value.startDate)
+            || (!!this.billInstructionComponent.issueDate.value && !this.billInstructionComponent.issueDate.value.startDate)
+        ) {
+            valid = false;
+        }
+        return valid;
     }
     refresh() { }
 }

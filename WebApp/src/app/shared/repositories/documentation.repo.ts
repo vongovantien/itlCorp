@@ -121,7 +121,7 @@ export class DocumentationRepo {
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
-    }    
+    }
 
     getShipmentByPartnerOrService(partnerId: string, services: string[]) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentsCreditPayer`, { partner: partnerId, productServices: services }).pipe(
@@ -274,7 +274,7 @@ export class DocumentationRepo {
         );
     }
 
-    getListCDNote(jobId: string, isShipmentOperation: boolean){
+    getListCDNote(jobId: string, isShipmentOperation: boolean) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: jobId, IsShipmentOperation: isShipmentOperation });
     }
 
@@ -441,6 +441,18 @@ export class DocumentationRepo {
 
     previewFCLImportManifest(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewFCLImportManifest`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    getShippingInstruction(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShippingInstruction/` + id).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    updateShippingInstruction(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShippingInstruction`, body).pipe(
+            catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
