@@ -36,6 +36,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsMawbcontainerService containerService;
         readonly ICsShipmentSurchargeService surchargeService;
         readonly ICsTransactionDetailService transactionDetailService;
+        readonly ICsArrivalFrieghtChargeService csArrivalFrieghtChargeServiceRepo;
         private readonly IStringLocalizer stringLocalizer;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
@@ -55,7 +56,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCountry> catCountry,
             ICsMawbcontainerService contService,
             ICsShipmentSurchargeService surService,
-            ICsTransactionDetailService tranDetailService) : base(repository, mapper)
+            ICsTransactionDetailService tranDetailService, ICsArrivalFrieghtChargeService arrivalFrieghtChargeService ) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -73,6 +74,7 @@ namespace eFMS.API.Documentation.DL.Services
             surchargeService = surService;
             catCountryRepo = catCountry;
             transactionDetailService = tranDetailService;
+            csArrivalFrieghtChargeServiceRepo = arrivalFrieghtChargeService;
         }
 
         #region -- INSERT & UPDATE --
@@ -664,6 +666,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    && (x.transaction.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     &&
                     (
                         (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -895,12 +898,24 @@ namespace eFMS.API.Documentation.DL.Services
                                 csShipmentSurchargeRepo.Add(charge, false);
                             }
                         }
+                        var freightCharge = csArrivalFrieghtChargeServiceRepo.Get(x => x.Hblid == houseId);
+                        if(freightCharge != null)
+                        {
+                            foreach(var freight in freightCharge)
+                            {
+                                freight.Id = Guid.NewGuid();
+                                freight.UserCreated = transaction.UserCreated;
+                                freight.Hblid = item.Id;
+                                csArrivalFrieghtChargeServiceRepo.Add(freight, false);
+                            }
+                        }
                     }
                 }
                 transactionRepository.SubmitChanges();
                 csTransactionDetailRepo.SubmitChanges();
                 csMawbcontainerRepo.SubmitChanges();
                 csShipmentSurchargeRepo.SubmitChanges();
+                csArrivalFrieghtChargeServiceRepo.SubmitChanges();
                 return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
             }
             catch (Exception ex)

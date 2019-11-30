@@ -66,7 +66,6 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
         public HandleState AddTransactionDetail(CsTransactionDetailModel model)
         {
             var detail = mapper.Map<CsTransactionDetail>(model);
-            detail.Id = Guid.NewGuid();
             if (model.CsMawbcontainers.Count > 0)
             {
                 var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, detail.Id);
