@@ -1,9 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
-import { getParamsRouterState, getQueryParamsRouterState } from 'src/app/store';
 import { SeaFCLExportCreateJobComponent } from '../create-job/create-job-fcl-export.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 
@@ -22,7 +21,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobComponent implements OnInit {
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    
+
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
@@ -35,7 +34,8 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
-        protected _cd: ChangeDetectorRef
+        protected _cd: ChangeDetectorRef,
+        protected _activedRoute: ActivatedRoute
 
     ) {
         super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
@@ -43,8 +43,8 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
     ngAfterViewInit() {
         combineLatest([
-            this._store.select(getParamsRouterState),
-            this._store.select(getQueryParamsRouterState),
+            this._activedRoute.params,
+            this._activedRoute.queryParams
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param: any) => {
@@ -153,6 +153,8 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                     this.containers = containers || [];
 
                     this.shipmentGoodSummaryComponent.containers = this.containers;
+
+                    console.log(this.containers);
                 }
             );
     }
