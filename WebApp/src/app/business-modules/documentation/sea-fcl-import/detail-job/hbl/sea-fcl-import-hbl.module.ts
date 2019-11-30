@@ -53,6 +53,7 @@ const LIB = [
         CreateHouseBillComponent,
         FormAddHouseBillComponent,
         DetailHouseBillComponent,
+
         ImportHouseBillDetailComponent,
         FormSearchHouseBillComponent,
         SeaFClImportArrivalNoteComponent,

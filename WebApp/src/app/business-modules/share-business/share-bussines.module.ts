@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
@@ -26,6 +26,9 @@ import { ShareBussinessCdNoteAddRemainingChargePopupComponent } from './componen
 import { ShareBussinessCdNoteDetailPopupComponent } from './components/cd-note/detail-cd-note/detail-cd-note.popup';
 
 import { reducers, effects } from './store';
+import { ShareBusinessImportJobDetailPopupComponent } from './components/import-job-detail/import-job-detail.popup';
+import { ShareBusinessFormSearchImportJobComponent } from './components/import-job-detail/components/form-search-import/form-search-import-job-detail.component';
+
 
 
 const COMPONENTS = [
@@ -37,6 +40,8 @@ const COMPONENTS = [
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBussinessContainerListPopupComponent,
     ShareBussinessGrantTotalProfitComponent,
+    ShareBusinessImportJobDetailPopupComponent,
+    ShareBusinessFormSearchImportJobComponent,
     ShareBussinessCdNoteListComponent,
     ShareBussinessCdNoteAddPopupComponent,
     ShareBussinessCdNoteAddRemainingChargePopupComponent,
@@ -63,6 +68,7 @@ const customCurrencyMaskConfig = {
         CommonModule,
         CommonComponentModule,
         FormsModule,
+        ReactiveFormsModule,
         ModalModule.forRoot(),
         NgxDaterangepickerMd.forRoot(),
         DirectiveModule,

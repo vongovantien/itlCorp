@@ -96,9 +96,9 @@
                                 Port of Loading <span class="m--font-danger">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfLoading"
-                                [selectedDisplayFields]="configPortOfLoading.selectedDisplayFields"
+                                [selectedDisplayFields]="configPort.selectedDisplayFields"
                                 [dataSources]="configPortOfLoading.dataSource"
-                                [displayFields]="configPortOfLoading.displayFields"
+                                [displayFields]="configPort.displayFields"
                                 (itemSelected)="onSelectDataFormInfo($event, 'PortOfLoading')">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback" *ngIf="isSubmitted &&  !selectedPortOfLoading.value  ">
@@ -113,9 +113,9 @@
                                 Port of Discharge <span class="m--font-danger">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfDischarge"
-                                [selectedDisplayFields]="configPortOfDischarge.selectedDisplayFields"
+                                [selectedDisplayFields]="configPort.selectedDisplayFields"
                                 [dataSources]="configPortOfDischarge.dataSource"
-                                [displayFields]="configPortOfDischarge.displayFields">
+                                [displayFields]="configPort.displayFields">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback" *ngIf="isSubmitted &&  !selectedPortOfDischarge.value  ">
                                 Port of Discharge is required!
