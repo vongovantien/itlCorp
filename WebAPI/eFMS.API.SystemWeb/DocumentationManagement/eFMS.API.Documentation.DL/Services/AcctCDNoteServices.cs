@@ -901,8 +901,14 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.TransID = data.JobNo;
                     charge.DepartureAirport = data.Pol + ", " + data.PolCountry; //POL
                     charge.PlaceDelivery = data.Pod + ", " + data.PodCountry; //POD
-                    charge.LoadingDate = data.Etd.Value; //ETD
-                    charge.ETA = data.Eta.Value; //ETA
+                    if (data.Etd != null)
+                    {
+                        charge.LoadingDate = data.Etd.Value;//ETD
+                    }
+                    if (data.Eta != null)
+                    {
+                        charge.ETA = data.Eta.Value; //ETA
+                    }
                     charge.ATTN = data.HbShippers;//Shipper -- lấy từ Housebill
                     charge.LocalVessel = data.Vessel;//Vessel
                     charge.MAWB = data.MbLadingNo; //MBLNO
@@ -934,7 +940,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyDescription = string.Empty;
 
             parameter.DebitNo = criteria.CreditDebitNo;
-            parameter.IssuedDate = data != null ? data.CDNote.DatetimeCreated.Value.ToString("dd/MM/yyyy") : string.Empty;//Lấy ngày tạo CDNote
+            parameter.IssuedDate = data != null && data.CDNote != null && data.CDNote.DatetimeCreated != null ? data.CDNote.DatetimeCreated.Value.ToString("dd/MM/yyyy") : string.Empty;//Lấy ngày tạo CDNote
             parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
             parameter.ReviseNotice = "Revised: " + DateTime.Now.ToString("dd/MM/yyyy");
 
@@ -942,7 +948,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal? _amount = listCharge.Sum(x => x.Debit) - listCharge.Sum(x => x.Credit);
             decimal _balanceAmount = Math.Abs(_amount.Value);
             var _inword = string.Empty;
-            if (_balanceAmount > 0)
+            if (_balanceAmount >= 1)
             {
                 var _currency = criteria.Currency == Constants.CURRENCY_LOCAL ?
                            (_balanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")

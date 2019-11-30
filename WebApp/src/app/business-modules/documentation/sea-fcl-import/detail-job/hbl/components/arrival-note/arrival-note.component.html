@@ -47,7 +47,7 @@
             <div class="m-portlet">
                 <div class="alert-block__heading">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="alert-block__title">
+                        <h3 class="alert-block__title" (dblclick)="method2()">
                             Freight Charge
                         </h3>
                         <div>
@@ -87,18 +87,18 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="form-group"
+                                                <div class="form-group" (clickOutside)="charge.isShowCharge = false"
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.chargeId}">
-                                                    <app-combo-grid-virtual-scroll
-                                                        [currentActiveItemId]="{field:'id', value:charge.chargeId}"
-                                                        (itemSelected)="onSelectCharge($event,charge)"
-                                                        [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                                        [dataSources]="listCharges | async"
-                                                        [displayFields]="configComboGridCharge.displayFields"
-                                                        [height]="200">
-                                                    </app-combo-grid-virtual-scroll>
+                                                    <input type="text" class="form-control"
+                                                        [(ngModel)]="charge.description"
+                                                        (click)="charge.isShowCharge = true">
+                                                    <ng-container *ngIf="charge.isShowCharge">
+                                                        <app-combo-grid [headers]="headerCharge" [data]="listCharges"
+                                                            [fields]="['chargeNameEn']" [active]="charge.chargeId"
+                                                            (onClick)="onSelectCharge($event, charge)">
+                                                        </app-combo-grid>
+                                                    </ng-container>
                                                 </div>
-
                                             </td>
                                             <td>
                                                 <div class="form-group">

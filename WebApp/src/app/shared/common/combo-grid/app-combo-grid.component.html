@@ -19,7 +19,7 @@
             <cdk-virtual-scroll-viewport [ngStyle]="{'height.px': 200}" itemSize="10">
                 <table class="table table-hover">
                     <tbody>
-                        <ng-container *ngIf="!!data.length">
+                        <ng-container *ngIf="!!data && !!data.length">
                             <tr class="data-row " (click)="selectItem(item)"
                                 *cdkVirtualFor="let item of data | filter: keyword: fields; let i = index; trackBy: trackByFn"
                                 [class.data-selected]="!!active && item.id === active">
@@ -28,7 +28,7 @@
                                 </td>
                             </tr>
                         </ng-container>
-                        <tr *ngIf="!data.length" app-table-none-record [colspan]="headers.length"> </tr>
+                        <tr *ngIf="!!data && !data.length" app-table-none-record [colspan]="headers.length"> </tr>
                     </tbody>
                 </table>
             </cdk-virtual-scroll-viewport>

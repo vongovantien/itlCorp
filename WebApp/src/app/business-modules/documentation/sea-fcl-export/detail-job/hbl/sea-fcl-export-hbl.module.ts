@@ -1,12 +1,17 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { SeaFCLExportHBLComponent } from './sea-fcl-export-hbl.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+
 import { PaginationModule, TabsModule, ModalModule } from 'ngx-bootstrap';
+import { SelectModule } from 'ng2-select';
+
+import { SeaFCLExportHBLComponent } from './sea-fcl-export-hbl.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule } from '@angular/forms';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { SeaFCLExportCreateHBLComponent } from './create/create-house-bill.component';
+import { SeaFCLExportFormCreateHBLComponent } from './components/form-create/form-create-hbl.component';
 
 
 const routing: Routes = [
@@ -15,11 +20,11 @@ const routing: Routes = [
         data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.SFE_CODE }
     },
     {
-        path: 'new', component: SeaFCLExportHBLComponent,
+        path: 'new', component: SeaFCLExportCreateHBLComponent,
         data: { name: 'New House Bill Detail', path: ':id', level: 5 }
     },
     {
-        path: ':hblId', component: SeaFCLExportHBLComponent,
+        path: ':hblId', component: SeaFCLExportCreateHBLComponent,
         data: { name: 'House Bill Detail', path: ':id', level: 5 }
     }
 ];
@@ -28,6 +33,12 @@ const LIB = [
     PaginationModule.forRoot(),
     ModalModule.forRoot(),
     TabsModule.forRoot(),
+    SelectModule,
+
+];
+
+const COMPONENTS = [
+    SeaFCLExportFormCreateHBLComponent
 ];
 
 @NgModule({
@@ -37,13 +48,15 @@ const LIB = [
         ShareBussinessModule,
         FormsModule,
         RouterModule.forChild(routing),
-
+        ReactiveFormsModule,
         ...LIB
 
     ],
     exports: [],
     declarations: [
-        SeaFCLExportHBLComponent
+        SeaFCLExportHBLComponent,
+        SeaFCLExportCreateHBLComponent,
+        ...COMPONENTS
     ],
     providers: [],
     bootstrap: [
