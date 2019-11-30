@@ -1,20 +1,27 @@
 <div class="sea-fcl-create-hbl-page">
-    <app-sub-header>
-        <div class="c-button-actions">
-            <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
-            <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
-        </div>
-    </app-sub-header>
+    <app-sub-header> </app-sub-header>
 </div>
 
 <div class="m-content">
+
     <form-create-hbl-fcl-export></form-create-hbl-fcl-export>
-    <!-- <shipment-good-summary> HBL Good Summary </shipment-good-summary> -->
+
+    <shipment-good-summary> HBL Goods Summary </shipment-good-summary>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="m--align-center">
+                <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"
+                    class="m--margin-right-20"></app-default-button>
+                <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Create HBL'"></info-popup>
 
 <confirm-popup [body]="'You are about to create a new  HBL, are you sure all entered details are correct ?'"
-    [labelCancel]="'No'" (onSubmit)="oncreate()" [labelConfirm]="'Yes'">
+    [labelCancel]="'No'" (onSubmit)="onSaveHBL()" [labelConfirm]="'Yes'">
 </confirm-popup>

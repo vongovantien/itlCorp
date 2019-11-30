@@ -9,14 +9,14 @@ import { User, CsTransactionDetail } from 'src/app/shared/models';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { AppForm } from 'src/app/app.form';
-
+import { SystemConstants } from 'src/constants/system.const';
+import { FormValidators } from 'src/app/shared/validators';
 
 import { Observable } from 'rxjs';
 import { catchError, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../../share-business/store';
-import { SystemConstants } from 'src/constants/system.const';
-import { FormValidators } from 'src/app/shared/validators';
+
 
 
 @Component({
@@ -37,7 +37,7 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
     hwbno: AbstractControl;
     consigneeDescription: AbstractControl;
     notifyPartyDescription: AbstractControl;
-    mbltype: AbstractControl;
+    hbltype: AbstractControl;
     bookingNo: AbstractControl;
     localVoyNo: AbstractControl;
     oceanVoyNo: AbstractControl;
@@ -101,7 +101,6 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
     ];
 
 
-
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
@@ -124,15 +123,15 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
         this.countries = this._catalogueRepo.getCountry();
         this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
 
+
+        // * get detail shipment from store.
         this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
             .subscribe(
                 (shipment: CsTransactionDetail) => {
-
                     // * set default value for controls from shipment detail.
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         console.log("detail job from store", shipment);
-
                         this.formCreate.patchValue({
                             bookingNo: shipment.bookingNo,
                             mawb: shipment.mawb,
@@ -143,6 +142,18 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
                         });
                     }
 
+                }
+            );
+
+        // * get detail HBL from store.
+        this._store.select(fromShareBussiness.getDetailHBlState)
+            .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
+            .subscribe(
+                (res: CsTransactionDetail) => {
+                    console.log("detail hbl from store", res);
+                    if (!!res) {
+                        this.updateFormValue(res);
+                    }
                 }
             );
     }
@@ -162,7 +173,7 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
             goodsDelivery: [],
 
             // * Select
-            mbltype: [],
+            hbltype: [],
             serviceType: [],
             freightPayment: [],
 
@@ -208,7 +219,7 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
         this.notifyParty = this.formCreate.controls["notifyParty"];
         this.consigneeDescription = this.formCreate.controls["consigneeDescription"];
         this.notifyPartyDescription = this.formCreate.controls["notifyPartyDescription"];
-        this.mbltype = this.formCreate.controls["mbltype"];
+        this.hbltype = this.formCreate.controls["hbltype"];
         this.bookingNo = this.formCreate.controls["bookingNo"];
         this.localVoyNo = this.formCreate.controls["localVoyNo"];
         this.oceanVoyNo = this.formCreate.controls["oceanVoyNo"];
@@ -238,6 +249,49 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
         this.inWord = this.formCreate.controls["inWord"];
 
 
+    }
+
+    updateFormValue(data: CsTransactionDetail) {
+        this.formCreate.setValue({
+            mawb: data.mawb,
+            customer: data.customerId,
+            saleMan: data.saleManId,
+            shipper: data.shipperId,
+            shipperDescription: data.shipperDescription,
+            consignee: data.consigneeId,
+            consigneeDescription: data.consigneeDescription,
+            notifyParty: data.notifyPartyId,
+            notifyPartyDescription: data.notifyPartyDescription,
+            hwbno: data.hwbno,
+            hbltype: !!data.hbltype ? [this.ladingTypes.find(type => type.id === data.hbltype)] : null,
+            bookingNo: data.customsBookingNo,
+            localVoyNo: data.localVoyNo,
+            oceanVoyNo: data.oceanVoyNo,
+            country: data.originCountryId,
+            placeReceipt: data.pickupPlace,
+            pol: data.pol,
+            pod: data.pod,
+            placeDelivery: data.deliveryPlace,
+            finalDestinationPlace: data.finalDestinationPlace,
+            freightPayment: !!data.freightPayment ? [this.termTypes.find(type => type.id === data.freightPayment)] : null,
+            closingDate: !!data.closingDate ? { startDate: new Date(data.closingDate), endDate: new Date(data.closingDate) } : null,
+            sailingDate: !!data.sailingDate ? { startDate: new Date(data.sailingDate), endDate: new Date(data.sailingDate) } : null,
+            placeFreightPay: data.placeFreightPay,
+            forwardingAgent: data.forwardingAgentId,
+            goodsDelivery: data.goodsDeliveryId,
+            goodsDeliveryDescription: data.goodsDeliveryDescription,
+            forwardingAgentDescription: data.forwardingAgentDescription,
+            originBlnumber: !!data.originBlnumber ? [this.originNumbers.find(type => type.id === data.originBlnumber)] : null,
+            referenceNo: data.referenceNo,
+            exportReferenceNo: data.exportReferenceNo,
+            issueHblplaceAndDate: data.issueHblplace,
+            moveType: !!data.moveType ? [this.typeOfMoves.find(type => type.id === data.moveType)] : null,
+            serviceType: !!data.serviceType ? [this.serviceTypes.find(s => s.id === data.serviceType)] : null,
+            purchaseOrderNo: data.purchaseOrderNo,
+            shippingMark: data.shippingMark,
+            inWord: data.inWord,
+            onBoardStatus: data.onBoardStatus
+        });
     }
 
     getSaleMans() {
@@ -323,9 +377,5 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
                 break;
         }
 
-    }
-
-    saveForm(form: FormGroup) {
-        console.log(form.value);
     }
 }

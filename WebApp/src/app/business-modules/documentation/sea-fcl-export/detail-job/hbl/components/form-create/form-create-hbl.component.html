@@ -77,10 +77,10 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mbltype.value}">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !hbltype.value}">
                         <label required>House Bill of Landing Type</label>
                         <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
-                            formControlName="mbltype" (opened)="closeOtherSelects(selectMBL)">
+                            formControlName="hbltype" (opened)="closeOtherSelects(selectMBL)">
                         </ng-select>
                     </div>
                 </div>
@@ -212,7 +212,7 @@
                         <label>Forwarding Agent</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'forwarding')"
                             [currentActiveItemId]="{ field: 'id', value: forwardingAgent.value}"
-                            [selectedDisplayFields]="['nameEn']" [dataSources]="agents | async"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                             [displayFields]="displayFieldsCustomer">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
@@ -254,7 +254,7 @@
                         <label>Delivery of Good</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'deliveryGood')"
                             [currentActiveItemId]="{ field: 'id', value: goodsDelivery.value}"
-                            [selectedDisplayFields]="['nameEn']" [dataSources]="agents | async"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                             [displayFields]="displayFieldsCustomer">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
@@ -309,17 +309,6 @@
                         <label>On Board Status</label>
                         <textarea rows="5" class="form-control m-input m-input--square"
                             formControlName="onBoardStatus"></textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="m--align-center">
-                        <button class="btn btn-primary" (click)="saveForm(formCreate)">Save</button>
-
-                        {{formCreate.errors | json}}
-                        {{formCreate.valid}}
-
                     </div>
                 </div>
             </div>

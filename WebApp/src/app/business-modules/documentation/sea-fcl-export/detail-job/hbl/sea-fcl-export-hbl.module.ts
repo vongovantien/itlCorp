@@ -13,6 +13,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { SeaFCLExportCreateHBLComponent } from './create/create-house-bill.component';
 import { SeaFCLExportFormCreateHBLComponent } from './components/form-create/form-create-hbl.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { SeaFCLExportDetailHBLComponent } from './detail/detail-house-bill.component';
 
 
 const routing: Routes = [
@@ -25,7 +26,7 @@ const routing: Routes = [
         data: { name: 'New House Bill Detail', path: ':id', level: 5 }
     },
     {
-        path: ':hblId', component: SeaFCLExportCreateHBLComponent,
+        path: ':hblId', component: SeaFCLExportDetailHBLComponent,
         data: { name: 'House Bill Detail', path: ':id', level: 5 }
     }
 ];
@@ -58,6 +59,7 @@ const COMPONENTS = [
     declarations: [
         SeaFCLExportHBLComponent,
         SeaFCLExportCreateHBLComponent,
+        SeaFCLExportDetailHBLComponent,
         ...COMPONENTS
     ],
     providers: [],

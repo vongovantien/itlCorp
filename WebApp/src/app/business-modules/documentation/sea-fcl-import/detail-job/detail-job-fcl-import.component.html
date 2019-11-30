@@ -47,7 +47,7 @@
                     (selectTab)="onSelectTab('shipment')">
 
                     <form-create-sea-fcl-import>
-                        <div class="row" *ngIf="!!fclImportDetail">
+                        <div class="row m--margin-top-20" *ngIf="!!fclImportDetail">
                             <div class="col-md-4">
                                 <span>Created: {{fclImportDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
                                 <span class="text-success">{{fclImportDetail.userCreated}}</span>

@@ -99,7 +99,7 @@
                             </ng-container>
                         </ng-container>
 
-                        <tr app-table-none-record *ngIf="!shipments.length"></tr>
+                        <tr app-table-none-record *ngIf="!(isLoading | async) && !shipments.length"></tr>
                         <tr app-table-row-loading *ngIf="isLoading | async"></tr>
 
                     </tbody>
