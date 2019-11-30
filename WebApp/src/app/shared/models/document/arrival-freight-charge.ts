@@ -23,6 +23,8 @@ export class ArrivalFreightCharge extends BaseModel {
     isFull: boolean = false;
     isTick: boolean = false;
 
+    isShowCharge: boolean = false;
+
     constructor(object?: any) {
         super();
         const self = this;
