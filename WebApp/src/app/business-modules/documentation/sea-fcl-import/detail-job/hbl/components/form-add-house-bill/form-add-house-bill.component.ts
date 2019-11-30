@@ -13,6 +13,8 @@ import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromShare from './../../../../../../share-business/store';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 @Component({
     selector: 'app-form-add-house-bill',
@@ -58,18 +60,19 @@ export class FormAddHouseBillComponent extends AppForm {
     configPortOfDischarge: CommonInterface.IComboGirdConfig | any = {};
     configSupplier: CommonInterface.IComboGirdConfig | any = {};
     configPlaceOfIssued: CommonInterface.IComboGirdConfig | any = {};
+    configPartner: CommonInterface.IComboGirdConfig | any = {};
+    configPort: CommonInterface.IComboGirdConfig | any = {};
 
-
-    selectedCustomer: Partial<CommonInterface.IComboGridData | any> = {};
+    selectedCustomer: any = {};
     selectedSaleman: any = {};
-    selectedShipper: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedConsignee: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedNotifyParty: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedAlsoNotifyParty: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedPortOfLoading: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedPortOfDischarge: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedSupplier: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedPlaceOfIssued: Partial<CommonInterface.IComboGridData | any> = {};
+    selectedShipper: any = {};
+    selectedConsignee: any = {};
+    selectedNotifyParty: any = {};
+    selectedAlsoNotifyParty: any = {};
+    selectedPortOfLoading: any = {};
+    selectedPortOfDischarge: any = {};
+    selectedSupplier: any = {};
+    selectedPlaceOfIssued: any = {};
     selectedDocDate: any;
     selectedETAWareHouse: any;
     selectedDateOfIssued: any;
@@ -118,12 +121,11 @@ export class FormAddHouseBillComponent extends AppForm {
     ngOnInit() {
         this.getListSaleman();
         this.getCommonData();
-
         this.headersSaleman = [
             { title: 'User Name', field: 'username' },
         ];
 
-        this.configCustomer = Object.assign({}, this.configComoBoGrid, {
+        this.configPartner = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'id', label: 'Partner ID' },
                 { field: 'shortName', label: 'Name ABBR' },
@@ -132,74 +134,20 @@ export class FormAddHouseBillComponent extends AppForm {
 
             ],
         }, { selectedDisplayFields: ['shortName'], });
+
+        this.configPort = Object.assign({}, this.configComoBoGrid, {
+            displayFields: [
+                { field: 'code', label: 'Port Code' },
+                { field: 'nameEn', label: 'Port Name' },
+                { field: 'countryNameEN', label: 'Country' },
+            ],
+        }, { selectedDisplayFields: ['nameEn'], });
 
         this.configSaleman = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'username', label: 'Username' },
             ],
         }, { selectedDisplayFields: ['username'], });
-
-        this.configShipper = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'id', label: 'Partner ID' },
-                { field: 'shortName', label: 'Name ABBR' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' },
-
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
-
-        this.configConsignee = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'id', label: 'Partner ID' },
-                { field: 'shortName', label: 'Name ABBR' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' }
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
-
-        this.configNotifyParty = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'id', label: 'Partner ID' },
-                { field: 'shortName', label: 'Name ABBR' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' }
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
-
-        this.configAlsoNotifyParty = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'id', label: 'Partner ID' },
-                { field: 'shortName', label: 'Name ABBR' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' }
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
-
-        this.configPortOfLoading = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'nameVn', label: 'Name Vn' },
-                { field: 'nameEn', label: 'Name EN' },
-                { field: 'code', label: 'Code' }
-            ],
-        }, { selectedDisplayFields: ['nameEn'], });
-
-        this.configPortOfDischarge = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'nameVn', label: 'Name Vn' },
-                { field: 'nameEn', label: 'Name EN' },
-                { field: 'code', label: 'Code' }
-            ],
-        }, { selectedDisplayFields: ['nameEn'], });
-
-        this.configSupplier = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'id', label: 'Partner ID' },
-                { field: 'shortName', label: 'Name ABBR' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' }
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
 
         this.configPlaceOfIssued = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -209,10 +157,8 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'code', label: 'Code' }
             ],
         }, { selectedDisplayFields: ['name_EN'], });
-
-
-
         this.initForm();
+        this.getPort();
         this._store.select(fromShare.getDetailHBlState)
             .subscribe(
                 (res: any) => {
@@ -223,6 +169,27 @@ export class FormAddHouseBillComponent extends AppForm {
                     }
                 }
             );
+
+    }
+
+    async getPort() {
+        this._spinner.show();
+        try {
+            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
+                this.configPortOfLoading.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
+                this.configPortOfDischarge.dataSource = this.configPortOfLoading.dataSource;
+            } else {
+                const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }).toPromise();
+                this.configPortOfLoading.dataSource = ports || [];
+                this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
+                this.configPortOfDischarge.dataSource = this.configPortOfLoading.dataSource;
+            }
+        } catch (error) {
+
+        }
+        finally {
+            this._spinner.hide();
+        }
     }
 
 
@@ -350,13 +317,8 @@ export class FormAddHouseBillComponent extends AppForm {
 
         this.getListCustomer();
         this.getListShipper();
-        // this.getListConsignee();
-        this.getListPort();
         this.getListSupplier();
         this.getListProvince();
-
-
-
     }
 
     bindDescriptionModel(data: any, key: string) {
@@ -462,7 +424,6 @@ export class FormAddHouseBillComponent extends AppForm {
     }
 
     bindSalemanImport(data: string) {
-
         this.saleMans.forEach(item => {
             if (item.id === data) {
                 this.selectedSaleman = item;
@@ -499,11 +460,10 @@ export class FormAddHouseBillComponent extends AppForm {
 
     getListSupplier() {
         this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CARRIER })
-            .subscribe((res: any) => { this.configSupplier.dataSource = res; });
-    }
+            .subscribe((res: any) => {
+                this.configSupplier.dataSource = res;
 
-    getListPort() {
-        this._catalogueRepo.getListPortByTran().subscribe((res: any) => { this.configPortOfLoading.dataSource = res; this.configPortOfDischarge.dataSource = res; });
+            });
     }
 
     getListProvince() {
@@ -514,12 +474,9 @@ export class FormAddHouseBillComponent extends AppForm {
         this._systemRepo.getListSystemUser().subscribe((res: any) => {
             if (!!res) {
                 this.saleMans = res;
-
-            }
-            else {
+            } else {
                 this.saleMans = [];
             }
-
         });
     }
 }

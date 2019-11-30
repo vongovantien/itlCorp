@@ -15,8 +15,8 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Fax { get; set; }
         public string TransID { get; set; }
         public DateTime? TransDate { get; set; }
-        public DateTime LoadingDate { get; set; }
-        public DateTime ETA { get; set; }
+        public DateTime? LoadingDate { get; set; }
+        public DateTime? ETA { get; set; }
         public string LocalVessel { get; set; }
         public string OceanVessel { get; set; }
         public string MAWB { get; set; }
