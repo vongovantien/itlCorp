@@ -53,7 +53,7 @@ const customCurrencyMaskConfig = {
     allowNegative: false,
     allowZero: true,
     decimal: ".",
-    precision: 0,
+    precision: 2,
     prefix: "",
     suffix: "",
     thousands: ",",

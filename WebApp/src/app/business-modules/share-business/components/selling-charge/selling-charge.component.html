@@ -111,7 +111,7 @@
                                     <div class="row quantity-hint">
                                         <div class="col-md-6 p-r-none">
                                             <input type="text" class="form-control" [(ngModel)]="charge.quantity"
-                                                currencyMask placeholder="Quantity"
+                                                placeholder="Quantity"
                                                 (ngModelChange)="onChangeQuantity($event, charge)"
                                                 [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                         </div>
@@ -166,8 +166,8 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="number" class="form-control" [(ngModel)]="charge.total" readonly
-                                        disabled placeholder="Total">
+                                    <input currencyMask type="number" class="form-control" [(ngModel)]="charge.total"
+                                        readonly disabled placeholder="Total">
                                 </div>
                             </td>
                             <td>

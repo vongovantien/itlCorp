@@ -99,7 +99,7 @@
                                     <div class="row quantity-hint">
                                         <div class="col-md-6 p-r-none">
                                             <input type="text" class="form-control" [(ngModel)]="charge.quantity"
-                                                currencyMask placeholder="Quantity"
+                                                placeholder="Quantity"
                                                 (ngModelChange)="onChangeQuantity($event, charge)"
                                                 [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">
                                         </div>
