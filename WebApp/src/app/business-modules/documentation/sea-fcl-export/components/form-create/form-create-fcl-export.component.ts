@@ -10,7 +10,7 @@ import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
-import { User } from 'src/app/shared/models';
+import { User, CsTransactionDetail } from 'src/app/shared/models';
 
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -95,7 +95,7 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), skip(1))
             .subscribe(
-                (res: ISeaFCLExportDetail | any) => {
+                (res: CsTransactionDetail | any) => {
                     if (!!res) {
                         this.formCreateFCLExport.setValue({
                             jobID: res.jobNo,
@@ -244,59 +244,5 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
 
 }
 
-interface ISeaFCLExportDetail {
-    active: boolean;
-    agentId: string;
-    agentName: string;
-    bookingNo: string;
-    branchId: string;
-    cbm: number;
-    chargeWeight: number;
-    coloaderId: string;
-    commodity: string;
-    creatorName: null;
-    currentStatus: string;
-    customerId: null;
-    datetimeCreated: string;
-    datetimeModified: string;
-    deliveryPlace: null;
-    desOfGoods: string;
-    eta: string;
-    etd: string;
-    flightVesselName: string;
-    grossWeight: number;
-    hblId: string;
-    hwbNo: string;
-    id: string;
-    inactiveOn: string;
-    isLocked: false;
-    jobNo: string;
-    lockedDate: string;
-    mawb: string;
-    mbltype: string;
-    netWeight: number;
-    notes: string;
-    notifyPartyId: string;
-    packageContainer: string;
-    paymentTerm: string;
-    personIncharge: string;
-    placeDeliveryName: string;
-    pod: string;
-    podName: string;
-    pol: string;
-    polName: string;
-    pono: string;
-    saleManId: string;
-    serviceDate: string;
-    shipmentType: string;
-    subColoader: string;
-    sumCont: string;
-    sumPackage: string;
-    supplierName: string;
-    transactionType: string;
-    typeOfService: string;
-    userCreated: string;
-    userModified: string;
-    voyNo: string;
-}
+
 

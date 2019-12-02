@@ -1,15 +1,16 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
-import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
-import { DataService } from 'src/app/shared/services';
-import { SystemConstants } from 'src/constants/system.const';
-import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { formatDate } from '@angular/common';
+import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
+
+import { AppForm } from 'src/app/app.form';
+import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
-import { Observable } from 'rxjs';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { User } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+
+import { Observable } from 'rxjs';
+
 
 @Component({
     selector: 'form-search-fcl-import',
@@ -51,7 +52,6 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
 
     constructor(
         private _fb: FormBuilder,
-        private _dataService: DataService,
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo) {
         super();
@@ -59,11 +59,13 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
 
     ngOnInit(): void {
         this.initFormSearch();
-        this.getCustomer();
-        this.getSupplier();
-        this.getAgent();
-        this.getSaleman();
-        this.getCreator();
+
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+        this.suppliers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
+        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
+        this.salemans = this._systemRepo.getSystemUsers({ active: true });
+        this.creators = this._systemRepo.getSystemUsers({ active: true });
+
 
         this.filterTypes = [
             { title: 'Job ID', value: 'jobNo' },
@@ -100,51 +102,6 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
         this.searchText = this.formSearch.controls['searchText'];
         this.filterType = this.formSearch.controls['filterType'];
         this.serviceDate = this.formSearch.controls['serviceDate'];
-    }
-
-    getCustomer() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CUSTOMER)) {
-            this.customers = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CUSTOMER);
-        } else {
-            this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-            this._dataService.setDataService(SystemConstants.CSTORAGE.CUSTOMER, this.customers);
-        }
-    }
-
-    getSupplier() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER)) {
-            this.suppliers = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER);
-        } else {
-            this.suppliers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
-            this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, this.suppliers);
-        }
-    }
-
-    getAgent() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT)) {
-            this.agents = this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT);
-        } else {
-            this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
-            this._dataService.setDataService(SystemConstants.CSTORAGE.AGENT, this.agents);
-        }
-    }
-
-    getSaleman() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SALE)) {
-            this.salemans = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SALE);
-        } else {
-            this.salemans = this._systemRepo.getSystemUsers({ active: true });
-            this._dataService.setDataService(SystemConstants.CSTORAGE.SALE, this.salemans);
-        }
-    }
-
-    getCreator() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SALE)) {
-            this.creators = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SALE);
-        } else {
-            this.creators = this._systemRepo.getSystemUsers({ active: true });
-            this._dataService.setDataService(SystemConstants.CSTORAGE.SALE, this.creators);
-        }
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -195,7 +152,7 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
 
     resetSearch() {
         this.formSearch.reset();
-        
+
         this.resetFormControl(this.customer);
         this.resetFormControl(this.supplier);
         this.resetFormControl(this.agent);

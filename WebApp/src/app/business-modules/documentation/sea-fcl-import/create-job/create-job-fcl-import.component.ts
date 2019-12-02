@@ -78,10 +78,11 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
             personIncharge: this.formCreateComponent.personIncharge.value, // TODO user with Role = CS.
             subColoader: form.subColoader || null,
 
-            shipmentType: form.shipmentType,
             flightVesselName: form.flightVesselName,
-            typeOfService: !!form.typeOfService ? form.typeOfService : null,
-            mbltype: form.mbltype,
+
+            shipmentType: !!form.shipmentType ? form.shipmentType[0].id : null,
+            typeOfService: !!form.typeOfService ? form.typeOfService[0].id : null,
+            mbltype: !!form.mbltype ? form.mbltype[0].id : null,
 
             agentId: form.agentId,
             pol: form.pol,

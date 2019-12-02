@@ -53,20 +53,17 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (mbltype.dirty && !mbltype.valid) || (isSubmitted && !mbltype.valid)}">
                             <label required>Master Bill of Landing Type</label>
-                            <select class="form-control" formControlName="mbltype">
-                                <option value="null" disabled>Please Select</option>
-                                <option *ngFor="let landingType of ladingTypes" [ngValue]="landingType.value">
-                                    {{landingType.displayName}}</option>
-                            </select>
+                            <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
+                                formControlName="mbltype" (opened)="closeOtherSelects(selectMBL)">
+                            </ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label required>Shipment Type</label>
-                            <select class="form-control" formControlName="shipmentType">
-                                <option *ngFor="let shipmentType of shipmentTypes" [ngValue]="shipmentType.value">
-                                    {{shipmentType.displayName}}</option>
-                            </select>
+                            <ng-select #selectShipmentType [items]="shipmentTypes" placeholder="Please Select"
+                                formControlName="shipmentType" (opened)="closeOtherSelects(selectShipmentType)">
+                            </ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -75,7 +72,7 @@
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: coloader.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [selectedDisplayFields]="configComboGridPartner.selectedDisplayFields"
-                                [dataSources]="carries" [displayFields]="configComboGridPartner.displayFields"
+                                [dataSources]="carries | async" [displayFields]="configComboGridPartner.displayFields"
                                 [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
@@ -93,7 +90,7 @@
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: agentId.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                                 [selectedDisplayFields]="configComboGridPartner.selectedDisplayFields"
-                                [dataSources]="agents" [displayFields]="configComboGridPartner.displayFields"
+                                [dataSources]="agents | async" [displayFields]="configComboGridPartner.displayFields"
                                 [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
@@ -104,8 +101,8 @@
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: pol.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-loading')"
                                 [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
-                                [dataSources]="configComboGridPort.dataSource"
-                                [displayFields]="configComboGridPort.displayFields" [height]="200">
+                                [dataSources]="ports | async" [displayFields]="configComboGridPort.displayFields"
+                                [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -115,8 +112,8 @@
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: pod.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-destination')"
                                 [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
-                                [dataSources]="configComboGridPort.dataSource"
-                                [displayFields]="configComboGridPort.displayFields" [height]="200">
+                                [dataSources]="ports | async" [displayFields]="configComboGridPort.displayFields"
+                                [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -127,8 +124,8 @@
                                 [currentActiveItemId]="{field: 'id', value: deliveryPlace.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-delivery')"
                                 [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
-                                [dataSources]="configComboGridPort.dataSource"
-                                [displayFields]="configComboGridPort.displayFields" [height]="200">
+                                [dataSources]="ports | async" [displayFields]="configComboGridPort.displayFields"
+                                [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -156,12 +153,9 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (typeOfService.dirty && !typeOfService.valid) || (isSubmitted && !typeOfService.valid)}">
                             <label required>Service Type</label>
-                            <select class="form-control" formControlName="typeOfService">
-                                <option value="null" disabled>Please Select</option>
-                                <option *ngFor="let serviceType of serviceTypes" [ngValue]="serviceType.value">
-                                    {{serviceType.displayName}}
-                                </option>
-                            </select>
+                            <ng-select #selectServiceType [items]="serviceTypes" placeholder="Please Select"
+                                formControlName="typeOfService" (opened)="closeOtherSelects(selectServiceType)">
+                            </ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">
