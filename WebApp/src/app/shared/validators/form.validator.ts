@@ -7,6 +7,9 @@ export class FormValidators extends Validators {
         const pol: string = controls.get('pol').value;
         const pod: string = controls.get('pod').value;
 
+        if (!pol || !pod) {
+            return null;
+        }
         if (pol !== null && pod !== null && pol === pod) {
             return { invalidPort: true };
         }
