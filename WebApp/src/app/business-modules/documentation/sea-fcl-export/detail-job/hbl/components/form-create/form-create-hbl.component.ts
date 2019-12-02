@@ -13,7 +13,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from 'src/app/shared/validators';
 
 import { Observable } from 'rxjs';
-import { catchError, takeUntil, skip } from 'rxjs/operators';
+import { catchError, takeUntil, skip, distinctUntilChanged } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../../share-business/store';
 
@@ -161,39 +161,39 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
     initForm() {
         this.formCreate = this._fb.group({
             // * Combogrid
-            customer: [],
+            customer: [null, Validators.required],
             saleMan: [],
-            shipper: [],
-            consignee: [],
+            shipper: [null, Validators.required],
+            consignee: [null, Validators.required],
             notifyParty: [],
             country: [],
-            pol: [],
-            pod: [],
+            pol: [null, Validators.required],
+            pod: [null, Validators.required],
             forwardingAgent: [],
             goodsDelivery: [],
 
             // * Select
-            hbltype: [],
+            hbltype: [null, Validators.required],
             serviceType: [],
-            freightPayment: [],
+            freightPayment: [null, Validators.required],
 
-            // * DataService
-            sailingDate: [],
+            // * date
+            sailingDate: [null, Validators.required],
             closingDate: [],
 
             // * Input
-            mawb: [],
-            hwbno: [],
+            mawb: [null, Validators.required],
+            hwbno: [null, Validators.required],
             localVoyNo: [],
             finalDestinationPlace: [],
-            oceanVoyNo: [],
+            oceanVoyNo: [null, Validators.required],
             shipperDescription: [],
             consigneeDescription: [],
             notifyPartyDescription: [],
             bookingNo: [],
             goodsDeliveryDescription: [],
             forwardingAgentDescription: [],
-            placeFreightPay: [],
+            placeFreightPay: [null, Validators.required],
             originBlnumber: [],
             issueHblplaceAndDate: [],
             referenceNo: [],
@@ -248,7 +248,14 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
         this.onBoardStatus = this.formCreate.controls["onBoardStatus"];
         this.inWord = this.formCreate.controls["inWord"];
 
-
+        this.formCreate.valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev === curr),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((value) => {
+                console.log(this.formCreate.status);
+            });
     }
 
     updateFormValue(data: CsTransactionDetail) {

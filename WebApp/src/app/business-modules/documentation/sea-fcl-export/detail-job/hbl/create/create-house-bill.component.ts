@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -40,7 +40,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         protected _documentationRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
-        protected _router: Router
+        protected _router: Router,
+        protected _cd: ChangeDetectorRef
 
     ) {
         super();
@@ -64,7 +65,6 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
-                    console.log(this.jobId);
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                 }
             });
@@ -73,6 +73,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     ngAfterViewInit() {
         this.goodSummaryComponent.initContainer();
         this.goodSummaryComponent.containerPopup.isAdd = true;
+
+        this._cd.detectChanges();
     }
 
     showCreatepoup() {

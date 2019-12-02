@@ -5,12 +5,14 @@ import { ToastrService } from 'ngx-toastr';
 
 import { SeaFCLExportCreateJobComponent } from '../create-job/create-job-fcl-export.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
+import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 import { combineLatest, of } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, skip, take } from 'rxjs/operators';
+import { tap, map, switchMap, catchError, takeUntil, skip, take, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -20,7 +22,9 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 })
 
 export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobComponent implements OnInit {
+
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
@@ -35,7 +39,8 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
         protected _cd: ChangeDetectorRef,
-        protected _activedRoute: ActivatedRoute
+        protected _activedRoute: ActivatedRoute,
+        private _documentRepo: DocumentationRepo
 
     ) {
         super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
@@ -151,10 +156,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             .subscribe(
                 (containers: any) => {
                     this.containers = containers || [];
-
                     this.shipmentGoodSummaryComponent.containers = this.containers;
-
-                    console.log(this.containers);
                 }
             );
     }
@@ -186,6 +188,35 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                         }, 1000);
                     } else {
                         this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/sea-fcl-export"]);
+    }
+
+    deleteJob() {
+        this.confirmDeleteJobPopup.show();
+    }
+
+    onDeleteJob() {
+        this._progressRef.start();
+        this._documentRepo.deleteMasterBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                    this.confirmDeleteJobPopup.hide();
+                })
+            ).subscribe(
+                (respone: CommonInterface.IResult) => {
+                    if (respone.status) {
+
+                        this._toastService.success(respone.message, 'Delete Success !');
+
+                        this.gotoList();
                     }
                 },
             );
