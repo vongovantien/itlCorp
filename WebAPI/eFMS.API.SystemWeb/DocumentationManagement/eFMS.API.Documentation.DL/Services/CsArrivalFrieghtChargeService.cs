@@ -349,7 +349,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             result = new Crystal
             {
-                ReportName = criteria.Currency == "VND" ? "SeaArrivalNotes.rpt" : "SeaArrivalNotesOG.rpt",
+                ReportName = criteria.Currency == Constants.CURRENCY_LOCAL ? "SeaArrivalNotes.rpt" : "SeaArrivalNotesOG.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };

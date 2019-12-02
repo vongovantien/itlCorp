@@ -32,6 +32,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsMawbcontainerService containerService;
         readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
+        readonly IContextBase<CatCountry> countryRepository;
         private readonly ICurrentUser currentUser;
 
 
@@ -45,6 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> catUnit,
             IContextBase<CatCommodity> catCommodity,
             IContextBase<CatSaleman> catSaleman,
+            IContextBase<CatCountry> countryRepo,
             IContextBase<CsShipmentSurcharge> surchareRepo , IContextBase<CsTransactionDetail> csTransactiondetail,
 ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mapper)
         {
@@ -60,6 +62,7 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
             containerService = contService;
             csTransactionDetailRepo = csTransactiondetail;
             currentUser = user;
+            countryRepository = countryRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -723,17 +726,25 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                 housebill.OSI = "OSI"; //Chưa biết
                 housebill.CheckNullAttach = "CheckNullAttach"; //Chưa biết
                 housebill.ReferrenceNo = data.ReferenceNo; //ReferenceNo
-                housebill.Shipper = dataShipper?.PartnerNameEn; //Shipper name
+                housebill.Shipper = data.ShipperDescription;//dataShipper?.PartnerNameEn; //Shipper name
                 housebill.ConsigneeID = data.ConsigneeId; //NOT USE
-                housebill.Consignee = dataConsignee?.PartnerNameEn;
-                housebill.Notify = data.NotifyParty; //Notify Party Name
-                housebill.PlaceAtReceipt = "PlaceAtReceipt"; //Chưa biết
-                housebill.PlaceDelivery = data.DeliveryPlace;
+                housebill.Consignee = data.ConsigneeDescription;//dataConsignee?.PartnerNameEn;
+                housebill.Notify = data.NotifyPartyDescription;//data.NotifyParty; //Notify Party Name
+                housebill.PlaceAtReceipt = data.PickupPlace;// Place of receipt //"PlaceAtReceipt"; //Chưa biết
+                housebill.PlaceDelivery = "PlaceDelivery";//Chưa biết
                 housebill.LocalVessel = data.LocalVessel;
                 housebill.FromSea = "FromSea"; //NOT USE
                 housebill.OceanVessel = data.OceanVessel;
-                housebill.DepartureAirport = dataPOL?.NameEn; //POL
-                housebill.PortofDischarge = dataPOD?.NameEn; //POD
+                if(dataPOL != null)
+                {
+                    var polCountry = countryRepository.Get(x => x.Id == dataPOL.CountryId).FirstOrDefault()?.NameEn;
+                    housebill.DepartureAirport = dataPOL?.NameEn + ", " + polCountry; //POL
+                }                
+                if(dataPOD != null)
+                {
+                    var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
+                    housebill.PortofDischarge = dataPOD?.NameEn + ", " + podCountry; //POD
+                }               
                 housebill.TranShipmentTo = "TranShipmentTo"; //NOT USE
                 housebill.GoodsDelivery = "GoodsDelivery"; //Chưa biết
                 housebill.CleanOnBoard = "CleanOnBoard"; //Chưa biết
@@ -783,22 +794,22 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
             string _reportName = string.Empty;
             switch (reportType)
             {
-                case "ITL":
+                case Constants.HBLOFLANDING_ITL:
                     _reportName = "SeaHBillofLadingITL.rpt";
                     break;
-                case "ITL_FRAME":
+                case Constants.HBLOFLANDING_ITL_FRAME:
                     _reportName = "SeaHBillofLadingITLFrame.rpt";
                     break;
-                case "FBL_FRAME":
+                case Constants.HBLOFLANDING_FBL_FRAME:
                     _reportName = "SeaHBillofLadingFBLFrame.rpt";
                     break;
-                case "ITL_KESCO":
+                case Constants.HBLOFLANDING_ITL_KESCO:
                     _reportName = "SeaHBillofLadingITL_KESCO.rpt";
                     break;
-                case "ITL_FRAME_KESCO":
+                case Constants.HBLOFLANDING_ITL_FRAME_KESCO:
                     _reportName = "SeaHBillofLadingITLFrame_Kesco.rpt";
                     break;
-                case "ITL_SEKO":
+                case Constants.HBLOFLANDING_ITL_SEKO:
                     _reportName = "SeaHBillofLadingITL_Seko.rpt";
                     break;
             }
@@ -810,7 +821,7 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
             };
             result.AddDataSource(housebills);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            if (reportType == "ITL" || reportType == "ITL_FRAME" || reportType == "ITL_SEKO")
+            if (reportType == Constants.HBLOFLANDING_ITL || reportType == Constants.HBLOFLANDING_ITL_FRAME || reportType == Constants.HBLOFLANDING_ITL_SEKO)
             {
                 var parameter = new SeaHBillofLadingReportParams1()
                 {
@@ -821,7 +832,7 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                 result.SetParameter(parameter);
             }
 
-            if (reportType == "ITL_KESCO" || reportType == "ITL_FRAME_KESCO")
+            if (reportType == Constants.HBLOFLANDING_ITL_KESCO || reportType == Constants.HBLOFLANDING_ITL_FRAME_KESCO)
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {
