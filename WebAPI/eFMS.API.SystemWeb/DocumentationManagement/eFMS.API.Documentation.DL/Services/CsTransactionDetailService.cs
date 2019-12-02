@@ -142,14 +142,14 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                             return checkDuplicateCont;
                         }
                     }
-                    hb.UserModified = ChangeTrackerHelper.currentUser;
-                    hb.DatetimeModified = DateTime.Now;
-                    model.SailingDate = DateTime.Now;
-                    hb = mapper.Map<CsTransactionDetail>(model);
-                    var isUpdateDone = DataContext.Update(hb, x => x.Id == hb.Id);
+                    //model.SailingDate = DateTime.Now;
+                    var entity = mapper.Map<CsTransactionDetail>(model);
+                    entity.UserModified = ChangeTrackerHelper.currentUser;
+                    entity.DatetimeModified = DateTime.Now;
+                    var isUpdateDone = DataContext.Update(entity, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
                     {
-                        if (model.CsMawbcontainers.Count > 0)
+                        if (model.CsMawbcontainers != null)
                         {
                             var listConts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
                             foreach (var item in listConts)
@@ -420,8 +420,9 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                           PODName = pod.NameEn,
                           ManifestRefNo = detail.ManifestRefNo,
                           ServiceType = detail.ServiceType,
-                          ContSealNo = detail.ContSealNo
-                          
+                          ContSealNo = detail.ContSealNo,
+                          SailingDate = detail.SailingDate,
+                          FreightPayment = detail.FreightPayment
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.ToList();

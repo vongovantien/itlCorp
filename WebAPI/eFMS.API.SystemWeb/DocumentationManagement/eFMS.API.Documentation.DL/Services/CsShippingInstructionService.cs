@@ -20,15 +20,18 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatPartner> partnerRepository;
         private readonly IContextBase<CatPlace> placeRepository;
         private readonly IContextBase<SysUser> userRepository;
+        private readonly IContextBase<CsMawbcontainer> containerRepository;
         public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository, 
             IMapper mapper,
             IContextBase<CatPartner> partnerRepo,
             IContextBase<CatPlace> placeRepo,
-            IContextBase<SysUser> userRepo) : base(repository, mapper)
+            IContextBase<SysUser> userRepo,
+            IContextBase<CsMawbcontainer> containerRepo) : base(repository, mapper)
         {
             partnerRepository = partnerRepo;
             placeRepository = placeRepo;
             userRepository = userRepo;
+            containerRepository = containerRepo;
         }
 
         public HandleState AddOrUpdate(CsShippingInstructionModel model)
@@ -81,28 +84,28 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return result;
             }
-            foreach (var item in model.CsTransactionDetails)
+            var containers = containerRepository.Get(x => x.Mblid == model.JobId);
+            foreach(var item in containers)
             {
-                var instruction = new SeaShippingInstruction
-                {
-                    Attn = item.NotifyParty,
+                var instruction = new SeaShippingInstruction {
+                    Attn = model.InvoiceNoticeRecevier,
                     ToPartner = model.SupplierName,
                     Re = model.BookingNo,
-                    DatePackage = model.InvoiceDate == null ? model.InvoiceDate : null,
+                    DatePackage = model.InvoiceDate,
                     ShipperDf = model.ActualShipperDescription,
                     GoodsDelivery = model.ConsigneeDescription,
-                    NotitfyParty = model.CargoNoticeRecevier,
-                    PortofLoading = model.PolName,
+                    NotitfyParty = model.InvoiceNoticeRecevier,
+                    PortofLoading = model.PodName,
                     PortofDischarge = model.PodName,
                     PlaceDelivery = model.PoDelivery,
                     Vessel = model.VoyNo,
                     Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
-                    ShippingMarks = item.ShippingMark,
-                    Containers = item.ContSealNo,
-                    ContSealNo = item.ContSealNo,
-                    NoofPeace = item.PackageContainer,
-                    SIDescription = model.GoodsDescription,
-                    GrossWeight = (decimal)model?.GrossWeight,
+                    ShippingMarks = item.MarkNo,
+                    Containers = item.ContainerNo,
+                    ContSealNo = item.SealNo,
+                    NoofPeace = "100",
+                    SIDescription = item.Description,
+                    GrossWeight = item.Gw,
                     CBM = item.Cbm,
                     Qty = "200",
                     RateRequest = model.Remark,
@@ -111,6 +114,36 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 instructions.Add(instruction);
             }
+            //foreach (var item in model.CsTransactionDetails)
+            //{
+            //    var instruction = new SeaShippingInstruction
+            //    {
+            //        Attn = item.NotifyParty,
+            //        ToPartner = model.SupplierName,
+            //        Re = model.BookingNo,
+            //        DatePackage = model.InvoiceDate == null ? model.InvoiceDate : null,
+            //        ShipperDf = model.ActualShipperDescription,
+            //        GoodsDelivery = model.ConsigneeDescription,
+            //        NotitfyParty = model.CargoNoticeRecevier,
+            //        PortofLoading = model.PolName,
+            //        PortofDischarge = model.PodName,
+            //        PlaceDelivery = model.PoDelivery,
+            //        Vessel = model.VoyNo,
+            //        Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
+            //        ShippingMarks = item.ShippingMark,
+            //        Containers = item.ContSealNo,
+            //        ContSealNo = item.ContSealNo,
+            //        NoofPeace = item.PackageContainer,
+            //        SIDescription = model.GoodsDescription,
+            //        GrossWeight = (decimal)model?.GrossWeight,
+            //        CBM = item.Cbm,
+            //        Qty = "200",
+            //        RateRequest = model.Remark,
+            //        Payment = model.PaymenType,
+            //        ShippingMarkImport = string.Empty
+            //    };
+            //    instructions.Add(instruction);
+            //}
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionNew.rpt",
