@@ -23,7 +23,7 @@ namespace eFMS.API.Documentation.DL.IService
         List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount);
         object GetGoodSummaryOfAllHBLByJobId(Guid jobId);
         object ImportCSTransactionDetail(CsTransactionDetailModel model);
-        CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId);
+        //CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId);
         Crystal Preview(CsTransactionDetailModel model);
 
         //CsTransactionDetailModel GetById(CsTransactionDetailCriteria csTransactionDetailCriteria);

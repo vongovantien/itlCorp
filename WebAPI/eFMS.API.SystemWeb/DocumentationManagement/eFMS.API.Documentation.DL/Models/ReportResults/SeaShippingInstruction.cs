@@ -31,7 +31,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Containers { get; set; }
         public string MaskNos { get; set; }
         public string SIDescription { get; set; }
-        public decimal GrossWeight { get; set; }
+        public decimal? GrossWeight { get; set; }
         public decimal? CBM { get; set; }
         public bool SeaLCL { get; set; }
         public bool SeaFCL { get; set; }

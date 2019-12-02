@@ -33,8 +33,6 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
         private readonly ICurrentUser currentUser;
-
-
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
             IContextBase<CsTransaction> csTransaction,
@@ -45,8 +43,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> catUnit,
             IContextBase<CatCommodity> catCommodity,
             IContextBase<CatSaleman> catSaleman,
-            IContextBase<CsShipmentSurcharge> surchareRepo , IContextBase<CsTransactionDetail> csTransactiondetail,
-ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mapper)
+            IContextBase<CsShipmentSurcharge> surchareRepo , 
+            IContextBase<CsTransactionDetail> csTransactiondetail,
+            ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -142,19 +141,17 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                             return checkDuplicateCont;
                         }
                     }
-                    hb.UserModified = ChangeTrackerHelper.currentUser;
-                    hb.DatetimeModified = DateTime.Now;
-                    model.SailingDate = DateTime.Now;
-                    hb = mapper.Map<CsTransactionDetail>(model);
-                    var isUpdateDone = DataContext.Update(hb, x => x.Id == hb.Id);
+                    model.UserModified = currentUser.UserID;
+                    model.DatetimeModified = DateTime.Now;
+                    var isUpdateDone = Update(model, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
                     {
-                        if (model.CsMawbcontainers.Count > 0)
+                        if (model.CsMawbcontainers != null)
                         {
                             var listConts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
                             foreach (var item in listConts)
                             {
-                                var isExist = model.CsMawbcontainers.Where(x => x.Id == item.Id).FirstOrDefault();
+                                var isExist = model.CsMawbcontainers.FirstOrDefault(x => x.Id == item.Id);
                                 if (isExist == null)
                                 {
                                     var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Id == item.Id);
@@ -191,7 +188,7 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                             }
                         }
                     }
-                    trans.Rollback();
+                    trans.Commit();
                     return isUpdateDone;
                 }
                 catch (Exception ex)
@@ -207,13 +204,13 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
         }
         #endregion -- INSERT & UPDATE HOUSEBILLS --
 
-        public CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId)
-        {
-            var listHB = GetByJob(new CsTransactionDetailCriteria { JobId = JobId });
-            var returnHB = listHB.FirstOrDefault(x => x.Id == HbId);
-            return returnHB;
+        //public CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId)
+        //{
+        //    var listHB = GetByJob(new CsTransactionDetailCriteria { JobId = JobId });
+        //    var returnHB = listHB.FirstOrDefault(x => x.Id == HbId);
+        //    return returnHB;
 
-        }
+        //}
 
         public List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria)
         {
@@ -274,7 +271,6 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
         public IQueryable<CsTransactionDetailModel> QueryDetail(CsTransactionDetailCriteria criteria)
         {
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            //var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == criteria.JobId);
             var details = DataContext.Get(x => x.JobId == criteria.JobId);
             var partners = catPartnerRepo.Get();
             var places = catPlaceRepo.Get();
@@ -420,8 +416,9 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                           PODName = pod.NameEn,
                           ManifestRefNo = detail.ManifestRefNo,
                           ServiceType = detail.ServiceType,
-                          ContSealNo = detail.ContSealNo
-                          
+                          ContSealNo = detail.ContSealNo,
+                          SailingDate = detail.SailingDate,
+                          FreightPayment = detail.FreightPayment
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.ToList();
