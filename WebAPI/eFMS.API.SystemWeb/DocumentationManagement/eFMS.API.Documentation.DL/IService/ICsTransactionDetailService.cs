@@ -30,6 +30,7 @@ namespace eFMS.API.Documentation.DL.IService
         CsTransactionDetailModel GetById(Guid Id);
         Crystal PreviewProofOfDelivery(Guid Id);
 
+        Crystal PreviewSeaHBLofLading(Guid hblId, string reportType);
 
 
     }

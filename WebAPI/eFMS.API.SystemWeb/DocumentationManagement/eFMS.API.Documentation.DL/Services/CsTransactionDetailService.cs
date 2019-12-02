@@ -711,28 +711,77 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
         public Crystal PreviewSeaHBLofLading(Guid hblId, string reportType)
         {
             Crystal result = null;
-
-            object parameter = null;
-            if(reportType == "ITL" || reportType == "ITL_FRAME" || reportType == "ITL_SEKO")
-            {
-                parameter = new SeaHBillofLadingReportParams1() {
-                    Packages = "Packages",
-                    GrossWeight = "GrossWeight",
-                    Measurement = "Measurement"
-                };
-            }
-
-            if(reportType == "ITL_KESCO" || reportType == "ITL_FRAME_KESCO")
-            {
-                parameter = new SeaHBillofLadingReportParams2() {
-                    Packages = "Packages",
-                    GrossWeight = "GrossWeight",
-                    Measurement = "Measurement",
-                    DocumentNo = "DocumentNo"
-                };
-            }
-
+            var data = GetById(hblId);
             var housebills = new List<SeaHBillofLadingReport>();
+            if (data != null)
+            {
+                var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
+                var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
+                var dataATTN = catPartnerRepo.Get(x => x.Id == data.AlsoNotifyPartyId).FirstOrDefault();
+                var dataConsignee = catPartnerRepo.Get(x => x.Id == data.ConsigneeId).FirstOrDefault();
+                var dataShipper = catPartnerRepo.Get(x => x.Id == data.ShipperId).FirstOrDefault();
+
+                var housebill = new SeaHBillofLadingReport();
+                housebill.HWBNO = data.Hwbno; //HouseBill No
+                housebill.OSI = "OSI"; //Chưa biết
+                housebill.CheckNullAttach = "CheckNullAttach"; //Chưa biết
+                housebill.ReferrenceNo = data.ReferenceNo; //ReferenceNo
+                housebill.Shipper = dataShipper?.PartnerNameEn; //Shipper name
+                housebill.ConsigneeID = data.ConsigneeId; //NOT USE
+                housebill.Consignee = dataConsignee?.PartnerNameEn;
+                housebill.Notify = data.NotifyParty; //Notify Party Name
+                housebill.PlaceAtReceipt = "PlaceAtReceipt"; //Chưa biết
+                housebill.PlaceDelivery = data.DeliveryPlace;
+                housebill.LocalVessel = data.LocalVessel;
+                housebill.FromSea = "FromSea"; //NOT USE
+                housebill.OceanVessel = data.OceanVessel;
+                housebill.DepartureAirport = dataPOL?.NameEn; //POL
+                housebill.PortofDischarge = dataPOD?.NameEn; //POD
+                housebill.TranShipmentTo = "TranShipmentTo"; //NOT USE
+                housebill.GoodsDelivery = "GoodsDelivery"; //Chưa biết
+                housebill.CleanOnBoard = "CleanOnBoard"; //Chưa biết
+                housebill.MaskNos = "MaskNos"; //Chưa biết
+                housebill.NoPieces = "NoPieces"; //Chưa biết
+                housebill.Qty = "Qty"; //Chưa biết
+                housebill.Description = "Description";//Chưa biết
+                housebill.GrossWeight = data.GW != null ? data.GW.Value : 0;
+                housebill.GrwDecimal = 2;
+                housebill.Unit = "Kgs"; //Đang gán cứng
+                housebill.CBM = data.Cbm != null ? data.Cbm.Value : 0;
+                housebill.CBMDecimal = 2;
+                housebill.SpecialNote = "SpecialNote"; //Chưa biết
+                housebill.TotalPackages = "TotalPackages"; //NOT USE
+                housebill.OriginCode = "OriginCode"; //NOT USE
+                housebill.ICASNC = "ICASNC"; //NOT USE
+                housebill.Movement = "Movement"; //Chưa biết
+                housebill.AccountingInfo = "AccountingInfo"; //NOT USE
+                housebill.SayWord = "SayWord"; //Chưa biết
+                housebill.strOriginLandPP = "strOriginLandPP"; //NOT USE
+                housebill.strOriginLandCC = "strOriginLandCC"; //NOT USE
+                housebill.strOriginTHCPP = "strOriginTHCPP"; //NOT USE
+                housebill.strOriginTHCCC = "strOriginTHCCC"; //NOT USE
+                housebill.strSeafreightPP = "strSeafreightPP"; //NOT USE
+                housebill.strSeafreightCC = "strSeafreightCC"; //NOT USE
+                housebill.strDesTHCPP = "strDesTHCPP"; //NOT USE
+                housebill.strDesTHCCC = "strDesTHCCC"; //NOT USE
+                housebill.strDesLandPP = "strDesLandPP"; //NOT USE
+                housebill.strDesLandCC = "strDesLandCC"; //NOT USE
+                housebill.FreightPayAt = "FreightPayAt"; //Chưa biết
+                housebill.ExecutedAt = "ExecutedAt"; //Chưa biết
+                housebill.ExecutedOn = "ExecutedOn"; //Chưa biết
+                housebill.NoofOriginBL = "NoofOriginBL"; //Chưa biết
+                housebill.ForCarrier = "ForCarrier"; //Chưa biết
+                housebill.SeaLCL = false; //NOT USE
+                housebill.SeaFCL = false; //NOT USE
+                housebill.ExportReferences = "ExportReferences"; //NOT USE
+                housebill.AlsoNotify = dataATTN?.PartnerNameEn; //NOT USE
+                housebill.Signature = "Signature"; //Chưa biết
+                housebill.SailingDate = DateTime.Now; //NOT USE
+                housebill.ShipPicture = null; //Chưa biết
+                housebill.PicMarks = "PicMarks"; //Chưa biết
+
+                housebills.Add(housebill);
+            }
 
             string _reportName = string.Empty;
             switch (reportType)
@@ -764,7 +813,28 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
             };
             result.AddDataSource(housebills);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            result.SetParameter(parameter);
+            if (reportType == "ITL" || reportType == "ITL_FRAME" || reportType == "ITL_SEKO")
+            {
+                var parameter = new SeaHBillofLadingReportParams1()
+                {
+                    Packages = "Packages",
+                    GrossWeight = "GrossWeight",
+                    Measurement = "Measurement"
+                };
+                result.SetParameter(parameter);
+            }
+
+            if (reportType == "ITL_KESCO" || reportType == "ITL_FRAME_KESCO")
+            {
+                var parameter = new SeaHBillofLadingReportParams2()
+                {
+                    Packages = "Packages",
+                    GrossWeight = "GrossWeight",
+                    Measurement = "Measurement",
+                    DocumentNo = "DocumentNo"
+                };
+                result.SetParameter(parameter);
+            }
             return result;
         }
 

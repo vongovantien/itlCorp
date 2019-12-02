@@ -233,6 +233,17 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-
+        /// <summary>
+        /// preview sea house bill of lading
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <param name="reportType"></param>
+        /// <returns></returns>
+        [HttpGet("PreviewSeaHBLofLading")]
+        public IActionResult PreviewSeaHBLofLading(Guid hblId, string reportType)
+        {
+            var result = csTransactionDetailService.PreviewSeaHBLofLading(hblId, reportType);
+            return Ok(result);
+        }
     }
 }
