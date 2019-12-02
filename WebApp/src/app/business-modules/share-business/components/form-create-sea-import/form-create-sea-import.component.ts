@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
@@ -11,27 +11,31 @@ import { User } from 'src/app/shared/models';
 import { BaseService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { Customer } from 'src/app/shared/models/catalogue/customer.model';
+import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 
+
+import * as fromShare from '../../store';
+import { Observable } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 
-import * as fromShare from './../../../../share-business/store';
-
 @Component({
-    selector: 'form-create-sea-fcl-import',
-    templateUrl: './form-create-sea-fcl-import.component.html',
+    selector: 'form-create-sea-import',
+    templateUrl: './form-create-sea-import.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class SeaFClImportFormCreateComponent extends AppForm {
+export class ShareBussinessFormCreateSeaImportComponent extends AppForm implements OnInit {
 
-    ladingTypes: CommonInterface.IValueDisplay[];
-    shipmentTypes: CommonInterface.IValueDisplay[] = [];
-    serviceTypes: CommonInterface.IValueDisplay[];
+    ladingTypes: CommonInterface.INg2Select[];
+    shipmentTypes: CommonInterface.INg2Select[];
+    serviceTypes: CommonInterface.INg2Select[];
 
     configComboGridPartner: CommonInterface.IComboGirdConfig;
     configComboGridPort: CommonInterface.IComboGirdConfig;
 
-    carries: any[] = [];
-    agents: any[] = [];
+    carries: Observable<Customer[]>;
+    agents: Observable<Customer[]>;
+    ports: Observable<PortIndex[]>;
 
     formCreate: FormGroup;
     jobId: AbstractControl;
@@ -77,6 +81,11 @@ export class SeaFClImportFormCreateComponent extends AppForm {
     }
 
     ngOnInit(): void {
+
+        this.carries = this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER);
+        this.agents = this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT);
+        this.ports = this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
+
         this.configComboGridPartner = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'shortName', label: 'Name Abbr' },
@@ -97,10 +106,6 @@ export class SeaFClImportFormCreateComponent extends AppForm {
 
         this.initForm();
         this.getUserLogged();
-
-        this.getCarrier();
-        this.getAgent();
-        this.getPort();
         this.getCommonData();
 
         // * Subscribe state to update form.
@@ -124,9 +129,9 @@ export class SeaFClImportFormCreateComponent extends AppForm {
                             eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null,
                             serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
 
-                            mbltype: (this.ladingTypes || []).find(type => type.value === this.fclImportDetail.mbltype).value,
-                            shipmentType: (this.shipmentTypes || []).find(type => type.value === this.fclImportDetail.shipmentType).value,
-                            typeOfService: (this.serviceTypes || []).find(type => type.value === this.fclImportDetail.typeOfService).value,
+                            mbltype: [(this.ladingTypes || []).find(type => type.id === this.fclImportDetail.mbltype)],
+                            shipmentType: [(this.shipmentTypes || []).find(type => type.id === this.fclImportDetail.shipmentType)],
+                            typeOfService: [(this.serviceTypes || []).find(type => type.id === this.fclImportDetail.typeOfService)],
                             personIncharge: this.fclImportDetail.personIncharge,
 
                             pod: this.fclImportDetail.pod,
@@ -232,85 +237,26 @@ export class SeaFClImportFormCreateComponent extends AppForm {
         this.personIncharge.disable();
     }
 
-
-    async getCarrier() {
-        this._spinner.show();
-        try {
-            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER)) {
-                this.carries = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER);
-
-            } else {
-                const carries: any = await this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER).toPromise();
-                this.carries = carries;
-                this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, carries);
-            }
-        } catch (error) {
-
-        } finally {
-            this._spinner.hide();
-        }
-    }
-
-    async getAgent() {
-        this._spinner.show();
-
-        try {
-            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT)) {
-                this.agents = this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT);
-            } else {
-                const agents: any = await this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT).toPromise();
-                this.agents = agents;
-                this._dataService.setDataService(SystemConstants.CSTORAGE.AGENT, agents);
-            }
-        } catch (error) {
-
-        }
-        finally {
-            this._spinner.hide();
-        }
-    }
-
-    async getPort() {
-        this._spinner.show();
-
-        try {
-            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
-                this.configComboGridPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
-            } else {
-                const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }).toPromise();
-                this.configComboGridPort.dataSource = ports || [];
-                this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
-            }
-        } catch (error) {
-
-        }
-        finally {
-            this._spinner.hide();
-        }
-    }
-
     async getCommonData() {
         this._spinner.show();
-
         try {
             if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
                 const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-                this.serviceTypes = commonData.serviceTypes;
-                this.ladingTypes = commonData.billOfLadings;
-                this.shipmentTypes = commonData.shipmentTypes;
-                this.shipmentType.setValue(this.shipmentTypes[0].value);
+                this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
+                this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
+                this.shipmentTypes = this.utility.prepareNg2SelectData(commonData.shipmentTypes, 'value', 'displayName');
 
+                this.shipmentType.setValue([this.shipmentTypes[0]]);
             } else {
                 const commonData: any = await this._documentRepo.getShipmentDataCommon().toPromise();
-                this.serviceTypes = commonData.serviceTypes;
-                this.ladingTypes = commonData.billOfLadings;
-                this.shipmentTypes = commonData.shipmentTypes;
+                this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
+                this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
+                this.shipmentTypes = this.utility.prepareNg2SelectData(commonData.shipmentTypes, 'value', 'displayName');
 
-                this.shipmentType.setValue(this.shipmentTypes[0].value);
+                this.shipmentType.setValue([this.shipmentTypes[0]]);
 
                 this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
             }
-
         } catch (error) {
         }
         finally {

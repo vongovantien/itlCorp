@@ -15,7 +15,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import * as fromStore from '../../store';
-import { ShareContainerImportComponent } from '..';
+import { ShareContainerImportComponent } from '../container-import/container-import.component';
 
 
 @Component({

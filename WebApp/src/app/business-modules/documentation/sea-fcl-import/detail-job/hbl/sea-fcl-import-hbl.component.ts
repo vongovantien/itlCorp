@@ -59,8 +59,8 @@ export class SeaFCLImportHBLComponent extends AppList {
         this._activedRoute.params
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
-                if (param.id) {
-                    this.jobId = param.id;
+                if (param.jobId) {
+                    this.jobId = param.jobId;
                     this.getHourseBill(this.jobId);
                 }
             });

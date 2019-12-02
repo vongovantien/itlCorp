@@ -65,9 +65,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
     ngAfterViewInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.hblId) {
+            if (param.hblId && param.jobId) {
                 this.hblId = param.hblId;
-                this.jobId = param.id;
+                this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
 
                 this.getDetailHbl();
