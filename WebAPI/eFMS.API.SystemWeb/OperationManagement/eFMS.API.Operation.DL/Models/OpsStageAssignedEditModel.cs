@@ -6,7 +6,7 @@ using System.Text;
 
 namespace eFMS.API.Operation.DL.Models
 {
-    public class OpsStageAssignedEditModel//: OpsStageAssigned
+    public class OpsStageAssignedEditModel //: OpsStageAssigned
     {
         public Guid Id { get; set; }
         public Guid JobId { get; set; }

@@ -17,6 +17,9 @@ import { ShareBussinessFormCreateSeaImportComponent, ShareBussinessBuyingChargeC
 
 
 import { reducers, effects } from './store';
+import { ShareBusinessAssignStagePopupComponent } from './components/stage-management/assign-stage/assign-stage.popup';
+import { ShareBusinessAsignmentComponent } from './components/asignment/asignment.component';
+import { ShareBusinessStageManagementDetailComponent } from './components/stage-management/detail/detail-stage-popup.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -34,7 +37,10 @@ const COMPONENTS = [
     ShareBussinessCdNoteAddRemainingChargePopupComponent,
     ShareBussinessCdNoteDetailPopupComponent,
     ShareBussinessFormCreateSeaImportComponent,
-    ShareBussinessShipmentGoodSummaryLCLComponent
+    ShareBussinessShipmentGoodSummaryLCLComponent,
+    ShareBusinessAssignStagePopupComponent,
+    ShareBusinessAsignmentComponent,
+    ShareBusinessStageManagementDetailComponent
 ];
 
 
@@ -58,6 +64,7 @@ const customCurrencyMaskConfig = {
         CommonModule,
         CommonComponentModule,
         FormsModule,
+        SelectModule,
         ReactiveFormsModule,
         ModalModule.forRoot(),
         NgxDaterangepickerMd.forRoot(),
@@ -70,6 +77,7 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         StoreModule.forFeature('share-bussiness', reducers),
         EffectsModule.forFeature(effects),
+
 
     ],
     exports: [
