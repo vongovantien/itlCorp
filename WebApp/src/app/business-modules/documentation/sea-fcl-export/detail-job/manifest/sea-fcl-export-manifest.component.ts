@@ -138,7 +138,10 @@ export class SeaFclExportManifestComponent extends AppList {
                     this.manifest = res;
                     setTimeout(() => {
                         this.formManifest.supplier.setValue(res.supplier);
-                        this.formManifest.referenceNo.setValue(res.refNo);
+
+                        if (res.refNo != null) {
+                            this.formManifest.referenceNo.setValue(res.refNo);
+                        }
                         this.formManifest.attention.setValue(res.attention);
                         this.formManifest.marksOfNationality.setValue(res.masksOfRegistration);
                         this.formManifest.vesselNo.setValue(res.voyNo);
@@ -161,7 +164,7 @@ export class SeaFclExportManifestComponent extends AppList {
 
     addOrUpdateManifest() {
         this.formManifest.isSubmitted = true;
-        if (this.formManifest.formGroup.valid) {
+        if (this.formManifest.formGroup.valid && this.formManifest.selectedPortOfDischarge.value && this.formManifest.selectedPortOfLoading.value) {
 
             this._progressRef.start();
             const body: any = {
@@ -286,7 +289,7 @@ export class SeaFclExportManifestComponent extends AppList {
             volume: this.formManifest.volume.value,
             weight: this.formManifest.weight.value,
             manifestIssuer: this.formManifest.agent.value,
-            csTransactionDetails: this.housebills.filter(x => x.isRemoved === true)
+            csTransactionDetails: this.housebills.filter(x => x.isRemoved === false)
         };
         this._documentationRepo.previewFCLImportManifest(body)
             .pipe(

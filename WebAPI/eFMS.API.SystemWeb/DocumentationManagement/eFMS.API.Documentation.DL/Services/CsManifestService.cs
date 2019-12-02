@@ -193,8 +193,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 foreach(var item in model.CsTransactionDetails)
                 {
-                    if(item.ManifestRefNo != null)
-                    {
+              
                         var houseContainers = containerService.Query(new Models.Criteria.CsMawbcontainerCriteria { Hblid = item.Id });
                         if (houseContainers.Count() > 0)
                         {
@@ -238,13 +237,13 @@ namespace eFMS.API.Documentation.DL.Services
                             ShippingMarkImport = item.ShippingMark,
                             Description = item.DesOfGoods,
                             NoPieces = noPieces,
-                            GrossWeight = item.GrossWeight,
+                            GrossWeight = item.GrossWeight == null ? 0 : item.GrossWeight ,
                             CBM = item.CBM,
                             Liner = item.ColoaderId,
                             OverseasAgent = transaction.AgentName
                         };
                         manifests.Add(manifest);
-                    }
+                    
                    
                 }
             }

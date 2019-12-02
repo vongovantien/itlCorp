@@ -106,7 +106,7 @@ export class ShareBusinessFormManifestComponent extends AppList {
                 this.selectedPortOfLoading = { field: 'nameVn', value: data.id, data: data };
                 break;
             case 'PortOfDischarge':
-                this.selectedPortOfLoading = { field: 'nameVn', value: data.id, data: data };
+                this.selectedPortOfDischarge = { field: 'nameVn', value: data.id, data: data };
                 break;
         }
     }

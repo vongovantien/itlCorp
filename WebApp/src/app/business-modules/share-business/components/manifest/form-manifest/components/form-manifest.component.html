@@ -1,4 +1,4 @@
-<div class="m-content form-manifest">
+<div class="m-content form-manifest m-form--state">
     <form [formGroup]="formGroup">
         <div class="m-portlet">
             <div class="m-portlet__body">
@@ -108,16 +108,17 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted  && (!selectedPortOfDischarge.value) }">
+                            [ngClass]="{'m-form__group has-danger': isSubmitted  && !selectedPortOfDischarge.value }">
                             <label class="form-control-label">
                                 Port of Discharge <span class="m--font-danger">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfDischarge"
                                 [selectedDisplayFields]="configPort.selectedDisplayFields"
                                 [dataSources]="configPortOfDischarge.dataSource"
-                                [displayFields]="configPort.displayFields">
+                                [displayFields]="configPort.displayFields"
+                                (itemSelected)="onSelectDataFormInfo($event, 'PortOfDischarge')">
                             </app-combo-grid-virtual-scroll>
-                            <div class="form-control-feedback" *ngIf="isSubmitted &&  !selectedPortOfDischarge.value  ">
+                            <div class="form-control-feedback" *ngIf="isSubmitted &&  !selectedPortOfDischarge.value">
                                 Port of Discharge is required!
                             </div>
                         </div>
