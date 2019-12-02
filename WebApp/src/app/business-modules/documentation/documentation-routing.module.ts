@@ -5,12 +5,7 @@ import { AirImportComponent } from './air-import/air-import.component';
 import { InlandTruckingComponent } from './inland-trucking/inland-trucking.component';
 import { SeaConsolExportComponent } from './sea-consol-export/sea-consol-export.component';
 import { SeaConsolImportComponent } from './sea-consol-import/sea-consol-import.component';
-import { SeaFCLExportComponent } from './sea-fcl-export/sea-fcl-export.component';
 import { SeaLCLExportComponent } from './sea-lcl-export/sea-lcl-export.component';
-import { SeaLCLImportComponent } from './sea-lcl-import/sea-lcl-import.component';
-import { SeaFclExportCreateComponent } from './sea-fcl-export-create/sea-fcl-export-create.component';
-import { ManifestComponent } from './sea-fcl-export-create/manifest/manifest.component';
-import { ShippingInstructionComponent } from './sea-fcl-export-create/shipping-instruction/shipping-instruction.component';
 import { SeaLclExportCreateComponent } from './sea-lcl-export-create/sea-lcl-export-create.component';
 import { SeaLclExportHousebillAddnewComponent } from './sea-lcl-export-create/sea-lcl-export-housebill-addnew/sea-lcl-export-housebill-addnew.component';
 import { SeaLclExportManifestComponent } from './sea-lcl-export-create/sea-lcl-export-manifest/sea-lcl-export-manifest.component';
@@ -64,22 +59,6 @@ const routes: Routes = [
         }
     },
 
-    {
-        path: 'manifest',
-        component: ManifestComponent,
-        data: {
-            name: "Manifest",
-            level: 4
-        }
-    },
-    {
-        path: 'shipping-instruction',
-        component: ShippingInstructionComponent,
-        data: {
-            name: "Shipping Instruction",
-            level: 4
-        }
-    },
     {
         path: 'sea-fcl-import', loadChildren: () => import('./sea-fcl-import/sea-fcl-import.module').then(m => m.SeaFCLImportModule),
     },
