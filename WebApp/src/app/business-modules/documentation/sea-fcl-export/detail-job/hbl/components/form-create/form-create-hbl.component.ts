@@ -248,14 +248,14 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
         this.onBoardStatus = this.formCreate.controls["onBoardStatus"];
         this.inWord = this.formCreate.controls["inWord"];
 
-        this.formCreate.valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev === curr),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe((value) => {
-                console.log(this.formCreate.status);
-            });
+        // this.formCreate.valueChanges
+        //     .pipe(
+        //         distinctUntilChanged((prev, curr) => prev === curr),
+        //         takeUntil(this.ngUnsubscribe)
+        //     )
+        //     .subscribe((value) => {
+        //         console.log(this.formCreate.status);
+        //     });
     }
 
     updateFormValue(data: CsTransactionDetail) {
