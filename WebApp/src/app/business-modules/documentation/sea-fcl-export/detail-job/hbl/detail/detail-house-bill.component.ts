@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
@@ -28,7 +28,9 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         protected _documentationRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
-        protected _router: Router
+        protected _router: Router,
+        protected _cd: ChangeDetectorRef
+
     ) {
         super(
             _progressService,
@@ -37,7 +39,8 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
             _documentationRepo,
             _toastService,
             _actionStoreSubject,
-            _router
+            _router,
+            _cd
         );
     }
 

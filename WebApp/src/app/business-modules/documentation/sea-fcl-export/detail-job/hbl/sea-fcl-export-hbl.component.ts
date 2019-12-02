@@ -14,6 +14,7 @@ import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../share-business/store';
 import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/share-business/components/selling-charge/selling-charge.component';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteHBLPopup: ConfirmPopupComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(ShareBussinessSellingChargeComponent, { static: false }) sellingChargeComponent: ShareBussinessSellingChargeComponent;
 
     jobId: string;
     headers: CommonInterface.IHeaderTable[];
@@ -186,6 +188,8 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
                     this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
                     break;
                 case 'SELL':
+                    this.sellingChargeComponent.isShowSyncFreightCharge = false;
+
                     this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
                     break;
                 case 'OBH':
