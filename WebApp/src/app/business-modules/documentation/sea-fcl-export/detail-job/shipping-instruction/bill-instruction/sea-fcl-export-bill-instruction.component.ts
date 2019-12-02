@@ -2,13 +2,12 @@ import { Component } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { Observable } from 'rxjs';
-import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
-import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { catchError, finalize } from 'rxjs/operators';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { formatDate } from '@angular/common';
+import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
 
 @Component({
     selector: 'app-sea-fcl-export-bill-instruction',
@@ -22,6 +21,7 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
     shippers: any[] = [];
     ports: any[] = [];
     termTypes: CommonInterface.INg2Select[];
+    shippingInstruction: any;
 
     siRefNo: AbstractControl;
     issueDate: AbstractControl;
@@ -65,11 +65,43 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
         this.getConsignees();
         this.getShippers();
         this.getPorts();
-        this.getTerms();
+    }
+    setformValue(res) {
+        if (!!res) {
+            this.formSI.setValue({
+                siRefNo: res.refNo, // * disabled
+                bookingNo: res.bookingNo,
+                issueDate: !!res.invoiceDate ? { startDate: new Date(res.invoiceDate), endDate: new Date(res.invoiceDate) } : null,
+                issuedUser: res.issuedUser,
+                supplier: res.supplier,
+                invoiceNoticeRecevier: res.invoiceNoticeRecevier,
+                shipper: res.shipper,
+                consignee: res.consigneeId,
+                consigneeDescription: res.consigneeDescription,
+                cargoNoticeRecevier: res.cargoNoticeRecevier,
+                realShipper: res.actualShipperId,
+                actualShipperDescription: res.actualShipperDescription,
+                realconsignee: res.actualConsigneeId,
+                actualConsigneeDescription: res.actualConsigneeDescription,
+                term: [this.termTypes.find(type => type.id === res.paymenType)],
+                remark: res.remark,
+                pol: res.pol,
+                pod: res.pod,
+                poDelivery: res.poDelivery,
+                voyNo: res.voyNo,
+                loadingDate: !!res.loadingDate ? { startDate: new Date(res.loadingDate), endDate: new Date(res.loadingDate) } : null,
+                contSealNo: res.containerSealNo,
+                desOfGoods: res.goodsDescription,
+                sumContainers: res.containerNote,
+                packages: res.packagesNote,
+                gw: res.grossWeight,
+                cbm: res.volume
+            });
+        }
     }
     initForm() {
         this.formSI = this._fb.group({
-            siRefNo: [{ value: null, disabled: true }, Validators.required], // * disabled
+            siRefNo: [{ value: null, disabled: true }], // * disabled
             bookingNo: [],
             issueDate: [null, Validators.required],
             issuedUser: [null, Validators.required],
@@ -182,21 +214,7 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
                 },
             );
     }
-    async getTerms() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
-            const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-            this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
 
-        } else {
-            const commonData: { [key: string]: CommonInterface.IValueDisplay[] } = await this._documentRepo.getShipmentDataCommon().toPromise();
-            this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
-            this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-        }
-    }
-
-    getConsigneeDescription(event) { }
-    getRealConsigneeDescription(event) { }
-    getRealShipperDescription(event) { }
     onSelectDataForm(data, type) {
         switch (type) {
             case 'issuedUser':
@@ -207,12 +225,24 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
                 break;
             case 'consignee':
                 this.consignee.setValue(data.id);
+                const indexConsignee = this.consignees.findIndex(x => x.id === data.id);
+                if (indexConsignee > -1) {
+                    this.getConsigneeDescription(this.consignees[indexConsignee]);
+                }
                 break;
             case 'realshipper':
                 this.realShipper.setValue(data.id);
+                const indexShipper = this.shippers.findIndex(x => x.id === data.id);
+                if (indexShipper > -1) {
+                    this.getActualShipperDescription(this.shippers[indexShipper]);
+                }
                 break;
             case 'realconsignee':
                 this.realconsignee.setValue(data.id);
+                const indexRealConsignee = this.consignees.findIndex(x => x.id === data.id);
+                if (indexRealConsignee > -1) {
+                    this.getActualConsigneeDescription(this.consignees[indexRealConsignee]);
+                }
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
@@ -223,5 +253,54 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
             default:
                 break;
         }
+    }
+    onSubmitForm() {
+        const form: any = this.formSI.getRawValue();
+        const formData = {
+            refNo: form.siRefNo,
+            bookingNo: form.bookingNo,
+            invoiceDate: !!form.issueDate && !!form.issueDate.startDate ? formatDate(form.issueDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            issuedUser: form.issuedUser,
+            supplier: form.supplier,
+            invoiceNoticeRecevier: form.invoiceNoticeRecevier,
+            shipper: form.shipper,
+            consigneeId: form.consignee,
+            consigneeDescription: form.consigneeDescription,
+            cargoNoticeRecevier: form.consigneeDescription,
+            actualShipperId: form.realShipper,
+            actualShipperDescription: form.actualShipperDescription,
+            actualConsigneeId: form.realconsignee,
+            actualConsigneeDescription: form.actualConsigneeDescription,
+            paymenType: !!form.term ? form.term[0].id : null,
+            remark: form.remark,
+            pol: form.pol,
+            pod: form.pod,
+            poDelivery: form.poDelivery,
+            voyNo: form.voyNo,
+            loadingDate: !!form.loadingDate && !!form.loadingDate.startDate ? formatDate(form.loadingDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            containerSealNo: form.contSealNo,
+            goodsDescription: form.desOfGoods,
+            containerNote: form.sumContainers,
+            packagesNote: form.packages,
+            grossWeight: form.gw,
+            volume: form.cbm
+        };
+        const shippingModel: CsShippingInstruction = new CsShippingInstruction(formData);
+        return shippingModel;
+    }
+    getActualConsigneeDescription(consignee: any) {
+        const description = consignee.shortName +
+            (consignee.addressEn == null ? '\n' : ("\nAddress: " + consignee.addressEn));
+        this.actualConsigneeDescription.setValue(description);
+    }
+    getActualShipperDescription(shipper: any) {
+        const description = shipper.shortName +
+            (shipper.addressEn == null ? '\n' : ("\nAddress: " + shipper.addressEn));
+        this.actualShipperDescription.setValue(description);
+    }
+    getConsigneeDescription(consignee: any) {
+        const description = consignee.shortName +
+            (consignee.addressEn == null ? '\n' : ("\nAddress: " + consignee.addressEn));
+        this.consigneeDescription.setValue(description);
     }
 }

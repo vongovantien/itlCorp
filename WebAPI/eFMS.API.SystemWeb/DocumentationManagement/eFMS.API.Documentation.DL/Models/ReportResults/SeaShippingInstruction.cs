@@ -32,7 +32,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string MaskNos { get; set; }
         public string SIDescription { get; set; }
         public decimal GrossWeight { get; set; }
-        public decimal CBM { get; set; }
+        public decimal? CBM { get; set; }
         public bool SeaLCL { get; set; }
         public bool SeaFCL { get; set; }
         public string NotitfyParty { get; set; }

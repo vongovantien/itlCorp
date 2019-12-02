@@ -17,8 +17,18 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class CsShippingInstructionService : RepositoryBase<CsShippingInstruction, CsShippingInstructionModel>, ICsShippingInstructionService
     {
-        public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository, IMapper mapper) : base(repository, mapper)
+        private readonly IContextBase<CatPartner> partnerRepository;
+        private readonly IContextBase<CatPlace> placeRepository;
+        private readonly IContextBase<SysUser> userRepository;
+        public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository, 
+            IMapper mapper,
+            IContextBase<CatPartner> partnerRepo,
+            IContextBase<CatPlace> placeRepo,
+            IContextBase<SysUser> userRepo) : base(repository, mapper)
         {
+            partnerRepository = partnerRepo;
+            placeRepository = placeRepo;
+            userRepository = userRepo;
         }
 
         public HandleState AddOrUpdate(CsShippingInstructionModel model)
@@ -38,117 +48,20 @@ namespace eFMS.API.Documentation.DL.Services
 
         public CsShippingInstructionModel GetById(Guid jobId)
         {
-            var query = (from shipping in ((eFMSDataContext)DataContext.DC).CsShippingInstruction
-                         where shipping.JobId == jobId
-                         join user in ((eFMSDataContext)DataContext.DC).SysUser on shipping.IssuedUser equals user.Id
-                         join supplier in ((eFMSDataContext)DataContext.DC).CatPartner on shipping.Supplier equals supplier.Id
-                         join consignee in ((eFMSDataContext)DataContext.DC).CatPartner on shipping.ConsigneeId equals consignee.Id
-                         join pod in ((eFMSDataContext)DataContext.DC).CatPlace on shipping.Pod equals pod.Id
-                         join pol in ((eFMSDataContext)DataContext.DC).CatPlace on shipping.Pol equals pol.Id
-                         join shipper in ((eFMSDataContext)DataContext.DC).CatPartner on shipping.ActualShipperId equals shipper.Id into grpShipper
-                         from actualShipper in grpShipper.DefaultIfEmpty()
-                         join realConsignee in ((eFMSDataContext)DataContext.DC).CatPartner on shipping.ActualConsigneeId equals realConsignee.Id into grpConsignee
-                         from actualConsignee in grpConsignee.DefaultIfEmpty()
-                         select new
-                         {
-                             shipping,
-                             IssuedUserName = user.Username,
-                             SupplierName = supplier.PartnerNameEn,
-                             ConsigneeName = consignee.PartnerNameEn,
-                             PolName = pol.NameEn,
-                             PodName = pod.NameEn,
-                             ActualConsigneeName = actualConsignee.PartnerNameEn,
-                             ActualShipperName = actualShipper.PartnerNameEn
-                         }).FirstOrDefault();
-            if (query == null) return null;
-            var result = mapper.Map<CsShippingInstructionModel>(query.shipping);
-            result.IssuedUserName = query.IssuedUserName;
-            result.SupplierName = query.SupplierName;
-            result.ConsigneeName = query.ConsigneeName;
-            result.PolName = query.PolName;
-            result.PodName = query.PodName;
-            result.ActualShipperName = query.ActualShipperName;
-            result.ActualConsigneeName = query.ActualConsigneeName;
+            var result = Get(x => x.JobId == jobId).FirstOrDefault();
+            if (result == null) return null;
+            var partners = partnerRepository.Get();
+            var places = placeRepository.Get();
+            var users = userRepository.Get();
+            result.IssuedUserName = users?.FirstOrDefault(x => x.Id == result.IssuedUser)?.Username;
+            result.SupplierName = partners?.FirstOrDefault(x => x.Id == result.Supplier)?.PartnerNameEn;
+            result.ConsigneeName = partners?.FirstOrDefault(x => x.Id == result.ConsigneeId)?.PartnerNameEn;
+            result.PolName = places?.FirstOrDefault(x => x.Id == result.Pol)?.NameEn;
+            result.PodName = places?.FirstOrDefault(x => x.Id == result.Pod)?.NameEn;
+            result.ActualShipperName = partners?.FirstOrDefault(x => x.Id == result.ActualShipperId)?.PartnerNameEn;
+            result.ActualConsigneeName = partners?.FirstOrDefault(x => x.Id == result.ActualConsigneeId)?.PartnerNameEn;
             return result;
         }
-
-        //public Crystal PreviewFCLShippingInstruction(CsShippingInstructionReportModel model)
-        //{
-        //    Crystal result = new Crystal();
-        //    var contHouseBills = new List<ShippingInstructionContainer>();
-        //    List<ContainerObject> listContainerTypes = new List<ContainerObject>();
-        //    List<ContainerObject> listPackageTypes = new List<ContainerObject>();
-        //    if (model.CsTransactionDetails != null)
-        //    {
-        //        decimal? sumGW = 0;
-        //        decimal? sumCBM = 0;
-        //        foreach (var transactionDetail in model.CsTransactionDetails)
-        //        {
-        //            var item = new ShippingInstructionContainer();
-        //            if (transactionDetail.CsMawbcontainers != null)
-        //            {
-        //                item.ContainerSealNo = string.Empty;
-        //                item.PackagesNote = string.Empty;
-        //                foreach (var container in transactionDetail.CsMawbcontainers)
-        //                {
-        //                    listContainerTypes.Add(new ContainerObject { Quantity = (int)container.Quantity, Name = container.ContainerTypeName });
-        //                    item.ContainerSealNo += container.Quantity + "X" + container.ContainerTypeName + " ";
-        //                    if (!string.IsNullOrEmpty(container.ContainerNo) && !string.IsNullOrEmpty(container.SealNo))
-        //                    {
-        //                        item.ContainerSealNo += container.ContainerNo + "/" + item.ContainerSealNo + ", ";
-        //                    }
-        //                    if (container.PackageQuantity != null && container.PackageTypeId != null)
-        //                    {
-        //                        item.PackagesNote += container.PackageQuantity + " " + container.PackageTypeName;
-        //                        listPackageTypes.Add(new ContainerObject { Quantity = (int)container.PackageQuantity, Name = container.PackageTypeName });
-        //                    }
-        //                    item.DesOfGoods = string.Join(",", transactionDetail.CsMawbcontainers.Select(x => x.Description));
-        //                    item.GW = transactionDetail.CsMawbcontainers.Sum(x => x.Gw);
-        //                    item.CBM = transactionDetail.CsMawbcontainers.Sum(x => x.Cbm);
-        //                    sumCBM += item.CBM;
-        //                    sumGW += item.GW;
-        //                }
-        //            }
-        //            contHouseBills.Add(item);
-        //        }
-        //        if(contHouseBills.Count > 0)
-        //        {
-        //            contHouseBills.ForEach(x => {
-        //                x.SumGrossWeight = sumGW;
-        //                x.SumVolume = sumCBM;
-        //            });
-        //        }
-        //    }
-        //    var s = listContainerTypes.GroupBy(x => new { x.Quantity, x.Name });
-        //    var t = listPackageTypes.GroupBy(x => new { x.Quantity, x.Name });
-        //    var shippingIns = new List<ShippingInstructionReportResult>();
-        //    var si = new ShippingInstructionReportResult
-        //    {
-        //        IssuedUserName = model.IssuedUserName,
-        //        IssuedUserTel = string.Empty,
-        //        SupplierName = model.SupplierName,
-        //        InvoiceNoticeRecevier = model.InvoiceNoticeRecevier,
-        //        BookingNo = model.BookingNo,
-        //        InvoiceDate = model.InvoiceDate?.ToString("dd MMMM, yyyy"),
-        //        LoadingDate = model.LoadingDate?.ToString("dd MMMM, yyyy"),
-        //        Shipper = model.Shipper,
-        //        ConsigneeDescription = model.ConsigneeDescription,
-        //        CargoNoticeRecevier = model.CargoNoticeRecevier,
-        //        PodName = model.PodName,
-        //        PolName = model.PolName,
-        //        PoDelivery = model.PoDelivery,
-        //        VesselNo = model.VoyNo,
-        //        Remark = model.Remark,
-        //        PaymenType = model.PaymenType
-        //    };
-        //    shippingIns.Add(si);
-        //    result.ReportName = "rptShippingInstruction.rpt";
-        //    result.AddDataSource(shippingIns);
-        //    result.FormatType = ExportFormatType.PortableDocFormat;
-        //    result.AddSubReport("ShippingInstructionContainerList", contHouseBills);
-        //    return result;
-        //}
-
         public Crystal PreviewFCLShippingInstruction(CsShippingInstructionReportModel model)
         {
             Crystal result = new Crystal();
@@ -164,38 +77,39 @@ namespace eFMS.API.Documentation.DL.Services
                 Website = string.Empty,
                 DecimalNo = 2
             };
-            if (model.CsTransactionDetails != null)
+            if (model.CsTransactionDetails == null)
             {
-                foreach(var item in model.CsTransactionDetails)
+                return result;
+            }
+            foreach (var item in model.CsTransactionDetails)
+            {
+                var instruction = new SeaShippingInstruction
                 {
-                    var instruction = new SeaShippingInstruction
-                    {
-                        Attn = item.NotifyParty,
-                        ToPartner = model.SupplierName,
-                        Re = model.BookingNo,
-                        DatePackage = model.InvoiceDate == null? model.InvoiceDate: null,
-                        ShipperDf = model.ActualShipperDescription,
-                        GoodsDelivery = model.ConsigneeDescription,
-                        NotitfyParty = item.NotifyParty,
-                        PortofLoading = model.PolName,
-                        PortofDischarge = model.PodName,
-                        PlaceDelivery = model.PoDelivery,
-                        Vessel = model.VoyNo,
-                        Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
-                        ShippingMarks = item.ShippingMark,
-                        Containers = item.ContainerNames,
-                        ContSealNo = item.OceanVoyNo,
-                        NoofPeace = item.PackageContainer,
-                        SIDescription = model.GoodsDescription,
-                        GrossWeight = (decimal)model?.GrossWeight,
-                        CBM = 200,
-                        Qty = "200",
-                        RateRequest = model.Remark,
-                        Payment = model.PaymenType,
-                        ShippingMarkImport = string.Empty
-                    };
-                    instructions.Add(instruction);
-                }
+                    Attn = item.NotifyParty,
+                    ToPartner = model.SupplierName,
+                    Re = model.BookingNo,
+                    DatePackage = model.InvoiceDate == null ? model.InvoiceDate : null,
+                    ShipperDf = model.ActualShipperDescription,
+                    GoodsDelivery = model.ConsigneeDescription,
+                    NotitfyParty = model.CargoNoticeRecevier,
+                    PortofLoading = model.PolName,
+                    PortofDischarge = model.PodName,
+                    PlaceDelivery = model.PoDelivery,
+                    Vessel = model.VoyNo,
+                    Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
+                    ShippingMarks = item.ShippingMark,
+                    Containers = item.ContSealNo,
+                    ContSealNo = item.ContSealNo,
+                    NoofPeace = item.PackageContainer,
+                    SIDescription = model.GoodsDescription,
+                    GrossWeight = (decimal)model?.GrossWeight,
+                    CBM = item.Cbm,
+                    Qty = "200",
+                    RateRequest = model.Remark,
+                    Payment = model.PaymenType,
+                    ShippingMarkImport = string.Empty
+                };
+                instructions.Add(instruction);
             }
             result = new Crystal
             {

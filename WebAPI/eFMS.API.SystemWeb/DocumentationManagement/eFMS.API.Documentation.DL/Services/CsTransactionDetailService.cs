@@ -65,117 +65,144 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
         #region -- INSERT & UPDATE HOUSEBILLS --
         public HandleState AddTransactionDetail(CsTransactionDetailModel model)
         {
-            var detail = mapper.Map<CsTransactionDetail>(model);
             if (model.CsMawbcontainers.Count > 0)
             {
-                var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, detail.Id);
+                var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, model.Id);
                 if (checkDuplicateCont.Success == false)
                 {
                     return checkDuplicateCont;
                 }
             }
-            detail.UserModified = detail.UserCreated;
-            detail.DatetimeModified = detail.DatetimeCreated = DateTime.Now;
-            detail.Active = true;
-            //detail.SailingDate = DateTime.Now;
-            try
+            model.UserModified = model.UserCreated = currentUser.UserID;
+            model.DatetimeModified = model.DatetimeCreated = DateTime.Now;
+            model.Active = true;
+            string contSealNo = string.Empty;
+            var containers = new List<CsMawbcontainerModel>();
+            foreach (var x in model.CsMawbcontainers)
             {
-                var hs = DataContext.Add(detail);
-                if (hs.Success)
+                if (!string.IsNullOrEmpty(x.ContainerNo))
                 {
-                    foreach (var x in model.CsMawbcontainers)
-                    {
-                        var cont = mapper.Map<CsMawbcontainerModel>(x);
-                        cont.Id = Guid.NewGuid();
-                        cont.Hblid = detail.Id;
-                        cont.UserModified = detail.UserModified;
-                        cont.DatetimeModified = DateTime.Now;
-                        var hsContainer = csMawbcontainerRepo.Add(cont);
-                    }
+                    contSealNo = contSealNo + x.ContainerNo;
                 }
-                ((eFMSDataContext)DataContext.DC).SaveChanges();
-                return hs;
+                if (!string.IsNullOrEmpty(x.SealNo))
+                {
+                    contSealNo = contSealNo + "/ " + x.SealNo + "; ";
+                }
+                var cont = mapper.Map<CsMawbcontainerModel>(x);
+                cont.Id = Guid.NewGuid();
+                cont.Hblid = model.Id;
+                cont.UserModified = model.UserModified;
+                cont.DatetimeModified = DateTime.Now;
+                containers.Add(cont);
             }
-            catch (Exception ex)
+            model.ContSealNo = contSealNo;
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                var hs = new HandleState(ex.Message);
-                return hs;
+                try
+                {
+                    var hs = Add(model);
+                    if (hs.Success)
+                    {
+                        var t = containerService.Add(containers);
+                    }
+                    DataContext.SubmitChanges();
+                    trans.Commit();
+                    return hs;
+
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
         }
 
         public HandleState UpdateTransactionDetail(CsTransactionDetailModel model)
         {
-            try
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                var hb = DataContext.Where(x => x.Id == model.Id).FirstOrDefault();
-                if (hb == null)
+                try
                 {
-                    return new HandleState("Housebill not found !");
-                }
-
-                if (model.CsMawbcontainers.Count > 0)
-                {
-                    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, model.Id);
-                    if (checkDuplicateCont.Success == false)
+                    var hb = DataContext.Where(x => x.Id == model.Id).FirstOrDefault();
+                    if (hb == null)
                     {
-                        return checkDuplicateCont;
+                        return new HandleState("Housebill not found !");
                     }
-                }
-                hb.UserModified = ChangeTrackerHelper.currentUser;
-                hb.DatetimeModified = DateTime.Now;
-                model.SailingDate = DateTime.Now;
-                hb = mapper.Map<CsTransactionDetail>(model);
-                var isUpdateDone = DataContext.Update(hb, x => x.Id == hb.Id);
-                if (isUpdateDone.Success)
-                {
+
                     if (model.CsMawbcontainers.Count > 0)
                     {
-                        var listConts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
-                        foreach (var item in listConts)
+                        var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, model.Id);
+                        if (checkDuplicateCont.Success == false)
                         {
-                            var isExist = model.CsMawbcontainers.Where(x => x.Id == item.Id).FirstOrDefault();
-                            if (isExist == null)
+                            return checkDuplicateCont;
+                        }
+                    }
+                    hb.UserModified = ChangeTrackerHelper.currentUser;
+                    hb.DatetimeModified = DateTime.Now;
+                    model.SailingDate = DateTime.Now;
+                    hb = mapper.Map<CsTransactionDetail>(model);
+                    var isUpdateDone = DataContext.Update(hb, x => x.Id == hb.Id);
+                    if (isUpdateDone.Success)
+                    {
+                        if (model.CsMawbcontainers.Count > 0)
+                        {
+                            var listConts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
+                            foreach (var item in listConts)
+                            {
+                                var isExist = model.CsMawbcontainers.Where(x => x.Id == item.Id).FirstOrDefault();
+                                if (isExist == null)
+                                {
+                                    var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Id == item.Id);
+                                }
+                            }
+
+                            foreach (var item in model.CsMawbcontainers)
+                            {
+                                var cont = mapper.Map<CsMawbcontainer>(item);
+
+                                if (cont.Id == Guid.Empty)
+                                {
+                                    cont.Id = Guid.NewGuid();
+                                    cont.Hblid = hb.Id;
+                                    cont.UserModified = hb.UserModified;
+                                    cont.DatetimeModified = DateTime.Now;
+                                    var hsContainerAdd = csMawbcontainerRepo.Add(cont);
+                                }
+                                else
+                                {
+                                    cont.Hblid = hb.Id;
+                                    cont.UserModified = hb.UserModified;
+                                    cont.DatetimeModified = DateTime.Now;
+                                    var hsContainerUpdate = csMawbcontainerRepo.Update(cont, x => x.Id == cont.Id);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var conts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
+                            foreach (var item in conts)
                             {
                                 var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Id == item.Id);
                             }
                         }
-
-                        foreach (var item in model.CsMawbcontainers)
-                        {
-                            var cont = mapper.Map<CsMawbcontainer>(item);
-
-                            if (cont.Id == Guid.Empty)
-                            {
-                                cont.Id = Guid.NewGuid();
-                                cont.Hblid = hb.Id;
-                                cont.UserModified = hb.UserModified;
-                                cont.DatetimeModified = DateTime.Now;
-                                var hsContainerAdd = csMawbcontainerRepo.Add(cont);
-                            }
-                            else
-                            {
-                                cont.Hblid = hb.Id;
-                                cont.UserModified = hb.UserModified;
-                                cont.DatetimeModified = DateTime.Now;
-                                var hsContainerUpdate = csMawbcontainerRepo.Update(cont, x => x.Id == cont.Id);
-                            }
-                        }                        
                     }
-                    else
-                    {
-                        var conts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
-                        foreach (var item in conts)
-                        {
-                            var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Id == item.Id);
-                        }
-                    }
+                    trans.Rollback();
+                    return isUpdateDone;
                 }
-                return isUpdateDone;
-            }
-            catch (Exception ex)
-            {
-                var hs = new HandleState(ex.Message);
-                return hs;
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
         }
         #endregion -- INSERT & UPDATE HOUSEBILLS --
@@ -278,37 +305,6 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
             }
             return results.AsQueryable();
         }
-
-        //public IQueryable<CsTransactionDetailModel> QueryById(CsTransactionDetailCriteria criteria)
-        //{
-        //    List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-        //    var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == criteria.Id);
-        //    var query = (from detail in details
-        //                 join customer in ((eFMSDataContext)DataContext.DC).CatPartner on detail.CustomerId equals customer.Id into detailCustomers
-        //                 from y in detailCustomers.DefaultIfEmpty()
-        //                 join noti in ((eFMSDataContext)DataContext.DC).CatPartner on detail.NotifyPartyId equals noti.Id into detailNotis
-        //                 from noti in detailNotis.DefaultIfEmpty()
-        //                 join port in ((eFMSDataContext)DataContext.DC).CatPlace on detail.Pod equals port.Id into portDetail
-        //                 from pod in portDetail.DefaultIfEmpty()
-        //                 join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on detail.ForwardingAgentId equals fwd.Id into forwarding
-        //                 from f in forwarding.DefaultIfEmpty()
-        //                 join saleman in ((eFMSDataContext)DataContext.DC).CatSaleman on detail.SaleManId equals saleman.Id.ToString() into prods
-        //                 from x in prods.DefaultIfEmpty()
-        //                 select new { detail, customer = y, notiParty = noti, saleman = x, agent = f, pod });
-        //    if (query == null) return null;
-        //    foreach (var item in query)
-        //    {
-        //        var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
-        //        detail.CustomerName = item.customer?.PartnerNameEn;
-        //        detail.CustomerNameVn = item.customer?.PartnerNameVn;
-        //        detail.SaleManId = item.saleman?.Id.ToString();
-        //        detail.NotifyParty = item.notiParty?.PartnerNameEn;
-        //        detail.ForwardingAgentName = item.agent?.PartnerNameEn;
-        //        detail.PODName = item.pod?.NameEn;
-        //        results.Add(detail);
-        //    }
-        //    return results.AsQueryable();
-        //}
 
         public CsTransactionDetailModel GetById(Guid Id)
         {
@@ -423,7 +419,8 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                           DesOfGoods = detail.DesOfGoods,
                           PODName = pod.NameEn,
                           ManifestRefNo = detail.ManifestRefNo,
-                          ServiceType = detail.ServiceType
+                          ServiceType = detail.ServiceType,
+                          ContSealNo = detail.ContSealNo
                           
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();

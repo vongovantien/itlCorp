@@ -6,7 +6,7 @@
             </button>
             <div class="dropdown-menu">
                 <a class="dropdown-item" href="#">Export excel</a>
-                <a class="dropdown-item" href="javascript:void(0)">Crystal Report</a>
+                <a class="dropdown-item" (click)="previewSIReport()">Crystal Report</a>
             </div>
         </div>
         <div class="dropdown m-dropdown m-dropdown--inline">
@@ -28,7 +28,7 @@
                 </span>
             </span>
         </button>
-        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="save()">
             <span>
                 <i class="la la-save"></i>
                 <span>
@@ -69,7 +69,8 @@
 
     <div class="tab-content" id="">
         <div class="tab-pane fade show active" id="bill-instruction-tabview" role="tabpanel" aria-labelledby="">
-            <app-sea-fcl-export-bill-instruction></app-sea-fcl-export-bill-instruction>
+            <app-sea-fcl-export-bill-instruction>
+            </app-sea-fcl-export-bill-instruction>
         </div>
         <div class="tab-pane fade" id="bill-detail-tabview" role="tabpanel" aria-labelledby="">
             <app-sea-fcl-export-bill-detail></app-sea-fcl-export-bill-detail>
@@ -119,4 +120,7 @@
 <!--end::confirm-refresh-shipping-instruction-modal-->
 
 <!--begin::preview-modal-->
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>
 <!--end::preview-modal-->

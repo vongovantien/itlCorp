@@ -29,7 +29,7 @@ export class ShippingInstructionComponent implements OnInit {
     realConsignees: any[] = [];
     //listShippers: any[] = [];
     shippers: any[] = [];
-    realShippers: any [] = [];
+    realShippers: any[] = [];
     paymentTerms: any[] = [];
     housebills: any[] = [];
     isLoad: boolean = false;
@@ -52,20 +52,20 @@ export class ShippingInstructionComponent implements OnInit {
         private api_menu: API_MENU,
         private sanitizer: DomSanitizer,
         private router: Router) {
-            this.issueDate = { startDate: moment(), endDate: moment()};
-         }
+        this.issueDate = { startDate: moment(), endDate: moment() };
+    }
 
     async ngOnInit() {
         await this.loadReferenceData();
         await this.route.params.subscribe(async prams => {
-            if(prams.id != undefined){         
-                await this.getShipmentDetail(prams.id); 
+            if (prams.id != undefined) {
+                await this.getShipmentDetail(prams.id);
                 await this.getShippingInstruction(prams.id);
-                if(this.shippingIns == null){
+                if (this.shippingIns == null) {
                     this.shippingIns = new CsShippingInstruction();
                     this.getNewInstructionDetail();
                 }
-                else{
+                else {
                     this.getInstructionDetail();
                 }
                 await this.getHouseBillList(prams.id);
@@ -79,7 +79,7 @@ export class ShippingInstructionComponent implements OnInit {
     }
     async getContainerList(id: any) {
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: id }, false, false);
-        this.shippingIns.csMawbcontainers = responses;
+        //this.shippingIns.csMawbcontainers = responses;
     }
     async loadReferenceData() {
         await this.getUserInCharges(null);
@@ -94,73 +94,73 @@ export class ShippingInstructionComponent implements OnInit {
     }
     getInstructionDetail(): any {
         let index = this.paymentTerms.findIndex(x => x.id == this.shippingIns.paymenType);
-        if(index > -1){
+        if (index > -1) {
             this.paymentTermActive = [this.paymentTerms[index]];
         }
         this.issueDate = { startDate: moment(this.shippingIns.invoiceDate), endDate: moment(this.shippingIns.invoiceDate) };
         this.loadingDate = { startDate: moment(this.shippingIns.invoiceDate), endDate: moment(this.shippingIns.loadingDate) };
     }
-    async getShippingInstruction(id: any){
+    async getShippingInstruction(id: any) {
         this.shippingIns = await this.baseServices.getAsync(this.api_menu.Documentation.CsShippingInstruction.get + id, false, true);
         console.log(this.shippingIns);
     }
-    async previewSIReport(){
+    async previewSIReport() {
         this.dataReport = null;
         this.shippingIns.jobId = this.shipment.id;
-        this.shippingIns.csTransactionDetails = this.housebills;
+        //this.shippingIns.csTransactionDetails = this.housebills;
         var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsShippingInstruction.previewSI, this.shippingIns, false, true);
         console.log(response);
         this.dataReport = response;
         var id = this.previewModalId;
-        setTimeout(function(){ 
+        setTimeout(function () {
             $('#' + id).modal('show');
         }, 100);
     }
-    async previewOCLReport(){
+    async previewOCLReport() {
         this.dataReport = null;
         this.shippingIns.jobId = this.shipment.id;
-        this.shippingIns.csTransactionDetails = this.housebills;
+        //this.shippingIns.csTransactionDetails = this.housebills;
         var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsShippingInstruction.previewOCL, this.shippingIns, false, true);
         console.log(response);
         this.dataReport = response;
         var id = this.previewModalId;
-        setTimeout(function(){ 
+        setTimeout(function () {
             $('#' + id).modal('show');
         }, 200);
     }
-    getContainerInfos(){
+    getContainerInfos() {
         this.totalCBM = 0;
         this.totalGW = 0;
         this.shippingIns.goodsDescription = '';
         this.shippingIns.containerNote = '';
         this.shipment.packageContainer = '';
-        this.housebills.forEach(x =>{
-                this.totalGW = this.totalGW + x.gw;
-                this.totalCBM = this.totalCBM + x.cbm;
-                this.shippingIns.goodsDescription += (x.desOfGoods!= null|| x.desOfGoods == '')? (stringHelper.subStringComma(x.desOfGoods) + "\n"): '';
-                this.shippingIns.containerNote += (x.containerNames != null || x.containerNames =='')? (stringHelper.subStringComma(x.containerNames) + "\n"): '';
-                this.shippingIns.packagesNote += (x.packageTypes != null || x.packageTypes == '')? (stringHelper.subStringComma(x.packageTypes) + "\n"): '';
+        this.housebills.forEach(x => {
+            this.totalGW = this.totalGW + x.gw;
+            this.totalCBM = this.totalCBM + x.cbm;
+            this.shippingIns.goodsDescription += (x.desOfGoods != null || x.desOfGoods == '') ? (stringHelper.subStringComma(x.desOfGoods) + "\n") : '';
+            this.shippingIns.containerNote += (x.containerNames != null || x.containerNames == '') ? (stringHelper.subStringComma(x.containerNames) + "\n") : '';
+            this.shippingIns.packagesNote += (x.packageTypes != null || x.packageTypes == '') ? (stringHelper.subStringComma(x.packageTypes) + "\n") : '';
         });
         this.shippingIns.grossWeight = this.totalGW;
-        this.shippingIns.volume= this.totalCBM;
+        this.shippingIns.volume = this.totalCBM;
     }
-    closeSIModal(event){
+    closeSIModal(event) {
         console.log(event);
         this.router.navigate(["/home/documentation/shipping-instruction", { id: this.shipment.id }]);
     }
-    async save(form: NgForm){
+    async save(form: NgForm) {
         this.shippingIns.jobId = this.shipment.id;
         this.shippingIns.invoiceDate = dataHelper.dateTimeToUTC(this.issueDate["startDate"]);
         this.shippingIns.loadingDate = dataHelper.dateTimeToUTC(this.loadingDate["startDate"]);
         console.log(this.shippingIns);
-        if(form.valid && this.shippingIns.supplier != null 
-                      && this.shippingIns.issuedUser != null 
-                      && this.shippingIns.consigneeId != null
-                      && this.shippingIns.paymenType != null
-                      && this.shippingIns.pol != null
-                      && this.shippingIns.pod != null
-                      && this.loadingDate != null
-                      && this.issueDate != null){
+        if (form.valid && this.shippingIns.supplier != null
+            && this.shippingIns.issuedUser != null
+            && this.shippingIns.consigneeId != null
+            && this.shippingIns.paymenType != null
+            && this.shippingIns.pol != null
+            && this.shippingIns.pod != null
+            && this.loadingDate != null
+            && this.issueDate != null) {
             let response = await this.baseServices.postAsync(this.api_menu.Documentation.CsShippingInstruction.update, this.shippingIns, true, true);
         }
     }
@@ -168,7 +168,7 @@ export class ShippingInstructionComponent implements OnInit {
         console.log(consignee);
         this.shippingIns.consigneeDescription =
             consignee.shortName + "\n" +
-            consignee.addressEn == null ?'':("Address: " + consignee.addressEn);
+                consignee.addressEn == null ? '' : ("Address: " + consignee.addressEn);
     }
     getRealConsigneeDescription(consignee: any) {
         console.log(consignee);
@@ -179,22 +179,22 @@ export class ShippingInstructionComponent implements OnInit {
     getRealShipperDescription(shipper: any) {
         console.log(shipper);
         this.shippingIns.actualShipperDescription =
-        shipper.shortName + "\n" +
+            shipper.shortName + "\n" +
             "Address: " + shipper.addressEn;
     }
-    async getHouseBillList(jobId: String){
+    async getHouseBillList(jobId: String) {
         var responses = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransactionDetail.getByJob + "?jobId=" + jobId, false, false);
-        if(responses != null){
+        if (responses != null) {
             this.housebills = responses;
         }
-        else{
+        else {
             this.housebills = [];
         }
-        this.shippingIns.csTransactionDetails = this.housebills;
+        //this.shippingIns.csTransactionDetails = this.housebills;
         console.log(this.shippingIns);
         //console.log(this.shipment.csTransactionDetails);
     }
-    refreshShippingInstruction(){
+    refreshShippingInstruction() {
         this.shippingIns.invoiceNoticeRecevier = null;
         this.shippingIns.shipper = null;
         this.shippingIns.invoiceNoticeRecevier = null;
@@ -214,31 +214,29 @@ export class ShippingInstructionComponent implements OnInit {
     getNewInstructionDetail(): any {
         this.shippingIns.bookingNo = this.shipment.bookingNo;
         let index = this.suppliers.findIndex(x => x.id == this.shipment.coloaderId);
-        if(index > -1){
+        if (index > -1) {
             this.shippingIns.supplier = this.suppliers[index].id;
             this.shippingIns.supplierName = this.suppliers[index].partnerNameEn;
         }
         let claim = localStorage.getItem('id_token_claims_obj');
         index = this.userIssues.findIndex(x => x.id == JSON.parse(claim)["id"]);
-        if(index > -1) {
+        if (index > -1) {
             this.shippingIns.issuedUserName = this.userIssues[index].username;
             this.shippingIns.issuedUser = JSON.parse(claim)["id"];
         }
         index = this.consignees.findIndex(x => x.id == this.shipment.agentId);
-        if(index > -1)
-        {
+        if (index > -1) {
             this.shippingIns.consigneeId = this.consignees[index].id;
             this.shippingIns.consigneeName = this.consignees[index].partnerNameEn;
             this.shippingIns.consigneeDescription = this.consignees[index].partnerNameEn;
         }
         index = this.portOfLadings.findIndex(x => x.id == this.shipment.pol);
-        if(index > -1)
-        {
+        if (index > -1) {
             this.shippingIns.pol = this.portOfLadings[index].id;
             this.shippingIns.polName = this.portOfLadings[index].nameEn;
         }
         index = this.portOfDestinations.findIndex(x => x.id == this.shipment.pod);
-        if(index > -1){
+        if (index > -1) {
             this.shippingIns.pod = this.portOfDestinations[index].id;
             this.shippingIns.podName = this.portOfDestinations[index].nameEn;
             this.shippingIns.poDelivery = this.portOfDestinations[index].nameEn;
@@ -250,7 +248,7 @@ export class ShippingInstructionComponent implements OnInit {
     }
     async getShipmentDetail(id: String) {
         this.shipment = await this.baseServices.getAsync(this.api_menu.Documentation.CsTransaction.getById + id, false, true);
-        console.log({"THIS":this.shipment});
+        console.log({ "THIS": this.shipment });
     }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getShipmentCommonData(this.baseServices, this.api_menu);
@@ -262,33 +260,33 @@ export class ShippingInstructionComponent implements OnInit {
             this.userIssues = users;
             console.log(this.userIssues);
         }
-        else{
+        else {
             this.userIssues = [];
         }
     }
     changeSupplier(keySearch: string) {
-        keySearch = keySearch != null?keySearch.trim(): null;
+        keySearch = keySearch != null ? keySearch.trim() : null;
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
             return 0;
         }
         this.getSuppliers(keySearch);
     }
     changeConsignee(keySearch: string) {
-        keySearch = keySearch != null?keySearch.trim(): null;
+        keySearch = keySearch != null ? keySearch.trim() : null;
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
             return 0;
         }
         this.getConsignees(keySearch);
     }
     changeRealShipper(keySearch: string) {
-        keySearch = keySearch != null?keySearch.trim(): null;
+        keySearch = keySearch != null ? keySearch.trim() : null;
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
             return 0;
         }
         this.getRealShippers(keySearch);
     }
     changeRealConsignee(keySearch: string) {
-        keySearch = keySearch != null?keySearch.trim(): null;
+        keySearch = keySearch != null ? keySearch.trim() : null;
         if (keySearch !== null && keySearch.length < 3 && keySearch.length > 0) {
             return 0;
         }
@@ -304,7 +302,7 @@ export class ShippingInstructionComponent implements OnInit {
             this.suppliers = partners.data;
             console.log(this.suppliers);
         }
-        else{
+        else {
             this.suppliers = [];
         }
     }
@@ -317,7 +315,7 @@ export class ShippingInstructionComponent implements OnInit {
         if (partners != null) {
             this.consignees = partners.data;
         }
-        else{
+        else {
             this.consignees = [];
         }
     }
@@ -331,7 +329,7 @@ export class ShippingInstructionComponent implements OnInit {
             this.realConsignees = partners.data;
             console.log(this.realConsignees);
         }
-        else{
+        else {
             this.realConsignees = [];
         }
     }
@@ -345,7 +343,7 @@ export class ShippingInstructionComponent implements OnInit {
             this.shippers = partners.data;
             console.log(this.shippers);
         }
-        else{
+        else {
             this.shippers = [];
         }
     }
@@ -359,7 +357,7 @@ export class ShippingInstructionComponent implements OnInit {
             this.realShippers = partners.data;
             console.log(this.realShippers);
         }
-        else{
+        else {
             this.realShippers = [];
         }
     }
@@ -379,7 +377,7 @@ export class ShippingInstructionComponent implements OnInit {
             this.portOfLadings = portIndexs;
             console.log(this.portOfLadings);
         }
-        else{
+        else {
             this.portOfLadings = [];
         }
     }
@@ -399,7 +397,7 @@ export class ShippingInstructionComponent implements OnInit {
             this.portOfDestinations = portIndexs;
             console.log(this.portOfDestinations);
         }
-        else{
+        else {
             this.portOfDestinations = [];
         }
     }

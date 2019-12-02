@@ -78,6 +78,7 @@ export class CsTransactionDetail {
   forwardingAgentName: string = null;
   notifyParty: string = null;
   podName: string = null;
+  contSealNo: string;
   containerNames: string = null;
   packageTypes: string = null;
   cw: number = 0;

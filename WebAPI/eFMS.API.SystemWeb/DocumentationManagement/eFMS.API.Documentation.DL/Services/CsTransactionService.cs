@@ -157,10 +157,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
                 if (!string.IsNullOrEmpty(employeeId))
                 {
-                    var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault().WorkPlaceId;
+                    var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
                     if (branchOfUser != null)
                     {
-                        transaction.BranchId = branchOfUser;
+                        transaction.BranchId = (Guid)branchOfUser;
                     }
                 }
 
@@ -214,10 +214,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
                 if (!string.IsNullOrEmpty(employeeId))
                 {
-                    var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault().WorkPlaceId;
+                    var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
                     if (branchOfUser != null)
                     {
-                        transaction.BranchId = branchOfUser;
+                        transaction.BranchId = (Guid)branchOfUser;
                     }
                 }
                 var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);

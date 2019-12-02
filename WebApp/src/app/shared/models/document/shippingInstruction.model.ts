@@ -3,8 +3,8 @@ import { CsTransactionDetail } from "./csTransactionDetail";
 
 export class CsShippingInstruction {
   jobId: string = "00000000-0000-0000-0000-000000000000";
-  refNo: String = null;
-  bookingNo: String = null;
+  refNo: string = null;
+  bookingNo: string = null;
   invoiceDate: Date = null;
   issuedUser: string = null;
   supplier: string = null;
@@ -31,12 +31,6 @@ export class CsShippingInstruction {
   packagesNote: string = null;
   grossWeight: number = null;
   volume: number = null;
-  userCreated: string = null;
-  createdDate: Date = null;
-  userModified: string = null;
-  modifiedDate: Date = null;
-  active: boolean = true;
-  inactiveOn: Date = null;
   issuedUserName: string = null;
   supplierName: string = null;
   consigneeName: string = null;
@@ -44,6 +38,21 @@ export class CsShippingInstruction {
   actualConsigneeName: string = null;
   polName: string = null;
   podName: string = null;
+  userCreated: string = null;
+  createdDate: Date = null;
+  userModified: string = null;
+  modifiedDate: Date = null;
+  active: boolean = true;
+  inactiveOn: Date = null;
   csTransactionDetails: CsTransactionDetail[] = null;
-  csMawbcontainers: Container[] = [];
+  // csMawbcontainers: Container[] = [];
+
+  constructor(object?: any) {
+    const self = this;
+    for (const key in object) {
+      if (self.hasOwnProperty(key.toString())) {
+        self[key] = object[key];
+      }
+    }
+  }
 }
