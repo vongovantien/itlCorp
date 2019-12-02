@@ -85,7 +85,7 @@
                             *ngFor="let housebill of housebills | filter : keyword : ['hwbno','packages','gw','cbm','podName','shipperName','consigneeName','desOfGoods']; let j = index; trackBy: trackByFn">
 
                             <ng-container
-                                *ngIf="!!housebills.length && housebill.manifestRefNo != null || housebill.isRemoved == false">
+                                *ngIf="!!housebills.length && housebill.manifestRefNo != null  || housebill.isRemoved == false">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <label class="m-checkbox">

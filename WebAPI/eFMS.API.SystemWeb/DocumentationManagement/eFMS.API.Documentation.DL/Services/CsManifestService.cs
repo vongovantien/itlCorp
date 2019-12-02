@@ -193,54 +193,59 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 foreach(var item in model.CsTransactionDetails)
                 {
-                    var houseContainers = containerService.Query(new Models.Criteria.CsMawbcontainerCriteria { Hblid = item.Id });
-                    if(houseContainers.Count() > 0)
+                    if(item.ManifestRefNo != null)
                     {
-                        foreach(var container in houseContainers)
+                        var houseContainers = containerService.Query(new Models.Criteria.CsMawbcontainerCriteria { Hblid = item.Id });
+                        if (houseContainers.Count() > 0)
                         {
-                            if(container.PackageTypeId != null)
+                            foreach (var container in houseContainers)
                             {
-                                noPieces = noPieces + container.PackageQuantity + " " + container.PackageTypeName + "\n";
+                                if (container.PackageTypeId != null)
+                                {
+                                    noPieces = noPieces + container.PackageQuantity + " " + container.PackageTypeName + "\n";
+                                }
+                                totalPackages = totalPackages + container.Quantity + "X" + container.ContainerTypeName + "\n"
+                                    + container.ContainerNo + container.SealNo + ";\n";
+                                var containerTemp = new SeaImportCargoManifestContainer
+                                {
+                                    Qty = container.Quantity,
+                                    ContType = container.ContainerTypeName,
+                                    ContainerNo = container.ContainerNo,
+                                    SealNo = container.SealNo,
+                                    TotalPackages = container.PackageQuantity,
+                                    UnitPack = container.PackageTypeName,
+                                    GrossWeight = container.Gw,
+                                    CBM = container.Cbm,
+                                    DecimalNo = 2
+                                };
+                                containers.Add(containerTemp);
                             }
-                            totalPackages = totalPackages + container.Quantity + "X" + container.ContainerTypeName + "\n"
-                                + container.ContainerNo + container.SealNo + ";\n";
-                            var containerTemp = new SeaImportCargoManifestContainer {
-                                Qty = container.Quantity,
-                                ContType = container.ContainerTypeName,
-                                ContainerNo = container.ContainerNo,
-                                SealNo = container.SealNo,
-                                TotalPackages = container.PackageQuantity,
-                                UnitPack = container.PackageTypeName,
-                                GrossWeight = container.Gw,
-                                CBM = container.Cbm,
-                                DecimalNo = 2
-                            };
-                            containers.Add(containerTemp);
                         }
-                    }
 
-                    var manifest = new ManifestFCLImportReport
-                    {
-                        DateConfirm = model.InvoiceDate,
-                        LoadingDate = transaction.Etd,
-                        LocalVessel = transaction.FlightVesselName,
-                        ContSealNo = transaction.VoyNo,
-                        PortofDischarge = model.PodName,
-                        PlaceDelivery = transaction.PlaceDeliveryName,
-                        HWBNO = item.Hwbno,
-                        ATTN = item.ShipperDescription,
-                        Consignee = item.ConsigneeDescription,
-                        Notify = item.NotifyPartyDescription,
-                        TotalPackages = totalPackages,
-                        ShippingMarkImport = item.ShippingMark,
-                        Description = item.DesOfGoods,
-                        NoPieces = noPieces,
-                        GrossWeight = item.GrossWeight,
-                        CBM = item.CBM,
-                        Liner = item.ColoaderId,
-                        OverseasAgent = transaction.AgentName
-                    };
-                    manifests.Add(manifest);
+                        var manifest = new ManifestFCLImportReport
+                        {
+                            DateConfirm = model.InvoiceDate,
+                            LoadingDate = transaction.Etd,
+                            LocalVessel = transaction.FlightVesselName,
+                            ContSealNo = transaction.VoyNo,
+                            PortofDischarge = model.PodName,
+                            PlaceDelivery = transaction.PlaceDeliveryName,
+                            HWBNO = item.Hwbno,
+                            ATTN = item.ShipperDescription,
+                            Consignee = item.ConsigneeDescription,
+                            Notify = item.NotifyPartyDescription,
+                            TotalPackages = totalPackages,
+                            ShippingMarkImport = item.ShippingMark,
+                            Description = item.DesOfGoods,
+                            NoPieces = noPieces,
+                            GrossWeight = item.GrossWeight,
+                            CBM = item.CBM,
+                            Liner = item.ColoaderId,
+                            OverseasAgent = transaction.AgentName
+                        };
+                        manifests.Add(manifest);
+                    }
+                   
                 }
             }
             if (manifests.Count == 0)
