@@ -18,10 +18,10 @@ import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/sha
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
 
 @Component({
-    selector: 'app-sea-fcl-import-manifest',
-    templateUrl: './sea-fcl-import-manifest.component.html'
+    selector: 'app-sea-fcl-export-manifest',
+    templateUrl: './sea-fcl-export-manifest.component.html'
 })
-export class SeaFclImportManifestComponent extends AppList {
+export class SeaFclExportManifestComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
 
     @ViewChild(ShareBusinessFormManifestComponent, { static: false }) formManifest: ShareBusinessFormManifestComponent;
@@ -76,8 +76,8 @@ export class SeaFclImportManifestComponent extends AppList {
     ngAfterViewInit() {
         this._store.select(getParamsRouterState)
             .subscribe((param: Params) => {
-                if (param.jobId) {
-                    this.jobId = param.jobId;
+                if (param.id) {
+                    this.jobId = param.id;
                     this.formManifest.jobId = this.jobId;
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);
                     this.getHblList(this.jobId);
@@ -138,7 +138,10 @@ export class SeaFclImportManifestComponent extends AppList {
                     this.manifest = res;
                     setTimeout(() => {
                         this.formManifest.supplier.setValue(res.supplier);
-                        this.formManifest.referenceNo.setValue(res.refNo);
+
+                        if (res.refNo != null) {
+                            this.formManifest.referenceNo.setValue(res.refNo);
+                        }
                         this.formManifest.attention.setValue(res.attention);
                         this.formManifest.marksOfNationality.setValue(res.masksOfRegistration);
                         this.formManifest.vesselNo.setValue(res.voyNo);
@@ -161,7 +164,7 @@ export class SeaFclImportManifestComponent extends AppList {
 
     addOrUpdateManifest() {
         this.formManifest.isSubmitted = true;
-        if (this.formManifest.formGroup.valid) {
+        if (this.formManifest.formGroup.valid && this.formManifest.selectedPortOfDischarge.value && this.formManifest.selectedPortOfLoading.value) {
 
             this._progressRef.start();
             const body: any = {
@@ -174,7 +177,7 @@ export class SeaFclImportManifestComponent extends AppList {
                 invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
                 pol: !!this.formManifest.selectedPortOfLoading.value ? this.formManifest.selectedPortOfLoading.value : null,
                 pod: !!this.formManifest.selectedPortOfDischarge.value ? this.formManifest.selectedPortOfDischarge.value : null,
-                paymentTerm: this.formManifest.freightCharge.value !== "" ? this.formManifest.freightCharge.value[0].text : null,
+                paymentTerm: this.formManifest.freightCharge.value[0].text,
                 consolidator: this.formManifest.consolidator.value,
                 deConsolidator: this.formManifest.deconsolidator.value,
                 volume: this.formManifest.volume.value,
@@ -268,6 +271,7 @@ export class SeaFclImportManifestComponent extends AppList {
                 },
             );
     }
+
     previewManifest() {
         const body: any = {
             jobId: this.jobId,

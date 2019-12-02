@@ -20,6 +20,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SeaFclExportShippingInstructionComponent } from './detail-job/shipping-instruction/sea-fcl-export-shipping-instruction.component';
 import { SeaFclExportBillInstructionComponent } from './detail-job/shipping-instruction/bill-instruction/sea-fcl-export-bill-instruction.component';
 import { SeaFclExportBillDetailComponent } from './detail-job/shipping-instruction/bill-detail/sea-fcl-export-bill-detail.component';
+import { SeaFclExportManifestComponent } from './detail-job/manifest/sea-fcl-export-manifest.component';
 
 const routing: Routes = [
     {
@@ -34,7 +35,7 @@ const routing: Routes = [
     },
     {
         path: ':jobId', component: SeaFCLExportDetailJobComponent, data: {
-            name: "Job Detail", path: "sea-fcl-export", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport 
+            name: "Job Detail", path: "sea-fcl-export", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport
         }
     },
     {
@@ -44,7 +45,11 @@ const routing: Routes = [
         path: ':jobId/si', component: SeaFclExportShippingInstructionComponent, data: {
             name: "Shipping Instructions", path: ":jobId", level: 4
         }
-    }
+    },
+    {
+        path: ':id/manifest', component: SeaFclExportManifestComponent,
+        data: { name: "Manifest", path: ":id", level: 4 },
+    },
 ];
 
 const LIB = [
@@ -79,6 +84,7 @@ const COMPONENTS = [
         SeaFclExportShippingInstructionComponent,
         SeaFclExportBillInstructionComponent,
         SeaFclExportBillDetailComponent,
+        SeaFclExportManifestComponent,
         ...COMPONENTS
     ],
     providers: [],

@@ -13,9 +13,7 @@ import { SeaFCLImportDetailJobComponent } from './detail-job/detail-job-fcl-impo
 import { SeaFCLImportManagementFormSearchComponent } from './components/form-search/form-search-fcl-import.component';
 import { SeaFCLImportLazyLoadModule } from './sea-fcl-import-lazy-load.module';
 import { SeaFclImportManifestComponent } from './detail-job/manifest/sea-fcl-import-manifest.component';
-import { FormManifestSeaFclImportComponent } from './detail-job/manifest/components/form-manifest/form-manifest-sea-fcl-import.component';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
-import { AddHblToManifestComponent } from './detail-job/manifest/popup/add-hbl-to-manifest.popup';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 const routing: Routes = [
@@ -45,7 +43,6 @@ const routing: Routes = [
 
 const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
-    AddHblToManifestComponent
 ];
 
 const LIB = [
@@ -64,8 +61,7 @@ const LIB = [
         SeaFCLImportManagementComponent,
         SeaFCLImportCreateJobComponent,
         SeaFCLImportDetailJobComponent,
-        SeaFclImportManifestComponent,
-        FormManifestSeaFclImportComponent
+        SeaFclImportManifestComponent
     ],
     imports: [
         CommonModule,
