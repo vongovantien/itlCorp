@@ -32,6 +32,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsMawbcontainerService containerService;
         readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
+        readonly IContextBase<CatCountry> countryRepository;
         private readonly ICurrentUser currentUser;
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -44,6 +45,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCommodity> catCommodity,
             IContextBase<CatSaleman> catSaleman,
             IContextBase<CsShipmentSurcharge> surchareRepo , 
+            IContextBase<CatCountry> countryRepo,
+            IContextBase<CsShipmentSurcharge> surchareRepo , IContextBase<CsTransactionDetail> csTransactiondetail,
+ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mapper)
             IContextBase<CsTransactionDetail> csTransactiondetail,
             ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mapper)
         {
@@ -59,6 +63,7 @@ namespace eFMS.API.Documentation.DL.Services
             containerService = contService;
             csTransactionDetailRepo = csTransactiondetail;
             currentUser = user;
+            countryRepository = countryRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -717,62 +722,86 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var housebill = new SeaHBillofLadingReport();
                 housebill.HWBNO = data.Hwbno; //HouseBill No
-                housebill.OSI = "OSI"; //Chưa biết
-                housebill.CheckNullAttach = "CheckNullAttach"; //Chưa biết
+                housebill.OSI = string.Empty; //Để trống
+                housebill.CheckNullAttach = string.Empty; //Để trống
                 housebill.ReferrenceNo = data.ReferenceNo; //ReferenceNo
-                housebill.Shipper = dataShipper?.PartnerNameEn; //Shipper name
+                housebill.Shipper = data.ShipperDescription;//dataShipper?.PartnerNameEn; //Shipper name
                 housebill.ConsigneeID = data.ConsigneeId; //NOT USE
-                housebill.Consignee = dataConsignee?.PartnerNameEn;
-                housebill.Notify = data.NotifyParty; //Notify Party Name
-                housebill.PlaceAtReceipt = "PlaceAtReceipt"; //Chưa biết
-                housebill.PlaceDelivery = data.DeliveryPlace;
-                housebill.LocalVessel = data.LocalVessel;
-                housebill.FromSea = "FromSea"; //NOT USE
-                housebill.OceanVessel = data.OceanVessel;
-                housebill.DepartureAirport = dataPOL?.NameEn; //POL
-                housebill.PortofDischarge = dataPOD?.NameEn; //POD
-                housebill.TranShipmentTo = "TranShipmentTo"; //NOT USE
-                housebill.GoodsDelivery = "GoodsDelivery"; //Chưa biết
-                housebill.CleanOnBoard = "CleanOnBoard"; //Chưa biết
-                housebill.MaskNos = "MaskNos"; //Chưa biết
-                housebill.NoPieces = "NoPieces"; //Chưa biết
-                housebill.Qty = "Qty"; //Chưa biết
-                housebill.Description = "Description";//Chưa biết
-                housebill.GrossWeight = data.GW != null ? data.GW.Value : 0;
+                housebill.Consignee = data.ConsigneeDescription;//dataConsignee?.PartnerNameEn;
+                housebill.Notify = data.NotifyPartyDescription;
+                housebill.PlaceAtReceipt = data.PickupPlace;// Place of receipt
+                housebill.PlaceDelivery = data.DeliveryPlace;// Place of Delivery
+                housebill.LocalVessel = data.LocalVoyNo;
+                housebill.FromSea = string.Empty; //NOT USE
+                housebill.OceanVessel = data.OceanVoyNo;
+                if(dataPOL != null)
+                {
+                    var polCountry = countryRepository.Get(x => x.Id == dataPOL.CountryId).FirstOrDefault()?.NameEn;
+                    housebill.DepartureAirport = dataPOL?.NameEn + ", " + polCountry; //POL
+                }                
+                if(dataPOD != null)
+                {
+                    var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
+                    housebill.PortofDischarge = dataPOD?.NameEn + ", " + podCountry; //POD
+                }               
+                housebill.TranShipmentTo = string.Empty; //NOT USE
+                housebill.GoodsDelivery = data.GoodsDeliveryDescription; //Good delivery
+                housebill.CleanOnBoard = data.OnBoardStatus; //On board status                
+                housebill.NoPieces = string.Empty; //Tạm thời để trống
+                var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
+                if (conts != null && conts.Count() > 0)
+                {
+                    string hbConstainers = string.Empty;
+                    foreach (var cont in conts)
+                    {
+                        var contUnit = catUnitRepo.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
+                        if (contUnit != null)
+                        {
+                            hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + ", ");
+                        }
+                    }
+                    housebill.Qty = hbConstainers; //Qty Container (Số Lượng container + Cont Type)
+                    housebill.MaskNos = string.Join("\r\n", conts.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "-" + x.SealNo : string.Empty));
+                }
+                housebill.Description = data.DesOfGoods;//Description of goods
+                housebill.GrossWeight = data.GrossWeight != null ? data.GrossWeight.Value : 0;
                 housebill.GrwDecimal = 2;
-                housebill.Unit = "Kgs"; //Đang gán cứng
+                housebill.Unit = "PKS"; //Đang gán cứng
                 housebill.CBM = data.Cbm != null ? data.Cbm.Value : 0;
                 housebill.CBMDecimal = 2;
-                housebill.SpecialNote = "SpecialNote"; //Chưa biết
-                housebill.TotalPackages = "TotalPackages"; //NOT USE
-                housebill.OriginCode = "OriginCode"; //NOT USE
-                housebill.ICASNC = "ICASNC"; //NOT USE
-                housebill.Movement = "Movement"; //Chưa biết
-                housebill.AccountingInfo = "AccountingInfo"; //NOT USE
-                housebill.SayWord = "SayWord"; //Chưa biết
-                housebill.strOriginLandPP = "strOriginLandPP"; //NOT USE
-                housebill.strOriginLandCC = "strOriginLandCC"; //NOT USE
-                housebill.strOriginTHCPP = "strOriginTHCPP"; //NOT USE
-                housebill.strOriginTHCCC = "strOriginTHCCC"; //NOT USE
-                housebill.strSeafreightPP = "strSeafreightPP"; //NOT USE
-                housebill.strSeafreightCC = "strSeafreightCC"; //NOT USE
-                housebill.strDesTHCPP = "strDesTHCPP"; //NOT USE
-                housebill.strDesTHCCC = "strDesTHCCC"; //NOT USE
-                housebill.strDesLandPP = "strDesLandPP"; //NOT USE
-                housebill.strDesLandCC = "strDesLandCC"; //NOT USE
-                housebill.FreightPayAt = "FreightPayAt"; //Chưa biết
-                housebill.ExecutedAt = "ExecutedAt"; //Chưa biết
-                housebill.ExecutedOn = "ExecutedOn"; //Chưa biết
-                housebill.NoofOriginBL = "NoofOriginBL"; //Chưa biết
-                housebill.ForCarrier = "ForCarrier"; //Chưa biết
+                housebill.SpecialNote = string.Empty; //Để trống
+                housebill.TotalPackages = string.Empty; //NOT USE
+                housebill.OriginCode = string.Empty; //NOT USE
+                housebill.ICASNC = string.Empty; //NOT USE
+                housebill.Movement = data.MoveType; //Type of move
+                housebill.AccountingInfo = string.Empty; //NOT USE
+                housebill.SayWord = data.InWord; //Inword
+                housebill.strOriginLandPP = string.Empty; //NOT USE
+                housebill.strOriginLandCC = string.Empty; //NOT USE
+                housebill.strOriginTHCPP = string.Empty; //NOT USE
+                housebill.strOriginTHCCC = string.Empty; //NOT USE
+                housebill.strSeafreightPP = string.Empty; //NOT USE
+                housebill.strSeafreightCC = string.Empty; //NOT USE
+                housebill.strDesTHCPP = string.Empty; //NOT USE
+                housebill.strDesTHCCC = string.Empty; //NOT USE
+                housebill.strDesLandPP = string.Empty; //NOT USE
+                housebill.strDesLandCC = string.Empty; //NOT USE
+                housebill.FreightPayAt = data.PlaceFreightPay; //Freight Payable at
+                housebill.ExecutedAt = data.IssueHblplace; //Place of Issue HBL
+                housebill.ExecutedOn = data.DatetimeCreated != null ? data.DatetimeCreated.Value.ToString("dd MMM, yyyy") : string.Empty; //Created Date
+                housebill.NoofOriginBL = data.OriginBlnumber.ToString(); //Number of Origin B/L
+                housebill.ForCarrier = string.Empty; //Để trống
                 housebill.SeaLCL = false; //NOT USE
                 housebill.SeaFCL = false; //NOT USE
-                housebill.ExportReferences = "ExportReferences"; //NOT USE
+                housebill.ExportReferences = data.ExportReferenceNo; //NOT USE
                 housebill.AlsoNotify = dataATTN?.PartnerNameEn; //NOT USE
-                housebill.Signature = "Signature"; //Chưa biết
-                housebill.SailingDate = DateTime.Now; //NOT USE
-                housebill.ShipPicture = null; //Chưa biết
-                housebill.PicMarks = "PicMarks"; //Chưa biết
+                housebill.Signature = string.Empty; //Để trống
+                if (data.SailingDate != null)
+                {
+                    housebill.SailingDate = data.SailingDate.Value; //NOT USE
+                }
+                housebill.ShipPicture = null; //Để trống
+                housebill.PicMarks = string.Empty; //Để trống
 
                 housebills.Add(housebill);
             }
@@ -780,25 +809,30 @@ namespace eFMS.API.Documentation.DL.Services
             string _reportName = string.Empty;
             switch (reportType)
             {
-                case "ITL":
+                case Constants.HBLOFLANDING_ITL:
                     _reportName = "SeaHBillofLadingITL.rpt";
                     break;
-                case "ITL_FRAME":
+                case Constants.HBLOFLANDING_ITL_FRAME:
                     _reportName = "SeaHBillofLadingITLFrame.rpt";
                     break;
-                case "FBL_FRAME":
+                case Constants.HBLOFLANDING_FBL_FRAME:
                     _reportName = "SeaHBillofLadingFBLFrame.rpt";
                     break;
-                case "ITL_KESCO":
+                case Constants.HBLOFLANDING_ITL_KESCO:
                     _reportName = "SeaHBillofLadingITL_KESCO.rpt";
                     break;
-                case "ITL_FRAME_KESCO":
+                case Constants.HBLOFLANDING_ITL_FRAME_KESCO:
                     _reportName = "SeaHBillofLadingITLFrame_Kesco.rpt";
                     break;
-                case "ITL_SEKO":
+                case Constants.HBLOFLANDING_ITL_SEKO:
                     _reportName = "SeaHBillofLadingITL_Seko.rpt";
                     break;
             }
+
+            var freightCharges = new List<FreightCharge>() {
+                new FreightCharge(){ FreightCharges = "Freight " + data.FreightPayment }
+            };
+
             result = new Crystal
             {
                 ReportName = _reportName,
@@ -806,26 +840,27 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true
             };
             result.AddDataSource(housebills);
+            result.AddSubReport("Freightcharges", freightCharges);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            if (reportType == "ITL" || reportType == "ITL_FRAME" || reportType == "ITL_SEKO")
+            if (reportType == Constants.HBLOFLANDING_ITL || reportType == Constants.HBLOFLANDING_ITL_FRAME || reportType == Constants.HBLOFLANDING_ITL_SEKO)
             {
                 var parameter = new SeaHBillofLadingReportParams1()
                 {
-                    Packages = "Packages",
-                    GrossWeight = "GrossWeight",
-                    Measurement = "Measurement"
+                    Packages = string.Empty, //Tạm thời để trống (sao này sẽ thay thế bằng field Package)
+                    GrossWeight = data?.GrossWeight.ToString(), 
+                    Measurement = data?.Cbm.ToString(),
                 };
                 result.SetParameter(parameter);
             }
 
-            if (reportType == "ITL_KESCO" || reportType == "ITL_FRAME_KESCO")
+            if (reportType == Constants.HBLOFLANDING_ITL_KESCO || reportType == Constants.HBLOFLANDING_ITL_FRAME_KESCO)
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {
-                    Packages = "Packages",
-                    GrossWeight = "GrossWeight",
-                    Measurement = "Measurement",
-                    DocumentNo = "DocumentNo"
+                    Packages = string.Empty, //Tạm thời để trống (sao này sẽ thay thế bằng field Package)
+                    GrossWeight = data?.GrossWeight.ToString(),
+                    Measurement = data?.Cbm.ToString(),
+                    DocumentNo = string.Empty //Tạm thời để trống
                 };
                 result.SetParameter(parameter);
             }

@@ -1,6 +1,21 @@
 <div class="sea-fcl-detail-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
+            <div class="dropdown m-dropdown m-dropdown--inline">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    <i class="la la-print"></i>Preview<span class="caret"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" (click)="preview('ITL_FRAME')">ITL (Frame) H-B/L Preview</a>
+                    <a class="dropdown-item" (click)="preview('ITL')">ITL H-B/L Preview</a>
+                    <a class="dropdown-item" (click)="preview('FBL_FRAME')">VLA (Frame) H-B/L Preview</a>
+                    <!-- <a class="dropdown-item" >VLA H-B/L Preview</a> -->
+                    <a class="dropdown-item" (click)="preview('ITL_SEKO')">ITL H-B/L SEKO Preview</a>
+                    <a class="dropdown-item" (click)="preview('ITL_FRAME_KESCO')">ITL (Frame) H-B/L KESCO Preview</a>
+                    <a class="dropdown-item" (click)="preview('ITL_KESCO')">ITL H-B/L KESKO Preview</a>                    
+                </div>
+            </div>
+                   
             <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
@@ -21,3 +36,7 @@
 <confirm-popup [body]="'You are about to create a new  HBL, are you sure all entered details are correct ?'"
     [labelCancel]="'No'" (onSubmit)="onSaveHBL()" [labelConfirm]="'Yes'">
 </confirm-popup>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>

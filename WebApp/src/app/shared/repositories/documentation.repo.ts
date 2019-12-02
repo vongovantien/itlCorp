@@ -466,4 +466,13 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    previewSeaHBLOfLanding(hblId: string, reportType: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewSeaHBLofLading`, { hblId: hblId, reportType: reportType }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
 }

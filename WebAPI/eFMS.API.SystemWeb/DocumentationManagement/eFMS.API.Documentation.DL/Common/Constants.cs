@@ -42,5 +42,12 @@ namespace eFMS.API.Documentation.DL.Common
         #endregion
         public static readonly string CURRENCY_LOCAL = "VND";
         public static readonly string CURRENCY_USD = "USD";
+
+        public const string HBLOFLANDING_ITL = "ITL";
+        public const string HBLOFLANDING_ITL_FRAME = "ITL_FRAME";
+        public const string HBLOFLANDING_FBL_FRAME = "FBL_FRAME";
+        public const string HBLOFLANDING_ITL_KESCO = "ITL_KESCO";
+        public const string HBLOFLANDING_ITL_FRAME_KESCO = "ITL_FRAME_KESCO";
+        public const string HBLOFLANDING_ITL_SEKO = "ITL_SEKO";
     }
 }
