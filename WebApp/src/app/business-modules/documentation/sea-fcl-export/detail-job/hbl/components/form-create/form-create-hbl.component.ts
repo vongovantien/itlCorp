@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from 'src/app/shared/repositories';
@@ -11,19 +12,17 @@ import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { AppForm } from 'src/app/app.form';
 import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from 'src/app/shared/validators';
+import { DataService } from 'src/app/shared/services';
+
 
 import { Observable } from 'rxjs';
-import { catchError, takeUntil, skip, distinctUntilChanged } from 'rxjs/operators';
+import { catchError, takeUntil, skip, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../../share-business/store';
-
-
-
 @Component({
     selector: 'form-create-hbl-fcl-export',
     templateUrl: './form-create-hbl.component.html'
 })
-
 export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnInit {
 
     formCreate: FormGroup;
@@ -80,7 +79,7 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
     serviceTypes: CommonInterface.INg2Select[];
     ladingTypes: CommonInterface.INg2Select[];
     termTypes: CommonInterface.INg2Select[];
-    originNumbers: CommonInterface.INg2Select[];
+    originNumbers: CommonInterface.INg2Select[] = [{ id: 1, text: '1' }, { id: 2, text: '2' }, { id: 3, text: '3' }];
     typeOfMoves: CommonInterface.INg2Select[];
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
@@ -106,7 +105,9 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
         private _documentRepo: DocumentationRepo,
-        private _store: Store<fromShareBussiness.IShareBussinessState>
+        private _store: Store<fromShareBussiness.IShareBussinessState>,
+        private _spinner: NgxSpinnerService,
+        private _dataService: DataService
     ) {
         super();
     }
@@ -270,7 +271,7 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
             notifyParty: data.notifyPartyId,
             notifyPartyDescription: data.notifyPartyDescription,
             hwbno: data.hwbno,
-            hbltype: !!data.hbltype ? [this.ladingTypes.find(type => type.id === data.hbltype)] : null,
+            hbltype: !!data.hbltype ? [(this.ladingTypes || []).find(type => type.id === data.hbltype)] : null,
             bookingNo: data.customsBookingNo,
             localVoyNo: data.localVoyNo,
             oceanVoyNo: data.oceanVoyNo,
@@ -280,7 +281,7 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
             pod: data.pod,
             placeDelivery: data.deliveryPlace,
             finalDestinationPlace: data.finalDestinationPlace,
-            freightPayment: !!data.freightPayment ? [this.termTypes.find(type => type.id === data.freightPayment)] : null,
+            freightPayment: !!data.freightPayment ? [(this.termTypes || []).find(type => type.id === data.freightPayment)] : null,
             closingDate: !!data.closingDate ? { startDate: new Date(data.closingDate), endDate: new Date(data.closingDate) } : null,
             sailingDate: !!data.sailingDate ? { startDate: new Date(data.sailingDate), endDate: new Date(data.sailingDate) } : null,
             placeFreightPay: data.placeFreightPay,
@@ -288,17 +289,18 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
             goodsDelivery: data.goodsDeliveryId,
             goodsDeliveryDescription: data.goodsDeliveryDescription,
             forwardingAgentDescription: data.forwardingAgentDescription,
-            originBlnumber: !!data.originBlnumber ? [this.originNumbers.find(type => type.id === data.originBlnumber)] : null,
+            originBlnumber: !!data.originBlnumber ? [(this.originNumbers || []).find(type => type.id === data.originBlnumber)] : null,
             referenceNo: data.referenceNo,
             exportReferenceNo: data.exportReferenceNo,
             issueHblplaceAndDate: data.issueHblplace,
-            moveType: !!data.moveType ? [this.typeOfMoves.find(type => type.id === data.moveType)] : null,
-            serviceType: !!data.serviceType ? [this.serviceTypes.find(s => s.id === data.serviceType)] : null,
+            moveType: !!data.moveType ? [(this.typeOfMoves || []).find(type => type.id === data.moveType)] : null,
+            serviceType: !!data.serviceType ? [(this.serviceTypes || []).find(s => s.id === data.serviceType)] : null,
             purchaseOrderNo: data.purchaseOrderNo,
             shippingMark: data.shippingMark,
             inWord: data.inWord,
             onBoardStatus: data.onBoardStatus
         });
+        console.log(this.formCreate.value);
     }
 
     getSaleMans() {
@@ -314,18 +316,32 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
     }
 
     getDropdownData() {
-        this.originNumbers = <any>[{ id: 1, text: '1' }, { id: 2, text: '2' }, { id: 3, text: '3' }];
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
+            const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
 
-        this._documentRepo.getShipmentDataCommon()
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (commonData: any) => {
-                    this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
-                    this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
-                    this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-                    this.typeOfMoves = this.utility.prepareNg2SelectData(commonData.typeOfMoves, 'value', 'displayName');
-                }
-            );
+            this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
+            this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
+            this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
+            this.typeOfMoves = this.utility.prepareNg2SelectData(commonData.typeOfMoves, 'value', 'displayName');
+
+        } else {
+            this._spinner.show();
+            this._documentRepo.getShipmentDataCommon()
+                .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+                .subscribe(
+                    (commonData: any) => {
+                        this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
+                        this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
+                        this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
+                        this.typeOfMoves = this.utility.prepareNg2SelectData(commonData.typeOfMoves, 'value', 'displayName');
+
+                        console.log(this.serviceTypes);
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
+
+                    }
+                );
+        }
+
     }
 
     onSelectDataFormInfo(data: any, type: string) {

@@ -23,6 +23,7 @@ import * as fromStore from './../../store';
 
 export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingChargeComponent {
 
+    isShowSyncFreightCharge: boolean = true;
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,

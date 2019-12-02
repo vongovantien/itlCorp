@@ -192,6 +192,6 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     }
 
     gotoList() {
-        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`])
+        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
     }
 }
