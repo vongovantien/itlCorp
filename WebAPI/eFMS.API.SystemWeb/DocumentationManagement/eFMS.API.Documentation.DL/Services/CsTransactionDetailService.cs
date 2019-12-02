@@ -46,8 +46,6 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatSaleman> catSaleman,
             IContextBase<CsShipmentSurcharge> surchareRepo , 
             IContextBase<CatCountry> countryRepo,
-            IContextBase<CsShipmentSurcharge> surchareRepo , IContextBase<CsTransactionDetail> csTransactiondetail,
-ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mapper)
             IContextBase<CsTransactionDetail> csTransactiondetail,
             ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mapper)
         {
