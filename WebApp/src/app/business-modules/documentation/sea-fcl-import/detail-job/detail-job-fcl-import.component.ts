@@ -28,7 +28,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
-    id: string;
+    jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
@@ -60,17 +60,17 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param: any) => {
                 this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
-                this.id = !!param.id ? param.id : '';
+                this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
                 }
 
                 this.cdr.detectChanges();
             }),
-            switchMap(() => of(this.id))
+            switchMap(() => of(this.jobId))
         ).subscribe(
             (jobId: string) => {
-                this.id = jobId;
+                this.jobId = jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
                 this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
                 this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
@@ -134,7 +134,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
         //  * Update field
         modelUpdate.csMawbcontainers = this.containers;
-        modelUpdate.id = this.id;
+        modelUpdate.id = this.jobId;
         modelUpdate.branchId = this.fclImportDetail.branchId;
         modelUpdate.transactionType = this.fclImportDetail.transactionType;
         modelUpdate.jobNo = this.fclImportDetail.jobNo;
@@ -157,12 +157,12 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.id = res.data.id;
-                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.id));
+                        this.jobId = res.data.id;
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.id }));
+                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                         // * get detail & container list.
-                        this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                        this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
                     } else {
                         this._toastService.error(res.message);
@@ -182,9 +182,9 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                         this._toastService.success(res.message);
 
                         // * get detail & container list.
-                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.id));
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.id }));
+                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -195,16 +195,16 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'hbl':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}/hbl`]);
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }
@@ -215,7 +215,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     onDeleteJob() {
         this._progressRef.start();
-        this._documenRepo.deleteMasterBill(this.id)
+        this._documenRepo.deleteMasterBill(this.jobId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
@@ -240,7 +240,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     duplicateConfirm() {
         this.action = { action: 'copy' };
-        this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], {
+        this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
         this.confirmDuplicatePopup.hide();
@@ -251,7 +251,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     }
 
     previewPLsheet(currency: string) {
-        this._documenRepo.previewSIFPLsheet(this.id, currency)
+        this._documenRepo.previewSIFPLsheet(this.jobId, currency)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {

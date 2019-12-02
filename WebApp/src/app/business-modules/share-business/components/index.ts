@@ -18,6 +18,7 @@ export * from './import-job-detail/import-job-detail.popup';
 export * from './import-job-detail/components/form-search-import/form-search-import-job-detail.component';
 
 export * from './shipment-good-summary/shipment-good-summary.component';
+export * from './shipment-good-summary-lcl/shipment-good-summary-lcl.component';
 export * from './form-create-sea-import/form-create-sea-import.component';
 
 

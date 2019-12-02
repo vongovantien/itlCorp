@@ -59,8 +59,8 @@ export class SeaFCLImportAsignmentComponent extends AppList {
 
     ngOnInit() {
         this._activedRouter.params.subscribe((param: any) => {
-            if (param.id) {
-                this.jobId = param.id;
+            if (param.jobId) {
+                this.jobId = param.jobId;
                 this.getCSTransactionDetails(this.jobId);
                 this.getListStageJob(this.jobId);
                 this.getListStageAvailable(this.jobId);

@@ -78,8 +78,8 @@ export class CreateHouseBillComponent extends AppForm {
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.id) {
-                this.jobId = param.id;
+            if (param.jobId) {
+                this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
 

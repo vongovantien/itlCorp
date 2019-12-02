@@ -19,4 +19,13 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
     gotoList() {
         this._router.navigate(["home/documentation/sea-lcl-import"]);
     }
+
+    showImportPopup() {
+
+    }
+
+    onCreateJob() {
+
+    }
+
 }

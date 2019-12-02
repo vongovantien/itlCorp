@@ -6,13 +6,13 @@ import { AppForm } from 'src/app/app.form';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { getParamsRouterState } from 'src/app/store';
+import { ShareBussinessContainerListPopupComponent } from '../container-list/container-list.popup';
 
 import _uniqBy from 'lodash/uniqBy';
 import _groupBy from 'lodash/groupBy';
 import { takeUntil } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
-import { ShareBussinessContainerListPopupComponent } from '../container-list/container-list.popup';
 
 
 @Component({

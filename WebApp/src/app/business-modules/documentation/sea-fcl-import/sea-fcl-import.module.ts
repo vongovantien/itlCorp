@@ -29,15 +29,15 @@ const routing: Routes = [
         data: { name: "Create New Job", path: "new", level: 3 }
     },
     {
-        path: ':id', component: SeaFCLImportDetailJobComponent,
-        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport },
+        path: ':jobId', component: SeaFCLImportDetailJobComponent,
+        data: { name: "Job Detail", path: ":jobId", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport },
     },
     {
-        path: ':id/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),
+        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),
     },
     {
-        path: ':id/manifest', component: SeaFclImportManifestComponent,
-        data: { name: "Manifest", path: ":id", level: 4 },
+        path: ':jobId/manifest', component: SeaFclImportManifestComponent,
+        data: { name: "Manifest", path: ":jobId", level: 4 },
     },
 
 
