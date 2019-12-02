@@ -77,38 +77,39 @@ namespace eFMS.API.Documentation.DL.Services
                 Website = string.Empty,
                 DecimalNo = 2
             };
-            if (model.CsTransactionDetails != null)
+            if (model.CsTransactionDetails == null)
             {
-                foreach(var item in model.CsTransactionDetails)
+                return result;
+            }
+            foreach (var item in model.CsTransactionDetails)
+            {
+                var instruction = new SeaShippingInstruction
                 {
-                    var instruction = new SeaShippingInstruction
-                    {
-                        Attn = item.NotifyParty,
-                        ToPartner = model.SupplierName,
-                        Re = model.BookingNo,
-                        DatePackage = model.InvoiceDate == null? model.InvoiceDate: null,
-                        ShipperDf = model.ActualShipperDescription,
-                        GoodsDelivery = model.ConsigneeDescription,
-                        NotitfyParty = item.NotifyParty,
-                        PortofLoading = model.PolName,
-                        PortofDischarge = model.PodName,
-                        PlaceDelivery = model.PoDelivery,
-                        Vessel = model.VoyNo,
-                        Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
-                        ShippingMarks = item.ShippingMark,
-                        Containers = item.ContainerNames,
-                        ContSealNo = item.OceanVoyNo,
-                        NoofPeace = item.PackageContainer,
-                        SIDescription = model.GoodsDescription,
-                        GrossWeight = (decimal)model?.GrossWeight,
-                        CBM = 200,
-                        Qty = "200",
-                        RateRequest = model.Remark,
-                        Payment = model.PaymenType,
-                        ShippingMarkImport = string.Empty
-                    };
-                    instructions.Add(instruction);
-                }
+                    Attn = item.NotifyParty,
+                    ToPartner = model.SupplierName,
+                    Re = model.BookingNo,
+                    DatePackage = model.InvoiceDate == null ? model.InvoiceDate : null,
+                    ShipperDf = model.ActualShipperDescription,
+                    GoodsDelivery = model.ConsigneeDescription,
+                    NotitfyParty = model.CargoNoticeRecevier,
+                    PortofLoading = model.PolName,
+                    PortofDischarge = model.PodName,
+                    PlaceDelivery = model.PoDelivery,
+                    Vessel = model.VoyNo,
+                    Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
+                    ShippingMarks = item.ShippingMark,
+                    Containers = item.ContSealNo,
+                    ContSealNo = item.ContSealNo,
+                    NoofPeace = item.PackageContainer,
+                    SIDescription = model.GoodsDescription,
+                    GrossWeight = (decimal)model?.GrossWeight,
+                    CBM = item.Cbm,
+                    Qty = "200",
+                    RateRequest = model.Remark,
+                    Payment = model.PaymenType,
+                    ShippingMarkImport = string.Empty
+                };
+                instructions.Add(instruction);
             }
             result = new Crystal
             {

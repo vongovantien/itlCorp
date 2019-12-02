@@ -456,4 +456,9 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+    previewSIReport(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewFCLShippingInstruction`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }

@@ -59,7 +59,6 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
     }
 
     ngOnInit() {
-        this.getTerms();
         this.initForm();
         this.getUserIssuses();
         this.getSuppliers();
@@ -102,7 +101,7 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
     }
     initForm() {
         this.formSI = this._fb.group({
-            siRefNo: [{ value: null, disabled: true }, Validators.required], // * disabled
+            siRefNo: [{ value: null, disabled: true }], // * disabled
             bookingNo: [],
             issueDate: [null, Validators.required],
             issuedUser: [null, Validators.required],
@@ -214,17 +213,6 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
                     this.userIssues = res;
                 },
             );
-    }
-    async getTerms() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
-            const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-            this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-
-        } else {
-            const commonData: { [key: string]: CommonInterface.IValueDisplay[] } = await this._documentRepo.getShipmentDataCommon().toPromise();
-            this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
-            this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-        }
     }
 
     onSelectDataForm(data, type) {

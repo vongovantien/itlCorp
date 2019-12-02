@@ -22,7 +22,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobComponent implements OnInit {
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    
+
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};

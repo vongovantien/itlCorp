@@ -57,6 +57,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string ShippingMark { get; set; }
         public string Remark { get; set; }
         public string Commodity { get; set; }
+        public string ContSealNo { get; set; }
         public string PackageContainer { get; set; }
         public string DesOfGoods { get; set; }
         public decimal? NetWeight { get; set; }

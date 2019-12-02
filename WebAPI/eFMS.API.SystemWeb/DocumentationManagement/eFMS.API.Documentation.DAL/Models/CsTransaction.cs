@@ -37,9 +37,9 @@ namespace eFMS.API.Documentation.Service.Models
         public string Notes { get; set; }
         public string TransactionType { get; set; }
         public string CurrentStatus { get; set; }
-        public string UserCreated { get; set; }
-        public bool? IsLocked { get; set; }
         public DateTime? LockedDate { get; set; }
+        public bool? IsLocked { get; set; }
+        public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }

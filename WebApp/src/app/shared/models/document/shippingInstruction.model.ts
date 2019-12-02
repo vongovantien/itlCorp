@@ -44,6 +44,8 @@ export class CsShippingInstruction {
   modifiedDate: Date = null;
   active: boolean = true;
   inactiveOn: Date = null;
+  csTransactionDetails: CsTransactionDetail[] = null;
+  // csMawbcontainers: Container[] = [];
 
   constructor(object?: any) {
     const self = this;
@@ -53,6 +55,4 @@ export class CsShippingInstruction {
       }
     }
   }
-  // csTransactionDetails: CsTransactionDetail[] = null;
-  // csMawbcontainers: Container[] = [];
 }
