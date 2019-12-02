@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
@@ -10,6 +10,8 @@ import { CsTransactionDetail } from 'src/app/shared/models';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
+import { Crystal } from 'src/app/shared/models/report/crystal.model';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 @Component({
     selector: 'app-detail-hbl-fcl-export',
@@ -17,9 +19,10 @@ import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 })
 
 export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLComponent implements OnInit, AfterViewInit {
-
+    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     hblId: string;
     hblDetail: CsTransactionDetail;
+    dataReport: Crystal;
 
     constructor(
         protected _progressService: NgProgress,
@@ -132,6 +135,28 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                         this._toastService.error(res.message);
                     }
                 }
+            );
+    }
+
+    preview(reportType: string){
+        this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    console.log(res)
+                    if (this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
             );
     }
 
