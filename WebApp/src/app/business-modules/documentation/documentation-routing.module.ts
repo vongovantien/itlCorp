@@ -63,22 +63,7 @@ const routes: Routes = [
             level: 2
         }
     },
-    // {
-    //     path: 'sea-fcl-export',
-    //     component: SeaFCLExportComponent,
-    //     data: {
-    //         name: "Sea FCL Export",
-    //         level: 2
-    //     }
-    // },
-    {
-        path: 'sea-fcl-export-create',
-        component: SeaFclExportCreateComponent,
-        data: {
-            name: "Sea FCL Create",
-            level: 3
-        }
-    },
+
     {
         path: 'manifest',
         component: ManifestComponent,
@@ -100,6 +85,10 @@ const routes: Routes = [
     },
     {
         path: 'sea-fcl-export', loadChildren: () => import('./sea-fcl-export/sea-fcl-export.module').then(m => m.SeaFCLExportModule),
+    },
+    {
+        path: 'sea-lcl-import', loadChildren: () => import('./sea-lcl-import/sea-lcl-import.module').then(m => m.SeaLCLImportModule),
+
     },
     {
         path: 'sea-lcl-export',
@@ -138,14 +127,7 @@ const routes: Routes = [
         path: 'sea-lcl-export-housebill-addnew',
         component: SeaLclExportHousebillAddnewComponent
     },
-    {
-        path: 'sea-lcl-import',
-        component: SeaLCLImportComponent,
-        data: {
-            name: "Sea LCL Import",
-            level: 2
-        }
-    }
+
 ];
 
 @NgModule({
