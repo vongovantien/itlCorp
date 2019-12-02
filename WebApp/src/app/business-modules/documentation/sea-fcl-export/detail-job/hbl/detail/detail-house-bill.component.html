@@ -1,21 +1,16 @@
 <div class="sea-fcl-detail-hbl-page">
-    <app-sub-header></app-sub-header>
+    <app-sub-header>
+        <div class="c-button-actions">
+            <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
 
+            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
+        </div>
+    </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
             <form-create-hbl-fcl-export></form-create-hbl-fcl-export>
 
             <shipment-good-summary> HBL Goods Summary </shipment-good-summary>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="m--align-center">
-                        <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"
-                            class="m--margin-right-20"></app-default-button>
-                        <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

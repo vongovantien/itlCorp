@@ -19,7 +19,8 @@
                 </span>
             </button>
 
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                (click)="deleteJob()">
                 <span>
                     <i class="la la-trash"></i>
                     <span>
@@ -28,7 +29,7 @@
                 </span>
             </button>
 
-            <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase" disabled>
                 <span>
                     <i class="la la-save"></i>
                     <span>
@@ -38,6 +39,7 @@
             </button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
+
         </div>
     </app-sub-header>
     <div class="m-content">
