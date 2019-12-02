@@ -172,6 +172,9 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             case 'cdNote':
                 this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
+            case 'assignment':
+                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
         }
     }
 

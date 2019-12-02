@@ -28,6 +28,10 @@ import { ShareBussinessCdNoteDetailPopupComponent } from './components/cd-note/d
 import { reducers, effects } from './store';
 import { ShareBusinessImportJobDetailPopupComponent } from './components/import-job-detail/import-job-detail.popup';
 import { ShareBusinessFormSearchImportJobComponent } from './components/import-job-detail/components/form-search-import/form-search-import-job-detail.component';
+import { ShareBusinessAssignStagePopupComponent } from './components/stage-management/assign-stage/assign-stage.popup';
+import { SelectModule } from 'ng2-select';
+import { ShareBusinessAsignmentComponent } from './components/asignment/asignment.component';
+import { ShareBusinessStageManagementDetailComponent } from './components/stage-management/detail/detail-stage-popup.component';
 
 
 
@@ -46,6 +50,9 @@ const COMPONENTS = [
     ShareBussinessCdNoteAddPopupComponent,
     ShareBussinessCdNoteAddRemainingChargePopupComponent,
     ShareBussinessCdNoteDetailPopupComponent,
+    ShareBusinessAssignStagePopupComponent,
+    ShareBusinessAsignmentComponent,
+    ShareBusinessStageManagementDetailComponent
 ];
 
 const customCurrencyMaskConfig = {
@@ -68,6 +75,7 @@ const customCurrencyMaskConfig = {
         CommonModule,
         CommonComponentModule,
         FormsModule,
+        SelectModule,
         ReactiveFormsModule,
         ModalModule.forRoot(),
         NgxDaterangepickerMd.forRoot(),
@@ -79,6 +87,7 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         StoreModule.forFeature('share-bussiness', reducers),
         EffectsModule.forFeature(effects),
+
 
     ],
     exports: [
