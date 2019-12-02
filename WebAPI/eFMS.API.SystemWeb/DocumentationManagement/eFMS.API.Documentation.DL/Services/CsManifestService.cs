@@ -220,6 +220,22 @@ namespace eFMS.API.Documentation.DL.Services
                                 containers.Add(containerTemp);
                             }
                         }
+                        else
+                        {
+                            var containerTemp = new SeaImportCargoManifestContainer
+                            {
+                                Qty = 0,
+                                ContType = null,
+                                ContainerNo = null,
+                                SealNo = null,
+                                TotalPackages = 0,
+                                UnitPack = null,
+                                GrossWeight = 0,
+                                CBM =0,
+                                DecimalNo = 0
+                            };
+                            containers.Add(containerTemp);
+                        }
 
                         var manifest = new ManifestFCLImportReport
                         {

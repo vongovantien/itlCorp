@@ -283,7 +283,7 @@ export class SeaFclExportManifestComponent extends AppList {
             invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
             pol: !!this.formManifest.selectedPortOfLoading.value ? this.formManifest.selectedPortOfLoading.value : null,
             pod: !!this.formManifest.selectedPortOfDischarge.value ? this.formManifest.selectedPortOfDischarge.value : null,
-            paymentTerm: this.formManifest.freightCharge.value[0].text,
+            paymentTerm: this.formManifest.freightCharge.value !== "" ? this.formManifest.freightCharge.value[0].text : null,
             consolidator: this.formManifest.consolidator.value,
             deConsolidator: this.formManifest.deconsolidator.value,
             volume: this.formManifest.volume.value,
