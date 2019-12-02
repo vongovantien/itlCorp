@@ -20,11 +20,6 @@ export class SeaFCLImportManagementComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
 
-    tabs: any[] = [
-        { title: 'Shipment Detail', content: 'Dynamic content 1' },
-        { title: 'Dynamic Title 2', content: 'Dynamic content 2' },
-        { title: 'Dynamic Title 3', content: 'Dynamic content 3', removable: true }
-    ];
     headers: CommonInterface.IHeaderTable[];
     headerHouseBills: CommonInterface.IHeaderTable[];
 

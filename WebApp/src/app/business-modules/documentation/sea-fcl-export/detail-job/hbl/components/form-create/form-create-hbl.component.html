@@ -130,14 +130,15 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger':formCreate.errors | equalError:'invalidPort' || isSubmitted && !pod.value}">
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!pod.value || formCreate.errors | equalError:'invalidPort')}">
                         <label required>Port of Discharge</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                             [currentActiveItemId]="{ field: 'id', value: pod.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                             [displayFields]="displayFieldPort">
                         </app-combo-grid-virtual-scroll>
-                        <div class="form-control-feedback" *ngIf="formCreate.errors | equalError:'invalidPort'">Port of
+                        <div class="form-control-feedback"
+                            *ngIf="isSubmitted && formCreate.errors | equalError:'invalidPort'">Port of
                             Discharge must be different from Port of Loading
                         </div>
                     </div>
