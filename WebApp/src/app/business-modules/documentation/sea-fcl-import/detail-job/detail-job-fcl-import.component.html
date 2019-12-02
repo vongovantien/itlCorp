@@ -45,7 +45,7 @@
             <tabset class="custom-class-tab">
                 <tab heading="Shipment Detail" [active]="selectedTab === 'SHIPMENT'"
                     (selectTab)="onSelectTab('shipment')">
-                    <form-create-sea-fcl-import>
+                    <form-create-sea-import>
                         <div class="row m--margin-top-20" *ngIf="!!fclImportDetail">
                             <div class="col-md-4">
                                 <span>Created: {{fclImportDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
@@ -56,7 +56,7 @@
                                 </span> <span class="text-success">{{fclImportDetail.userModified}}</span>
                             </div>
                         </div>
-                    </form-create-sea-fcl-import>
+                    </form-create-sea-import>
 
                     <shipment-good-summary> Shipment Goods Summary </shipment-good-summary>
 

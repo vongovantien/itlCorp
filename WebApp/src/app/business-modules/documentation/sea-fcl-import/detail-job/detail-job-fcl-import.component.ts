@@ -6,8 +6,6 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 import { SeaFCLImportCreateJobComponent } from '../create-job/create-job-fcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { SeaFClImportFormCreateComponent } from '../components/form-create/form-create-sea-fcl-import.component';
-import { Container } from 'src/app/shared/models/document/container.model';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 
@@ -23,11 +21,9 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 @Component({
     selector: 'app-detail-job-fcl-import',
     templateUrl: './detail-job-fcl-import.component.html',
-    styleUrls: ['./../create-job/create-job-fcl-import.component.scss']
 })
 export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobComponent {
 
-    @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
@@ -37,7 +33,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     fclImportDetail: any; // TODO Model.
-    containers: Container[] = [];
     action: any = {};
 
     dataReport: any = null;

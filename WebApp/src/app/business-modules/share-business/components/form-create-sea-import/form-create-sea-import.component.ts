@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
@@ -15,16 +15,16 @@ import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 
 
-import * as fromShare from './../../../../share-business/store';
+import * as fromShare from '../../store';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 
 @Component({
-    selector: 'form-create-sea-fcl-import',
-    templateUrl: './form-create-sea-fcl-import.component.html',
+    selector: 'form-create-sea-import',
+    templateUrl: './form-create-sea-import.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class SeaFClImportFormCreateComponent extends AppForm {
+export class ShareBussinessFormCreateSeaImportComponent extends AppForm implements OnInit {
 
     ladingTypes: CommonInterface.INg2Select[];
     shipmentTypes: CommonInterface.INg2Select[];

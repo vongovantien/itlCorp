@@ -6,33 +6,35 @@ import { ToastrService } from 'ngx-toastr';
 
 import { AppForm } from 'src/app/app.form';
 import { FCLImportAddModel } from 'src/app/shared/models';
-import { SeaFClImportFormCreateComponent } from '../components/form-create/form-create-sea-fcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-
+import { ShareBusinessImportJobDetailPopupComponent } from 'src/app/business-modules/share-business/components/import-job-detail/import-job-detail.popup';
+import { ShareBussinessFormCreateSeaImportComponent } from 'src/app/business-modules/share-business';
 
 import { catchError, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
-import { ShareBusinessImportJobDetailPopupComponent } from 'src/app/business-modules/share-business/components/import-job-detail/import-job-detail.popup';
+
 
 @Component({
     selector: 'app-create-job-fcl-import',
     templateUrl: './create-job-fcl-import.component.html',
-    styleUrls: ['./create-job-fcl-import.component.scss']
 })
 export class SeaFCLImportCreateJobComponent extends AppForm {
-    @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
+
+    @ViewChild(ShareBussinessFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
+
     containers: Container[] = [];
     selectedJob: any = {}; // TODO model.
     isImport: boolean = false;
+
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
