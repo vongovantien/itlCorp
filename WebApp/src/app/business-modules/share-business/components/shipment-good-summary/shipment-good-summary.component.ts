@@ -47,7 +47,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         this._store.select(getParamsRouterState).subscribe(
             (p: Params) => {
                 this.hblid = p['hblId'];
-                this.mblid = p['id'];
+                this.mblid = p['jobId'];
             }
         );
 

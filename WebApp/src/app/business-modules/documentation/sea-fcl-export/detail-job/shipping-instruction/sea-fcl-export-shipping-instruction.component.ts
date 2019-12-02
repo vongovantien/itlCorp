@@ -186,7 +186,24 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                             this.previewPopup.show();
                         }, 1000);
                     } else {
-                        this._toastService.warning('There is no data to display preview');
+                        this._toastService.warning('There is no container data to display preview');
+                    }
+                },
+            );
+    }
+    previewOCL() {
+        this._documentRepo.previewOCLReport(this.billInstructionComponent.shippingInstruction)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no container data to display preview');
                     }
                 },
             );

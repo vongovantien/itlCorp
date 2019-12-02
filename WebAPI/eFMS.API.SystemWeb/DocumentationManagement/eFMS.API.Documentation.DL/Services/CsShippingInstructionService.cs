@@ -80,14 +80,13 @@ namespace eFMS.API.Documentation.DL.Services
                 Website = string.Empty,
                 DecimalNo = 2
             };
-            if (model.CsTransactionDetails == null)
-            {
-                return result;
-            }
             var containers = containerRepository.Get(x => x.Mblid == model.JobId);
-            foreach(var item in containers)
+            if (containers == null) return result;
+            var total = containers.Sum(x => x.Quantity);
+            foreach (var item in containers)
             {
                 var instruction = new SeaShippingInstruction {
+                    TRANSID = model.BookingNo,
                     Attn = model.InvoiceNoticeRecevier,
                     ToPartner = model.SupplierName,
                     Re = model.BookingNo,
@@ -101,49 +100,20 @@ namespace eFMS.API.Documentation.DL.Services
                     Vessel = model.VoyNo,
                     Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
                     ShippingMarks = item.MarkNo,
-                    Containers = item.ContainerNo,
+                    Containers = item.ContainerNo + "/ " + item.SealNo,
                     ContSealNo = item.SealNo,
-                    NoofPeace = "100",
+                    NoofPeace = item.PackageQuantity?.ToString(),
                     SIDescription = item.Description,
                     GrossWeight = item.Gw,
                     CBM = item.Cbm,
-                    Qty = "200",
+                    Qty = total?.ToString(),
                     RateRequest = model.Remark,
                     Payment = model.PaymenType,
-                    ShippingMarkImport = string.Empty
+                    ShippingMarkImport = string.Empty,
+                    MaskNos = item.MarkNo
                 };
                 instructions.Add(instruction);
             }
-            //foreach (var item in model.CsTransactionDetails)
-            //{
-            //    var instruction = new SeaShippingInstruction
-            //    {
-            //        Attn = item.NotifyParty,
-            //        ToPartner = model.SupplierName,
-            //        Re = model.BookingNo,
-            //        DatePackage = model.InvoiceDate == null ? model.InvoiceDate : null,
-            //        ShipperDf = model.ActualShipperDescription,
-            //        GoodsDelivery = model.ConsigneeDescription,
-            //        NotitfyParty = model.CargoNoticeRecevier,
-            //        PortofLoading = model.PolName,
-            //        PortofDischarge = model.PodName,
-            //        PlaceDelivery = model.PoDelivery,
-            //        Vessel = model.VoyNo,
-            //        Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
-            //        ShippingMarks = item.ShippingMark,
-            //        Containers = item.ContSealNo,
-            //        ContSealNo = item.ContSealNo,
-            //        NoofPeace = item.PackageContainer,
-            //        SIDescription = model.GoodsDescription,
-            //        GrossWeight = (decimal)model?.GrossWeight,
-            //        CBM = item.Cbm,
-            //        Qty = "200",
-            //        RateRequest = model.Remark,
-            //        Payment = model.PaymenType,
-            //        ShippingMarkImport = string.Empty
-            //    };
-            //    instructions.Add(instruction);
-            //}
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionNew.rpt",
@@ -152,47 +122,77 @@ namespace eFMS.API.Documentation.DL.Services
             };
             result.AddDataSource(instructions);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            //result.AddSubReport("FreightManifest", freightManifests);
             result.SetParameter(parameter);
             return result;
         }
 
         public Crystal PreviewOCL(CsShippingInstructionReportModel model)
         {
-            var result = new Crystal();
-            var oclList = new List<OnBoardContainerReportResult>
-                {
-                    new OnBoardContainerReportResult {
-                        POD = model.PodName,
-                        POL = model.PolName,
-                        VoyNo = model.VoyNo,
-                        FDestination = model.PoDelivery
-                    }
-                };
-            var oclContainerList = new List<OCLContainerReportResult>();
-            if (model.CsMawbcontainers != null)
+            Crystal result = new Crystal();
+            var containerRS = new List<OnBoardContainerReportResult>();
+            var parameter = new SeaShippingInstructionParameter
             {
-                int i = 0;
-                foreach (var container in model.CsMawbcontainers)
+                CompanyName = "itl",
+                CompanyAddress1 = "52 Trường Sơn",
+                CompanyAddress2 = "54 Trường Sơn",
+                CompanyDescription = "itl company",
+                Contact = model.IssuedUserName,
+                Tel = string.Empty,
+                Website = string.Empty,
+                DecimalNo = 2
+            };
+            var containers = containerRepository.Get(x => x.Mblid == model.JobId);
+            if (containers == null) return result;
+            var total = containers.Sum(x => x.Quantity);
+            foreach (var item in containers)
+            {
+                var container = new OnBoardContainerReportResult
                 {
-                    i = i + 1;
-                    decimal? cbm = container.Cbm;
-                    decimal? gw = container.Gw;
-                    var item = new OCLContainerReportResult
-                    {
-                        STT = i,
-                        CBM = cbm != null ? (decimal)cbm : 0,
-                        GW = gw != null ? (decimal)gw : 0,
-                        ContainerNo = container.ContainerNo,
-                        SealNo = container.SealNo
-                    };
-                    oclContainerList.Add(item);
-                }
+                    TRANSID = model.BookingNo,
+                    ShippingMarkImport = string.Empty,
+                    CheckAttachNull = string.Empty,
+                    DatePackage = model.InvoiceDate,
+                    ToPartner = model.SupplierName,
+                    Attn = model.InvoiceNoticeRecevier,
+                    Notify = model.InvoiceNoticeRecevier,
+                    Re = model.BookingNo,
+                    ShipperDf = model.ActualShipperDescription,
+                    GoodsDelivery = model.ConsigneeDescription,
+                    RealShipper = string.Empty,
+                    RealConsignee = string.Empty,
+                    PortofLoading = model.PodName,
+                    PortofDischarge = model.PodName,
+                    PlaceDelivery = model.PoDelivery,
+                    Vessel = model.VoyNo,
+                    ContSealNo = item.SealNo,
+                    Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
+                    ShippingMarks = item.MarkNo,
+                    RateRequest = model.Remark,
+                    Payment = model.PaymenType,
+                    NoofPeace = item.PackageQuantity?.ToString(),
+                    Containers = item.ContainerNo + "/ " + item.SealNo,
+                    MaskNos = item.MarkNo,
+                    SIDescription = item.Description,
+                    GrossWeight = item.Gw,
+                    CBM = item.Cbm,
+                    SeaLCL = false,
+                    SeaFCL = true,
+                    NotifyParty = model.CargoNoticeRecevier,
+                    CTNS = string.Empty,
+                    Measurement = string.Empty,
+                    Qty = total?.ToString()
+                };
+                containerRS.Add(container);
             }
-            result.ReportName = "rptOnBoardContainerList.rpt";
-            result.AddDataSource(oclList);
+            result = new Crystal
+            {
+                ReportName = "SeaOnboardContainerList.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(containerRS);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            result.AddSubReport("OnBoardContainerList", oclContainerList);
+            result.SetParameter(parameter);
             return result;
         }
     }

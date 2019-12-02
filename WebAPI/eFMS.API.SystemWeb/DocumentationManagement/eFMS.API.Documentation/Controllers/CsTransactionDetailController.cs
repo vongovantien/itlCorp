@@ -50,7 +50,6 @@ namespace eFMS.API.Documentation.Controllers
         [Route("GetById")]
         public IActionResult GetById(Guid Id)
         {
-            //CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { Id = Id };
             CsMawbcontainerCriteria criteriaMaw = new CsMawbcontainerCriteria { Hblid = Id };
             var hbl = csTransactionDetailService.GetById(Id);
             var resultMaw = containerService.Query(criteriaMaw).ToList();
@@ -60,19 +59,18 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(hbl);
         }
 
-        [HttpGet]
-        [Route("GetHbDetails")]
-        public CsTransactionDetailModel GetHbDetails(Guid JobId,Guid HbId)
-        {
-            return csTransactionDetailService.GetHbDetails(JobId,HbId);
-        }
+        //[HttpGet]
+        //[Route("GetHbDetails")]
+        //public CsTransactionDetailModel GetHbDetails(Guid JobId,Guid HbId)
+        //{
+        //    return csTransactionDetailService.GetHbDetails(JobId,HbId);
+        //}
 
         [HttpPost]
         [Route("addNew")]
         [Authorize]
         public IActionResult Add(CsTransactionDetailModel model)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model);
             if (checkExistMessage.Length > 0)
@@ -126,7 +124,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPut]
         [Route("Update")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Update(CsTransactionDetailModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -144,22 +142,6 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
-        }
-
-        [HttpGet]
-        [Route("{id}")]
-        public IActionResult GetBy(Guid id)
-        {
-            var result = csTransactionDetailService.First(x => x.Id == id);
-           
-            if (result == null)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = "Error", Data = result });
-            }
-            else
-            {
-                return Ok(new ResultHandle { Status = true, Message = "Success", Data = result });
-            }
         }
 
         private string CheckExist(CsTransactionDetailModel model)
@@ -182,13 +164,6 @@ namespace eFMS.API.Documentation.Controllers
             
             return message;
         }
-
-    //    [HttpGet("GetReport")]
-    //    public CsTransactionDetailReport GetReport(Guid jobId)
-    //    {
-    //        var result = csTransactionDetailService.GetReportBy(jobId);
-    //        return result;
-    //}
 
         [HttpPost("QueryData")]
         public IActionResult QueryData(CsTransactionDetailCriteria criteria)
