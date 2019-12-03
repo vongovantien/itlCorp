@@ -130,6 +130,7 @@ export class SeaFCLExportComponent extends AppList {
     }
 
     onSearchShipment($event: any) {
+        $event.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLExport;
         this.dataSearch = $event;
         this.requestSearchShipment();
     }

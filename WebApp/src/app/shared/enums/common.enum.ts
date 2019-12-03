@@ -31,7 +31,8 @@ export namespace CommonEnum {
         SeaFCLExport = 6,
         SeaFCLImport = 7,
         SeaLCLExport = 8,
-        SeaLCLImport = 9
+        SeaLCLImport = 9,
+        CustomLogistic = 10
     }
 
     export enum PlaceTypeEnum {

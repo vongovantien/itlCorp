@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { TabsModule } from 'ngx-bootstrap';
+import { TabsModule, PaginationModule } from 'ngx-bootstrap';
 
 import { SeaLCLImportComponent } from './sea-lcl-import.component';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -31,7 +31,8 @@ const routing: Routes = [
 const COMPONENTS = [];
 
 const LIBS = [
-    TabsModule.forRoot()
+    TabsModule.forRoot(),
+    PaginationModule.forRoot(),
 ];
 
 @NgModule({

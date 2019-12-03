@@ -1,22 +1,19 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { formatDate } from '@angular/common';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-
-import { AppForm } from 'src/app/app.form';
-import { Customer } from 'src/app/shared/models/catalogue/customer.model';
-import { User } from 'src/app/shared/models';
-import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-
-import { Observable } from 'rxjs';
+import { AppForm } from "src/app/app.form";
+import { Component, Output, EventEmitter } from "@angular/core";
+import { formatDate } from "@angular/common";
+import { CommonEnum } from "src/app/shared/enums/common.enum";
+import { CatalogueRepo, SystemRepo } from "src/app/shared/repositories";
+import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
+import { Observable } from "rxjs";
+import { Customer } from "src/app/shared/models/catalogue/customer.model";
+import { User } from "src/app/shared/models";
 
 @Component({
-    selector: 'sea-fcl-export-form-search',
-    templateUrl: './form-search-sea-fcl-export.component.html',
-    styleUrls: ['./form-search-fcl-export.component.scss']
+    selector: 'form-search-sea',
+    templateUrl: './form-search-sea.component.html',
+    styleUrls: ['./form-search-sea.component.scss']
 })
-
-export class SeaFCLExportFormSearchComponent extends AppForm {
+export class ShareBusinessFormSearchSeaComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
     filterTypes: CommonInterface.ICommonTitleValue[];
 
@@ -29,7 +26,7 @@ export class SeaFCLExportFormSearchComponent extends AppForm {
     agent: AbstractControl;
     saleman: AbstractControl;
     creator: AbstractControl;
-
+    transactionType: any;
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'id', label: 'Partner ID' },
         { field: 'shortName', label: 'Name ABBR' },
@@ -143,9 +140,8 @@ export class SeaFCLExportFormSearchComponent extends AppForm {
             userCreated: this.creator.value,
             fromDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport
+            transactionType: null
         };
-        console.log(body);
         this.onSearch.emit(body);
     }
 
@@ -158,7 +154,7 @@ export class SeaFCLExportFormSearchComponent extends AppForm {
         this.resetFormControl(this.saleman);
         this.resetFormControl(this.creator);
         this.filterType.setValue(this.filterTypes[0]);
-        this.onSearch.emit(<any>{ transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport });
+        this.onSearch.emit(<any>{ transactionType: null });
     }
 
     collapsed() {
@@ -171,9 +167,7 @@ export class SeaFCLExportFormSearchComponent extends AppForm {
     }
 
     expanded() {
-        //console.log('expanded')
     }
-    
 }
 
 interface ISearchDataShipment {

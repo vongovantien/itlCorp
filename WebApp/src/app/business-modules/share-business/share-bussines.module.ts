@@ -5,7 +5,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
 import { NgxCurrencyModule } from 'ngx-currency';
-import { ModalModule, BsDropdownModule, PaginationModule, TooltipModule } from 'ngx-bootstrap';
+import { ModalModule, BsDropdownModule, PaginationModule, TooltipModule, CollapseModule } from 'ngx-bootstrap';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 
@@ -36,6 +36,7 @@ import { ShareBusinessAsignmentComponent } from './components/asignment/asignmen
 import { ShareBusinessStageManagementDetailComponent } from './components/stage-management/detail/detail-stage-popup.component';
 import { ShareBusinessAddHblToManifestComponent } from './components/manifest/popup/add-hbl-to-manifest.popup';
 import { ShareBusinessFormManifestComponent } from './components/manifest/form-manifest/components/form-manifest.component';
+import { ShareBusinessFormSearchSeaComponent } from './components/form-search-sea/form-search-sea.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -59,7 +60,9 @@ const COMPONENTS = [
     ShareBussinessShipmentGoodSummaryLCLComponent,
     ShareBusinessAssignStagePopupComponent,
     ShareBusinessAsignmentComponent,
-    ShareBusinessStageManagementDetailComponent
+    ShareBusinessStageManagementDetailComponent,
+
+    ShareBusinessFormSearchSeaComponent
 ];
 
 
@@ -97,8 +100,7 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         StoreModule.forFeature('share-bussiness', reducers),
         EffectsModule.forFeature(effects),
-
-
+        CollapseModule.forRoot(),
     ],
     exports: [
         ...COMPONENTS
