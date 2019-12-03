@@ -34,6 +34,8 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? GrossWeight { get; set; }
         public decimal? ChargeWeight { get; set; }
         public decimal? Cbm { get; set; }
+        public int? PackageQty { get; set; }
+        public string PackageType { get; set; }
         public string Notes { get; set; }
         public string TransactionType { get; set; }
         public string CurrentStatus { get; set; }
