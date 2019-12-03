@@ -1,1 +1,78 @@
-hbl good summary work!
+<div class="m-portlet">
+    <div class="alert-block__heading">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3 class="alert-block__title">
+                <ng-content></ng-content>
+            </h3>
+            <div>
+                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="refresh()" title="Refresh">
+                    <span><i class="la la-refresh"></i>
+                        <span> Refresh </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="m-portlet__body">
+        <div class="shipment-good-summary-wrapper">
+            <div class="form">
+                <div class="row m--margin-bottom-10">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="">Commodities:</label>
+                                <textarea name="" id="" cols="30" rows="8" class="form-control" name="commodities"
+                                    [(ngModel)]="commodities"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="">Commodities Qty:</label>
+                                <textarea name="" id="" cols="30" rows="8" class="form-control" name="containerDetail"
+                                    [(ngModel)]="containerDetail"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="">Description of Goods</label>
+                                <textarea name="" id="" cols="30" rows="8" class="form-control" name="description"
+                                    [(ngModel)]="description"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="">Container No/ Cont Type/ Seal No</label>
+                                <textarea name="" id="" cols="30" rows="8" class="form-control" name="v"
+                                    [(ngModel)]="containerDescription"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Package Qty</label>
+                            <input type="text" class="form-control" [(ngModel)]="packageQty">
+                        </div>
+                        <div class="form-group">
+                            <label>Total Gross Weight(KGS)</label>
+                            <input type="text" class="form-control" [(ngModel)]="grossWeight">
+                        </div>
+                        <div class="form-group">
+                            <label>Total CBM</label>
+                            <input type="text" class="form-control" [(ngModel)]="totalCBM">
+                        </div>
+                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="openContainerListPopup()">
+                            <span>
+                                <i class="la la-list"></i>
+                                <span>
+                                    List of Goods
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<container-list-popup> HBL List of Goods</container-list-popup>
+
+<confirm-popup [body]="'All manually entered data will be refresh, are you sure you want to perform this action ?'"
+    [labelConfirm]="'Yes'" [labelConfirm]="'No'" (onSubmit)="onRefresh()" [title]="'Alert'"
+    [iconConfirm]="'la la-refresh'"></confirm-popup>
