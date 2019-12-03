@@ -175,6 +175,10 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         this.getHouseBills();
     }
     previewSIReport() {
+        if (this.billInstructionComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
+            this._toastService.warning('There is no container data to display preview');
+            return;
+        }
         this._documentRepo.previewSIReport(this.billInstructionComponent.shippingInstruction)
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -192,6 +196,10 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             );
     }
     previewOCL() {
+        if (this.billInstructionComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
+            this._toastService.warning('There is no container data to display preview');
+            return;
+        }
         this._documentRepo.previewOCLReport(this.billInstructionComponent.shippingInstruction)
             .pipe(catchError(this.catchError))
             .subscribe(
