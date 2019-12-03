@@ -63,6 +63,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
+                } else {
+                    this.ACTION = null;
                 }
 
                 this.cdr.detectChanges();
@@ -100,6 +102,15 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.shipmentGoodSummaryComponent.netWeight = this.fclImportDetail.netWeight;
                     this.shipmentGoodSummaryComponent.totalChargeWeight = this.fclImportDetail.chargeWeight;
                     this.shipmentGoodSummaryComponent.totalCBM = this.fclImportDetail.cbm;
+
+                    // * reset field duplicate
+                    if (this.ACTION === "COPY") {
+
+                        this.resetFormControl(this.formCreateComponent.etd);
+                        this.resetFormControl(this.formCreateComponent.mawb);
+                        this.resetFormControl(this.formCreateComponent.eta);
+                        this.formCreateComponent.getUserLogged();
+                    }
                 },
 
             );
@@ -115,6 +126,13 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.containers = containers || [];
 
                     this.shipmentGoodSummaryComponent.containers = this.containers;
+                    if (this.ACTION === 'COPY') {
+                        this.containers.forEach(item => {
+                            item.sealNo = null;
+                            item.containerNo = null;
+                            item.markNo = null;
+                        });
+                    }
                 }
             );
     }

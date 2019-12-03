@@ -21,6 +21,7 @@ export * from './document/csTransactionDetail';
 export * from './document/fcl-import';
 export * from './document/arrival-freight-charge';
 export * from './document/delivery-order';
+export * from './document/house-bill';
 
 export * from './tool-setting/tariff';
 

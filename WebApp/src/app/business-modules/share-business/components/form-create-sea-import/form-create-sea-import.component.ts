@@ -132,7 +132,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                             mbltype: [(this.ladingTypes || []).find(type => type.id === this.fclImportDetail.mbltype)],
                             shipmentType: [(this.shipmentTypes || []).find(type => type.id === this.fclImportDetail.shipmentType)],
                             typeOfService: [(this.serviceTypes || []).find(type => type.id === this.fclImportDetail.typeOfService)],
-                            personIncharge: this.fclImportDetail.personIncharge,
+                            personIncharge: this.fclImportDetail.personIncharge || this.userLogged.id,
 
                             pod: this.fclImportDetail.pod,
                             pol: this.fclImportDetail.pol,

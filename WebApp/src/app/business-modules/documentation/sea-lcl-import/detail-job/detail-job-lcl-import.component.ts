@@ -1,7 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { Store } from '@ngrx/store';
 
 import { SeaLCLImportCreateJobComponent } from '../create-job/create-job-lcl-import.component';
+import { DocumentationRepo } from 'src/app/shared/repositories';
+import { CsTransactionDetail } from 'src/app/shared/models';
+
+import { combineLatest, of } from 'rxjs';
+import { switchMap, map, tap, skip, takeUntil, catchError } from 'rxjs/operators';
+
+import * as fromShareBussiness from './../../../share-business/store';
+
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 @Component({
     selector: 'app-sea-lcl-import-detail-job',
@@ -9,11 +20,144 @@ import { SeaLCLImportCreateJobComponent } from '../create-job/create-job-lcl-imp
 })
 
 export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit {
+
+    jobId: string;
+
+    shipmentDetail: CsTransactionDetail;
+
+    selectedTab: TAB | string = 'SHIPMENT';
+
+    action: any = {};
+
     constructor(
-        protected _router: Router
+        protected _router: Router,
+        protected _documenRepo: DocumentationRepo,
+        protected _toastService: ToastrService,
+        private _activedRoute: ActivatedRoute,
+        private _store: Store<any>
     ) {
-        super(_router);
+        super(_router, _documenRepo, _toastService);
     }
 
     ngOnInit() { }
+
+    ngAfterViewInit() {
+        combineLatest([
+            this._activedRoute.params,
+            this._activedRoute.queryParams
+        ]).pipe(
+            map(([params, qParams]) => ({ ...params, ...qParams })),
+            tap((param: any) => {
+                this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
+                this.jobId = !!param.jobId ? param.jobId : '';
+                // if (param.action) {
+                //     this.ACTION = param.action.toUpperCase();
+                // }
+
+                // this.cdr.detectChanges();
+            }),
+            switchMap(() => of(this.jobId)),
+        ).subscribe(
+            (jobId: string) => {
+                if (!!jobId) {
+                    this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
+
+                    this.getDetailSeaFCLImport();
+                }
+            }
+        );
+    }
+
+    getDetailSeaFCLImport() {
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(
+                skip(1),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CsTransactionDetail) => {
+                    if (!!res) {
+                        this.shipmentDetail = res;
+
+                        // * Update Goods Summary.
+                        this.shipmentGoodSummaryComponent.commodities = res.commodity;
+                        this.shipmentGoodSummaryComponent.gw = res.grossWeight;
+                        this.shipmentGoodSummaryComponent.packageQuantity = res.packageQty;
+                        this.shipmentGoodSummaryComponent.cbm = res.cbm;
+
+                        const packageTypesTemp: CommonInterface.INg2Select[] = this.shipmentDetail.packageType.split(',').map((i: string) => <CommonInterface.INg2Select>({
+                            id: i,
+                            text: i,
+                        }));
+                        const packageTypes = [];
+                        packageTypesTemp.forEach((type: CommonInterface.INg2Select) => {
+                            const dataTempInPackages = this.shipmentGoodSummaryComponent.packages.find((t: CommonInterface.INg2Select) => t.id === type.id);
+                            if (!!dataTempInPackages) {
+                                packageTypes.push(dataTempInPackages);
+                            }
+                        });
+
+                        this.shipmentGoodSummaryComponent.packageTypes = packageTypes;
+                    }
+                },
+            );
+    }
+
+    onSaveJob() {
+        [this.formCreateComponent.isSubmitted, this.shipmentGoodSummaryComponent.isSubmitted] = [true, true];
+
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
+
+        const modelAdd = this.onSubmitData();
+
+        //  * Update field
+        modelAdd.id = this.jobId;
+        modelAdd.transactionType = this.shipmentDetail.transactionType;
+        modelAdd.jobNo = this.shipmentDetail.jobNo;
+        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
+        modelAdd.userCreated = this.shipmentDetail.userCreated;
+
+        this.saveJob(modelAdd);
+    }
+
+    saveJob(body: any) {
+        this._documenRepo.updateCSTransaction(body)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+
+                        // * Dispatch action get detail.
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+
+    onSelectTab(tabName: string) {
+        switch (tabName) {
+            case 'hbl':
+                this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}/hbl`]);
+                break;
+            case 'shipment':
+                this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                break;
+            case 'cdNote':
+                this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                break;
+            case 'assignment':
+                this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+        }
+    }
 }

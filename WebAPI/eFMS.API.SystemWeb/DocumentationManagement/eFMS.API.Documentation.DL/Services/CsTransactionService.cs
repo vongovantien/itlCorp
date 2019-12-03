@@ -36,7 +36,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsMawbcontainerService containerService;
         readonly ICsShipmentSurchargeService surchargeService;
         readonly ICsTransactionDetailService transactionDetailService;
-        readonly ICsArrivalFrieghtChargeService csArrivalFrieghtChargeServiceRepo;
+        readonly ICsArrivalFrieghtChargeService csArrivalFrieghtChargeService;
         private readonly IStringLocalizer stringLocalizer;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
@@ -74,7 +74,7 @@ namespace eFMS.API.Documentation.DL.Services
             surchargeService = surService;
             catCountryRepo = catCountry;
             transactionDetailService = tranDetailService;
-            csArrivalFrieghtChargeServiceRepo = arrivalFrieghtChargeService;
+            csArrivalFrieghtChargeService = arrivalFrieghtChargeService;
         }
 
         #region -- INSERT & UPDATE --
@@ -135,132 +135,144 @@ namespace eFMS.API.Documentation.DL.Services
 
         public object AddCSTransaction(CsTransactionEditModel model)
         {
-            try
+            var transaction = mapper.Map<CsTransaction>(model);
+            transaction.Id = Guid.NewGuid();
+            if (model.CsMawbcontainers.Count > 0)
             {
-                var transaction = mapper.Map<CsTransaction>(model);
-                transaction.Id = Guid.NewGuid();
-                if (model.CsMawbcontainers.Count > 0)
+                var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, transaction.Id, null);
+                if (checkDuplicateCont.Success == false)
                 {
-                    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, transaction.Id, null);
-                    if (checkDuplicateCont.Success == false)
-                    {
-                        return checkDuplicateCont;
-                    }
+                    return checkDuplicateCont;
                 }
-                transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
-                transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
-                transaction.Active = true;
-                transaction.UserModified = transaction.UserCreated;
-                transaction.IsLocked = false;
-                transaction.LockedDate = null;
-                transaction.CurrentStatus = TermData.Processing; //Mặc định gán CurrentStatus = Processing
-                var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
-                if (!string.IsNullOrEmpty(employeeId))
-                {
-                    var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
-                    if (branchOfUser != null)
-                    {
-                        transaction.BranchId = (Guid)branchOfUser;
-                    }
-                }
-
-                var hsTrans = DataContext.Add(transaction);
-                if (hsTrans.Success)
-                {
-                    var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
-                    if (containers != null && containers.Count > 0)
-                    {
-                        foreach (var container in containers)
-                        {
-                            container.Id = Guid.NewGuid();
-                            container.Mblid = transaction.Id;
-                            container.UserModified = transaction.UserCreated;
-                            container.DatetimeModified = DateTime.Now;
-                            var hsContMBL = csMawbcontainerRepo.Add(container);
-                        }
-                    }
-                }
-                var result = hsTrans;
-                return new { model = transaction, result };
             }
-            catch (Exception ex)
+            transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
+            transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
+            transaction.Active = true;
+            transaction.UserModified = transaction.UserCreated;
+            transaction.IsLocked = false;
+            transaction.LockedDate = null;
+            transaction.CurrentStatus = TermData.Processing; //Mặc định gán CurrentStatus = Processing
+            var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
+            if (!string.IsNullOrEmpty(employeeId))
             {
-                var result = new HandleState(ex.Message);
-                return new { model = new object { }, result };
+                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
+                if (branchOfUser != null)
+                {
+                    transaction.BranchId = (Guid)branchOfUser;
+                }
+            }
+            model.CsMawbcontainers.ForEach(x => {
+                x.Id = Guid.NewGuid();
+                x.Mblid = transaction.Id;
+                x.UserModified = transaction.UserCreated;
+                x.DatetimeModified = DateTime.Now;
+            });
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hsTrans = DataContext.Add(transaction);
+                    if (hsTrans.Success)
+                    {
+                        var t = containerService.Add(model.CsMawbcontainers);
+                    }
+                    var result = hsTrans;
+                    trans.Commit();
+                    return new { model = transaction, result };
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    var result = new HandleState(ex.Message);
+                    return new { model = new object { }, result };
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
         }
 
         public HandleState UpdateCSTransaction(CsTransactionEditModel model)
         {
-            try
+            if (model.CsMawbcontainers.Count > 0)
             {
-                if (model.CsMawbcontainers.Count > 0)
+                var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, model.Id, null);
+                if (checkDuplicateCont.Success == false)
                 {
-                    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, model.Id, null);
-                    if (checkDuplicateCont.Success == false)
-                    {
-                        return checkDuplicateCont;
-                    }
+                    return checkDuplicateCont;
                 }
-                var transaction = mapper.Map<CsTransaction>(model);
-                transaction.DatetimeModified = DateTime.Now;
-                if (transaction.IsLocked.HasValue)
-                {
-                    if (transaction.IsLocked == true)
-                    {
-                        transaction.LockedDate = DateTime.Now;
-                    }
-                }
-                var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
-                if (!string.IsNullOrEmpty(employeeId))
-                {
-                    var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
-                    if (branchOfUser != null)
-                    {
-                        transaction.BranchId = (Guid)branchOfUser;
-                    }
-                }
-                var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);
-                if (hsTrans.Success)
-                {
-                    if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count > 0)
-                    {
-                        var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
-
-                        var listIdOfCont = containers.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
-                        var idContainersNeedRemove = csMawbcontainerRepo.Get(x => x.Mblid == transaction.Id && !listIdOfCont.Contains(x.Id)).Select(s => s.Id);
-                        //Delete item of List Container MBL
-                        if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
-                        {
-                            var hsDelContHBL = csMawbcontainerRepo.Delete(x => idContainersNeedRemove.Contains(x.Id));
-                        }
-
-                        foreach (var container in containers)
-                        {
-                            //Insert & Update List Container MBL
-                            if (container.Id == Guid.Empty)
-                            {
-                                container.Id = Guid.NewGuid();
-                                container.Mblid = transaction.Id;
-                                container.UserModified = transaction.UserModified;
-                                container.DatetimeModified = DateTime.Now;
-                                var hsAddContMBL = csMawbcontainerRepo.Add(container);
-                            }
-                            else
-                            {
-                                container.Mblid = transaction.Id;
-                                container.UserModified = transaction.UserModified;
-                                container.DatetimeModified = DateTime.Now;
-                                var hsUpdateContMBL = csMawbcontainerRepo.Update(container, x => x.Id == container.Id);
-                            }
-                        }
-                    }
-                }
-                return hsTrans;
             }
-            catch (Exception ex)
+            var transaction = mapper.Map<CsTransaction>(model);
+            transaction.DatetimeModified = DateTime.Now;
+            if (transaction.IsLocked.HasValue)
             {
-                return new HandleState(ex.Message);
+                if (transaction.IsLocked == true)
+                {
+                    transaction.LockedDate = DateTime.Now;
+                }
+            }
+            var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
+            if (!string.IsNullOrEmpty(employeeId))
+            {
+                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
+                if (branchOfUser != null)
+                {
+                    transaction.BranchId = (Guid)branchOfUser;
+                }
+            }
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);
+                    if (hsTrans.Success)
+                    {
+                        if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count > 0)
+                        {
+                            var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
+
+                            var listIdOfCont = containers.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
+                            var idContainersNeedRemove = csMawbcontainerRepo.Get(x => x.Mblid == transaction.Id && !listIdOfCont.Contains(x.Id)).Select(s => s.Id);
+                            //Delete item of List Container MBL
+                            if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
+                            {
+                                var hsDelContHBL = csMawbcontainerRepo.Delete(x => idContainersNeedRemove.Contains(x.Id));
+                            }
+
+                            foreach (var container in containers)
+                            {
+                                //Insert & Update List Container MBL
+                                if (container.Id == Guid.Empty)
+                                {
+                                    container.Id = Guid.NewGuid();
+                                    container.Mblid = transaction.Id;
+                                    container.UserModified = transaction.UserModified;
+                                    container.DatetimeModified = DateTime.Now;
+                                    var hsAddContMBL = csMawbcontainerRepo.Add(container);
+                                }
+                                else
+                                {
+                                    container.Mblid = transaction.Id;
+                                    container.UserModified = transaction.UserModified;
+                                    container.DatetimeModified = DateTime.Now;
+                                    var hsUpdateContMBL = csMawbcontainerRepo.Update(container, x => x.Id == container.Id);
+                                }
+                            }
+                        }
+                    }
+                    trans.Commit();
+                    return hsTrans;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
         }
 
@@ -288,40 +300,54 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState DeleteCSTransaction(Guid jobId)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = new HandleState();
-            try
+            var containers = csMawbcontainerRepo.Get(x => x.Mblid == jobId);
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                var containers = csMawbcontainerRepo.Get(x => x.Mblid == jobId);
-                if (containers.Count() > 0)
+                try
                 {
-                    var hsMasterCont = csMawbcontainerRepo.Delete(x => containers.Any(s => s.Id == x.Id));
-                }
-
-                var details = csTransactionDetailRepo.Get(x => x.JobId == jobId);
-                if (details.Count() > 0)
-                {
-                    foreach (var item in details)
+                    if (containers.Count() > 0)
                     {
-                        var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == item.Id);
-                        if (houseContainers.Count() > 0)
-                        {
-                            var hsHouseCont = csMawbcontainerRepo.Delete(x => houseContainers.Any(s => s.Id == x.Id));
-                        }
-                        var surcharges = csShipmentSurchargeRepo.Get(x => x.Hblid == item.Id);
-                        if (surcharges.Count() > 0)
-                        {
-                            var hsSurcharge = csShipmentSurchargeRepo.Delete(x => surcharges.Any(s => s.Id == x.Id));
-                        }
+                        var hsMasterCont = csMawbcontainerRepo.Delete(x => containers.Any(s => s.Id == x.Id));
                     }
-                    var hsHouseBill = csTransactionDetailRepo.Delete(x => details.Any(s => s.Id == x.Id));
+                    var details = csTransactionDetailRepo.Get(x => x.JobId == jobId);
+                    if (details.Count() > 0)
+                    {
+                        foreach (var item in details)
+                        {
+                            var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == item.Id);
+                            if (houseContainers.Count() > 0)
+                            {
+                                var hsHouseCont = csMawbcontainerRepo.Delete(x => houseContainers.Any(s => s.Id == x.Id));
+                            }
+                            var surcharges = csShipmentSurchargeRepo.Get(x => x.Hblid == item.Id);
+                            if (surcharges.Count() > 0)
+                            {
+                                var hsSurcharge = csShipmentSurchargeRepo.Delete(x => surcharges.Any(s => s.Id == x.Id));
+                            }
+                        }
+                        var hsHouseBill = csTransactionDetailRepo.Delete(x => details.Any(s => s.Id == x.Id));
+                    }
+                    var hs = DataContext.Delete(x => x.Id == jobId);
+                    if (hs.Success)
+                    {
+                        trans.Commit();
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                    }
+                    return hs;
                 }
-                hs = DataContext.Delete(x => x.Id == jobId);
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
-            catch (Exception ex)
-            {
-                hs = new HandleState(ex.Message);
-            }
-            return hs;
         }
 
         public HandleState SoftDeleteJob(Guid jobId)
@@ -981,133 +1007,116 @@ namespace eFMS.API.Documentation.DL.Services
 
         public ResultHandle ImportCSTransaction(CsTransactionEditModel model)
         {
-            try
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                var transaction = mapper.Map<CsTransaction>(model);
-                transaction.Id = Guid.NewGuid();
-                transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
-                transaction.UserCreated = currentUser.UserID;
-                transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
-                transaction.UserModified = model.UserCreated;
-                transaction.Active = true;
-                var hsTrans = transactionRepository.Add(transaction, false);
-                List<CsMawbcontainer> containers = null;
-                if (model.CsMawbcontainers.Count > 0)
+                try
                 {
-                    containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
+                    var transaction = mapper.Map<CsTransaction>(model);
+                    transaction.Id = Guid.NewGuid();
+                    transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
+                    transaction.UserCreated = currentUser.UserID;
+                    transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
+                    transaction.UserModified = model.UserCreated;
+                    transaction.Active = true;
+                    var hsTrans = transactionRepository.Add(transaction);
+                    if (model.CsMawbcontainers.Count > 0)
+                    {
+                        model.CsMawbcontainers.ForEach(x => {
+                            x.Id = Guid.NewGuid();
+                            x.Mblid = transaction.Id;
+                            x.UserModified = transaction.UserCreated;
+                            x.DatetimeModified = DateTime.Now;
+                        });
+                        var hsCont = containerService.Add(model.CsMawbcontainers);
+                    }
+                    var detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
+                    if (detailTrans != null)
+                    {
+                        int countDetail = csTransactionDetailRepo.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                                            && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                                            && x.DatetimeCreated.Value.Day == DateTime.Now.Day);
+                        string generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
 
-                    foreach (var container in containers)
-                    {
-                        container.Id = Guid.NewGuid();
-                        container.Mblid = transaction.Id;
-                        container.UserModified = transaction.UserCreated;
-                        container.DatetimeModified = DateTime.Now;
-                        csMawbcontainerRepo.Add(container, false);
+                        if (csTransactionDetailRepo.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
+                        {
+                            generatePrefixHouse = Constants.SEF_HBL
+                                + GenerateID.GeneratePrefixHousbillNo();
+                        }
+                        foreach (var item in detailTrans)
+                        {
+                            var houseId = item.Id;
+                            item.Id = Guid.NewGuid();
+                            item.JobId = transaction.Id;
+                            item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
+                            countDetail = countDetail + 1;
+                            item.Active = true;
+                            item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
+                            item.DatetimeCreated = DateTime.Now;
+                            csTransactionDetailRepo.Add(item);
+                            var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == houseId);
+                            if (houseContainers != null)
+                            {
+                                foreach (var x in houseContainers)
+                                {
+                                    x.Id = Guid.NewGuid();
+                                    x.Hblid = item.Id;
+                                    x.Mblid = Guid.Empty;
+                                    x.ContainerNo = string.Empty;
+                                    x.SealNo = string.Empty;
+                                    x.MarkNo = string.Empty;
+                                    x.UserModified = transaction.UserCreated;
+                                    x.DatetimeModified = DateTime.Now;
+                                    csMawbcontainerRepo.Add(x);
+                                }
+                            }
+                            var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == houseId);
+                            if (charges != null)
+                            {
+                                foreach (var charge in charges)
+                                {
+                                    charge.Id = Guid.NewGuid();
+                                    charge.UserCreated = transaction.UserCreated;
+                                    charge.DatetimeCreated = DateTime.Now;
+                                    charge.Hblid = item.Id;
+                                    charge.Soano = null;
+                                    charge.PaySoano = null;
+                                    charge.CreditNo = null;
+                                    charge.DebitNo = null;
+                                    charge.Soaclosed = null;
+                                    charge.SettlementCode = null;
+                                    csShipmentSurchargeRepo.Add(charge);
+                                }
+                            }
+                            var freightCharge = csArrivalFrieghtChargeService.Get(x => x.Hblid == houseId);
+                            if (freightCharge != null)
+                            {
+                                foreach (var freight in freightCharge)
+                                {
+                                    freight.Id = Guid.NewGuid();
+                                    freight.UserCreated = transaction.UserCreated;
+                                    freight.Hblid = item.Id;
+                                    csArrivalFrieghtChargeService.Add(freight);
+                                }
+                            }
+                        }
                     }
+                    transactionRepository.SubmitChanges();
+                    csTransactionDetailRepo.SubmitChanges();
+                    csMawbcontainerRepo.SubmitChanges();
+                    csShipmentSurchargeRepo.SubmitChanges();
+                    csArrivalFrieghtChargeService.SubmitChanges();
+                    trans.Commit();
+                    return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
                 }
-                else
+                catch (Exception ex)
                 {
-                    containers = csMawbcontainerRepo.Get(x => x.Mblid == model.Id).ToList();
-                    foreach (var container in containers)
-                    {
-                        container.ContainerNo = string.Empty;
-                        container.SealNo = string.Empty;
-                        container.MarkNo = string.Empty;
-                        container.Id = Guid.NewGuid();
-                        container.Mblid = transaction.Id;
-                        container.UserModified = transaction.UserCreated;
-                        container.DatetimeModified = DateTime.Now;
-                        csMawbcontainerRepo.Add(container, false);
-                    }
+                    trans.Rollback();
+                    var result = new HandleState(ex.Message);
+                    return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
                 }
-                var detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
-                if (detailTrans != null)
-                {
-                    int countDetail = csTransactionDetailRepo.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                                        && x.DatetimeCreated.Value.Day == DateTime.Now.Day);
-                    string generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
-
-                    if (csTransactionDetailRepo.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
-                    {
-                        generatePrefixHouse = Constants.SEF_HBL
-                            + GenerateID.GeneratePrefixHousbillNo();
-                    }
-                    foreach (var item in detailTrans)
-                    {
-                        var houseId = item.Id;
-                        item.Id = Guid.NewGuid();
-                        item.JobId = transaction.Id;
-                        item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
-                        countDetail = countDetail + 1;
-                        item.Active = true;
-                        item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
-                        item.DatetimeCreated = DateTime.Now;
-                        csTransactionDetailRepo.Add(item, false);
-                        var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == houseId);
-                        if (houseContainers != null)
-                        {
-                            foreach (var x in houseContainers)
-                            {
-                                x.Id = Guid.NewGuid();
-                                x.Hblid = item.Id;
-                                x.Mblid = Guid.Empty;
-                                x.ContainerNo = string.Empty;
-                                x.SealNo = string.Empty;
-                                x.MarkNo = string.Empty;
-                                x.UserModified = transaction.UserCreated;
-                                x.DatetimeModified = DateTime.Now;
-                                csMawbcontainerRepo.Add(x, false);
-                            }
-                        }
-                        var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == houseId);
-                        if (charges != null)
-                        {
-                            foreach (var charge in charges)
-                            {
-                                charge.Id = Guid.NewGuid();
-                                charge.UserCreated = transaction.UserCreated;
-                                charge.DatetimeCreated = DateTime.Now;
-                                charge.Hblid = item.Id;
-                                charge.Soano = null;
-                                charge.PaySoano = null;
-                                charge.CreditNo = null;
-                                charge.DebitNo = null;
-                                charge.Soaclosed = null;
-                                charge.SoaadjustmentRequestor = null;
-                                charge.SoaadjustmentRequestedDate = null;
-                                charge.SoaadjustmentReason = null;
-                                charge.UnlockedSoadirector = null;
-                                charge.UnlockedSoadirectorDate = null;
-                                charge.UnlockedSoadirectorStatus = null;
-                                charge.UnlockedSoasaleMan = null;
-                                csShipmentSurchargeRepo.Add(charge, false);
-                            }
-                        }
-                        var freightCharge = csArrivalFrieghtChargeServiceRepo.Get(x => x.Hblid == houseId);
-                        if(freightCharge != null)
-                        {
-                            foreach(var freight in freightCharge)
-                            {
-                                freight.Id = Guid.NewGuid();
-                                freight.UserCreated = transaction.UserCreated;
-                                freight.Hblid = item.Id;
-                                csArrivalFrieghtChargeServiceRepo.Add(freight, false);
-                            }
-                        }
-                    }
+                finally {
+                    trans.Dispose();
                 }
-                transactionRepository.SubmitChanges();
-                csTransactionDetailRepo.SubmitChanges();
-                csMawbcontainerRepo.SubmitChanges();
-                csShipmentSurchargeRepo.SubmitChanges();
-                csArrivalFrieghtChargeServiceRepo.SubmitChanges();
-                return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
-            }
-            catch (Exception ex)
-            {
-                var result = new HandleState(ex.Message);
-                return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
             }
         }
 

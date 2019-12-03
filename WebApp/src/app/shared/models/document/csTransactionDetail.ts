@@ -98,6 +98,9 @@ export class CsTransactionDetail {
   notes: string = '';
   shipperName: string = '';
   consigneeName: string = '';
+  packageQty: number = null;
+  packageType: string = null;
+  transactionType: string = null;
 
   constructor(object?: any) {
     const self = this;
