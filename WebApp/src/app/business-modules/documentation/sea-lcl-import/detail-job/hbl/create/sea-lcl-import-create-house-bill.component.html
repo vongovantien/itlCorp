@@ -1,9 +1,8 @@
-<div class="sea-fcl-create-hbl-page">
+<div class="sea-lcl-create-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
             <app-default-button (click)="showCreatePpoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
-
         </div>
 
     </app-sub-header>
@@ -12,21 +11,15 @@
 
 <div class="m-content">
     <div class="m-portlet__body">
-
         <tabset class="custom-class-tab">
-            <tab heading="HBL Detail" [active]="true">
-
+            <tab heading="HBL Detail">
                 <form-create-house-bill-import> </form-create-house-bill-import>
-
-                <shipment-good-summary> HBL Goods Summary </shipment-good-summary>
             </tab>
             <tab heading="Arrival Note">
                 <hbl-arrival-note></hbl-arrival-note>
             </tab>
             <tab heading="Delivery Order (D/O)">
-                <ng-container>
-                    <hbl-delivery-order></hbl-delivery-order>
-                </ng-container>
+                <hbl-delivery-order></hbl-delivery-order>
             </tab>
         </tabset>
     </div>

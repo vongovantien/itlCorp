@@ -381,7 +381,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 this.pol.setValue(data.id);
                 break;
             case 'PortOfDischarge':
-                this.pod.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                this.pod.setValue(data.id);
                 if (this.countChangePort === 0) {
                     this.finalDestinationPlace.setValue(data.nameEn);
                 }

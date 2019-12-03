@@ -13,10 +13,14 @@ import { SystemConstants } from 'src/constants/system.const';
 import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
 import { finalize } from 'rxjs/internal/operators/finalize';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil, mergeMap } from 'rxjs/operators';
 
-import * as fromShareBussiness from './../../../../../share-business/store';
+import * as fromShareBussiness from '../../../../../share-business/store';
 import { ShareBusinessFormCreateHouseBillImportComponent } from 'src/app/business-modules/share-business/components/form-create-house-bill-import/form-create-house-bill-import.component';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from 'src/app/business-modules/share-business';
+import { DeliveryOrder } from 'src/app/shared/models';
+import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
+import { forkJoin } from 'rxjs';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -25,15 +29,16 @@ enum HBL_TAB {
 }
 
 @Component({
-    selector: 'app-create-house-bill',
-    templateUrl: './create-house-bill.component.html',
+    selector: 'sea-lcl-import-create-house-bill',
+    templateUrl: './sea-lcl-import-create-house-bill.component.html',
 })
 export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessFormCreateHouseBillImportComponent, { static: false }) formHouseBill: ShareBusinessFormCreateHouseBillImportComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
-
+    @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
+    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
 
     jobId: string = '';
     shipmentDetail: any = {}; // TODO model.
@@ -90,12 +95,9 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
 
     ngAfterViewInit() {
-        this.shipmentGoodSummaryComponent.initContainer();
-        this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
-
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
-
-
+        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
+        this.deliveryComponent.deliveryOrder = new DeliveryOrder();
         this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
             .subscribe(
                 (res: any) => {
@@ -136,7 +138,9 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     oncreate() {
         this.confirmCreatePopup.hide();
         this.formHouseBill.isSubmited = true;
-        if (!this.checkValidateForm()) {
+        if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
+            this.arrivalNoteComponent.isSubmitted = true;
+            this.deliveryComponent.isSubmitted = true;
             this.infoPopup.show();
         } else {
             const body = this.onsubmitData();
@@ -182,7 +186,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl`]);
+        this._router.navigate([`/home/documentation/sea-lcl-import/${this.jobId}/hbl`]);
 
     }
 
@@ -195,6 +199,20 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(
+                    mergeMap((res: any) => {
+                        const dateNotice = {
+                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                            arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
+                        const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
+                        const printedDate = {
+                            deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        this.deliveryComponent.deliveryOrder.hblid = res.data;
+                        const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+                        return forkJoin(arrival, delivery);
+                    }),
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
                 ).subscribe(result => {
@@ -209,25 +227,25 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             id: SystemConstants.EMPTY_GUID,
             jobId: this.jobId,
             mawb: this.formHouseBill.mtBill.value,
-            saleManId: !!this.formHouseBill.selectedSaleman.id ? this.formHouseBill.selectedSaleman.id : null,
+            saleManId: !!this.formHouseBill.saleMan.value ? this.formHouseBill.saleMan.value : null,
             shipperId: !!this.formHouseBill.shipper.value ? this.formHouseBill.shipper.value : null,
-            shipperDescription: this.formHouseBill.shipperdescriptionModel !== undefined ? this.formHouseBill.shipperdescriptionModel : this.formHouseBill.shipperDescription.value,
+            shipperDescription: !!this.formHouseBill.shipperDescription.value ? this.formHouseBill.shipperDescription.value : null,
             consigneeId: this.formHouseBill.consignee.value,
-            consigneeDescription: this.formHouseBill.consigneedescriptionModel !== undefined ? this.formHouseBill.consigneedescriptionModel : this.formHouseBill.consigneeDescription.value,
-            notifyPartyId: !!this.formHouseBill.selectedNotifyParty.value ? this.formHouseBill.selectedNotifyParty.value : null,
-            notifyPartyDescription: this.formHouseBill.notifyPartyModel !== undefined ? this.formHouseBill.notifyPartyModel : this.formHouseBill.notifyPartyDescription.value,
-            alsoNotifyPartyId: !!this.formHouseBill.selectedAlsoNotifyParty.value ? this.formHouseBill.selectedAlsoNotifyParty.value : null,
-            alsoNotifyPartyDescription: this.formHouseBill.alsoNotifyPartyDescriptionModel !== undefined ? this.formHouseBill.alsoNotifyPartyDescriptionModel : this.formHouseBill.alsonotifyPartyDescription.value,
+            consigneeDescription: !!this.formHouseBill.consigneeDescription.value ? this.formHouseBill.consigneeDescription.value : null,
+            notifyPartyId: !!this.formHouseBill.notifyParty.value ? this.formHouseBill.notifyParty.value : null,
+            notifyPartyDescription: !!this.formHouseBill.notifyPartyDescription.value ? this.formHouseBill.notifyPartyDescription.value : null,
+            alsoNotifyPartyId: !!this.formHouseBill.alsoNotifyParty.value ? this.formHouseBill.alsoNotifyParty.value : null,
+            alsoNotifyPartyDescription: !!this.formHouseBill.alsonotifyPartyDescription.value ? this.formHouseBill.alsonotifyPartyDescription.value : null,
             hwbno: this.formHouseBill.hwbno.value,
             hbltype: this.formHouseBill.hbltype.value[0].text,
             servicetype: this.formHouseBill.servicetype.value[0].text,
             etd: !!this.formHouseBill.etd.value && this.formHouseBill.etd.value.startDate != null ? formatDate(this.formHouseBill.etd.value.startDate !== undefined ? this.formHouseBill.etd.value.startDate : this.formHouseBill.etd.value, 'yyyy-MM-dd', 'en') : null,
             eta: !!this.formHouseBill.eta.value ? formatDate(this.formHouseBill.eta.value.startDate !== undefined ? this.formHouseBill.eta.value.startDate : this.formHouseBill.eta.value, 'yyyy-MM-dd', 'en') : null,
             pickupPlace: this.formHouseBill.pickupPlace.value,
-            pol: this.formHouseBill.selectedPortOfLoading.value,
-            pod: this.formHouseBill.selectedPortOfDischarge.value,
+            pol: this.formHouseBill.pol.value,
+            pod: this.formHouseBill.pod.value,
             finalDestinationPlace: this.formHouseBill.finalDestinationPlace.value,
-            coloaderId: this.formHouseBill.selectedNotifyParty.value !== undefined ? this.formHouseBill.selectedSupplier.value : null,
+            coloaderId: this.formHouseBill.supplier.value !== undefined ? this.formHouseBill.supplier.value : null,
             localVessel: this.formHouseBill.localVessel.value,
             localVoyNo: this.formHouseBill.localVoyNo.value,
             oceanVessel: this.formHouseBill.oceanVessel.value,
@@ -237,20 +255,19 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             warehouseNotice: this.formHouseBill.warehouseNotice.value,
             shippingMark: this.formHouseBill.shippingMark.value,
             remark: this.formHouseBill.remark.value,
-            issueHBLPlace: !!this.formHouseBill.selectedPlaceOfIssued.value ? this.formHouseBill.selectedPlaceOfIssued.value : null,
+            issueHBLPlace: !!this.formHouseBill.placeOfIssues.value ? this.formHouseBill.placeOfIssues.value : null,
             issueHBLDate: !!this.formHouseBill.issueHBLDate.value && this.formHouseBill.issueHBLDate.value.startDate != null ? formatDate(this.formHouseBill.issueHBLDate.value.startDate !== undefined ? this.formHouseBill.issueHBLDate.value.startDate : this.formHouseBill.issueHBLDate.value, 'yyyy-MM-dd', 'en') : null,
             originBLNumber: this.formHouseBill.originBLNumber.value.value,
             referenceNo: this.formHouseBill.referenceNo.value,
             customerId: this.formHouseBill.customer.value,
             oceanVoyNo: this.formHouseBill.oceanVoyNo.value,
             csMawbcontainers: this.containers,
-            commodity: this.shipmentGoodSummaryComponent.commodities,
-            packageContainer: this.shipmentGoodSummaryComponent.containerDetail,
-            desOfGoods: this.shipmentGoodSummaryComponent.description,
-            cbm: this.shipmentGoodSummaryComponent.totalCBM,
-            grossWeight: this.shipmentGoodSummaryComponent.grossWeight,
-            netWeight: this.shipmentGoodSummaryComponent.netWeight,
-
+            commodity: null,
+            packageContainer: null,
+            desOfGoods: null,
+            cbm: null,
+            grossWeight: null,
+            netWeight: null,
             arrivalSecondNotice: null,
             arrivalNo: null,
             arrivalHeader: null,

@@ -11,7 +11,6 @@ import { ShareBussinessModule } from '../../share-business/share-bussines.module
 import { SeaLCLImportCreateJobComponent } from './create-job/create-job-lcl-import.component';
 import { SeaLCLImportDetailJobComponent } from './detail-job/detail-job-lcl-import.component';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { SeaLCLImportCreateHouseBillComponent } from './detail-job/hbl/create/create-house-bill.component';
 
 
 const routing: Routes = [
@@ -54,7 +53,6 @@ const LIBS = [
         SeaLCLImportComponent,
         SeaLCLImportCreateJobComponent,
         SeaLCLImportDetailJobComponent,
-        SeaLCLImportCreateHouseBillComponent,
         ...COMPONENTS
     ],
     providers: [],

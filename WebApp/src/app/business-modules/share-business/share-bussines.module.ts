@@ -13,7 +13,7 @@ import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { ShareContainerImportComponent } from './components/container-import/container-import.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
-import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
+import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 import {
     ShareBussinessFormCreateSeaImportComponent,
     ShareBussinessBuyingChargeComponent,
@@ -28,19 +28,19 @@ import {
     ShareBussinessCdNoteAddRemainingChargePopupComponent,
     ShareBussinessCdNoteDetailPopupComponent,
     ShareBussinessShipmentGoodSummaryLCLComponent,
-    ShareBussinessHBLGoodSummaryComponent
+    ShareBussinessHBLGoodSummaryComponent,
+    ShareBusinessAssignStagePopupComponent,
+    ShareBusinessAsignmentComponent,
+    ShareBusinessStageManagementDetailComponent,
+    ShareBusinessAddHblToManifestComponent,
+    ShareBusinessFormManifestComponent,
+    ShareBusinessFormCreateHouseBillImportComponent,
+    ShareBusinessArrivalNoteComponent,
+    ShareBusinessDeliveryOrderComponent
 } from './components';
 
 
 import { reducers, effects } from './store';
-import { ShareBusinessAssignStagePopupComponent } from './components/stage-management/assign-stage/assign-stage.popup';
-import { ShareBusinessAsignmentComponent } from './components/asignment/asignment.component';
-import { ShareBusinessStageManagementDetailComponent } from './components/stage-management/detail/detail-stage-popup.component';
-import { ShareBusinessAddHblToManifestComponent } from './components/manifest/popup/add-hbl-to-manifest.popup';
-import { ShareBusinessFormManifestComponent } from './components/manifest/form-manifest/components/form-manifest.component';
-import { ShareBusinessFormCreateHouseBillImportComponent } from './components/form-create-house-bill-import/form-create-house-bill-import.component';
-import { ShareBusinessArrivalNoteComponent } from './components/hbl/arrival-note/arrival-note.component';
-import { ShareBusinessDeliveryOrderComponent } from './components/hbl/delivery-order/delivery-order.component';
 import { ShareBusinessFormSearchSeaComponent } from './components/form-search-sea/form-search-sea.component';
 
 const COMPONENTS = [
@@ -60,7 +60,6 @@ const COMPONENTS = [
     ShareBussinessCdNoteDetailPopupComponent,
     ShareBusinessFormManifestComponent,
     ShareBusinessAddHblToManifestComponent,
-
     ShareBussinessFormCreateSeaImportComponent,
     ShareBussinessShipmentGoodSummaryLCLComponent,
     ShareBusinessAssignStagePopupComponent,
