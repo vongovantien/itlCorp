@@ -5,7 +5,6 @@ export const environment = {
     HOST: {
         WEB_URL: "test.api-efms.itlvn.com",
         ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
-        DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
         // DOCUMENTATION: "localhost:44366",
         // DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
         CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
