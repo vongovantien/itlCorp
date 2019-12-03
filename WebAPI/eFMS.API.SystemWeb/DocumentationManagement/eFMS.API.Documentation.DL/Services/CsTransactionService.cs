@@ -1151,7 +1151,7 @@ namespace eFMS.API.Documentation.DL.Services
             var containerNoList = string.Empty;
             if (containerList.Count() > 0)
             {
-                containerNoList = String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) && !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
+                containerNoList = String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
             }
 
             var listCharge = new List<FormPLsheetReport>();
