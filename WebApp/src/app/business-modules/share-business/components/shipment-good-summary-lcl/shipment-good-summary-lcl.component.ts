@@ -11,7 +11,14 @@ import { catchError } from 'rxjs/operators';
 })
 
 export class ShareBussinessShipmentGoodSummaryLCLComponent extends AppForm implements OnInit {
+
     packages: CommonInterface.INg2Select[];
+    commodities: string = null;
+    gw: number = null;
+    cbm: number = null;
+    packageQuantity: number = null;
+    packageTypes: CommonInterface.INg2Select[] = [];
+
     constructor(
         private _catalogueRepo: CatalogueRepo
     ) {
@@ -33,11 +40,13 @@ export class ShareBussinessShipmentGoodSummaryLCLComponent extends AppForm imple
     }
 
     selected($event: any) {
-        console.log($event);
+        if (!this.packageTypes.length) {
+            this.packageTypes.push($event);
+        }
+        console.log(this.packageTypes);
     }
 
     removed($event: any) {
-        console.log($event);
-
+        console.log(this.packageTypes);
     }
 }

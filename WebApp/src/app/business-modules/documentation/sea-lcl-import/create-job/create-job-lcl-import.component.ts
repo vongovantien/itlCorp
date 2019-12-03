@@ -1,6 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { formatDate } from '@angular/common';
+
+import { AppForm } from 'src/app/app.form';
+import { ShareBussinessFormCreateSeaImportComponent, ShareBussinessShipmentGoodSummaryLCLComponent } from 'src/app/business-modules/share-business';
+import { CsTransaction } from 'src/app/shared/models';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { DocumentationRepo } from 'src/app/shared/repositories';
+import { InfoPopupComponent } from 'src/app/shared/common/popup';
+
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-job-lcl-import',
@@ -8,8 +18,15 @@ import { Router } from '@angular/router';
 })
 
 export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
+
+    @ViewChild(ShareBussinessFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaImportComponent;
+    @ViewChild(ShareBussinessShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryLCLComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+
     constructor(
-        protected _router: Router
+        protected _router: Router,
+        protected _documenRepo: DocumentationRepo,
+        protected _toastService: ToastrService
     ) {
         super();
     }
@@ -24,8 +41,98 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
 
     }
 
-    onCreateJob() {
+    onSubmitData() {
+        const form: any = this.formCreateComponent.formCreate.getRawValue();
 
+        const formData = {
+            eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
+            etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDate: !!form.serviceDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
+
+            mawb: form.mawb,
+            voyNo: form.voyNo,
+            pono: form.pono,
+            notes: form.notes,
+            personIncharge: this.formCreateComponent.personIncharge.value, // TODO user with Role = CS.
+            subColoader: form.subColoader || null,
+
+            flightVesselName: form.flightVesselName,
+
+            shipmentType: !!form.shipmentType ? form.shipmentType[0].id : null,
+            typeOfService: !!form.typeOfService ? form.typeOfService[0].id : null,
+            mbltype: !!form.mbltype ? form.mbltype[0].id : null,
+
+            agentId: form.agentId,
+            pol: form.pol,
+            pod: form.pod,
+            deliveryPlace: form.deliveryPlace,
+            coloaderId: form.coloader,
+
+            // * containers summary
+            commodity: this.shipmentGoodSummaryComponent.commodities,
+            grossWeight: this.shipmentGoodSummaryComponent.gw,
+            cbm: this.shipmentGoodSummaryComponent.cbm,
+            packageQty: this.shipmentGoodSummaryComponent.packageQuantity,
+            packageType: this.shipmentGoodSummaryComponent.packageTypes.map(type => type.id).toString(),
+        };
+
+
+        const fclExportAddModel: CsTransaction = new CsTransaction(formData);
+        fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaLCLImport;
+
+        return fclExportAddModel;
+    }
+
+    checkValidateForm() {
+        let valid: boolean = true;
+        if (
+            !this.formCreateComponent.formCreate.valid
+            || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)
+        ) {
+            valid = false;
+        }
+
+        if (
+            this.shipmentGoodSummaryComponent.gw === null
+            || this.shipmentGoodSummaryComponent.cbm === null
+            || this.shipmentGoodSummaryComponent.packageQuantity === null
+            || this.shipmentGoodSummaryComponent.gw < 0
+            || this.shipmentGoodSummaryComponent.cbm < 0
+            || this.shipmentGoodSummaryComponent.packageQuantity < 0
+        ) {
+            valid = false;
+        }
+        return valid;
+    }
+
+    onCreateJob() {
+        [this.formCreateComponent.isSubmitted, this.shipmentGoodSummaryComponent.isSubmitted] = [true, true];
+
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
+
+        const modelAdd = this.onSubmitData();
+        this.saveJob(modelAdd);
+    }
+
+    saveJob(body: any) {
+        this._documenRepo.createTransaction(body)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.result.success) {
+                        this._toastService.success("New data added");
+
+                        this._router.navigate([`home/documentation/sea-lcl-import/${res.model.id}`]);
+                    } else {
+                        this._toastService.error("Opps", "Something getting error!");
+                    }
+                }
+            );
     }
 
 }
