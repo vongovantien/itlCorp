@@ -26,7 +26,8 @@ import {
     ShareBussinessCdNoteAddPopupComponent,
     ShareBussinessCdNoteAddRemainingChargePopupComponent,
     ShareBussinessCdNoteDetailPopupComponent,
-    ShareBussinessShipmentGoodSummaryLCLComponent
+    ShareBussinessShipmentGoodSummaryLCLComponent,
+
 } from './components';
 
 
@@ -36,6 +37,8 @@ import { ShareBusinessAsignmentComponent } from './components/asignment/asignmen
 import { ShareBusinessStageManagementDetailComponent } from './components/stage-management/detail/detail-stage-popup.component';
 import { ShareBusinessAddHblToManifestComponent } from './components/manifest/popup/add-hbl-to-manifest.popup';
 import { ShareBusinessFormManifestComponent } from './components/manifest/form-manifest/components/form-manifest.component';
+import { ShareBusinessFormCreateHouseBillImportComponent } from './components/form-create-house-bill-import/form-create-house-bill-import.component';
+import { ShareBusinessArrivalNoteComponent } from './components/hbl/arrival-note/arrival-note.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -59,7 +62,9 @@ const COMPONENTS = [
     ShareBussinessShipmentGoodSummaryLCLComponent,
     ShareBusinessAssignStagePopupComponent,
     ShareBusinessAsignmentComponent,
-    ShareBusinessStageManagementDetailComponent
+    ShareBusinessStageManagementDetailComponent,
+    ShareBusinessFormCreateHouseBillImportComponent,
+    ShareBusinessArrivalNoteComponent
 ];
 
 
