@@ -16,6 +16,7 @@ import { catchError, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 import { Container } from 'src/app/shared/models/document/container.model';
+import { ShareBusinessImportJobDetailPopupComponent } from 'src/app/business-modules/share-business/components/import-job-detail/import-job-detail.popup';
 
 @Component({
     selector: 'app-create-job-fcl-export',
@@ -27,9 +28,10 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
     @ViewChild(SeaFCLExportFormCreateComponent, { static: false }) formCreateComponent: SeaFCLExportFormCreateComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
-
+    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
     containers: Container[] = [];
-
+    isImport: boolean = false;
+    selectedJob: any = {}; // TODO model.
     constructor(
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
@@ -115,6 +117,9 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
 
     onSaveJob() {
         this.formCreateComponent.isSubmitted = true;
+        if (Object.keys(this.selectedJob).length > 0) {
+            this.containers = this.selectedJob.containers;
+        }
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;
@@ -127,7 +132,12 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
 
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model
-        this.saveJob(modelAdd);
+        if (this.isImport === true) {
+            modelAdd.id = this.selectedJob.id;
+            this.importJob(modelAdd);
+        } else {
+            this.saveJob(modelAdd);
+        }
     }
 
     saveJob(body: any) {
@@ -141,6 +151,40 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
                         this._toastService.success("New data added");
 
                         this._router.navigate([`home/documentation/sea-fcl-export/${res.model.id}`]);
+                    } else {
+                        this._toastService.error("Opps", "Something getting error!");
+                    }
+                }
+            );
+    }
+
+    onImport(selectedData: any) {
+        this.selectedJob = selectedData;
+        this.isImport = true;
+        this.shipmentGoodSummaryComponent.commodities = this.selectedJob.commodity;
+        this.shipmentGoodSummaryComponent.containerDetail = this.selectedJob.packageContainer;
+        this.shipmentGoodSummaryComponent.description = this.selectedJob.desOfGoods;
+        this.shipmentGoodSummaryComponent.grossWeight = this.selectedJob.grossWeight;
+        this.shipmentGoodSummaryComponent.netWeight = this.selectedJob.netWeight;
+        this.shipmentGoodSummaryComponent.totalChargeWeight = this.selectedJob.chargeWeight;
+        this.shipmentGoodSummaryComponent.totalCBM = this.selectedJob.cbm;
+    }
+
+    showImportPopup() {
+        this.formImportJobDetailPopup.show();
+    }
+
+    importJob(body: any) {
+        this._documenRepo.importCSTransaction(body)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        // TODO goto detail.
+                        this._router.navigate([`home/documentation/sea-fcl-export/${res.data.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
