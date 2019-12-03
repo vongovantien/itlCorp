@@ -8,7 +8,6 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { PaginationModule, ModalModule, TabsModule } from 'ngx-bootstrap';
 
 import { SeaLCLImportHBLComponent } from './sea-lcl-import-hbl.component';
-import { SeaFCLExportFormCreateHBLComponent } from '../../../sea-fcl-export/detail-job/hbl/components/form-create/form-create-hbl.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 
@@ -40,7 +39,6 @@ const LIB = [
 ];
 
 const COMPONENTS = [
-    SeaFCLExportFormCreateHBLComponent
 ];
 
 

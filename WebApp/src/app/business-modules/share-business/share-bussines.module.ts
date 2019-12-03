@@ -26,7 +26,8 @@ import {
     ShareBussinessCdNoteAddPopupComponent,
     ShareBussinessCdNoteAddRemainingChargePopupComponent,
     ShareBussinessCdNoteDetailPopupComponent,
-    ShareBussinessShipmentGoodSummaryLCLComponent
+    ShareBussinessShipmentGoodSummaryLCLComponent,
+    ShareBussinessHBLGoodSummaryComponent
 } from './components';
 
 
@@ -59,7 +60,8 @@ const COMPONENTS = [
     ShareBussinessShipmentGoodSummaryLCLComponent,
     ShareBusinessAssignStagePopupComponent,
     ShareBusinessAsignmentComponent,
-    ShareBusinessStageManagementDetailComponent
+    ShareBusinessStageManagementDetailComponent,
+    ShareBussinessHBLGoodSummaryComponent
 ];
 
 
