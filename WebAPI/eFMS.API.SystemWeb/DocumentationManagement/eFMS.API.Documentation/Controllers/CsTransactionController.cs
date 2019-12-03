@@ -276,10 +276,10 @@ namespace eFMS.API.Documentation.Controllers
                 }
             }
 
-            if (model.CsMawbcontainers == null || model.CsMawbcontainers.Count == 0)
-            {
-                message = "Shipment container list must have at least 1 row of data!";
-            }
+            //if (model.CsMawbcontainers == null || model.CsMawbcontainers.Count == 0)
+            //{
+            //    message = "Shipment container list must have at least 1 row of data!";
+            //}
             if (message.Length > 0) return message;
             var resultMessage = string.Empty;
             if (model.TransactionTypeEnum == TransactionTypeEnum.SeaFCLImport)
