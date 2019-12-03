@@ -23,7 +23,7 @@ const routing: Routes = [
         data: { name: "Create New Job", path: "new", level: 3 }
     },
     {
-        path: ':id', component: SeaLCLImportDetailJobComponent,
+        path: ':jobId', component: SeaLCLImportDetailJobComponent,
         data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport },
     },
 ];
