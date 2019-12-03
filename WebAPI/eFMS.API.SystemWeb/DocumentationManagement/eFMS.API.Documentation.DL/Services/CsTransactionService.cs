@@ -1340,11 +1340,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (transactionType == TermData.SeaConsolExport)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Export (Sea Consol) ";
             }
             if (transactionType == TermData.SeaConsolImport)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Import (Sea Consol) ";
             }
             if (transactionType == TermData.SeaFCLExport)
             {
@@ -1356,11 +1356,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (transactionType == TermData.SeaLCLExport)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Export (Sea LCL) ";
             }
             if (transactionType == TermData.SeaLCLImport)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Import (Sea LCL) ";
             }
             return shipmentType;
         }
