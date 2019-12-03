@@ -26,6 +26,9 @@ const routing: Routes = [
         path: ':jobId', component: SeaLCLImportDetailJobComponent,
         data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport },
     },
+    {
+        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-lcl-import-hbl.module').then(m => m.SeaLCLImportHBLModule),
+    }
 ];
 
 const COMPONENTS = [];
