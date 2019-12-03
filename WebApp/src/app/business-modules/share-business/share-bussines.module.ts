@@ -5,7 +5,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
 import { NgxCurrencyModule } from 'ngx-currency';
-import { ModalModule, BsDropdownModule, PaginationModule, TooltipModule } from 'ngx-bootstrap';
+import { ModalModule, BsDropdownModule, PaginationModule, TooltipModule, CollapseModule } from 'ngx-bootstrap';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 
@@ -28,8 +28,7 @@ import {
     ShareBussinessCdNoteAddRemainingChargePopupComponent,
     ShareBussinessCdNoteDetailPopupComponent,
     ShareBussinessShipmentGoodSummaryLCLComponent,
-
-
+    ShareBussinessHBLGoodSummaryComponent
 } from './components';
 
 
@@ -42,6 +41,7 @@ import { ShareBusinessFormManifestComponent } from './components/manifest/form-m
 import { ShareBusinessFormCreateHouseBillImportComponent } from './components/form-create-house-bill-import/form-create-house-bill-import.component';
 import { ShareBusinessArrivalNoteComponent } from './components/hbl/arrival-note/arrival-note.component';
 import { ShareBusinessDeliveryOrderComponent } from './components/hbl/delivery-order/delivery-order.component';
+import { ShareBusinessFormSearchSeaComponent } from './components/form-search-sea/form-search-sea.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -68,7 +68,9 @@ const COMPONENTS = [
     ShareBusinessStageManagementDetailComponent,
     ShareBusinessFormCreateHouseBillImportComponent,
     ShareBusinessArrivalNoteComponent,
-    ShareBusinessDeliveryOrderComponent
+    ShareBusinessDeliveryOrderComponent,
+    ShareBusinessFormSearchSeaComponent,
+    ShareBussinessHBLGoodSummaryComponent
 ];
 
 
@@ -107,8 +109,7 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         StoreModule.forFeature('share-bussiness', reducers),
         EffectsModule.forFeature(effects),
-
-
+        CollapseModule.forRoot(),
     ],
     exports: [
         ...COMPONENTS

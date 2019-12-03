@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { TabsModule } from 'ngx-bootstrap';
+import { TabsModule, CollapseModule, PaginationModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -57,7 +57,8 @@ const LIB = [
     NgxDaterangepickerMd.forRoot(),
     PerfectScrollbarModule,
     TabsModule.forRoot(),
-
+    CollapseModule.forRoot(),
+    PaginationModule.forRoot(),
 ];
 
 const COMPONENTS = [

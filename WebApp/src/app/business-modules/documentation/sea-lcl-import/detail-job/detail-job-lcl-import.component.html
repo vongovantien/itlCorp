@@ -1,23 +1,59 @@
 <div class="detail-job-lcl-import">
-    <app-sub-header></app-sub-header>
+    <app-sub-header>
+        <div class="c-button-actions">
+            <button (click)="showImportPopup()" type="button"
+                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-search-plus"></i>
+                    <span>
+                        Import Job Detail
+                    </span>
+                </span>
+            </button>
+
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveJob()"></app-default-button>
+
+            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
+
+        </div>
+    </app-sub-header>
 
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
-                <tab heading="Shipment Detail">
-                    <form-create-sea-import></form-create-sea-import>
+                <tab heading="Shipment Detail" [active]="selectedTab === 'SHIPMENT'"
+                    (selectTab)="onSelectTab('shipment')">
+                    <form-create-sea-import>
+                        <div class="row m--margin-top-20" *ngIf="!!shipmentDetail">
+                            <div class="col-md-4">
+                                <span>Created: {{shipmentDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
+                                <span class="text-success">{{shipmentDetail.userCreated}}</span>
+                            </div>
+                            <div class="col-md-4">
+                                <span>Modified: {{shipmentDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
+                                </span> <span class="text-success">{{shipmentDetail.userModified}}</span>
+                            </div>
+                        </div>
+                    </form-create-sea-import>
 
                     <shipment-good-summary-lcl> Shipment Goods Summary </shipment-good-summary-lcl>
 
                     <grant-total-profit></grant-total-profit>
+
                 </tab>
-                <tab heading="House Bills List">
+                <tab heading="House Bills List" (selectTab)="onSelectTab('hbl')">
                 </tab>
-                <tab heading="Debit Note & Credit Note">
+                <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')"
+                    [active]="selectedTab === 'CDNOTE'">
                 </tab>
-                <tab heading="Assignment">
+                <tab heading="Assignment" (selectTab)="onSelectTab('assignment')"
+                    [active]="selectedTab === 'ASSIGNMENT'">
                 </tab>
             </tabset>
         </div>
     </div>
 </div>
+
+
+<info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
+    [title]="'Cannot Create Job'"></info-popup>

@@ -114,11 +114,12 @@
             <div class="form-actions">
                 <div class="row">
                     <div class="col-lg-6">
-                        <a class="btn btn-link collapsed collapse-toggle" role="button"
+                        <a class="btn btn-link collapsed" role="button" aria-expanded="false" data-toggle="collapse"
                             (click)="isCollapsed = !isCollapsed">
                             <span>
-                                <i class="la la-angle-up"></i>
-                                <span>Advance search</span>
+                                <i class="la"
+                                    [ngClass]="{'la-angle-up': !isCollapsed, 'la-angle-down': isCollapsed}"></i>
+                                <span>Advance Search</span>
                             </span>
                         </a>
                     </div>

@@ -3,13 +3,13 @@ import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 @Component({
     selector: 'app-sea-fcl-import-management',
@@ -73,7 +73,7 @@ export class SeaFCLImportManagementComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
         this.dataSearch = {
-            transactionType: TransactionTypeEnum.SeaFCLImport
+            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport
         };
         this.searchList(this.dataSearch);
     }
@@ -81,7 +81,7 @@ export class SeaFCLImportManagementComponent extends AppList {
     searchList(dataSearch?: any) {
         if (dataSearch === undefined) {
             dataSearch = {
-                transactionType: TransactionTypeEnum.SeaFCLImport
+                transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport
             };
         }
         this._progressRef.start();
@@ -136,6 +136,7 @@ export class SeaFCLImportManagementComponent extends AppList {
 
     onSearchMasterBills(data: any) {
         this.page = 1; // reset page.
+        data.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
         this.searchList(data);
     }
 

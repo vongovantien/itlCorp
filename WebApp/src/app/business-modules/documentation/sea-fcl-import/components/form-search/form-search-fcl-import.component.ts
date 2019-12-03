@@ -4,7 +4,6 @@ import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
 
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
-import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { User } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -144,7 +143,7 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
             userCreated: this.creator.value,
             fromDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            transactionType: TransactionTypeEnum.SeaFCLImport
+            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport
         };
         //console.log(body);
         this.onSearch.emit(body);
@@ -159,7 +158,7 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
         this.resetFormControl(this.saleman);
         this.resetFormControl(this.creator);
         this.filterType.setValue(this.filterTypes[0]);
-        this.onSearch.emit(<any>{ transactionType: TransactionTypeEnum.SeaFCLImport });
+        this.onSearch.emit(<any>{ transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport });
     }
 
     collapsed() {

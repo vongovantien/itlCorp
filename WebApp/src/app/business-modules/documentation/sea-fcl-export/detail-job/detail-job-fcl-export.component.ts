@@ -25,10 +25,12 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
+    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     shipmentDetail: any;
     dataReport: any = null;
@@ -55,9 +57,11 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             tap((param: any) => {
                 this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
                 this.jobId = !!param.jobId ? param.jobId : '';
-                // if (param.action) {
-                //     this.ACTION = param.action.toUpperCase();
-                // }
+                if (param.action) {
+                    this.ACTION = param.action.toUpperCase();
+                } else {
+                    this.ACTION = null;
+                }
 
                 // this.cdr.detectChanges();
             }),
@@ -95,6 +99,15 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                         this.shipmentGoodSummaryComponent.netWeight = res.netWeight;
                         this.shipmentGoodSummaryComponent.totalChargeWeight = res.chargeWeight;
                         this.shipmentGoodSummaryComponent.totalCBM = res.cbm;
+
+                        // * reset field duplicate
+                        if (this.ACTION === "COPY") {
+
+                            this.resetFormControl(this.formCreateComponent.etd);
+                            this.resetFormControl(this.formCreateComponent.mawb);
+                            this.resetFormControl(this.formCreateComponent.eta);
+                            this.formCreateComponent.getUserLogged();
+                        }
                     }
                 },
             );
@@ -123,10 +136,34 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
         modelAdd.jobNo = this.shipmentDetail.jobNo;
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
-
-        this.saveJob(modelAdd);
+        if (this.ACTION === 'UPDATE') {
+            this.saveJob(modelAdd);
+        } else {
+            this.duplicateJob(modelAdd);
+        }
     }
+    duplicateJob(body: any) {
+        this._documenRepo.importCSTransaction(body)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.jobId = res.data.id;
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
+                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+                        // * get detail & container list.
+                        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                        this.ACTION = 'SHIPMENT';
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
     saveJob(body: any) {
         this._documenRepo.updateCSTransaction(body)
             .pipe(
@@ -157,6 +194,13 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                 (containers: any) => {
                     this.containers = containers || [];
                     this.shipmentGoodSummaryComponent.containers = this.containers;
+                    if (this.ACTION === 'COPY') {
+                        this.containers.forEach(item => {
+                            item.sealNo = null;
+                            item.containerNo = null;
+                            item.markNo = null;
+                        });
+                    }
                 }
             );
     }
@@ -223,5 +267,15 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                     }
                 },
             );
+    }
+    showDuplicateConfirm() {
+        this.confirmDuplicatePopup.show();
+    }
+    duplicateConfirm() {
+        this.action = { action: 'copy' };
+        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], {
+            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
+        });
+        this.confirmDuplicatePopup.hide();
     }
 }

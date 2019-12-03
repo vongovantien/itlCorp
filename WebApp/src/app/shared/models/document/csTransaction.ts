@@ -62,6 +62,8 @@ export class CsTransaction {
     sumCont: number = 0;
     sumPackage: number = 0;
     hblId: string = "00000000-0000-0000-0000-000000000000";
+    packageQty: number = null;
+    packageType: string = null;
 
     constructor(object?: any) {
         const self = this;

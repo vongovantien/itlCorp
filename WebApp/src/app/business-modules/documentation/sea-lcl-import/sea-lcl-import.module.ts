@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { TabsModule } from 'ngx-bootstrap';
+import { TabsModule, PaginationModule } from 'ngx-bootstrap';
 
 import { SeaLCLImportComponent } from './sea-lcl-import.component';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -24,15 +24,19 @@ const routing: Routes = [
         data: { name: "Create New Job", path: "new", level: 3 }
     },
     {
-        path: ':id', component: SeaLCLImportDetailJobComponent,
+        path: ':jobId', component: SeaLCLImportDetailJobComponent,
         data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport },
     },
+    {
+        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-lcl-import-hbl.module').then(m => m.SeaLCLImportHBLModule),
+    }
 ];
 
 const COMPONENTS = [];
 
 const LIBS = [
-    TabsModule.forRoot()
+    TabsModule.forRoot(),
+    PaginationModule.forRoot(),
 ];
 
 @NgModule({
