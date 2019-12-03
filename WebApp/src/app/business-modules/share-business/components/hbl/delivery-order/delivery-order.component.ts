@@ -15,7 +15,7 @@ import { catchError, takeUntil, switchMap, finalize } from 'rxjs/operators';
 
 import * as fromShare from './../../../store';
 @Component({
-    selector: 'sea-fcl-import-hbl-delivery-order',
+    selector: 'hbl-delivery-order',
     templateUrl: './delivery-order.component.html'
 })
 

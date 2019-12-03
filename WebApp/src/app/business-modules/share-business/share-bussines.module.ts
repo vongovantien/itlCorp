@@ -13,6 +13,7 @@ import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { ShareContainerImportComponent } from './components/container-import/container-import.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
+import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
 import {
     ShareBussinessFormCreateSeaImportComponent,
     ShareBussinessBuyingChargeComponent,
@@ -28,6 +29,7 @@ import {
     ShareBussinessCdNoteDetailPopupComponent,
     ShareBussinessShipmentGoodSummaryLCLComponent,
 
+
 } from './components';
 
 
@@ -39,6 +41,7 @@ import { ShareBusinessAddHblToManifestComponent } from './components/manifest/po
 import { ShareBusinessFormManifestComponent } from './components/manifest/form-manifest/components/form-manifest.component';
 import { ShareBusinessFormCreateHouseBillImportComponent } from './components/form-create-house-bill-import/form-create-house-bill-import.component';
 import { ShareBusinessArrivalNoteComponent } from './components/hbl/arrival-note/arrival-note.component';
+import { ShareBusinessDeliveryOrderComponent } from './components/hbl/delivery-order/delivery-order.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -64,7 +67,8 @@ const COMPONENTS = [
     ShareBusinessAsignmentComponent,
     ShareBusinessStageManagementDetailComponent,
     ShareBusinessFormCreateHouseBillImportComponent,
-    ShareBusinessArrivalNoteComponent
+    ShareBusinessArrivalNoteComponent,
+    ShareBusinessDeliveryOrderComponent
 ];
 
 
@@ -99,6 +103,7 @@ const customCurrencyMaskConfig = {
         PaginationModule.forRoot(),
         BsDropdownModule.forRoot(),
         TooltipModule.forRoot(),
+        FroalaEditorModule.forRoot(),
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         StoreModule.forFeature('share-bussiness', reducers),
         EffectsModule.forFeature(effects),
