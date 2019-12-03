@@ -914,7 +914,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.MAWB = data.MbLadingNo; //MBLNO
                     charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
                     charge.ContainerSize = data.HbPackages; //Quantity Cont
-                    charge.GrossWeight = data.HbGrossweight.Value;//Total GW of HBL
+                    charge.GrossWeight = data.HbGrossweight != null ? data.HbGrossweight.Value : 0;//Total GW of HBL
                     charge.CBM = data.Volum.Value; //Total CBM of HBL
                     charge.SealNo = data.HbSealNo; //Cont/Seal No
                     charge.HWBNO = data.HbLadingNo; //HBLNOs
