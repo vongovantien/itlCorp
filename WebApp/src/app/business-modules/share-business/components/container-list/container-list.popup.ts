@@ -1,21 +1,22 @@
 import { Component, ChangeDetectorRef, ViewChild, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
 
 import { PopupBase } from 'src/app/popup.base';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { Unit } from 'src/app/shared/models';
-
-import { catchError, takeUntil } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
-
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { DataService, SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { ShareContainerImportComponent } from '../container-import/container-import.component';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+
+import { catchError, takeUntil } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 import * as fromStore from '../../store';
-import { ShareContainerImportComponent } from '../container-import/container-import.component';
 
 
 @Component({
@@ -25,10 +26,11 @@ import { ShareContainerImportComponent } from '../container-import/container-imp
 export class ShareBussinessContainerListPopupComponent extends PopupBase implements OnInit {
 
     @ViewChild(ShareContainerImportComponent, { static: false }) containerImportPopup: ShareContainerImportComponent;
-
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteContainerPopup: ConfirmPopupComponent;
 
     mblid: string = null;
     hblid: string = null;
+
     containers: Container[] = [];
     initContainers: Container[] = [];
 
@@ -41,16 +43,17 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     isSubmitted: boolean = false;
     isAdd: boolean = false;
-
     isDuplicateContPakage: boolean = false;
 
+    selectedIndexContainer: number = -1;
 
     constructor(
-        private _catalogueRepo: CatalogueRepo,
-        private _store: Store<fromStore.IContainerState>,
-        private cdRef: ChangeDetectorRef,
-        private _dataService: DataService,
-        private _sortService: SortService,
+        protected _catalogueRepo: CatalogueRepo,
+        protected _store: Store<fromStore.IContainerState>,
+        protected cdRef: ChangeDetectorRef,
+        protected _dataService: DataService,
+        protected _sortService: SortService,
+        protected _toastService: ToastrService
     ) {
         super();
 
@@ -58,6 +61,24 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
     }
 
     ngOnInit(): void {
+        this.configHeader();
+        this.cdRef.detectChanges(); // * tell ChangeDetect update view in app-table-header (field required).
+        this.getMasterData();
+
+        // * GET DATA FROM STORE.
+        this._store.select(fromStore.getContainerSaveState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: fromStore.IContainerState | any) => {
+                    this.containers = res;
+                    if (!this.initContainers.length) {
+                        this.initContainers = res;
+                    }
+                }
+            );
+    }
+
+    configHeader() {
         this.headers = [
             { title: 'Cont Type', field: 'containerTypeId', sortable: true, required: true },
             { title: 'Cont Q`Ty', field: 'quantity', required: true, sortable: true },
@@ -74,21 +95,6 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
             { title: 'N.W', field: 'nw', sortable: true, },
             { title: 'Unit', field: 'unitOfMeasureId', sortable: true, },
         ];
-        this.cdRef.detectChanges(); // * tell ChangeDetect update view in app-table-header (field required).
-        this.getMasterData();
-
-
-        // * GET DATA FROM STORE.
-        this._store.select(fromStore.getContainerSaveState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: fromStore.IContainerState | any) => {
-                    this.containers = res;
-                    if (!this.initContainers.length) {
-                        this.initContainers = res;
-                    }
-                }
-            );
     }
 
     addNewContainer() {
@@ -96,8 +102,21 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
     }
 
-    deleteContainerItem(index: number) {
-        this._store.dispatch(new fromStore.DeleteContainerAction(index)); // * DISPATCH DELETE ACTION
+    deleteContainerItem(index: number, container: Container) {
+        this.selectedIndexContainer = index;
+
+        if (container.id === SystemConstants.EMPTY_GUID) {
+            this._store.dispatch(new fromStore.DeleteContainerAction(index)); // * DISPATCH DELETE ACTION
+        } else {
+            this.confirmDeleteContainerPopup.show();
+        }
+    }
+
+    onDeleteContainer() {
+        this.confirmDeleteContainerPopup.hide();
+        if (this.selectedIndexContainer > 0) {
+            this._store.dispatch(new fromStore.DeleteContainerAction(this.selectedIndexContainer)); // * DISPATCH DELETE ACTION
+        }
     }
 
     getMasterData() {
@@ -132,10 +151,6 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     onSaveContainerList() {
         this.isSubmitted = true;
-        // if (!this.containers.length) {
-        //     return;
-        // }
-
         if (this.checkValidateContainer()) {
             // * DISPATCH SAVE ACTION
             if (this.checkDuplicate()) {
@@ -183,6 +198,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         ) {
             this.isDuplicateContPakage = true;
             valid = false;
+            this._toastService.warning("Cont Type, Container No, Package Type, Package Qty is Duplicated");
             return;
         } else {
             valid = true;
@@ -223,8 +239,6 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         this.isSubmitted = false;
         if (!this.isAdd) {
             this._store.dispatch(new fromStore.GetContainerSuccessAction(this.initContainers));
-        } else {
-            // this._store.dispatch(new fromStore.GetContainerSuccessAction([]));
         }
         this.hide();
     }

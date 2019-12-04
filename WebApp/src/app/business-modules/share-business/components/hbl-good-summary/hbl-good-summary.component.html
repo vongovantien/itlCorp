@@ -16,44 +16,55 @@
     </div>
     <div class="m-portlet__body">
         <div class="shipment-good-summary-wrapper">
-            <div class="form">
+            <div class="form m-form m-form--state">
                 <div class="row m--margin-bottom-10">
                     <div class="col-md-8">
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="">Commodities:</label>
-                                <textarea name="" id="" cols="30" rows="8" class="form-control" name="commodities"
+                                <textarea name="" id="" cols="30" rows="5" class="form-control" name="commodities"
                                     [(ngModel)]="commodities"></textarea>
                             </div>
                             <div class="col-md-6">
                                 <label for="">Commodities Qty:</label>
-                                <textarea name="" id="" cols="30" rows="8" class="form-control" name="containerDetail"
+                                <textarea name="" id="" cols="30" rows="5" class="form-control" name="containerDetail"
                                     [(ngModel)]="containerDetail"></textarea>
                             </div>
                             <div class="col-md-6">
-                                <label for="">Description of Goods</label>
-                                <textarea name="" id="" cols="30" rows="8" class="form-control" name="description"
+                                <label for="">Description of Goods:</label>
+                                <textarea name="" id="" cols="30" rows="5" class="form-control" name="description"
                                     [(ngModel)]="description"></textarea>
                             </div>
                             <div class="col-md-6">
-                                <label for="">Container No/ Cont Type/ Seal No</label>
-                                <textarea name="" id="" cols="30" rows="8" class="form-control" name="v"
+                                <label for="">Container No/ Cont Type/ Seal No:</label>
+                                <textarea name="" id="" cols="30" rows="5" class="form-control" name="v"
                                     [(ngModel)]="containerDescription"></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Package Qty</label>
-                            <input type="text" class="form-control" [(ngModel)]="packageQty">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!packageQty || !packageQty)}">
+                            <label required>Package Qty: </label>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="number" class="form-control" [(ngModel)]="packageQty" min="0">
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-control" [(ngModel)]="selectedPackage" name="selectedPackage">
+                                        <option *ngFor="let unit of packages" [value]="unit.code">
+                                            {{unit.code}}</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Total Gross Weight(KGS)</label>
-                            <input type="text" class="form-control" [(ngModel)]="grossWeight">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !grossWeight}">
+                            <label required>Total Gross Weight(KGS): </label>
+                            <input type="number" class="form-control" [(ngModel)]="grossWeight" min="0">
                         </div>
-                        <div class="form-group">
-                            <label>Total CBM</label>
-                            <input type="text" class="form-control" [(ngModel)]="totalCBM">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !totalCBM }">
+                            <label required>Total CBM: </label>
+                            <input type="number" class="form-control" [(ngModel)]="totalCBM" min="0">
                         </div>
                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                             (click)="openContainerListPopup()">
@@ -71,7 +82,7 @@
     </div>
 </div>
 
-<container-list-popup> HBL List of Goods</container-list-popup>
+<goods-list-popup></goods-list-popup>>
 
 <confirm-popup [body]="'All manually entered data will be refresh, are you sure you want to perform this action ?'"
     [labelConfirm]="'Yes'" [labelConfirm]="'No'" (onSubmit)="onRefresh()" [title]="'Alert'"

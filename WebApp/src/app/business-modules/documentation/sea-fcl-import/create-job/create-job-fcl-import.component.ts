@@ -141,10 +141,10 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
             return;
         }
 
-        if (!this.containers.length) {
-            this._toastService.warning('Please add container to create new job');
-            return;
-        }
+        // if (!this.containers.length) {
+        //     this._toastService.warning('Please add container to create new job');
+        //     return;
+        // }
 
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model

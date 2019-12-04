@@ -10,6 +10,7 @@ export * from './cd-note/detail-cd-note/detail-cd-note.popup';
 export * from './container-import/container-import.component';
 export * from './container-list/container-list.popup';
 export * from './container-import/container-import.component';
+export * from './goods-list/goods-list.popup';
 
 export * from './grant-total-profit/grant-total-profit.component';
 export * from './profit-summary/profit-summary.component';
