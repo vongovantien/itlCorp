@@ -68,7 +68,7 @@
     "ngx-currency": "^2.0.0",
     "ngx-daterangepicker-material": "^2.1.8",
     "ngx-perfect-scrollbar": "^7.0.0",
-    "ngx-spinner": "^6.1.2",
+    "ngx-spinner": "^8.0.3",
     "ngx-toastr": "^9.1.0",
     "rxjs": "^6.5.2",
     "save": "^2.3.3",
