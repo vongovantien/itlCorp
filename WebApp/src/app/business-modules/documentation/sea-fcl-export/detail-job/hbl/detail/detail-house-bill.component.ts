@@ -150,7 +150,6 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    console.log(res)
                     if (this.dataReport.dataSource.length > 0) {
                         setTimeout(() => {
                             this.reportPopup.frm.nativeElement.submit();
