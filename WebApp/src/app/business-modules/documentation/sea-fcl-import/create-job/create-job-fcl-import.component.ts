@@ -151,6 +151,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
         if (this.isImport === true) {
             modelAdd.id = this.selectedJob.id;
             this.importJob(modelAdd);
+            this.isImport = false;
         } else {
             this.createJob(modelAdd);
         }

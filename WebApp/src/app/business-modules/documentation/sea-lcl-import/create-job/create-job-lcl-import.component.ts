@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
 import { AppForm } from 'src/app/app.form';
-import { ShareBussinessFormCreateSeaImportComponent, ShareBussinessShipmentGoodSummaryLCLComponent } from 'src/app/business-modules/share-business';
+import { ShareBussinessFormCreateSeaImportComponent, ShareBussinessShipmentGoodSummaryLCLComponent, ShareBusinessImportJobDetailPopupComponent } from 'src/app/business-modules/share-business';
 import { CsTransaction } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { DocumentationRepo } from 'src/app/shared/repositories';
@@ -22,7 +22,9 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
     @ViewChild(ShareBussinessFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryLCLComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-
+    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
+    isImport: boolean = false;
+    selectedJob: any = {}; // TODO model.
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
@@ -38,7 +40,13 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
     }
 
     showImportPopup() {
+        this.formImportJobDetailPopup.show();
+    }
 
+    onImport(selectedData: any) {
+        this.selectedJob = selectedData;
+        this.isImport = true;
+        this.shipmentGoodSummaryComponent.commodities = this.selectedJob.commodity;
     }
 
     onSubmitData() {
@@ -114,7 +122,31 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
         }
 
         const modelAdd = this.onSubmitData();
-        this.saveJob(modelAdd);
+        if (this.isImport === true) {
+            modelAdd.id = this.selectedJob.id;
+            this.importJob(modelAdd);
+            this.isImport = false;
+        } else {
+            this.saveJob(modelAdd);
+        }
+    }
+
+    importJob(body: any) {
+        this._documenRepo.importCSTransaction(body)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        // TODO goto detail.
+                        this._router.navigate([`home/documentation/sea-lcl-import/${res.data.id}`]);
+                    } else {
+                        this._toastService.error("Opps", "Something getting error!");
+                    }
+                }
+            );
     }
 
     saveJob(body: any) {
@@ -134,5 +166,7 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
                 }
             );
     }
+
+
 
 }

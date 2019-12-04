@@ -5,10 +5,10 @@ import { catchError, finalize } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
 @Component({
-    selector: 'popup-import-house-bill-detail',
+    selector: 'import-house-bill-detail',
     templateUrl: './import-house-bill-detail.component.html'
 })
-export class ImportHouseBillDetailComponent extends PopupBase {
+export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
     @Output() onImport: EventEmitter<any> = new EventEmitter<any>();
     headers: CommonInterface.IHeaderTable[];
     dataSearch: any = {};

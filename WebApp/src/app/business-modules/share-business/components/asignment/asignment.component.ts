@@ -40,7 +40,7 @@ export class ShareBusinessAsignmentComponent extends AppList {
         this._progressRef = this._ngProgressService.ref();
         this.headers = [
             { title: 'Action', field: 'status' },
-            { title: 'No', field: 'status' },
+            { title: 'No', field: 'orderNumberProcessed' },
             { title: 'Person Incharge', field: 'mainPersonInCharge', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'Code', field: 'stageCode', sortable: true },
@@ -104,6 +104,7 @@ export class ShareBusinessAsignmentComponent extends AppList {
                 } else {
                     this.stages = this._sortService.sort(res.map((item: any) => new Stage(item)), 'orderNumberProcessed', true);
                     this.currentStages = this.stages;
+                    console.log(this.currentStages);
                 }
             },
         );

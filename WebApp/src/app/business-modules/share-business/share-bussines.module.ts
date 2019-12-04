@@ -13,6 +13,7 @@ import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { ShareContainerImportComponent } from './components/container-import/container-import.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
+import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 import {
     ShareBussinessFormCreateSeaImportComponent,
     ShareBussinessBuyingChargeComponent,
@@ -35,10 +36,23 @@ import {
     ShareBusinessAsignmentComponent,
     ShareBusinessStageManagementDetailComponent,
     ShareBusinessFormSearchSeaComponent,
+    ShareBusinessAssignStagePopupComponent,
+    ShareBusinessAsignmentComponent,
+    ShareBusinessStageManagementDetailComponent,
+    ShareBusinessAddHblToManifestComponent,
+    ShareBusinessFormManifestComponent,
+    ShareBusinessFormCreateHouseBillImportComponent,
+    ShareBusinessArrivalNoteComponent,
+    ShareBusinessDeliveryOrderComponent,
+    ShareBusinessImportHouseBillDetailComponent,
+    ShareBusinessFormSearchHouseBillComponent,
+    ShareBussinessGoodsListPopupComponent
+
 } from './components';
 
 
 import { reducers, effects } from './store';
+import { ShareBusinessFormSearchSeaComponent } from './components/form-search-sea/form-search-sea.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -63,8 +77,13 @@ const COMPONENTS = [
     ShareBusinessAssignStagePopupComponent,
     ShareBusinessAsignmentComponent,
     ShareBusinessStageManagementDetailComponent,
+    ShareBusinessFormCreateHouseBillImportComponent,
+    ShareBusinessArrivalNoteComponent,
+    ShareBusinessDeliveryOrderComponent,
     ShareBusinessFormSearchSeaComponent,
-    ShareBussinessHBLGoodSummaryComponent
+    ShareBussinessHBLGoodSummaryComponent,
+    ShareBusinessImportHouseBillDetailComponent,
+    ShareBusinessFormSearchHouseBillComponent
 ];
 
 
@@ -99,6 +118,7 @@ const customCurrencyMaskConfig = {
         PaginationModule.forRoot(),
         BsDropdownModule.forRoot(),
         TooltipModule.forRoot(),
+        FroalaEditorModule.forRoot(),
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         StoreModule.forFeature('share-bussiness', reducers),
         EffectsModule.forFeature(effects),

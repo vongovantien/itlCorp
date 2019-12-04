@@ -10,8 +10,9 @@ import { PaginationModule, ModalModule, TabsModule } from 'ngx-bootstrap';
 import { SeaLCLImportHBLComponent } from './sea-lcl-import-hbl.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
-
 import { ChargeConstants } from 'src/constants/charge.const';
+import { SeaLCLImportCreateHouseBillComponent } from './create/sea-lcl-import-create-house-bill.component';
+import { SeaLCLImportDetailHouseBillComponent } from './detail/sea-lcl-import-detail-house-bill.component';
 
 
 const routing: Routes = [
@@ -20,11 +21,11 @@ const routing: Routes = [
         data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.SLI_CODE }
     },
     {
-        path: 'new', component: SeaLCLImportHBLComponent,
-        data: { name: 'New House Bill', path: ':id', level: 5 }
+        path: 'new', component: SeaLCLImportCreateHouseBillComponent,
+        data: { name: 'New House Bill Detail', path: ':id', level: 5 }
     },
     {
-        path: ':hblId', component: SeaLCLImportHBLComponent,
+        path: ':hblId', component: SeaLCLImportDetailHouseBillComponent,
         data: { name: 'House Bill Detail', path: ':id', level: 5 }
     }
 ];
@@ -54,10 +55,10 @@ const COMPONENTS = [
     ],
     exports: [],
     declarations: [
-        SeaLCLImportHBLComponent,
+        SeaLCLImportHBLComponent, SeaLCLImportCreateHouseBillComponent, SeaLCLImportDetailHouseBillComponent,
         ...COMPONENTS
     ],
     providers: [],
-    bootstrap: [SeaLCLImportHBLComponent]
+    bootstrap: [SeaLCLImportHBLComponent, SeaLCLImportCreateHouseBillComponent, SeaLCLImportDetailHouseBillComponent]
 })
 export class SeaLCLImportHBLModule { }
