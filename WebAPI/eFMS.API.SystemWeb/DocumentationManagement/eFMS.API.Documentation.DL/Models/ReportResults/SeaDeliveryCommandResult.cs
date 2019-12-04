@@ -27,9 +27,9 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Description { get; set; }
         public string TotalPackages { get; set; }
         public string NoPieces { get; set; }
-        public decimal GrossWeight { get; set; }
+        public decimal? GrossWeight { get; set; }
         public string Unit { get; set; }	
-        public decimal CBM { get; set; }
+        public decimal? CBM { get; set; }
         public bool SeaLCL { get; set; }
         public DateTime DatePackage { get; set; }
         public string DeliveryOrderNote { get; set; }
