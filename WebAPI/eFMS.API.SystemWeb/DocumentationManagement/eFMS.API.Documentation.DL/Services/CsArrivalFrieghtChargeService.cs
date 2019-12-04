@@ -278,17 +278,20 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ATTN = houserBill.NotifyPartyDescription;
                         charge.Consignee = houserBill.ConsigneeDescription;//partnerRepositoty.Get(x => x.Id == houserBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
                         charge.Notify = houserBill.NotifyPartyDescription;
-                        charge.HandlingInfo = "HandlingInfo";
-                        charge.ExecutedOn = "ExecutedOn";
+                        charge.HandlingInfo = string.Empty;
+                        charge.ExecutedOn = string.Empty;
                         charge.OceanVessel = houserBill.OceanVessel;
 
                         charge.OSI = "";//Để trống
-                        charge.FlightDate = houserBill.Eta.Value; //ETA
+                        if (houserBill.Eta != null)
+                        {
+                            charge.FlightDate = houserBill.Eta.Value; //ETA
+                        }
                         charge.DateConfirm = DateTime.Now;
                         charge.DatePackage = DateTime.Now;
                         charge.LocalVessel = houserBill.LocalVessel;//Local Vessel of HBL
                         charge.ContSealNo = houserBill.LocalVoyNo;// Local Voy No of HBL
-                        charge.ForCarrier = "ForCarrier";
+                        charge.ForCarrier = string.Empty;
                         charge.DepartureAirport = polName;//POL of HBL
                         charge.PortofDischarge = podName;//POD of HBL
                         charge.PlaceDelivery = podName;//POD of HBL

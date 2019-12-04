@@ -1,12 +1,32 @@
 <div class="detail-job-lcl-import">
     <app-sub-header>
         <div class="c-button-actions">
+            <div class="dropdown m-dropdown m-dropdown--inline">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    <i class="la la-print"></i>P/L Sheet<span class="caret"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" (click)="previewPLsheet('USD')">Preview with USD</a>
+                    <a class="dropdown-item" (click)="previewPLsheet('VND')">Preview with VND</a>
+                </div>
+            </div>
+
             <button (click)="showImportPopup()" type="button"
                 class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="la la-search-plus"></i>
                     <span>
                         Import Job Detail
+                    </span>
+                </span>
+            </button>
+
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                (click)="deleteJob()">
+                <span>
+                    <i class="la la-trash"></i>
+                    <span>
+                        Delete
                     </span>
                 </span>
             </button>
@@ -57,3 +77,10 @@
 
 <info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Create Job'"></info-popup>
+
+<confirm-popup #deleteConfirmTemplate [body]="'You you sure you want to delete this Job'" [title]="'Alert'"
+    [labelConfirm]="'Yes'" (onSubmit)="onDeleteJob()"></confirm-popup>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>

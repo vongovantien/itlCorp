@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
@@ -8,9 +8,12 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CsTransactionDetail } from 'src/app/shared/models';
 
 import { combineLatest, of } from 'rxjs';
-import { switchMap, map, tap, skip, takeUntil, catchError } from 'rxjs/operators';
+import { switchMap, map, tap, skip, takeUntil, catchError, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -20,7 +23,10 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 })
 
 export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit {
-
+    @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    
     jobId: string;
 
     shipmentDetail: CsTransactionDetail;
@@ -28,15 +34,17 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
     selectedTab: TAB | string = 'SHIPMENT';
 
     action: any = {};
-
+    dataReport: any = null;
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
-        private _store: Store<any>
+        private _store: Store<any>,
+        private _ngProgressService: NgProgress
     ) {
         super(_router, _documenRepo, _toastService);
+        this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit() { }
@@ -159,5 +167,46 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
+    }
+
+    deleteJob() {
+        this.confirmDeletePopup.show();
+    }
+
+    onDeleteJob() {
+        this._progressRef.start();
+        this._documenRepo.deleteMasterBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                    this.confirmDeletePopup.hide();
+                })
+            ).subscribe(
+                (respone: CommonInterface.IResult) => {
+                    if (respone.status) {
+                        this._toastService.success(respone.message, 'Delete Success !');
+                        this.gotoList();
+                    }
+                },
+            );
+    }
+
+    previewPLsheet(currency: string) {
+        this._documenRepo.previewSIFPLsheet(this.jobId, currency)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
     }
 }
