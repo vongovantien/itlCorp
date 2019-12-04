@@ -10,6 +10,7 @@ using System.Linq;
 using System.Collections.Generic;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.DL.Common;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -19,17 +20,20 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPlace> placeRepository;
         readonly ICsMawbcontainerService containerService;
         readonly ICsTransactionService csTransactionService;
+        readonly IContextBase<CsTransaction> transactionRepository;
         public CsManifestService(IContextBase<CsManifest> repository, 
             IMapper mapper,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
             IContextBase<CatPlace> placeRepo,
             ICsMawbcontainerService contService,
-            ICsTransactionService transactionService) : base(repository, mapper)
+            ICsTransactionService transactionService,
+            IContextBase<CsTransaction> transactionRepo) : base(repository, mapper)
         {
             transactionDetailRepository = transactionDetailRepo;
             placeRepository = placeRepo;
             containerService = contService;
             csTransactionService = transactionService;
+            transactionRepository = transactionRepo;
         }
 
         public HandleState AddOrUpdateManifest(CsManifestEditModel model)
@@ -45,6 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
+                    manifest.RefNo = GetManifestNo(model.JobId);
                     hs = DataContext.Add(manifest);
                 }
                 if (hs.Success)
@@ -75,6 +80,25 @@ namespace eFMS.API.Documentation.DL.Services
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
+        }
+
+        private string GetManifestNo(Guid jobId)
+        {
+            string manifestNo = string.Empty;
+            var shipment = transactionRepository.Get(x => x.Id == jobId).FirstOrDefault();
+            var prefixJob = shipment.JobNo.Substring(0, 3);
+            int length = shipment.JobNo.Length - 1;
+            var suffixJob = shipment.JobNo.Substring(3);
+            switch (prefixJob)
+            {
+                case "SIF":
+                    manifestNo = "MSI" + suffixJob;
+                    break;
+                case "SEF":
+                    manifestNo = "MSE" + suffixJob;
+                    break;
+            }
+            return manifestNo;
         }
 
         public CsManifestModel GetById(Guid jobId)
@@ -180,7 +204,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return null;
             }
-            Crystal result = null;
+            Crystal result = new Crystal();
             var manifests = new List<ManifestFCLImportReport>();
 
             string noPieces = string.Empty;

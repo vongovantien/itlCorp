@@ -273,6 +273,10 @@ export class SeaFclExportManifestComponent extends AppList {
     }
 
     previewManifest() {
+        if (this.formManifest.referenceNo.value === null) {
+            this._toastService.warning('There is no data to display preview');
+            return;
+        }
         const body: any = {
             jobId: this.jobId,
             refNo: this.formManifest.referenceNo.value,
