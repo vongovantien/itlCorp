@@ -10,12 +10,11 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ReportPreviewComponent } from 'src/app/shared/common';
-import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
-import { ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from 'src/app/business-modules/share-business';
+import { ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBussinessHBLGoodSummaryComponent } from 'src/app/business-modules/share-business';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -32,7 +31,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessFormCreateHouseBillImportComponent, { static: false }) formHouseBill: ShareBusinessFormCreateHouseBillImportComponent;
-    @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryComponent, { static: false }) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
@@ -186,7 +185,13 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                     this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
-
+                        this.hblGoodsSummaryComponent.containerDetail = this.hblDetail.packageContainer;
+                        this.hblGoodsSummaryComponent.commodities = this.hblDetail.commodity;
+                        this.hblGoodsSummaryComponent.description = this.hblDetail.desOfGoods;
+                        this.hblGoodsSummaryComponent.grossWeight = this.hblDetail.grossWeight;
+                        this.hblGoodsSummaryComponent.netWeight = this.hblDetail.netWeight;
+                        this.hblGoodsSummaryComponent.totalChargeWeight = this.hblDetail.chargeWeight;
+                        this.hblGoodsSummaryComponent.totalCBM = this.hblDetail.cbm;
                         this.formHouseBill.etd.setValue(this.hblDetail.etd);
                         !!this.hblDetail.etd ? this.formHouseBill.etd.setValue({ startDate: new Date(this.hblDetail.etd), endDate: new Date(this.hblDetail.etd) }) : this.formHouseBill.etd.setValue(null), // * Date;
                             this.formHouseBill.getListSaleman();

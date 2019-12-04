@@ -70,7 +70,6 @@ export class CreateHouseBillComponent extends AppForm {
             .subscribe(
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
-
                         this.containers = action.payload;
                     }
                 });

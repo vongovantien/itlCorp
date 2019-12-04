@@ -10,14 +10,13 @@ import { AppForm } from 'src/app/app.form';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
-import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError, takeUntil, mergeMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
 import { ShareBusinessFormCreateHouseBillImportComponent } from 'src/app/business-modules/share-business/components/form-create-house-bill-import/form-create-house-bill-import.component';
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent } from 'src/app/business-modules/share-business';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryComponent } from 'src/app/business-modules/share-business';
 import { DeliveryOrder } from 'src/app/shared/models';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { forkJoin } from 'rxjs';
@@ -36,10 +35,11 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessFormCreateHouseBillImportComponent, { static: false }) formHouseBill: ShareBusinessFormCreateHouseBillImportComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
-    @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryComponent, { static: false }) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+
     jobId: string = '';
     shipmentDetail: any = {}; // TODO model.
     selectedHbl: any = {}; // TODO model.
@@ -264,12 +264,12 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             customerId: this.formHouseBill.customer.value,
             oceanVoyNo: this.formHouseBill.oceanVoyNo.value,
             csMawbcontainers: this.containers,
-            commodity: null,
-            packageContainer: null,
-            desOfGoods: null,
-            cbm: null,
-            grossWeight: null,
-            netWeight: null,
+            commodity: this.hblGoodsSummaryComponent.commodities,
+            packageContainer: this.hblGoodsSummaryComponent.containerDetail,
+            desOfGoods: this.hblGoodsSummaryComponent.description,
+            cbm: this.hblGoodsSummaryComponent.totalCBM,
+            grossWeight: this.hblGoodsSummaryComponent.grossWeight,
+            netWeight: this.hblGoodsSummaryComponent.netWeight,
             arrivalSecondNotice: null,
             arrivalNo: null,
             arrivalHeader: null,

@@ -48,6 +48,7 @@
                 <tab heading="HBL Detail" (selectTab)="onSelectTab('DETAIL')">
                     <ng-container>
                         <form-create-house-bill-import> </form-create-house-bill-import>
+                        <hbl-goods-summary> HBL Goods Summary </hbl-goods-summary>
                     </ng-container>
                 </tab>
                 <tab heading="Arrival Note" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">

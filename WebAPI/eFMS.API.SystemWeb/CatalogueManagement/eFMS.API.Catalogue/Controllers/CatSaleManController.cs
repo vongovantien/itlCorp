@@ -102,7 +102,7 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             string messageDuplicate = string.Empty;
-            bool checkExist = catSaleManService.Any(x => x.Service == model.Service  && x.Office == model.Office);
+            bool checkExist = catSaleManService.Any(x => x.Service == model.Service  && x.Office == model.Office && x.PartnerId == model.PartnerId);
             if (checkExist)
             {
                 messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
