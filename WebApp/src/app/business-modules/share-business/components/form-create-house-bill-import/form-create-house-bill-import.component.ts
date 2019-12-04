@@ -15,8 +15,8 @@ import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import * as fromShare from './../../store';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { User } from 'src/app/shared/models';
 
+import { User } from 'src/app/shared/models';
 @Component({
     selector: 'form-create-house-bill-import',
     templateUrl: './form-create-house-bill-import.component.html'
@@ -73,18 +73,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     configPlaceOfIssued: CommonInterface.IComboGirdConfig | any = {};
     configPartner: CommonInterface.IComboGirdConfig | any = {};
     configPort: CommonInterface.IComboGirdConfig | any = {};
-    selectedSaleman: any = {};
-    selectedNotifyParty: any = {};
-    selectedAlsoNotifyParty: any = {};
-    selectedPortOfLoading: any = {};
-    selectedPortOfDischarge: any = {};
-    selectedSupplier: any = {};
-    selectedPlaceOfIssued: any = {};
-    selectedDocDate: any;
-    selectedETAWareHouse: any;
-    selectedDateOfIssued: any;
-    selectedETD: any;
-    selectedETA: any;
     shipperdescriptionModel: string;
     consigneedescriptionModel: string;
     notifyPartydescriptinModel: string;
@@ -401,14 +389,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 this.placeOfIssues.setValue(data.id);
                 break;
         }
-    }
-
-    bindSalemanImport(data: string) {
-        this.saleMans.forEach(item => {
-            if (item.id === data) {
-                this.selectedSaleman = item;
-            }
-        });
     }
 
     getListCustomer() {

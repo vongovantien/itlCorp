@@ -30,6 +30,8 @@ export * from './manifest/form-manifest/components/form-manifest.component';
 export * from './form-create-house-bill-import/form-create-house-bill-import.component';
 export * from './hbl/arrival-note/arrival-note.component';
 export * from './hbl/delivery-order/delivery-order.component';
+export * from './hbl/import-detail/import-house-bill-detail.component';
+export * from './hbl/form-search-house-bill/form-search-house-bill.component';
 
 
 

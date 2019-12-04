@@ -1,6 +1,7 @@
 <div class="sea-lcl-create-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
+            <app-default-button (click)="showImportPopup()" [buttonSetting]="importButtonSetting"></app-default-button>
             <app-default-button (click)="showCreatePpoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
@@ -24,6 +25,9 @@
         </tabset>
     </div>
 </div>
+
+<import-house-bill-detail (onImport)="onImport($event)"> </import-house-bill-detail>
+
 <info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Create HBL'"></info-popup>
 

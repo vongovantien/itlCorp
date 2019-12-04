@@ -17,7 +17,7 @@ import { catchError, takeUntil, mergeMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
 import { ShareBusinessFormCreateHouseBillImportComponent } from 'src/app/business-modules/share-business/components/form-create-house-bill-import/form-create-house-bill-import.component';
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from 'src/app/business-modules/share-business';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent } from 'src/app/business-modules/share-business';
 import { DeliveryOrder } from 'src/app/shared/models';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { forkJoin } from 'rxjs';
@@ -39,7 +39,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
-
+    @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     jobId: string = '';
     shipmentDetail: any = {}; // TODO model.
     selectedHbl: any = {}; // TODO model.
@@ -86,6 +86,10 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     }
 
+    showImportPopup() {
+        this.importHouseBillPopup.show();
+    }
+
     getShipmentDetail() {
     }
 
@@ -106,17 +110,17 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                     this.formHouseBill.mtBill.setValue(this.shipmentDetail.mawb);
                     this.formHouseBill.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
                     this.formHouseBill.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                    this.formHouseBill.selectedSupplier = { field: 'id', value: this.shipmentDetail.coloaderId };
-                    this.formHouseBill.selectedPortOfLoading = { field: 'id', value: this.shipmentDetail.pol };
-                    this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: this.shipmentDetail.pod };
+                    this.formHouseBill.supplier.setValue(this.shipmentDetail.coloaderId);
+                    this.formHouseBill.pol.setValue(this.shipmentDetail.pol);
+                    this.formHouseBill.pod.setValue(this.shipmentDetail.pod);
                 }
             );
     }
 
     checkValidateForm() {
         let valid: boolean = true;
-        if (this.formHouseBill.selectedPortOfLoading.value !== undefined && this.formHouseBill.selectedPortOfDischarge.value !== undefined) {
-            if (this.formHouseBill.selectedPortOfLoading.value === this.formHouseBill.selectedPortOfDischarge.value) {
+        if (this.formHouseBill.pol.value !== undefined && this.formHouseBill.pod.value !== undefined) {
+            if (this.formHouseBill.pol.value === this.formHouseBill.pod.value) {
                 this.formHouseBill.PortChargeLikePortLoading = true;
 
             } else {
@@ -151,8 +155,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     onImport(selectedData: any) {
         this.selectedHbl = selectedData;
-
-        console.log(this.selectedHbl);
         if (!!this.selectedHbl) {
             this.formHouseBill.mtBill.setValue(this.selectedHbl.mawb);
             this.formHouseBill.consigneeDescription.setValue(this.selectedHbl.consigneeDescription);
@@ -166,15 +168,15 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.selectedHbl.originBlnumber)[0]);
             this.formHouseBill.alsonotifyPartyDescription.setValue(this.selectedHbl.alsoNotifyPartyDescription);
             this.formHouseBill.customer.setValue(this.selectedHbl.customerId);
-            this.formHouseBill.bindSalemanImport(this.selectedHbl.saleManId);
             this.formHouseBill.shipper.setValue(this.selectedHbl.shipperId);
             this.formHouseBill.consignee.setValue(this.selectedHbl.consigneeId);
-            this.formHouseBill.selectedNotifyParty = { field: 'id', value: this.selectedHbl.notifyPartyId };
-            this.formHouseBill.selectedPortOfLoading = { field: 'id', value: this.selectedHbl.pol };
-            this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: this.selectedHbl.pod };
-            this.formHouseBill.selectedAlsoNotifyParty = { field: 'id', value: this.selectedHbl.alsoNotifyPartyId };
+            this.formHouseBill.notifyParty.setValue(this.selectedHbl.notifyPartyId);
+            this.formHouseBill.pol.setValue(this.selectedHbl.pol);
+            this.formHouseBill.pod.setValue(this.selectedHbl.pod);
+            this.formHouseBill.alsoNotifyParty.setValue(this.selectedHbl.alsoNotifyPartyId);
             this.formHouseBill.hbltype.setValue([<CommonInterface.INg2Select>{ id: this.selectedHbl.hbltype, text: this.selectedHbl.hbltype }]);
-            this.formHouseBill.selectedSupplier = { field: 'id', value: this.selectedHbl.coloaderId };
+            this.formHouseBill.supplier.setValue(this.selectedHbl.coloaderId);
+            this.formHouseBill.saleMan.setValue(this.selectedHbl.saleManId);
 
         }
     }
