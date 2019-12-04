@@ -63,14 +63,14 @@
 
 
                 </tab>
-                <tab heading="House Bills List" (selectTab)="onSelectTab('hbl')">
+                <tab heading="House Bills List" (selectTab)="onSelectTab('hbl')" [disabled]="ACTION === 'COPY'">
                 </tab>
                 <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')"
-                    [active]="selectedTab === 'CDNOTE'">
+                    [disabled]="ACTION === 'COPY'" [active]="selectedTab === 'CDNOTE'">
                     <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="SeaLCLImport_cdNote">
                     </ng-container>
                 </tab>
-                <tab heading="Assignment" (selectTab)="onSelectTab('assignment')"
+                <tab heading="Assignment" (selectTab)="onSelectTab('assignment')" [disabled]="ACTION === 'COPY'"
                     [active]="selectedTab === 'ASSIGNMENT'">
                     <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="SeaLCLImport_assignment">
                     </ng-container>

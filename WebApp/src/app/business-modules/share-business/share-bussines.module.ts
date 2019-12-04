@@ -31,28 +31,21 @@ import {
     ShareBussinessHBLGoodSummaryComponent,
     ShareBussinessGoodsListPopupComponent,
     ShareBusinessFormManifestComponent,
-    ShareBusinessAddHblToManifestComponent,
-    ShareBusinessAssignStagePopupComponent,
-    ShareBusinessAsignmentComponent,
-    ShareBusinessStageManagementDetailComponent,
     ShareBusinessFormSearchSeaComponent,
     ShareBusinessAssignStagePopupComponent,
     ShareBusinessAsignmentComponent,
     ShareBusinessStageManagementDetailComponent,
     ShareBusinessAddHblToManifestComponent,
-    ShareBusinessFormManifestComponent,
     ShareBusinessFormCreateHouseBillImportComponent,
     ShareBusinessArrivalNoteComponent,
     ShareBusinessDeliveryOrderComponent,
     ShareBusinessImportHouseBillDetailComponent,
     ShareBusinessFormSearchHouseBillComponent,
-    ShareBussinessGoodsListPopupComponent
 
 } from './components';
 
 
 import { reducers, effects } from './store';
-import { ShareBusinessFormSearchSeaComponent } from './components/form-search-sea/form-search-sea.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
