@@ -67,6 +67,8 @@
                 </tab>
                 <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')"
                     [active]="selectedTab === 'CDNOTE'">
+                    <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="SeaLCLImport_cdNote">
+                    </ng-container>
                 </tab>
                 <tab heading="Assignment" (selectTab)="onSelectTab('assignment')"
                     [active]="selectedTab === 'ASSIGNMENT'">

@@ -11,6 +11,7 @@ import { ShareBussinessModule } from '../../share-business/share-bussines.module
 import { SeaLCLImportCreateJobComponent } from './create-job/create-job-lcl-import.component';
 import { SeaLCLImportDetailJobComponent } from './detail-job/detail-job-lcl-import.component';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { SeaLCLImportLazyLoadModule } from './sea-lcl-import-lazy-load.module';
 
 
 const routing: Routes = [
@@ -24,7 +25,7 @@ const routing: Routes = [
     },
     {
         path: ':jobId', component: SeaLCLImportDetailJobComponent,
-        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport },
+        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaLCLImport },
     },
     {
         path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-lcl-import-hbl.module').then(m => m.SeaLCLImportHBLModule),
@@ -46,7 +47,8 @@ const LIBS = [
         FormsModule,
         ReactiveFormsModule,
         ShareBussinessModule,
-        ...LIBS
+        ...LIBS,
+        SeaLCLImportLazyLoadModule, // ?  Lazy loading module with  tab component (CD Note).
     ],
     exports: [],
     declarations: [
