@@ -2,18 +2,19 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
+import { NgProgress } from '@ngx-progressbar/core';
 
 import { SeaLCLImportCreateJobComponent } from '../create-job/create-job-lcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransactionDetail, CsTransaction } from 'src/app/shared/models';
+import { CsTransactionDetail } from 'src/app/shared/models';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import { combineLatest, of } from 'rxjs';
 import { switchMap, map, tap, skip, takeUntil, catchError, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { NgProgress } from '@ngx-progressbar/core';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 

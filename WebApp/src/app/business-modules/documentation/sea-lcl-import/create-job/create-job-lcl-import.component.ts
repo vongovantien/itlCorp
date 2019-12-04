@@ -87,7 +87,7 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
         let valid: boolean = true;
         if (
             !this.formCreateComponent.formCreate.valid
-            || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)
+            || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)
         ) {
             valid = false;
         }
