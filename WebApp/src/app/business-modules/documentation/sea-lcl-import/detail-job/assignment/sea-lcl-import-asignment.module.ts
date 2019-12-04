@@ -5,7 +5,6 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ModalModule } from 'ngx-bootstrap';
 import { ShareBusinessAsignmentComponent } from 'src/app/business-modules/share-business/components/asignment/asignment.component';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
-import { ShareBussinessCdNoteListComponent } from 'src/app/business-modules/share-business';
 
 
 @NgModule({
@@ -21,10 +20,10 @@ import { ShareBussinessCdNoteListComponent } from 'src/app/business-modules/shar
     ],
     providers: [],
     entryComponents: [
-        ShareBussinessCdNoteListComponent
+        ShareBusinessAsignmentComponent
     ]
 })
 export class SeaLCLImportAsignmentModule {
-    static rootComponent = ShareBussinessCdNoteListComponent;
+    static rootComponent = ShareBusinessAsignmentComponent;
 
 }
