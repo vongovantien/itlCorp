@@ -207,14 +207,6 @@ namespace eFMS.API.Documentation.DL.Services
         }
         #endregion -- INSERT & UPDATE HOUSEBILLS --
 
-        //public CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId)
-        //{
-        //    var listHB = GetByJob(new CsTransactionDetailCriteria { JobId = JobId });
-        //    var returnHB = listHB.FirstOrDefault(x => x.Id == HbId);
-        //    return returnHB;
-
-        //}
-
         public List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria)
         {
             var results = QueryDetail(criteria).ToList();
