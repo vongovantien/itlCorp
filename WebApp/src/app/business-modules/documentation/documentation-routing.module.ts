@@ -70,43 +70,9 @@ const routes: Routes = [
 
     },
     {
-        path: 'sea-lcl-export',
-        component: SeaLCLExportComponent,
-        data: {
-            name: "Sea LCL Export",
-            level: 2
-        }
-    },
-    {
-        path: 'sea-lcl-export-create',
-        component: SeaLclExportCreateComponent,
-        data: {
-            name: "Sea LCL Export Create",
-            level: 3
-        }
-    },
-    {
-        path: 'sea-lcl-export-manifest',
-        component: SeaLclExportManifestComponent,
-        data: {
-            name: "Sea LCL Export Manifest",
-            level: 4
-        }
-    },
-    {
-        path: 'sea-lcl-export-shipping-instruction',
-        component: SeaLclExportShippingInstructionComponent,
-        data: {
-            name: "Sea LCL Export Shipping Instruction",
-            level: 4
-        }
-    },
+        path: 'sea-lcl-export', loadChildren: () => import('./sea-lcl-export/sea-lcl-export.module').then(m => m.SeaLCLExportModule),
 
-    {
-        path: 'sea-lcl-export-housebill-addnew',
-        component: SeaLclExportHousebillAddnewComponent
     },
-
 ];
 
 @NgModule({
