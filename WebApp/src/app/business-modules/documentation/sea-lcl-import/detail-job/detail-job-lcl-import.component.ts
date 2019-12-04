@@ -1,16 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 
 import { SeaLCLImportCreateJobComponent } from '../create-job/create-job-lcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransactionDetail } from 'src/app/shared/models';
+import { CsTransactionDetail, CsTransaction } from 'src/app/shared/models';
 
 import { combineLatest, of } from 'rxjs';
-import { switchMap, map, tap, skip, takeUntil, catchError } from 'rxjs/operators';
+import { switchMap, map, tap, skip, takeUntil, catchError, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -20,23 +23,29 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 })
 
 export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit {
+    @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     jobId: string;
 
     shipmentDetail: CsTransactionDetail;
 
     selectedTab: TAB | string = 'SHIPMENT';
+    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     action: any = {};
-
+    dataReport: any = null;
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
-        private _store: Store<any>
+        private _store: Store<any>,
+        private _ngProgressService: NgProgress
     ) {
         super(_router, _documenRepo, _toastService);
+        this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit() { }
@@ -50,11 +59,11 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
             tap((param: any) => {
                 this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
                 this.jobId = !!param.jobId ? param.jobId : '';
-                // if (param.action) {
-                //     this.ACTION = param.action.toUpperCase();
-                // }
-
-                // this.cdr.detectChanges();
+                if (param.action) {
+                    this.ACTION = param.action.toUpperCase();
+                } else {
+                    this.ACTION = null;
+                }
             }),
             switchMap(() => of(this.jobId)),
         ).subscribe(
@@ -85,6 +94,15 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                         this.shipmentGoodSummaryComponent.gw = res.grossWeight;
                         this.shipmentGoodSummaryComponent.packageQuantity = res.packageQty;
                         this.shipmentGoodSummaryComponent.cbm = res.cbm;
+
+                        // * reset field duplicate
+                        if (this.ACTION === "COPY") {
+
+                            this.resetFormControl(this.formCreateComponent.etd);
+                            this.resetFormControl(this.formCreateComponent.mawb);
+                            this.resetFormControl(this.formCreateComponent.eta);
+                            this.formCreateComponent.getUserLogged();
+                        }
 
                         const packageTypesTemp: CommonInterface.INg2Select[] = this.shipmentDetail.packageType.split(',').map((i: string) => <CommonInterface.INg2Select>({
                             id: i,
@@ -120,8 +138,33 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         modelAdd.jobNo = this.shipmentDetail.jobNo;
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
+        if (this.ACTION === 'UPDATE') {
+            this.saveJob(modelAdd);
+        } else {
+            this.duplicateJob(modelAdd);
+        }
+    }
+    duplicateJob(body: any) {
+        this._documenRepo.importCSTransaction(body)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.jobId = res.data.id;
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-        this.saveJob(modelAdd);
+                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+                        // * get detail & container list.
+                        this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                        this.ACTION = 'SHIPMENT';
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
     }
 
     saveJob(body: any) {
@@ -159,5 +202,56 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
+    }
+
+    deleteJob() {
+        this.confirmDeletePopup.show();
+    }
+
+    onDeleteJob() {
+        this._progressRef.start();
+        this._documenRepo.deleteMasterBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                    this.confirmDeletePopup.hide();
+                })
+            ).subscribe(
+                (respone: CommonInterface.IResult) => {
+                    if (respone.status) {
+                        this._toastService.success(respone.message, 'Delete Success !');
+                        this.gotoList();
+                    }
+                },
+            );
+    }
+
+    previewPLsheet(currency: string) {
+        this._documenRepo.previewSIFPLsheet(this.jobId, currency)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+    showDuplicateConfirm() {
+        this.confirmDuplicatePopup.show();
+    }
+    duplicateConfirm() {
+        this.action = { action: 'copy' };
+        this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], {
+            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
+        });
+        this.confirmDuplicatePopup.hide();
     }
 }

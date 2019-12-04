@@ -107,7 +107,6 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 (res: any) => {
                     this.cdNoteGroups = res;
                     this.initGroup = res;
-                    console.log(this.cdNoteGroups)
                 },
             );
     }

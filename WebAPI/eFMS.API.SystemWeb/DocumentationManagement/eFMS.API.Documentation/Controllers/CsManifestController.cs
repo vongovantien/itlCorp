@@ -64,8 +64,8 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult AddOrUpdateManifest(CsManifestEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            model.UserCreated = currentUser.UserID;
-            model.CreatedDate = DateTime.Now;
+            model.UserCreated = model.UserModified = currentUser.UserID;
+            model.CreatedDate = model.ModifiedDate = DateTime.Now;
             var hs = manifestService.AddOrUpdateManifest(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

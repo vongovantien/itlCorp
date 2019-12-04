@@ -278,17 +278,20 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ATTN = houserBill.NotifyPartyDescription;
                         charge.Consignee = houserBill.ConsigneeDescription;//partnerRepositoty.Get(x => x.Id == houserBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
                         charge.Notify = houserBill.NotifyPartyDescription;
-                        charge.HandlingInfo = "HandlingInfo";
-                        charge.ExecutedOn = "ExecutedOn";
+                        charge.HandlingInfo = string.Empty;
+                        charge.ExecutedOn = string.Empty;
                         charge.OceanVessel = houserBill.OceanVessel;
 
                         charge.OSI = "";//Để trống
-                        charge.FlightDate = houserBill.Eta.Value; //ETA
+                        if (houserBill.Eta != null)
+                        {
+                            charge.FlightDate = houserBill.Eta.Value; //ETA
+                        }
                         charge.DateConfirm = DateTime.Now;
                         charge.DatePackage = DateTime.Now;
                         charge.LocalVessel = houserBill.LocalVessel;//Local Vessel of HBL
                         charge.ContSealNo = houserBill.LocalVoyNo;// Local Voy No of HBL
-                        charge.ForCarrier = "ForCarrier";
+                        charge.ForCarrier = string.Empty;
                         charge.DepartureAirport = polName;//POL of HBL
                         charge.PortofDischarge = podName;//POD of HBL
                         charge.PlaceDelivery = podName;//POD of HBL
@@ -450,6 +453,7 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewDeliveryOrder(Guid hblid)
         {
             var detail = detailTransactionRepository.First(x => x.Id == hblid);
+            if (detail.DeliveryOrderNo == null) return new Crystal();
             var parameter = new SeaDeliveryCommandParam
             {
                 Consignee = "s",
@@ -469,6 +473,9 @@ namespace eFMS.API.Documentation.DL.Services
             var containers = containerRepository.Get(x => x.Hblid == hblid);
             foreach (var cont in containers)
             {
+                string totalPackages = cont.ContainerTypeId != null ? (cont.Quantity + "X" + unitRepository.Get(x => x.Id == cont.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn) : null;
+                string nopieces = cont.PackageTypeId != null ? (cont.PackageQuantity + " " + unitRepository.Get(x => x.Id == cont.PackageTypeId)?.FirstOrDefault()?.UnitNameEn) : null;
+                string unitOfMeasures = cont.UnitOfMeasureId != null ? (unitRepository.Get(x => x.Id == cont.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn) : null;
                 var item = new SeaDeliveryCommandResult
                 {
                     DONo = detail.DeliveryOrderNo,
@@ -483,11 +490,11 @@ namespace eFMS.API.Documentation.DL.Services
                     SpecialNote = "",
                     Description = cont.Description,
                     ContSealNo = cont.SealNo, //continue
-                    TotalPackages = cont.Quantity + "X" + unitRepository.Get(x => x.Id == cont.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn,
-                    NoPieces = cont.PackageQuantity + " " + unitRepository.Get(x => x.Id == cont.PackageTypeId)?.FirstOrDefault()?.UnitNameEn,
-                    GrossWeight = (decimal)cont.Gw,
-                    Unit = unitRepository.Get(x => x.Id == cont.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn,
-                    CBM = (decimal)cont.Cbm,
+                    TotalPackages = totalPackages,
+                    NoPieces = nopieces,
+                    GrossWeight = cont.Gw,
+                    Unit = unitOfMeasures,
+                    CBM = cont.Cbm != null?cont.Cbm: 0,
                     DeliveryOrderNote = detail.Dofooter,
                     FirstDestination = detail.DosentTo1,
                     SecondDestination = detail.DosentTo2,

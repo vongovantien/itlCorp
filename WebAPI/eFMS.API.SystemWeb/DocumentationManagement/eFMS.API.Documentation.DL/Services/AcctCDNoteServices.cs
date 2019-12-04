@@ -471,7 +471,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
                 var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
-                var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
 
                 charge.Currency = currencyRepository.First(x => x.Id == charge.CurrencyId).CurrencyName;
                 charge.ExchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
@@ -914,7 +914,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.MAWB = data.MbLadingNo; //MBLNO
                     charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
                     charge.ContainerSize = data.HbPackages; //Quantity Cont
-                    charge.GrossWeight = data.HbGrossweight.Value;//Total GW of HBL
+                    charge.GrossWeight = data.HbGrossweight != null ? data.HbGrossweight.Value : 0;//Total GW of HBL
                     charge.CBM = data.Volum.Value; //Total CBM of HBL
                     charge.SealNo = data.HbSealNo; //Cont/Seal No
                     charge.HWBNO = data.HbLadingNo; //HBLNOs
@@ -947,6 +947,7 @@ namespace eFMS.API.Documentation.DL.Services
             //Chuyển tiền Amount thành chữ
             decimal? _amount = listCharge.Sum(x => x.Debit) - listCharge.Sum(x => x.Credit);
             decimal _balanceAmount = Math.Abs(_amount.Value);
+            _balanceAmount = Math.Round(_balanceAmount, 2);
             var _inword = string.Empty;
             if (_balanceAmount >= 1)
             {

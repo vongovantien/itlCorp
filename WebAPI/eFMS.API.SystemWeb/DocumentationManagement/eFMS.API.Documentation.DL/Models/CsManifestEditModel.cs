@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.Service.Models;
+﻿using eFMS.API.Documentation.DL.Common;
+using eFMS.API.Documentation.Service.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -1151,7 +1151,7 @@ namespace eFMS.API.Documentation.DL.Services
             var containerNoList = string.Empty;
             if (containerList.Count() > 0)
             {
-                containerNoList = String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) && !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
+                containerNoList = String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
             }
 
             var listCharge = new List<FormPLsheetReport>();
@@ -1223,9 +1223,9 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.TransDate = shipment.DatetimeCreated != null ? shipment.DatetimeCreated.Value : DateTime.Now; //CreatedDate of shipment
                         charge.HWBNO = surcharge.Hwbno;
                         charge.MAWB = shipment.Mawb; //MasterBill of shipment
-                        charge.PartnerName = "PartnerName"; //NOT USE
+                        charge.PartnerName = string.Empty; //NOT USE
                         charge.ContactName = userSaleman?.Username; //Saleman đầu tiên của list housebill
-                        charge.ShipmentType = _shipmentType; //"Import (Sea FCL) " + shipment.TypeOfService;
+                        charge.ShipmentType = _shipmentType;
                         charge.NominationParty = string.Empty;
                         charge.Nominated = true; //Gán cứng
                         charge.POL = polName + ", " + polCountry;
@@ -1243,7 +1243,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.SeaImpVoy = string.Empty;//Gán rỗng
                         charge.LoadingDate = shipment.Etd != null ? shipment.Etd.Value.ToString("dd MMM yyyy") : string.Empty; //ETD
                         charge.ArrivalDate = shipment.Eta != null ? shipment.Eta.Value.ToString("dd MMM yyyy") : string.Empty; //ETA
-                        charge.FreightCustomer = "0"; //NOT USE
+                        charge.FreightCustomer = string.Empty; //NOT USE
                         charge.FreightColoader = 0; //NOT USE
                         charge.PayableAccount = surcharge.PartnerName;//Partner name of charge
                         charge.Description = surcharge.ChargeNameEn; //Charge name of charge
@@ -1252,8 +1252,8 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.VATAmount = 0; //NOT USE
                         charge.Cost = cost; //Phí chi của charge
                         charge.Revenue = revenue; //Phí thu của charge
-                        charge.Exchange = currency == "USD" ? _exchangeRateUSD * saleProfit : 0; //Exchange phí của charge về USD
-                        charge.VNDExchange = surcharge.ExchangeRate.Value;
+                        charge.Exchange = currency == Constants.CURRENCY_USD ? _exchangeRateUSD * saleProfit : 0; //Exchange phí của charge về USD
+                        charge.VNDExchange = surcharge.ExchangeRate != null ? surcharge.ExchangeRate.Value : 0;
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.DatePaid = DateTime.Now; //NOT USE
                         charge.Docs = surcharge.InvoiceNo; //InvoiceNo of charge
@@ -1261,7 +1261,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.InputData = string.Empty; //Gán rỗng
                         charge.SalesProfit = saleProfit;
                         charge.Quantity = surcharge.Quantity;
-                        charge.UnitPrice = surcharge.UnitPrice.Value;
+                        charge.UnitPrice = surcharge.UnitPrice != null ? surcharge.UnitPrice.Value : 0;
                         charge.Unit = unitCode;
                         charge.LastRevised = DateTime.Now.ToString("dd MMMM yyyy");
                         charge.OBH = isOBH;
@@ -1272,22 +1272,22 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ApproveDate = DateTime.Now; //NOT USE
                         charge.SalesCurr = currency;
                         charge.GW = shipment.GrossWeight;
-                        charge.MCW = shipment.NetWeight.Value;//Đang lấy NetWeight của Shipment
+                        charge.MCW = shipment.NetWeight != null ? shipment.NetWeight.Value : 0;//Đang lấy NetWeight của Shipment
                         charge.HCW = shipment.ChargeWeight;
-                        charge.PaymentTerm = "PaymentTerm"; //NOT USE
+                        charge.PaymentTerm = string.Empty; //NOT USE
                         charge.DetailNotes = string.Empty; //Gán rỗng
                         charge.ExpressNotes = string.Empty; //Gán rỗng
-                        charge.InvoiceNo = "InvoiceNo"; //NOT USE
-                        charge.CodeVender = "CodeVender"; //NOT USE
-                        charge.CodeCus = "CodeCus"; //NOT USE
+                        charge.InvoiceNo = string.Empty; //NOT USE
+                        charge.CodeVender = string.Empty; //NOT USE
+                        charge.CodeCus = string.Empty; //NOT USE
                         charge.Freight = true; //NOT USE
                         charge.Collect = true; //NOT USE
-                        charge.FreightPayableAt = "FreightPayableAt"; //NOT USE
+                        charge.FreightPayableAt = string.Empty; //NOT USE
                         charge.PaymentTime = 0; //NOT USE
                         charge.PaymentTimeCus = 0; //NOT USE
                         charge.Noofpieces = 0; //NOT USE
-                        charge.UnitPieaces = "UnitPieces"; //NOT USE
-                        charge.TpyeofService = "TpyeofService"; //NOT USE
+                        charge.UnitPieaces = string.Empty; //NOT USE
+                        charge.TpyeofService = string.Empty; //NOT USE
                         charge.ShipmentSource = shipment.ShipmentType;
                         charge.RealCost = true;
 
@@ -1322,29 +1322,25 @@ namespace eFMS.API.Documentation.DL.Services
         public string GetShipmentTypeForPreviewPL(string transactionType)
         {
             string shipmentType = string.Empty;
-            if (transactionType == TermData.AirExport)
-            {
-                shipmentType = string.Empty;
-            }
             if (transactionType == TermData.InlandTrucking)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Inland Trucking ";
             }
             if (transactionType == TermData.AirExport)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Air Export ";
             }
             if (transactionType == TermData.AirImport)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Air Import ";
             }
             if (transactionType == TermData.SeaConsolExport)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Export (Sea Consol) ";
             }
             if (transactionType == TermData.SeaConsolImport)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Import (Sea Consol) ";
             }
             if (transactionType == TermData.SeaFCLExport)
             {
@@ -1356,11 +1352,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (transactionType == TermData.SeaLCLExport)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Export (Sea LCL) ";
             }
             if (transactionType == TermData.SeaLCLImport)
             {
-                shipmentType = string.Empty;
+                shipmentType = "Import (Sea LCL) ";
             }
             return shipmentType;
         }

@@ -146,12 +146,12 @@ export class ShareBusinessFormManifestComponent extends AppList {
                 this.supplier.setValue(this.shipmentDetail.supplierName);
                 this.selectedPortOfLoading = { field: 'id', value: this.shipmentDetail.pol };
                 this.selectedPortOfDischarge = { field: 'id', value: this.shipmentDetail.pod };
-                const date = new Date().toISOString().substr(0, 19);
-                const jobNo = this.shipmentDetail.jobNo;
-                if (jobNo != null) {
-                    this.referenceNo.setValue("MSIF" + date.substring(2, 4) + date.substring(5, 7) + jobNo.substring(jobNo.length - 5, jobNo.length));
+                // const date = new Date().toISOString().substr(0, 19);
+                // const jobNo = this.shipmentDetail.jobNo;
+                // if (jobNo != null) {
+                //     this.referenceNo.setValue("MSIF" + date.substring(2, 4) + date.substring(5, 7) + jobNo.substring(jobNo.length - 5, jobNo.length));
 
-                }
+                // }
             }
         }, 500);
 

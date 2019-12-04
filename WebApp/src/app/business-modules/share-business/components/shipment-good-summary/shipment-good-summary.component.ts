@@ -38,8 +38,8 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
     containers: Container[] = [];
 
     constructor(
-        private _actionStoreSubject: ActionsSubject,
-        private _store: Store<fromStore.IContainerState>,
+        protected _actionStoreSubject: ActionsSubject,
+        protected _store: Store<fromStore.IContainerState>,
     ) {
         super();
     }
@@ -59,6 +59,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
+                        console.log(this.containers);
                         this.updateData(action.payload);
                     }
                 }

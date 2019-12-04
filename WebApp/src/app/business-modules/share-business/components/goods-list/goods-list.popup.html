@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    List of Container
+                    HBL List of Goods
                 </h5>
                 <button type="button" (click)="closePopup()" class="close">
                     <span aria-hidden="true">&times;</span>
@@ -39,7 +39,7 @@
                             <span>
                                 <i class="la la-plus-square"></i>
                                 <span>
-                                    Add Container
+                                    Add Detail
                                 </span>
                             </span>
                         </button>
@@ -55,7 +55,7 @@
                         <tbody>
                             <ng-container *ngIf="!!containers.length">
                                 <tr class="text-center m-form m-form--state"
-                                    *ngFor="let container of containers | filter: keyword: ['containerTypeId','seaNo','markNo']; let i = index; trackBy: trackByFn">
+                                    *ngFor="let container of containers | filter: keyword: ['containerTypeId','sealNo','markNo']; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col fixed-side">
                                         <div class="table-actions">
                                             <button type="button" (click)="deleteContainerItem(i,container)"
@@ -67,7 +67,7 @@
                                     </td>
                                     <td>
                                         <div class="form-group "
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!container.containerTypeId || isDuplicateContPakage )}">
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage}">
                                             <select class="form-control" [(ngModel)]="container.containerTypeId"
                                                 (ngModelChange)="onChangeDataFormTable()" name=containerTypeId>
                                                 <option value="null">Please select</option>
@@ -78,8 +78,9 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !container.quantity}">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': 
+                                            isSubmitted && ((!!container.containerNo || !!container.sealNo || !!container.markNo ) && !container.quantity)
+                                            }">
                                             <input type="number" class="form-control" [(ngModel)]="container.quantity"
                                                 (ngModelChange)="onChangeDataFormTable()" name="quantity" min="0"
                                                 step=".10">
@@ -87,45 +88,37 @@
                                     </td>
                                     <td>
                                         <div class=" form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.gw && container.gw < 0}">
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !container.gw}">
                                             <input type="number" class="form-control" [(ngModel)]="container.gw"
                                                 name="gw" min="0" step=".10">
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.chargeAbleWeight && container.chargeAbleWeight < 0}">
-                                            <input type="number" class="form-control"
-                                                [(ngModel)]="container.chargeAbleWeight" name="chargeAbleWeight" min="0"
-                                                step=".10">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.cbm && container.cbm < 0}">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': 
+                                            isSubmitted && !container.cbm}">
                                             <input type="number" class="form-control" [(ngModel)]="container.cbm"
-                                                name="cbm" min="0" step=".10">
+                                                name="cbm" min="0" step=".10" (ngModelChange)="onChangeDataFormTable()">
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage }">
-                                            <input type="number" class="form-control"
-                                                [(ngModel)]="container.packageQuantity" name="packageQuantity"
-                                                (ngModelChange)="onChangeDataFormTable()" min="0" step=".10">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage }">
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && (isDuplicateContPakage || !container.packageTypeId) }">
                                             <select class="form-control" [(ngModel)]="container.packageTypeId"
                                                 (ngModelChange)="onChangeDataFormTable()" name="packageTypeId">
-                                                <option value="null">Please select</option>
-
+                                                <option value="null" disabled>Please select</option>
                                                 <option *ngFor="let unit of packageUnits" [ngValue]="unit.id">
                                                     {{unit.unitNameEn}}
                                                 </option>
                                             </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger':
+                                                 isSubmitted && (isDuplicateContPakage || !container.packageQuantity)}">
+                                            <input type="number" class="form-control"
+                                                [(ngModel)]="container.packageQuantity" name="packageQuantity"
+                                                (ngModelChange)="onChangeDataFormTable()" min="0" step=".10">
                                         </div>
                                     </td>
                                     <td>
@@ -159,30 +152,12 @@
                                             </app-combo-grid-virtual-scroll>
                                         </div>
                                     </td>
-
                                     <td>
                                         <div class="form-group">
                                             <input type="text" class="form-control" [(ngModel)]="container.description"
                                                 name="description">
                                         </div>
                                     </td>
-
-                                    <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.nw && container.nw < 0}">
-                                            <input type="number" class="form-control" [(ngModel)]="container.nw"
-                                                name="nw" min="0" step=".10">
-                                        </div>
-                                    </td>
-
-                                    <td>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control"
-                                                [value]="container.unitOfMeasureName" name="unitOfMeasureId" readonly
-                                                disabled>
-                                        </div>
-                                    </td>
-
                                 </tr>
                             </ng-container>
                             <tr *ngIf="!containers.length" app-table-none-record [colspan]="headers.length  + 1">
@@ -222,7 +197,8 @@
         </div>
     </div>
 </div>
+
 <app-container-import></app-container-import>
 
-<confirm-popup [body]="'Are you sure you want to delete ?'" [title]="'Alert'" [labelConfirm]="'Yes'"
-    (onSubmit)="onDeleteContainer()"></confirm-popup>
+<confirm-popup #confirmCancel [body]="'Do you want to save your changes to List of Goods ?'" [title]="'Alert'"
+    [labelConfirm]="'Yes'" [labelCancel]="'No'" (onSubmit)="onSubmitCancel()" (onCancel)="onCancel()"></confirm-popup>

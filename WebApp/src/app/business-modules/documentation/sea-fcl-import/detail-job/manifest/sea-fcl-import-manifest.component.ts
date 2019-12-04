@@ -269,6 +269,10 @@ export class SeaFclImportManifestComponent extends AppList {
             );
     }
     previewManifest() {
+        if (this.formManifest.referenceNo.value === null) {
+            this._toastService.warning('There is no data to display preview');
+            return;
+        }
         const body: any = {
             jobId: this.jobId,
             refNo: this.formManifest.referenceNo.value,
@@ -296,10 +300,14 @@ export class SeaFclImportManifestComponent extends AppList {
                 (res: any) => {
                     if (res != null) {
                         this.dataReport = res;
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.reportPopup.frm.nativeElement.submit();
+                                this.reportPopup.show();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
                 },
             );

@@ -143,10 +143,10 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             this.infoPopup.show();
             return;
         }
-        if (!this.containers.length) {
-            this._toastService.warning('Please add container to update job');
-            return;
-        }
+        // if (!this.containers.length) {
+        //     this._toastService.warning('Please add container to update job');
+        //     return;
+        // }
 
         const modelUpdate = this.onSubmitData();
 
