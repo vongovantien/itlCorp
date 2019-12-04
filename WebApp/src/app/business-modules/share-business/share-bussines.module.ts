@@ -28,17 +28,17 @@ import {
     ShareBussinessCdNoteDetailPopupComponent,
     ShareBussinessShipmentGoodSummaryLCLComponent,
     ShareBussinessHBLGoodSummaryComponent,
-    ShareBussinessGoodsListPopupComponent
+    ShareBussinessGoodsListPopupComponent,
+    ShareBusinessFormManifestComponent,
+    ShareBusinessAddHblToManifestComponent,
+    ShareBusinessAssignStagePopupComponent,
+    ShareBusinessAsignmentComponent,
+    ShareBusinessStageManagementDetailComponent,
+    ShareBusinessFormSearchSeaComponent,
 } from './components';
 
 
 import { reducers, effects } from './store';
-import { ShareBusinessAssignStagePopupComponent } from './components/stage-management/assign-stage/assign-stage.popup';
-import { ShareBusinessAsignmentComponent } from './components/asignment/asignment.component';
-import { ShareBusinessStageManagementDetailComponent } from './components/stage-management/detail/detail-stage-popup.component';
-import { ShareBusinessAddHblToManifestComponent } from './components/manifest/popup/add-hbl-to-manifest.popup';
-import { ShareBusinessFormManifestComponent } from './components/manifest/form-manifest/components/form-manifest.component';
-import { ShareBusinessFormSearchSeaComponent } from './components/form-search-sea/form-search-sea.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -63,7 +63,6 @@ const COMPONENTS = [
     ShareBusinessAssignStagePopupComponent,
     ShareBusinessAsignmentComponent,
     ShareBusinessStageManagementDetailComponent,
-
     ShareBusinessFormSearchSeaComponent,
     ShareBussinessHBLGoodSummaryComponent
 ];
