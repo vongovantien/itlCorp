@@ -119,7 +119,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return null;
             }
-            Crystal result = null;
+            Crystal result = new Crystal();
             string noPieces = string.Empty;
             string totalPackages = string.Empty;
             
@@ -184,7 +184,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                return null;
+                return result;
             }
             result = new Crystal
             {
