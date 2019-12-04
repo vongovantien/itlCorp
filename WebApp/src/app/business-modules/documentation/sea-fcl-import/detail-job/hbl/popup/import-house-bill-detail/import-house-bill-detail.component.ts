@@ -50,11 +50,16 @@ export class ImportHouseBillDetailComponent extends PopupBase {
 
     getHourseBill(data: any = {}) {
         this.isLoading = true;
+
         const date = new Date();
-        if (data.all === undefined) {
+        if (this.dataSearch !== undefined) {
+            data = this.dataSearch;
+        }
+        if (data.fromDate === undefined) {
             data.fromDate = formatDate(new Date(date.getFullYear(), date.getMonth(), 1), 'yyyy-MM-dd', 'en');
             data.toDate = formatDate(new Date(), 'yyyy-MM-dd', 'en');
         }
+
         this._documentRepo.getListHblPaging(this.page, this.pageSize, data).pipe(
             catchError(this.catchError),
             finalize(() => { this.isLoading = false; }),

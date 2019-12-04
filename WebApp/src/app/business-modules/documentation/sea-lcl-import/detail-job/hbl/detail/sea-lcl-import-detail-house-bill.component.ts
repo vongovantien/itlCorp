@@ -216,7 +216,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                         this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.hblDetail.originBlnumber)[0]);
                         this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? this.createMoment(this.hblDetail.etd) : null;
                         this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? this.createMoment(this.hblDetail.eta) : null;
-
                         this.formHouseBill.saleMan.setValue(this.hblDetail.saleManId);
                         this.formHouseBill.customer.setValue(this.hblDetail.customerId);
                         this.formHouseBill.shipper.setValue(this.hblDetail.shipperId);
