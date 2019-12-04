@@ -72,6 +72,8 @@
                 </tab>
                 <tab heading="Assignment" (selectTab)="onSelectTab('assignment')"
                     [active]="selectedTab === 'ASSIGNMENT'">
+                    <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="SeaLCLImport_assignment">
+                    </ng-container>
                 </tab>
             </tabset>
         </div>
