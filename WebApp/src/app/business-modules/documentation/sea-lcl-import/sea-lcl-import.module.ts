@@ -32,8 +32,6 @@ const routing: Routes = [
     }
 ];
 
-const COMPONENTS = [];
-
 const LIBS = [
     TabsModule.forRoot(),
     PaginationModule.forRoot(),
@@ -55,7 +53,6 @@ const LIBS = [
         SeaLCLImportComponent,
         SeaLCLImportCreateJobComponent,
         SeaLCLImportDetailJobComponent,
-        ...COMPONENTS
     ],
     providers: [],
     bootstrap: [SeaLCLImportComponent]

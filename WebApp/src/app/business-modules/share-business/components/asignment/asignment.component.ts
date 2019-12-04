@@ -5,8 +5,6 @@ import { ActivatedRoute } from '@angular/router';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { OpsModuleStageManagementDetailComponent } from 'src/app/business-modules/operation/job-edit/stage-management/detail/detail-stage-popup.component';
-import { OpsModuleStageManagementAddStagePopupComponent } from 'src/app/business-modules/operation/job-edit/stage-management/add/add-stage.popup.component';
 import { Stage } from 'src/app/shared/models';
 import { ShareBusinessAssignStagePopupComponent } from '../stage-management/assign-stage/assign-stage.popup';
 import { ShareBusinessStageManagementDetailComponent } from '../stage-management/detail/detail-stage-popup.component';
@@ -18,7 +16,7 @@ import { ShareBusinessStageManagementDetailComponent } from '../stage-management
 
 export class ShareBusinessAsignmentComponent extends AppList {
 
-    @ViewChild(OpsModuleStageManagementAddStagePopupComponent, { static: false }) popupCreate: OpsModuleStageManagementAddStagePopupComponent;
+
     @ViewChild(ShareBusinessStageManagementDetailComponent, { static: false }) popupDetail: ShareBusinessStageManagementDetailComponent;
     @ViewChild(ShareBusinessAssignStagePopupComponent, { static: false }) assignStagePopup: ShareBusinessAssignStagePopupComponent;
     data: any = null;
@@ -80,15 +78,9 @@ export class ShareBusinessAsignmentComponent extends AppList {
                 finalize(() => this._progressRef.complete()),
             ).subscribe(
                 (response: any) => {
-
                     this.data = response;
-                    console.log(this.data);
                 },
             );
-    }
-
-    openPopUpCreateStage() {
-        this.popupCreate.show();
     }
 
     openPopUpAssignStage() {

@@ -1,15 +1,20 @@
 import { Component, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
-import { SortService } from 'src/app/shared/services';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
+import { Store } from '@ngrx/store';
+
+import { DocumentationRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services';
+import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+
+import * as fromShare from './../../share-business/store';
 
 @Component({
     selector: 'app-sea-fcl-import-management',
@@ -37,11 +42,15 @@ export class SeaFCLImportManagementComponent extends AppList {
         private _sortService: SortService,
         private _progressService: NgProgress,
         private _toastService: ToastrService,
+        private _store: Store<fromShare.IShareBussinessState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
-        this.requestList = this.searchList;
+
+        this.requestList = this.requestSearchShipment;
         this.requestSort = this.sortMasterBills;
+
+        this.isLoading = <any>this._store.select(fromShare.getTransationLoading);
     }
 
     ngOnInit() {
@@ -72,39 +81,30 @@ export class SeaFCLImportManagementComponent extends AppList {
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
+
         this.dataSearch = {
             transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport
         };
-        this.searchList(this.dataSearch);
+
+        this.requestSearchShipment();
+        this.getShipments();
     }
 
-    searchList(dataSearch?: any) {
-        if (dataSearch === undefined) {
-            dataSearch = {
-                transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport
-            };
-        }
-        this._progressRef.start();
-        this.isLoading = true;
-        this._documentationRepo.getListShipmentDocumentation(this.page, this.pageSize, Object.assign({}, dataSearch))
+    getShipments() {
+        this._store.select(fromShare.getTransactionListShipment)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.isLoading = false;
-                    this._progressRef.complete();
-                }),
-                map((data: any) => {
-                    return {
-                        data: data.data.map((item: any) => new CsTransaction(item)),
-                        totalItems: data.totalItems,
-                    };
-                })
-            ).subscribe(
-                (res: any) => {
-                    this.totalItems = res.totalItems || 0;
-                    this.masterbills = res.data;
-                },
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe(
+                (res: CommonInterface.IResponsePaging | any) => {
+                    this.masterbills = res.data || [];
+                    this.totalItems = res.totalItems;
+                }
             );
+    }
+
+    requestSearchShipment() {
+        this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     showHblList(jobId: string, index: number) {
@@ -128,8 +128,6 @@ export class SeaFCLImportManagementComponent extends AppList {
         }
     }
 
-
-
     gotoCreateJob() {
         this._router.navigate(['home/documentation/sea-fcl-import/new']);
     }
@@ -137,7 +135,9 @@ export class SeaFCLImportManagementComponent extends AppList {
     onSearchMasterBills(data: any) {
         this.page = 1; // reset page.
         data.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
-        this.searchList(data);
+
+        this.dataSearch = data;
+        this.requestSearchShipment();
     }
 
     sortMasterBills(sort: string): void {
@@ -182,10 +182,9 @@ export class SeaFCLImportManagementComponent extends AppList {
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
                         this._toastService.success(respone.message, 'Delete Success !');
-                        this.searchList(this.dataSearch);
+                        this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
                     }
                 },
             );
-
     }
 }

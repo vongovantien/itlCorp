@@ -5,11 +5,6 @@ import { AirImportComponent } from './air-import/air-import.component';
 import { InlandTruckingComponent } from './inland-trucking/inland-trucking.component';
 import { SeaConsolExportComponent } from './sea-consol-export/sea-consol-export.component';
 import { SeaConsolImportComponent } from './sea-consol-import/sea-consol-import.component';
-import { SeaLCLExportComponent } from './sea-lcl-export/sea-lcl-export.component';
-import { SeaLclExportCreateComponent } from './sea-lcl-export-create/sea-lcl-export-create.component';
-import { SeaLclExportHousebillAddnewComponent } from './sea-lcl-export-create/sea-lcl-export-housebill-addnew/sea-lcl-export-housebill-addnew.component';
-import { SeaLclExportManifestComponent } from './sea-lcl-export-create/sea-lcl-export-manifest/sea-lcl-export-manifest.component';
-import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-create/sea-lcl-export-shipping-instruction/sea-lcl-export-shipping-instruction.component';
 
 const routes: Routes = [
 
@@ -70,43 +65,9 @@ const routes: Routes = [
 
     },
     {
-        path: 'sea-lcl-export',
-        component: SeaLCLExportComponent,
-        data: {
-            name: "Sea LCL Export",
-            level: 2
-        }
-    },
-    {
-        path: 'sea-lcl-export-create',
-        component: SeaLclExportCreateComponent,
-        data: {
-            name: "Sea LCL Export Create",
-            level: 3
-        }
-    },
-    {
-        path: 'sea-lcl-export-manifest',
-        component: SeaLclExportManifestComponent,
-        data: {
-            name: "Sea LCL Export Manifest",
-            level: 4
-        }
-    },
-    {
-        path: 'sea-lcl-export-shipping-instruction',
-        component: SeaLclExportShippingInstructionComponent,
-        data: {
-            name: "Sea LCL Export Shipping Instruction",
-            level: 4
-        }
-    },
+        path: 'sea-lcl-export', loadChildren: () => import('./sea-lcl-export/sea-lcl-export.module').then(m => m.SeaLCLExportModule),
 
-    {
-        path: 'sea-lcl-export-housebill-addnew',
-        component: SeaLclExportHousebillAddnewComponent
     },
-
 ];
 
 @NgModule({

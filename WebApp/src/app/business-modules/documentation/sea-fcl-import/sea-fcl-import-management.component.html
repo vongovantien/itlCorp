@@ -133,17 +133,16 @@
                                                         </td>
                                                     </tr>
                                                 </ng-container>
-                                                <tr *ngIf="!isLoading && !housebills.length" app-table-none-record
-                                                    [colspan]="headerHouseBills.length">
+                                                <tr *ngIf="!(isLoading | async) && !housebills.length"
+                                                    app-table-none-record [colspan]="headerHouseBills.length">
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </tr>
                                 </ng-container>
                             </ng-container>
-                            <tr *ngIf="!isLoading && !masterbills.length" app-table-none-record
-                                [colspan]="headers.length + 1"></tr>
-                            <tr *ngIf="isLoading" app-table-row-loading></tr>
+                            <tr app-table-none-record *ngIf="!(isLoading | async) && !masterbills.length"></tr>
+                            <tr app-table-row-loading *ngIf="isLoading | async"></tr>
                         </tbody>
                     </table>
                 </div>
