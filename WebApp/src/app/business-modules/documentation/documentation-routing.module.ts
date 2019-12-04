@@ -5,11 +5,6 @@ import { AirImportComponent } from './air-import/air-import.component';
 import { InlandTruckingComponent } from './inland-trucking/inland-trucking.component';
 import { SeaConsolExportComponent } from './sea-consol-export/sea-consol-export.component';
 import { SeaConsolImportComponent } from './sea-consol-import/sea-consol-import.component';
-import { SeaLCLExportComponent } from './sea-lcl-export/sea-lcl-export.component';
-import { SeaLclExportCreateComponent } from './sea-lcl-export-create/sea-lcl-export-create.component';
-import { SeaLclExportHousebillAddnewComponent } from './sea-lcl-export-create/sea-lcl-export-housebill-addnew/sea-lcl-export-housebill-addnew.component';
-import { SeaLclExportManifestComponent } from './sea-lcl-export-create/sea-lcl-export-manifest/sea-lcl-export-manifest.component';
-import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-create/sea-lcl-export-shipping-instruction/sea-lcl-export-shipping-instruction.component';
 
 const routes: Routes = [
 
