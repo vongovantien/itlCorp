@@ -149,15 +149,26 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var houseBill in houseBills)
                 {
                     listCharges = Query(houseBill.Id, null);
-                    //listCharges = listCharges.Where(x => (x.PayerId == partnerId || x.Type == "OBH" || x.PaymentObjectId == partnerId)).ToList();
-                    listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == "OBH") || x.PaymentObjectId == partnerId)).ToList();
+                    listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == Constants.CHARGE_OBH_TYPE) || x.PaymentObjectId == partnerId)).ToList();
                     if (!string.IsNullOrEmpty(cdNoteCode))
                     {
                         listCharges = listCharges.Where(x => (x.CreditNo == cdNoteCode || x.DebitNo == cdNoteCode)).ToList();
                     }
                     else
                     {
-                        listCharges = listCharges.Where(x => (string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))).ToList();
+                        listCharges = listCharges.Where(x =>
+                            x.Type == Constants.CHARGE_OBH_TYPE ?
+                            (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo)  ?
+                                string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
+                                :
+                                (
+                                    string.IsNullOrEmpty(x.DebitNo) && !string.IsNullOrEmpty(x.CreditNo) ?
+                                        string.IsNullOrEmpty(x.DebitNo) && x.PaymentObjectId == partnerId
+                                     : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
+                                )
+                            )
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)
+                        ).ToList();
                     }
                     listCharges.ForEach(fe =>
                     {
@@ -172,14 +183,26 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var houseBill = opsTransRepository.Get(x => x.Id == id).FirstOrDefault();
                 listCharges = Query(houseBill.Hblid, null);
-                listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == "OBH") || x.PaymentObjectId == partnerId)).ToList();
+                listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == Constants.CHARGE_OBH_TYPE) || x.PaymentObjectId == partnerId)).ToList();
                 if (!string.IsNullOrEmpty(cdNoteCode))
                 {
                     listCharges = listCharges.Where(x => (x.CreditNo == cdNoteCode || x.DebitNo == cdNoteCode)).ToList();
                 }
                 else
                 {
-                    listCharges = listCharges.Where(x => (string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))).ToList();
+                    listCharges = listCharges.Where(x =>
+                            x.Type == Constants.CHARGE_OBH_TYPE ?
+                            (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
+                                string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
+                                :
+                                (
+                                    string.IsNullOrEmpty(x.DebitNo) && !string.IsNullOrEmpty(x.CreditNo) ?
+                                        string.IsNullOrEmpty(x.DebitNo) && x.PaymentObjectId == partnerId
+                                     : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
+                                )
+                            )
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)
+                    ).ToList();
                 }
                 listCharges.ForEach(fe =>
                 {
