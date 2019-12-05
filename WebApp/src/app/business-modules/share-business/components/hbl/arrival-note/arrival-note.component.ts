@@ -109,6 +109,8 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
                     }
                 }
             );
+
+        this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
     }
 
     configData() {

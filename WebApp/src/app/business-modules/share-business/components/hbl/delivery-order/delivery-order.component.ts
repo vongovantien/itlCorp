@@ -68,6 +68,8 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
                     }
                 }
             );
+
+        this.isLocked = this._store.select(fromShare.getTransactionLocked);
     }
 
     setDefaultHeadeFooter() {

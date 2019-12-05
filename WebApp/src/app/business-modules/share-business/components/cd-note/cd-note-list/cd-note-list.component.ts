@@ -58,7 +58,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
             (params: any) => {
                 const jobId = params.id || params.jobId;
                 if (jobId) {
-                    this.transactionType = parseInt(params.transactionType) || 0;
+                    this.transactionType = +params.transactionType || 0;
                     this.idMasterBill = jobId;
                     this.getListCdNote(this.idMasterBill);
                 }

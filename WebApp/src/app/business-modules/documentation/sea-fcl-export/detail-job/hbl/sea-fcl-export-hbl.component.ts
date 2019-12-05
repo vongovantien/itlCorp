@@ -37,8 +37,10 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
 
     selectedTabSurcharge: string = 'BUY';
 
-
     dataReport: any = null;
+
+    totalCBM: number;
+    totalGW: number;
 
     constructor(
         private _router: Router,
@@ -72,6 +74,10 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
+
+        this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+        this._store.select(fromShareBussiness.getTransactionLocked).subscribe((res: any) => { console.log(res) });
+
     }
 
     getHouseBills(id: string) {
@@ -83,6 +89,8 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
             (res: any) => {
                 this.houseBills = res;
                 if (!!this.houseBills.length) {
+                    this.totalGW = this.houseBills.reduce((acc: number, curr: CsTransactionDetail) => acc += curr.gw, 0);
+                    this.totalCBM = this.houseBills.reduce((acc: number, curr: CsTransactionDetail) => acc += curr.cbm, 0);
                     this.selectHBL(this.houseBills[0]);
                 }
             },

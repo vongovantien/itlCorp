@@ -24,13 +24,15 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 })
 
 export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit {
+
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
+    @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     jobId: string;
 
-    shipmentDetail: CsTransactionDetail;
+    shipmentDetail: any;
 
     selectedTab: TAB | string = 'SHIPMENT';
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
@@ -245,14 +247,36 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 },
             );
     }
+
     showDuplicateConfirm() {
         this.confirmDuplicatePopup.show();
     }
+
     duplicateConfirm() {
         this.action = { action: 'copy' };
         this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
         this.confirmDuplicatePopup.hide();
+    }
+
+    lockShipment() {
+        this.confirmLockPopup.show();
+    }
+
+    onLockShipment() {
+        this.confirmLockPopup.hide();
+
+        const modelAdd = this.onSubmitData();
+
+        //  * Update field
+        modelAdd.id = this.jobId;
+        modelAdd.transactionType = this.shipmentDetail.transactionType;
+        modelAdd.jobNo = this.shipmentDetail.jobNo;
+        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
+        modelAdd.userCreated = this.shipmentDetail.userCreated;
+        modelAdd.isLocked = true;
+
+        this.saveJob(modelAdd);
     }
 }

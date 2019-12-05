@@ -50,7 +50,7 @@
                         <h3 class="alert-block__title">
                             Freight Charge
                         </h3>
-                        <div>
+                        <div *ngIf="!(isLocked | async)">
                             <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
                                 (click)="setDefaultFreightCharge()">
                                 <span><i class="la la-save"></i>
@@ -185,7 +185,7 @@
                                     <tr app-table-none-record [colspan]="headers.length  + 1"
                                         *ngIf="!hblArrivalNote.csArrivalFrieghtCharges.length">
                                     </tr>
-                                    <tr>
+                                    <tr *ngIf="!(isLocked | async)">
                                         <td colspan=1 class="fixed-side">
                                             <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"
                                                 (click)="addCharge()">
@@ -205,7 +205,7 @@
                         <h3 class="alert-block__title">
                             Header
                         </h3>
-                        <div>
+                        <div *ngIf="!(isLocked | async)">
                             <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
                                 (click)="setDefaultHeadeFooter()">
                                 <span><i class="la la-save"></i>
@@ -229,7 +229,7 @@
                         <h3 class="alert-block__title">
                             Footer
                         </h3>
-                        <div>
+                        <div *ngIf="!(isLocked | async)">
                             <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
                                 (click)="setDefaultHeadeFooter()">
                                 <span><i class="la la-save"></i>

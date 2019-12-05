@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="m--align-right">
+                <div class="m--align-right" *ngIf="!(isLocked | async)">
                     <ng-container *ngIf="isShowSyncFreightCharge && !!charges && !charges.length">
                         <button type="button"
                             class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
@@ -53,7 +53,7 @@
                         <tr *ngFor="let charge of charges  | filter: keyword: ['partnerName','chargeNameEn','invoiceNo','notes','invoiceNo','seriesNo','soano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
                             class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''">
                             <td class="table-actions-col fixed-side">
-                                <div class="table-actions">
+                                <div class="table-actions" *ngIf="!(isLocked | async)">
                                     <button (click)="duplicate(i, 'SELL')"
                                         class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                         title="Duplicate"><i class="la la-copy"></i>
@@ -257,7 +257,7 @@
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
                     </tr>
-                    <tr>
+                    <tr *ngIf="!(isLocked | async)">
                         <td colspan=1 class="fixed-side">
                             <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"
                                 (click)="addCharge('SELL')">

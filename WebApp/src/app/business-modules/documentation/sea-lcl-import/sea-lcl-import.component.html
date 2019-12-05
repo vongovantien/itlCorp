@@ -41,11 +41,11 @@
                                                     <i class="la la-edit"></i>
                                                 </button>
 
-                                                <!-- <button type="button" *ngIf="item.isLocked"
-                                                        class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                        <i class="fa fa-lock"></i>
-                                                    </button> -->
-                                                <button type="button"
+                                                <button type="button" *ngIf="item.isLocked"
+                                                    class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                    <i class="fa fa-lock"></i>
+                                                </button>
+                                                <button type="button" *ngIf="!item.isLocked"
                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                     title="Remove" (click)="checkDeleteMasterBill(item)">
                                                     <i class="la la-trash"></i>

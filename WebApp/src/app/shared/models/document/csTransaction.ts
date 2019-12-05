@@ -41,7 +41,7 @@ export class CsTransaction {
     cbm: number = 0;
     notes: string = null;
     transactionType: string = null;
-    isLocked: boolean = null;
+    isLocked: boolean = false;
     lockedDate: string = null;
     userCreated: string = null;
     datetimeCreated: string = null;

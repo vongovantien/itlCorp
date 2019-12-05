@@ -43,7 +43,11 @@
                                                 [routerLink]="['/home/documentation/sea-fcl-export/' + shipment.id]">
                                                 <i class="la la-edit"></i>
                                             </button>
-                                            <button type="button"
+                                            <button type="button" *ngIf="shipment.isLocked"
+                                                class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                <i class="fa fa-lock"></i>
+                                            </button>
+                                            <button type="button" *ngIf="!shipment.isLocked"
                                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                 title="Remove" (click)="confirmDelete(shipment)">
                                                 <i class="la la-trash"></i>
@@ -107,29 +111,28 @@
                 </table>
             </div>
             <div class="pagination-nav ">
-                    <div class="row">
-                        <div *ngIf="!!shipments.length" class="col-sm-6">
-                            <div class="tatable__pager-size">
-                                <div class="select-box">
-                                    <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                        (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
-                                        <ng-container
-                                            *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                            <option [ngValue]="item">{{item}} line / screen</option>
-                                        </ng-container>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                            <div class="float-right">
-                                <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
-                                    (pageChanged)="pageChanged($event)" [(ngModel)]="page">
-                                </pagination>
+                <div class="row">
+                    <div *ngIf="!!shipments.length" class="col-sm-6">
+                        <div class="tatable__pager-size">
+                            <div class="select-box">
+                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                    (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                    <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                        <option [ngValue]="item">{{item}} line / screen</option>
+                                    </ng-container>
+                                </select>
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                        <div class="float-right">
+                            <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
+                                (pageChanged)="pageChanged($event)" [(ngModel)]="page">
+                            </pagination>
+                        </div>
+                    </div>
                 </div>
+            </div>
         </div>
     </div>
 </div>

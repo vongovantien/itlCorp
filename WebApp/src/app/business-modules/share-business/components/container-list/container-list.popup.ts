@@ -7,7 +7,7 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { Unit } from 'src/app/shared/models';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
-import { DataService, SortService } from 'src/app/shared/services';
+import { SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ShareContainerImportComponent } from '../container-import/container-import.component';
@@ -51,7 +51,6 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IContainerState>,
         protected cdRef: ChangeDetectorRef,
-        protected _dataService: DataService,
         protected _sortService: SortService,
         protected _toastService: ToastrService
     ) {
@@ -120,33 +119,23 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
     }
 
     getMasterData() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.UNIT) && !!this._dataService.getDataByKey(SystemConstants.CSTORAGE.UNIT).length) {
-            const res: any[] = this._dataService.getDataByKey(SystemConstants.CSTORAGE.UNIT);
-            this.containerUnits = res[0] || [];
-            this.packageUnits = res[1] || [];
-            this.weightUnits = res[2] || [];
-            this.commodities = res[3] || [];
-        } else {
-            forkJoin([
-                this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.CONTAINER }),
-                this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE }),
-                this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.WEIGHT }),
-                this._catalogueRepo.getCommondity({ active: true }),
-            ])
-                .pipe(
-                    catchError(this.catchError)
-                )
-                .subscribe(
-                    (res: any[] = [[], [], [], []]) => {
-                        this.containerUnits = res[0];
-                        this.packageUnits = res[1];
-                        this.weightUnits = res[2];
-                        this.commodities = res[3];
-
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.UNIT, [...res]);
-                    }
-                );
-        }
+        forkJoin([
+            this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.CONTAINER }),
+            this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE }),
+            this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.WEIGHT }),
+            this._catalogueRepo.getCommondity({ active: true }),
+        ])
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: any[] = [[], [], [], []]) => {
+                    this.containerUnits = res[0];
+                    this.packageUnits = res[1];
+                    this.weightUnits = res[2];
+                    this.commodities = res[3];
+                }
+            );
     }
 
     onSaveContainerList() {

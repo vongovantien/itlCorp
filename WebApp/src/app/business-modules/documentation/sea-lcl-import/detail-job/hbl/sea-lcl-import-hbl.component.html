@@ -1,5 +1,32 @@
 <div class="sea-lcl-import-hbl-page">
-    <app-sub-header></app-sub-header>
+    <app-sub-header>
+        <div class="c-button-actions">
+            <span *ngIf="!!(isLocked | async)" class="m--margin-right-10 align-middle">
+                <i class="fa fa-lock text-danger fa-3x"></i>
+            </span>
+
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                (click)="deleteJob()" *ngIf="!(isLocked | async)">
+                <span>
+                    <i class="la la-trash"></i>
+                    <span>
+                        Delete
+                    </span>
+                </span>
+            </button>
+
+            <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase" disabled>
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        save
+                    </span>
+                </span>
+            </button>
+
+            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
+        </div>
+    </app-sub-header>
 
     <div class="m-content">
         <div class="m-portlet__body">
@@ -30,7 +57,7 @@
                                     <div class="form-group">
                                         <button type="button"
                                             class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase float-right"
-                                            (click)="gotoCreate()">
+                                            (click)="gotoCreate()" [disabled]="isLocked | async">
                                             <span>
                                                 <i class="la la-plus"></i>
                                                 <span>
@@ -81,6 +108,18 @@
                                                 <td>{{house.packages}}</td>
                                                 <td>{{house.gw}}</td>
                                                 <td>{{house.cbm}}</td>
+                                            </tr>
+                                            <tr class="font-weight-bold">
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>Total</td>
+                                                <td>{{totalGW}}</td>
+                                                <td>{{totalCBM}}</td>
                                             </tr>
                                         </ng-container>
                                         <tr *ngIf="!isLoading && !houseBills.length" app-table-none-record

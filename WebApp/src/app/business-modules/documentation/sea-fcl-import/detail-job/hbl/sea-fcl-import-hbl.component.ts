@@ -39,6 +39,10 @@ export class SeaFCLImportHBLComponent extends AppList {
 
     selectedTabSurcharge: string = 'BUY';
     dataReport: any = null;
+
+    totalCBM: number;
+    totalGW: number;
+
     constructor(
         private _router: Router,
         private _sortService: SortService,
@@ -152,6 +156,8 @@ export class SeaFCLImportHBLComponent extends AppList {
             (res: any) => {
                 this.houseBill = res;
                 if (!!this.houseBill.length) {
+                    this.totalGW = this.houseBill.reduce((acc: number, curr: CsTransactionDetail) => acc += curr.gw, 0);
+                    this.totalCBM = this.houseBill.reduce((acc: number, curr: CsTransactionDetail) => acc += curr.cbm, 0);
                     this.selectHBL(this.houseBill[0]);
                 }
             },

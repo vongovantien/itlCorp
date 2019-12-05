@@ -1245,3 +1245,9 @@ a:not([href]):not([tabindex]) {
         }
     }
 }
+
+button {
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
