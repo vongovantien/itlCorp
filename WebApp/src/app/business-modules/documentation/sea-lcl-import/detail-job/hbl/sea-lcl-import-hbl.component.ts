@@ -34,6 +34,9 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
 
     selectedTabSurcharge: CommonEnum.SurchargeTypeEnum = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
 
+    totalCBM: number;
+    totalGW: number;
+
     constructor(
         private _router: Router,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -75,6 +78,8 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
             (res: any) => {
                 this.houseBills = res;
                 if (!!this.houseBills.length) {
+                    this.totalGW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
+                    this.totalCBM = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
                     this.selectHBL(this.houseBills[0]);
                 }
             },

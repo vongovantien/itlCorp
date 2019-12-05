@@ -10,7 +10,7 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
-import { CsShipmentSurcharge } from 'src/app/shared/models';
+import { CsShipmentSurcharge, HouseBill } from 'src/app/shared/models';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import * as fromShareBussiness from './../../../../share-business/store';
@@ -39,6 +39,10 @@ export class SeaFCLImportHBLComponent extends AppList {
 
     selectedTabSurcharge: string = 'BUY';
     dataReport: any = null;
+
+    totalCBM: number;
+    totalGW: number;
+
     constructor(
         private _router: Router,
         private _sortService: SortService,
@@ -152,6 +156,8 @@ export class SeaFCLImportHBLComponent extends AppList {
             (res: any) => {
                 this.houseBill = res;
                 if (!!this.houseBill.length) {
+                    this.totalGW = this.houseBill.reduce((acc: number, curr: CsTransactionDetail) => acc += curr.gw, 0);
+                    this.totalCBM = this.houseBill.reduce((acc: number, curr: CsTransactionDetail) => acc += curr.cbm, 0);
                     this.selectHBL(this.houseBill[0]);
                 }
             },

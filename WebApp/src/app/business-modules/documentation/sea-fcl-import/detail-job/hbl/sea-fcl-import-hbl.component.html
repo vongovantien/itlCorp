@@ -127,6 +127,18 @@
                                                         <td>{{house.gw}}</td>
                                                         <td>{{house.cbm}}</td>
                                                     </tr>
+                                                    <tr class="font-weight-bold">
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>Total</td>
+                                                        <td>{{totalGW}}</td>
+                                                        <td>{{totalCBM}}</td>
+                                                    </tr>
                                                 </ng-container>
                                                 <tr *ngIf="!isLoading && !houseBill.length" app-table-none-record
                                                     [colspan]="headers.length + 1">
