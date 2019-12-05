@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -18,6 +18,7 @@ import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-mod
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from 'src/app/business-modules/share-business';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -35,8 +36,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
-    @ViewChild(SeaFClImportArrivalNoteComponent, { static: false }) arrivalNoteComponent: SeaFClImportArrivalNoteComponent;
-    @ViewChild(SeaFClImportDeliveryOrderComponent, { static: false }) deliveryComponent: SeaFClImportDeliveryOrderComponent;
+    @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
+    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
 
@@ -55,9 +56,10 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _store: Store<fromShareBussiness.ITransactionState>,
-        private _exportRepository: ExportRepo
+        private _exportRepository: ExportRepo,
+        protected _cd: ChangeDetectorRef
     ) {
-        super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
+        super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd);
     }
 
     ngOnInit() {

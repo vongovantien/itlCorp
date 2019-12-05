@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -52,9 +52,11 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _store: Store<fromShareBussiness.ITransactionState>,
-        private _exportRepository: ExportRepo
+        private _exportRepository: ExportRepo,
+        protected _cd: ChangeDetectorRef
+
     ) {
-        super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
+        super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd);
     }
 
     ngOnInit() {

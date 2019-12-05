@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { formatDate } from '@angular/common';
@@ -54,6 +54,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _store: Store<fromShareBussiness.ITransactionState>,
+        protected _cd: ChangeDetectorRef
 
 
     ) {
@@ -103,19 +104,8 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         this.hblGoodsSummaryComponent.initContainer();
         this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
         this.deliveryComponent.deliveryOrder = new DeliveryOrder();
-        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
-            .subscribe(
-                (res: any) => {
+        this._cd.detectChanges();
 
-                    this.shipmentDetail = res;
-                    this.formHouseBill.mtBill.setValue(this.shipmentDetail.mawb);
-                    this.formHouseBill.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
-                    this.formHouseBill.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                    this.formHouseBill.supplier.setValue(this.shipmentDetail.coloaderId);
-                    this.formHouseBill.pol.setValue(this.shipmentDetail.pol);
-                    this.formHouseBill.pod.setValue(this.shipmentDetail.pod);
-                }
-            );
     }
 
     checkValidateForm() {

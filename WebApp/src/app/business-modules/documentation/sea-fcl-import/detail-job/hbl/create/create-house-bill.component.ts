@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { formatDate } from '@angular/common';
@@ -58,8 +58,7 @@ export class CreateHouseBillComponent extends AppForm {
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _store: Store<fromShareBussiness.ITransactionState>,
-
-
+        protected _cd: ChangeDetectorRef
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -87,6 +86,7 @@ export class CreateHouseBillComponent extends AppForm {
         });
 
 
+
     }
 
     getShipmentDetail() {
@@ -100,12 +100,11 @@ export class CreateHouseBillComponent extends AppForm {
     ngAfterViewInit() {
         this.shipmentGoodSummaryComponent.initContainer();
         this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
-
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
-
         this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
         this.deliveryComponent.deliveryOrder = new DeliveryOrder();
 
+        this._cd.detectChanges();
         this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
             .subscribe(
                 (res: any) => {
