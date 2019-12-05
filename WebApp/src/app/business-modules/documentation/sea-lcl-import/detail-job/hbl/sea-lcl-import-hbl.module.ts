@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { PaginationModule, ModalModule, TabsModule } from 'ngx-bootstrap';
+import { PaginationModule, ModalModule, TabsModule, BsDropdownModule } from 'ngx-bootstrap';
 
 import { SeaLCLImportHBLComponent } from './sea-lcl-import-hbl.component';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -35,8 +35,8 @@ const LIB = [
     ModalModule.forRoot(),
     TabsModule.forRoot(),
     SelectModule,
-    NgxDaterangepickerMd.forRoot()
-
+    NgxDaterangepickerMd.forRoot(),
+    BsDropdownModule.forRoot()
 ];
 
 const COMPONENTS = [
