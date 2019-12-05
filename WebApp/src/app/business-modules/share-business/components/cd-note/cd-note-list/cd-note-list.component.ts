@@ -176,6 +176,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         this.cdNoteGroups = this.initGroup;
         //TODO improve search.
         if (!!keyword) {
+            if(keyword.indexOf('\\') != -1) return this.cdNoteGroups = [];
             keyword = keyword.toLowerCase();
             // Search group
             let dataGrp = this.cdNoteGroups.filter((item: any) => item.partnerNameEn.toLowerCase().toString().search(keyword) !== -1)
@@ -183,7 +184,10 @@ export class ShareBussinessCdNoteListComponent extends AppList {
             if (dataGrp.length == 0) {
                 let arrayCharge = [];
                 for (const group of this.cdNoteGroups) {
-                    const data = group.listCDNote.filter((item: any) => item.type.toLowerCase().toString().search(keyword) !== -1 || item.code.toLowerCase().toString().search(keyword) !== -1)
+                    const data = group.listCDNote.filter((item: any) => item.type.toLowerCase().toString().search(keyword) !== -1 
+                                                                     || item.code.toLowerCase().toString().search(keyword) !== -1 
+                                                                     || item.userCreated.toLowerCase().toString().search(keyword) !== -1
+                                                                     || item.soaNo.toLowerCase().toString().search(keyword) !== -1)
                     if (data.length > 0) {
                         arrayCharge.push({ id: group.id, partnerNameEn: group.partnerNameEn, partnerNameVn: group.partnerNameVn, listCDNote: data });
                     }
