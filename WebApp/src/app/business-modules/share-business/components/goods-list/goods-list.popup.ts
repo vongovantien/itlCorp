@@ -26,7 +26,7 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
         protected _sortService: SortService,
         protected _toastService: ToastrService
     ) {
-        super(_catalogueRepo, _store, cdRef, _dataService, _sortService, _toastService);
+        super(_catalogueRepo, _store, cdRef, _sortService, _toastService);
     }
 
     configHeader() {

@@ -97,6 +97,10 @@ export class ShareBussinessHBLGoodSummaryComponent extends ShareBussinessShipmen
         }
     }
 
+    initContainer() {
+        this._store.dispatch(new fromStore.InitContainerAction([]));
+    }
+
     handleStringCont(contOb: { cont: string, quantity: number }) {
         return `Part of Container ${contOb.quantity}x${!!contOb.cont ? contOb.cont : ''}, `;
     }

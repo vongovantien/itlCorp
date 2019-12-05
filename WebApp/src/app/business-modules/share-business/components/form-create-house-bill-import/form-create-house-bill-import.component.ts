@@ -163,6 +163,18 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                     }
                 }
             );
+        this._store.select(fromShare.getTransactionDetailCsTransactionState)
+            .subscribe(
+                (res: any) => {
+                    this.shipmentDetail = res;
+                    this.mtBill.setValue(this.shipmentDetail.mawb);
+                    this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
+                    this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
+                    this.supplier.setValue(this.shipmentDetail.coloaderId);
+                    this.pol.setValue(this.shipmentDetail.pol);
+                    this.pod.setValue(this.shipmentDetail.pod);
+                }
+            );
 
     }
 
