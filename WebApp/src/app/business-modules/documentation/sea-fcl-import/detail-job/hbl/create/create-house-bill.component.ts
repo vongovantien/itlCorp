@@ -23,6 +23,7 @@ import { SeaFClImportDeliveryOrderComponent } from '../components/delivery-order
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { DeliveryOrder } from 'src/app/shared/models';
 import { forkJoin } from 'rxjs';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from 'src/app/business-modules/share-business';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -40,8 +41,8 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ImportHouseBillDetailComponent;
-    @ViewChild(SeaFClImportArrivalNoteComponent, { static: false }) arrivalNoteComponent: SeaFClImportArrivalNoteComponent;
-    @ViewChild(SeaFClImportDeliveryOrderComponent, { static: false }) deliveryComponent: SeaFClImportDeliveryOrderComponent;
+    @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
+    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
 
     jobId: string = '';
     shipmentDetail: any = {}; // TODO model.
@@ -130,8 +131,7 @@ export class CreateHouseBillComponent extends AppForm {
                 this.formHouseBill.PortChargeLikePortLoading = false;
 
             }
-        }
-        else {
+        } else {
             valid = false;
         }
         if (!this.formHouseBill.formGroup.valid) {
@@ -153,8 +153,6 @@ export class CreateHouseBillComponent extends AppForm {
         } else {
             const body = this.onsubmitData();
             this.createHbl(body);
-
-
         }
 
     }
@@ -223,7 +221,7 @@ export class CreateHouseBillComponent extends AppForm {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
-                        return forkJoin(arrival, delivery);
+                        return forkJoin([arrival, delivery]);
                     }),
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())

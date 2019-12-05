@@ -100,6 +100,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     ngAfterViewInit() {
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
+        this.hblGoodsSummaryComponent.initContainer();
         this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
         this.deliveryComponent.deliveryOrder = new DeliveryOrder();
         this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
@@ -213,7 +214,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
-                        return forkJoin(arrival, delivery);
+                        return forkJoin([arrival, delivery]);
                     }),
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
