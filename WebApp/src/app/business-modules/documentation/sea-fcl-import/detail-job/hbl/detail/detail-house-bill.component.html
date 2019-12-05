@@ -52,7 +52,7 @@
                         <shipment-good-summary> HBL Goods Summary </shipment-good-summary>
                     </ng-container>
                 </tab>
-                <tab heading="Arrival Note" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
+                <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
                     <ng-container *ngIf="selectedTab === 'ARRIVAL'">
                         <hbl-arrival-note></hbl-arrival-note>
                     </ng-container>
