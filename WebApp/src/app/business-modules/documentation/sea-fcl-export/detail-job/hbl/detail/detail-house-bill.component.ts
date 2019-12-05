@@ -20,8 +20,11 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 
 export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLComponent implements OnInit, AfterViewInit {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+
     hblId: string;
+
     hblDetail: CsTransactionDetail;
+
     dataReport: Crystal;
 
     constructor(
@@ -53,6 +56,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
+                this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                 this.getDetailHbl();
 
@@ -60,6 +64,8 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 // TODO handle error. 
             }
         });
+
+        this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
     }
 
     ngAfterViewInit() {
@@ -141,7 +147,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
             );
     }
 
-    preview(reportType: string){
+    preview(reportType: string) {
         this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
             .pipe(
                 catchError(this.catchError),

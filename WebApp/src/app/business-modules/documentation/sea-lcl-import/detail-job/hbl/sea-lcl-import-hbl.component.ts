@@ -67,6 +67,8 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
+
+        this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
     }
 
     getHouseBills(id: string) {

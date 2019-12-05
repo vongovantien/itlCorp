@@ -10,7 +10,7 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
-import { CsShipmentSurcharge, HouseBill } from 'src/app/shared/models';
+import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import * as fromShareBussiness from './../../../../share-business/store';

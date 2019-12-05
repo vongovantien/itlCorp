@@ -4,7 +4,7 @@
             <h3 class="alert-block__title">
                 <ng-content></ng-content>
             </h3>
-            <div>
+            <div *ngIf="!(isLocked | async)">
                 <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
                     (click)="refresh()" title="Refresh">
                     <span><i class="la la-refresh"></i>
@@ -65,7 +65,7 @@
                     </div>
                     <div class="col-md-4">
                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="openContainerListPopup()">
+                            (click)="openContainerListPopup()" [disabled]="isLocked | async">
                             <span>
                                 <i class="la la-list"></i>
                                 <span>

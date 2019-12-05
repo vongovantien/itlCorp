@@ -74,6 +74,10 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
+
+        this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+        this._store.select(fromShareBussiness.getTransactionLocked).subscribe((res: any) => { console.log(res) });
+
     }
 
     getHouseBills(id: string) {

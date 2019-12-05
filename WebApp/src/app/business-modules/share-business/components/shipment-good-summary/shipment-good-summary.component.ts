@@ -59,11 +59,12 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
-                        console.log(this.containers);
                         this.updateData(action.payload);
                     }
                 }
             );
+
+        this.isLocked = this._store.select(fromStore.getTransactionLocked);
     }
 
     handleStringCont(contOb: { cont: string, quantity: number }) {

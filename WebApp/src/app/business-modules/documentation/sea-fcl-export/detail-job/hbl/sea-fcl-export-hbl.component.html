@@ -1,6 +1,9 @@
 <div class="sea-fcl-import-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
+            <span *ngIf="!!(isLocked | async)" class="m--margin-right-10 align-middle">
+                <i class="fa fa-lock text-danger fa-3x"></i>
+            </span>
             <div class="dropdown m-dropdown m-dropdown--inline">
                 <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
                     <i class="la la-print"></i>P/L Sheet<span class="caret"></span>
@@ -20,7 +23,7 @@
             </button>
 
             <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="deleteJob()">
+                (click)="deleteJob()" *ngIf="!(isLocked | async)">
                 <span>
                     <i class="la la-trash"></i>
                     <span>
@@ -73,7 +76,7 @@
                                             <div class="form-group">
                                                 <button type="button"
                                                     class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase float-right"
-                                                    (click)="gotoCreate()">
+                                                    (click)="gotoCreate()" [disabled]="isLocked | async">
                                                     <span>
                                                         <i class="la la-plus"></i>
                                                         <span>
@@ -105,7 +108,7 @@
                                                                     [routerLink]="house.id" title="Detail">
                                                                     <i class="la la-edit"></i>
                                                                 </button>
-                                                                <button type="button"
+                                                                <button type="button" *ngIf="!(isLocked | async)"
                                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                                     title="Remove"
                                                                     (click)="showDeletePopup(house, $event)">

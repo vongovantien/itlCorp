@@ -26,6 +26,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
+    @ViewChild("confirmLockShipment", { static: false }) confirmLockShipmentPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     jobId: string;
@@ -103,6 +104,9 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.shipmentGoodSummaryComponent.totalChargeWeight = this.fclImportDetail.chargeWeight;
                     this.shipmentGoodSummaryComponent.totalCBM = this.fclImportDetail.cbm;
 
+                    // * Locked
+                    this.shipmentGoodSummaryComponent.isDisabled = this.fclImportDetail.isLocked;
+
                     // * reset field duplicate
                     if (this.ACTION === "COPY") {
 
@@ -137,7 +141,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             );
     }
 
-    onUpdateShipmenetDetail() {
+    onUpdateShipmentDetail() {
         this.formCreateComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
@@ -250,6 +254,27 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     }
                 },
             );
+    }
+
+    lockShipment() {
+        this.confirmLockShipmentPopup.show();
+    }
+
+    onLockShipment() {
+        this.confirmLockShipmentPopup.hide();
+
+        const modelUpdate = this.onSubmitData();
+
+        //  * Update field
+        modelUpdate.csMawbcontainers = this.containers;
+        modelUpdate.id = this.jobId;
+        modelUpdate.branchId = this.fclImportDetail.branchId;
+        modelUpdate.transactionType = this.fclImportDetail.transactionType;
+        modelUpdate.jobNo = this.fclImportDetail.jobNo;
+        modelUpdate.datetimeCreated = this.fclImportDetail.datetimeCreated;
+        modelUpdate.userCreated = this.fclImportDetail.userCreated;
+        modelUpdate.isLocked = true;
+        this.updateJob(modelUpdate);
     }
 
     showDuplicateConfirm() {

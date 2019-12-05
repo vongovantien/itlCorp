@@ -12,11 +12,12 @@
                     <!-- <a class="dropdown-item" >VLA H-B/L Preview</a> -->
                     <a class="dropdown-item" (click)="preview('ITL_SEKO')">ITL H-B/L SEKO Preview</a>
                     <a class="dropdown-item" (click)="preview('ITL_FRAME_KESCO')">ITL (Frame) H-B/L KESCO Preview</a>
-                    <a class="dropdown-item" (click)="preview('ITL_KESCO')">ITL H-B/L KESKO Preview</a>                    
+                    <a class="dropdown-item" (click)="preview('ITL_KESCO')">ITL H-B/L KESKO Preview</a>
                 </div>
             </div>
-                   
-            <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
+
+            <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"
+                *ngIf="!(isLocked | async)"></app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>

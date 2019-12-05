@@ -26,6 +26,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
+    @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
@@ -34,6 +35,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
     shipmentDetail: any;
     dataReport: any = null;
+
     constructor(
         private _store: Store<fromShareBussiness.TransactionActions>,
         protected _toastService: ToastrService,
@@ -120,10 +122,10 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             return;
         }
 
-        if (!this.containers.length) {
-            this._toastService.warning('Please add container to create new job');
-            return;
-        }
+        // if (!this.containers.length) {
+        //     this._toastService.warning('Please add container to create new job');
+        //     return;
+        // }
 
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model
@@ -142,6 +144,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             this.duplicateJob(modelAdd);
         }
     }
+
     duplicateJob(body: any) {
         this._documenRepo.importCSTransaction(body)
             .pipe(
@@ -268,14 +271,38 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                 },
             );
     }
+
     showDuplicateConfirm() {
         this.confirmDuplicatePopup.show();
     }
+
     duplicateConfirm() {
         this.action = { action: 'copy' };
         this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
         this.confirmDuplicatePopup.hide();
+    }
+
+    lockShipment() {
+        this.confirmLockPopup.show();
+    }
+
+    onLockShipment() {
+        this.confirmLockPopup.hide();
+
+        const modelAdd = this.onSubmitData();
+        modelAdd.csMawbcontainers = this.containers;
+
+        //  * Update field
+        modelAdd.csMawbcontainers = this.containers;
+        modelAdd.id = this.jobId;
+        modelAdd.branchId = this.shipmentDetail.branchId;
+        modelAdd.transactionType = this.shipmentDetail.transactionType;
+        modelAdd.jobNo = this.shipmentDetail.jobNo;
+        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
+        modelAdd.userCreated = this.shipmentDetail.userCreated;
+        modelAdd.isLocked = true;
+        this.saveJob(modelAdd);
     }
 }

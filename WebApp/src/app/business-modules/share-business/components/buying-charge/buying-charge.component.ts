@@ -80,6 +80,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     this.serviceTypeId = dataParam.serviceId;
                 }
             );
+
+        this.isLocked = this._store.select(fromStore.getTransactionLocked);
     }
 
     getSurcharge() {

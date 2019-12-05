@@ -30,6 +30,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
     isLoading: boolean | any = false;
     isCheckAll: boolean = false;
+    isLocked: boolean | any = false;
+
     _isShowAutoComplete = new BehaviorSubject<boolean>(false);
     $isShowAutoComplete: Observable<boolean> = this._isShowAutoComplete.asObservable();
 

@@ -9,8 +9,7 @@ import { CreateHouseBillComponent } from '../create/create-house-bill.component'
 import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { SeaFClImportArrivalNoteComponent } from '../components/arrival-note/arrival-note.component';
-import { SeaFClImportDeliveryOrderComponent } from '../components/delivery-order/delivery-order.component';
+
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
@@ -35,10 +34,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
-    @ViewChild(SeaFClImportArrivalNoteComponent, { static: false }) arrivalNoteComponent: SeaFClImportArrivalNoteComponent;
-    @ViewChild(SeaFClImportDeliveryOrderComponent, { static: false }) deliveryComponent: SeaFClImportDeliveryOrderComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
-
 
     hblId: string;
     containers: Container[] = [];
@@ -61,6 +57,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     }
 
     ngOnInit() {
+        this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
     }
 
     ngAfterViewInit() {
@@ -69,6 +66,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
+                this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                 this.getDetailHbl();
 
