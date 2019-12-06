@@ -262,8 +262,6 @@ namespace eFMS.API.Documentation.DL.Services
             var houserBill = houseBills.GetById(criteria.HblId);
             if (arrival != null && houserBill != null)
             {
-                var containers = containerRepository.Get(x => x.Hblid == criteria.HblId);
-
                 var polName = placeRepository.Get(x => x.Id == houserBill.Pol).FirstOrDefault()?.NameEn;
                 var podName = placeRepository.Get(x => x.Id == houserBill.Pod).FirstOrDefault()?.NameEn;
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
@@ -275,22 +273,22 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ArrivalNo = arrival.ArrivalNo;
                         charge.ReferrenceNo = houserBill.ReferenceNo;
                         charge.ISSUED = DateTime.Now.ToString("dd/MM/yyyy");//Issued Date
-                        charge.ATTN = houserBill.NotifyPartyDescription;
+                        charge.ATTN = houserBill.ShipperDescription;//Shipper
                         charge.Consignee = houserBill.ConsigneeDescription;//partnerRepositoty.Get(x => x.Id == houserBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
                         charge.Notify = houserBill.NotifyPartyDescription;
                         charge.HandlingInfo = string.Empty;
                         charge.ExecutedOn = string.Empty;
                         charge.OceanVessel = houserBill.OceanVessel;
 
-                        charge.OSI = "";//Để trống
+                        charge.OSI = arrival.ArrivalHeader.Replace("<strong>","<b>").Replace("</strong>","<b>").Replace("<em>", "<i>").Replace("</em>", "</i>");//Header of arrival
                         if (houserBill.Eta != null)
                         {
                             charge.FlightDate = houserBill.Eta.Value; //ETA
                         }
                         charge.DateConfirm = DateTime.Now;
                         charge.DatePackage = DateTime.Now;
-                        charge.LocalVessel = houserBill.LocalVessel;//Local Vessel of HBL
-                        charge.ContSealNo = houserBill.LocalVoyNo;// Local Voy No of HBL
+                        charge.LocalVessel = houserBill.OceanVessel;//Ocean Vessel of HBL
+                        charge.ContSealNo = houserBill.OceanVoyNo;// Ocean Voy No of HBL
                         charge.ForCarrier = string.Empty;
                         charge.DepartureAirport = polName;//POL of HBL
                         charge.PortofDischarge = podName;//POD of HBL
@@ -298,16 +296,13 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ArrivalNote = houserBill.Remark;//Remark of HBL
 
                         charge.ShippingMarkImport = houserBill.ShippingMark;//ShippingMark of HBL
-                        if (containers.Count() > 0)
-                        {
-                            var container = containers.ToList()[0];
-                            charge.TotalPackages = container.Quantity.ToString();// Quantity of container                    
-                            charge.Description = container.Description;// Description of container
-                            charge.NoPieces = container.PackageQuantity.ToString();
-                            charge.GrossWeight = container.Gw != null ? container.Gw.Value : 0; //GrossWeight of container
-                            charge.CBM = container.Cbm != null ? container.Cbm.Value : 0; //CBM of container
-                            charge.Unit = unitRepository.Get(x => x.Id == container.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn; //Unit name of container
-                        }
+                        
+                        charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
+                        charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
+                        charge.NoPieces = houserBill.PackageQty.ToString();
+                        charge.GrossWeight = houserBill.GrossWeight != null ? houserBill.GrossWeight.Value : 0; //GrossWeight of container
+                        charge.CBM = houserBill.Cbm != null ? houserBill.Cbm.Value : 0; //CBM of container
+                        charge.Unit = "KGS"; //Đang gán cứng
 
                         charge.blnShow = frieght.IsShow != null ? frieght.IsShow.Value : false; //isShow of charge arrival
                         charge.blnStick = frieght.IsTick != null ? frieght.IsTick.Value : false;//isStick of charge arrival
@@ -319,7 +314,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
                         charge.VAT = frieght.Vatrate != null ? frieght.Vatrate.Value : 0; //VAT of charge arrival
                         charge.Notes = frieght.Notes;//Note of charge arrival
-                        charge.ArrivalFooterNoitice = arrival.ArrivalFooter;//Footer of arrival
+                        charge.ArrivalFooterNoitice = arrival.ArrivalFooter.Replace("<strong>", "<b>").Replace("</strong>", "<b>").Replace("<em>","<i>").Replace("</em>","</i>");//Footer of arrival
                         charge.SeaFCL = true; //Đang gán cứng lấy hàng nguyên công
                         charge.MaskNos = "MaskNos";
                         charge.DlvCustoms = "DlvCustoms";
@@ -329,8 +324,8 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ExVND = frieght.ExchangeRate != null ? frieght.ExchangeRate.Value : 0;
                         charge.DecimalSymbol = ",";//Dấu phân cách phần ngàn
                         charge.DigitSymbol = ".";//Dấu phân cách phần thập phân
-                        charge.DecimalNo = 0;
-                        charge.CurrDecimalNo = 0;
+                        charge.DecimalNo = 2;
+                        charge.CurrDecimalNo = 2;
 
                         listCharge.Add(charge);
                     }
