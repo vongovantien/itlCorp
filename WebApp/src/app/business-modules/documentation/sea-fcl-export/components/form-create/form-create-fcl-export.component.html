@@ -82,7 +82,7 @@
                             </ng-select>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-group">
                             <label>Services Date</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
@@ -96,6 +96,17 @@
                                     </span>
                                 </span>
                             </div>
+                        </div>
+                    </div> -->
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Agent</label>
+                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
+                                [currentActiveItemId]="{ field: 'id', value: agent.value}"
+                                [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
+                                [displayFields]="displayFieldsSupplier">
+                            </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -118,14 +129,13 @@
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
+
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Agent</label>
-                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
-                                [currentActiveItemId]="{ field: 'id', value: agent.value}"
-                                [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                                [displayFields]="displayFieldsSupplier">
-                            </app-combo-grid-virtual-scroll>
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger':  isSubmitted && !term.value}">
+                            <label required>Term</label>
+                            <ng-select #selectTerm [items]="termTypes" placeholder="Please Select"
+                                formControlName="term" (opened)="closeOtherSelects(selectTerm)">
+                            </ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -140,11 +150,13 @@
                             <input type="text" class="form-control" formControlName="voyNo">
                         </div>
                     </div>
+
                     <div class="col-md-4">
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger':  isSubmitted && !term.value}">
-                            <label required>Term</label>
-                            <ng-select #selectTerm [items]="termTypes" placeholder="Please Select"
-                                formControlName="term" (opened)="closeOtherSelects(selectTerm)">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':  isSubmitted && !shipmentType.value}">
+                            <label required>Shipment Type</label>
+                            <ng-select #selectShipmentType [items]="shipmentTypes" placeholder="Please Select"
+                                formControlName="shipmentType" (opened)="closeOtherSelects(selectShipmentType)">
                             </ng-select>
                         </div>
                     </div>
@@ -153,12 +165,9 @@
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger':  isSubmitted && !shipmentType.value}">
-                                    <label required>Shipment Type</label>
-                                    <ng-select #selectShipmentType [items]="shipmentTypes" placeholder="Please Select"
-                                        formControlName="shipmentType" (opened)="closeOtherSelects(selectShipmentType)">
-                                    </ng-select>
+                                <div class="form-group">
+                                    <label>Purhase Order(P/O) No</label>
+                                    <input type="text" class="form-control" formControlName="pono">
                                 </div>
                             </div>
                             <div class="col-md-12">

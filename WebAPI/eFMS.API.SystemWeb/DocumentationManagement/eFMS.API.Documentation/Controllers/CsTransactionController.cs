@@ -330,7 +330,7 @@ namespace eFMS.API.Documentation.Controllers
 
             if(model.DeliveryPlace != null && model.DeliveryPlace != Guid.Empty)
             {
-                message = model.DeliveryPlace == model.Pol ? "Port of Destination must be different from Port of Loading" : message;
+                message = model.DeliveryPlace == model.Pol ? "Place of Delivery must be different from Port of Loading" : message;
             }
 
             message = string.IsNullOrEmpty(model.TypeOfService) ? "Service Type is required!" : message;
