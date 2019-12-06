@@ -1,6 +1,7 @@
 <div class="sea-fcl-create-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
+            <app-default-button (click)="showImportPopup()" [buttonSetting]="importButtonSetting"></app-default-button>
             <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>
@@ -14,6 +15,7 @@
     <shipment-good-summary> HBL Goods Summary </shipment-good-summary>
 
 </div>
+<import-house-bill-detail (onImport)="onImport($event)"> </import-house-bill-detail>
 
 <info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Update HBL'"></info-popup>

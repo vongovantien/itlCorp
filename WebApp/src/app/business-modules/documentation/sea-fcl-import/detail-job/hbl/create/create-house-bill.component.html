@@ -19,7 +19,7 @@
         <tabset class="custom-class-tab">
             <tab heading="HBL Detail" [active]="true">
 
-                <app-form-add-house-bill> </app-form-add-house-bill>
+                <form-create-house-bill-import> </form-create-house-bill-import>
 
                 <shipment-good-summary> HBL Goods Summary </shipment-good-summary>
             </tab>
@@ -40,4 +40,4 @@
 <confirm-popup [body]="'You are about to create a new  HBL, are you sure all entered details are correct?'"
     [labelCancel]="'No'" (onSubmit)="oncreate()">
 </confirm-popup>
-<popup-import-house-bill-detail (onImport)="onImport($event)"> </popup-import-house-bill-detail>
+<import-house-bill-detail (onImport)="onImport($event)"> </import-house-bill-detail>

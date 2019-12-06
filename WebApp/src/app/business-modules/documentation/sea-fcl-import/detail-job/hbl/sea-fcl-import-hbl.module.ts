@@ -11,10 +11,8 @@ import { TabsModule, ModalModule, PaginationModule, BsDropdownModule } from 'ngx
 import { SeaFCLImportHBLComponent } from './sea-fcl-import-hbl.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CreateHouseBillComponent } from './create/create-house-bill.component';
-import { FormAddHouseBillComponent } from './components/form-add-house-bill/form-add-house-bill.component';
 import { DetailHouseBillComponent } from './detail/detail-house-bill.component';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
-import { ImportHouseBillDetailComponent } from './popup/import-house-bill-detail/import-house-bill-detail.component';
 import { FormSearchHouseBillComponent } from './components/form-search-house-bill/form-search-house-bill.component';
 
 import { ChargeConstants } from 'src/constants/charge.const';
@@ -50,9 +48,7 @@ const LIB = [
     declarations: [
         SeaFCLImportHBLComponent,
         CreateHouseBillComponent,
-        FormAddHouseBillComponent,
         DetailHouseBillComponent,
-        ImportHouseBillDetailComponent,
         FormSearchHouseBillComponent,
     ],
     imports: [
