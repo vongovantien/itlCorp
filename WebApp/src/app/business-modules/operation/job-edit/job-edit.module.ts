@@ -1,4 +1,14 @@
 import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { SelectModule } from 'ng2-select';
+import { NgxCurrencyModule } from 'ngx-currency';
+import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
+
 import { OpsModuleBillingJobEditComponent } from './job-edit.component';
 import { ContainerListComponent } from './container-list/container-list.component';
 import { AddBuyingRatePopupComponent } from './charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
@@ -8,25 +18,19 @@ import { EditSellingRatePopupComponent } from './charge-list/edit-selling-rate-p
 import { AddObhRatePopupComponent } from './charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
 import { EditObhRatePopupComponent } from './charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
-import { Routes, RouterModule } from '@angular/router';
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { SelectModule } from 'ng2-select';
-import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { JobManagementBuyingRateComponent } from './components/buying-rate/buying-rate.component';
 import { JobManagementSellingRateComponent } from './components/selling-rate/selling-rate.component';
 import { JobManagementOBHComponent } from './components/obh/obh.component';
 import { ContainerImportComponent } from './container-list/container-import/container-import.component';
-import { NgxCurrencyModule } from 'ngx-currency';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 import { JobEditLazyLoadComponentModule } from './job-edit-lazy-load-component.module';
 import { JobEditShareModule } from './job-edit-share.module';
+import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 const routing: Routes = [
     {
-        path: ":id", component: OpsModuleBillingJobEditComponent, data: { name: "Job Edit", level: 3 }
+        path: ":id", component: OpsModuleBillingJobEditComponent, data: { name: "Job Edit", level: 3, serviceId: ChargeConstants.CL_CODE }
     },
 
 ];
@@ -80,7 +84,8 @@ const customCurrencyMaskConfig = {
         FormsModule,
         ReactiveFormsModule,
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
-        JobEditLazyLoadComponentModule, // ? Lazy loading module with 3 tab component (CD, Credit/Debit, Stage)
+        JobEditLazyLoadComponentModule, // ? Lazy loading module with 3 tab component (CD, Credit/Debit, Stage),
+        ShareBussinessModule,
         ...LIB,
 
     ],

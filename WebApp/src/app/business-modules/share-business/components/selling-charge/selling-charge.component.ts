@@ -52,7 +52,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         this.headers = [
             { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 150 },
             { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 250 },
-            { title: 'Quantity', field: 'quantity', required: true, sortable: true },
+            { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 150 },
             { title: 'Unit', field: 'unitId', required: true, sortable: true },
             { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
             { title: 'Currency', field: 'currencyId', required: true, sortable: true },
@@ -72,12 +72,11 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     getCharge() {
-        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT });
+        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.DEBIT });
     }
 
     saveSellingSurCharge() {
         // * Update data 
-        this._progressRef.start();
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;
@@ -88,6 +87,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         }
 
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+        this._progressRef.start();
 
         this._documentRepo.addShipmentSurcharges(this.charges)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))

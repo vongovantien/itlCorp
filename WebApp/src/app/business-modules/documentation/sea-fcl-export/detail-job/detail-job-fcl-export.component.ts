@@ -65,7 +65,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                     this.ACTION = null;
                 }
 
-                // this.cdr.detectChanges();
+                this._cd.detectChanges();
             }),
             switchMap(() => of(this.jobId)),
         ).subscribe(

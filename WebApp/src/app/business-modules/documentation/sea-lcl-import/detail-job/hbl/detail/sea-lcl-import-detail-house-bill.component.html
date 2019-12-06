@@ -15,12 +15,14 @@
                         <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">
                             <li role="menuitem"><a class="dropdown-item pointer"
                                     (click)="onPreview('ARRIVAL_ORIGINAL')">Original Currency</a></li>
-                            <li role="menuitem"><a class="dropdown-item pointer" (click)="onPreview('ARRIVAL_VND')">VND</a></li>
+                            <li role="menuitem"><a class="dropdown-item pointer"
+                                    (click)="onPreview('ARRIVAL_VND')">VND</a></li>
                         </ul>
                     </li>
                     <li role="menuitem"><a class="dropdown-item pointer" (click)="onPreview('DELIVERY_ORDER')">Delivery
                             Order</a></li>
-                    <li role="menuitem"><a class="dropdown-item pointer" (click)="onPreview('PROOF_OF_DELIVERY')">Proof of
+                    <li role="menuitem"><a class="dropdown-item pointer" (click)="onPreview('PROOF_OF_DELIVERY')">Proof
+                            of
                             Delivery</a></li>
                     <li role="menuitem" dropdown triggers="mouseover" placement="right" container="body">
                         <a dropdownToggle class="dropdown-item dropdown-toggle" (click)="false">Export Manifest
@@ -29,7 +31,8 @@
                         <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">
                             <li role="menuitem"><a class="dropdown-item pointer"
                                     (click)="onPreview('E_MANIFEST')">E-Manifest</a></li>
-                            <li role="menuitem"><a class="dropdown-item pointer" (click)="onPreview('GOODS_DECLARE')">Goods
+                            <li role="menuitem"><a class="dropdown-item pointer"
+                                    (click)="onPreview('GOODS_DECLARE')">Goods
                                     Declare</a></li>
                             <li role="menuitem"><a class="dropdown-item pointer"
                                     (click)="onPreview('DANGEROUS_GOODS')">Dangerous
@@ -48,7 +51,7 @@
                 <tab heading="HBL Detail" (selectTab)="onSelectTab('DETAIL')">
                     <ng-container>
                         <form-create-house-bill-import> </form-create-house-bill-import>
-                        <hbl-goods-summary> HBL Goods Summary </hbl-goods-summary>
+                        <hbl-goods-summary-lcl> HBL Goods Summary </hbl-goods-summary-lcl>
                     </ng-container>
                 </tab>
                 <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">

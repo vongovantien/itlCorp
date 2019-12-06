@@ -14,7 +14,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
-import { ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBussinessHBLGoodSummaryComponent } from 'src/app/business-modules/share-business';
+import { ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBussinessHBLGoodSummaryLCLComponent } from 'src/app/business-modules/share-business';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -31,7 +31,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessFormCreateHouseBillImportComponent, { static: false }) formHouseBill: ShareBusinessFormCreateHouseBillImportComponent;
-    @ViewChild(ShareBussinessHBLGoodSummaryComponent, { static: false }) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent, { static: false }) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;

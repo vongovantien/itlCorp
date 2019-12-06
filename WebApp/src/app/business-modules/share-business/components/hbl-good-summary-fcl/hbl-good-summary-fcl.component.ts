@@ -1,27 +1,24 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActionsSubject, Store } from '@ngrx/store';
 
 import { ShareBussinessShipmentGoodSummaryComponent } from '../shipment-good-summary/shipment-good-summary.component';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { ShareBussinessGoodsListPopupComponent } from '../goods-list/goods-list.popup';
 import { Unit } from 'src/app/shared/models';
 
 import _groupBy from 'lodash/groupBy';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/operators';
 
-import * as fromStore from './../../store';
+import * as fromStore from '../../store';
 
 
 @Component({
-    selector: 'hbl-goods-summary',
-    templateUrl: './hbl-good-summary.component.html'
+    selector: 'hbl-goods-summary-fcl',
+    templateUrl: './hbl-good-summary-fcl.component.html'
 })
 
-export class ShareBussinessHBLGoodSummaryComponent extends ShareBussinessShipmentGoodSummaryComponent implements OnInit {
-
-    @ViewChild(ShareBussinessGoodsListPopupComponent, { static: false }) containerPopup: ShareBussinessGoodsListPopupComponent;
+export class ShareBussinessHBLGoodSummaryFCLComponent extends ShareBussinessShipmentGoodSummaryComponent implements OnInit {
 
     packageQty: number = null;
 
@@ -44,10 +41,6 @@ export class ShareBussinessHBLGoodSummaryComponent extends ShareBussinessShipmen
             );
     }
 
-    openContainerListPopup() {
-        this.containerPopup.show();
-    }
-
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
         if (!this.description) {
@@ -64,8 +57,9 @@ export class ShareBussinessHBLGoodSummaryComponent extends ShareBussinessShipmen
 
         // * GW, Nw, CW, CBM
         this.grossWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
+        this.netWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.nw, 0);
+        this.totalChargeWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.chargeAbleWeight, 0);
         this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
-        this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
 
         if (!!containers.length) {
             this.selectedPackage = this.packages.find((unit: Unit) => unit.id === containers[0].packageTypeId).code;
@@ -95,14 +89,36 @@ export class ShareBussinessHBLGoodSummaryComponent extends ShareBussinessShipmen
         for (const item of contData) {
             this.containerDetail += this.handleStringCont(item);
         }
+
+        let packageObject: any[] = (containers || []).map((container: Container | any) => {
+            if (container.packageTypeName && container.packageQuantity) {
+                return {
+                    package: container.packageTypeName,
+                    quantity: container.packageQuantity
+                };
+            }
+        });
+
+        // ? If has PackageType & Quantity Package
+        if (!!packageObject.filter(i => Boolean(i)).length) {
+            packageObject = packageObject.filter(i => Boolean(i)); // * Filtering truly and valid value
+
+            const packageData = [];
+            for (const item of Object.keys(_groupBy(packageObject, 'package'))) {
+                packageData.push({
+                    package: item,
+                    quantity: _groupBy(packageObject, 'package')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
+                });
+            }
+
+            for (const item of packageData) {
+                this.containerDetail += this.handleStringPackage(item);
+            }
+        }
     }
 
     initContainer() {
         this._store.dispatch(new fromStore.InitContainerAction([]));
-    }
-
-    handleStringCont(contOb: { cont: string, quantity: number }) {
-        return `Part of Container ${contOb.quantity}x${!!contOb.cont ? contOb.cont : ''}, `;
     }
 
     handleStringContSeal(contNo: string = '', contType: string = '', sealNo: string = '') {

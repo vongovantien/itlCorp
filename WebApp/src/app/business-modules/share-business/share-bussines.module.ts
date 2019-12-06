@@ -28,7 +28,7 @@ import {
     ShareBussinessCdNoteAddRemainingChargePopupComponent,
     ShareBussinessCdNoteDetailPopupComponent,
     ShareBussinessShipmentGoodSummaryLCLComponent,
-    ShareBussinessHBLGoodSummaryComponent,
+    ShareBussinessHBLGoodSummaryLCLComponent,
     ShareBussinessGoodsListPopupComponent,
     ShareBusinessFormManifestComponent,
     ShareBusinessFormSearchSeaComponent,
@@ -41,6 +41,7 @@ import {
     ShareBusinessDeliveryOrderComponent,
     ShareBusinessImportHouseBillDetailComponent,
     ShareBusinessFormSearchHouseBillComponent,
+    ShareBussinessHBLGoodSummaryFCLComponent,
 
 } from './components';
 
@@ -74,9 +75,10 @@ const COMPONENTS = [
     ShareBusinessArrivalNoteComponent,
     ShareBusinessDeliveryOrderComponent,
     ShareBusinessFormSearchSeaComponent,
-    ShareBussinessHBLGoodSummaryComponent,
+    ShareBussinessHBLGoodSummaryLCLComponent,
     ShareBusinessImportHouseBillDetailComponent,
-    ShareBusinessFormSearchHouseBillComponent
+    ShareBusinessFormSearchHouseBillComponent,
+    ShareBussinessHBLGoodSummaryFCLComponent
 ];
 
 

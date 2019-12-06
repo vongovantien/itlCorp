@@ -44,14 +44,16 @@
                                     {{(hblProfit$ | async)?.houseBillTotalCharge.totalOBHLocal | number :'.0-3'}}
                                 </td>
                             </tr>
-                            <tr class="font-weight-bold">
-                                <td>Total</td>
-                                <td class="text-right">{{(hblProfit$ | async)?.profitUSD | number: '.0-3'}} USD</td>
-                                <td class="text-right">{{(hblProfit$ | async)?.profitLocal | number: '.0-3'}} VND</td>
-                            </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(hblProfit$ | async)"></tr>
                     </tbody>
+                    <tfoot>
+                        <tr class="font-weight-bold">
+                            <td>Total</td>
+                            <td class="text-right">{{(hblProfit$ | async)?.profitUSD | number: '.0-3'}} USD</td>
+                            <td class="text-right">{{(hblProfit$ | async)?.profitLocal | number: '.0-3'}} VND</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
