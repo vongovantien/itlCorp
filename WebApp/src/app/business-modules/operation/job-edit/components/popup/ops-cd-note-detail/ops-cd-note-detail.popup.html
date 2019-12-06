@@ -3,7 +3,7 @@
         <div class="modal-content" *ngIf="!!CdNoteDetail">
             <div class="modal-header">
                 <h5 class="modal-title">Detail<span
-                    class="m--margin-left-5">{{CdNoteDetail.cdNote.type === 'CREDIT' ? '"Credit Note"': CdNoteDetail.cdNote.type === 'DEBIT' ? '"Debit Note"' : '"Invoice"'}}</span>
+                    class="m--margin-left-5">{{CdNoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note': CdNoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span>
                 No: {{CdNoteDetail.cdNote.code}}</h5>
                 <button type="button" class="close" (click)="closePopup()">
                     <span aria-hidden="true">&times;</span>
