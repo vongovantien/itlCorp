@@ -16,8 +16,7 @@ import { DetailHouseBillComponent } from './detail/detail-house-bill.component';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 import { ImportHouseBillDetailComponent } from './popup/import-house-bill-detail/import-house-bill-detail.component';
 import { FormSearchHouseBillComponent } from './components/form-search-house-bill/form-search-house-bill.component';
-import { SeaFClImportArrivalNoteComponent } from './components/arrival-note/arrival-note.component';
-import { SeaFClImportDeliveryOrderComponent } from './components/delivery-order/delivery-order.component';
+
 import { ChargeConstants } from 'src/constants/charge.const';
 
 const routing: Routes = [
@@ -53,11 +52,8 @@ const LIB = [
         CreateHouseBillComponent,
         FormAddHouseBillComponent,
         DetailHouseBillComponent,
-
         ImportHouseBillDetailComponent,
         FormSearchHouseBillComponent,
-        SeaFClImportArrivalNoteComponent,
-        SeaFClImportDeliveryOrderComponent
     ],
     imports: [
         CommonModule,

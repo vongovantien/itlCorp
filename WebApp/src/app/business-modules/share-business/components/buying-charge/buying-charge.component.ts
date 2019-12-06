@@ -212,7 +212,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getCharge() {
-        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.DEBIT });
+        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT });
     }
 
     sortSurcharge() {
