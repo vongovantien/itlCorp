@@ -341,14 +341,27 @@ namespace eFMS.API.Documentation.DL.Services
                          select new { detail, tran, cus, sale });
             if (criteria.All == null)
             {
-                query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
-                                    && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && (x.detail.Eta >= criteria.FromDate || criteria.FromDate == null)
-                                    && (x.detail.Eta <= criteria.ToDate || criteria.ToDate == null)
-                                    && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    );
+               if(criteria.TypeFCL == "Export")
+                {
+                    query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
+                 && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 && (x.detail.Etd >= criteria.FromDate || criteria.FromDate == null)
+                 && (x.detail.Etd <= criteria.ToDate || criteria.ToDate == null)
+                 && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                }
+               else
+                {
+                    query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
+                                         && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                         && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                         && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                         && (x.detail.Eta >= criteria.FromDate || criteria.FromDate == null)
+                                         && (x.detail.Eta <= criteria.ToDate || criteria.ToDate == null)
+                                         && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                         );
+                }
             }
             else
             {
@@ -413,7 +426,22 @@ namespace eFMS.API.Documentation.DL.Services
                           ServiceType = detail.ServiceType,
                           ContSealNo = detail.ContSealNo,
                           SailingDate = detail.SailingDate,
-                          FreightPayment = detail.FreightPayment
+                          FreightPayment = detail.FreightPayment, 
+                          PickupPlace = detail.PickupPlace,
+                          DeliveryPlace = detail.DeliveryPlace,
+                          GoodsDeliveryDescription = detail.GoodsDeliveryDescription,
+                          GoodsDeliveryId = detail.GoodsDeliveryId,
+                          ForwardingAgentDescription = detail.ForwardingAgentDescription,
+                          ForwardingAgentId = detail.ForwardingAgentId,
+                          MoveType = detail.MoveType,
+                          ShippingMark = detail.ShippingMark,
+                          InWord = detail.InWord,
+                          OnBoardStatus = detail.OnBoardStatus,
+                          Remark = detail.Remark,
+                          PurchaseOrderNo = detail.PurchaseOrderNo,
+                          OriginCountryId = detail.OriginCountryId
+
+
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.ToList();

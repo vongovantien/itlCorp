@@ -88,6 +88,11 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     }
 
     showImportPopup() {
+        const dataSearch = { jobId: this.jobId };
+        dataSearch.jobId = this.jobId;
+        this.importHouseBillPopup.typeFCL = '';
+        this.importHouseBillPopup.selected = - 1;
+        this.importHouseBillPopup.getHourseBill(dataSearch);
         this.importHouseBillPopup.show();
     }
 
@@ -147,6 +152,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     onImport(selectedData: any) {
         this.selectedHbl = selectedData;
         if (!!this.selectedHbl) {
+
             this.formHouseBill.mtBill.setValue(this.selectedHbl.mawb);
             this.formHouseBill.consigneeDescription.setValue(this.selectedHbl.consigneeDescription);
             this.formHouseBill.shipperDescription.setValue(this.selectedHbl.shipperDescription);
@@ -168,7 +174,11 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             this.formHouseBill.hbltype.setValue([<CommonInterface.INg2Select>{ id: this.selectedHbl.hbltype, text: this.selectedHbl.hbltype }]);
             this.formHouseBill.supplier.setValue(this.selectedHbl.coloaderId);
             this.formHouseBill.saleMan.setValue(this.selectedHbl.saleManId);
-
+            this.formHouseBill.shippingMark.setValue(this.selectedHbl.shippingMark);
+            this.formHouseBill.remark.setValue(this.selectedHbl.remark);
+            this.formHouseBill.warehouseNotice.setValue(this.selectedHbl.inWord);
+            this.formHouseBill.pickupPlace.setValue(this.selectedHbl.pickupPlace);
+            this.formHouseBill.finalDestinationPlace.setValue(this.selectedHbl.finalDestinationPlace);
         }
     }
 

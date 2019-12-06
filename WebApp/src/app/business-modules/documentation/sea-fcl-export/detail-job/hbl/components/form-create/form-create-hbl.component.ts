@@ -344,6 +344,40 @@ export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnIni
 
     }
 
+    onUpdateDataToImport(data: CsTransactionDetail) {
+        this.formCreate.patchValue({
+            mawb: data.mawb,
+            consigneeDescription: data.consigneeDescription,
+            shipperDescription: data.shipperDescription,
+            customer: data.customerId,
+            consignee: data.consigneeId,
+            saleMan: data.saleManId,
+            shipper: data.shipperId,
+            notifyParty: data.notifyParty,
+            localVoyNo: data.localVoyNo,
+            oceanVoyNo: data.oceanVoyNo,
+            country: data.originCountryId,
+            pickupPlace: data.pickupPlace,
+            pol: data.pol,
+            pod: data.pod,
+            placeDelivery: data.deliveryPlace,
+            finalDestinationPlace: data.finalDestinationPlace,
+            forwardingAgent: data.forwardingAgentId,
+            forwardingAgentDescription: data.forwardingAgentDescription,
+            goodsDelivery: data.goodsDeliveryId,
+            goodsDeliveryDescription: data.goodsDeliveryDescription,
+            purchaseOrderNo: data.purchaseOrderNo,
+            shippingMark: data.shippingMark,
+            inWord: data.inWord,
+            onBoardStatus: data.onBoardStatus,
+            originBlnumber: [<CommonInterface.INg2Select>{ id: data.originBlnumber, text: data.originBlnumber }],
+            freightCharge: [<CommonInterface.INg2Select>{ id: data.freightPayment, text: data.freightPayment }],
+            moveType: [<CommonInterface.INg2Select>{ id: data.moveType, text: data.moveType }],
+            serviceType: [<CommonInterface.INg2Select>{ id: data.serviceType, text: data.serviceType }],
+            hbltype: [<CommonInterface.INg2Select>{ id: data.hbltype, text: data.hbltype }]
+        });
+    }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':

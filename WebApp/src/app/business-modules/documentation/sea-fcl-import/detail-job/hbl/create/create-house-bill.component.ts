@@ -148,7 +148,6 @@ export class CreateHouseBillComponent extends AppForm {
             this.formHouseBill.consigneeDescription.setValue(this.selectedHbl.consigneeDescription);
             this.formHouseBill.shipperDescription.setValue(this.selectedHbl.shipperDescription);
             this.formHouseBill.notifyPartyDescription.setValue(this.selectedHbl.notifyPartyDescription);
-            this.formHouseBill.referenceNo.setValue(this.selectedHbl.referenceNo);
             this.formHouseBill.localVessel.setValue(this.selectedHbl.localVessel);
             this.formHouseBill.localVoyNo.setValue(this.selectedHbl.localVoyNo);
             this.formHouseBill.oceanVessel.setValue(this.selectedHbl.oceanVessel);
@@ -165,6 +164,11 @@ export class CreateHouseBillComponent extends AppForm {
             this.formHouseBill.alsoNotifyParty.setValue(this.selectedHbl.alsoNotifyPartyId);
             this.formHouseBill.hbltype.setValue([<CommonInterface.INg2Select>{ id: this.selectedHbl.hbltype, text: this.selectedHbl.hbltype }]);
             this.formHouseBill.supplier.setValue(this.selectedHbl.coloaderId);
+            this.formHouseBill.shippingMark.setValue(this.selectedHbl.shippingMark);
+            this.formHouseBill.remark.setValue(this.selectedHbl.remark);
+            this.formHouseBill.warehouseNotice.setValue(this.selectedHbl.inWord);
+            this.formHouseBill.pickupPlace.setValue(this.selectedHbl.pickupPlace);
+            this.formHouseBill.finalDestinationPlace.setValue(this.selectedHbl.finalDestinationPlace);
 
         }
     }
@@ -174,6 +178,11 @@ export class CreateHouseBillComponent extends AppForm {
     }
 
     showImportPopup() {
+        const dataSearch = { jobId: this.jobId };
+        dataSearch.jobId = this.jobId;
+        this.importHouseBillPopup.typeFCL = '';
+        this.importHouseBillPopup.selected = - 1;
+        this.importHouseBillPopup.getHourseBill(dataSearch);
         this.importHouseBillPopup.show();
     }
 

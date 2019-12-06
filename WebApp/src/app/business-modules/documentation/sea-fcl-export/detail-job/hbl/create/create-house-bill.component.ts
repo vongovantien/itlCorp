@@ -16,6 +16,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { skip, catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
+import { ShareBusinessImportHouseBillDetailComponent } from 'src/app/business-modules/share-business';
 
 
 @Component({
@@ -29,9 +30,10 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(SeaFCLExportFormCreateHBLComponent, { static: false }) formCreateHBLComponent: SeaFCLExportFormCreateHBLComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) goodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
-
+    @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     jobId: string;
     containers: Container[] = [];
+    selectedHbl: any = {}; // TODO model.
 
     constructor(
         protected _progressService: NgProgress,
@@ -68,9 +70,11 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                 }
             });
+
     }
 
     ngAfterViewInit() {
+        this.importHouseBillPopup.typeFCL = 'Export';
         this.goodSummaryComponent.initContainer();
         this.goodSummaryComponent.containerPopup.isAdd = true;
 
@@ -78,6 +82,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     }
 
     showCreatepoup() {
+
         this.confirmPopup.show();
     }
 
@@ -157,6 +162,25 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
         return formData;
     }
+
+    onImport(selectedData: any) {
+        this.selectedHbl = selectedData;
+        if (!!this.selectedHbl) {
+            this.formCreateHBLComponent.onUpdateDataToImport(this.selectedHbl);
+        }
+    }
+
+
+    showImportPopup() {
+        const dataSearch = { jobId: this.jobId };
+        dataSearch.jobId = this.jobId;
+        this.importHouseBillPopup.typeFCL = 'Export';
+        this.importHouseBillPopup.selected = - 1;
+        this.importHouseBillPopup.getHourseBill(dataSearch);
+        this.importHouseBillPopup.show();
+
+    }
+
 
     checkValidateForm() {
         let valid: boolean = true;

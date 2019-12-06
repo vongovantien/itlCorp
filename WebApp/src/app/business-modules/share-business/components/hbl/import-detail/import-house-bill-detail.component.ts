@@ -18,6 +18,7 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
     selectedHbl: any = {};
     isCheckHbl: boolean = false;
     pageChecked: number = 0;
+    typeFCL: string = '';
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -41,7 +42,7 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
             { title: 'SaleMan', field: 'saleManName', sortable: true },
             { title: 'Shipment Date', field: 'etd', sortable: true }
         ];
-        this.getHourseBill(this.dataSearch);
+
     }
 
     onCancel() {
@@ -50,7 +51,6 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
 
     getHourseBill(data: any = {}) {
         this.isLoading = true;
-
         const date = new Date();
         if (this.dataSearch !== undefined) {
             data = this.dataSearch;
@@ -59,7 +59,9 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
             data.fromDate = formatDate(new Date(date.getFullYear(), date.getMonth(), 1), 'yyyy-MM-dd', 'en');
             data.toDate = formatDate(new Date(), 'yyyy-MM-dd', 'en');
         }
-
+        if (this.typeFCL !== '') {
+            data.typeFCL = this.typeFCL;
+        }
         this._documentRepo.getListHblPaging(this.page, this.pageSize, data).pipe(
             catchError(this.catchError),
             finalize(() => { this.isLoading = false; }),
