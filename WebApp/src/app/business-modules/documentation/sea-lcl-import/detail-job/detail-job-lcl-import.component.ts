@@ -145,10 +145,10 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         modelAdd.jobNo = this.shipmentDetail.jobNo;
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
-        if (this.ACTION === 'UPDATE') {
-            this.saveJob(modelAdd);
-        } else {
+        if (this.ACTION === 'COPY') {
             this.duplicateJob(modelAdd);
+        } else {
+            this.saveJob(modelAdd);
         }
     }
     duplicateJob(body: any) {
