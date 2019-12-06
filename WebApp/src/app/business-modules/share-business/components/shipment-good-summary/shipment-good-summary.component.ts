@@ -110,8 +110,8 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
 
         // * Container, Package.
-        this.containerDetail = '';
-
+        this.containerDetail = '';        
+        
         const contObject: any[] = (containers || []).map((container: Container | any) => ({
             cont: container.containerTypeName,
             quantity: container.quantity
@@ -128,32 +128,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         for (const item of contData) {
             this.containerDetail += this.handleStringCont(item);
         }
-
-        let packageObject: any[] = (containers || []).map((container: Container | any) => {
-            if (container.packageTypeName && container.packageQuantity) {
-                return {
-                    package: container.packageTypeName,
-                    quantity: container.packageQuantity
-                };
-            }
-        });
-
-        // ? If has PackageType & Quantity Package
-        if (!!packageObject.filter(i => Boolean(i)).length) {
-            packageObject = packageObject.filter(i => Boolean(i)); // * Filtering truly and valid value
-
-            const packageData = [];
-            for (const item of Object.keys(_groupBy(packageObject, 'package'))) {
-                packageData.push({
-                    package: item,
-                    quantity: _groupBy(packageObject, 'package')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
-                });
-            }
-
-            for (const item of packageData) {
-                this.containerDetail += this.handleStringPackage(item);
-            }
-        }
+        this.containerDetail = this.containerDetail.trim().replace(/\,$/, "")
     }
 
     onRefresh() {
