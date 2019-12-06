@@ -1,6 +1,7 @@
 import * as fromRouter from '@ngrx/router-store';
 import { Params, RouterStateSnapshot, Data } from '@angular/router';
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
+import { spinnerReducer, ISpinnerState } from './spinner.reducer';
 
 export interface IRouterStateUrl {
     url: string;
@@ -9,12 +10,14 @@ export interface IRouterStateUrl {
     data: Data;
 }
 
-export interface IState {
+export interface IAppState {
     routerReducer: fromRouter.RouterReducerState<IRouterStateUrl>;
+    spinnerReducer: ISpinnerState;
 }
 
-export const reducers: ActionReducerMap<IState> = {
-    routerReducer: fromRouter.routerReducer
+export const reducers: ActionReducerMap<IAppState> = {
+    routerReducer: fromRouter.routerReducer,
+    spinnerReducer: spinnerReducer
 };
 
 // * Custom Serializer
@@ -45,8 +48,4 @@ export const getParamsRouterState = createSelector(routerState, (state: fromRout
 export const getUrlRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.url);
 export const getDataRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.data);
 
-export const selectRouterParamByKey = createSelector(
-    routerState,
-    (state: fromRouter.RouterReducerState<IRouterStateUrl>, { field }: { field: string }) => !!state.state.params[field] ? state.state.params[field] : null
-);
-
+export const isSpinnerShowing = createSelector(spinnerReducer, (state: ISpinnerState) => state.show);
