@@ -77,7 +77,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
     saveSellingSurCharge() {
         // * Update data 
-        this._progressRef.start();
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;
@@ -88,6 +87,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         }
 
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+        this._progressRef.start();
 
         this._documentRepo.addShipmentSurcharges(this.charges)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
