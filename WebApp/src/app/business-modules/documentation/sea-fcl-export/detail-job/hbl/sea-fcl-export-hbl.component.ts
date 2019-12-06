@@ -76,8 +76,6 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
         ];
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
-        this._store.select(fromShareBussiness.getTransactionLocked).subscribe((res: any) => { console.log(res) });
-
     }
 
     getHouseBills(id: string) {

@@ -1,18 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { NgProgress } from '@ngx-progressbar/core';
+
 import { PopupBase } from 'src/app/popup.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
-import { UploadAlertComponent } from 'src/app/shared/common/popup/upload-alert/upload-alert.component';
-import { Store } from '@ngrx/store';
+import { InfoPopupComponent } from 'src/app/shared/common/popup';
 
 import * as fromStore from './../../store';
 @Component({
-    selector: 'app-container-import',
+    selector: 'container-import-popup',
     templateUrl: './container-import.component.html'
 })
 export class ShareContainerImportComponent extends PopupBase implements OnInit {
-    @ViewChild(UploadAlertComponent, { static: false }) importAlert: UploadAlertComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
 
     isShowInvalid: boolean = true;
     totalValidRow: number = 0;

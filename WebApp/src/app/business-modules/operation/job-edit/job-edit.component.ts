@@ -1,29 +1,31 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { BaseService } from 'src/app/shared/services/base.service';
-import * as dataHelper from 'src/helper/data.helper';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgForm } from '@angular/forms';
+import { NgProgress } from '@ngx-progressbar/core';
+import { Store } from '@ngrx/store';
+
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
+
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
-import { ChargeConstants } from 'src/constants/charge.const';
 import { ContainerListComponent } from './container-list/container-list.component';
 import { SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
-import { catchError, finalize } from 'rxjs/operators';
 import { DataService } from 'src/app/shared/services';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
-import { CsShipmentSurcharge } from 'src/app/shared/models';
-import { NgProgress } from '@ngx-progressbar/core';
+import { CsTransactionDetail } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
 import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { JobManagementBuyingRateComponent } from './components/buying-rate/buying-rate.component';
-import { JobManagementSellingRateComponent } from './components/selling-rate/selling-rate.component';
-import { JobManagementOBHComponent } from './components/obh/obh.component';
-import { NgxSpinnerService } from 'ngx-spinner';
-import { ToastrService } from 'ngx-toastr';
+import { ShareBussinessSellingChargeComponent } from '../../share-business';
+
+import { catchError, finalize } from 'rxjs/operators';
+
+import * as fromShareBussiness from './../../share-business/store';
+import * as dataHelper from 'src/helper/data.helper';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -33,14 +35,11 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     @ViewChild(ContainerListComponent, { static: false }) popupContainerList: ContainerListComponent;
     @ViewChild(PlSheetPopupComponent, { static: false }) plSheetPopup: PlSheetPopupComponent;
-    @ViewChild(JobManagementBuyingRateComponent, { static: false }) buyingRateManagement: JobManagementBuyingRateComponent;
-    @ViewChild(JobManagementSellingRateComponent, { static: false }) sellingRateManagement: JobManagementSellingRateComponent;
-    @ViewChild(JobManagementOBHComponent, { static: false }) obhRateManagement: JobManagementOBHComponent;
     @ViewChild('confirmCancelUpdate', { static: false }) confirmCancelJobPopup: ConfirmPopupComponent;
     @ViewChild('notAllowDelete', { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild('confirmDelete', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild('confirmLockShipment', { static: false }) confirmLockShipmentPopup: ConfirmPopupComponent;
-
+    @ViewChild(ShareBussinessSellingChargeComponent, { static: false }) sellingChargeComponent: ShareBussinessSellingChargeComponent;
 
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
@@ -63,37 +62,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     lstMasterContainers: any[];
     commodityGroupActive: any[] = [];
 
-    lstBuyingRateChargesComboBox: any[] = [];
-    lstSellingRateChargesComboBox: any[] = [];
-    lstOBHChargesComboBox: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
-
-    ListBuyingRateCharges: CsShipmentSurcharge[] = [];
-    ConstListBuyingRateCharges: any = [];
-    numberOfTimeSaveContainer: number = 0;
-
-    ListSellingRateCharges: any[] = [];
-    ConstListSellingRateCharges: any[] = [];
-
-    ListOBHCharges: CsShipmentSurcharge[] = [];
-    ConstListOBHCharges: any[] = [];
-
-    totalSellingUSD: number = 0;
-    totalSellingLocal: number = 0;
-
-    totalProfitUSD: number = 0;
-    totalProfitLocal: number = 0;
-
-    totalLogisticChargeUSD: number = 0;
-    totalLogisticChargeLocal: number = 0;
-
-    totalBuyingUSD: number = 0;
-    totalBuyingLocal: number = 0;
-
-    totalOBHUSD: number = 0;
-    totalOBHLocal: number = 0;
-
 
     listPackageTypes: any[];
     packageTypes: any[] = [];
@@ -105,7 +75,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     packagesUnitActive = [];
 
-    constructor(private baseServices: BaseService,
+    constructor(
         private _spinner: NgxSpinnerService,
         private route: ActivatedRoute,
         private router: Router,
@@ -115,7 +85,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _ngProgressService: NgProgress,
         private _documentRepo: DocumentationRepo,
         private _router: Router,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _store: Store<fromShareBussiness.IShareBussinessState>
     ) {
         super();
 
@@ -126,9 +97,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.getShipmentCommonData();
         this.getUnits();
         this.getListCurrencies();
-        this.getListBuyingRateCharges();
-        this.getListSellingRateCharges();
-        this.getListOBHCharges();
         this.getCustomers();
         this.getPorts();
         this.getSuppliers();
@@ -137,7 +105,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.getWarehouses();
         this.getCommodityGroup();
         this.getListPackageTypes();
-        this.getPartners();
         this.route.params.subscribe((params: any) => {
             this.tab = 'job-edit';
             this.tabCharge = 'buying';
@@ -148,15 +115,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             }
         });
 
-    }
-    getPartners() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
-            .subscribe((res: any) => {
-                this.buyingRateManagement.lstPartners = res;
-                this.sellingRateManagement.lstPartners = res;
-                this.obhRateManagement.lstPartners = res;
-                this._data.setDataService(SystemConstants.CSTORAGE.PARTNER, res);
-            });
     }
 
     getListContainersOfJob() {
@@ -341,7 +299,13 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
                             this.commodityGroupActive = this.commodityGroup.filter(i => i.id === this.opsTransaction.commodityGroupId);
 
-                            this.getCustomClearances();
+                            const hbl = new CsTransactionDetail(this.opsTransaction);
+                            hbl.id = this.opsTransaction.hblid;
+
+                            this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
+                            this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(this.opsTransaction));
+                            this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.opsTransaction.hblid));
+                            this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ mblid: this.opsTransaction.id }));
                         } else {
                             this.serviceDate = null;
                             this.finishDate = null;
@@ -412,53 +376,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             );
     }
 
-    getListBuyingRateCharges() {
-        this._catalogueRepo.getCharges({ active: true, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE })
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (responses: any) => {
-                    this.lstBuyingRateChargesComboBox = responses;
-                    this._data.setDataService('buyingCharges', this.lstBuyingRateChargesComboBox);
-                },
-            );
-    }
-
-    getListSellingRateCharges() {
-        // this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { active: true, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
-        //     this.lstSellingRateChargesComboBox = res['data'];
-        //     this._data.setDataService('sellingCharges', this.lstSellingRateChargesComboBox);
-        // });
-        this._catalogueRepo.getCharges({ active: true, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE })
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (responses: any) => {
-                    this.lstSellingRateChargesComboBox = responses;
-                    this._data.setDataService('sellingCharges', this.lstSellingRateChargesComboBox);
-                },
-            );
-    }
-
-    getListOBHCharges() {
-        // this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { active: true, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
-        //     this.lstOBHChargesComboBox = res['data'];
-        //     this._data.setDataService('obhCharges', this.lstOBHChargesComboBox);
-        // });
-        this._catalogueRepo.getCharges({ active: true, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE })
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (responses: any) => {
-                    this.lstOBHChargesComboBox = responses;
-                    this._data.setDataService('obhCharges', this.lstOBHChargesComboBox);
-                },
-            );
-    }
-
     getUnits() {
         this._catalogueRepo.getUnit().pipe(
             catchError(this.catchError),
@@ -503,73 +420,19 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         }
     }
 
-    totalProfit() {
-        this.totalProfitUSD = this.totalSellingUSD - this.totalBuyingUSD - this.totalLogisticChargeUSD;
-        this.totalProfitLocal = this.totalSellingLocal - this.totalBuyingLocal - this.totalLogisticChargeLocal;
-    }
-
-    totalBuyingCharge() {
-        this.totalBuyingUSD = 0;
-        this.totalBuyingLocal = 0;
-        if (this.ListBuyingRateCharges.length > 0) {
-
-            this.ListBuyingRateCharges.forEach((element: any) => {
-                const currentLocalBuying = element.total * element.exchangeRate;
-                this.totalBuyingLocal += currentLocalBuying;
-                // this.totalBuyingUSD += currentLocalBuying / element.exchangeRateUSDToVND;
-                this.totalBuyingUSD += element.total * element.rateToUSD;
-                this.totalProfit();
-            });
-        }
-    }
-
-    totalSellingCharge() {
-        this.totalSellingUSD = 0;
-        this.totalSellingLocal = 0;
-        if (this.ListSellingRateCharges.length > 0) {
-            this.ListSellingRateCharges.forEach(element => {
-                const currentLocalSelling = element.total * element.exchangeRate;
-                this.totalSellingLocal += currentLocalSelling;
-                // this.totalSellingUSD += currentLocalSelling / element.exchangeRateUSDToVND;
-                this.totalSellingUSD += element.total * element.rateToUSD;
-                this.totalProfit();
-            });
-        }
-    }
-
-    totalOBHCharge() {
-        this.totalOBHUSD = 0;
-        this.totalOBHLocal = 0;
-        if (this.ListOBHCharges.length > 0) {
-
-            this.ListOBHCharges.forEach((element: any) => {
-                const currentOBHCharge = element.total * element.exchangeRate;
-                this.totalOBHLocal += currentOBHCharge;
-                // this.totalOBHUSD += currentOBHCharge / element.exchangeRateUSDToVND;
-                this.totalOBHUSD += element.total * element.rateToUSD;
-                this.totalProfit();
-            });
-
-        }
-    }
 
     getSurCharges(type: 'BUY' | 'SELL' | 'OBH') {
         this._documentRepo.getSurchargeByHbl(type, this.opsTransaction.hblid)
             .subscribe((res: any) => {
                 if (type === 'BUY') {
-                    this.ListBuyingRateCharges = res;
-                    this.ConstListBuyingRateCharges = res;
-                    this.totalBuyingCharge();
+                    this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.opsTransaction.hblid }));
                 }
                 if (type === 'SELL') {
-                    this.ListSellingRateCharges = res;
-                    this.ConstListSellingRateCharges = res;
-                    this.totalSellingCharge();
+                    this.sellingChargeComponent.isShowSyncFreightCharge = false;
+                    this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.opsTransaction.hblid }));
                 }
                 if (type === 'OBH') {
-                    this.ListOBHCharges = res;
-                    this.ConstListOBHCharges = res;
-                    this.totalOBHCharge();
+                    this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: 'OBH', hblId: this.opsTransaction.hblid }));
                 }
             });
     }
@@ -578,10 +441,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.getSurCharges('BUY');
         this.getSurCharges('SELL');
         this.getSurCharges('OBH');
-    }
-
-    getCustomClearances() {
-        this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
     }
 
     selectTab($event: any, tabName: string) {

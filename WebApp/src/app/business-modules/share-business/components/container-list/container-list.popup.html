@@ -70,7 +70,7 @@
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && (!container.containerTypeId || isDuplicateContPakage )}">
                                             <select class="form-control" [(ngModel)]="container.containerTypeId"
                                                 (ngModelChange)="onChangeDataFormTable()" name=containerTypeId>
-                                                <option value="null">Please select</option>
+                                                <option [ngValue]="null">Please select</option>
                                                 <option *ngFor="let unit of containerUnits" [ngValue]="unit.id">
                                                     {{unit.unitNameEn}}
                                                 </option>
@@ -222,7 +222,8 @@
         </div>
     </div>
 </div>
-<app-container-import></app-container-import>
+
+<container-import-popup></container-import-popup>
 
 <confirm-popup [body]="'Are you sure you want to delete ?'" [title]="'Alert'" [labelConfirm]="'Yes'"
     (onSubmit)="onDeleteContainer()"></confirm-popup>

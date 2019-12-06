@@ -52,7 +52,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         this.headers = [
             { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 150 },
             { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 250 },
-            { title: 'Quantity', field: 'quantity', required: true, sortable: true },
+            { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 150 },
             { title: 'Unit', field: 'unitId', required: true, sortable: true },
             { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
             { title: 'Currency', field: 'currencyId', required: true, sortable: true },

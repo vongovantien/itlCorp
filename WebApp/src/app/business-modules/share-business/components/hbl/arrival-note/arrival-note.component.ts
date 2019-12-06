@@ -185,7 +185,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
     }
 
     getCharge() {
-        this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.CREDIT })
+        this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.DEBIT })
             .pipe(catchError(this.catchError))
             .subscribe(
                 (charges: Charge[]) => {

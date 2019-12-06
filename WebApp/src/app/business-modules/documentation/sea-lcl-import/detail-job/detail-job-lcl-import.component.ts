@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
@@ -45,7 +45,8 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         protected _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
         private _store: Store<any>,
-        private _ngProgressService: NgProgress
+        private _ngProgressService: NgProgress,
+        private _cd: ChangeDetectorRef
     ) {
         super(_router, _documenRepo, _toastService);
         this._progressRef = this._ngProgressService.ref();
@@ -67,6 +68,9 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 } else {
                     this.ACTION = null;
                 }
+
+                this._cd.detectChanges();
+
             }),
             switchMap(() => of(this.jobId)),
         ).subscribe(

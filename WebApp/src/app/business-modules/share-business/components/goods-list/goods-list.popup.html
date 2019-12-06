@@ -70,7 +70,7 @@
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage}">
                                             <select class="form-control" [(ngModel)]="container.containerTypeId"
                                                 (ngModelChange)="onChangeDataFormTable()" name=containerTypeId>
-                                                <option value="null">Please select</option>
+                                                <option [ngValue]="null">Please select</option>
                                                 <option *ngFor="let unit of containerUnits" [ngValue]="unit.id">
                                                     {{unit.unitNameEn}}
                                                 </option>
@@ -198,7 +198,8 @@
     </div>
 </div>
 
-<app-container-import></app-container-import>
+
+<container-import-popup></container-import-popup>
 
 <confirm-popup #confirmCancel [body]="'Do you want to save your changes to List of Goods ?'" [title]="'Alert'"
     [labelConfirm]="'Yes'" [labelCancel]="'No'" (onSubmit)="onSubmitCancel()" (onCancel)="onCancel()"></confirm-popup>

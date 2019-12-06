@@ -49,7 +49,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             { title: 'Receiver', field: 'payerName', required: true, sortable: true, width: 150 },
             { title: 'Payer', field: 'receiverName', required: true, sortable: true, width: 150 },
             { title: 'Charge', field: 'chargeId', required: true, sortable: true, width: 250 },
-            { title: 'Quantity', field: 'quantity', required: true, sortable: true },
+            { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 150 },
             { title: 'Unit', field: 'unitId', required: true, sortable: true },
             { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
             { title: 'Currency', field: 'currencyId', required: true, sortable: true },
@@ -82,6 +82,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 switch (partnerType.value) {
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
                         chargeItem.receiverName = this.hbl.customerName;
+                        if (!chargeItem.receiverName) {
+                            chargeItem.receiverName = this.listPartner.find(p => p.id === this.hbl.customerId).partnerNameEn;
+                        }
                         chargeItem.paymentObjectId = this.hbl.customerId;
                         break;
                     case CommonEnum.PartnerGroupEnum.CARRIER:
@@ -100,6 +103,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 switch (partnerType.value) {
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
                         chargeItem.payerName = this.hbl.customerName;
+                        if (!chargeItem.payerName) {
+                            chargeItem.payerName = this.listPartner.find(p => p.id === this.hbl.customerId).partnerNameEn;
+                        }
                         chargeItem.payerId = this.hbl.customerId;
                         break;
                     case CommonEnum.PartnerGroupEnum.CARRIER:
