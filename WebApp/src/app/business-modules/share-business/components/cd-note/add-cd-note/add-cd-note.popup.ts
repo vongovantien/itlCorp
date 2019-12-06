@@ -374,6 +374,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.listChargePartner = this.initGroup;
         //TODO improve search.
         if (!!keyword) {
+            if(keyword.indexOf('\\') != -1) return this.listChargePartner = [];
             keyword = keyword.toLowerCase();
             // Search group
             let dataGrp = this.listChargePartner.filter((item: any) => item.hwbno.toLowerCase().toString().search(keyword) !== -1)
