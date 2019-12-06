@@ -60,6 +60,7 @@
                                     [currentActiveItemId]="{ field: 'id', value: shipper.value}"
                                     [dataSources]="configShipper.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'Shipper')"
+                                    [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                     [displayFields]="configPartner.displayFields">
                                 </app-combo-grid-virtual-scroll>
                                 <textarea rows="3" class="form-control m-input m-input--square"
