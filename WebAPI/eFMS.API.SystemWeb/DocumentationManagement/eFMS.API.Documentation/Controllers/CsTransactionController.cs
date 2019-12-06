@@ -282,12 +282,28 @@ namespace eFMS.API.Documentation.Controllers
             //}
             if (message.Length > 0) return message;
             var resultMessage = string.Empty;
-            if (model.TransactionTypeEnum == TransactionTypeEnum.SeaFCLImport)
+
+            switch (model.TransactionTypeEnum)
             {
-                resultMessage = CheckExistsSIF(id, model);
+                case TransactionTypeEnum.SeaFCLImport:
+                    resultMessage = CheckExistsSIF(id, model);
+                    break;
+                case TransactionTypeEnum.SeaFCLExport:
+                    resultMessage = CheckExistSFE(model);
+                    break;
             }
 
             return resultMessage;
+        }
+
+        private string CheckExistSFE(CsTransactionEditModel model)
+        {
+            string message = string.Empty;
+            if(model.Pol == model.Pod && model.Pol != null && model.Pod != null)
+            {
+                message = model.Pod == model.Pol ? "Port of Destination must be different from Port of Loading" : message;
+            }
+            return message;
         }
 
         private string CheckExistsSIF(Guid id, CsTransactionEditModel model)
