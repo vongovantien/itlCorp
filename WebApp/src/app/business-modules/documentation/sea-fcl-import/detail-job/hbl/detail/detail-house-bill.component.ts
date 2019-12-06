@@ -3,8 +3,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
-
-import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
 import { CreateHouseBillComponent } from '../create/create-house-bill.component';
 import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
@@ -17,7 +15,7 @@ import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-mod
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from 'src/app/business-modules/share-business';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent } from 'src/app/business-modules/share-business';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -33,7 +31,7 @@ enum HBL_TAB {
 export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
+    @ViewChild(ShareBusinessFormCreateHouseBillImportComponent, { static: false }) formHouseBill: ShareBusinessFormCreateHouseBillImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
@@ -139,23 +137,11 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         const modelUpdate = this.onsubmitData();
         modelUpdate.jobId = this.hblDetail.jobId;
         modelUpdate.id = this.hblDetail.id;
-        modelUpdate.consigneeDescription = !!this.formHouseBill.selectedConsignee.data ? this.formHouseBill.selectedConsignee.data.partnerNameEn + "\n" +
-            this.formHouseBill.selectedConsignee.data.addressShippingEn + "\n" +
-            "Tel: " + this.formHouseBill.selectedConsignee.data.tel + "\n" +
-            "Fax: " + this.formHouseBill.selectedConsignee.data.fax + "\n" : this.hblDetail.consigneeDescription;
-        modelUpdate.shipperDescription = !!this.formHouseBill.selectedShipper.data ? this.formHouseBill.selectedShipper.data.partnerNameEn + "\n" +
-            this.formHouseBill.selectedShipper.data.addressShippingEn + "\n" +
-            "Tel: " + this.formHouseBill.selectedShipper.data.tel + "\n" +
-            "Fax: " + this.formHouseBill.selectedShipper.data.fax + "\n" : this.hblDetail.shipperDescription;
-        modelUpdate.notifyPartyDescription = !!this.formHouseBill.selectedNotifyParty.data ? this.formHouseBill.selectedNotifyParty.data.partnerNameEn + "\n" +
-            this.formHouseBill.selectedNotifyParty.data.addressShippingEn + "\n" +
-            "Tel: " + this.formHouseBill.selectedNotifyParty.data.tel + "\n" +
-            "Fax: " + this.formHouseBill.selectedNotifyParty.data.fax + "\n" : this.hblDetail.notifyPartyDescription;
 
-        modelUpdate.alsoNotifyPartyDescription = !!this.formHouseBill.selectedAlsoNotifyParty.data ? this.formHouseBill.selectedAlsoNotifyParty.data.partnerNameEn + "\n" +
-            this.formHouseBill.selectedAlsoNotifyParty.data.addressShippingEn + "\n" +
-            "Tel: " + this.formHouseBill.selectedAlsoNotifyParty.data.tel + "\n" +
-            "Fax: " + this.formHouseBill.selectedAlsoNotifyParty.data.fax + "\n" : this.hblDetail.alsoNotifyPartyDescription;
+        modelUpdate.consigneeDescription = this.formHouseBill.consigneeDescription.value;
+        modelUpdate.shipperDescription = this.formHouseBill.shipperDescription.value;
+        modelUpdate.notifyPartyDescription = this.formHouseBill.notifyPartyDescription.value;
+        modelUpdate.alsoNotifyPartyDescription = this.formHouseBill.alsonotifyPartyDescription.value;
 
         modelUpdate.arrivalFirstNotice = this.hblDetail.arrivalFirstNotice;
         modelUpdate.arrivalFooter = this.hblDetail.arrivalFooter;
@@ -223,7 +209,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                         this.formHouseBill.pickupPlace.setValue(this.hblDetail.pickupPlace);
                         !!this.hblDetail.eta ? this.formHouseBill.eta.setValue({ startDate: new Date(this.hblDetail.eta), endDate: new Date(this.hblDetail.eta) }) : this.formHouseBill.eta.setValue(null), // * Date;
                             this.formHouseBill.finalDestinationPlace.setValue(this.hblDetail.finalDestinationPlace);
-                        this.formHouseBill.selectedShipper = { field: 'shortName', value: this.hblDetail.shipperId };
+                        this.formHouseBill.shipper.setValue(this.hblDetail.shipperId);
 
                         this.formHouseBill.localVessel.setValue(this.hblDetail.localVessel);
                         this.formHouseBill.localVoyNo.setValue(this.hblDetail.localVoyNo);
@@ -240,27 +226,18 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                         this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.hblDetail.originBlnumber)[0]);
                         this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? this.createMoment(this.hblDetail.etd) : null;
                         this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? this.createMoment(this.hblDetail.eta) : null;
-                        setTimeout(() => {
-                            this.formHouseBill.saleMans.forEach(item => {
-                                if (item.id === this.hblDetail.saleManId) {
-                                    this.formHouseBill.selectedSaleman = item;
-                                    return;
-                                }
-                            });
-                            this.formHouseBill.selectedCustomer = { field: 'id', value: this.hblDetail.customerId };
-                            this.formHouseBill.selectedShipper = { field: 'id', value: this.hblDetail.shipperId };
-                            this.formHouseBill.selectedConsignee = { field: 'id', value: this.hblDetail.consigneeId };
-                            this.formHouseBill.selectedNotifyParty = { field: 'id', value: this.hblDetail.notifyPartyId };
-                            this.formHouseBill.selectedAlsoNotifyParty = { field: 'id', value: this.hblDetail.alsoNotifyPartyId };
-                            this.formHouseBill.selectedPortOfLoading = { field: 'id', value: this.hblDetail.pol };
-                            this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: this.hblDetail.pod };
-                            this.formHouseBill.selectedSupplier = { field: 'id', value: this.hblDetail.coloaderId };
-                            this.formHouseBill.selectedPlaceOfIssued = { field: 'id', value: this.hblDetail.issueHblplace };
-                            this.formHouseBill.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.hblDetail.serviceType, text: this.hblDetail.serviceType }]);
-                            this.formHouseBill.hbltype.setValue([<CommonInterface.INg2Select>{ id: this.hblDetail.hbltype, text: this.hblDetail.hbltype }]);
-
-                        }, 500);
-
+                        this.formHouseBill.saleMan.setValue(this.hblDetail.saleManId);
+                        this.formHouseBill.customer.setValue(this.hblDetail.customerId);
+                        this.formHouseBill.shipper.setValue(this.hblDetail.shipperId);
+                        this.formHouseBill.consignee.setValue(this.hblDetail.consigneeId);
+                        this.formHouseBill.notifyParty.setValue(this.hblDetail.notifyPartyId);
+                        this.formHouseBill.alsoNotifyParty.setValue(this.hblDetail.alsoNotifyPartyId);
+                        this.formHouseBill.pol.setValue(this.hblDetail.pol);
+                        this.formHouseBill.pod.setValue(this.hblDetail.pod);
+                        this.formHouseBill.supplier.setValue(this.hblDetail.coloaderId);
+                        this.formHouseBill.placeOfIssues.setValue(this.hblDetail.issueHblplace);
+                        this.formHouseBill.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.hblDetail.serviceType, text: this.hblDetail.serviceType }]);
+                        this.formHouseBill.hbltype.setValue([<CommonInterface.INg2Select>{ id: this.hblDetail.hbltype, text: this.hblDetail.hbltype }]);
                     }
 
                     // * Dispatch to save containers.
