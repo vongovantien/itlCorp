@@ -116,7 +116,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
     configData() {
         this.headers = [
             { title: 'Charge', field: 'chargeId', sortable: true, width: 250 },
-            { title: 'Quantity', field: 'quantity', sortable: true },
+            { title: 'Quantity', field: 'quantity', sortable: true, width: 150 },
             { title: 'Unit', field: 'unitId', sortable: true },
             { title: 'Unit Price', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },

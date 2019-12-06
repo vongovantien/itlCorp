@@ -132,7 +132,7 @@
                                             <td>
                                                 <div class="form-group"
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice < 0}">
-                                                    <input type="text" class="form-control"
+                                                    <input type="number" class="form-control"
                                                         [(ngModel)]="charge.unitPrice"
                                                         (ngModelChange)="onChangeUnitPrice($event,charge)">
                                                 </div>

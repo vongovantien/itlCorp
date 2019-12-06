@@ -10,15 +10,22 @@ import { AppForm } from 'src/app/app.form';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
+import { ShareBusinessFormCreateHouseBillImportComponent } from 'src/app/business-modules/share-business/components/form-create-house-bill-import/form-create-house-bill-import.component';
+import {
+    ShareBusinessArrivalNoteComponent,
+    ShareBusinessDeliveryOrderComponent,
+    ShareBusinessImportHouseBillDetailComponent,
+    ShareBussinessHBLGoodSummaryLCLComponent
+} from 'src/app/business-modules/share-business';
+import { DeliveryOrder } from 'src/app/shared/models';
+import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError, takeUntil, mergeMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
-import { ShareBusinessFormCreateHouseBillImportComponent } from 'src/app/business-modules/share-business/components/form-create-house-bill-import/form-create-house-bill-import.component';
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryComponent } from 'src/app/business-modules/share-business';
-import { DeliveryOrder } from 'src/app/shared/models';
-import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
+
+
 import { forkJoin } from 'rxjs';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -35,7 +42,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessFormCreateHouseBillImportComponent, { static: false }) formHouseBill: ShareBusinessFormCreateHouseBillImportComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
-    @ViewChild(ShareBussinessHBLGoodSummaryComponent, { static: false }) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent, { static: false }) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
