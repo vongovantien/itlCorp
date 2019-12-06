@@ -67,7 +67,7 @@ export class SeaFCLImportManagementComponent extends AppList {
             { title: 'G.W', field: 'grossWeight', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
             { title: 'Creator', field: 'creatorName', sortable: true },
-            { title: 'Modified Date', field: 'modifiedDate', sortable: true },
+            { title: 'Modified Date', field: 'datetimeModified', sortable: true },
         ];
 
         this.headerHouseBills = [
