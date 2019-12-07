@@ -86,7 +86,8 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     onRequestSurcharge(surcharge: any) {
-        this.surcharges.push(...surcharge);
+        // this.surcharges.push(surcharge);
+        this.surcharges = [...this.surcharges, surcharge];
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
     }
 
