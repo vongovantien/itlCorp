@@ -255,13 +255,11 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             ],
             arrivalVoyage: [
             ],
-            singledater: [
-            ],
+
             documentNo: [],
-            warehousecbo: [],
             referenceNo: [],
             warehousenotice: [],
-            shppingMark: [],
+            shippingMark: [],
             documnentDate: [],
             remark: [],
             feederVoyageNo: [
@@ -305,7 +303,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this.documentNo = this.formGroup.controls['documentNo'];
         this.etawarehouse = this.formGroup.controls['dateETA'];
         this.warehouseNotice = this.formGroup.controls['warehousenotice'];
-        this.shippingMark = this.formGroup.controls['shppingMark'];
+        this.shippingMark = this.formGroup.controls['shippingMark'];
         this.remark = this.formGroup.controls['remark'];
         this.issueHBLDate = this.formGroup.controls['dateOfIssued'];
         this.originBLNumber = this.formGroup.controls['numberOfOrigin'];
@@ -375,10 +373,53 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         });
     }
 
+    updateDataToForm(res: CsTransactionDetail) {
+        this.formGroup.setValue({
+            etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null, // * Date;,
+            masterBill: res.mawb,
+            shipperDescription: res.shipperDescription,
+            consigneeDescription: res.consigneeDescription,
+            notifyPartyDescription: res.notifyPartyDescription,
+            alsonotifyPartyDescription: res.alsoNotifyPartyDescription,
+            hbOfladingNo: res.hwbno,
+            placeofReceipt: res.pickupPlace,
+            eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null, // * Date;
+            finalDestination: res.finalDestinationPlace,
+            shipper: res.shipperId,
+            feederVessel1: res.localVessel,
+            feederVoyageNo: res.localVoyNo,
+            arrivalVoyage: res.oceanVoyNo,
+            arrivalVessel: res.oceanVessel,
+            documnentDate: !!res.documentDate ? { startDate: new Date(res.documentDate), endDate: new Date(res.documentDate) } : null,
+            documentNo: res.documentNo,
+            dateETA: !!res.etawarehouse ? { startDate: new Date(res.etawarehouse), endDate: new Date(res.etawarehouse) } : null, // * Date;
+            warehousenotice: res.warehouseNotice,
+            shippingMark: res.shippingMark,
+            remark: res.remark,
+            dateOfIssued: !!res.issueHbldate ? { startDate: new Date(res.issueHbldate), endDate: new Date(res.issueHbldate) } : null, // * Date;
+            referenceNo: res.referenceNo,
+            numberOfOrigin: this.numberOfOrigins.filter(i => i.value === res.originBlnumber)[0],
+            saleMan: res.saleManId,
+            customer: res.customerId,
+            consignee: res.consigneeId,
+            notifyParty: res.notifyPartyId,
+            alsoNotifyParty: res.alsoNotifyPartyId,
+            pol: res.pol,
+            pod: res.pod,
+            supplier: res.coloaderId,
+            placeOfIssues: res.issueHblplace,
+            serviceType: [<CommonInterface.INg2Select>{ id: res.serviceType, text: res.serviceType }],
+            hbOfladingType: [<CommonInterface.INg2Select>{ id: res.hbltype, text: res.hbltype }],
+        });
+        this.mindateEta = !!this.mindateEta ? this.createMoment(res.etd) : null;
+        this.mindateEtaWareHouse = !!res.eta ? this.createMoment(res.eta) : null;
+    }
+
     onSelectDataFormInfo(data: any, key: string) {
         switch (key) {
             case 'saleman':
                 this.isShowSaleMan = false;
+                this.saleMan.setValue(data.id);
                 break;
             case 'Customer':
                 this.customer.setValue(data.id);

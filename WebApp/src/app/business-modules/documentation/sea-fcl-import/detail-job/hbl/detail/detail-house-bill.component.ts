@@ -197,47 +197,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                         this.shipmentGoodSummaryComponent.netWeight = this.hblDetail.netWeight;
                         this.shipmentGoodSummaryComponent.totalChargeWeight = this.hblDetail.chargeWeight;
                         this.shipmentGoodSummaryComponent.totalCBM = this.hblDetail.cbm;
-                        this.formHouseBill.etd.setValue(this.hblDetail.etd);
-                        !!this.hblDetail.etd ? this.formHouseBill.etd.setValue({ startDate: new Date(this.hblDetail.etd), endDate: new Date(this.hblDetail.etd) }) : this.formHouseBill.etd.setValue(null), // * Date;
-                            this.formHouseBill.getListSaleman();
-                        this.formHouseBill.mtBill.setValue(this.hblDetail.mawb);
-                        this.formHouseBill.shipperDescription.setValue(this.hblDetail.shipperDescription);
-                        this.formHouseBill.consigneeDescription.setValue(this.hblDetail.consigneeDescription);
-                        this.formHouseBill.notifyPartyDescription.setValue(this.hblDetail.notifyPartyDescription);
-                        this.formHouseBill.alsonotifyPartyDescription.setValue(this.hblDetail.alsoNotifyPartyDescription);
-                        this.formHouseBill.hwbno.setValue(this.hblDetail.hwbno);
-                        this.formHouseBill.pickupPlace.setValue(this.hblDetail.pickupPlace);
-                        !!this.hblDetail.eta ? this.formHouseBill.eta.setValue({ startDate: new Date(this.hblDetail.eta), endDate: new Date(this.hblDetail.eta) }) : this.formHouseBill.eta.setValue(null), // * Date;
-                            this.formHouseBill.finalDestinationPlace.setValue(this.hblDetail.finalDestinationPlace);
-                        this.formHouseBill.shipper.setValue(this.hblDetail.shipperId);
-
-                        this.formHouseBill.localVessel.setValue(this.hblDetail.localVessel);
-                        this.formHouseBill.localVoyNo.setValue(this.hblDetail.localVoyNo);
-                        this.formHouseBill.oceanVessel.setValue(this.hblDetail.oceanVessel);
-                        this.formHouseBill.oceanVoyNo.setValue(this.hblDetail.oceanVoyNo);
-                        !!this.hblDetail.documentDate ? this.formHouseBill.documentDate.setValue({ startDate: new Date(this.hblDetail.documentDate), endDate: new Date(this.hblDetail.documentDate) }) : this.formHouseBill.documentDate.setValue(null), // * Date;
-                            this.formHouseBill.documentNo.setValue(this.hblDetail.documentNo);
-                        !!this.hblDetail.etawarehouse ? this.formHouseBill.etawarehouse.setValue({ startDate: new Date(this.hblDetail.etawarehouse), endDate: new Date(this.hblDetail.etawarehouse) }) : this.formHouseBill.etawarehouse.setValue(null), // * Date;
-                            this.formHouseBill.warehouseNotice.setValue(this.hblDetail.warehouseNotice);
-                        this.formHouseBill.shippingMark.setValue(this.hblDetail.shippingMark);
-                        this.formHouseBill.remark.setValue(this.hblDetail.remark);
-                        !!this.hblDetail.issueHbldate ? this.formHouseBill.issueHBLDate.setValue({ startDate: new Date(this.hblDetail.issueHbldate), endDate: new Date(this.hblDetail.issueHbldate) }) : this.formHouseBill.issueHBLDate.setValue(null), // * Date;
-                            this.formHouseBill.referenceNo.setValue(this.hblDetail.referenceNo);
-                        this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.hblDetail.originBlnumber)[0]);
-                        this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? this.createMoment(this.hblDetail.etd) : null;
-                        this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? this.createMoment(this.hblDetail.eta) : null;
-                        this.formHouseBill.saleMan.setValue(this.hblDetail.saleManId);
-                        this.formHouseBill.customer.setValue(this.hblDetail.customerId);
-                        this.formHouseBill.shipper.setValue(this.hblDetail.shipperId);
-                        this.formHouseBill.consignee.setValue(this.hblDetail.consigneeId);
-                        this.formHouseBill.notifyParty.setValue(this.hblDetail.notifyPartyId);
-                        this.formHouseBill.alsoNotifyParty.setValue(this.hblDetail.alsoNotifyPartyId);
-                        this.formHouseBill.pol.setValue(this.hblDetail.pol);
-                        this.formHouseBill.pod.setValue(this.hblDetail.pod);
-                        this.formHouseBill.supplier.setValue(this.hblDetail.coloaderId);
-                        this.formHouseBill.placeOfIssues.setValue(this.hblDetail.issueHblplace);
-                        this.formHouseBill.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.hblDetail.serviceType, text: this.hblDetail.serviceType }]);
-                        this.formHouseBill.hbltype.setValue([<CommonInterface.INg2Select>{ id: this.hblDetail.hbltype, text: this.hblDetail.hbltype }]);
+                        this.formHouseBill.getListSaleman();
+                        this.formHouseBill.updateDataToForm(this.hblDetail);
                     }
 
                     // * Dispatch to save containers.
