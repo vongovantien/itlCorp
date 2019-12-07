@@ -223,7 +223,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
         this._catalogueRepo.getUnit({ unitType: 'Package' })
             .subscribe((res: any) => {
                 this.listUnit = res;
-                const datasort = this.sortService.sort(res, res[0].code, true);
+                const datasort = this.sortService.sort(res, 'code', true);
                 this.strUnitCurrent = datasort != null ? datasort[0].code : '';
             });
     }

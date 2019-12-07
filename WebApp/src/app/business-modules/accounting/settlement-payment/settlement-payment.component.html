@@ -49,13 +49,19 @@
                                                         (click)="showSurcharge(settlePayment.settlementNo, i)">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
-                                                    <ng-container
+                                                    <!-- <ng-container
                                                         *ngIf="settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied'">
                                                         <a title="Delete" class="pointer"
                                                             (click)="showDeletePopup(settlePayment)">
                                                             <i class="la la-trash text-danger"></i>
                                                         </a>
-                                                    </ng-container>
+                                                    </ng-container> -->
+                                                    <button [disabled]="settlePayment.statusApproval !== 'New' && settlePayment.statusApproval !== 'Denied'"
+                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"                                                       
+                                                        title="Delete"
+                                                        (click)="showDeletePopup(settlePayment)">
+                                                        <i class="la la-trash text-danger"></i>
+                                                    </button>
                                                     <span>
                                                         <a title="Preview" class="pointer"
                                                             (click)="printSettlement(settlePayment.settlementNo)">

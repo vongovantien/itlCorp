@@ -279,8 +279,10 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.HandlingInfo = string.Empty;
                         charge.ExecutedOn = string.Empty;
                         charge.OceanVessel = houserBill.OceanVessel;
-
-                        charge.OSI = arrival.ArrivalHeader.Replace("<strong>","<b>").Replace("</strong>","<b>").Replace("<em>", "<i>").Replace("</em>", "</i>");//Header of arrival
+                        if (string.IsNullOrEmpty(arrival.ArrivalHeader))
+                        {
+                            charge.OSI = arrival.ArrivalHeader.Replace("<strong>", "<b>").Replace("</strong>", "<b>").Replace("<em>", "<i>").Replace("</em>", "</i>");//Header of arrival
+                        }
                         if (houserBill.Eta != null)
                         {
                             charge.FlightDate = houserBill.Eta.Value; //ETA
@@ -314,7 +316,10 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
                         charge.VAT = frieght.Vatrate != null ? frieght.Vatrate.Value : 0; //VAT of charge arrival
                         charge.Notes = frieght.Notes;//Note of charge arrival
-                        charge.ArrivalFooterNoitice = arrival.ArrivalFooter.Replace("<strong>", "<b>").Replace("</strong>", "<b>").Replace("<em>","<i>").Replace("</em>","</i>");//Footer of arrival
+                        if (!string.IsNullOrEmpty(arrival.ArrivalFooter))
+                        {
+                            charge.ArrivalFooterNoitice = arrival.ArrivalFooter.Replace("<strong>", "<b>").Replace("</strong>", "<b>").Replace("<em>", "<i>").Replace("</em>", "</i>");//Footer of arrival
+                        }
                         charge.SeaFCL = true; //Đang gán cứng lấy hàng nguyên công
                         charge.MaskNos = "MaskNos";
                         charge.DlvCustoms = "DlvCustoms";

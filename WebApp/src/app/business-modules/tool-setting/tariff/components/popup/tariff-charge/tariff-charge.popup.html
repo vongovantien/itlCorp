@@ -73,7 +73,7 @@
                         </div>
                         <div class="col-md-4 m--margin-bottom-10">
                             <div class="form-group">
-                                <label>Comondities</label>
+                                <label>Commodities</label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCommondityGroup"
                                     (itemSelected)="onSelectDataFormInfo($event, 'commondity')"
                                     [selectedDisplayFields]="configComondity.selectedDisplayFields"
@@ -142,6 +142,9 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && formChargeTariff.value.tariffChargeDetail.rangeFrom < formChargeTariff.value.tariffChargeDetail.rangeTo}">
                                 <label>Range From</label>
                                 <input currencyMask type="text" class="form-control" formControlName="rangeFrom">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && formChargeTariff.value.tariffChargeDetail.rangeFrom < formChargeTariff.value.tariffChargeDetail.rangeTo">
+                                    Range From must be greater than or equal to Range To!
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-4 m--margin-bottom-10">
