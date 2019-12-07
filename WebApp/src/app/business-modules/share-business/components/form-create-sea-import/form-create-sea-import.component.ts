@@ -30,29 +30,31 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
     shipmentTypes: CommonInterface.INg2Select[];
     serviceTypes: CommonInterface.INg2Select[];
 
-    configComboGridPartner: CommonInterface.IComboGirdConfig;
-    configComboGridPort: CommonInterface.IComboGirdConfig;
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'shortName', label: 'Name Abbr' },
+        { field: 'partnerNameEn', label: 'Name EN' },
+        { field: 'taxCode', label: 'Tax Code' },
+    ];
+
+    displayFieldsPort: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Port Code' },
+        { field: 'nameEn', label: 'Port Name' },
+        { field: 'countryNameEN', label: 'Country' },
+    ];
 
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
 
     formCreate: FormGroup;
-    jobId: AbstractControl;
     etd: AbstractControl;
     eta: AbstractControl;
     mawb: AbstractControl;
     mbltype: AbstractControl;
     shipmentType: AbstractControl;
-    subSupplier: AbstractControl;
-    flightVesselName: AbstractControl;
-    voyNo: AbstractControl;
-    pono: AbstractControl;
     typeOfService: AbstractControl;
     serviceDate: AbstractControl;
     personIncharge: AbstractControl;
-    notes: AbstractControl;
-    subColoader: AbstractControl;
 
     agentId: AbstractControl;
     pol: AbstractControl;
@@ -85,24 +87,6 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         this.carries = this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER);
         this.agents = this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT);
         this.ports = this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
-
-        this.configComboGridPartner = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'shortName', label: 'Name Abbr' },
-                { field: 'partnerNameEn', label: 'Name EN' },
-                { field: 'taxCode', label: 'Tax Code' },
-
-            ]
-        }, { selectedDisplayFields: ['shortName'], });
-
-        this.configComboGridPort = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'code', label: 'Port Code' },
-                { field: 'nameEn', label: 'Port Name' },
-                { field: 'countryNameEN', label: 'Country' },
-
-            ]
-        }, { selectedDisplayFields: ['nameEn'], });
 
         this.initForm();
         this.getUserLogged();
@@ -153,7 +137,6 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         this.formCreate = this._fb.group({
 
             jobId: [{ value: null, disabled: true }], // * disabled
-
             // * Date
             etd: [],
             eta: [null, Validators.required],
@@ -164,13 +147,12 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
             voyNo: [],
             pono: [],
             mawb: ['', Validators.required],
-
-            mbltype: [null, Validators.required], // * select
-            shipmentType: [null, Validators.required], // * select
-            typeOfService: [null, Validators.required], // * select
-            personIncharge: [],  // * select
+            // * select
+            mbltype: [null, Validators.required],
+            shipmentType: [null, Validators.required],
+            typeOfService: [null, Validators.required],
+            personIncharge: [],
             notes: [],
-
             // * Combogrid.
             agentId: [],
             pol: [],
@@ -179,20 +161,14 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
             deliveryPlace: [],
         });
 
-        this.jobId = this.formCreate.controls["jobId"];
         this.etd = this.formCreate.controls["etd"];
         this.eta = this.formCreate.controls["eta"];
         this.mawb = this.formCreate.controls["mawb"];
         this.mbltype = this.formCreate.controls["mbltype"];
         this.shipmentType = this.formCreate.controls["shipmentType"];
-        this.flightVesselName = this.formCreate.controls["flightVesselName"];
-        this.voyNo = this.formCreate.controls["voyNo"];
-        this.pono = this.formCreate.controls["pono"];
         this.typeOfService = this.formCreate.controls["typeOfService"];
         this.personIncharge = this.formCreate.controls["personIncharge"];
-        this.notes = this.formCreate.controls["notes"];
         this.serviceDate = this.formCreate.controls["serviceDate"];
-        this.subColoader = this.formCreate.controls["subColoader"];
         this.agentId = this.formCreate.controls["agentId"];
         this.pol = this.formCreate.controls["pol"];
         this.pod = this.formCreate.controls["pod"];

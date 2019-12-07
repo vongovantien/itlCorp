@@ -29,9 +29,11 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
+
     containers: Container[] = [];
     isImport: boolean = false;
     selectedJob: any = {}; // TODO model.
+
     constructor(
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
@@ -79,6 +81,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             coloader: form.coloader,
             bookingNo: form.bookingNo,
             flightVesselName: form.flightVesselName,
+            pono: form.pono,
 
             shipmentType: !!form.shipmentType ? form.shipmentType[0].id : null,
             typeOfService: !!form.typeOfService ? form.typeOfService[0].id : null,

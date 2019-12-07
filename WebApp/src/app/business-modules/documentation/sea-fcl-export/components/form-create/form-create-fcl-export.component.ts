@@ -12,7 +12,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { User, CsTransactionDetail } from 'src/app/shared/models';
 
-import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
+import { takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../../share-business/store';
@@ -25,28 +25,19 @@ import * as fromShare from './../../../../share-business/store';
 export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
 
     formCreateFCLExport: FormGroup;
-    jobID: AbstractControl;
     etd: AbstractControl;
     eta: AbstractControl;
     mawb: AbstractControl;
     mbltype: AbstractControl;
     shipmentType: AbstractControl;
-    subSupplier: AbstractControl;
-    flightVesselName: AbstractControl;
-    voyNo: AbstractControl;
     typeOfService: AbstractControl;
-    //serviceDate: AbstractControl;
     personalIncharge: AbstractControl;
-    notes: AbstractControl;
-    bookingNo: AbstractControl;
     term: AbstractControl;
-    pono: AbstractControl;
 
     coloader: AbstractControl; // Supplier/Vendor(Coloader).
-    pol: AbstractControl; // Port of Loading.
-    pod: AbstractControl; // Port of Des.
-    agent: AbstractControl; // Agent.
-
+    pol: AbstractControl;
+    pod: AbstractControl;
+    agent: AbstractControl;
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
@@ -107,7 +98,6 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
                             coloader: res.coloaderId,
                             bookingNo: res.bookingNo,
                             typeOfService: [this.serviceTypes.find(type => type.id === res.typeOfService)],
-                            //serviceDate: !!res.serviceDate ? { startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) } : null,
                             pol: res.pol,
                             pod: res.pod,
                             agent: res.agentId,
@@ -135,7 +125,6 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
             flightVesselName: [],
             voyNo: [],
             typeOfService: [], // * select
-            //serviceDate: [],
             personalIncharge: [],  // * select
             notes: [],
             term: [],
@@ -147,50 +136,19 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
             pono: []
         });
 
-        this.jobID = this.formCreateFCLExport.controls["jobID"];
         this.etd = this.formCreateFCLExport.controls["etd"];
         this.eta = this.formCreateFCLExport.controls["eta"];
         this.mawb = this.formCreateFCLExport.controls["mawb"];
         this.mbltype = this.formCreateFCLExport.controls["mbltype"];
         this.shipmentType = this.formCreateFCLExport.controls["shipmentType"];
-        this.flightVesselName = this.formCreateFCLExport.controls["flightVesselName"];
-        this.voyNo = this.formCreateFCLExport.controls["voyNo"];
         this.typeOfService = this.formCreateFCLExport.controls["typeOfService"];
         this.term = this.formCreateFCLExport.controls["term"];
-        //this.serviceDate = this.formCreateFCLExport.controls["serviceDate"];
         this.personalIncharge = this.formCreateFCLExport.controls["personalIncharge"];
-        this.notes = this.formCreateFCLExport.controls["notes"];
-        this.bookingNo = this.formCreateFCLExport.controls["bookingNo"];
 
         this.coloader = this.formCreateFCLExport.controls["coloader"];
         this.pol = this.formCreateFCLExport.controls["pol"];
         this.pod = this.formCreateFCLExport.controls["pod"];
         this.agent = this.formCreateFCLExport.controls["agent"];
-        this.agent = this.formCreateFCLExport.controls["agent"];
-        this.pono = this.formCreateFCLExport.controls["pono"];
-
-        // * Handle etd date changing.
-
-        this.formCreateFCLExport.controls['etd'].valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe((value: { startDate: any, endDate: any }) => {
-                if (!!value.startDate) {
-                    // * serviceDate hadn't value
-                    if (!this.formCreateFCLExport.controls["serviceDate"].value || !this.formCreateFCLExport.controls["serviceDate"].value.startDate) {
-                        this.formCreateFCLExport.controls["serviceDate"].setValue(value);
-                    }
-                } else {
-                    this.formCreateFCLExport.controls["serviceDate"].setValue(null);
-                }
-                // this.minDate = value.startDate; // * Update min date
-
-                // this.isSubmitted = false;
-                // this.resetFormControl(this.formCreateFCLExport.controls["eta"]);
-                // this.formCreateFCLExport.controls["serviceDate"].setValue(null);
-            });
     }
 
     getUserLogged() {
@@ -205,11 +163,12 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
         try {
             if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
                 const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
+
                 this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
                 this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
                 this.shipmentTypes = this.utility.prepareNg2SelectData(commonData.shipmentTypes, 'value', 'displayName');
                 this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-                console.log('âfafafafaf');
+
                 this.formCreateFCLExport.controls["shipmentType"].setValue([this.shipmentTypes[0]]);
 
             } else {
@@ -219,7 +178,7 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
                 this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
                 this.shipmentTypes = this.utility.prepareNg2SelectData(commonData.shipmentTypes, 'value', 'displayName');
                 this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-                console.log('âfafafafaf');
+
                 this.formCreateFCLExport.controls["shipmentType"].setValue([this.shipmentTypes[0]]);
 
                 this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
@@ -249,7 +208,6 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
                 break;
         }
     }
-
 }
 
 

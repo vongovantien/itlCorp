@@ -71,9 +71,8 @@
                             <label>Supplier/Co-Loader</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: coloader.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
-                                [selectedDisplayFields]="configComboGridPartner.selectedDisplayFields"
-                                [dataSources]="carries | async" [displayFields]="configComboGridPartner.displayFields"
-                                [height]="200">
+                                [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
+                                [displayFields]="displayFieldsPartner" [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -89,9 +88,8 @@
                             <label>Agent</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: agentId.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'agent')"
-                                [selectedDisplayFields]="configComboGridPartner.selectedDisplayFields"
-                                [dataSources]="agents | async" [displayFields]="configComboGridPartner.displayFields"
-                                [height]="200">
+                                [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
+                                [displayFields]="displayFieldsPartner" [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -100,9 +98,8 @@
                             <label>Port of Loading</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: pol.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-loading')"
-                                [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
-                                [dataSources]="ports | async" [displayFields]="configComboGridPort.displayFields"
-                                [height]="200">
+                                [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
+                                [displayFields]="displayFieldsPort" [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -111,9 +108,8 @@
                             <label required>Port of Destination</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: pod.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-destination')"
-                                [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
-                                [dataSources]="ports | async" [displayFields]="configComboGridPort.displayFields"
-                                [height]="200">
+                                [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
+                                [displayFields]="displayFieldsPort" [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -123,9 +119,8 @@
                             <app-combo-grid-virtual-scroll
                                 [currentActiveItemId]="{field: 'id', value: deliveryPlace.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-delivery')"
-                                [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
-                                [dataSources]="ports | async" [displayFields]="configComboGridPort.displayFields"
-                                [height]="200">
+                                [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
+                                [displayFields]="displayFieldsPort" [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
