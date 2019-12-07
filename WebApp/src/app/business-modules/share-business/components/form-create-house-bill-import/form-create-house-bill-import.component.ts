@@ -16,7 +16,7 @@ import * as fromShare from './../../store';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { User } from 'src/app/shared/models';
+import { User, CsTransactionDetail } from 'src/app/shared/models';
 @Component({
     selector: 'form-create-house-bill-import',
     templateUrl: './form-create-house-bill-import.component.html'
@@ -77,7 +77,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     consigneedescriptionModel: string;
     notifyPartydescriptinModel: string;
     notifyPartyModel: string;
-    alsoNotifyPartyDescriptionModel: string;
     isSubmited: boolean = false;
     PortChargeLikePortLoading: boolean = false;
     countChangePort: number = 0;
@@ -272,10 +271,10 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             dateOfIssued: [],
             etd: [],
             eta: ['', Validators.required],
-            ShipperDescription: [],
-            ConsigneeDescription: [],
-            NotifyPartyDescription: [],
-            AlsoNotifyPartyDescription: [],
+            shipperDescription: [],
+            consigneeDescription: [],
+            notifyPartyDescription: [],
+            alsonotifyPartyDescription: [],
             serviceType: ['',
                 Validators.required]
 
@@ -311,10 +310,10 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this.issueHBLDate = this.formGroup.controls['dateOfIssued'];
         this.originBLNumber = this.formGroup.controls['numberOfOrigin'];
         this.referenceNo = this.formGroup.controls['referenceNo'];
-        this.consigneeDescription = this.formGroup.controls['ConsigneeDescription'];
-        this.shipperDescription = this.formGroup.controls['ShipperDescription'];
-        this.notifyPartyDescription = this.formGroup.controls['NotifyPartyDescription'];
-        this.alsonotifyPartyDescription = this.formGroup.controls['AlsoNotifyPartyDescription'];
+        this.consigneeDescription = this.formGroup.controls['consigneeDescription'];
+        this.shipperDescription = this.formGroup.controls['shipperDescription'];
+        this.notifyPartyDescription = this.formGroup.controls['notifyPartyDescription'];
+        this.alsonotifyPartyDescription = this.formGroup.controls['alsonotifyPartyDescription'];
         this.etd.valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
@@ -342,6 +341,38 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this.getListShipper();
         this.getListSupplier();
         this.getListProvince();
+    }
+
+    onUpdateDataToImport(data: CsTransactionDetail) {
+        this.formGroup.patchValue({
+            mawb: data.mawb,
+            shipperDescription: data.shipperDescription,
+            notifyPartyDescription: data.notifyPartyDescription,
+            localVessel: data.localVessel,
+            localVoyNo: data.localVoyNo,
+            oceanVessel: data.oceanVessel,
+            oceanVoyNo: data.oceanVoyNo,
+            originBlnumber: [<CommonInterface.INg2Select>{ id: data.originBlnumber, text: data.originBlnumber }],
+            alsonotifyPartyDescription: data.alsoNotifyPartyDescription,
+            customer: data.customerId,
+            saleMan: data.saleManId,
+            shipper: data.shipperId,
+            consignee: data.consigneeId,
+            consigneeDescription: data.consigneeDescription,
+            notifyParty: data.notifyPartyId,
+            pol: data.pol,
+            pod: data.pod,
+            alsoNotifyParty: data.alsoNotifyPartyId,
+            hbltype: [<CommonInterface.INg2Select>{ id: data.hbltype, text: data.hbltype }],
+            supplier: data.coloaderId,
+            pickupPlace: data.pickupPlace,
+            finalDestinationPlace: data.finalDestinationPlace,
+            shippingMark: data.shippingMark,
+            remark: data.remark,
+            warehouseNotice: data.inWord,
+            serviceType: [<CommonInterface.INg2Select>{ id: data.serviceType, text: data.serviceType }],
+
+        });
     }
 
     onSelectDataFormInfo(data: any, key: string) {
