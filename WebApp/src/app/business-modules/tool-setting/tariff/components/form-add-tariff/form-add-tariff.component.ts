@@ -27,8 +27,8 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
     carries: any[] = [];
     agents: any[] = [];
 
-    selectedSupplier: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedAgent: Partial<CommonInterface.IComboGridData | any> = {};
+    selectedSupplier: Partial<CommonInterface.IComboGridData> | any = {};
+    selectedAgent: Partial<CommonInterface.IComboGridData> | any = {};
 
     isDisabledCustomer: boolean = true;
     isDisabledSupplier: boolean = true;

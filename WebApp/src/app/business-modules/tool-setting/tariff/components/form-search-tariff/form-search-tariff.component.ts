@@ -32,9 +32,9 @@ export class TariffFormSearchComponent extends AppForm {
     configCustomer: CommonInterface.IComboGirdConfig | any = {};
     configOffice: CommonInterface.IComboGirdConfig | any = {};
 
-    selectedCustomer: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedSupplier: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedOffice: Partial<CommonInterface.IComboGridData | any> = {};
+    selectedCustomer: Partial<CommonInterface.IComboGridData> | any = {};
+    selectedSupplier: Partial<CommonInterface.IComboGridData> | any = {};
+    selectedOffice: Partial<CommonInterface.IComboGridData> | any = {};
 
 
     suppliers: Partner[] = [];
