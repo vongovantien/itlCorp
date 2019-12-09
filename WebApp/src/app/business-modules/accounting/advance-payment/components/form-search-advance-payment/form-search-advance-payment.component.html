@@ -6,7 +6,9 @@
                     <div class="form-group">
                         <label>Reference No</label>
                         <textarea name="" id="" cols="30" rows="10" class="form-control" formControlName="referenceNo"
-                            placeholder="Reference No"></textarea>
+                            placeholder="Reference No"
+                            onkeypress="return event.charCode === 13 || event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)">
+                        </textarea>
                     </div>
                 </div>
                 <div class="col-4">

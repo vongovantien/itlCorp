@@ -441,9 +441,9 @@ export class TariffChargePopupComponent extends PopupBase {
 
         this.submitData();
         this.closePopup();
-
         setTimeout(() => {
             this.selectedCommondityGroup = { field: 'id', value: this.tariffCharge.commodityId };
+            this.formChargeTariff.controls['tariffChargeDetail'].get("useFor").setValue(this.useFors.find(item => item.value === this.tariffCharge.useFor));
             this.show();
         }, 500);
     }
