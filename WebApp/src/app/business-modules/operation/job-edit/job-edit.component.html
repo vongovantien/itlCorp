@@ -141,7 +141,7 @@
                                                             </span>
                                                         </div>
                                                         <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate)">
+                                                            *ngIf="addOpsForm.submitted && finishDate != null && this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate)">
                                                             Finish Date must more greater or equal Service Date
                                                         </div>
                                                     </div>
@@ -654,9 +654,9 @@
     </div>
 </div>
 
-<app-container-list [jobId]="jobId" [lstMasterContainers]='lstMasterContainers'
-    (outputContainers)="saveContainers($event)" *ngIf="jobId && lstMasterContainers"></app-container-list>
-
+<!-- <app-container-list [jobId]="jobId" [lstMasterContainers]='lstMasterContainers'
+    (outputContainers)="saveContainers($event)" *ngIf="jobId && lstMasterContainers"></app-container-list> -->
+<container-list-popup></container-list-popup>
 <pl-sheet-popup [jobId]="jobId"></pl-sheet-popup>
 
 <confirm-popup #confirmCancelUpdate (onSubmit)="onCancelUpdateJob()"

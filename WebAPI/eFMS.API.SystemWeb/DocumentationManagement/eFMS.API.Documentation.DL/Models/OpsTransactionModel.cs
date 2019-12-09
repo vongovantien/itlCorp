@@ -7,6 +7,7 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class OpsTransactionModel: OpsTransaction
     {
+        public List<CsMawbcontainerModel> CsMawbcontainers { get; set; }
         public string PODName { get; set; }
         public string POLName { get; set; }
         public int CurrentStageId { get; set; }

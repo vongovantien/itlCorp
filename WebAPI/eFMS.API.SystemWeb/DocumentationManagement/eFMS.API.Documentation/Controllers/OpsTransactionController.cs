@@ -136,7 +136,7 @@ namespace eFMS.API.Documentation.Controllers
 
             model.DatetimeModified = DateTime.Now;
             model.UserModified = currentUser.UserID;
-            var hs = transactionService.Update(model,x=>x.Id==model.Id);
+            var hs = transactionService.Update(model);//.Update(model,x=>x.Id==model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

@@ -235,6 +235,8 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
     showImportPopup() {
         this.containerImportPopup.mblid = this.mblid;
         this.containerImportPopup.hblid = this.hblid;
+        this.containerImportPopup.data = [];
+        this.containerImportPopup.getData();
         this.containerImportPopup.show();
     }
 

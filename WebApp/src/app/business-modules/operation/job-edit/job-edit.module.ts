@@ -10,7 +10,6 @@ import { NgxCurrencyModule } from 'ngx-currency';
 import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
 
 import { OpsModuleBillingJobEditComponent } from './job-edit.component';
-import { ContainerListComponent } from './container-list/container-list.component';
 import { AddBuyingRatePopupComponent } from './charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
 import { EditBuyingRatePopupComponent } from './charge-list/edit-buying-rate-popup/edit-buying-rate-popup.component';
 import { AddSellingRatePopupComponent } from './charge-list/add-selling-rate-popup/add-selling-rate-popup.component';
@@ -22,7 +21,6 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { JobManagementBuyingRateComponent } from './components/buying-rate/buying-rate.component';
 import { JobManagementSellingRateComponent } from './components/selling-rate/selling-rate.component';
 import { JobManagementOBHComponent } from './components/obh/obh.component';
-import { ContainerImportComponent } from './container-list/container-import/container-import.component';
 import { JobEditLazyLoadComponentModule } from './job-edit-lazy-load-component.module';
 import { JobEditShareModule } from './job-edit-share.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
@@ -48,9 +46,6 @@ const COMPONENTS = [
     JobManagementBuyingRateComponent,
     JobManagementSellingRateComponent,
     JobManagementOBHComponent,
-
-    ContainerListComponent,
-
     AddBuyingRatePopupComponent,
     EditBuyingRatePopupComponent,
     AddSellingRatePopupComponent,
@@ -59,7 +54,6 @@ const COMPONENTS = [
     EditObhRatePopupComponent,
 
     PlSheetPopupComponent,
-    ContainerImportComponent,
 ];
 
 const customCurrencyMaskConfig = {
