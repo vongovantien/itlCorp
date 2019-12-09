@@ -12,7 +12,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
 import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import * as _ from 'lodash';
+import _map from 'lodash/map';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
@@ -316,7 +316,7 @@ export class PortIndexComponent implements OnInit {
     var portIndexes = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, this.criteria);
     console.log(portIndexes);
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      portIndexes = _.map(portIndexes, function (pi, index) {
+      portIndexes = _map(portIndexes, function (pi, index) {
         return [
           index + 1,
           pi['code'],
@@ -331,7 +331,7 @@ export class PortIndexComponent implements OnInit {
     }
 
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      portIndexes = _.map(portIndexes, function (pi, index) {
+      portIndexes = _map(portIndexes, function (pi, index) {
         return [
           index + 1,
           pi['code'],

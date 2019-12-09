@@ -3,7 +3,7 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import * as lodash from 'lodash';
+import _map from 'lodash/map';
 
 /**
  * Return list provinces that belong to country has countryId
@@ -34,7 +34,7 @@ export async function getDistricts(countryId: any, provinceId: any, baseService:
     var searchObj = {
         countryId: countryId,
         provinceId: provinceId,
-        placeType:  PlaceTypeEnum.District 
+        placeType: PlaceTypeEnum.District
     }
     var districts = await baseService.postAsync(api_menu.Catalogue.CatPlace.query, searchObj, false, false);
     return districts;
@@ -56,7 +56,7 @@ export async function getTownWards(countryId: any, provinceId: any, districtId, 
         countryId: countryId,
         provinceId: provinceId,
         districtId: districtId,
-        placeType:  PlaceTypeEnum.Ward 
+        placeType: PlaceTypeEnum.Ward
     }
     var townWards = await baseService.postAsync(api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, searchObj, false, false);
     return townWards;
@@ -71,9 +71,9 @@ export async function getTownWards(countryId: any, provinceId: any, districtId, 
  * @param idField 
  * @param textField 
  */
-export function prepareNg2SelectData(dataSource:any[],idField:any,textField:any){
-    var returnData = lodash.map(dataSource,function(o){
-        return {id:o[idField],text:o[textField]}
+export function prepareNg2SelectData(dataSource: any[], idField: any, textField: any) {
+    var returnData = _map(dataSource, function (o) {
+        return { id: o[idField], text: o[textField] }
     });
     return returnData;
 }
@@ -82,7 +82,7 @@ export function prepareNg2SelectData(dataSource:any[],idField:any,textField:any)
  * Return true if input string contains special characters but false
  * @param str 
  */
-export function checkSpecialCharacters(str:String){
+export function checkSpecialCharacters(str: String) {
     var reg = /[!@#$%^&*()?":{}|<>]/;
     return reg.test(str.toLowerCase());
 }
@@ -91,9 +91,9 @@ export function checkSpecialCharacters(str:String){
  * Return UTC datetime
  * @param dateTime 
  */
-export function dateTimeToUTC(dateTime:any){
+export function dateTimeToUTC(dateTime: any) {
     try {
-        const date = new Date(dateTime.toString()+" UTC");
+        const date = new Date(dateTime.toString() + " UTC");
         return date;
     } catch (error) {
         throw error;

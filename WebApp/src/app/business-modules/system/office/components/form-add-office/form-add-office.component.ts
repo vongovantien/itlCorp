@@ -1,16 +1,12 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { Company } from 'src/app/shared/models';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { finalize } from 'rxjs/internal/operators/finalize';
+import { finalize, catchError } from 'rxjs/operators';
 import { Department } from 'src/app/shared/models/system/department';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { Router } from '@angular/router';
-import { Office } from 'src/app/shared/models/system/office';
-
-
 
 @Component({
     selector: 'form-add-office',

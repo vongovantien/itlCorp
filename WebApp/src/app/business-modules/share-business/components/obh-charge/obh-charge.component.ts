@@ -72,7 +72,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     }
 
     getCharge() {
-        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.OBH });
+        this.listCharges = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.OBH });
     }
 
     selectPartnerTypes(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge, type: string) {

@@ -14,11 +14,12 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { forkJoin } from 'rxjs';
-import { catchError, takeUntil, finalize, take } from 'rxjs/operators';
+import { forkJoin, Observable } from 'rxjs';
+import { catchError, takeUntil, finalize, take, filter, tap } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
+import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 
 @Component({
     selector: 'buying-charge',
@@ -39,9 +40,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     headerPartner: CommonInterface.IHeaderTable[] = [];
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
 
-    listCharges: Charge[] = new Array<Charge>();
-    listUnits: Unit[] = new Array<Unit>();
-    listCurrency: Currency[] = new Array<Currency>();
+    listCharges: Observable<Charge[]>;
+    listUnits: Unit[] = [];
+    listCurrency: Observable<Currency[]>;
     listPartner: Partner[] = new Array<Partner>();
 
     configComboGridCharge: Partial<CommonInterface.IComboGirdConfig> = {};
@@ -126,7 +127,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { displayName: 'Agent', value: CommonEnum.PartnerGroupEnum.AGENT, fieldName: 'AGENT' },
         ];
 
-        this.getMasterData();
+        this.listCurrency = this._catalogueRepo.getCurrencyBy({ active: true });
+
+        this.getUnits();
+        this.getPartner();
+        this.getCharge();
         this.getShipmentContainer();
         this.getShipmentDetail();
         this.getDetailHBL();
@@ -135,7 +140,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     configHeader() {
         this.headers = [
-            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 150 },
+            { title: 'Partner Name', field: 'partnerShortName', required: true, sortable: true, width: 150 },
             { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 250 },
             { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 150 },
             { title: 'Unit', field: 'unitId', required: true, sortable: true },
@@ -160,20 +165,23 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         ];
     }
 
-    getMasterData() {
+    getUnits() {
         this._progressRef.start();
-        forkJoin([
-            this.getCharge(),
-            this._catalogueRepo.getUnit({ active: true }),
-            this._catalogueRepo.getCurrencyBy({ active: true }),
-            this._catalogueRepo.getListPartner(null, null, { active: true })
-        ])
+        this._catalogueRepo.getUnit({ active: true })
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
-                ([charges, units, currencies, partners]: any[] = [[], [], [], []]) => {
-                    this.listCharges = charges;
+                (units: Unit[]) => {
                     this.listUnits = units;
-                    this.listCurrency = currencies;
+                }
+            );
+    }
+
+    getPartner() {
+        this._progressRef.start();
+        this._catalogueRepo.getListPartner(null, null, { active: true })
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (partners: Partner[]) => {
                     this.listPartner = partners;
                 }
             );
@@ -195,7 +203,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (shipment: any) => {
                     this.shipment = shipment;
-                    console.log(this.shipment);
                 }
             );
     }
@@ -206,13 +213,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (hbl: any) => {
                     this.hbl = hbl;
-                    console.log("detail hbl", this.hbl);
                 }
             );
     }
 
     getCharge() {
-        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT });
+        this.listCharges = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT });
     }
 
     sortSurcharge() {
@@ -229,7 +235,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 chargeItem.chargeNameEn = data.chargeNameEn;
                 // * Unit, Unit Price had value
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
-                    chargeItem.unitId = this.listUnits.filter(unit => unit.id === data.unitId)[0].id;
+                    chargeItem.unitId = this.listUnits.find((u: Unit) => u.id === data.unitId).id;
                     chargeItem.unitPrice = data.unitPrice;
                 }
                 break;
@@ -432,7 +438,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
         if (!!partnerData) {
-            chargeItem.partnerName = partnerData.shortName;
+            chargeItem.partnerShortName = partnerData.shortName;
             chargeItem.paymentObjectId = partnerData.id;
             chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
         }
@@ -442,18 +448,18 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         chargeItem.objectBePaid = partnerType.fieldName;
         switch (partnerType.value) {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
-                chargeItem.partnerName = this.hbl.customerName;
-                if (!chargeItem.partnerName) {
-                    chargeItem.partnerName = this.listPartner.find(p => p.id === this.hbl.customerId).partnerNameEn;
+                chargeItem.partnerShortName = this.hbl.customerName;
+                if (!chargeItem.partnerShortName) {
+                    chargeItem.partnerShortName = this.listPartner.find(p => p.id === this.hbl.customerId).partnerNameEn;
                 }
                 chargeItem.paymentObjectId = this.hbl.customerId;
                 break;
             case CommonEnum.PartnerGroupEnum.CARRIER:
-                chargeItem.partnerName = this.shipment.supplierName;
+                chargeItem.partnerShortName = this.shipment.supplierName;
                 chargeItem.paymentObjectId = this.shipment.coloaderId;
                 break;
             case CommonEnum.PartnerGroupEnum.AGENT:
-                chargeItem.partnerName = this.shipment.agentName;
+                chargeItem.partnerShortName = this.shipment.agentName;
                 chargeItem.paymentObjectId = this.shipment.agentId;
                 break;
             default:
@@ -469,7 +475,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 || !charge.chargeId
                 // || !charge.chargeCode
                 || !charge.unitId
-                || !charge.partnerName
+                || !charge.partnerShortName
                 || charge.unitPrice === null
                 || charge.unitPrice < 0
                 || charge.vatrate > 100

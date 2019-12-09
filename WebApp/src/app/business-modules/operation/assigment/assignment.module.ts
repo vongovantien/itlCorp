@@ -40,8 +40,5 @@ const LIB = [
     exports: [],
     declarations: [AssigmentComponent],
     providers: [],
-    bootstrap: [
-        AssigmentComponent
-    ]
 })
 export class AssignmentModule { }

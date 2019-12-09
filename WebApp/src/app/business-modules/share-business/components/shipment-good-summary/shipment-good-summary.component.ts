@@ -10,10 +10,9 @@ import { ShareBussinessContainerListPopupComponent } from '../container-list/con
 
 import _uniqBy from 'lodash/uniqBy';
 import _groupBy from 'lodash/groupBy';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, skip } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
-
 
 @Component({
     selector: 'shipment-good-summary',
@@ -64,6 +63,23 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
                 }
             );
 
+        this._store.select(fromStore.getTransactionDetailCsTransactionState)
+            .pipe(skip(1))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        console.log("detail shipment from store", res);
+                        this.containerDetail = res.packageContainer;
+                        this.commodities = res.commodity;
+                        this.description = res.desOfGoods;
+                        this.grossWeight = res.grossWeight;
+                        this.netWeight = res.netWeight;
+                        this.totalChargeWeight = res.chargeWeight;
+                        this.totalCBM = res.cbm;
+                    }
+                }
+            );
+
         this.isLocked = this._store.select(fromStore.getTransactionLocked);
     }
 
@@ -110,8 +126,8 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
 
         // * Container, Package.
-        this.containerDetail = '';        
-        
+        this.containerDetail = '';
+
         const contObject: any[] = (containers || []).map((container: Container | any) => ({
             cont: container.containerTypeName,
             quantity: container.quantity
@@ -128,7 +144,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         for (const item of contData) {
             this.containerDetail += this.handleStringCont(item);
         }
-        this.containerDetail = this.containerDetail.trim().replace(/\,$/, "")
+        this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
     }
 
     onRefresh() {

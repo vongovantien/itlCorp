@@ -49,7 +49,7 @@ export class HouseBill extends BaseModel {
     freightPayment: string = null;
     goodsDeliveryDescription: string = null;
     goodsDeliveryId: string = null;
-    grossWeight: string = null;
+    grossWeight: number = null;
     gw: number = null;
     hbltype: string = null;
     hwbno: string = null;
@@ -63,7 +63,7 @@ export class HouseBill extends BaseModel {
     manifestRefNo: string = null;
     mawb: string = null;
     moveType: string = null;
-    netWeight: string = null;
+    netWeight: number = null;
     notifyParty: string = null;
     notifyPartyDescription: string = null;
     notifyPartyId: string = null;
@@ -73,7 +73,8 @@ export class HouseBill extends BaseModel {
     originBlnumber: number = null;
     originCountryId: string = null;
     packageContainer: string = null;
-    packageTypes: string = null;
+    packageTypes: any = null;
+    packageType: number = null;
     packages: string = null;
     pickupPlace: string = null;
     placeFreightPay: string = null;

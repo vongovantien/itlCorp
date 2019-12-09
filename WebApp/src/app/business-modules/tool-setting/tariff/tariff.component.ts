@@ -1,9 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { SettingRepo } from 'src/app/shared/repositories';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { finalize } from 'rxjs/internal/operators/finalize';
-import { map } from 'rxjs/operators';
+import { map, catchError, finalize } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';

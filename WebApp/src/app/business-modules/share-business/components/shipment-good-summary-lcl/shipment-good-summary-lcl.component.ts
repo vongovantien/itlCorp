@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+
 import { AppForm } from 'src/app/app.form';
-import { Unit } from 'src/app/shared/models';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { catchError } from 'rxjs/operators';
+import { catchError, skip } from 'rxjs/operators';
+
+import * as fromStore from './../../store';
 
 @Component({
     selector: 'shipment-good-summary-lcl',
@@ -20,13 +23,27 @@ export class ShareBussinessShipmentGoodSummaryLCLComponent extends AppForm imple
     packageTypes: CommonInterface.INg2Select[] = [];
 
     constructor(
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _store: Store<fromStore.IShareBussinessState>
     ) {
         super();
     }
 
     ngOnInit() {
         this.getPackage();
+
+        this._store.select(fromStore.getTransactionDetailCsTransactionState)
+            .pipe(skip(1))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.commodities = res.commodity;
+                        this.gw = res.grossWeight;
+                        this.packageQuantity = res.packageQty;
+                        this.cbm = res.cbm;
+                    }
+                }
+            );
     }
 
     getPackage() {

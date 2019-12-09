@@ -81,8 +81,5 @@ const customCurrencyMaskConfig = {
     ],
     providers: [
     ],
-    bootstrap: [
-        AdvancePaymentComponent
-    ],
 })
 export class AdvancePaymentModule { }

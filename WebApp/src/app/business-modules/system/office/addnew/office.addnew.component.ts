@@ -3,8 +3,7 @@ import { OfficeFormAddComponent } from '../components/form-add-office/form-add-o
 import { AppPage } from 'src/app/app.base';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemRepo } from 'src/app/shared/repositories';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { finalize } from 'rxjs/internal/operators/finalize';
+import { finalize, catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 

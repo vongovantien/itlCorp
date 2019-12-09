@@ -90,6 +90,8 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
                         this.totalGW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
                         this.totalCBM = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
                         this.selectHBL(this.houseBills[0]);
+                    } else {
+                        this.selectedHbl = null;
                     }
                 }
             );

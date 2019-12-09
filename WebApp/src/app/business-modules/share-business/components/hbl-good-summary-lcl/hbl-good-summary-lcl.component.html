@@ -67,7 +67,7 @@
                             <input type="number" class="form-control" [(ngModel)]="totalCBM" min="0">
                         </div>
                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="openContainerListPopup()">
+                            (click)="openContainerListPopup()" [disabled]="isLocked | async">
                             <span>
                                 <i class="la la-list"></i>
                                 <span>

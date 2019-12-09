@@ -23,8 +23,10 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
     @ViewChild(ShareBussinessShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryLCLComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
+
     isImport: boolean = false;
     selectedJob: any = {}; // TODO model.
+
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,

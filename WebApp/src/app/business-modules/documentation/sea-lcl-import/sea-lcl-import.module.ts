@@ -55,6 +55,5 @@ const LIBS = [
         SeaLCLImportDetailJobComponent,
     ],
     providers: [],
-    bootstrap: [SeaLCLImportComponent]
 })
 export class SeaLCLImportModule { }

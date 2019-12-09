@@ -62,8 +62,6 @@ const routing: Routes = [
     ],
     exports: [],
     providers: [],
-    bootstrap: [
-        ComanyInformationComponent
-    ]
 })
 export class CompanyInformationModule { }
+

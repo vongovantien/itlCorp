@@ -155,6 +155,8 @@ export class SeaFCLImportHBLComponent extends AppList {
                         this.totalGW = this.houseBill.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
                         this.totalCBM = this.houseBill.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
                         this.selectHBL(this.houseBill[0]);
+                    } else {
+                        this.selectedHbl = null;
                     }
                 }
             );

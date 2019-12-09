@@ -76,7 +76,7 @@
                                         <div class="col-md-6">
                                             <select class="form-control" [(ngModel)]="selectedPackage"
                                                 name="selectedPackage">
-                                                <option *ngFor="let unit of packages" [value]="unit.code">
+                                                <option *ngFor="let unit of packages" [value]="unit.id">
                                                     {{unit.code}}</option>
                                             </select>
                                         </div>
@@ -87,7 +87,7 @@
 
                         <button type="button"
                             class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-top-10"
-                            (click)="openContainerListPopup()">
+                            (click)="openContainerListPopup()" [disabled]="isLocked | async">
                             <span>
                                 <i class="la la-list"></i>
                                 <span>

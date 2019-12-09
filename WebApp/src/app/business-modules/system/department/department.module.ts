@@ -42,8 +42,5 @@ const routing: Routes = [
         DepartmentDetailComponent
     ],
     providers: [],
-    bootstrap: [
-        DepartmentComponent
-    ]
 })
 export class DepartmentModule { }

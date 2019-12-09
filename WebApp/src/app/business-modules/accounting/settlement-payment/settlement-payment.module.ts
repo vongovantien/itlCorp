@@ -25,7 +25,7 @@ import { SettlementFormCopyPopupComponent } from './components/popup/copy-settle
 
 const routing: Routes = [
     {
-        path: '', component: SettlementPaymentComponent, data: {
+        path: '', component: SettlementPaymentComponent, pathMatch: 'full', data: {
             name: "Settlement Payment",
             level: 2
         }

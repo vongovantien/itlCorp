@@ -4,8 +4,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { SystemRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { finalize } from 'rxjs/internal/operators/finalize';
+import { finalize, catchError } from 'rxjs/operators';
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html'

@@ -58,8 +58,5 @@ const LIB = [
     ],
     providers: [
     ],
-    bootstrap: [
-        JobManagementComponent
-    ],
 })
 export class JobManagementModule { }
