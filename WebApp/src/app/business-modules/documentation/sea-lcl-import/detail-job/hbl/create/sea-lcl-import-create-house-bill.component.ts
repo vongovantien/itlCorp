@@ -159,33 +159,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     onImport(selectedData: any) {
         this.selectedHbl = selectedData;
         if (!!this.selectedHbl) {
-
-            this.formHouseBill.mtBill.setValue(this.selectedHbl.mawb);
-            this.formHouseBill.consigneeDescription.setValue(this.selectedHbl.consigneeDescription);
-            this.formHouseBill.shipperDescription.setValue(this.selectedHbl.shipperDescription);
-            this.formHouseBill.notifyPartyDescription.setValue(this.selectedHbl.notifyPartyDescription);
-            this.formHouseBill.referenceNo.setValue(this.selectedHbl.referenceNo);
-            this.formHouseBill.localVessel.setValue(this.selectedHbl.localVessel);
-            this.formHouseBill.localVoyNo.setValue(this.selectedHbl.localVoyNo);
-            this.formHouseBill.oceanVessel.setValue(this.selectedHbl.oceanVessel);
-            this.formHouseBill.oceanVoyNo.setValue(this.selectedHbl.oceanVoyNo);
-            this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.selectedHbl.originBlnumber)[0]);
-            this.formHouseBill.alsonotifyPartyDescription.setValue(this.selectedHbl.alsoNotifyPartyDescription);
-            this.formHouseBill.customer.setValue(this.selectedHbl.customerId);
-            this.formHouseBill.shipper.setValue(this.selectedHbl.shipperId);
-            this.formHouseBill.consignee.setValue(this.selectedHbl.consigneeId);
-            this.formHouseBill.notifyParty.setValue(this.selectedHbl.notifyPartyId);
-            this.formHouseBill.pol.setValue(this.selectedHbl.pol);
-            this.formHouseBill.pod.setValue(this.selectedHbl.pod);
-            this.formHouseBill.alsoNotifyParty.setValue(this.selectedHbl.alsoNotifyPartyId);
-            this.formHouseBill.hbltype.setValue([<CommonInterface.INg2Select>{ id: this.selectedHbl.hbltype, text: this.selectedHbl.hbltype }]);
-            this.formHouseBill.supplier.setValue(this.selectedHbl.coloaderId);
-            this.formHouseBill.saleMan.setValue(this.selectedHbl.saleManId);
-            this.formHouseBill.shippingMark.setValue(this.selectedHbl.shippingMark);
-            this.formHouseBill.remark.setValue(this.selectedHbl.remark);
-            this.formHouseBill.warehouseNotice.setValue(this.selectedHbl.inWord);
-            this.formHouseBill.pickupPlace.setValue(this.selectedHbl.pickupPlace);
-            this.formHouseBill.finalDestinationPlace.setValue(this.selectedHbl.finalDestinationPlace);
+            this.formHouseBill.onUpdateDataToImport(this.selectedHbl);
         }
     }
 
