@@ -5,8 +5,7 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { finalize } from 'rxjs/internal/operators/finalize';
+import { finalize, catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-add-company-info',

@@ -59,6 +59,5 @@ const COMPONENTS = [
         ...COMPONENTS
     ],
     providers: [],
-    bootstrap: [SeaLCLImportHBLComponent, SeaLCLImportCreateHouseBillComponent, SeaLCLImportDetailHouseBillComponent]
 })
 export class SeaLCLImportHBLModule { }

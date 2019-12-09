@@ -3,16 +3,14 @@ import { AppList } from 'src/app/app.list';
 import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-setting.model';
 import { ButtonType } from '../../../shared/enums/type-button.enum';
 import { SystemRepo } from 'src/app/shared/repositories';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { finalize } from 'rxjs/internal/operators/finalize';
-import { User } from 'src/app/shared/models/system/user';
-import { map } from 'rxjs/internal/operators/map';
+import { map, catchError, finalize } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { Router } from '@angular/router';
 import { ExportRepo } from 'src/app/shared/repositories';
+import { User } from 'src/app/shared/models';
 
 @Component({
     selector: 'app-user-management',

@@ -76,8 +76,5 @@ const LIB = [
         CustomClearanceFormSearchComponent
     ],
     providers: [],
-    bootstrap: [
-        CustomClearanceComponent
-    ]
 })
 export class CustomClearanceModule { }

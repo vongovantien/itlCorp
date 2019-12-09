@@ -20,8 +20,7 @@ import {
 import { DeliveryOrder } from 'src/app/shared/models';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 
-import { finalize } from 'rxjs/internal/operators/finalize';
-import { catchError, takeUntil, mergeMap } from 'rxjs/operators';
+import { catchError, takeUntil, mergeMap, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
 

@@ -63,8 +63,7 @@ const LIB = [
     ],
     exports: [],
     providers: [],
-    bootstrap: [
-        SeaFCLImportHBLComponent
-    ]
+
 })
 export class SeaFCLImportHBLModule { }
+

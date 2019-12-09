@@ -85,10 +85,6 @@ const COMPONENTS = [
     providers: [
 
     ],
-    bootstrap: [
-        StatementOfAccountComponent
-    ],
-
 })
 export class StatementOfAccountModule {
     static routing = routing;

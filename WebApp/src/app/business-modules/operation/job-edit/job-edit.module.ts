@@ -96,8 +96,5 @@ const customCurrencyMaskConfig = {
     ],
     providers: [
     ],
-    bootstrap: [
-        OpsModuleBillingJobEditComponent
-    ],
 })
 export class JobEditModule { }

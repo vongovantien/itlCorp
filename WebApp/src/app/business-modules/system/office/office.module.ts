@@ -16,7 +16,7 @@ import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 
 const routing: Routes = [
 
-    { path: '', component: OfficeComponent, data: { name: "Office", level: 2 } },
+    { path: '', component: OfficeComponent, data: { name: "Office", level: 2 }, pathMatch: 'full' },
     { path: 'addnew', component: OfficeAddNewComponent, data: { name: "Addnew Office", level: 3 } },
     { path: ':id', component: OfficeDetailsComponent, data: { name: "Edit Office", level: 3 } },
 

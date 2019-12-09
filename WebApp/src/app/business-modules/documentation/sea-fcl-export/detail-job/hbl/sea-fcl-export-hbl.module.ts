@@ -63,8 +63,5 @@ const COMPONENTS = [
         ...COMPONENTS
     ],
     providers: [],
-    bootstrap: [
-        SeaFCLExportHBLComponent
-    ]
 })
 export class SeaFCLExportHBLModule { }

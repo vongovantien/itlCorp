@@ -6,8 +6,7 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { finalize } from 'rxjs/internal/operators/finalize';
+import { finalize, catchError } from 'rxjs/operators';
 @Component({
     selector: 'app-user.addnew',
     templateUrl: './user.addnew.component.html'

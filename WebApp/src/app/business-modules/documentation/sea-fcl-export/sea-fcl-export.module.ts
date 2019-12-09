@@ -89,8 +89,5 @@ const COMPONENTS = [
         ...COMPONENTS
     ],
     providers: [],
-    bootstrap: [
-        SeaFCLExportComponent
-    ]
 })
 export class SeaFCLExportModule { }

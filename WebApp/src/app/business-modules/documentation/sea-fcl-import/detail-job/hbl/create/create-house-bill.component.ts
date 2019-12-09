@@ -11,8 +11,7 @@ import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { finalize } from 'rxjs/internal/operators/finalize';
-import { catchError, takeUntil, mergeMap, map } from 'rxjs/operators';
+import { catchError, takeUntil, mergeMap, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 
