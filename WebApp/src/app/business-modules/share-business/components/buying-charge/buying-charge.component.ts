@@ -14,11 +14,12 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { forkJoin } from 'rxjs';
-import { catchError, takeUntil, finalize, take } from 'rxjs/operators';
+import { forkJoin, Observable } from 'rxjs';
+import { catchError, takeUntil, finalize, take, filter, tap } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
+import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 
 @Component({
     selector: 'buying-charge',
@@ -39,9 +40,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     headerPartner: CommonInterface.IHeaderTable[] = [];
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
 
-    listCharges: Charge[] = new Array<Charge>();
-    listUnits: Unit[] = new Array<Unit>();
-    listCurrency: Currency[] = new Array<Currency>();
+    listCharges: Observable<Charge[]>;
+    listUnits: Unit[] = [];
+    listCurrency: Observable<Currency[]>;
     listPartner: Partner[] = new Array<Partner>();
 
     configComboGridCharge: Partial<CommonInterface.IComboGirdConfig> = {};
@@ -126,7 +127,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { displayName: 'Agent', value: CommonEnum.PartnerGroupEnum.AGENT, fieldName: 'AGENT' },
         ];
 
-        this.getMasterData();
+        this.listCurrency = this._catalogueRepo.getCurrencyBy({ active: true });
+
+        this.getUnits();
+        this.getPartner();
+        this.getCharge();
         this.getShipmentContainer();
         this.getShipmentDetail();
         this.getDetailHBL();
@@ -160,20 +165,23 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         ];
     }
 
-    getMasterData() {
+    getUnits() {
         this._progressRef.start();
-        forkJoin([
-            this.getCharge(),
-            this._catalogueRepo.getUnit({ active: true }),
-            this._catalogueRepo.getCurrencyBy({ active: true }),
-            this._catalogueRepo.getListPartner(null, null, { active: true })
-        ])
+        this._catalogueRepo.getUnit({ active: true })
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
-                ([charges, units, currencies, partners]: any[] = [[], [], [], []]) => {
-                    this.listCharges = charges;
+                (units: Unit[]) => {
                     this.listUnits = units;
-                    this.listCurrency = currencies;
+                }
+            );
+    }
+
+    getPartner() {
+        this._progressRef.start();
+        this._catalogueRepo.getListPartner(null, null, { active: true })
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (partners: Partner[]) => {
                     this.listPartner = partners;
                 }
             );
@@ -195,7 +203,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (shipment: any) => {
                     this.shipment = shipment;
-                    console.log(this.shipment);
                 }
             );
     }
@@ -206,13 +213,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (hbl: any) => {
                     this.hbl = hbl;
-                    console.log("detail hbl", this.hbl);
                 }
             );
     }
 
     getCharge() {
-        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT });
+        this.listCharges = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT });
     }
 
     sortSurcharge() {
@@ -229,7 +235,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 chargeItem.chargeNameEn = data.chargeNameEn;
                 // * Unit, Unit Price had value
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
-                    chargeItem.unitId = this.listUnits.filter(unit => unit.id === data.unitId)[0].id;
+                    chargeItem.unitId = this.listUnits.find((u: Unit) => u.id === data.unitId).id;
                     chargeItem.unitPrice = data.unitPrice;
                 }
                 break;

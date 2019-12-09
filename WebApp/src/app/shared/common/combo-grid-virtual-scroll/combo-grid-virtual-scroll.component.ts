@@ -1,9 +1,7 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChange, SimpleChanges, ChangeDetectorRef, AfterViewInit } from '@angular/core';
-import filter from 'lodash/filter';
-import cloneDeep from 'lodash/cloneDeep';
-import findIndex from 'lodash/findIndex';
-import { SortService } from '../../services/sort.service';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
+
+import cloneDeep from 'lodash/cloneDeep';
 @Component({
     selector: 'app-combo-grid-virtual-scroll',
     templateUrl: './combo-grid-virtual-scroll.component.html'
@@ -25,46 +23,35 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = null;
     indexSelected: number = -1;
     displaySelectedStr: string = '';
-
     ConstDataSources: any[] = [];
     DataSources: any[] = [];
     DisplayFields: { field: string, label: string }[] = [];
     SearchFields: string[] = [];
     SelectedDisplayFields: string[] = [];
-    CurrentActiveItem: any = null;
     Disabled: boolean = false;
-
 
     constructor(
         private cdr: ChangeDetectorRef,
-        private sortService: SortService,
     ) {
         super();
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        const _dataSources: SimpleChange = changes.dataSources;
-        const _displayFields: SimpleChange = changes.displayFields;
-        const _selectedDisplayFields: SimpleChange = changes.selectedDisplayFields;
-        const _currentActiveItemId: SimpleChange = changes.currentActiveItemId;
-        const _disabled: SimpleChange = changes.disabled;
-
-        if (_dataSources !== undefined && _dataSources !== null) {
-            this.setDataSource(_dataSources.currentValue);
+        if (!!changes.dataSources) {
+            this.setDataSource(changes.dataSources.currentValue);
         }
-        if (_displayFields !== undefined && _displayFields !== null) {
-            this.setDisplayFields(_displayFields.currentValue);
+        if (!!changes.displayFields) {
+            this.setDisplayFields(changes.displayFields.currentValue);
         }
-        if (_selectedDisplayFields !== undefined && _selectedDisplayFields !== null) {
-            this.setSelectedDisplayFields(_selectedDisplayFields.currentValue);
+        if (!!changes.selectedDisplayFields) {
+            this.setSelectedDisplayFields(changes.selectedDisplayFields.currentValue);
         }
-        if (_currentActiveItemId !== undefined && _currentActiveItemId !== null) {
-            this.setCurrentActiveItemId(_currentActiveItemId.currentValue);
+        if (!!changes.currentActiveItemId) {
+            this.setCurrentActiveItemId(changes.currentActiveItemId.currentValue);
         }
-        if (_disabled !== undefined && _disabled !== null) {
-            this.setDisabled(_disabled.currentValue);
+        if (changes.disabled !== undefined && changes.disabled !== null) {
+            this.setDisabled(changes.disabled.currentValue);
         }
-
     }
 
     ngAfterViewInit(): void {
@@ -77,17 +64,16 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
 
     setDataSource(data: any[]) {
         if (!!data && data.length > 0) {
-            data = this.sortService.sort(data, this.displayFields[0].field, true);
             this.DataSources = data;
             this.ConstDataSources = cloneDeep(data);
             if (this.CurrentActiveItemIdObj !== null) {
                 const activeItemData = this.CurrentActiveItemIdObj;
-                const itemIndex = findIndex(this.ConstDataSources, function (o) {
-                    return o[activeItemData.field] === activeItemData.value;
-                });
+                const itemIndex = this.ConstDataSources.findIndex(o => o[activeItemData.field] === activeItemData.value);
+
                 if (itemIndex !== -1) {
                     this.indexSelected = itemIndex;
                     const item = this.ConstDataSources[itemIndex];
+
                     this.setCurrentActiveItem(item);
                 }
                 if (itemIndex === -1 && activeItemData.hardValue != null) {
@@ -137,7 +123,9 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
 
     emitSelected(item: any) {
         this.itemSelected.emit(item);
+
         this.setCurrentActiveItem(item);
+
         this.currentItemSelected = item;
         if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
             this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
@@ -154,18 +142,16 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             } else {
                 this.displaySelectedStr += this.getValue(item, field) + " - ";
             }
-
         }
     }
 
     Search(key: string) {
-
         key = key.toLowerCase().trim();
         const constData = this.ConstDataSources;
         const displayFields = this.DisplayFields;
         const context = this;
 
-        const data = filter(constData, function (o) {
+        const data = constData.filter(o => {
             let matched: boolean = false;
             for (const i of displayFields) {
                 const field: string = i.field;
@@ -186,7 +172,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             }
             return matched;
         });
-
         if (!!data.length) {
             this.DataSources = data;
         } else {
@@ -195,28 +180,22 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
 
         if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
             const _CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = this.CurrentActiveItemIdObj;
-            this.indexSelected = findIndex(this.DataSources, function (o) {
-                return o[_CurrentActiveItemIdObj.field] === _CurrentActiveItemIdObj.value;
-            });
+            this.indexSelected = this.DataSources.findIndex(o => o[_CurrentActiveItemIdObj.field] === _CurrentActiveItemIdObj.value);
         }
-
     }
 
     getValue(item: any, field: string) {
         try {
-
-            if (field.includes(".")) {
-                const fieldList = field.split(".");
-                for (const i of fieldList) {
-                    item = item[i];
-                }
-                // for (let i = 0; i < fieldList.length; i++) {
-                //     item = item[fieldList[i]];
-                // }
-                return item;
-            } else {
-                return item[field];
-            }
+            // if (field.includes(".")) {
+            //     const fieldList = field.split(".");
+            //     for (const i of fieldList) {
+            //         item = item[i];
+            //     }
+            //     return item;
+            // } else {
+            //     return item[field];
+            // }
+            return item[field];
 
         } catch (error) {
             return null;

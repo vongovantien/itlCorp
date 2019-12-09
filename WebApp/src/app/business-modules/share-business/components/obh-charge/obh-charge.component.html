@@ -108,7 +108,7 @@
                                         [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                         (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                         [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                        [dataSources]="listCharges"
+                                        [dataSources]="listCharges | async"
                                         [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                         [disabled]="!!charge.debitNo || !!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                     </app-combo-grid-virtual-scroll>
@@ -159,7 +159,7 @@
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.currencyId)}">
                                     <select class="form-control" [(ngModel)]="charge.currencyId"
                                         [disabled]="!!charge.debitNo || !!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
-                                        <option *ngFor="let currency of listCurrency" [ngValue]="currency.id">
+                                        <option *ngFor="let currency of (listCurrency | async)" [ngValue]="currency.id">
                                             {{currency.id}}
                                         </option>
                                     </select>

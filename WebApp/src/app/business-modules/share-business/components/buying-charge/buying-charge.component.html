@@ -87,7 +87,7 @@
                                         [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                         (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                         [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                        [dataSources]="listCharges"
+                                        [dataSources]="listCharges | async"
                                         [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                         [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">
                                     </app-combo-grid-virtual-scroll>
@@ -121,7 +121,8 @@
                                     <select class="form-control" [(ngModel)]="charge.unitId"
                                         [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">
                                         <option value="null" disabled>Please select</option>
-                                        <option *ngFor="let unit of listUnits" [ngValue]="unit.id">{{unit.code}}
+                                        <option *ngFor="let unit of (listUnits)" [ngValue]="unit.id">
+                                            {{unit.code}}
                                         </option>
                                     </select>
                                 </div>
@@ -139,7 +140,7 @@
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.currencyId)}">
                                     <select class="form-control" [(ngModel)]="charge.currencyId"
                                         [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">
-                                        <option *ngFor="let currency of listCurrency" [ngValue]="currency.id">
+                                        <option *ngFor="let currency of (listCurrency | async)" [ngValue]="currency.id">
                                             {{currency.id}}
                                         </option>
                                     </select>
