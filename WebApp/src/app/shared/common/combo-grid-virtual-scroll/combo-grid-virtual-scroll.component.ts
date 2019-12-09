@@ -46,7 +46,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         if (!!changes.selectedDisplayFields) {
             this.setSelectedDisplayFields(changes.selectedDisplayFields.currentValue);
         }
-        if (!!changes.currentActiveItemId) {
+        if (!!changes.currentActiveItemId && (changes.currentActiveItemId.previousValue !== changes.currentActiveItemId.currentValue)) {
             this.setCurrentActiveItemId(changes.currentActiveItemId.currentValue);
         }
         if (changes.disabled !== undefined && changes.disabled !== null) {
@@ -122,24 +122,25 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     emitSelected(item: any) {
-        this.itemSelected.emit(item);
+        if (this.currentItemSelected !== item) {
+            this.itemSelected.emit(item);
+            this.setCurrentActiveItem(item);
 
-        this.setCurrentActiveItem(item);
-
-        this.currentItemSelected = item;
-        if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
-            this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
+            this.currentItemSelected = item;
+            if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
+                this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
+            }
         }
+
+
     }
 
     setCurrentActiveItem(item: any) {
         this.displaySelectedStr = '';
-        for (let i = 0; i < this.SelectedDisplayFields.length; i++) {
-            const field = this.SelectedDisplayFields[i];
-
-            if (i === this.SelectedDisplayFields.length - 1) {
-                this.displaySelectedStr += this.getValue(item, field);
-            } else {
+        if (this.SelectedDisplayFields.length === 1) {
+            this.displaySelectedStr += this.getValue(item, this.SelectedDisplayFields[0]);
+        } else {
+            for (const field of this.SelectedDisplayFields) {
                 this.displaySelectedStr += this.getValue(item, field) + " - ";
             }
         }
@@ -185,22 +186,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     getValue(item: any, field: string) {
-        try {
-            // if (field.includes(".")) {
-            //     const fieldList = field.split(".");
-            //     for (const i of fieldList) {
-            //         item = item[i];
-            //     }
-            //     return item;
-            // } else {
-            //     return item[field];
-            // }
-            return item[field];
-
-        } catch (error) {
-            return null;
-        }
-
+        return item[field] || null;
     }
 
 }

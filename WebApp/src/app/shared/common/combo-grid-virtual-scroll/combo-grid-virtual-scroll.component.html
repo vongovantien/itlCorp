@@ -1,6 +1,6 @@
 <div class="dropdown e--combogrid">
     <input class="form-control m-input m-input--square dropdown-toggle" [disabled]="Disabled" type="text" readonly
-        data-toggle="dropdown" (keyup)="Search($event.target.value)" placeholder="Please select"
+        data-toggle="dropdown" placeholder="Please select"
         [value]="displaySelectedStr == '' ? null : displaySelectedStr"
         [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''">
 
@@ -9,9 +9,9 @@
             <div class="table-head-fixed">
                 <div class="table-filter-block">
                     <div class="search-field">
-                        <input (keyup)="Search($event.target.value)"
+                        <input (ngModelChange)="Search(keyword)"
                             class="form-control m-input m-input--square cbgr-input-search" type="text"
-                            placeholder="Search..." autofocus>
+                            placeholder="Search..." autofocus [(ngModel)]="keyword">
                         <i class="icon-search"></i>
                     </div>
                 </div>
