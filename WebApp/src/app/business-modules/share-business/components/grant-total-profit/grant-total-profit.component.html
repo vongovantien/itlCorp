@@ -25,15 +25,17 @@
                                     </app-table-cell>
                                 </td>
                             </tr>
-                            <tr class=" font-weight-bold">
-                                <td class="font-16">Total</td>
-                                <td class="text-right">{{totalUSD$ | async | number: '.0-3'}} USD</td>
-                                <td class="text-right">{{totalVND$ | async | number: '.0-3'}} VND</td>
-                            </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(shipmentProfits$ | async).length">
                         </tr>
                     </tbody>
+                    <tfoot *ngIf="!!(shipmentProfits$ | async)?.length">
+                        <tr class="font-weight-bold">
+                            <td>Total</td>
+                            <td class="text-right">{{totalUSD$ | async | number: '.0-3'}} USD</td>
+                            <td class="text-right">{{totalVND$ | async | number: '.0-3'}} VND</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>

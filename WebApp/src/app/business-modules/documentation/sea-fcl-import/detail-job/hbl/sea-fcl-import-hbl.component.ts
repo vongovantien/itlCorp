@@ -10,7 +10,7 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
-import { CsShipmentSurcharge } from 'src/app/shared/models';
+import { CsShipmentSurcharge, HouseBill } from 'src/app/shared/models';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import * as fromShareBussiness from './../../../../share-business/store';
@@ -29,11 +29,11 @@ export class SeaFCLImportHBLComponent extends AppList {
 
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
-    houseBill: CsTransactionDetail[] = [];
+    houseBill: HouseBill[] = [];
 
     containers: Observable<Container[]>;
     selectedShipment: any; // TODO model.
-    selectedHbl: CsTransactionDetail;
+    selectedHbl: HouseBill;
 
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
 
@@ -65,6 +65,7 @@ export class SeaFCLImportHBLComponent extends AppList {
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
+                    this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
                     this.getHourseBill(this.jobId);
                 }
             });
@@ -107,20 +108,17 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.houseBill = this._sortService.sort(this.houseBill, sort, this.order);
     }
 
-
     gotoCreateHouseBill() {
         this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl/new`]);
     }
 
-
-    showDeletePopup(hbl: CsTransactionDetail, event: Event) {
+    showDeletePopup(hbl: HouseBill, event: Event) {
         event.preventDefault();
         event.stopImmediatePropagation();
         event.stopPropagation();
 
         this.confirmDeletePopup.show();
         this.selectedHbl = hbl;
-
     }
 
     deleteHbl(id: string) {
@@ -148,24 +146,22 @@ export class SeaFCLImportHBLComponent extends AppList {
     }
 
     getHourseBill(id: string) {
-        this.isLoading = true;
-        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
-            catchError(this.catchError),
-            finalize(() => { this.isLoading = false; }),
-        ).subscribe(
-            (res: any) => {
-                this.houseBill = res;
-                if (!!this.houseBill.length) {
-                    this.totalGW = this.houseBill.reduce((acc: number, curr: CsTransactionDetail) => acc += curr.gw, 0);
-                    this.totalCBM = this.houseBill.reduce((acc: number, curr: CsTransactionDetail) => acc += curr.cbm, 0);
-                    this.selectHBL(this.houseBill[0]);
+        this._store.select(fromShareBussiness.getHBLSState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (hbls: any[]) => {
+                    this.houseBill = hbls;
+                    if (!!this.houseBill.length) {
+                        this.totalGW = this.houseBill.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
+                        this.totalCBM = this.houseBill.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
+                        this.selectHBL(this.houseBill[0]);
+                    }
                 }
-            },
-        );
+            );
     }
 
-    selectHBL(hbl: CsTransactionDetail) {
-        this.selectedHbl = new CsTransactionDetail(hbl);
+    selectHBL(hbl: HouseBill) {
+        this.selectedHbl = new HouseBill(hbl);
 
         // * Get container, Job detail, Surcharge with hbl id, JobId.
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
@@ -186,7 +182,6 @@ export class SeaFCLImportHBLComponent extends AppList {
             default:
                 break;
         }
-
     }
 
     onSelectTabSurcharge(tabName: string) {
@@ -235,7 +230,6 @@ export class SeaFCLImportHBLComponent extends AppList {
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
-
                         this._toastService.success(respone.message, 'Delete Success !');
 
                         this.gotoList();

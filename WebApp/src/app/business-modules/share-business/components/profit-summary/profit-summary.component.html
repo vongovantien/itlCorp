@@ -47,7 +47,7 @@
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(hblProfit$ | async)"></tr>
                     </tbody>
-                    <tfoot>
+                    <tfoot *ngIf="!!(hblProfit$ | async)">
                         <tr class="font-weight-bold">
                             <td>Total</td>
                             <td class="text-right">{{(hblProfit$ | async)?.profitUSD | number: '.0-3'}} USD</td>

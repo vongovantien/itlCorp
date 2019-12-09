@@ -8,7 +8,7 @@ import { Observable, of } from "rxjs";
 
 import { switchMap, catchError, map } from "rxjs/operators";
 import {
-    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction, TransactionLoadListSuccessAction, TransactionLoadListFailAction
+    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction, TransactionLoadListSuccessAction, TransactionLoadListFailAction, GetListHBLSuccessAction, GetListHBLFailAction
 } from "../actions";
 import { ITransactionProfit } from "../reducers";
 
@@ -99,6 +99,20 @@ export class ShareBussinessEffects {
                     .pipe(
                         map((data: any) => new GetDetailHBLSuccessAction(data)),
                         catchError(err => of(new GetDetailHBLFailAction(err)))
+                    )
+            )
+        );
+
+    @Effect()
+    getListHBL$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<HBLActions>(HBLActionTypes.GET_LIST),
+            map((payload: any) => payload.payload),
+            switchMap(
+                (body: any) => this._documentRepo.getListHouseBillOfJob(body)
+                    .pipe(
+                        map((data: any) => new GetListHBLSuccessAction(data)),
+                        catchError(err => of(new GetListHBLFailAction(err)))
                     )
             )
         );

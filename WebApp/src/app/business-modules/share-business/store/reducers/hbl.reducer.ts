@@ -48,7 +48,7 @@ export function HBLReducer(state = initHBlState, action: HBLActions): IHBLState 
         }
 
         case HBLActionTypes.GET_LIST_SUCCESS: {
-            return { ...state, isLoaded: false, isLoading: true };
+            return { ...state, hbls: action.payload, isLoaded: false, isLoading: true };
         }
 
         // Profit

@@ -52,6 +52,7 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
+                    this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
                     this.getHouseBills(this.jobId);
                 }
             });
@@ -72,20 +73,18 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
     }
 
     getHouseBills(id: string) {
-        this.isLoading = true;
-        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
-            catchError(this.catchError),
-            finalize(() => { this.isLoading = false; }),
-        ).subscribe(
-            (res: any) => {
-                this.houseBills = res;
-                if (!!this.houseBills.length) {
-                    this.totalGW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
-                    this.totalCBM = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
-                    this.selectHBL(this.houseBills[0]);
+        this._store.select(fromShareBussiness.getHBLSState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (hbls: any[]) => {
+                    this.houseBills = hbls;
+                    if (!!this.houseBills.length) {
+                        this.totalGW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
+                        this.totalCBM = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
+                        this.selectHBL(this.houseBills[0]);
+                    }
                 }
-            },
-        );
+            );
     }
 
     selectHBL(hbl: HouseBill) {
