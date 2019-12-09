@@ -43,6 +43,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     dataReport: Crystal;
 
     selectedTab: string = HBL_TAB.DETAIL;
+    isClickSubMenu: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -212,6 +213,8 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     }
 
     onPreview(type: string) {
+        this.isClickSubMenu = false;
+
         // Preview Delivery Order
         if (type === 'DELIVERY_ORDER') {
             this.previewDeliveryOrder();

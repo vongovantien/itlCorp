@@ -157,7 +157,7 @@ namespace eFMS.API.Accounting.DL.Services
                                   true
                               )
                          )
-                         select sur.SettlementCode).ToList();
+                         select set.SettlementNo).ToList();
             }
 
             var data = from set in settlement
