@@ -96,12 +96,6 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                     if (!!res) {
                         this.shipmentDetail = res;
 
-                        // * Update Goods Summary.
-                        this.shipmentGoodSummaryComponent.commodities = res.commodity;
-                        this.shipmentGoodSummaryComponent.gw = res.grossWeight;
-                        this.shipmentGoodSummaryComponent.packageQuantity = res.packageQty;
-                        this.shipmentGoodSummaryComponent.cbm = res.cbm;
-
                         // * reset field duplicate
                         if (this.ACTION === "COPY") {
 

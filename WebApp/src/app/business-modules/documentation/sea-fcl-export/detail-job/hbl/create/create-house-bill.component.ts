@@ -9,14 +9,13 @@ import { AppForm } from 'src/app/app.form';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SeaFCLExportFormCreateHBLComponent } from '../components/form-create/form-create-hbl.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
+import { ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent } from 'src/app/business-modules/share-business';
 
 import { skip, catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
-import { ShareBusinessImportHouseBillDetailComponent } from 'src/app/business-modules/share-business';
 
 
 @Component({
@@ -29,7 +28,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(SeaFCLExportFormCreateHBLComponent, { static: false }) formCreateHBLComponent: SeaFCLExportFormCreateHBLComponent;
-    @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) goodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent, { static: false }) goodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     jobId: string;
     containers: Container[] = [];
@@ -158,6 +157,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             cbm: this.goodSummaryComponent.totalCBM,
             grossWeight: this.goodSummaryComponent.grossWeight,
             netWeight: this.goodSummaryComponent.netWeight,
+            packageQty: this.goodSummaryComponent.packageQty,
+            packageType: +this.goodSummaryComponent.selectedPackage,
         };
 
         return formData;

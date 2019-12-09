@@ -190,13 +190,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
-                        this.shipmentGoodSummaryComponent.containerDetail = this.hblDetail.packageContainer;
-                        this.shipmentGoodSummaryComponent.commodities = this.hblDetail.commodity;
-                        this.shipmentGoodSummaryComponent.description = this.hblDetail.desOfGoods;
-                        this.shipmentGoodSummaryComponent.grossWeight = this.hblDetail.grossWeight;
-                        this.shipmentGoodSummaryComponent.netWeight = this.hblDetail.netWeight;
-                        this.shipmentGoodSummaryComponent.totalChargeWeight = this.hblDetail.chargeWeight;
-                        this.shipmentGoodSummaryComponent.totalCBM = this.hblDetail.cbm;
+
                         this.formHouseBill.getListSaleman();
                         this.formHouseBill.updateDataToForm(this.hblDetail);
                     }

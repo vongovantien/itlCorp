@@ -17,7 +17,6 @@ import * as fromShareBussiness from './../../../share-business/store';
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 
-
 @Component({
     selector: 'app-detail-job-fcl-import',
     templateUrl: './detail-job-fcl-import.component.html',
@@ -94,29 +93,14 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             .subscribe(
                 (res: any) => {
                     this.fclImportDetail = res; // TODO Model.
-
-                    // * Update Good Summary.
-                    this.shipmentGoodSummaryComponent.containerDetail = this.fclImportDetail.packageContainer;
-                    this.shipmentGoodSummaryComponent.commodities = this.fclImportDetail.commodity;
-                    this.shipmentGoodSummaryComponent.description = this.fclImportDetail.desOfGoods;
-                    this.shipmentGoodSummaryComponent.grossWeight = this.fclImportDetail.grossWeight;
-                    this.shipmentGoodSummaryComponent.netWeight = this.fclImportDetail.netWeight;
-                    this.shipmentGoodSummaryComponent.totalChargeWeight = this.fclImportDetail.chargeWeight;
-                    this.shipmentGoodSummaryComponent.totalCBM = this.fclImportDetail.cbm;
-
-                    // * Locked
-                    this.shipmentGoodSummaryComponent.isDisabled = this.fclImportDetail.isLocked;
-
                     // * reset field duplicate
                     if (this.ACTION === "COPY") {
-
                         this.resetFormControl(this.formCreateComponent.etd);
                         this.resetFormControl(this.formCreateComponent.mawb);
                         this.resetFormControl(this.formCreateComponent.eta);
                         this.formCreateComponent.getUserLogged();
                     }
                 },
-
             );
     }
 
@@ -147,11 +131,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             this.infoPopup.show();
             return;
         }
-        // if (!this.containers.length) {
-        //     this._toastService.warning('Please add container to update job');
-        //     return;
-        // }
-
         const modelUpdate = this.onSubmitData();
 
         //  * Update field

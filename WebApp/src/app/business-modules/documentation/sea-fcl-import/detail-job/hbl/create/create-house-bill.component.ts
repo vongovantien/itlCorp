@@ -10,7 +10,6 @@ import { AppForm } from 'src/app/app.form';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
-import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError, takeUntil, mergeMap, map } from 'rxjs/operators';
@@ -20,7 +19,8 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { DeliveryOrder } from 'src/app/shared/models';
 import { forkJoin } from 'rxjs';
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent } from 'src/app/business-modules/share-business';
+
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent } from 'src/app/business-modules/share-business';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -36,7 +36,7 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessFormCreateHouseBillImportComponent, { static: false }) formHouseBill: ShareBusinessFormCreateHouseBillImportComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
-    @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent, { static: false }) hblGoodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
@@ -77,13 +77,8 @@ export class CreateHouseBillComponent extends AppForm {
             if (param.jobId) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-
-
             }
         });
-
-
-
     }
 
     getShipmentDetail() {
@@ -95,8 +90,8 @@ export class CreateHouseBillComponent extends AppForm {
 
 
     ngAfterViewInit() {
-        this.shipmentGoodSummaryComponent.initContainer();
-        this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
+        this.hblGoodSummaryComponent.initContainer();
+        this.hblGoodSummaryComponent.containerPopup.isAdd = true;
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
         this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
         this.deliveryComponent.deliveryOrder = new DeliveryOrder();
@@ -237,12 +232,14 @@ export class CreateHouseBillComponent extends AppForm {
             customerId: this.formHouseBill.customer.value,
             oceanVoyNo: this.formHouseBill.oceanVoyNo.value,
             csMawbcontainers: this.containers,
-            commodity: this.shipmentGoodSummaryComponent.commodities,
-            packageContainer: this.shipmentGoodSummaryComponent.containerDetail,
-            desOfGoods: this.shipmentGoodSummaryComponent.description,
-            cbm: this.shipmentGoodSummaryComponent.totalCBM,
-            grossWeight: this.shipmentGoodSummaryComponent.grossWeight,
-            netWeight: this.shipmentGoodSummaryComponent.netWeight,
+            commodity: this.hblGoodSummaryComponent.commodities,
+            packageContainer: this.hblGoodSummaryComponent.containerDetail,
+            desOfGoods: this.hblGoodSummaryComponent.description,
+            cbm: this.hblGoodSummaryComponent.totalCBM,
+            grossWeight: this.hblGoodSummaryComponent.grossWeight,
+            netWeight: this.hblGoodSummaryComponent.netWeight,
+            packageQty: this.hblGoodSummaryComponent.packageQty,
+            packageType: +this.hblGoodSummaryComponent.selectedPackage,
 
             arrivalSecondNotice: null,
             arrivalNo: null,
@@ -316,4 +313,6 @@ export interface ITransactionDetail {
     dofooter: string;
     dosentTo1: string;
     dosentTo2: string;
+    packageQty: number;
+    packageType: number;
 }

@@ -93,18 +93,8 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                     if (!!res) {
                         this.shipmentDetail = res;
 
-                        // * Update Good Summary.
-                        this.shipmentGoodSummaryComponent.containerDetail = res.packageContainer;
-                        this.shipmentGoodSummaryComponent.commodities = res.commodity;
-                        this.shipmentGoodSummaryComponent.description = res.desOfGoods;
-                        this.shipmentGoodSummaryComponent.grossWeight = res.grossWeight;
-                        this.shipmentGoodSummaryComponent.netWeight = res.netWeight;
-                        this.shipmentGoodSummaryComponent.totalChargeWeight = res.chargeWeight;
-                        this.shipmentGoodSummaryComponent.totalCBM = res.cbm;
-
                         // * reset field duplicate
                         if (this.ACTION === "COPY") {
-
                             this.resetFormControl(this.formCreateComponent.etd);
                             this.resetFormControl(this.formCreateComponent.mawb);
                             this.resetFormControl(this.formCreateComponent.eta);
@@ -121,12 +111,6 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             this.infoPopup.show();
             return;
         }
-
-        // if (!this.containers.length) {
-        //     this._toastService.warning('Please add container to create new job');
-        //     return;
-        // }
-
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model
 
@@ -303,6 +287,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
         modelAdd.isLocked = true;
+
         this.saveJob(modelAdd);
     }
 }
