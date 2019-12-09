@@ -102,7 +102,7 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="form-group" [tooltip]="charge.chargeNameEn"
+                                <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || isDuplicateChargeCode)}">
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id', value:charge.chargeId}"
