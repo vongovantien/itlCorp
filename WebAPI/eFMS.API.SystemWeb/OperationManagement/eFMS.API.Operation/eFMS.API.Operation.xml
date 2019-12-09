@@ -240,6 +240,13 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Operation.Controllers.OpsStageAssignedController.DeleteStageAssigned(System.Guid)">
+            <summary>
+            delete an existed charge
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Operation.Controllers.OpsStageAssignedController.AddMultipleStage(System.Collections.Generic.List{eFMS.API.Operation.DL.Models.OpsStageAssignedEditModel},System.Guid)">
             <summary>
             add list of stages to a job

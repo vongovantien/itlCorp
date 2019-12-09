@@ -8,6 +8,8 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Stage } from 'src/app/shared/models';
 import { ShareBusinessAssignStagePopupComponent } from '../stage-management/assign-stage/assign-stage.popup';
 import { ShareBusinessStageManagementDetailComponent } from '../stage-management/detail/detail-stage-popup.component';
+import { ToastrService } from 'ngx-toastr';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
     selector: 'share-assignment',
@@ -16,7 +18,7 @@ import { ShareBusinessStageManagementDetailComponent } from '../stage-management
 
 export class ShareBusinessAsignmentComponent extends AppList {
 
-
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(ShareBusinessStageManagementDetailComponent, { static: false }) popupDetail: ShareBusinessStageManagementDetailComponent;
     @ViewChild(ShareBusinessAssignStagePopupComponent, { static: false }) assignStagePopup: ShareBusinessAssignStagePopupComponent;
     data: any = null;
@@ -25,6 +27,7 @@ export class ShareBusinessAsignmentComponent extends AppList {
     stageAvailable: any[] = [];
     selectedStage: Stage = null;
     currentStages: Stage[] = [];
+
 
     timeOutSearch: any;
     headers: CommonInterface.IHeaderTable[];
@@ -35,6 +38,8 @@ export class ShareBusinessAsignmentComponent extends AppList {
         private _sortService: SortService,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
+        private _toastService: ToastrService
+
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -123,6 +128,36 @@ export class ShareBusinessAsignmentComponent extends AppList {
                 }
             },
         );
+    }
+
+    showDeletePopup(data: any) {
+        this.confirmDeletePopup.show();
+        this.selectedStage = data;
+    }
+
+    onDeleteStage() {
+        this.confirmDeletePopup.hide();
+        this.deleteStageAssigned(this.selectedStage.id);
+    }
+
+
+    deleteStageAssigned(id: string) {
+        this.isLoading = true;
+        this._progressRef.start();
+        this._operation.deleteStageAssigned(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.getListStageJob(this.jobId);
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
     }
 
     getDetail(id: string) {

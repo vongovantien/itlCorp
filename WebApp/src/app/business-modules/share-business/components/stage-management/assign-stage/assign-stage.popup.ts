@@ -18,7 +18,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     configStage: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [
-            { field: 'code', label: 'stageCode' },
+            { field: 'code', label: 'Stage Code' },
             { field: 'stageNameEn', label: 'Stage Name' },
         ],
         dataSource: [],

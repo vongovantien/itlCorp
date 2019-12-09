@@ -190,7 +190,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         if ((this.statusStageActive[0].id === 'Pending' || this.statusStageActive[0].id === "Deleted") && !form.value.comment) {
             return;
         }
-        if (!this.selectedMainPersonInCharge.value || this.selectedMainPersonInCharge.value === this.selectedRealPersonInCharge.value) {
+        if (!this.selectedMainPersonInCharge.value) {
             return;
         } else {
             const body = {
@@ -230,6 +230,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 }
             );
         }
+
     }
 
     getListSystemUser() {

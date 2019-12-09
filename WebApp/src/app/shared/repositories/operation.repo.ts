@@ -95,6 +95,13 @@ export class OperationRepo {
         );
     }
 
+    deleteStageAssigned(id: string) {
+        return this._api.delete(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/OpsStageAssigned/Delete`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
 
 
 }

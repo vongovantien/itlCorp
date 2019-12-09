@@ -10,7 +10,7 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { catchError, takeUntil, switchMap, finalize } from 'rxjs/operators';
+import { catchError, takeUntil, switchMap, finalize, skip } from 'rxjs/operators';
 
 
 import * as fromShare from './../../../store';
@@ -28,6 +28,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
 
     userLogged: User;
     hblid: string;
+    hblDetail: any = {};
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -56,18 +57,20 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        this.deliveryOrder = new DeliveryOrder(res);
+                        if (res.deliveryOrderNo !== null) {
+                            this.deliveryOrder = new DeliveryOrder(res);
+                            this.deliveryOrder.deliveryOrderPrintedDate = {
+                                startDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
+                                endDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
+                            };
 
-                        this.deliveryOrder.deliveryOrderPrintedDate = {
-                            startDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
-                            endDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
-                        };
-
-                        this.deliveryOrder.userDefault = this.userLogged.id;
-                        this.deliveryOrder.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
+                            this.deliveryOrder.userDefault = this.userLogged.id;
+                            this.deliveryOrder.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
+                        }
                     }
                 }
             );
+
 
         this.isLocked = this._store.select(fromShare.getTransactionLocked);
     }
