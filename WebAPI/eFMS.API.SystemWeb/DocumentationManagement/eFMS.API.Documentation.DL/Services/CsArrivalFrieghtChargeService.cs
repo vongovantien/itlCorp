@@ -264,6 +264,10 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var polName = placeRepository.Get(x => x.Id == houserBill.Pol).FirstOrDefault()?.NameEn;
                 var podName = placeRepository.Get(x => x.Id == houserBill.Pod).FirstOrDefault()?.NameEn;
+
+                var _arrivalHeader = ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
+                var _arrivalFooter = ReplaceHtmlBaseForPreviewReport(arrival.ArrivalFooter);
+
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
                 {
                     foreach (var frieght in arrival.CsArrivalFrieghtCharges)
@@ -274,15 +278,12 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ReferrenceNo = houserBill.ReferenceNo;
                         charge.ISSUED = DateTime.Now.ToString("dd/MM/yyyy");//Issued Date
                         charge.ATTN = houserBill.ShipperDescription;//Shipper
-                        charge.Consignee = houserBill.ConsigneeDescription;//partnerRepositoty.Get(x => x.Id == houserBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
+                        charge.Consignee = houserBill.ConsigneeDescription;
                         charge.Notify = houserBill.NotifyPartyDescription;
                         charge.HandlingInfo = string.Empty;
                         charge.ExecutedOn = string.Empty;
                         charge.OceanVessel = houserBill.OceanVessel;
-                        if (string.IsNullOrEmpty(arrival.ArrivalHeader))
-                        {
-                            charge.OSI = arrival.ArrivalHeader.Replace("<strong>", "<b>").Replace("</strong>", "<b>").Replace("<em>", "<i>").Replace("</em>", "</i>");//Header of arrival
-                        }
+                        charge.OSI = _arrivalHeader;//Header of arrival
                         if (houserBill.Eta != null)
                         {
                             charge.FlightDate = houserBill.Eta.Value; //ETA
@@ -316,10 +317,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
                         charge.VAT = frieght.Vatrate != null ? frieght.Vatrate.Value : 0; //VAT of charge arrival
                         charge.Notes = frieght.Notes;//Note of charge arrival
-                        if (!string.IsNullOrEmpty(arrival.ArrivalFooter))
-                        {
-                            charge.ArrivalFooterNoitice = arrival.ArrivalFooter.Replace("<strong>", "<b>").Replace("</strong>", "<b>").Replace("<em>", "<i>").Replace("</em>", "</i>");//Footer of arrival
-                        }
+                        charge.ArrivalFooterNoitice = _arrivalFooter;//Footer of arrival
                         charge.SeaFCL = true; //Đang gán cứng lấy hàng nguyên công
                         charge.MaskNos = "MaskNos";
                         charge.DlvCustoms = "DlvCustoms";
@@ -335,13 +333,75 @@ namespace eFMS.API.Documentation.DL.Services
                         listCharge.Add(charge);
                     }
                 }
+                else
+                {
+                    var charge = new SeaArrivalNotesReport();
+                    charge.HWBNO = houserBill.Hwbno;
+                    charge.ArrivalNo = arrival.ArrivalNo;
+                    charge.ReferrenceNo = houserBill.ReferenceNo;
+                    charge.ISSUED = DateTime.Now.ToString("dd/MM/yyyy");//Issued Date
+                    charge.ATTN = houserBill.ShipperDescription;//Shipper
+                    charge.Consignee = houserBill.ConsigneeDescription;
+                    charge.Notify = houserBill.NotifyPartyDescription;
+                    charge.HandlingInfo = string.Empty;
+                    charge.ExecutedOn = string.Empty;
+                    charge.OceanVessel = houserBill.OceanVessel;
+                    charge.OSI = _arrivalHeader;//Header of arrival
+                    if (houserBill.Eta != null)
+                    {
+                        charge.FlightDate = houserBill.Eta.Value; //ETA
+                    }
+                    charge.DateConfirm = DateTime.Now;
+                    charge.DatePackage = DateTime.Now;
+                    charge.LocalVessel = houserBill.OceanVessel;//Ocean Vessel of HBL
+                    charge.ContSealNo = houserBill.OceanVoyNo;// Ocean Voy No of HBL
+                    charge.ForCarrier = string.Empty;
+                    charge.DepartureAirport = polName;//POL of HBL
+                    charge.PortofDischarge = podName;//POD of HBL
+                    charge.PlaceDelivery = podName;//POD of HBL
+                    charge.ArrivalNote = houserBill.Remark;//Remark of HBL
+
+                    charge.ShippingMarkImport = houserBill.ShippingMark;//ShippingMark of HBL
+
+                    charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
+                    charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
+                    charge.NoPieces = houserBill.PackageQty.ToString();
+                    charge.GrossWeight = houserBill.GrossWeight != null ? houserBill.GrossWeight.Value : 0; //GrossWeight of container
+                    charge.CBM = houserBill.Cbm != null ? houserBill.Cbm.Value : 0; //CBM of container
+                    charge.Unit = "KGS"; //Đang gán cứng
+
+                    charge.blnShow = false; //isShow of charge arrival
+                    charge.blnStick = false;//isStick of charge arrival
+                    charge.blnRoot = false; //isRoot of charge arrival
+                    charge.FreightCharges = string.Empty;//Charge name of charge arrival
+                    charge.Qty = 0;//Quantity of charge arrival
+                    charge.QUnit = string.Empty;//Unit name of charge arrival
+                    charge.TotalValue = 0;//Unit price of charge arrival
+                    charge.Curr = string.Empty; //Currency of charge arrival
+                    charge.VAT = 0; //VAT of charge arrival
+                    charge.Notes = string.Empty;//Note of charge arrival
+                    charge.ArrivalFooterNoitice = _arrivalFooter;//Footer of arrival
+                    charge.SeaFCL = true; //Đang gán cứng lấy hàng nguyên công
+                    charge.MaskNos = "MaskNos";
+                    charge.DlvCustoms = "DlvCustoms";
+                    charge.insurAmount = "insurAmount";
+                    charge.BillType = houserBill.Hbltype; // House Bill of Lading Type
+                    charge.DOPickup = DateTime.Now;
+                    charge.ExVND = 0;
+                    charge.DecimalSymbol = ",";//Dấu phân cách phần ngàn
+                    charge.DigitSymbol = ".";//Dấu phân cách phần thập phân
+                    charge.DecimalNo = 2;
+                    charge.CurrDecimalNo = 2;
+
+                    listCharge.Add(charge);
+                }
             }
 
             var parameter = new SeaArrivalNotesReportParams();
-            parameter.No = "No";
-            parameter.ShipperName = "ShipperName";
+            parameter.No = string.Empty;
+            parameter.ShipperName = string.Empty;
             parameter.CompanyName = Constants.COMPANY_NAME;
-            parameter.CompanyDescription = "CompanyDescription";
+            parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
             parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
             parameter.Website = Constants.COMPANY_WEBSITE;
@@ -515,5 +575,27 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
         #endregion
+
+        private string ReplaceHtmlBaseForPreviewReport(string html)
+        {
+            if (string.IsNullOrEmpty(html)) return html;
+            if (html.Contains("<strong>"))
+            {
+                html = html.Replace("<strong>", "<b>");
+            }
+            if (html.Contains("</strong>"))
+            {
+                html = html.Replace("</strong>", "</b>");
+            }
+            if (html.Contains("<em>"))
+            {
+                html = html.Replace("<em>", "<i>");
+            }
+            if (html.Contains("</em>"))
+            {
+                html = html.Replace("</em>", "</i>");
+            }
+            return html;
+        }
     }
 }

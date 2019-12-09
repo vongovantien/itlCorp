@@ -1123,11 +1123,8 @@ namespace eFMS.API.Documentation.DL.Services
             var agent = catPartnerRepo.Get(x => x.Id == shipment.AgentId).FirstOrDefault();
             var supplier = catPartnerRepo.Get(x => x.Id == shipment.ColoaderId).FirstOrDefault();
 
-            var units = catUnitRepo.Get();
             var pol = catPlaceRepo.Get(x => x.Id == shipment.Pol).FirstOrDefault();
             var pod = catPlaceRepo.Get(x => x.Id == shipment.Pod).FirstOrDefault();
-            var polName = pol?.NameEn;
-            var podName = pod?.NameEn;
             var polCountry = string.Empty;
             var podCountry = string.Empty;
             if (pol != null)
@@ -1138,24 +1135,34 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 podCountry = catCountryRepo.Get(x => x.Id == pod.CountryId).FirstOrDefault()?.NameEn;
             }
+            var _polFull = pol?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty);
+            var _podFull = pod?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty);
 
             CsMawbcontainerCriteria contCriteria = new CsMawbcontainerCriteria { Mblid = jobId };
             var containerList = containerService.Query(contCriteria);
-            var containerNoList = string.Empty;
+            var _containerNoList = string.Empty;
             if (containerList.Count() > 0)
             {
-                containerNoList = String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
+                _containerNoList = String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
             }
+
+            var _transDate = shipment.DatetimeCreated != null ? shipment.DatetimeCreated.Value : DateTime.Now; //CreatedDate of shipment
+            var _etdDate = shipment.Etd != null ? shipment.Etd.Value.ToString("dd MMM yyyy") : string.Empty; //ETD
+            var _etaDate = shipment.Eta != null ? shipment.Eta.Value.ToString("dd MMM yyyy") : string.Empty; //ETA
+            var _grossWeight = shipment.GrossWeight != null ? shipment.GrossWeight : 0;//Đang lấy GrossWeight của Shipment
+            var _netWeight = shipment.NetWeight != null ? shipment.NetWeight.Value : 0;//Đang lấy NetWeight của Shipment
+            var _chargeWeight = shipment.ChargeWeight != null ? shipment.ChargeWeight : 0;//Đang lấy ChargeWeight của Shipment
+            var _dateNow = DateTime.Now.ToString("dd MMMM yyyy");
 
             var listCharge = new List<FormPLsheetReport>();
 
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
             var listHousebill = transactionDetailService.GetByJob(criteria);
-            var hblNoList = string.Empty;
+            var _hblNoList = string.Empty;
             var _shipmentType = GetShipmentTypeForPreviewPL(shipment.TransactionType) + shipment.TypeOfService;
             if (listHousebill.Count > 0)
             {
-                hblNoList = String.Join(";", listHousebill.Select(x => x.Hwbno));
+                _hblNoList = String.Join("; ", listHousebill.Select(x => x.Hwbno));
 
                 var housebillFirst = listHousebill.First();
                 var userSaleman = sysUserRepo.Get(x => x.Id == housebillFirst.SaleManId).FirstOrDefault();
@@ -1171,6 +1178,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (surcharges.Count > 0)
                 {
+                    var units = catUnitRepo.Get();
                     foreach (var surcharge in surcharges)
                     {
                         var unitCode = units.FirstOrDefault(x => x.Id == surcharge.UnitId)?.Code;
@@ -1197,7 +1205,7 @@ namespace eFMS.API.Documentation.DL.Services
                         //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
                         var exchargeDateSurcharge = surcharge.ExchangeDate == null ? DateTime.Now : surcharge.ExchangeDate;
                         //Exchange Rate theo Currency truyền vào
-                        var exchangeRate = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == surcharge.CurrencyId && x.CurrencyToId == "USD" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        var exchangeRate = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == surcharge.CurrencyId && x.CurrencyToId == Constants.CURRENCY_USD && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                         decimal _exchangeRateUSD;
                         if ((exchangeRate != null && exchangeRate.Rate != 0))
                         {
@@ -1213,7 +1221,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var charge = new FormPLsheetReport();
                         charge.COSTING = "COSTING";
                         charge.TransID = shipment.JobNo; //JobNo of shipment
-                        charge.TransDate = shipment.DatetimeCreated != null ? shipment.DatetimeCreated.Value : DateTime.Now; //CreatedDate of shipment
+                        charge.TransDate = _transDate;
                         charge.HWBNO = surcharge.Hwbno;
                         charge.MAWB = shipment.Mawb; //MasterBill of shipment
                         charge.PartnerName = string.Empty; //NOT USE
@@ -1221,21 +1229,21 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ShipmentType = _shipmentType;
                         charge.NominationParty = string.Empty;
                         charge.Nominated = true; //Gán cứng
-                        charge.POL = polName + ", " + polCountry;
-                        charge.POD = podName + ", " + podCountry;
+                        charge.POL = _polFull;
+                        charge.POD = _podFull;
                         charge.Commodity = shipment.Commodity;
                         charge.Volumne = string.Empty; //Gán rỗng
                         charge.Carrier = supplier?.PartnerNameEn;
                         charge.Agent = agent?.PartnerNameEn;
                         charge.ATTN = shipper; //Shipper đầu tiên của list housebill
                         charge.Consignee = consignee; //Consignee đầu tiên của list housebill
-                        charge.ContainerNo = containerNoList; //Danh sách container của Shipment (Format: contNo/SealNo)
+                        charge.ContainerNo = _containerNoList; //Danh sách container của Shipment (Format: contNo/SealNo)
                         charge.OceanVessel = shipment.FlightVesselName; //Tên chuyến bay
                         charge.LocalVessel = shipment.FlightVesselName; //Tên chuyến bay
                         charge.FlightNo = shipment.VoyNo; //Mã chuyến bay
                         charge.SeaImpVoy = string.Empty;//Gán rỗng
-                        charge.LoadingDate = shipment.Etd != null ? shipment.Etd.Value.ToString("dd MMM yyyy") : string.Empty; //ETD
-                        charge.ArrivalDate = shipment.Eta != null ? shipment.Eta.Value.ToString("dd MMM yyyy") : string.Empty; //ETA
+                        charge.LoadingDate = _etdDate; //ETD
+                        charge.ArrivalDate = _etaDate; //ETA
                         charge.FreightCustomer = string.Empty; //NOT USE
                         charge.FreightColoader = 0; //NOT USE
                         charge.PayableAccount = surcharge.PartnerName;//Partner name of charge
@@ -1256,7 +1264,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Quantity = surcharge.Quantity;
                         charge.UnitPrice = surcharge.UnitPrice != null ? surcharge.UnitPrice.Value : 0;
                         charge.Unit = unitCode;
-                        charge.LastRevised = DateTime.Now.ToString("dd MMMM yyyy");
+                        charge.LastRevised = _dateNow;
                         charge.OBH = isOBH;
                         charge.ExtRateVND = 0; //NOT USE
                         charge.KBck = true; //NOT USE
@@ -1264,9 +1272,9 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Approvedby = string.Empty; //Gán rỗng
                         charge.ApproveDate = DateTime.Now; //NOT USE
                         charge.SalesCurr = currency;
-                        charge.GW = shipment.GrossWeight;
-                        charge.MCW = shipment.NetWeight != null ? shipment.NetWeight.Value : 0;//Đang lấy NetWeight của Shipment
-                        charge.HCW = shipment.ChargeWeight;
+                        charge.GW = _grossWeight;//Đang lấy GrossWeight của Shipment
+                        charge.MCW = _netWeight;//Đang lấy NetWeight của Shipment
+                        charge.HCW = _chargeWeight;//Đang lấy ChargeWeight của Shipment
                         charge.PaymentTerm = string.Empty; //NOT USE
                         charge.DetailNotes = string.Empty; //Gán rỗng
                         charge.ExpressNotes = string.Empty; //Gán rỗng
@@ -1287,6 +1295,69 @@ namespace eFMS.API.Documentation.DL.Services
                         listCharge.Add(charge);
                     }
                 }
+                else
+                {
+                    var charge = new FormPLsheetReport();
+                    charge.COSTING = "COSTING";
+                    charge.TransID = shipment.JobNo; //JobNo of shipment
+                    charge.TransDate = _transDate;
+                    charge.MAWB = shipment.Mawb; //MasterBill of shipment
+                    charge.ContactName = userSaleman?.Username; //Saleman đầu tiên của list housebill
+                    charge.ShipmentType = _shipmentType;
+                    charge.Nominated = true;
+                    charge.POL = _polFull;
+                    charge.POD = _podFull;
+                    charge.Commodity = shipment.Commodity;
+                    charge.Carrier = supplier?.PartnerNameEn;
+                    charge.Agent = agent?.PartnerNameEn;
+                    charge.ATTN = shipper; //Shipper đầu tiên của list housebill
+                    charge.Consignee = consignee; //Consignee đầu tiên của list housebill
+                    charge.ContainerNo = _containerNoList; //Danh sách container của Shipment (Format: contNo/SealNo)
+                    charge.OceanVessel = shipment.FlightVesselName; //Tên chuyến bay
+                    charge.LocalVessel = shipment.FlightVesselName; //Tên chuyến bay
+                    charge.FlightNo = shipment.VoyNo; //Mã chuyến bay
+                    charge.SeaImpVoy = string.Empty;
+                    charge.LoadingDate = _etdDate; //ETD
+                    charge.ArrivalDate = _etaDate; //ETA
+                    charge.LastRevised = _dateNow;
+                    charge.SalesCurr = currency;
+                    charge.GW = _grossWeight;//Đang lấy GrossWeight của Shipment
+                    charge.MCW = _netWeight;//Đang lấy NetWeight của Shipment
+                    charge.HCW = _chargeWeight;//Đang lấy ChargeWeight của Shipment
+                    charge.ShipmentSource = shipment.ShipmentType;
+                    charge.RealCost = true;
+                    listCharge.Add(charge);
+                }
+            }
+            else
+            {
+                var charge = new FormPLsheetReport();
+                charge.COSTING = "COSTING";
+                charge.TransID = shipment.JobNo; //JobNo of shipment
+                charge.TransDate = _transDate;
+                charge.MAWB = shipment.Mawb; //MasterBill of shipment
+                charge.ShipmentType = _shipmentType;
+                charge.Nominated = true;
+                charge.POL = _polFull;
+                charge.POD = _podFull;
+                charge.Commodity = shipment.Commodity;
+                charge.Carrier = supplier?.PartnerNameEn;
+                charge.Agent = agent?.PartnerNameEn;
+                charge.ContainerNo = _containerNoList; //Danh sách container của Shipment (Format: contNo/SealNo)
+                charge.OceanVessel = shipment.FlightVesselName; //Tên chuyến bay
+                charge.LocalVessel = shipment.FlightVesselName; //Tên chuyến bay
+                charge.FlightNo = shipment.VoyNo; //Mã chuyến bay
+                charge.SeaImpVoy = string.Empty;
+                charge.LoadingDate = _etdDate; //ETD
+                charge.ArrivalDate = _etaDate; //ETA
+                charge.LastRevised = _dateNow;
+                charge.SalesCurr = currency;
+                charge.GW = _grossWeight;//Đang lấy GrossWeight của Shipment
+                charge.MCW = _netWeight;//Đang lấy NetWeight của Shipment
+                charge.HCW = _chargeWeight;//Đang lấy ChargeWeight của Shipment
+                charge.ShipmentSource = shipment.ShipmentType;
+                charge.RealCost = true;
+                listCharge.Add(charge);
             }
 
             var parameter = new FormPLsheetReportParameter();
@@ -1298,7 +1369,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.Website = Constants.COMPANY_WEBSITE;
             parameter.CurrDecimalNo = 2;
             parameter.DecimalNo = 2;
-            parameter.HBLList = hblNoList;
+            parameter.HBLList = _hblNoList;
 
             result = new Crystal
             {

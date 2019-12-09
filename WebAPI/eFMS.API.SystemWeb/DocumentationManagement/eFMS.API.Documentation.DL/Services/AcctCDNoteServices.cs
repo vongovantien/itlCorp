@@ -574,7 +574,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.CDNote = cdNote;
             soaDetails.ProductService = opsTransaction?.ProductService;
             soaDetails.ServiceMode = opsTransaction?.ServiceMode;
-            soaDetails.SoaNo = String.Join(",", charges.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
+            soaDetails.SoaNo = String.Join(", ", charges.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
             soaDetails.HbSealNo = sealsNo;
             soaDetails.HbGrossweight = hbGw;
             soaDetails.HbShippers = hbShippers; //Shipper
@@ -899,8 +899,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                     //Thông tin Shipment
                     charge.TransID = data.JobNo;
-                    charge.DepartureAirport = data.Pol + ", " + data.PolCountry; //POL
-                    charge.PlaceDelivery = data.Pod + ", " + data.PodCountry; //POD
+                    charge.DepartureAirport = data.Pol + (!string.IsNullOrEmpty(data.PolCountry) ? ", " + data.PolCountry : string.Empty); //POL
+                    charge.PlaceDelivery = data.Pod + (!string.IsNullOrEmpty(data.PodCountry) ? ", " + data.PodCountry : string.Empty); //POD
                     if (data.Etd != null)
                     {
                         charge.LoadingDate = data.Etd.Value;//ETD
@@ -915,7 +915,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
                     charge.ContainerSize = data.HbPackages; //Quantity Cont
                     charge.GrossWeight = data.HbGrossweight != null ? data.HbGrossweight.Value : 0;//Total GW of HBL
-                    charge.CBM = data.Volum.Value; //Total CBM of HBL
+                    charge.CBM = data.Volum != null ? data.Volum.Value : 0; //Total CBM of HBL
                     charge.SealNo = data.HbSealNo; //Cont/Seal No
                     charge.HWBNO = data.HbLadingNo; //HBLNOs
 
@@ -924,8 +924,8 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Description = item.NameEn;//Charge name
                     charge.Quantity = item.Quantity;
                     charge.Unit = item.Unit;
-                    charge.UnitPrice = item.UnitPrice * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
-                    charge.VAT = item.Vatrate;
+                    charge.UnitPrice = (item.UnitPrice != null ? item.UnitPrice : 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
+                    charge.VAT = item.Vatrate != null ? item.Vatrate : 0;
                     charge.Credit = (item.Type == Constants.CHARGE_BUY_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
                     charge.Debit = (item.Type == Constants.CHARGE_SELL_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? item.Total * _exchangeRate : 0;
                     listCharge.Add(charge);
