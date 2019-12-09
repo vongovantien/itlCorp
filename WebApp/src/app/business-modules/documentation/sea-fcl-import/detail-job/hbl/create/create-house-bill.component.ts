@@ -11,7 +11,8 @@ import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { catchError, takeUntil, mergeMap, finalize } from 'rxjs/operators';
+import { finalize } from 'rxjs/internal/operators/finalize';
+import { catchError, takeUntil, mergeMap, map, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 
@@ -45,6 +46,7 @@ export class CreateHouseBillComponent extends AppForm {
     selectedHbl: any = {}; // TODO model.
     containers: Container[] = [];
     selectedTab: string = HBL_TAB.DETAIL;
+    hblDetail: any = {};
 
     constructor(
         protected _progressService: NgProgress,
@@ -78,25 +80,64 @@ export class CreateHouseBillComponent extends AppForm {
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
             }
         });
+
     }
 
-    getShipmentDetail() {
-    }
+
 
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
 
 
+
     ngAfterViewInit() {
         this.hblGoodSummaryComponent.initContainer();
         this.hblGoodSummaryComponent.containerPopup.isAdd = true;
+        this.shipmentGoodSummaryComponent.description = "AS PER BILL";
+        this.formHouseBill.notifyPartyDescription.setValue("SAM AS CONSIGNEE");
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
+        this.getDetailShipment();
+
+        setTimeout(() => {
+            const objDelivery = {
+                deliveryOrderNo: this.hblDetail.jobNo + "-D01",
+                deliveryOrderPrintedDate: {
+                    startDate: new Date(),
+                    endDate: new Date()
+                }
+            };
+            const objArrival = {
+                arrivalNo: this.hblDetail.jobNo + "-A01",
+            };
+
         this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
-        this.deliveryComponent.deliveryOrder = new DeliveryOrder();
+            this.arrivalNoteComponent.hblArrivalNote.arrivalNo = objArrival.arrivalNo;
+            this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice = new Date();
+            this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
+        }, 700);
         this._cd.detectChanges();
 
     }
+
+    getDetailShipment() {
+        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+                skip(1),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!!res) {
+                        this.hblDetail = res;
+                        console.log(this.hblDetail);
+                    }
+                },
+            );
+    }
+
 
     checkValidateForm() {
         let valid: boolean = true;

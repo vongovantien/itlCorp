@@ -9,7 +9,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form class="m-form m-form--state" [formGroup]="form" novalidate (ngSubmit)="onSubmit(form)">
+                <form class="m-form m-form--state" [formGroup]="form" novalidate>
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group">
@@ -137,7 +137,7 @@
                         <div class="col-md-12 mt-3">
                             <div class="border-top text-center p-3">
                                 <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase mr-2"
-                                    type="submit">
+                                    (click)="onSubmit(form)">
                                     <span>
                                         <i class="la la-save "></i>
                                         <span>
