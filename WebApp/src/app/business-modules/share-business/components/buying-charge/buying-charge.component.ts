@@ -140,7 +140,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     configHeader() {
         this.headers = [
-            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 150 },
+            { title: 'Partner Name', field: 'partnerShortName', required: true, sortable: true, width: 150 },
             { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 250 },
             { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 150 },
             { title: 'Unit', field: 'unitId', required: true, sortable: true },
@@ -438,7 +438,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
         if (!!partnerData) {
-            chargeItem.partnerName = partnerData.shortName;
+            chargeItem.partnerShortName = partnerData.shortName;
             chargeItem.paymentObjectId = partnerData.id;
             chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
         }
@@ -448,18 +448,18 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         chargeItem.objectBePaid = partnerType.fieldName;
         switch (partnerType.value) {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
-                chargeItem.partnerName = this.hbl.customerName;
-                if (!chargeItem.partnerName) {
-                    chargeItem.partnerName = this.listPartner.find(p => p.id === this.hbl.customerId).partnerNameEn;
+                chargeItem.partnerShortName = this.hbl.customerName;
+                if (!chargeItem.partnerShortName) {
+                    chargeItem.partnerShortName = this.listPartner.find(p => p.id === this.hbl.customerId).partnerNameEn;
                 }
                 chargeItem.paymentObjectId = this.hbl.customerId;
                 break;
             case CommonEnum.PartnerGroupEnum.CARRIER:
-                chargeItem.partnerName = this.shipment.supplierName;
+                chargeItem.partnerShortName = this.shipment.supplierName;
                 chargeItem.paymentObjectId = this.shipment.coloaderId;
                 break;
             case CommonEnum.PartnerGroupEnum.AGENT:
-                chargeItem.partnerName = this.shipment.agentName;
+                chargeItem.partnerShortName = this.shipment.agentName;
                 chargeItem.paymentObjectId = this.shipment.agentId;
                 break;
             default:
@@ -475,7 +475,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 || !charge.chargeId
                 // || !charge.chargeCode
                 || !charge.unitId
-                || !charge.partnerName
+                || !charge.partnerShortName
                 || charge.unitPrice === null
                 || charge.unitPrice < 0
                 || charge.vatrate > 100

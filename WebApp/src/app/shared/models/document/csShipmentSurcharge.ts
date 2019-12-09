@@ -52,6 +52,7 @@ export class CsShipmentSurcharge {
     nameEn: string = null;
     otherSoa: string = null;
     partnerName: string = null;
+    partnerShortName: string = null;
     payerName: string = null;
     receiverName: string = null;
     unlockedSoadirector: string = null;

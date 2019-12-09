@@ -50,7 +50,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
     configHeader() {
         this.headers = [
-            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 150 },
+            { title: 'Partner Name', field: 'partnerShortName', required: true, sortable: true, width: 150 },
             { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 250 },
             { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 150 },
             { title: 'Unit', field: 'unitId', required: true, sortable: true },
@@ -124,7 +124,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                                 newSurCharge.invoiceDate = null;
 
                                 // * Default get partner = customer name's hbl.
-                                newSurCharge.partnerName = this.hbl.customerName;
+                                newSurCharge.partnerShortName = this.hbl.customerName;
                                 newSurCharge.paymentObjectId = this.hbl.customerId;
 
                                 this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
