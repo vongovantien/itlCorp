@@ -8,18 +8,20 @@ import { NgxCurrencyModule } from 'ngx-currency';
 import { ModalModule, BsDropdownModule, PaginationModule, TooltipModule, CollapseModule } from 'ngx-bootstrap';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
+import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { ShareContainerImportComponent } from './components/container-import/container-import.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
-import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 import {
     ShareBussinessFormCreateSeaImportComponent,
     ShareBussinessBuyingChargeComponent,
     ShareBussinessSellingChargeComponent,
-    ShareBussinessOBHChargeComponent, ShareBussinessProfitSummaryComponent,
-    ShareBussinessShipmentGoodSummaryComponent, ShareBussinessContainerListPopupComponent,
+    ShareBussinessOBHChargeComponent,
+    ShareBussinessProfitSummaryComponent,
+    ShareBussinessShipmentGoodSummaryComponent,
+    ShareBussinessContainerListPopupComponent,
     ShareBussinessGrantTotalProfitComponent,
     ShareBusinessImportJobDetailPopupComponent,
     ShareBusinessFormSearchImportJobComponent,
@@ -42,7 +44,6 @@ import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBusinessFormSearchHouseBillComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
-
 } from './components';
 
 
@@ -102,9 +103,7 @@ const customCurrencyMaskConfig = {
         CommonModule,
         CommonComponentModule,
         FormsModule,
-        SelectModule,
         ReactiveFormsModule,
-        SelectModule,
         ModalModule.forRoot(),
         NgxDaterangepickerMd.forRoot(),
         DirectiveModule,
