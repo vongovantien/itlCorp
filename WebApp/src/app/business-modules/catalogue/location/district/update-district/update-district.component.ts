@@ -6,6 +6,7 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'app-update-district',
@@ -32,8 +33,10 @@ export class UpdateDistrictComponent extends PopupBase implements OnInit {
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private toastService: ToastrService) {
+        private toastService: ToastrService,
+        private _progressService: NgProgress) {
         super();
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -121,6 +124,7 @@ export class UpdateDistrictComponent extends PopupBase implements OnInit {
             this.districtToUpdate.code = this.code.value;
             this.districtToUpdate.nameEn = this.nameEn.value;
             this.districtToUpdate.nameVn = this.nameVn.value;
+            this.districtToUpdate.active = this.active.value;
             this._catalogueRepo.updatePlace(this.currentId, this.districtToUpdate)
                 .pipe(
                     catchError(this.catchError),

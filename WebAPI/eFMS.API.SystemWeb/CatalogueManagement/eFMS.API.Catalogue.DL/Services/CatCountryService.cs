@@ -255,8 +255,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 model.InactiveOn = DateTime.Now;
             }
-            var country = mapper.Map<CatCountry>(model);
-            var result = DataContext.Add(country);
+            var result = Update(model, x => x.Id == model.Id);
             if (result.Success)
             {
                 ClearCache();
