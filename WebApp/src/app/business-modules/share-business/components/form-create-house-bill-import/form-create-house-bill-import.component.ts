@@ -177,7 +177,8 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                     if (this.shipmentDetail.eta != null) {
                         this.etd.setValue({ startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) });
                         this.eta.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                        this.mindateEta = this.createMoment(new Date(this.shipmentDetail.etd));
+                        this.mindateEta = this.createMoment(this.shipmentDetail.etd);
+                        this.mindateEtaWareHouse = this.createMoment(this.shipmentDetail.eta);
                     }
                 }
             );
@@ -319,27 +320,32 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this.shipperDescription = this.formGroup.controls['shipperDescription'];
         this.notifyPartyDescription = this.formGroup.controls['notifyPartyDescription'];
         this.alsonotifyPartyDescription = this.formGroup.controls['alsonotifyPartyDescription'];
-        this.etd.valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe((value: { startDate: any, endDate: any }) => {
-                this.mindateEta = value.startDate; // * Update min date
-                this.resetFormControl(this.eta);
-            });
-        this.eta.valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe((value: { startDate: any, endDate: any }) => {
-                this.mindateEtaWareHouse = value.startDate; // * Update min date
+        if (this.etd.value !== "") {
+            this.etd.valueChanges
+                .pipe(
+                    distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                    takeUntil(this.ngUnsubscribe)
+                )
+                .subscribe((value: { startDate: any, endDate: any }) => {
+                    this.mindateEta = value.startDate; // * Update min date
+                    this.resetFormControl(this.eta);
+                });
+        }
 
-                this.resetFormControl(this.etawarehouse);
+        if (this.eta.value !== "") {
+            this.eta.valueChanges
+                .pipe(
+                    distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                    takeUntil(this.ngUnsubscribe)
+                )
+                .subscribe((value: { startDate: any, endDate: any }) => {
+                    if (value != null) {
+                        this.mindateEtaWareHouse = value.startDate; // * Update min date
+                        this.resetFormControl(this.etawarehouse);
+                    }
+                });
 
-
-            });
+        }
 
         this.getListCustomer();
         this.getListShipper();
