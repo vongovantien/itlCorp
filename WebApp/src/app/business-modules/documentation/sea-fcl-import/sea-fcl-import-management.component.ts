@@ -83,7 +83,9 @@ export class SeaFCLImportManagementComponent extends AppList {
         ];
 
         this.dataSearch = {
-            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport
+            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport,
+            //fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            //toDate: new Date(),
         };
 
         this.requestSearchShipment();
