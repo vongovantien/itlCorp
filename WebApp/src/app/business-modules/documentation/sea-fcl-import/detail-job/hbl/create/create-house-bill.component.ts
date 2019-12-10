@@ -94,7 +94,7 @@ export class CreateHouseBillComponent extends AppForm {
     ngAfterViewInit() {
         this.hblGoodSummaryComponent.initContainer();
         this.hblGoodSummaryComponent.containerPopup.isAdd = true;
-        this.shipmentGoodSummaryComponent.description = "AS PER BILL";
+        this.hblGoodSummaryComponent.description = "AS PER BILL";
         this.formHouseBill.notifyPartyDescription.setValue("SAM AS CONSIGNEE");
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
         this.getDetailShipment();
@@ -111,7 +111,7 @@ export class CreateHouseBillComponent extends AppForm {
                 arrivalNo: this.hblDetail.jobNo + "-A01",
             };
 
-        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
+            this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
             this.arrivalNoteComponent.hblArrivalNote.arrivalNo = objArrival.arrivalNo;
             this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice = new Date();
             this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
