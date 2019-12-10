@@ -12,24 +12,22 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Container } from 'src/app/shared/models/document/container.model';
 import {
     ShareBussinessFormCreateSeaExportComponent,
-    ShareBussinessShipmentGoodSummaryComponent,
-    ShareBusinessImportJobDetailPopupComponent
+    ShareBusinessImportJobDetailPopupComponent,
+    ShareBussinessShipmentGoodSummaryLCLComponent
 } from 'src/app/business-modules/share-business';
 
-import * as fromShareBussiness from './../../../share-business/store';
-
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 @Component({
-    selector: 'app-create-job-fcl-export',
-    templateUrl: './create-job-fcl-export.component.html'
+    selector: 'app-create-job-lcl-export',
+    templateUrl: './create-job-lcl-export.component.html'
 })
 
-export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
+export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareBussinessFormCreateSeaExportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaExportComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
+    @ViewChild(ShareBussinessShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     containers: Container[] = [];
@@ -47,23 +45,11 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     ngOnInit() {
-        this._actionStoreSubject
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (action: fromShareBussiness.ContainerAction) => {
-                    if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
-                        this.containers = action.payload;
-                    }
-                });
+
     }
 
-    ngAfterViewInit() {
-        // * Init container
-        this.shipmentGoodSummaryComponent.initContainer();
-        this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
-        this._cdr.detectChanges();
+    gotoList() {
+        this._router.navigate(["home/documentation/sea-lcl-export"]);
     }
 
     onSubmitData() {
@@ -95,16 +81,14 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
 
             // * containers summary
             commodity: this.shipmentGoodSummaryComponent.commodities,
-            desOfGoods: this.shipmentGoodSummaryComponent.description,
-            packageContainer: this.shipmentGoodSummaryComponent.containerDetail,
-            netWeight: this.shipmentGoodSummaryComponent.netWeight,
-            grossWeight: this.shipmentGoodSummaryComponent.grossWeight,
-            chargeWeight: this.shipmentGoodSummaryComponent.totalChargeWeight,
-            cbm: this.shipmentGoodSummaryComponent.totalCBM,
+            grossWeight: this.shipmentGoodSummaryComponent.gw,
+            cbm: this.shipmentGoodSummaryComponent.cbm,
+            packageQty: this.shipmentGoodSummaryComponent.packageQuantity,
+            packageType: this.shipmentGoodSummaryComponent.packageTypes.map(type => type.id).toString(),
         };
 
         const fclExportAddModel: CsTransaction = new CsTransaction(formData);
-        fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaFCLExport;
+        fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaLCLExport;
 
         return fclExportAddModel;
     }
@@ -114,11 +98,23 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
         if (!this.formCreateComponent.formGroup.valid || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)) {
             valid = false;
         }
+
+        if (
+            this.shipmentGoodSummaryComponent.gw === null
+            || this.shipmentGoodSummaryComponent.cbm === null
+            || this.shipmentGoodSummaryComponent.packageQuantity === null
+            || this.shipmentGoodSummaryComponent.gw < 0
+            || this.shipmentGoodSummaryComponent.cbm < 0
+            || this.shipmentGoodSummaryComponent.packageQuantity < 0
+        ) {
+            valid = false;
+        }
         return valid;
     }
 
     onSaveJob() {
-        this.formCreateComponent.isSubmitted = true;
+        [this.formCreateComponent.isSubmitted, this.shipmentGoodSummaryComponent.isSubmitted] = [true, true];
+
         if (Object.keys(this.selectedJob).length > 0) {
             this.containers = this.selectedJob.containers;
         }
@@ -127,17 +123,12 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             return;
         }
 
-        if (!this.containers.length) {
-            this._toastService.warning('Please add container to create new job');
-            return;
-        }
-
         const modelAdd = this.onSubmitData();
-        modelAdd.csMawbcontainers = this.containers; // * Update containers model
 
         if (this.isImport === true) {
             modelAdd.id = this.selectedJob.id;
             this.importJob(modelAdd);
+            this.isImport = false;
         } else {
             this.saveJob(modelAdd);
         }
@@ -153,24 +144,12 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        this._router.navigate([`home/documentation/sea-fcl-export/${res.model.id}`]);
+                        this._router.navigate([`home/documentation/sea-lcl-export/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
                 }
             );
-    }
-
-    onImport(selectedData: any) {
-        this.selectedJob = selectedData;
-        this.isImport = true;
-        this.shipmentGoodSummaryComponent.commodities = this.selectedJob.commodity;
-        this.shipmentGoodSummaryComponent.containerDetail = this.selectedJob.packageContainer;
-        this.shipmentGoodSummaryComponent.description = this.selectedJob.desOfGoods;
-        this.shipmentGoodSummaryComponent.grossWeight = this.selectedJob.grossWeight;
-        this.shipmentGoodSummaryComponent.netWeight = this.selectedJob.netWeight;
-        this.shipmentGoodSummaryComponent.totalChargeWeight = this.selectedJob.chargeWeight;
-        this.shipmentGoodSummaryComponent.totalCBM = this.selectedJob.cbm;
     }
 
     showImportPopup() {
@@ -187,7 +166,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
                     if (res.status) {
                         this._toastService.success(res.message);
                         // TODO goto detail.
-                        this._router.navigate([`home/documentation/sea-fcl-export/${res.data.id}`]);
+                        this._router.navigate([`home/documentation/sea-lcl-export/${res.data.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }

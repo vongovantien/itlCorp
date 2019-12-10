@@ -11,13 +11,13 @@
 <div class="m-content">
     <form-create-house-bill-export></form-create-house-bill-export>
 
-    <hbl-goods-summary-fcl>HBL Goods Summary</hbl-goods-summary-fcl>
+    <hbl-goods-summary-lcl> HBL Goods Summary </hbl-goods-summary-lcl>
 </div>
 <import-house-bill-detail (onImport)="onImport($event)"> </import-house-bill-detail>
 
 <info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Update HBL'"></info-popup>
+    [title]="'Cannot Create HBL'"></info-popup>
 
-<confirm-popup [body]="'Are you sure you want to update HBL Detail ?'" [labelCancel]="'No'" (onSubmit)="onSaveHBL()"
-    [labelConfirm]="'Yes'" [title]="'Save HBL'">
+<confirm-popup [body]="'You are about to create a new  HBL, are you sure all entered details are correct ?'"
+    [labelCancel]="'No'" (onSubmit)="onSaveHBL()" [labelConfirm]="'Yes'" [title]="'Save HBL'">
 </confirm-popup>

@@ -10,10 +10,8 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 import { SeaFCLExportComponent } from './sea-fcl-export.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { SeaFCLExportFormSearchComponent } from './components/form-search/form-search-sea-fcl-export.component';
 import { SeaFCLExportCreateJobComponent } from './create-job/create-job-fcl-export.component';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
-import { SeaFCLExportFormCreateComponent } from './components/form-create/form-create-fcl-export.component';
 import { SeaFCLExportDetailJobComponent } from './detail-job/detail-job-fcl-export.component';
 import { SeaFCLExportLazyLoadModule } from './sea-fcl-export-lazy-load.module';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -61,11 +59,6 @@ const LIB = [
     PaginationModule.forRoot(),
 ];
 
-const COMPONENTS = [
-    SeaFCLExportFormSearchComponent,
-    SeaFCLExportFormCreateComponent
-];
-
 @NgModule({
     imports: [
         CommonModule,
@@ -86,7 +79,6 @@ const COMPONENTS = [
         SeaFclExportBillInstructionComponent,
         SeaFclExportBillDetailComponent,
         SeaFclExportManifestComponent,
-        ...COMPONENTS
     ],
     providers: [],
 })

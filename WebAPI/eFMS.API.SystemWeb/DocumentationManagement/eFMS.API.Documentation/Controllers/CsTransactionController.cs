@@ -258,19 +258,21 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return "MBL is required!";
             }
-            model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
-            if (model.TransactionType == string.Empty)
-                message = "Not found type transaction";
+            //model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
+            //if (model.TransactionType == string.Empty)
+            //    message = "Not found type transaction";
             if (id == Guid.Empty)
             {
-                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType && x.CurrentStatus != TermData.Canceled))
+                //Check trùng theo từng service
+                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType && x.CurrentStatus != TermData.Canceled))                
                 {
                     message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }
             }
             else
             {
-                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id && x.CurrentStatus != TermData.Canceled)))
+                //Check trùng theo từng service
+                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType && x.Id != id && x.CurrentStatus != TermData.Canceled)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }
@@ -290,6 +292,12 @@ namespace eFMS.API.Documentation.Controllers
                     break;
                 case TransactionTypeEnum.SeaFCLExport:
                     resultMessage = CheckExistSFE(model);
+                    break;
+                case TransactionTypeEnum.SeaLCLImport:
+                    resultMessage = CheckExistsSIF(id, model);//Sử dụng lại
+                    break;
+                case TransactionTypeEnum.SeaLCLExport:
+                    resultMessage = CheckExistSFE(model);//Sử dụng lại
                     break;
             }
 

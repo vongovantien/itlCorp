@@ -8,28 +8,33 @@ import { TabsModule, PaginationModule } from 'ngx-bootstrap';
 import { SeaLCLExportComponent } from './sea-lcl-export.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { SeaLCLExportCreateJobComponent } from './create-job/create-job-lcl-export.component';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { SeaLCLExportDetailJobComponent } from './detail-job/detail-job-lcl-export.component';
 
 const routing: Routes = [
     {
         path: '', pathMatch: 'full', component: SeaLCLExportComponent,
         data: { name: "Sea LCL Export", path: "sea-lcl-export", level: 2 }
     },
-    // {
-    //     path: 'new', component: SeaLCLImportCreateJobComponent,
-    //     data: { name: "Create New Job", path: "new", level: 3 }
-    // },
-    // {
-    //     path: ':jobId', component: SeaLCLImportDetailJobComponent,
-    //     data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaLCLImport },
-    // },
-    // {
-    //     path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-lcl-import-hbl.module').then(m => m.SeaLCLImportHBLModule),
-    // }
+    {
+        path: 'new', component: SeaLCLExportCreateJobComponent,
+        data: { name: "Create New Job", path: "new", level: 3 }
+    },
+    {
+        path: ':jobId', component: SeaLCLExportDetailJobComponent,
+        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaLCLExport },
+    },
+    {
+        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-lcl-export-hbl.module').then(m => m.SeaLCLExportHBLModule),
+    }
 ];
 
 const LIBS = [
     TabsModule.forRoot(),
     PaginationModule.forRoot(),
+    PerfectScrollbarModule,
 ];
 
 @NgModule({
@@ -44,7 +49,9 @@ const LIBS = [
     ],
     exports: [],
     declarations: [
-        SeaLCLExportComponent
+        SeaLCLExportComponent,
+        SeaLCLExportCreateJobComponent,
+        SeaLCLExportDetailJobComponent
     ],
     providers: [],
 })

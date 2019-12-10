@@ -188,13 +188,13 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                     this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
-                        this.hblGoodsSummaryComponent.containerDetail = this.hblDetail.packageContainer;
-                        this.hblGoodsSummaryComponent.commodities = this.hblDetail.commodity;
-                        this.hblGoodsSummaryComponent.description = this.hblDetail.desOfGoods;
-                        this.hblGoodsSummaryComponent.grossWeight = this.hblDetail.grossWeight;
-                        this.hblGoodsSummaryComponent.netWeight = this.hblDetail.netWeight;
-                        this.hblGoodsSummaryComponent.totalChargeWeight = this.hblDetail.chargeWeight;
-                        this.hblGoodsSummaryComponent.totalCBM = this.hblDetail.cbm;
+                        // this.hblGoodsSummaryComponent.containerDetail = this.hblDetail.packageContainer;
+                        // this.hblGoodsSummaryComponent.commodities = this.hblDetail.commodity;
+                        // this.hblGoodsSummaryComponent.description = this.hblDetail.desOfGoods;
+                        // this.hblGoodsSummaryComponent.grossWeight = this.hblDetail.grossWeight;
+                        // this.hblGoodsSummaryComponent.netWeight = this.hblDetail.netWeight;
+                        // this.hblGoodsSummaryComponent.totalChargeWeight = this.hblDetail.chargeWeight;
+                        // this.hblGoodsSummaryComponent.totalCBM = this.hblDetail.cbm;
                         this.formHouseBill.updateDataToForm(this.hblDetail);
                     }
 

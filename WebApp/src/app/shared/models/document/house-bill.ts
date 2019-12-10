@@ -96,6 +96,7 @@ export class HouseBill extends BaseModel {
     shipperName: string = null;
     shippingMark: string = null;
     warehouseNotice: string = null;
+    packageQty: number = null;
 
     constructor(object?: any) {
         super();

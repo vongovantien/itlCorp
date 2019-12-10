@@ -5,13 +5,15 @@ import { ShareBussinessShipmentGoodSummaryComponent } from '../shipment-good-sum
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ShareBussinessGoodsListPopupComponent } from '../goods-list/goods-list.popup';
-import { Unit } from 'src/app/shared/models';
+import { Unit, HouseBill } from 'src/app/shared/models';
 
 import _groupBy from 'lodash/groupBy';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError } from 'rxjs/operators';
+import { catchError, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromStore from '../../store';
+import { getParamsRouterState } from 'src/app/store';
+import { Params } from '@angular/router';
 
 
 @Component({
@@ -28,7 +30,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     containerDescription: string = '';
 
     packages: Unit[];
-    selectedPackage: string;
+    selectedPackage: any;
 
     constructor(
         protected _actionStoreSubject: ActionsSubject,
@@ -41,6 +43,50 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             .pipe(catchError(this.catchError))
             .subscribe(
                 (units: Unit[]) => { this.packages = units || []; }
+            );
+    }
+
+    ngOnInit(): void {
+        this._store.select(getParamsRouterState).subscribe(
+            (p: Params) => {
+                this.hblid = p['hblId'];
+                this.mblid = p['jobId'];
+            }
+        );
+
+        this._actionStoreSubject
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (action: fromStore.ContainerAction) => {
+                    if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
+                        this.containers = action.payload;
+                        this.updateData(action.payload);
+                    }
+                }
+            );
+
+        this.isLocked = this._store.select(fromStore.getTransactionLocked);
+
+        this._store.select(fromStore.getDetailHBlState)
+            .pipe(skip(1))
+            .subscribe(
+                (res: HouseBill) => {
+                    if (!!res) {
+                        console.log("detail hbl from store", res);
+                        this.totalCBM = res.cbm;
+                        this.netWeight = res.netWeight;
+                        this.totalChargeWeight = res.chargeWeight;
+                        this.grossWeight = res.grossWeight;
+                        this.containerDetail = res.packageContainer;
+                        this.commodities = res.commodity;
+                        this.description = res.desOfGoods;
+                        this.selectedPackage = [this.packages.find(p => p.id === res.packageType)];
+                        this.packageQty = res.packageQty;
+                        this.selectedPackage = res.packageType;
+                    }
+                }
             );
     }
 
@@ -67,10 +113,11 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
         this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
 
-        if (!!containers.length) {
-            this.selectedPackage = this.packages.find((unit: Unit) => unit.id === containers[0].packageTypeId).code;
+        if (!!containers.length && !this.selectedPackage || containers.length === 1 && !this.selectedPackage) {
+            if (!!containers[0].packageTypeId) {
+                this.selectedPackage = this.packages.find((unit: Unit) => unit.id === containers[0].packageTypeId).id;
+            }
         }
-
         // * Container
         this.containerDetail = '';
         this.containerDescription = '';

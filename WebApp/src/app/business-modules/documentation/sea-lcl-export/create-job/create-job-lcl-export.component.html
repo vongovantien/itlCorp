@@ -1,4 +1,4 @@
-<div class="sea-fcl-export-create-job-page">
+<div class="sea-lcl-export-create-job-page">
     <app-sub-header>
         <div class="c-button-actions">
             <button (click)="showImportPopup()" type="button"
@@ -13,7 +13,7 @@
 
             <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveJob()"></app-default-button>
 
-            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()"></app-default-button>
+            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
 
         </div>
     </app-sub-header>
@@ -24,13 +24,13 @@
 
                     <form-create-sea-export></form-create-sea-export>
 
-                    <shipment-good-summary>Shipment Goods Summary</shipment-good-summary>
+                    <shipment-good-summary-lcl>Shipment Goods Summary</shipment-good-summary-lcl>
 
                 </tab>
             </tabset>
         </div>
     </div>
 </div>
-<import-job-detail-popup (onImport)="onImport($event)"> </import-job-detail-popup>
+
 <info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Create Job'"></info-popup>

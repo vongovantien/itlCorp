@@ -18,12 +18,12 @@ import { DataService } from 'src/app/shared/services';
 import { Observable } from 'rxjs';
 import { catchError, takeUntil, skip, finalize } from 'rxjs/operators';
 
-import * as fromShareBussiness from './../../../../../../share-business/store';
+import * as fromShareBussiness from './../../../share-business/store';
 @Component({
-    selector: 'form-create-hbl-fcl-export',
-    templateUrl: './form-create-hbl.component.html'
+    selector: 'form-create-house-bill-export',
+    templateUrl: './form-create-house-bill-export.component.html'
 })
-export class SeaFCLExportFormCreateHBLComponent extends AppForm implements OnInit {
+export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm implements OnInit {
 
     formCreate: FormGroup;
     customer: AbstractControl;

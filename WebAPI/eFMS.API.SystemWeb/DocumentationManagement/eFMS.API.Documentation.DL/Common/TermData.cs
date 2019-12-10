@@ -74,7 +74,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string SeaFCLExport = "SFE";//"SeaFCLExport";
         public static readonly string SeaFCLImport = "SFI";//"SeaFCLImport";
         public static readonly string SeaLCLExport = "SLE";//"SeaLCLExport";
-        public static readonly string SeaLCLImport = "SLE";//"SeaLCLImport";
+        public static readonly string SeaLCLImport = "SLI";//"SeaLCLImport";
 
         public static readonly List<FreightTerm> FreightTerms = new List<FreightTerm>
         {

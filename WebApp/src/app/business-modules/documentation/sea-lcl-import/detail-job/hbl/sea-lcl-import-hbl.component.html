@@ -4,6 +4,24 @@
             <span *ngIf="!!(isLocked | async)" class="m--margin-right-10 align-middle">
                 <i class="fa fa-lock text-danger fa-3x"></i>
             </span>
+            <div class="dropdown m-dropdown m-dropdown--inline">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    <i class="la la-print"></i>P/L Sheet<span class="caret"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item pointer" (click)="previewPLsheet('USD')">Preview with USD</a>
+                    <a class="dropdown-item pointer" (click)="previewPLsheet('VND')">Preview with VND</a>
+                </div>
+            </div>
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                (click)="duplicateConfirm()">
+                <span>
+                    <i class="la la-search-plus"></i>
+                    <span>
+                        Duplicate Job Detail
+                    </span>
+                </span>
+            </button>
 
             <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
                 (click)="deleteJob()" *ngIf="!(isLocked | async)">
@@ -184,3 +202,7 @@
 
 <confirm-popup #confirmDeleteJob [body]="'You you sure you want to delete this Job'" [title]="'Alert'"
     [labelConfirm]="'Yes'" (onSubmit)="onDeleteJob()"></confirm-popup>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>
