@@ -92,13 +92,13 @@ namespace eFMS.API.Documentation.DL.Services
             switch (typeEnum)
             {
                 case TransactionTypeEnum.InlandTrucking:
-                    shipment = "AAA";
+                    shipment = Constants.IT_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirExport:
-                    shipment = "AAA";
+                    shipment = Constants.AE_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirImport:
-                    shipment = "AAA";
+                    shipment = Constants.AI_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaConsolExport:
                     shipment = Constants.SEC_SHIPMENT;

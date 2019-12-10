@@ -755,12 +755,12 @@ namespace eFMS.API.Documentation.DL.Services
                 if(dataPOL != null)
                 {
                     var polCountry = countryRepository.Get(x => x.Id == dataPOL.CountryId).FirstOrDefault()?.NameEn;
-                    housebill.DepartureAirport = dataPOL?.NameEn + ", " + polCountry; //POL
+                    housebill.DepartureAirport = dataPOL?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty); //POL
                 }                
                 if(dataPOD != null)
                 {
                     var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
-                    housebill.PortofDischarge = dataPOD?.NameEn + ", " + podCountry; //POD
+                    housebill.PortofDischarge = dataPOD?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //POD
                 }               
                 housebill.TranShipmentTo = string.Empty; //NOT USE
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription; //Good delivery
@@ -770,12 +770,13 @@ namespace eFMS.API.Documentation.DL.Services
                 if (conts != null && conts.Count() > 0)
                 {
                     string hbConstainers = string.Empty;
+                    var contLast = conts.Last();
                     foreach (var cont in conts)
                     {
                         var contUnit = catUnitRepo.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
                         if (contUnit != null)
                         {
-                            hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + ", ");
+                            hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + (!cont.Equals(contLast) ? ", " : string.Empty) );
                         }
                     }
                     housebill.Qty = hbConstainers; //Qty Container (Số Lượng container + Cont Type)
@@ -845,10 +846,13 @@ namespace eFMS.API.Documentation.DL.Services
                 case Constants.HBLOFLANDING_ITL_SEKO:
                     _reportName = "SeaHBillofLadingITL_Seko.rpt";
                     break;
+                case Constants.HBLOFLANDING_ITL_FRAME_SAMKIP:
+                    _reportName = "SeaHBillofLadingITLFrame_SAMKIP.rpt";
+                    break;
             }
 
             var freightCharges = new List<FreightCharge>() {
-                new FreightCharge(){ FreightCharges = "Freight " + data.FreightPayment }
+                new FreightCharge(){ FreightCharges = "FREIGHT " + data.FreightPayment }
             };
 
             result = new Crystal
@@ -860,7 +864,9 @@ namespace eFMS.API.Documentation.DL.Services
             result.AddDataSource(housebills);
             result.AddSubReport("Freightcharges", freightCharges);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            if (reportType == Constants.HBLOFLANDING_ITL || reportType == Constants.HBLOFLANDING_ITL_FRAME || reportType == Constants.HBLOFLANDING_ITL_SEKO)
+            if (    reportType == Constants.HBLOFLANDING_ITL 
+                ||  reportType == Constants.HBLOFLANDING_ITL_FRAME 
+                ||  reportType == Constants.HBLOFLANDING_ITL_SEKO)
             {
                 var parameter = new SeaHBillofLadingReportParams1()
                 {
@@ -871,7 +877,9 @@ namespace eFMS.API.Documentation.DL.Services
                 result.SetParameter(parameter);
             }
 
-            if (reportType == Constants.HBLOFLANDING_ITL_KESCO || reportType == Constants.HBLOFLANDING_ITL_FRAME_KESCO)
+            if (    reportType == Constants.HBLOFLANDING_ITL_KESCO 
+                ||  reportType == Constants.HBLOFLANDING_ITL_FRAME_KESCO 
+                ||  reportType == Constants.HBLOFLANDING_ITL_FRAME_SAMKIP)
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {

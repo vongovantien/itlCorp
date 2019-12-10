@@ -15,8 +15,8 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string SIC_SHIPMENT = "SIC"; //Sea Consol Import
         public static readonly string AE_SHIPMENT = "AE"; //Sea Air Export
         public static readonly string AI_SHIPMENT = "AI"; //Sea Air Import
-        //public static readonly string T_SHIPMENT = "T"; //Trucking
-        
+        public static readonly string IT_SHIPMENT = "IT"; //Inland Trucking
+
 
         public static readonly string SEF_HBL = "HBL";
         public static readonly string OPS_SHIPMENT = "LOG";
@@ -49,5 +49,6 @@ namespace eFMS.API.Documentation.DL.Common
         public const string HBLOFLANDING_ITL_KESCO = "ITL_KESCO";
         public const string HBLOFLANDING_ITL_FRAME_KESCO = "ITL_FRAME_KESCO";
         public const string HBLOFLANDING_ITL_SEKO = "ITL_SEKO";
+        public const string HBLOFLANDING_ITL_FRAME_SAMKIP = "ITL_FRAME_SAMKIP";
     }
 }

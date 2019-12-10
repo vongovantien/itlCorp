@@ -8,6 +8,7 @@ import { TabsModule, PaginationModule } from 'ngx-bootstrap';
 import { SeaLCLExportComponent } from './sea-lcl-export.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 
 const routing: Routes = [
     {
@@ -30,6 +31,7 @@ const routing: Routes = [
 const LIBS = [
     TabsModule.forRoot(),
     PaginationModule.forRoot(),
+    PerfectScrollbarModule,
 ];
 
 @NgModule({
