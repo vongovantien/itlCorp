@@ -226,9 +226,9 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     closePopup() {
         this.isSubmitted = false;
-        if (!this.isAdd) {
-            this._store.dispatch(new fromStore.GetContainerSuccessAction(this.initContainers));
-        }
+        // if (!this.isAdd) {
+        //     this._store.dispatch(new fromStore.GetContainerSuccessAction(this.initContainers));
+        // }
         this.hide();
     }
 
