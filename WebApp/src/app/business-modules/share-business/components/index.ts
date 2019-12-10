@@ -26,6 +26,7 @@ export * from './hbl-good-summary-fcl/hbl-good-summary-fcl.component';
 export * from './form-create-sea-import/form-create-sea-import.component';
 export * from './form-search-sea/form-search-sea.component';
 export * from './form-create-house-bill-import/form-create-house-bill-import.component';
+export * from './form-create-sea-export/form-create-sea-export.component';
 
 export * from './stage-management/assign-stage/assign-stage.popup';
 export * from './asignment/asignment.component';

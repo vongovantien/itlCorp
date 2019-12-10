@@ -15,16 +15,16 @@ import { User, CsTransactionDetail } from 'src/app/shared/models';
 import { takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
-import * as fromShare from './../../../../share-business/store';
+import * as fromShare from './../../../share-business/store';
 
 @Component({
-    selector: 'form-create-sea-fcl-export',
-    templateUrl: './form-create-fcl-export.component.html'
+    selector: 'form-create-sea-export',
+    templateUrl: './form-create-sea-export.component.html'
 })
 
-export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
+export class ShareBussinessFormCreateSeaExportComponent extends AppForm implements OnInit {
 
-    formCreateFCLExport: FormGroup;
+    formGroup: FormGroup;
     etd: AbstractControl;
     eta: AbstractControl;
     mawb: AbstractControl;
@@ -89,7 +89,7 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
             .subscribe(
                 (res: CsTransactionDetail | any) => {
                     if (!!res) {
-                        this.formCreateFCLExport.setValue({
+                        this.formGroup.setValue({
                             jobID: res.jobNo,
                             etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
                             eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
@@ -115,7 +115,7 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
     }
 
     initForm() {
-        this.formCreateFCLExport = this._fb.group({
+        this.formGroup = this._fb.group({
             jobID: [{ value: null, disabled: true }], // * disabled
             etd: [null, Validators.required], // * Date
             eta: [], // * Date
@@ -136,19 +136,19 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
             pono: []
         });
 
-        this.etd = this.formCreateFCLExport.controls["etd"];
-        this.eta = this.formCreateFCLExport.controls["eta"];
-        this.mawb = this.formCreateFCLExport.controls["mawb"];
-        this.mbltype = this.formCreateFCLExport.controls["mbltype"];
-        this.shipmentType = this.formCreateFCLExport.controls["shipmentType"];
-        this.typeOfService = this.formCreateFCLExport.controls["typeOfService"];
-        this.term = this.formCreateFCLExport.controls["term"];
-        this.personalIncharge = this.formCreateFCLExport.controls["personalIncharge"];
+        this.etd = this.formGroup.controls["etd"];
+        this.eta = this.formGroup.controls["eta"];
+        this.mawb = this.formGroup.controls["mawb"];
+        this.mbltype = this.formGroup.controls["mbltype"];
+        this.shipmentType = this.formGroup.controls["shipmentType"];
+        this.typeOfService = this.formGroup.controls["typeOfService"];
+        this.term = this.formGroup.controls["term"];
+        this.personalIncharge = this.formGroup.controls["personalIncharge"];
 
-        this.coloader = this.formCreateFCLExport.controls["coloader"];
-        this.pol = this.formCreateFCLExport.controls["pol"];
-        this.pod = this.formCreateFCLExport.controls["pod"];
-        this.agent = this.formCreateFCLExport.controls["agent"];
+        this.coloader = this.formGroup.controls["coloader"];
+        this.pol = this.formGroup.controls["pol"];
+        this.pod = this.formGroup.controls["pod"];
+        this.agent = this.formGroup.controls["agent"];
     }
 
     getUserLogged() {
@@ -169,7 +169,7 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
                 this.shipmentTypes = this.utility.prepareNg2SelectData(commonData.shipmentTypes, 'value', 'displayName');
                 this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
 
-                this.formCreateFCLExport.controls["shipmentType"].setValue([this.shipmentTypes[0]]);
+                this.formGroup.controls["shipmentType"].setValue([this.shipmentTypes[0]]);
 
             } else {
                 const commonData: { [key: string]: CommonInterface.IValueDisplay[] } = await this._documentRepo.getShipmentDataCommon().toPromise();
@@ -179,7 +179,7 @@ export class SeaFCLExportFormCreateComponent extends AppForm implements OnInit {
                 this.shipmentTypes = this.utility.prepareNg2SelectData(commonData.shipmentTypes, 'value', 'displayName');
                 this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
 
-                this.formCreateFCLExport.controls["shipmentType"].setValue([this.shipmentTypes[0]]);
+                this.formGroup.controls["shipmentType"].setValue([this.shipmentTypes[0]]);
 
                 this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
             }
