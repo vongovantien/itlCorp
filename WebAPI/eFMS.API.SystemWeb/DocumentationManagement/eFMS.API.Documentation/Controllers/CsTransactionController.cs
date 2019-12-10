@@ -251,12 +251,12 @@ namespace eFMS.API.Documentation.Controllers
         {
             model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
             if (model.TransactionType == string.Empty)
-                return "Not found type transaction";
+                return stringLocalizer[LanguageSub.MSG_NOT_FOUND_TRANSACTION_TYPE].Value;
             string message = string.Empty;
 
             if (string.IsNullOrEmpty(model.Mawb))
             {
-                return "MBL is required!";
+                return stringLocalizer[LanguageSub.MSG_MBL_REQUIRED].Value;
             }
             //model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
             //if (model.TransactionType == string.Empty)
@@ -309,7 +309,7 @@ namespace eFMS.API.Documentation.Controllers
             string message = string.Empty;
             if(model.Pol == model.Pod && model.Pol != null && model.Pod != null)
             {
-                message = model.Pod == model.Pol ? "Port of Destination must be different from Port of Loading" : message;
+                message = model.Pod == model.Pol ? stringLocalizer[LanguageSub.MSG_POD_DIFFERENT_POL].Value : message;
             }
             return message;
         }
@@ -319,47 +319,47 @@ namespace eFMS.API.Documentation.Controllers
             string message = string.Empty;
             if (model.Etd.HasValue)
             {
-                message = model.Etd.Value.Date >= model.Eta.Value.Date ? "ETD date must be before ETA date" : message;
+                message = model.Etd.Value.Date >= model.Eta.Value.Date ? stringLocalizer[LanguageSub.MSG_ETD_BEFORE_ETA].Value : message;
             }
 
             if (model.Eta.HasValue)
             {
                 if (model.Etd.HasValue)
                 {
-                    message = model.Eta.Value.Date <= model.Etd.Value.Date ? "ETA date must be after ETD date" : message;
+                    message = model.Eta.Value.Date <= model.Etd.Value.Date ? stringLocalizer[LanguageSub.MSG_ETA_AFTER_ETD].Value : message;
                 }
             }
             else
             {
-                message = "ETA is required!";
+                message = stringLocalizer[LanguageSub.MSG_ETA_REQUIRED].Value;
             }
 
-            message = string.IsNullOrEmpty(model.Mbltype) ? "Master Bill of Lading Type is required!" : message;
+            message = string.IsNullOrEmpty(model.Mbltype) ? stringLocalizer[LanguageSub.MSG_MBL_TYPE_REQUIRED].Value : message;
 
-            message = string.IsNullOrEmpty(model.ShipmentType) ? "Shipment Type is required!" : message;
+            message = string.IsNullOrEmpty(model.ShipmentType) ? stringLocalizer[LanguageSub.MSG_SHIPMENT_TYPE_REQUIRED].Value : message;
 
             if (model.Pol != null && model.Pol != Guid.Empty)
             {
-                message = model.Pol == model.Pod ? "Port of Loading must be different from Port of Destination" : message;
+                message = model.Pol == model.Pod ? stringLocalizer[LanguageSub.MSG_POL_DIFFERENT_POD].Value : message;
             }
 
             if (model.Pod == null || model.Pod == Guid.Empty)
             {
-                message = "Port of Destination is required!";
+                message = stringLocalizer[LanguageSub.MSG_POD_REQUIRED].Value;
             }
             else
             {
-                message = model.Pod == model.Pol ? "Port of Destination must be different from Port of Loading" : message;
+                message = model.Pod == model.Pol ? stringLocalizer[LanguageSub.MSG_POD_DIFFERENT_POL].Value : message;
             }
 
             if(model.DeliveryPlace != null && model.DeliveryPlace != Guid.Empty)
             {
-                message = model.DeliveryPlace == model.Pol ? "Place of Delivery must be different from Port of Loading" : message;
+                message = model.DeliveryPlace == model.Pol ? stringLocalizer[LanguageSub.MSG_PODELI_DIFFERENT_POL].Value : message;
             }
 
-            message = string.IsNullOrEmpty(model.TypeOfService) ? "Service Type is required!" : message;
+            message = string.IsNullOrEmpty(model.TypeOfService) ? stringLocalizer[LanguageSub.MSG_SERVICE_TYPE_REQUIRED].Value : message;
 
-            message = string.IsNullOrEmpty(model.PersonIncharge) ? "Person In Charge is required!" : message;
+            message = string.IsNullOrEmpty(model.PersonIncharge) ? stringLocalizer[LanguageSub.MSG_PERSON_IN_CHARGE_REQUIRED].Value : message;
 
             return message;
         }
