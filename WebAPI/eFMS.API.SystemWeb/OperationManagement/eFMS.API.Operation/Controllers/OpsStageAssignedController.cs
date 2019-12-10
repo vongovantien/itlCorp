@@ -116,6 +116,24 @@ namespace eFMS.API.Operation.Controllers
         }
 
         /// <summary>
+        /// delete an existed charge
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("Delete")]
+        [Authorize]
+        public IActionResult DeleteStageAssigned(Guid id)
+        {
+            var hs = opsStageAssignedService.Delete(x => x.Id == id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        /// <summary>
         /// add list of stages to a job
         /// </summary>
         /// <param name="models">list of stages</param>

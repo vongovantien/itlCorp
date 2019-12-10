@@ -10,10 +10,8 @@ import { NgxCurrencyModule } from 'ngx-currency';
 import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
 
 import { OpsModuleBillingJobEditComponent } from './job-edit.component';
-import { ContainerListComponent } from './container-list/container-list.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { ContainerImportComponent } from './container-list/container-import/container-import.component';
 import { JobEditLazyLoadComponentModule } from './job-edit-lazy-load-component.module';
 import { JobEditShareModule } from './job-edit-share.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
@@ -36,9 +34,7 @@ const LIB = [
 ];
 
 const COMPONENTS = [
-    ContainerListComponent,
     PlSheetPopupComponent,
-    ContainerImportComponent,
 ];
 
 const customCurrencyMaskConfig = {

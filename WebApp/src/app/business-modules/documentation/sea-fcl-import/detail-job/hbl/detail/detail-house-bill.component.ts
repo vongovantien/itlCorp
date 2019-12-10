@@ -43,6 +43,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     dataReport: Crystal;
 
     selectedTab: string = HBL_TAB.DETAIL;
+    isClickSubMenu: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -208,8 +209,10 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
-
+    
     onPreview(type: string) {
+        this.isClickSubMenu = false;
+        
         // Preview Delivery Order
         if (type === 'DELIVERY_ORDER') {
             this.previewDeliveryOrder();

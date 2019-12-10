@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
-import { Store } from '@ngrx/store';
+import { Store, ActionsSubject } from '@ngrx/store';
 
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
@@ -11,7 +11,6 @@ import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mo
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
-import { ContainerListComponent } from './container-list/container-list.component';
 import { SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
 import { DataService } from 'src/app/shared/services';
@@ -20,27 +19,26 @@ import { CsTransactionDetail } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
 import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { ShareBussinessSellingChargeComponent } from '../../share-business';
+import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '../../share-business';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../share-business/store';
 import * as dataHelper from 'src/helper/data.helper';
+import _groupBy from 'lodash/groupBy';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
     templateUrl: './job-edit.component.html',
 })
 export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit {
-
-    @ViewChild(ContainerListComponent, { static: false }) popupContainerList: ContainerListComponent;
     @ViewChild(PlSheetPopupComponent, { static: false }) plSheetPopup: PlSheetPopupComponent;
     @ViewChild('confirmCancelUpdate', { static: false }) confirmCancelJobPopup: ConfirmPopupComponent;
     @ViewChild('notAllowDelete', { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild('confirmDelete', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild('confirmLockShipment', { static: false }) confirmLockShipmentPopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessSellingChargeComponent, { static: false }) sellingChargeComponent: ShareBussinessSellingChargeComponent;
-
+    @ViewChild(ShareBussinessContainerListPopupComponent, { static: false }) containerPopup: ShareBussinessContainerListPopupComponent;
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
     serviceDate: any;
@@ -86,7 +84,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _documentRepo: DocumentationRepo,
         private _router: Router,
         private _toastService: ToastrService,
-        private _store: Store<fromShareBussiness.IShareBussinessState>
+        private _store: Store<fromShareBussiness.IShareBussinessState>,
+        protected _actionStoreSubject: ActionsSubject
     ) {
         super();
 
@@ -115,23 +114,64 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             }
         });
 
+        this._actionStoreSubject
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (action: fromShareBussiness.ContainerAction) => {
+                    if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
+                        this.lstMasterContainers = action.payload;
+                        this.updateData(this.lstMasterContainers);
+                    }
+                }
+            );
+    }
+    updateData(lstMasterContainers: any[]) {
+        let sumCbm = 0;
+        let sumPackages = 0;
+        let sumContainers = 0;
+        let sumNetWeight = 0;
+        let sumGrossWeight = 0;
+        this.opsTransaction.containerDescription = '';
+        lstMasterContainers.forEach(x => {
+            sumCbm = sumCbm + x.cbm;
+            sumPackages = sumPackages + x.packageQuantity;
+            sumContainers = sumContainers + x.quantity;
+            sumNetWeight = sumNetWeight + x.nw;
+            sumGrossWeight = sumGrossWeight + x.gw;
+        });
+        const contData = [];
+        for (const item of Object.keys(_groupBy(lstMasterContainers, 'containerTypeName'))) {
+            contData.push({
+                cont: item,
+                quantity: _groupBy(lstMasterContainers, 'containerTypeName')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
+            });
+        }
+        for (const item of contData) {
+            this.opsTransaction.containerDescription = this.opsTransaction.containerDescription + item.quantity + "x" + item.cont + "; ";
+            this.opsTransaction.sumCbm = sumCbm;
+            this.opsTransaction.sumPackages = sumPackages;
+            this.opsTransaction.sumContainers = sumContainers;
+            this.opsTransaction.sumNetWeight = sumNetWeight;
+            this.opsTransaction.sumGrossWeight = sumGrossWeight;
+        }
+        if (this.opsTransaction.containerDescription.length > 1) {
+            this.opsTransaction.containerDescription = this.opsTransaction.containerDescription.substring(0, this.opsTransaction.containerDescription.length - 3);
+        }
     }
 
     getListContainersOfJob() {
-        this._documentRepo.getListContainersOfJob({ mblid: this.opsTransaction.id })
+        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+        this._store.select<any>(fromShareBussiness.getContainerSaveState)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.isLoading = false;
-                })
+                takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
-                (res: any) => {
-                    this.lstMasterContainers = res || [];
-                },
-                (errors: any) => {
-                },
-                () => { }
+                (containers: any) => {
+                    this.lstMasterContainers = containers || [];
+                    console.log(this.lstMasterContainers);
+                }
             );
     }
 
@@ -171,9 +211,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
 
     saveShipment(form: NgForm) {
+        console.log(this.opsTransaction);
         this.opsTransaction.serviceDate = !!this.serviceDate ? (this.serviceDate.startDate != null ? dataHelper.dateTimeToUTC(this.serviceDate.startDate) : null) : null;
         this.opsTransaction.finishDate = !!this.finishDate ? (this.finishDate.startDate != null ? dataHelper.dateTimeToUTC(this.finishDate.startDate) : null) : null;
-
+        this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
         const s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
         if (form.invalid || this.opsTransaction.shipmentMode == null
             || (this.opsTransaction.pod === this.opsTransaction.pol && this.opsTransaction.pod != null && this.opsTransaction.pol != null)
@@ -227,10 +268,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     showListContainer() {
-        if (this.lstMasterContainers.length === 0) {
-            this.lstMasterContainers.push(this.popupContainerList.initNewContainer());
-        }
-        this.popupContainerList.show();
+        this.containerPopup.mblid = this.jobId;
+        this.containerPopup.show();
     }
 
     getListPackageTypes() {
@@ -305,7 +344,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
                             this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(this.opsTransaction));
                             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.opsTransaction.hblid));
-                            this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ mblid: this.opsTransaction.id }));
+
+                            this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                         } else {
                             this.serviceDate = null;
                             this.finishDate = null;

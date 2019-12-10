@@ -1,7 +1,7 @@
 <div class="sea-fcl-detail-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <div class="btn-group" autoClose="false" dropdown container="body">
+            <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
                 <button id="button-nested" dropdownToggle type="button" class="btn btn-success dropdown-toggle"
                     aria-controls="dropdown-nested">
                     <i class="la la-print"></i>Preview<span class="caret"></span>
@@ -9,7 +9,7 @@
                 <ul id="dropdown-nested" *dropdownMenu class="dropdown-menu" role="menu"
                     aria-labelledby="button-nested">
                     <li role="menuitem" dropdown triggers="mouseover" placement="right" container="body">
-                        <a dropdownToggle class="dropdown-item dropdown-toggle" (click)="false">Arrival Notice
+                        <a dropdownToggle class="dropdown-item dropdown-toggle pointer" (click)="isClickSubMenu = true">Arrival Notice
                             <span class="caret"></span>
                         </a>
                         <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">
@@ -25,7 +25,7 @@
                             of
                             Delivery</a></li>
                     <li role="menuitem" dropdown triggers="mouseover" placement="right" container="body">
-                        <a dropdownToggle class="dropdown-item dropdown-toggle" (click)="false">Export Manifest
+                        <a dropdownToggle class="dropdown-item dropdown-toggle pointer" (click)="isClickSubMenu = true">Export Manifest
                             <span class="caret"></span>
                         </a>
                         <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">

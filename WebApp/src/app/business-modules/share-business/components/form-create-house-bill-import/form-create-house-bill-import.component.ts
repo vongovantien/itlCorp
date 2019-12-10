@@ -170,8 +170,15 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                     this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
                     this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
                     this.supplier.setValue(this.shipmentDetail.coloaderId);
+                    this.issueHBLDate.setValue(new Date());
                     this.pol.setValue(this.shipmentDetail.pol);
                     this.pod.setValue(this.shipmentDetail.pod);
+
+                    if (this.shipmentDetail.eta != null) {
+                        this.etd.setValue({ startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) });
+                        this.eta.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
+                        this.mindateEta = this.createMoment(new Date(this.shipmentDetail.etd));
+                    }
                 }
             );
 
@@ -319,7 +326,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
                 this.mindateEta = value.startDate; // * Update min date
-
                 this.resetFormControl(this.eta);
             });
         this.eta.valueChanges

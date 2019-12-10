@@ -20,7 +20,8 @@ import {
 import { DeliveryOrder } from 'src/app/shared/models';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 
-import { catchError, takeUntil, mergeMap, finalize } from 'rxjs/operators';
+import { finalize } from 'rxjs/internal/operators/finalize';
+import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
 
@@ -52,6 +53,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     selectedHbl: any = {}; // TODO model.
     containers: Container[] = [];
     selectedTab: string = HBL_TAB.DETAIL;
+    hblDetail: any = {};
 
     constructor(
         protected _progressService: NgProgress,
@@ -112,7 +114,25 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
         this.deliveryComponent.deliveryOrder = new DeliveryOrder();
         this.hblGoodsSummaryComponent.initContainer();
-
+        this.getDetailShipment();
+        this.hblGoodsSummaryComponent.description = "AS PER BILL";
+        this.formHouseBill.notifyPartyDescription.setValue("SAM AS CONSIGNEE");
+        setTimeout(() => {
+            const objDelivery = {
+                deliveryOrderNo: this.hblDetail.jobNo + "-D01",
+                deliveryOrderPrintedDate: {
+                    startDate: new Date(),
+                    endDate: new Date()
+                }
+            };
+            const objArrival = {
+                arrivalNo: this.hblDetail.jobNo + "-A01",
+            };
+            this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
+            this.arrivalNoteComponent.hblArrivalNote.arrivalNo = objArrival.arrivalNo;
+            this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice = new Date();
+            this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
+        }, 800);
         this._cd.detectChanges();
     }
 
@@ -158,6 +178,24 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     showCreatePpoup() {
         this.confirmCreatePopup.show();
+    }
+
+    getDetailShipment() {
+        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+                skip(1),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!!res) {
+                        this.hblDetail = res;
+                        console.log(this.hblDetail);
+                    }
+                },
+            );
     }
 
     combackToHBLList() {

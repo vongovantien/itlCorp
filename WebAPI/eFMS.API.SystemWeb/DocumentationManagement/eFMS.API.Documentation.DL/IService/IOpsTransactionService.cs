@@ -23,5 +23,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState SoftDeleteJob(Guid id);
         string CheckExist(OpsTransactionModel model);
         Crystal PreviewFormPLsheet(Guid id, string currency);
+        HandleState Update(OpsTransactionModel model);
     }
 }
