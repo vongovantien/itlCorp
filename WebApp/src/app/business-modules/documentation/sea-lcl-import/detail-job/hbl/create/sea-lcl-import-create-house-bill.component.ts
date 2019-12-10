@@ -117,22 +117,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         this.getDetailShipment();
         this.hblGoodsSummaryComponent.description = "AS PER BILL";
         this.formHouseBill.notifyPartyDescription.setValue("SAM AS CONSIGNEE");
-        setTimeout(() => {
-            const objDelivery = {
-                deliveryOrderNo: this.hblDetail.jobNo + "-D01",
-                deliveryOrderPrintedDate: {
-                    startDate: new Date(),
-                    endDate: new Date()
-                }
-            };
-            const objArrival = {
-                arrivalNo: this.hblDetail.jobNo + "-A01",
-            };
-            this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
-            this.arrivalNoteComponent.hblArrivalNote.arrivalNo = objArrival.arrivalNo;
-            this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice = new Date();
-            this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
-        }, 800);
         this._cd.detectChanges();
     }
 
@@ -192,7 +176,22 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                 (res: CommonInterface.IResult) => {
                     if (!!res) {
                         this.hblDetail = res;
-                        console.log(this.hblDetail);
+                        const objArrival = {
+                            arrivalNo: this.hblDetail.jobNo + "-A01",
+                            arrivalFirstNotice: new Date()
+                        };
+
+                        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(
+                            objArrival
+                        );
+                        const objDelivery = {
+                            deliveryOrderNo: this.hblDetail.jobNo + "-D01",
+                            deliveryOrderPrintedDate: {
+                                startDate: new Date(),
+                                endDate: new Date()
+                            }
+                        };
+                        this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                     }
                 },
             );

@@ -339,7 +339,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 this.mindateEta = value.startDate; // * Update min date
                 this.resetFormControl(this.eta);
             });
-        if (this.eta.value != "") {
+        if (this.eta.value !== "") {
             this.eta.valueChanges
                 .pipe(
                     distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
