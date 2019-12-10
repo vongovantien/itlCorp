@@ -53,7 +53,7 @@ export class UpdateWardComponent extends PopupBase implements OnInit {
             this.wardToUpdate.code = this.code.value;
             this.wardToUpdate.nameEn = this.nameEn.value;
             this.wardToUpdate.nameVn = this.nameVn.value;
-            this._catalogueRepo.addPlace(this.wardToUpdate)
+            this._catalogueRepo.updatePlace(this.currentId, this.wardToUpdate)
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => {
