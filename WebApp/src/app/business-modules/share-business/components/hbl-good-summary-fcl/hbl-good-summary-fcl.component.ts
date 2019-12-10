@@ -1,16 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { ActionsSubject, Store } from '@ngrx/store';
+import { Params } from '@angular/router';
 
 import { ShareBussinessShipmentGoodSummaryComponent } from '../shipment-good-summary/shipment-good-summary.component';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Unit, HouseBill } from 'src/app/shared/models';
 
-import _groupBy from 'lodash/groupBy';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, skip } from 'rxjs/operators';
+import { catchError, skip, takeUntil } from 'rxjs/operators';
+import _groupBy from 'lodash/groupBy';
 
 import * as fromStore from '../../store';
+import { getParamsRouterState } from 'src/app/store';
 
 
 @Component({
@@ -39,6 +41,29 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends ShareBussinessShip
             .subscribe(
                 (units: Unit[]) => { this.packages = units || []; }
             );
+
+    }
+
+    ngOnInit() {
+        this._store.select(getParamsRouterState).subscribe(
+            (p: Params) => {
+                this.hblid = p['hblId'];
+                this.mblid = p['jobId'];
+            }
+        );
+
+        this._actionStoreSubject
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (action: fromStore.ContainerAction) => {
+                    if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
+                        this.containers = action.payload;
+                        this.updateData(action.payload);
+                    }
+                }
+            );
+
+        this.isLocked = this._store.select(fromStore.getTransactionLocked);
 
         this._store.select(fromStore.getDetailHBlState)
             .pipe(skip(1))
@@ -80,7 +105,9 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends ShareBussinessShip
         this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
 
         if (!!containers.length && !this.selectedPackage || containers.length === 1) {
-            this.selectedPackage = this.packages.find((unit: Unit) => unit.id === containers[0].packageTypeId).id;
+            if (!!containers[0].packageTypeId) {
+                this.selectedPackage = this.packages.find((unit: Unit) => unit.id === containers[0].packageTypeId).id;
+            }
         }
 
         // * Container

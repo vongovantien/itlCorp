@@ -10,17 +10,8 @@ import { NgxCurrencyModule } from 'ngx-currency';
 import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
 
 import { OpsModuleBillingJobEditComponent } from './job-edit.component';
-import { AddBuyingRatePopupComponent } from './charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
-import { EditBuyingRatePopupComponent } from './charge-list/edit-buying-rate-popup/edit-buying-rate-popup.component';
-import { AddSellingRatePopupComponent } from './charge-list/add-selling-rate-popup/add-selling-rate-popup.component';
-import { EditSellingRatePopupComponent } from './charge-list/edit-selling-rate-popup/edit-selling-rate-popup.component';
-import { AddObhRatePopupComponent } from './charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
-import { EditObhRatePopupComponent } from './charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { JobManagementBuyingRateComponent } from './components/buying-rate/buying-rate.component';
-import { JobManagementSellingRateComponent } from './components/selling-rate/selling-rate.component';
-import { JobManagementOBHComponent } from './components/obh/obh.component';
 import { JobEditLazyLoadComponentModule } from './job-edit-lazy-load-component.module';
 import { JobEditShareModule } from './job-edit-share.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
@@ -43,16 +34,6 @@ const LIB = [
 ];
 
 const COMPONENTS = [
-    JobManagementBuyingRateComponent,
-    JobManagementSellingRateComponent,
-    JobManagementOBHComponent,
-    AddBuyingRatePopupComponent,
-    EditBuyingRatePopupComponent,
-    AddSellingRatePopupComponent,
-    EditSellingRatePopupComponent,
-    AddObhRatePopupComponent,
-    EditObhRatePopupComponent,
-
     PlSheetPopupComponent,
 ];
 

@@ -1,44 +1,42 @@
-import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Router, Params, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { AppList } from 'src/app/app.list';
-import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
+import { getParamsRouterState } from 'src/app/store';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { SortService } from 'src/app/shared/services';
+import { CsTransactionDetail, HouseBill } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { Container } from 'src/app/shared/models/document/container.model';
-import { CsShipmentSurcharge, HouseBill } from 'src/app/shared/models';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+
+import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../share-business/store';
+import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/share-business/components/selling-charge/selling-charge.component';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'app-sea-fcl-import-hbl',
-    templateUrl: './sea-fcl-import-hbl.component.html',
+    selector: 'app-sea-lcl-export-hbl',
+    templateUrl: './sea-lcl-export-hbl.component.html'
 })
-export class SeaFCLImportHBLComponent extends AppList {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+export class SeaLCLExportHBLComponent extends AppList implements OnInit {
+
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteHBLPopup: ConfirmPopupComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(ShareBussinessSellingChargeComponent, { static: false }) sellingChargeComponent: ShareBussinessSellingChargeComponent;
 
-    jobId: string = '';
+    jobId: string;
     headers: CommonInterface.IHeaderTable[];
-    houseBill: HouseBill[] = [];
+    houseBills: HouseBill[] = [];
 
-    containers: Observable<Container[]>;
-    selectedShipment: any; // TODO model.
-    selectedHbl: HouseBill;
-
-    charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
+    selectedHbl: CsTransactionDetail;
 
     selectedTabSurcharge: string = 'BUY';
+
     dataReport: any = null;
 
     totalCBM: number;
@@ -46,28 +44,24 @@ export class SeaFCLImportHBLComponent extends AppList {
 
     constructor(
         private _router: Router,
-        private _sortService: SortService,
+        private _store: Store<fromShareBussiness.IShareBussinessState>,
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
-        private _store: Store<fromShareBussiness.ITransactionState>,
-        private cdr: ChangeDetectorRef,
-        private _activedRoute: ActivatedRoute
     ) {
         super();
-        this.requestSort = this.sortLocal;
         this._progressRef = this._progressService.ref();
-
     }
 
-    ngOnInit(): void {
-        this._activedRoute.params
-            .pipe(takeUntil(this.ngUnsubscribe))
+    ngOnInit() {
+        this._store.select(getParamsRouterState)
+            .pipe(takeUntil(this.ngUnsubscribe), take(1))
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
+
                     this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
-                    this.getHourseBill(this.jobId);
+                    this.getHouseBills(this.jobId);
                 }
             });
 
@@ -83,79 +77,19 @@ export class SeaFCLImportHBLComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
 
-        this.containers = this._store.select(fromShareBussiness.getHBLContainersState);
-        this.selectedShipment = this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState);
+        this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
     }
 
-    ngAfterViewInit() {
-        this.cdr.detectChanges();
-    }
-
-    onSelectTab(tabName: string) {
-        switch (tabName) {
-            case 'shipment':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
-                break;
-            case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
-                break;
-            case 'assignment':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
-                break;
-        }
-    }
-
-    sortLocal(sort: string): void {
-        this.houseBill = this._sortService.sort(this.houseBill, sort, this.order);
-    }
-
-    gotoCreateHouseBill() {
-        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl/new`]);
-    }
-
-    showDeletePopup(hbl: HouseBill, event: Event) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        event.stopPropagation();
-
-        this.confirmDeletePopup.show();
-        this.selectedHbl = hbl;
-    }
-
-    deleteHbl(id: string) {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._documentRepo.deleteHbl(id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
-            ).subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message, '');
-                        this.getHourseBill(this.jobId);
-                    } else {
-                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
-                    }
-                },
-            );
-    }
-
-    onDeleteHbl() {
-        this.confirmDeletePopup.hide();
-        this.deleteHbl(this.selectedHbl.id);
-    }
-
-    getHourseBill(id: string) {
+    getHouseBills(id: string) {
         this._store.select(fromShareBussiness.getHBLSState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (hbls: any[]) => {
-                    this.houseBill = hbls;
-                    if (!!this.houseBill.length) {
-                        this.totalGW = this.houseBill.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
-                        this.totalCBM = this.houseBill.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
-                        this.selectHBL(this.houseBill[0]);
+                    this.houseBills = hbls;
+                    if (!!this.houseBills.length) {
+                        this.totalGW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
+                        this.totalCBM = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
+                        this.selectHBL(this.houseBills[0]);
                     } else {
                         this.selectedHbl = null;
                     }
@@ -163,8 +97,74 @@ export class SeaFCLImportHBLComponent extends AppList {
             );
     }
 
+    showDeletePopup(hbl: CsTransactionDetail, event: Event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+
+        this.confirmDeleteHBLPopup.show();
+        this.selectedHbl = hbl;
+
+    }
+
+    onDeleteHbl() {
+        this.confirmDeleteHBLPopup.hide();
+        this.deleteHbl(this.selectedHbl.id);
+    }
+
+    deleteHbl(id: string) {
+        this._progressRef.start();
+        this._documentRepo.deleteHbl(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.getHouseBills(this.jobId);
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
+    }
+
+    deleteJob() {
+        this.confirmDeleteJobPopup.show();
+    }
+
+    onDeleteJob() {
+        this._progressRef.start();
+        this._documentRepo.deleteMasterBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                    this.confirmDeleteJobPopup.hide();
+                })
+            ).subscribe(
+                (respone: CommonInterface.IResult) => {
+                    if (respone.status) {
+
+                        this._toastService.success(respone.message, 'Delete Success !');
+
+                        this.gotoList();
+                    }
+                },
+            );
+    }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/sea-lcl-export"]);
+    }
+
+    gotoCreate() {
+        this._router.navigate([`/home/documentation/sea-lcl-export/${this.jobId}/hbl/new`]);
+    }
+
     selectHBL(hbl: HouseBill) {
-        this.selectedHbl = new HouseBill(hbl);
+        this.selectedHbl = new CsTransactionDetail(hbl);
 
         // * Get container, Job detail, Surcharge with hbl id, JobId.
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
@@ -196,6 +196,8 @@ export class SeaFCLImportHBLComponent extends AppList {
                     this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
                     break;
                 case 'SELL':
+                    this.sellingChargeComponent.isShowSyncFreightCharge = false;
+
                     this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
                     break;
                 case 'OBH':
@@ -207,38 +209,19 @@ export class SeaFCLImportHBLComponent extends AppList {
         }
     }
 
-    duplicateConfirm() {
-        this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
-        });
-    }
 
-    gotoList() {
-        this._router.navigate(["home/documentation/sea-fcl-import"]);
-    }
-
-    deleteJob() {
-        this.confirmDeleteJobPopup.show();
-    }
-
-    onDeleteJob() {
-        this._progressRef.start();
-        this._documentRepo.deleteMasterBill(this.jobId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.confirmDeleteJobPopup.hide();
-                })
-            ).subscribe(
-                (respone: CommonInterface.IResult) => {
-                    if (respone.status) {
-                        this._toastService.success(respone.message, 'Delete Success !');
-
-                        this.gotoList();
-                    }
-                },
-            );
+    onSelectTab(tabName: string) {
+        switch (tabName) {
+            case 'shipment':
+                this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
+                break;
+            case 'cdNote':
+                this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                break;
+            case 'assignment':
+                this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+        }
     }
 
     previewPLsheet(currency: string) {
