@@ -144,7 +144,7 @@
                     <!--begin::add-commodity-form-->
                     <div class="m-form m-form--state">
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityCode.invalid }">
+                            [ngClass]="{ 'm-form__group has-danger': (commodityCode.dirty && !commodityCode.valid) || (formCommodity.submitted && !commodityCode.valid) }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Code: <span class="m--font-danger">(*)</span>
                             </label>
@@ -152,17 +152,25 @@
                                 <input type="text" [(ngModel)]="commodity.code"
                                     (change)="commodity.code = commodity.code.trim()"
                                     class="form-control m-input m-input-group--square" #commodityCode="ngModel"
-                                    name="commodityCode" required placeholder="Please enter group name" maxlength="25"
-                                    [attr.disabled]="commodity.id ? '' : null">
+                                    name="commodityCode" required placeholder="Please enter code" minlength="2"
+                                    maxlength="25" [attr.disabled]="commodity.id ? '' : null">
                                 <div class="form-control-feedback"
-                                    *ngIf="formCommodity.submitted && commodityCode.invalid">
+                                    *ngIf="formCommodity.submitted && (commodityCode.errors | equalError: 'required') || (commodityCode.errors | equalError: 'required') && commodityCode.dirty">
                                     Code is required
+                                </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="commodityCode.errors | equalError: 'minlength'">
+                                    Min length must be greater than or equal to 2
+                                </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="commodityCode.errors | equalError: 'maxlength'">
+                                    Max length must be less than or equal 25
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameEn.invalid }">
+                            [ngClass]="{ 'm-form__group has-danger': (commodityNameEn.dirty && !commodityNameEn.valid) || (formCommodity.submitted && !commodityNameEn.valid) }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Name (EN): <span class="m--font-danger">(*)</span>
                             </label>
@@ -170,16 +178,24 @@
                                 <input type="text" [(ngModel)]="commodity.commodityNameEn"
                                     (change)="commodity.commodityNameEn = commodity.commodityNameEn.trim()"
                                     class="form-control m-input m-input-group--square" #commodityNameEn="ngModel"
-                                    name="commodityNameEn" required placeholder="Please enter group name"
-                                    maxlength="100">
+                                    name="commodityNameEn" required placeholder="Please enter name (EN)" minlength="2"
+                                    maxlength="250">
                                 <div class="form-control-feedback"
-                                    *ngIf="formCommodity.submitted && commodityNameEn.invalid">
+                                    *ngIf="formCommodity.submitted && (commodityNameEn.errors | equalError: 'required') || (commodityNameEn.errors | equalError: 'required') && commodityNameEn.dirty">
                                     Name(EN) is required
+                                </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="commodityNameEn.errors | equalError: 'minlength'">
+                                    Min length must be greater than or equal to 2
+                                </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="commodityNameEn.errors | equalError: 'maxlength'">
+                                    Max length must be less than or equal 250
                                 </div>
                             </div>
                         </div>
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameVn.invalid }">
+                            [ngClass]="{ 'm-form__group has-danger': (commodityNameVn.dirty && !commodityNameVn.valid) || (formCommodity.submitted && !commodityNameVn.valid) }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Name (Local): <span class="m--font-danger">(*)</span>
                             </label>
@@ -187,11 +203,19 @@
                                 <input type="text" [(ngModel)]="commodity.commodityNameVn"
                                     (change)="commodity.commodityNameVn = commodity.commodityNameVn.trim()"
                                     class="form-control m-input m-input-group--square" #commodityNameVn="ngModel"
-                                    name="commodityNameVn" required placeholder="Please enter group name"
-                                    maxlength="100">
+                                    name="commodityNameVn" required placeholder="Please enter name (Local)"
+                                    minlength="2" maxlength="250">
                                 <div class="form-control-feedback"
-                                    *ngIf="formCommodity.submitted && commodityNameVn.invalid">
+                                    *ngIf="formCommodity.submitted && (commodityNameVn.errors | equalError: 'required') || (commodityNameVn.errors | equalError: 'required') && commodityNameVn.dirty">
                                     Name (Local) is required
+                                </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="commodityNameVn.errors | equalError: 'minlength'">
+                                    Min length must be greater than or equal to 2
+                                </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="commodityNameVn.errors | equalError: 'maxlength'">
+                                    Max length must be less than or equal 250
                                 </div>
                             </div>
                         </div>
@@ -203,12 +227,12 @@
                             <div class="col-lg-8">
                                 <ng-select #chooseGroup [allowClear]="true" [items]="groups"
                                     (data)="refreshValue($event)" (selected)="commodity.commodityGroupId = $event.id"
-                                    (removed)="commodity.commodityGroupId = null" (typed)="typed($event)"
-                                    [active]="groupActive" placeholder="Select group commdity">
+                                    (removed)="commodity.commodityGroupId = null; formCommodity.submitted = true" (typed)="typed($event)"
+                                    [active]="groupActive" placeholder="Select group commodity">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="formCommodity.submitted && commodity.commodityGroupId == null">
-                                    Group commdity is required
+                                    Group commodity is required
                                 </div>
                             </div>
                         </div>
@@ -256,7 +280,7 @@
                     <div class="m-form">
                         <div class="m-form m-form--state">
                             <div class="form-group row"
-                                [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameEN.invalid }">
+                                [ngClass]="{ 'm-form__group has-danger': (groupNameEN.dirty && !groupNameEN.valid) || (formGroupCommodity.submitted && !groupNameEN.valid) }">
                                 <label class="col-lg-4 col-form-label form-control-label">
                                     Group Name(EN): <span class="m--font-danger">(*)</span>
                                 </label>
@@ -264,27 +288,32 @@
                                     <input type="text" [(ngModel)]="commodityGroup.groupNameEn"
                                         (change)="commodityGroup.groupNameEn = commodityGroup.groupNameEn.trim()"
                                         class="form-control m-input m-input-group--square" #groupNameEN="ngModel"
-                                        name="groupNameEN" required placeholder="Please enter group name">
+                                        [ngClass]="{ 'm-input--square': formGroupCommodity.submitted && groupNameEN.invalid }"
+                                        name="groupNameEN" required placeholder="Please enter group name (EN)">
                                     <div class="form-control-feedback"
-                                        *ngIf="formGroupCommodity.submitted && groupNameEN.invalid">
+                                        *ngIf="formGroupCommodity.submitted && (groupNameEN.errors | equalError: 'required') || (groupNameEN.errors | equalError: 'required') && groupNameEN.dirty">
                                         Group Name(EN) is required
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group row"
-                                [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameVN.invalid }">
+                                [ngClass]="{ 'm-form__group has-danger': (groupNameVN.dirty && !groupNameVN.valid) || (formGroupCommodity.submitted && !groupNameVN.valid) }">
                                 <label class="col-lg-4 col-form-label form-control-label">Group Name(Local): <span
                                         class="m--font-danger">(*)</span></label>
                                 <div class="col-lg-8">
                                     <input type="input" class="form-control m-input m-input-group--square"
-                                        placeholder="Enter group name (VN)" name="groupNameVN"
+                                        placeholder="Please enter group name (Local)" name="groupNameVN"
                                         [(ngModel)]="commodityGroup.groupNameVn" #groupNameVN="ngModel"
                                         (change)="commodityGroup.groupNameVn = commodityGroup.groupNameVn.trim()"
                                         [ngClass]="{ 'm-input--square': formGroupCommodity.submitted && groupNameVN.invalid }"
                                         minlength="3" required>
                                     <div class="form-control-feedback"
-                                        *ngIf="formGroupCommodity.submitted && groupNameEN.invalid">
+                                        *ngIf="formGroupCommodity.submitted && (groupNameVN.errors | equalError: 'required') || (groupNameVN.errors | equalError: 'required') && groupNameVN.dirty">
                                         Group Name(Local) is required
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="groupNameVN.errors | equalError: 'minlength'">
+                                        Min length must be greater than or equal to 3
                                     </div>
                                 </div>
                             </div>
