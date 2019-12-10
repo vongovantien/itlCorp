@@ -29,7 +29,6 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
-
     containers: Container[] = [];
     isImport: boolean = false;
     selectedJob: any = {}; // TODO model.
@@ -114,7 +113,6 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
 
     onSaveJob() {
         [this.formCreateComponent.isSubmitted, this.shipmentGoodSummaryComponent.isSubmitted] = [true, true];
-
         if (Object.keys(this.selectedJob).length > 0) {
             this.containers = this.selectedJob.containers;
         }
@@ -150,6 +148,12 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
                     }
                 }
             );
+    }
+
+    onImport(selectedData: any) {
+        this.selectedJob = selectedData;
+        this.isImport = true;
+        this.shipmentGoodSummaryComponent.commodities = this.selectedJob.commodity;
     }
 
     showImportPopup() {
