@@ -339,20 +339,19 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 this.mindateEta = value.startDate; // * Update min date
                 this.resetFormControl(this.eta);
             });
-        this.eta.valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe((value: { startDate: any, endDate: any }) => {
-                if (value != null) {
-                    this.mindateEtaWareHouse = value.startDate; // * Update min date
-                    this.resetFormControl(this.etawarehouse);
-                }
-            });
-
-
-
+        if (this.eta.value != "") {
+            this.eta.valueChanges
+                .pipe(
+                    distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                    takeUntil(this.ngUnsubscribe)
+                )
+                .subscribe((value: { startDate: any, endDate: any }) => {
+                    if (value != null) {
+                        this.mindateEtaWareHouse = value.startDate; // * Update min date
+                        this.resetFormControl(this.etawarehouse);
+                    }
+                });
+        }
         this.getListCustomer();
         this.getListShipper();
         this.getListSupplier();
