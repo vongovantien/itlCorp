@@ -12,8 +12,8 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
 import {
     ShareBusinessImportHouseBillDetailComponent,
-    ShareBussinessHBLGoodSummaryFCLComponent,
-    ShareBusinessFormCreateHouseBillExportComponent
+    ShareBusinessFormCreateHouseBillExportComponent,
+    ShareBussinessHBLGoodSummaryLCLComponent
 } from 'src/app/business-modules/share-business';
 
 import { skip, catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -22,19 +22,22 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 
 
 @Component({
-    selector: 'app-create-hbl-fcl-export',
+    selector: 'app-create-hbl-lcl-export',
     templateUrl: './create-house-bill.component.html'
 })
 
-export class SeaFCLExportCreateHBLComponent extends AppForm {
+export class SeaLCLExportCreateHBLComponent extends AppForm {
 
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(ShareBusinessFormCreateHouseBillExportComponent, { static: false }) formCreateHBLComponent: ShareBusinessFormCreateHouseBillExportComponent;
-    @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent, { static: false }) goodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent, { static: false }) goodSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+
     jobId: string;
+
     containers: Container[] = [];
+
     selectedHbl: any = {}; // TODO model.
 
     constructor(
@@ -61,7 +64,6 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                         this.containers = action.payload;
                     }
                 });
-
     }
 
     ngOnInit() {
@@ -72,19 +74,15 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                 }
             });
-
     }
 
     ngAfterViewInit() {
-        this.importHouseBillPopup.typeFCL = 'Export';
         this.goodSummaryComponent.initContainer();
-        this.goodSummaryComponent.containerPopup.isAdd = true;
 
         this._cd.detectChanges();
     }
 
     showCreatepoup() {
-
         this.confirmPopup.show();
     }
 
@@ -98,8 +96,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         }
 
         const modelAdd = this.getDataForm();
-        this.createHbl(modelAdd);
 
+        this.createHbl(modelAdd);
     }
 
     getDataForm() {
@@ -174,7 +172,6 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         }
     }
 
-
     showImportPopup() {
         const dataSearch = { jobId: this.jobId };
         dataSearch.jobId = this.jobId;
@@ -182,9 +179,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         this.importHouseBillPopup.selected = - 1;
         this.importHouseBillPopup.getHourseBill(dataSearch);
         this.importHouseBillPopup.show();
-
     }
-
 
     checkValidateForm() {
         let valid: boolean = true;
@@ -211,15 +206,12 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                     if (res.status) {
                         this._toastService.success(res.message, '');
                         this.gotoList();
-                    } else {
-
                     }
                 }
             );
-
     }
 
     gotoList() {
-        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
+        this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}/hbl`]);
     }
 }

@@ -38,6 +38,7 @@ enum HBL_TAB {
     templateUrl: './sea-lcl-import-create-house-bill.component.html',
 })
 export class SeaLCLImportCreateHouseBillComponent extends AppForm {
+
     @ViewChild(ShareBusinessFormCreateHouseBillImportComponent, { static: false }) formHouseBill: ShareBusinessFormCreateHouseBillImportComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
@@ -85,12 +86,8 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             if (param.jobId) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-
-
             }
         });
-
-
     }
 
     showImportPopup() {
@@ -109,14 +106,14 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         this.selectedTab = tabName;
     }
 
-
     ngAfterViewInit() {
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
-        this.hblGoodsSummaryComponent.initContainer();
+
         this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
         this.deliveryComponent.deliveryOrder = new DeliveryOrder();
-        this._cd.detectChanges();
+        this.hblGoodsSummaryComponent.initContainer();
 
+        this._cd.detectChanges();
     }
 
     checkValidateForm() {
@@ -124,10 +121,8 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         if (this.formHouseBill.pol.value !== undefined && this.formHouseBill.pod.value !== undefined) {
             if (this.formHouseBill.pol.value === this.formHouseBill.pod.value) {
                 this.formHouseBill.PortChargeLikePortLoading = true;
-
             } else {
                 this.formHouseBill.PortChargeLikePortLoading = false;
-
             }
         } else {
             valid = false;
@@ -152,7 +147,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             const body = this.onsubmitData();
             this.createHbl(body);
         }
-
     }
 
     onImport(selectedData: any) {
@@ -166,15 +160,8 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         this.confirmCreatePopup.show();
     }
 
-
-
     combackToHBLList() {
         this._router.navigate([`/home/documentation/sea-lcl-import/${this.jobId}/hbl`]);
-
-    }
-
-    onSaveHBLDetail() {
-
     }
 
     createHbl(body: any) {
@@ -205,6 +192,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                 );
         }
     }
+
     onsubmitData() {
         const body: ITransactionDetail = {
             id: SystemConstants.EMPTY_GUID,
@@ -251,6 +239,8 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             cbm: this.hblGoodsSummaryComponent.totalCBM,
             grossWeight: this.hblGoodsSummaryComponent.grossWeight,
             netWeight: this.hblGoodsSummaryComponent.netWeight,
+            packageQty: this.hblGoodsSummaryComponent.packageQty,
+            packageType: +this.hblGoodsSummaryComponent.selectedPackage,
             arrivalSecondNotice: null,
             arrivalNo: null,
             arrivalHeader: null,
@@ -264,7 +254,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         };
         return body;
     }
-
 }
 
 
@@ -323,4 +312,6 @@ export interface ITransactionDetail {
     dofooter: string;
     dosentTo1: string;
     dosentTo2: string;
+    packageQty: number;
+    packageType: any;
 }

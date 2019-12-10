@@ -76,7 +76,7 @@
                     </div>
                 </form-create-sea-export>
 
-                <shipment-good-summary> Shipment Goods Summary </shipment-good-summary>
+                <shipment-good-summary-lcl> Shipment Goods Summary </shipment-good-summary-lcl>
 
                 <grant-total-profit></grant-total-profit>
 
@@ -86,7 +86,7 @@
                 <ng-container *ngIf="selectedTab === 'HBL'">
                 </ng-container>
             </tab>
-            <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')" [disabled]="ACTION === 'COPY'"
+            <!-- <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')" [disabled]="ACTION === 'COPY'"
                 [active]="selectedTab === 'CDNOTE'">
                 <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="SeaFCLExport_cdNote">
                 </ng-container>
@@ -95,7 +95,7 @@
                 [disabled]="ACTION === 'COPY'">
                 <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="SeaFCLExport_assignment">
                 </ng-container>
-            </tab>
+            </tab> -->
         </tabset>
     </div>
     <ul class="m-nav-sticky fms-shipment-sidebar" *ngIf="ACTION !== 'COPY'">
@@ -111,6 +111,9 @@
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
+
+<info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
+    [title]="'Cannot Create Job'"></info-popup>
 
 <confirm-popup #duplicateconfirmTemplate
     [body]="'The system will open the Job Create Screen. Are you sure you want to leave?'"

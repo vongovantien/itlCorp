@@ -10,6 +10,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/share-business';
 import { getParamsRouterState } from 'src/app/store';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import { takeUntil, take, catchError, finalize } from 'rxjs/operators';
 
@@ -24,6 +25,7 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
     @ViewChild(ShareBussinessSellingChargeComponent, { static: false }) sellingChargeComponent: ShareBussinessSellingChargeComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteHBLPopup: ConfirmPopupComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     jobId: string;
 
@@ -36,6 +38,8 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
 
     totalCBM: number;
     totalGW: number;
+
+    dataReport: any = null;
 
     constructor(
         private _router: Router,
@@ -209,5 +213,29 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
                 this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
+    }
+
+    duplicateConfirm() {
+        this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], {
+            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
+        });
+    }
+
+    previewPLsheet(currency: string) {
+        this._documentRepo.previewSIFPLsheet(this.jobId, currency)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
     }
 }

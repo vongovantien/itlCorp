@@ -115,7 +115,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends ShareBussinessShip
         this.containerDescription = '';
 
         containers.forEach((c: Container) => {
-            this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.sealNo || '', c.markNo || '');
+            this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.containerTypeName || '', c.sealNo || '');
         });
 
         const contObject: any[] = (containers || []).map((container: Container | any) => ({
@@ -167,7 +167,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends ShareBussinessShip
         this._store.dispatch(new fromStore.InitContainerAction([]));
     }
 
-    handleStringContSeal(contNo: string = '', sealNo: string = '', markNo: string = '') {
-        return `${!!contNo ? contNo : '_'}/${!!sealNo ? sealNo : '_'}/${!!markNo ? markNo : '_'} \n`;
+    handleStringContSeal(contNo: string = '', contType: string = '', sealNo: string = '') {
+        return `${!!contNo ? contNo : '_'}/${!!contType ? contType : '_'}/${!!sealNo ? sealNo : '_'} \n`;
     }
 }
