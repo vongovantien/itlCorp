@@ -45,6 +45,7 @@ import {
     ShareBusinessFormSearchHouseBillComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
     ShareBussinessFormCreateSeaExportComponent,
+    ShareBusinessFormCreateHouseBillExportComponent
 } from './components';
 
 
@@ -81,7 +82,8 @@ const COMPONENTS = [
     ShareBusinessImportHouseBillDetailComponent,
     ShareBusinessFormSearchHouseBillComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
-    ShareBussinessFormCreateSeaExportComponent
+    ShareBussinessFormCreateSeaExportComponent,
+    ShareBusinessFormCreateHouseBillExportComponent
 ];
 
 
