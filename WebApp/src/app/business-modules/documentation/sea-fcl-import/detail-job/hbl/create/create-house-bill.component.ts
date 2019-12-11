@@ -92,6 +92,7 @@ export class CreateHouseBillComponent extends AppForm {
 
 
     ngAfterViewInit() {
+
         this.hblGoodSummaryComponent.initContainer();
         this.hblGoodSummaryComponent.containerPopup.isAdd = true;
         this.hblGoodSummaryComponent.description = "AS PER BILL";
