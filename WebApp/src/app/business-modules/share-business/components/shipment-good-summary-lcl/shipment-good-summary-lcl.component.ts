@@ -41,6 +41,22 @@ export class ShareBussinessShipmentGoodSummaryLCLComponent extends AppForm imple
                         this.gw = res.grossWeight;
                         this.packageQuantity = res.packageQty;
                         this.cbm = res.cbm;
+
+                        // * Update package type.
+                        const packageTypesTemp: CommonInterface.INg2Select[] =
+                            (res.packageType || '').split(',').map((i: string) => <CommonInterface.INg2Select>({
+                                id: i,
+                                text: i,
+                            }));
+                        const packageTypes = [];
+                        packageTypesTemp.forEach((type: CommonInterface.INg2Select) => {
+                            const dataTempInPackages = this.packages.find((t: CommonInterface.INg2Select) => t.id === type.id);
+                            if (!!dataTempInPackages) {
+                                packageTypes.push(dataTempInPackages);
+                            }
+                        });
+
+                        this.packageTypes = packageTypes;
                     }
                 }
             );

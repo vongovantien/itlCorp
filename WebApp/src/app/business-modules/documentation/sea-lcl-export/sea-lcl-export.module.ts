@@ -12,6 +12,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { SeaLCLExportCreateJobComponent } from './create-job/create-job-lcl-export.component';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SeaLCLExportDetailJobComponent } from './detail-job/detail-job-lcl-export.component';
+import { SeaLCLExportLazyLoadModule } from './sea-lcl-export-lazy-load.module';
 
 const routing: Routes = [
     {
@@ -45,6 +46,7 @@ const LIBS = [
         FormsModule,
         ReactiveFormsModule,
         ShareBussinessModule,
+        SeaLCLExportLazyLoadModule,
         ...LIBS,
     ],
     exports: [],

@@ -13,6 +13,7 @@ import _groupBy from 'lodash/groupBy';
 import { takeUntil, skip } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
+import { GetContainerAction } from './../../store';
 
 @Component({
     selector: 'shipment-good-summary',
@@ -36,6 +37,8 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
 
     containers: Container[] = [];
 
+    isSave: boolean = false;
+
     constructor(
         protected _actionStoreSubject: ActionsSubject,
         protected _store: Store<fromStore.IContainerState>,
@@ -57,6 +60,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
             .subscribe(
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
+                        this.isSave = true;
                         this.containers = action.payload;
                         this.updateData(action.payload);
                     }
@@ -68,7 +72,6 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        console.log("detail shipment from store", res);
                         this.containerDetail = res.packageContainer;
                         this.commodities = res.commodity;
                         this.description = res.desOfGoods;
@@ -98,6 +101,11 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
     openContainerListPopup() {
         this.containerPopup.mblid = this.mblid;
         this.containerPopup.hblid = this.hblid;
+
+        if (!this.isSave && !!this.mblid) {
+            this._store.dispatch(new GetContainerAction({ mblid: this.mblid }));
+        }
+
         this.containerPopup.show();
     }
 

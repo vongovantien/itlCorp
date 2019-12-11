@@ -104,20 +104,6 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                             this.resetFormControl(this.formCreateComponent.eta);
                             this.formCreateComponent.getUserLogged();
                         }
-
-                        const packageTypesTemp: CommonInterface.INg2Select[] = this.shipmentDetail.packageType.split(',').map((i: string) => <CommonInterface.INg2Select>({
-                            id: i,
-                            text: i,
-                        }));
-                        const packageTypes = [];
-                        packageTypesTemp.forEach((type: CommonInterface.INg2Select) => {
-                            const dataTempInPackages = this.shipmentGoodSummaryComponent.packages.find((t: CommonInterface.INg2Select) => t.id === type.id);
-                            if (!!dataTempInPackages) {
-                                packageTypes.push(dataTempInPackages);
-                            }
-                        });
-
-                        this.shipmentGoodSummaryComponent.packageTypes = packageTypes;
                     }
                 },
             );
