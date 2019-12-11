@@ -67,6 +67,10 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         typeButton: ButtonType.search,
     };
 
+    saveButtonSetting: ButtonModalSetting = {
+        typeButton: ButtonType.save
+    };
+
 
     configComoBoGrid: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -160,7 +164,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         }
     }
 
-    downLoadFile(data: any, type: string, filename: string = 'undefine.xlsx') {
+    downLoadFile(data: any, type: string = "application/ms-excel", filename: string = 'undefine.xlsx') {
         const blob: Blob = new Blob([data], { type: type });
         const fileName: string = filename;
         const objectUrl: string = URL.createObjectURL(blob);

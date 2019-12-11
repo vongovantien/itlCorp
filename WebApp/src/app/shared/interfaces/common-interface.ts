@@ -79,6 +79,18 @@ namespace CommonInterface {
         path: string;
         [name: string]: any;
     }
+
+    export interface IConfigSearchOption {
+        settingFields: ISearchOption[];
+        typeSearch: any;
+
+    }
+
+    export interface ISearchOption {
+        fieldName: string;
+        displayName: string;
+        [name: string]: any;
+    }
 }
 
 

@@ -30,6 +30,31 @@ export class CatalogueRepo {
         );
     }
 
+    addCurrency(data: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrency/Add`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    updateCurrency(data: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrency/Update`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    deleteCurrency(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCurrency/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     getCommondity(body?: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/Query`, body).pipe(
             catchError((error) => throwError(error)),
@@ -66,9 +91,9 @@ export class CatalogueRepo {
     }
 
 
-    getListCurrency(page?: number, size?: number) {
-        if (!!page && !!size) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrency/paging`, {}, {
+    getListCurrency(page?: number, size?: number, body?: any) {
+        if (!!page && !!size && !!body) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrency/paging`, body, {
                 page: '' + page,
                 size: '' + size
             }).pipe(

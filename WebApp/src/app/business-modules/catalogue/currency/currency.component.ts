@@ -1,234 +1,151 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
-import { CURRENCYCOLUMNSETTING } from './currency.columns';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { SortService } from 'src/app/shared/services/sort.service';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
-import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { ButtonType } from 'src/app/shared/enums/type-button.enum';
-import { NgForm } from '@angular/forms';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import _map from 'lodash/map';
-import { ExcelService } from 'src/app/shared/services/excel.service';
-import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
-import { SystemConstants } from 'src/constants/system.const';
-import { Currency } from 'src/app/shared/models';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
 
-declare var $: any;
+import { SortService } from 'src/app/shared/services/sort.service';
+import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
+import { Currency } from 'src/app/shared/models';
+import { AppList } from 'src/app/app.list';
+import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { FormCreateCurrencyPopupComponent } from './components/form-create/form-create-currency.popup';
+
+import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-currency',
-  templateUrl: './currency.component.html',
+    selector: 'app-currency',
+    templateUrl: './currency.component.html',
 })
-export class CurrencyComponent implements OnInit {
-  currencies: Array<Currency>;
-  currency: Currency = new Currency();
-  currenciesSettings: ColumnSetting[] = CURRENCYCOLUMNSETTING;
-  pager: PagerSetting = PAGINGSETTING;
-  criteria: any = {};
-  configSearch: any = {
-    settingFields: this.currenciesSettings.filter(x => x.allowSearch == true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
-    typeSearch: TypeSearch.outtab
-  };
-  keySortDefault = "";
-  isDesc: boolean = true;
-  addButtonSetting: ButtonModalSetting = {
-    dataTarget: 'edit-currency-modal',
-    typeButton: ButtonType.add
-  };
-  importButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.import
-  };
-  exportButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.export
-  };
-  saveButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.save
-  };
-  cancelButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.cancel
-  };
-  isAddnew: boolean;
-  @ViewChild(AppPaginationComponent, { static: false }) child;
-  @ViewChild('formAddEdit', { static: false }) form: NgForm;
-  totalPages: number;
-  constructor(private sortService: SortService, private baseService: BaseService,
-    private excelService: ExcelService,
-    private api_menu: API_MENU) { }
+export class CurrencyComponent extends AppList implements OnInit {
 
-  ngOnInit() {
-    this.initPager();
-    this.getCurrencies(this.pager);
-  }
-  initPager(): any {
-    this.pager.totalItems = 0;
-    this.pager.currentPage = 1;
-  }
-  async getCurrencies(pager: PagerSetting) {
-    this.baseService.spinnerShow();
-    console.log(this.criteria);
-    this.baseService.post(this.api_menu.Catalogue.Currency.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria).subscribe((response: any) => {
-      this.baseService.spinnerHide();
-      this.currencies = response.data;
-      this.pager.totalItems = response.totalItems;
-      console.log(response.totalPages);
-      this.totalPages = response.totalPages;
-    }, err => {
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
-  }
-  setPage(pager) {
-    console.log({ PAGER: pager })
-    this.pager.currentPage = pager.currentPage;
-    this.pager.totalPages = pager.totalPages;
-    this.pager.pageSize = pager.pageSize;
-    this.getCurrencies(pager);
-  }
-  onSearch(event) {
-    console.log(event);
-    if (event.fieldDisplayName == "All") {
-      this.criteria.all = event.searchString;
-    }
-    else {
-      this.criteria.all = null;
-      if (event.field == "id") {
-        this.criteria.id = event.searchString;
-      }
-      if (event.field == "currencyName") {
-        this.criteria.currencyName = event.searchString;
-      }
-    }
-    this.initPager();
-    this.getCurrencies(this.pager);
-  }
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(FormCreateCurrencyPopupComponent, { static: false }) formPopup: FormCreateCurrencyPopupComponent;
 
-  resetSearch(event) {
-    this.criteria = {};
-    this.onSearch(event);
-  }
-  onSortChange(column) {
-    let property = column.primaryKey;
-    this.isDesc = !this.isDesc;
-    this.currencies = this.sortService.sort(this.currencies, property, this.isDesc);
-  }
-  showAdd() {
-    this.isAddnew = true;
-    this.currency = new Currency();
-  }
-  onCancel() {
-    this.form.onReset();
-    this.currency = new Currency();
-    this.setPage(this.pager);
-  }
-  onSubmit() {
-    if (this.form.valid) {
-      if (this.isAddnew) {
-        this.addNew();
-      }
-      else {
-        this.update();
-      }
-    }
-  }
-  async update() {
-    let response = await this.baseService.putAsync(this.api_menu.Catalogue.Currency.update, this.currency, true, true);
-    if (response) {
-      this.resetForm();
-      this.getCurrencies(this.pager);
-    }
-  }
-  async addNew() {
-    let response = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.addNew, this.currency, true, true);
-    if (response.status) {
-      this.resetForm();
-      this.initPager();
-      this.getCurrencies(this.pager);
-    }
-  }
-  resetForm() {
-    this.form.onReset();
-    $('#edit-currency-modal').modal('hide');
-  }
-  showDetail(item) {
-    this.isAddnew = false;
-    this.currency = item;
-  }
-  showConfirmDelete(item) {
-    this.currency = item;
-  }
-  async onDelete(event) {
-    console.log(event);
-    if (event) {
-      this.baseService.spinnerShow();
-      this.baseService.delete(this.api_menu.Catalogue.Currency.delete + this.currency.id).subscribe((response: any) => {
+    currencies: Array<Currency> = [];
 
-        this.baseService.successToast(response.message);
-        this.setPageAfterDelete();
-        this.baseService.spinnerHide();
+    headers: CommonInterface.IHeaderTable[];
 
-      }, err => {
-        this.baseService.errorToast(err.error.message);
-        this.baseService.spinnerHide();
-      });
-    }
-  }
-  setPageAfterDelete() {
-    this.pager.totalItems = this.pager.totalItems - 1;
-    let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
-    if (totalPages < this.pager.totalPages) {
-      this.pager.currentPage = totalPages;
-    }
-    this.child.setPage(this.pager.currentPage);
-  }
+    currency: Currency = new Currency();
 
+    criteria: any = {};
 
-  async export() {
-    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery, this.criteria);
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      currenciesList = _map(currenciesList, function (currency, index) {
-        return [
-          index + 1,
-          currency['id'],
-          currency['currencyName'],
-          currency['isDefault'],
-          (currency['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-        ]
-      });
+    configSearch: CommonInterface.IConfigSearchOption = {
+        settingFields: [
+            { fieldName: 'id', displayName: 'Code' },
+            { fieldName: 'currencyName', displayName: 'Name' }
+        ],
+        typeSearch: TypeSearch.outtab
+    };
+
+    constructor(
+        private _sortService: SortService,
+        private _catalogueRepo: CatalogueRepo,
+        private _ngProgessSerice: NgProgress,
+        private _toastService: ToastrService,
+        private _exportRepo: ExportRepo,
+    ) {
+        super();
+
+        this.requestList = this.getCurrencies;
+        this.requestSort = this.sortCurrency;
+        this._progressRef = this._ngProgessSerice.ref();
     }
 
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      currenciesList = _map(currenciesList, function (currency, index) {
-        return [
-          index + 1,
-          currency['id'],
-          currency['currencyName'],
-          currency['isDefault'],
-          (currency['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
-        ]
-      });
+    ngOnInit() {
+        this.headers = [
+            { title: 'Code', sortable: true, field: 'id' },
+            { title: 'Name', sortable: true, field: 'currencyName' },
+            { title: 'DeFault', sortable: true, field: 'isDefault' },
+            { title: 'Status', sortable: true, field: 'active' },
+        ];
+        this.getCurrencies();
     }
 
+    getCurrencies() {
+        this._progressRef.start();
+        this._catalogueRepo.getListCurrency(this.page, this.pageSize, this.criteria)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (response: CommonInterface.IResponsePaging) => {
+                    console.log(response);
+                    this.currencies = response.data;
+                    this.totalItems = response.totalItems;
+                    this.pageSize = response.size;
+                }
+            );
+    }
 
-    /**Set up stylesheet */
-    var exportModel: ExportExcel = new ExportExcel();
-    exportModel.fileName = "Currency Report";
-    const currrently_user = localStorage.getItem('currently_userName');
-    exportModel.title = "Currency Report ";
-    exportModel.author = currrently_user;
-    exportModel.sheetName = "Sheet 1";
-    exportModel.header = [
-      { name: "No.", width: 10 },
-      { name: "Code", width: 10 },
-      { name: "Currency Name", width: 20 },
-      { name: "Is Default", width: 20 },
-      { name: "Inactive", width: 20 }
-    ]
-    exportModel.data = currenciesList;
-    this.excelService.generateExcel(exportModel);
+    sortCurrency() {
+        this.currencies = this._sortService.sort(this.currencies, this.sort, this.order);
+    }
 
-  }
+    onSearch(event: { field: string, searchString: string, displayName: string }) {
+        this.criteria = {};
+        this.criteria[event.field] = event.searchString;
+        this.getCurrencies();
+    }
+
+    resetSearch(event: any) {
+        this.criteria = {};
+        this.getCurrencies();
+    }
+
+    showAdd() {
+        [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [false, false];
+
+        this.formPopup.code.enable();
+        this.formPopup.form.reset();
+        this.formPopup.show();
+    }
+
+    showDetail(currency: Currency) {
+        this.currency = currency;
+        [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
+
+        this.formPopup.code.disable();
+
+        this.formPopup.form.setValue({
+            code: this.currency.id,
+            name: this.currency.currencyName,
+            active: this.currency.active,
+            default: this.currency.isDefault
+        });
+
+        this.formPopup.show();
+    }
+
+    showConfirmDelete(currency: Currency) {
+        this.currency = currency;
+        this.confirmDeletePopup.show();
+    }
+
+    onDelete() {
+        this.confirmDeletePopup.hide();
+        this._progressRef.start();
+        this._catalogueRepo.deleteCurrency(this.currency.id)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (response: CommonInterface.IResult) => {
+                    if (response.status) {
+                        this._toastService.success(response.message);
+
+                        this.getCurrencies();
+                    } else {
+                        this._toastService.error(response.message);
+                    }
+                }
+            );
+    }
+
+    export() {
+        this._progressRef.start();
+
+        this._exportRepo.exportCurrency(this.criteria)
+            .pipe((finalize(() => this._progressRef.complete())))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "eFms_Currency.xlsx");
+                },
+            );
+    }
 }

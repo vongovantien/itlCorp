@@ -1,4 +1,4 @@
-export enum TypeSearch{
-    intab="intab",
+export enum TypeSearch {
+    intab = "intab",
     outtab = "outtab"
 }
