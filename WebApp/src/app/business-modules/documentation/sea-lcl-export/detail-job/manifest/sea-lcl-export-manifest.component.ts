@@ -18,10 +18,10 @@ import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/sha
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
 
 @Component({
-    selector: 'app-sea-fcl-export-manifest',
-    templateUrl: './sea-fcl-export-manifest.component.html'
+    selector: 'app-sea-lcl-export-manifest',
+    templateUrl: './sea-lcl-export-manifest.component.html'
 })
-export class SeaFclExportManifestComponent extends AppList {
+export class SeaLclExportManifestComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
 
     @ViewChild(ShareBusinessFormManifestComponent, { static: false }) formManifest: ShareBusinessFormManifestComponent;
@@ -111,7 +111,7 @@ export class SeaFclExportManifestComponent extends AppList {
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-fcl-export/${this.jobId}`]);
+        this._router.navigate([`/home/documentation/sea-lcl-export/${this.jobId}`]);
     }
 
 

@@ -155,6 +155,7 @@ export class PartnerDataDetailComponent extends AppList {
     }
     async getParnerDetails() {
         this.partner = await this.baseService.getAsync(this.api_menu.Catalogue.PartnerData.getById + this.partner.id, false, true);
+        console.log('day ne:', this.partner);
         this.getReferenceData();
     }
 
@@ -300,12 +301,12 @@ export class PartnerDataDetailComponent extends AppList {
             }
             if (this.isRequiredSaleman) {
                 this.partner.salePersonId = this.saleMans[0].id;
-                this.update();
+                this.updatePartner();
             }
             else {
                 if (this.isRequiredSaleman === false) {
                     this.partner.accountNo = this.partner.id = this.partner.taxCode;
-                    this.update();
+                    this.updatePartner();
                 }
             }
         }
@@ -321,6 +322,23 @@ export class PartnerDataDetailComponent extends AppList {
             this.baseService.handleError(err);
             this.baseService.spinnerHide();
         });
+    }
+
+    updatePartner() {
+        this._catalogueRepo.updatePartner(this.dataSearchSaleman.partnerId, this.partner)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this.baseService.spinnerHide();
+                        this.baseService.successToast(res.message);
+                        this.router.navigate(["/home/catalogue/partner-data"]);
+                    }
+
+                }, err => {
+                    this.baseService.spinnerHide();
+                    this.baseService.handleError(err);
+                });
     }
 
     onDelete(event) {
