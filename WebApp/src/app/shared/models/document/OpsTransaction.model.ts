@@ -15,7 +15,7 @@ export class OpsTransaction {
         warehouseId: string = null;
         finishDate: any = null;
         billingOpsId: string = null;
-        createdDate: Date = null;
+        datetimeCreated: Date = null;
         purchaseOrderNo: string = null;
         flightVessel: string = null;
         supplierId: string = null;
@@ -34,15 +34,13 @@ export class OpsTransaction {
         id: string = "00000000-0000-0000-0000-000000000000";
         hblid: string = "00000000-0000-0000-0000-000000000000";
         agentId: string = null;
-        modifiedDate: Date = null;
+        datetimeModified: Date = null;
         salemanId: string = null;
         supplierName: string = null;
         agentName: string = null;
         podName: string = null;
         polName: string = null;
         packageTypeId: null;
-        //sumCont: number = null;
-        //packageQuantity: number = null;
         csMawbcontainers: Container[] = null;
         containerDescription: string = '';
         commodityGroupId: string = '';

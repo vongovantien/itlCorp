@@ -176,6 +176,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.DownloadGoodsExcel">
+            <summary>
+            download file excel from server
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.Importcontainer(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsMawbcontainerImportModel})">
             <summary>
             import list container
@@ -184,6 +190,15 @@
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.UploadFileContainer(Microsoft.AspNetCore.Http.IFormFile,System.Guid,System.Boolean)">
+            <summary>
+            read data from file excel
+            </summary>
+            <param name="uploadedFile"></param>
+            <param name="id"></param>
+            <param name="isHouseBill"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.UploadGoodsFile(Microsoft.AspNetCore.Http.IFormFile,System.Guid,System.Boolean)">
             <summary>
             read data from file excel
             </summary>
