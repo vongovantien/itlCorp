@@ -62,7 +62,7 @@ export class PartnerDataDetailComponent extends AppList {
     selectedSaleman: Saleman = null;
     saleMantoView: Saleman = new Saleman();
     isShowSaleMan: boolean = false;
-
+    currrently_user: string = '';
 
     @Output() isCloseModal = new EventEmitter();
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
@@ -588,6 +588,7 @@ export class PartnerDataDetailComponent extends AppList {
     }
 
     showDetailSaleMan(saleman: Saleman) {
+        this.currrently_user = localStorage.getItem('currently_userName');
         $('#saleman-detail-modal').modal('show');
         this.saleMantoView.description = saleman.description;
         this.saleMantoView.effectDate = saleman.effectDate == null ? null : formatDate(saleman.effectDate, 'yyyy-MM-dd', 'en');
