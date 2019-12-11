@@ -50,12 +50,14 @@ import {
 
 
 import { reducers, effects } from './store';
+import { ShareGoodsImportComponent } from './components/goods-import/goods-import.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
     ShareBussinessSellingChargeComponent,
     ShareBussinessOBHChargeComponent,
     ShareContainerImportComponent,
+    ShareGoodsImportComponent,
     ShareBussinessProfitSummaryComponent,
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBussinessContainerListPopupComponent,

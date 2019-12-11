@@ -8,6 +8,7 @@ import { DataService, SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 import * as fromStore from '../../store';
+import { ShareGoodsImportComponent } from '../goods-import/goods-import.component';
 
 @Component({
     selector: 'goods-list-popup',
@@ -15,7 +16,7 @@ import * as fromStore from '../../store';
 })
 
 export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContainerListPopupComponent implements OnInit {
-
+    @ViewChild(ShareGoodsImportComponent, { static: false }) goodsImportPopup: ShareGoodsImportComponent;
     @ViewChild('confirmCancel', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
 
     constructor(
@@ -92,5 +93,12 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
             this._store.dispatch(new fromStore.GetContainerSuccessAction(this.initContainers));
         }
         this.hide();
+    }
+    showImportPopup() {
+        this.goodsImportPopup.mblid = this.mblid;
+        this.goodsImportPopup.hblid = this.hblid;
+        this.goodsImportPopup.data = [];
+        this.goodsImportPopup.getData();
+        this.goodsImportPopup.show();
     }
 }

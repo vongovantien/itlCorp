@@ -179,6 +179,13 @@ export class DocumentationRepo {
         );
     }
 
+    downloadgoodsfileExcel() {
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/downloadGoodsFileExcel`, null).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     previewCDNote(data) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNote`, data).pipe(
             catchError((error) => throwError(error)),
@@ -330,6 +337,10 @@ export class DocumentationRepo {
 
     upLoadContainerFile(files: any, id: string, isHouseBill: boolean) {
         return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsMawbcontainer/UploadFile`, files, "uploadedFile", { id: id, isHouseBill: isHouseBill });
+    }
+
+    upLoadGoodsFile(files: any, id: string, isHouseBill: boolean) {
+        return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsMawbcontainer/UploadGoodsFile`, files, "uploadedFile", { id: id, isHouseBill: isHouseBill });
     }
 
     deleteShipmentSurcharge(chargId: string) {
