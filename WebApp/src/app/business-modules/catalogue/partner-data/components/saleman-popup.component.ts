@@ -34,6 +34,7 @@ export class SalemanPopupComponent extends PopupBase {
     selectedDataSaleMan: any;
     selectedDataOffice: any;
     index: number = 0;
+    currrently_user: string = '';
     @Input() popupData: Saleman;
     constructor(
         private baseService: BaseService,
@@ -45,6 +46,7 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+        this.currrently_user = localStorage.getItem('currently_userName');
         this.getComboboxData();
     }
 

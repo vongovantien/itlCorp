@@ -288,6 +288,12 @@ export class CatalogueRepo {
         );
     }
 
+    updatePartner(id: string, body: any = {}) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/` + id, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     createSaleman(body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatSaleMan/Add`, body).pipe(
             map((data: any) => data)
