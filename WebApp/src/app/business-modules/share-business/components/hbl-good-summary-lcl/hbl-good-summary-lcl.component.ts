@@ -100,7 +100,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             this._store.dispatch(new fromStore.GetContainerAction({ hblId: this.hblid }));
         }
 
-        this.containerPopup.show();
+        this.goodsImportPopup.show();
 
     }
 
