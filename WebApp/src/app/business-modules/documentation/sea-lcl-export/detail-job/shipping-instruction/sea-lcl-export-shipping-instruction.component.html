@@ -1,0 +1,126 @@
+<app-sub-header>
+    <div class="c-button-actions">
+        <div class="dropdown m-dropdown m-dropdown--inline">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+                Preview SI
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item">Export excel</a>
+                <a class="dropdown-item" (click)="previewSIReport()">Crystal Report</a>
+            </div>
+        </div>
+        <div class="dropdown m-dropdown m-dropdown--inline">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+                Preview OCL
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item">Export excel</a>
+                <a class="dropdown-item" (click)="previewOCL()">Crystal
+                    Report</a>
+            </div>
+        </div>
+        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+            data-target="#confirm-refresh-shipping-instruction-modal">
+            <span>
+                <i class="la la-refresh"></i>
+                <span>
+                    Refresh
+                </span>
+            </span>
+        </button>
+        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="save()">
+            <span>
+                <i class="la la-save"></i>
+                <span>
+                    save
+                </span>
+            </span>
+        </button>
+        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="back()">
+            <span>
+                <i class="la la-ban"></i>
+                <span>
+                    cancel
+                </span>
+            </span>
+        </button>
+    </div>
+</app-sub-header>
+<!--begin::m-content-->
+<div class="m-content">
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand" role="tablist">
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link active" id="bill-instruction-tablink"
+                        href="#bill-instruction-tabview" data-toggle="tab" role="tab">
+                        Bill Instruction
+                    </a>
+                </li>
+                <li class="nav-item m-tabs__item">
+                    <a class="nav-link m-tabs__link" id="bill-detail-tablink" href="#bill-detail-tabview"
+                        data-toggle="tab" role="tab">
+                        Bill detail
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="tab-content" id="">
+        <div class="tab-pane fade show active" id="bill-instruction-tabview" role="tabpanel" aria-labelledby="">
+            <app-sea-lcl-export-bill-instruction>
+            </app-sea-lcl-export-bill-instruction>
+        </div>
+        <div class="tab-pane fade" id="bill-detail-tabview" role="tabpanel" aria-labelledby="">
+            <app-sea-lcl-export-bill-detail></app-sea-lcl-export-bill-detail>
+        </div>
+    </div>
+</div>
+<!--end::m-content-->
+<!--begin::confirm-refresh-shipping-instruction-modal-->
+<div class="modal fade" id="confirm-refresh-shipping-instruction-modal" data-backdrop="static" role="dialog"
+    aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Alert</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>All manually entered data will be refresh. Are you sure you want to perform this
+                        action?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" (click)="refresh()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-refresh-shipping-instruction-modal-->
+
+<!--begin::preview-modal-->
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>
+<!--end::preview-modal-->
