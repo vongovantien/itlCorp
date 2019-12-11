@@ -76,7 +76,7 @@ export class SaleManRequest {
     company: string = '';
     service: number = 0;
     partnerId: string = '';
-    effectDate: string = '';
+    effectDate: any = '';
     description: string = '';
     status: boolean = false;
     createDate: string = '';

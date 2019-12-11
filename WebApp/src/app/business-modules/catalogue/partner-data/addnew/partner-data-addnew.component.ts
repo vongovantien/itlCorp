@@ -18,6 +18,7 @@ import { AppList } from 'src/app/app.list';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
+import { elementEventFullName } from '@angular/compiler/src/view_compiler/view_compiler';
 
 declare var $: any;
 @Component({
@@ -124,7 +125,6 @@ export class PartnerDataAddnewComponent extends AppList {
                             } else {
                                 this.saleMandetail.push(this.salemanToAdd);
                                 this.poupSaleman.hide();
-                                console.log(this.saleMandetail);
                                 for (const it of this.saleMandetail) {
                                     if (it.status === true) {
                                         it.statusstr = "Active";
@@ -431,6 +431,12 @@ export class PartnerDataAddnewComponent extends AppList {
     onCreatePartner() {
         this.baseService.spinnerShow();
         this.partner.saleMans = this.saleMandetail;
+        this.partner.saleMans.forEach(element => {
+            if (element.effectDate.startDate === null) {
+                element.effectDate = null;
+            }
+        });
+
         this._catalogueRepo.createPartner(this.partner)
             .pipe(catchError(this.catchError))
             .subscribe(
