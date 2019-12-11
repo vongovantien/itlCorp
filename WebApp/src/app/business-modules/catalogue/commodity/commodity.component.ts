@@ -4,7 +4,6 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { CommodityGroup } from 'src/app/shared/models/catalogue/commonity-group.model';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { SortService } from 'src/app/shared/services/sort.service';
 import { COMMODITYGROUPCOLUMNSETTING } from './commonity-group.column';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
@@ -20,6 +19,10 @@ import { ExcelService } from 'src/app/shared/services/excel.service';
 import _map from 'lodash/map';
 import { SystemConstants } from 'src/constants/system.const';
 import { SearchOptionsComponent } from '../../../shared/common/search-options/search-options.component';
+import { CatalogueRepo } from 'src/app/shared/repositories/catalogue.repo';
+import { SortService } from 'src/app/shared/services/sort.service';
+import { ToastrService } from 'ngx-toastr';
+
 declare var $: any;
 
 @Component({
@@ -90,28 +93,34 @@ export class CommodityComponent implements OnInit {
   constructor(private baseService: BaseService,
     private excelService: ExcelService,
     private api_menu: API_MENU,
-    private sortService: SortService) { }
+    private sortService: SortService,
+    private catalogueRepo: CatalogueRepo,
+    private _toastService: ToastrService, ) {
+  }
 
   ngOnInit() {
     this.pager.totalItems = 0;
     this.getCommodities(this.pager);
     this.getGroups();
   }
-  async getGroups() {
-    const response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getAllByLanguage, false, false);
-    if (response) {
-      this.groups = response.map(x => ({ "text": x.groupName, "id": x.id }));
-    }
+
+  getGroups() {
+    this.catalogueRepo.getAllCommodityGroup().subscribe(
+      (data: any) => {
+        this.groups = data.map(x => ({ "text": x.groupName, "id": x.id }));
+      },
+    );
   }
-  async setPage(pager: PagerSetting) {
+
+  setPage(pager: PagerSetting) {
     this.pager.currentPage = pager.currentPage;
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
     if (this.activeTab == this.tabName.commodityGroup) {
-      await this.getGroupCommodities(pager);
+      this.getGroupCommodities(pager);
     }
     if (this.activeTab == this.tabName.commodity) {
-      await this.getCommodities(pager);
+      this.getCommodities(pager);
     }
   }
   tabSelect(tabName: string) {
@@ -121,21 +130,27 @@ export class CommodityComponent implements OnInit {
     this.pager.totalItems = 0;
     this.resetSearch({ field: "All", fieldDisplayName: "All" }, tabName);
   }
-  async getCommodities(pager: PagerSetting) {
-    const responses = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
-    if (responses) {
-      this.commodities = responses.data;
-      this.pager.totalItems = responses.totalItems;
-    }
+
+  getCommodities(pager: PagerSetting) {
+    this.catalogueRepo.getCommodityPaging(pager.currentPage, pager.pageSize, Object.assign({}, this.criteria))
+      .subscribe(
+        (res: any) => {
+          this.pager.totalItems = res.totalItems || 0;
+          this.commodities = res.data;
+        },
+      );
   }
 
-  async getGroupCommodities(pager: PagerSetting) {
-    const responses = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
-    if (responses) {
-      this.commodityGroups = responses.data;
-      this.pager.totalItems = responses.totalItems;
-    }
+  getGroupCommodities(pager: PagerSetting) {
+    this.catalogueRepo.getCommodityGroupPaging(pager.currentPage, pager.pageSize, Object.assign({}, this.criteria))
+      .subscribe(
+        (res: any) => {
+          this.pager.totalItems = res.totalItems || 0;
+          this.commodityGroups = res.data;
+        },
+      );
   }
+
   onSearch(event, tabName) {
     if (this.activeTab == this.tabName.commodityGroup) {
       this.searchCommodityGroup(event);
@@ -206,42 +221,77 @@ export class CommodityComponent implements OnInit {
       this.commodityGroups = this.sortService.sort(this.commodityGroups, property, this.isDesc);
     }
   }
-  async showDetail(item, tabName) {
+  showDetail(item, tabName) {
     if (tabName == this.tabName.commodityGroup) {
       this.commodityGroup = item;
-      const response = await this.baseService.getAsync(this.api_menu.Catalogue.CommodityGroup.getById + item.id, false, false);
-      this.commodityGroup = response;
+      this.catalogueRepo.getDetailCommodityGroup(item.id).subscribe(
+        (res: any) => {
+          console.log(res)
+          if (res.id !== 0) {
+            this.commodityGroup = res;
+          } else {
+            this._toastService.error("Not found data");
+          }
+        },
+      );
     }
     if (tabName == this.tabName.commodity) {
       this.commodity = item;
-      const response = await this.baseService.getAsync(this.api_menu.Catalogue.Commodity.getById + item.id, false, false);
-      this.commodity = response;
-      let index = this.groups.findIndex(x => x.id == this.commodity.commodityGroupId);
-      if (index > -1) {
-        this.groupActive = [this.groups[index]];
-      }
+      this.catalogueRepo.getDetailCommodity(item.id).subscribe(
+        (res: any) => {
+          console.log(res)
+          if (res.id !== 0) {
+            this.commodity = res;
+            let index = this.groups.findIndex(x => x.id == this.commodity.commodityGroupId);
+            if (index > -1) {
+              this.groupActive = [this.groups[index]];
+            }
+          } else {
+            this._toastService.error("Not found data");
+          }
+        },
+      );
+
     }
   }
-  async onDelete(event) {
+  onDelete(event) {
     if (event) {
       if (this.commodityGroup) {
-        await this.deleteGroupCommodity();
+        this.deleteGroupCommodity();
       }
       if (this.commodity) {
-        await this.deleteCommodity();
+        this.deleteCommodity();
       }
     }
   }
-  async deleteCommodity() {
-    await this.baseService.deleteAsync(this.api_menu.Catalogue.Commodity.delete + this.commodity.id, true, false);
-    this.setPageAfterDelete();
+
+  deleteCommodity() {
+    this.catalogueRepo.deleteCommodity(this.commodity.id).subscribe(
+      (res: CommonInterface.IResult) => {
+        if (res.status) {
+          this._toastService.success(res.message, '');
+          this.getCommodities(this.pager);
+          //this.setPageAfterDelete();
+        } else {
+          this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+        }
+      },
+    );
   }
-  async deleteGroupCommodity() {
-    const response = await this.baseService.deleteAsync(this.api_menu.Catalogue.CommodityGroup.delete + this.commodityGroup.id, true, false);
-    if (response) {
-      this.getGroups();
-      this.setPageAfterDelete();
-    }
+
+  deleteGroupCommodity() {
+    this.catalogueRepo.deleteCommodityGroup(this.commodityGroup.id).subscribe(
+      (res: CommonInterface.IResult) => {
+        if (res.status) {
+          this._toastService.success(res.message, '');
+          this.getGroups();
+          this.getGroupCommodities(this.pager);
+          //this.setPageAfterDelete();
+        } else {
+          this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+        }
+      },
+    );
   }
   setPageAfterDelete() {
     this.pager.totalItems = this.pager.totalItems - 1;
@@ -285,58 +335,89 @@ export class CommodityComponent implements OnInit {
       }
     }
   }
-  async saveGroupCommodity() {
+  saveGroupCommodity() {
     if (this.formGroupCommodity.valid) {
       if (this.commodityGroup.id == null) {
-        await this.addNewGroup();
+        this.addNewGroup();
       }
       else {
-        await this.updateGroup();
+        this.updateGroup();
       }
     }
   }
-  async updateCommodity() {
-    let response = await this.baseService.putAsync(this.api_menu.Catalogue.Commodity.update + this.commodity.id, this.commodity, true, true);
-    if (response.status) {
-      this.resetCommodityForm();
-      this.getCommodities(this.pager);
-    }
+
+  updateCommodity() {
+    this.catalogueRepo.updateCommodity(this.commodity.id, this.commodity).subscribe(
+      (res: CommonInterface.IResult) => {
+        if (res.status) {
+          this._toastService.success(res.message);
+          this.resetCommodityForm();
+          this.getCommodities(this.pager);
+        } else {
+          this._toastService.error(res.message);
+        }
+      }
+    );
   }
-  async addNewCommodity() {
-    const res = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.add, this.commodity);
-    if (res.status) {
-      this.resetCommodityForm();
-      this.pager.totalItems = 0;
-      this.pager.currentPage = 1;
-      await this.getCommodities(this.pager);
-    }
+
+  addNewCommodity() {
+    this.catalogueRepo.addNewCommodity(this.commodity).subscribe(
+      (res: CommonInterface.IResult) => {
+        if (res.status) {
+          this._toastService.success(res.message);
+          this.resetCommodityForm();
+          this.pager.totalItems = 0;
+          this.pager.currentPage = 1;
+          this.getCommodities(this.pager);
+        } else {
+          this._toastService.error(res.message);
+        }
+      }
+    );
   }
+
   resetCommodityForm() {
     this.formCommodity.onReset();
     this.groupSelect.active = [];
     $('#edit-commodity-modal').modal('hide');
   }
-  async updateGroup() {
-    var response = await this.baseService.putAsync(this.api_menu.Catalogue.CommodityGroup.update + this.commodityGroup.id, this.commodityGroup, true, true);
-    if (response.status) {
-      this.resetCommodityGroupForm();
-      this.getCommodities(this.pager);
-    }
+
+  updateGroup() {
+    this.catalogueRepo.updateCommodityGroup(this.commodityGroup.id, this.commodityGroup).subscribe(
+      (res: CommonInterface.IResult) => {
+        if (res.status) {
+          this._toastService.success(res.message);
+          this.resetCommodityGroupForm();
+          this.getGroupCommodities(this.pager);
+        } else {
+          this._toastService.error(res.message);
+        }
+      }
+    );
   }
+
   resetCommodityGroupForm() {
     this.formGroupCommodity.onReset();
     $('#edit-commodity-group-modal').modal('hide');
   }
-  async addNewGroup() {
-    const response = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup, true, false);
-    if (response.status) {
-      this.getGroups();
-      this.pager.totalItems = 0;
-      this.pager.currentPage = 1;
-      this.getGroupCommodities(this.pager);
-      this.resetCommodityGroupForm();
-    }
+
+  addNewGroup() {
+    this.catalogueRepo.addNewCommodityGroup(this.commodityGroup).subscribe(
+      (res: CommonInterface.IResult) => {
+        if (res.status) {
+          this._toastService.success(res.message);
+          this.getGroups();
+          this.pager.totalItems = 0;
+          this.pager.currentPage = 1;
+          this.getGroupCommodities(this.pager);
+          this.resetCommodityGroupForm();
+        } else {
+          this._toastService.error(res.message);
+        }
+      }
+    );
   }
+
   showConfirmDelete(item, tabName: string) {
     if (tabName == this.tabName.commodityGroup) {
       this.commodityGroup = item;

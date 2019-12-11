@@ -432,4 +432,77 @@ export class CatalogueRepo {
                 map((data: any) => data)
             );
     }
+
+    getCommodityPaging(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getCommodityGroupPaging(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getAllCommodityGroup() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/GetByLanguage`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    deleteCommodity(id: number) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteCommodityGroup(id: number) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addNewCommodity(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateCommodity(id :number, body: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/${id}`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addNewCommodityGroup(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateCommodityGroup(id :number, body: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/${id}`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDetailCommodity(id: number){
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDetailCommodityGroup(id: number){
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }
