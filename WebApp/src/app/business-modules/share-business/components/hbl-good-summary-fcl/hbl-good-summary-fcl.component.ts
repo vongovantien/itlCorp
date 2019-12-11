@@ -57,6 +57,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends ShareBussinessShip
             .subscribe(
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
+                        this.isSave = true;
                         this.containers = action.payload;
                         this.updateData(action.payload);
                     }

@@ -73,14 +73,14 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         super();
     }
 
-    ngOnInit() {
+    async ngOnInit() {
         this.initForm();
 
         this.carries = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
         this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
         this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
 
-        this.getCommonData();
+        await this.getCommonData();
         this.getUserLogged();
 
         // * Subscribe state to update form.

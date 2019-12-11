@@ -4,9 +4,14 @@ import { Store } from '@ngrx/store';
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { catchError, skip } from 'rxjs/operators';
+import { DataService } from 'src/app/shared/services';
+import { SystemConstants } from 'src/constants/system.const';
 
 import * as fromStore from './../../store';
+
+import { catchError, skip } from 'rxjs/operators';
+
+
 
 @Component({
     selector: 'shipment-good-summary-lcl',
@@ -24,7 +29,8 @@ export class ShareBussinessShipmentGoodSummaryLCLComponent extends AppForm imple
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
-        private _store: Store<fromStore.IShareBussinessState>
+        private _store: Store<fromStore.IShareBussinessState>,
+        private _dataService: DataService
     ) {
         super();
     }
@@ -50,7 +56,7 @@ export class ShareBussinessShipmentGoodSummaryLCLComponent extends AppForm imple
                             }));
                         const packageTypes = [];
                         packageTypesTemp.forEach((type: CommonInterface.INg2Select) => {
-                            const dataTempInPackages = this.packages.find((t: CommonInterface.INg2Select) => t.id === type.id);
+                            const dataTempInPackages = (this.packages || []).find((t: CommonInterface.INg2Select) => t.id === type.id);
                             if (!!dataTempInPackages) {
                                 packageTypes.push(dataTempInPackages);
                             }
@@ -63,23 +69,25 @@ export class ShareBussinessShipmentGoodSummaryLCLComponent extends AppForm imple
     }
 
     getPackage() {
-        this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.packages = this.utility.prepareNg2SelectData(res, 'code', 'unitNameEn');
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PACKAGE)) {
+            this.packages = this.utility.prepareNg2SelectData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PACKAGE), 'code', 'unitNameEn');
+        } else {
+            this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        this.packages = this.utility.prepareNg2SelectData(res, 'code', 'unitNameEn');
+                    }
+                );
+        }
     }
 
     selected($event: any) {
         if (!this.packageTypes.length) {
             this.packageTypes.push($event);
         }
-        console.log(this.packageTypes);
     }
 
     removed($event: any) {
-        console.log(this.packageTypes);
     }
 }

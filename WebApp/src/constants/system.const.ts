@@ -86,7 +86,8 @@ export class SystemConstants {
         SHIPPER: 'efms:shipper',
         SHIPMENT_COMMON_DATA: 'efms:shipment-common-data',
         OPS_COMMON_DATA: 'efms:ops-common-data',
-        SALE: 'efms:sale'
+        SALE: 'efms:sale',
+        PACKAGE: 'efms:unit:package'
 
     };
 

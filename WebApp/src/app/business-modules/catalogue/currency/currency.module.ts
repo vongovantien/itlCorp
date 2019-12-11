@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Routes, RouterModule } from '@angular/router';
+
+import { PaginationModule, ModalModule } from 'ngx-bootstrap';
+import { NgProgressModule } from '@ngx-progressbar/core';
 
 import { CurrencyComponent } from './currency.component';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { SelectModule } from 'ng2-select';
-import { FormsModule } from '@angular/forms';
-import { NgProgressModule } from '@ngx-progressbar/core';
-import { Routes, RouterModule } from '@angular/router';
+import { FormCreateCurrencyPopupComponent } from './components/form-create/form-create-currency.popup';
 
 const routing: Routes = [
     { path: '', component: CurrencyComponent, data: { name: "Currency", level: 2 } }
@@ -16,13 +18,18 @@ const routing: Routes = [
     imports: [
         CommonModule,
         SharedModule,
-        SelectModule,
         FormsModule,
+        ReactiveFormsModule,
+        ModalModule.forRoot(),
         NgProgressModule,
+        PaginationModule.forRoot(),
         RouterModule.forChild(routing)
     ],
     exports: [],
-    declarations: [CurrencyComponent],
+    declarations: [
+        CurrencyComponent,
+        FormCreateCurrencyPopupComponent
+    ],
     providers: [],
 })
 export class CurrencyModule { }

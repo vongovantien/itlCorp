@@ -113,7 +113,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     onDeleteContainer() {
         this.confirmDeleteContainerPopup.hide();
-        if (this.selectedIndexContainer > 0) {
+        if (this.selectedIndexContainer > -1) {
             this._store.dispatch(new fromStore.DeleteContainerAction(this.selectedIndexContainer)); // * DISPATCH DELETE ACTION
         }
     }

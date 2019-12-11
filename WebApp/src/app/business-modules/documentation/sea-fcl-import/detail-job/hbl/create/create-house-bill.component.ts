@@ -78,31 +78,25 @@ export class CreateHouseBillComponent extends AppForm {
             if (param.jobId) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-
                 this.getDetailShipment();
-
             }
         });
-
     }
-
-
 
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
 
-
-
     ngAfterViewInit() {
         this.hblGoodSummaryComponent.initContainer();
+
         this.hblGoodSummaryComponent.containerPopup.isAdd = true;
+
         this.hblGoodSummaryComponent.description = "AS PER BILL";
-        console.log(this.hblGoodSummaryComponent.description);
         this.formHouseBill.notifyPartyDescription.setValue("SAM AS CONSIGNEE");
+
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
         this._cd.detectChanges();
-
     }
 
     getDetailShipment() {
@@ -117,27 +111,22 @@ export class CreateHouseBillComponent extends AppForm {
                 (res: CommonInterface.IResult) => {
                     if (!!res) {
                         this.hblDetail = res;
+
                         const objArrival = {
                             arrivalNo: this.hblDetail.jobNo + "-A01",
                             arrivalFirstNotice: new Date()
                         };
+                        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(objArrival);
 
-                        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(
-                            objArrival
-                        );
                         const objDelivery = {
                             deliveryOrderNo: this.hblDetail.jobNo + "-D01",
-                            deliveryOrderPrintedDate: {
-                                startDate: new Date(),
-                                endDate: new Date()
-                            }
+                            deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() }
                         };
                         this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                     }
                 },
             );
     }
-
 
     checkValidateForm() {
         let valid: boolean = true;
@@ -147,7 +136,6 @@ export class CreateHouseBillComponent extends AppForm {
 
             } else {
                 this.formHouseBill.PortChargeLikePortLoading = false;
-
             }
         } else {
             valid = false;
@@ -172,7 +160,6 @@ export class CreateHouseBillComponent extends AppForm {
             const body = this.onsubmitData();
             this.createHbl(body);
         }
-
     }
 
     onImport(selectedData: any) {
@@ -197,11 +184,6 @@ export class CreateHouseBillComponent extends AppForm {
 
     combackToHBLList() {
         this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl`]);
-
-    }
-
-    onSaveHBLDetail() {
-
     }
 
     createHbl(body: any) {
@@ -294,7 +276,6 @@ export class CreateHouseBillComponent extends AppForm {
         };
         return body;
     }
-
 }
 
 

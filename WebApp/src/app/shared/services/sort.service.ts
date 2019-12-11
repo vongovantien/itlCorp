@@ -39,6 +39,8 @@ export class SortService {
         }
         if (typeof str === "number") {
             return str;
+        } else {
+            return '' + str;
         }
 
     }

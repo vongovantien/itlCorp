@@ -1,20 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActionsSubject, Store } from '@ngrx/store';
+import { Params } from '@angular/router';
 
 import { ShareBussinessShipmentGoodSummaryComponent } from '../shipment-good-summary/shipment-good-summary.component';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ShareBussinessGoodsListPopupComponent } from '../goods-list/goods-list.popup';
 import { Unit, HouseBill } from 'src/app/shared/models';
+import { getParamsRouterState } from 'src/app/store';
 
 import _groupBy from 'lodash/groupBy';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromStore from '../../store';
-import { getParamsRouterState } from 'src/app/store';
-import { Params } from '@angular/router';
-import { GetContainerAction } from '../../store';
 
 
 @Component({
@@ -62,6 +61,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             .subscribe(
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
+                        this.isSave = true;
                         this.containers = action.payload;
                         this.updateData(action.payload);
                     }
@@ -92,14 +92,16 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     }
 
     openContainerListPopup() {
-        this.goodsImportPopup.mblid = this.mblid;
-        this.goodsImportPopup.hblid = this.hblid;
-
-        if (!this.isSave && !!this.mblid) {
-            this._store.dispatch(new GetContainerAction({ mblid: this.mblid }));
+        if ((!!this.mblid && !!this.hblid) && !this.isSave) {
+            this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.mblid }));
         }
 
-        this.goodsImportPopup.show();
+        if ((!!this.hblid && !!this.mblid) && !this.isSave) {
+            this._store.dispatch(new fromStore.GetContainerAction({ hblId: this.hblid }));
+        }
+
+        this.containerPopup.show();
+
     }
 
     updateData(containers: Container[] | any) {

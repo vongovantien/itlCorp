@@ -76,5 +76,12 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportCurrency(searchObject) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCurrency`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 

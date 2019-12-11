@@ -14,7 +14,6 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 
-
 import * as fromShare from '../../store';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
@@ -82,7 +81,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         super();
     }
 
-    ngOnInit(): void {
+    async ngOnInit() {
 
         this.carries = this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER);
         this.agents = this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT);
@@ -90,7 +89,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
 
         this.initForm();
         this.getUserLogged();
-        this.getCommonData();
+        await this.getCommonData();
 
         // * Subscribe state to update form.
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
