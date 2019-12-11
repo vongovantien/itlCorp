@@ -119,7 +119,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = (x => (x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.CurrencyName ?? "").IndexOf(criteria.CurrencyName ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }
-            var data = Paging(query, pageNumber, pageSize, out rowsCount);
+            var data = Paging(query, pageNumber, pageSize, x => x.DatetimeModified, false, out rowsCount);
             return data;
         }
         public IQueryable<CatCurrencyModel> Query(CatCurrrencyCriteria criteria)

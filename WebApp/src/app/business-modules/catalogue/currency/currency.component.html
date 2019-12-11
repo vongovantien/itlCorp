@@ -104,6 +104,6 @@
     </div>
 </div>
 
-<form-create-currency-popup (onChange)="resetSearch()"></form-create-currency-popup>
+<form-create-currency-popup (onChange)="resetSearch($event)"></form-create-currency-popup>
 
 <confirm-popup body="You want to delete this currency" (onSubmit)="onDelete()"></confirm-popup>
