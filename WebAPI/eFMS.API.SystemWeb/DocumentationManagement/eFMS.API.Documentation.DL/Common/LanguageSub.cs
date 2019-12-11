@@ -65,5 +65,19 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_CDNOTE_NOT_NOT_FOUND = "MSG_CDNOTE_NOT_NOT_FOUND";
 
         public static readonly string MSG_SURCHARGE_ARE_DUPLICATE_INVOICE = "MSG_SURCHARGE_ARE_DUPLICATE_INVOICE";
+
+        public static readonly string MSG_NOT_FOUND_TRANSACTION_TYPE = "MSG_NOT_FOUND_TRANSACTION_TYPE";
+        public static readonly string MSG_MBL_REQUIRED = "MSG_MBL_REQUIRED";
+        public static readonly string MSG_POD_DIFFERENT_POL = "MSG_POD_DIFFERENT_POL";
+        public static readonly string MSG_POL_DIFFERENT_POD = "MSG_POL_DIFFERENT_POD";
+        public static readonly string MSG_ETD_BEFORE_ETA = "MSG_ETD_BEFORE_ETA";
+        public static readonly string MSG_ETA_AFTER_ETD = "MSG_ETA_AFTER_ETD";
+        public static readonly string MSG_ETA_REQUIRED = "MSG_ETA_REQUIRED";
+        public static readonly string MSG_MBL_TYPE_REQUIRED = "MSG_MBL_TYPE_REQUIRED";
+        public static readonly string MSG_SHIPMENT_TYPE_REQUIRED = "MSG_SHIPMENT_TYPE_REQUIRED";
+        public static readonly string MSG_POD_REQUIRED = "MSG_POD_REQUIRED";
+        public static readonly string MSG_PODELI_DIFFERENT_POL = "MSG_PODELI_DIFFERENT_POL";
+        public static readonly string MSG_SERVICE_TYPE_REQUIRED = "MSG_SERVICE_TYPE_REQUIRED";
+        public static readonly string MSG_PERSON_IN_CHARGE_REQUIRED = "MSG_PERSON_IN_CHARGE_REQUIRED";
     }
 }
