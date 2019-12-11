@@ -82,8 +82,8 @@
                                             isSubmitted && ((!!container.containerNo || !!container.sealNo || !!container.markNo ) && !container.quantity)
                                             }">
                                             <input type="number" class="form-control" [(ngModel)]="container.quantity"
-                                                (ngModelChange)="onChangeDataFormTable()" name="quantity" min="0"
-                                                step=".10">
+                                                (ngModelChange)="onChangeDataFormTable()" name="quantity" step="1"
+                                                appIntergerInputCheck min="0">
                                         </div>
                                     </td>
                                     <td>
@@ -118,7 +118,8 @@
                                                  isSubmitted && (isDuplicateContPakage || !container.packageQuantity)}">
                                             <input type="number" class="form-control"
                                                 [(ngModel)]="container.packageQuantity" name="packageQuantity"
-                                                (ngModelChange)="onChangeDataFormTable()" min="0" step=".10">
+                                                (ngModelChange)="onChangeDataFormTable()" appIntergerInputCheck min="0"
+                                                step="1">
                                         </div>
                                     </td>
                                     <td>
