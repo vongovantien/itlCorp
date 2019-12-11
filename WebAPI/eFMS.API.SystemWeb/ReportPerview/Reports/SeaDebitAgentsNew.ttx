@@ -48,3 +48,4 @@ DecimalNo	Number
 CurrDecimalNo	Number		
 ExtVND	Number		
 ETA	Date		
+LoadingDate	Date		

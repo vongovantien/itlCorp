@@ -60,8 +60,8 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             { title: 'Unit Price', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
-            { title: "Credit Value (Local)", field: 'credit', sortable: true },
-            { title: "Debit Value (Local)", field: 'debit', sortable: true },
+            { title: "Credit Value", field: 'credit', sortable: true },
+            { title: "Debit Value", field: 'debit', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
     }
@@ -84,15 +84,49 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     calculatorAmount() {
+        // this.totalCredit = '';
+        // this.totalDebit = '';
+        // this.balanceAmount = '';
+        // const _credit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
+        // const _debit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
+        // const _balance = _debit - _credit;
+        // this.totalCredit = this.formatNumberCurrency(_credit);
+        // this.totalDebit = this.formatNumberCurrency(_debit);
+        // this.balanceAmount = (_balance > 0 ? this.formatNumberCurrency(_balance) : '(' + this.formatNumberCurrency(Math.abs(_balance)) + ')');
+
+        //List currency có trong listCharges
+        const listCurrency = [];
+        const listCharge = [];
+        console.log(this.CdNoteDetail)
+        //for (const charges of this.CdNoteDetail) {
+            for (const currency of this.CdNoteDetail.listSurcharges.map(m => m.currencyId)) {
+                listCurrency.push(currency)
+            }
+            for (const charge of this.CdNoteDetail.listSurcharges) {
+                listCharge.push(charge);
+            }
+        //}
+        console.log(listCurrency)
+        console.log(listCharge)
+        //List currency unique      
+        const uniqueCurrency = [...new Set(listCurrency)] // Remove duplicate
         this.totalCredit = '';
         this.totalDebit = '';
         this.balanceAmount = '';
-        const _credit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
-        const _debit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
-        const _balance = _debit - _credit;
-        this.totalCredit = this.formatNumberCurrency(_credit);
-        this.totalDebit = this.formatNumberCurrency(_debit);
-        this.balanceAmount = (_balance > 0 ? this.formatNumberCurrency(_balance) : '(' + this.formatNumberCurrency(Math.abs(_balance)) + ')');
+        for (const currency of uniqueCurrency) {
+            const _credit = listCharge.filter(f => f.currencyId === currency).reduce((credit, charge) => credit + charge.credit, 0);
+            const _debit = listCharge.filter(f => f.currencyId === currency).reduce((debit, charge) => debit + charge.debit, 0);
+            const _balance = _debit - _credit;
+            this.totalCredit += this.formatNumberCurrency(_credit) + ' ' + currency + ' | ';
+            this.totalDebit += this.formatNumberCurrency(_debit) + ' ' + currency + ' | ';
+            this.balanceAmount += (_balance > 0 ? this.formatNumberCurrency(_balance) : '(' + this.formatNumberCurrency(Math.abs(_balance)) + ')') + ' ' + currency + ' | ';
+        }
+        this.totalCredit += "]";
+        this.totalDebit += "]";
+        this.balanceAmount += "]";
+        this.totalCredit = this.totalCredit.replace("| ]", "").replace("]", "");
+        this.totalDebit = this.totalDebit.replace("| ]", "").replace("]", "");
+        this.balanceAmount = this.balanceAmount.replace("| ]", "").replace("]", "");
     }
 
     formatNumberCurrency(input: number) {

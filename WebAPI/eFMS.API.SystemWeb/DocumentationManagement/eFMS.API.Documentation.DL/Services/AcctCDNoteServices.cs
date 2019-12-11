@@ -923,7 +923,8 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Subject = "LOCAL CHARGES";
                     charge.Description = item.NameEn;//Charge name
                     charge.Quantity = item.Quantity;
-                    charge.Unit = item.Unit;
+                    charge.Unit = criteria.Currency;
+                    charge.QUnit = item.Unit;
                     charge.UnitPrice = (item.UnitPrice != null ? item.UnitPrice : 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
                     charge.VAT = item.Vatrate != null ? item.Vatrate : 0;
                     charge.Credit = (item.Type == Constants.CHARGE_BUY_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
@@ -949,16 +950,19 @@ namespace eFMS.API.Documentation.DL.Services
             decimal _balanceAmount = Math.Abs(_amount.Value);
             _balanceAmount = Math.Round(_balanceAmount, 2);
             var _inword = string.Empty;
-            if (_balanceAmount >= 1)
-            {
-                var _currency = criteria.Currency == Constants.CURRENCY_LOCAL ?
+            //if (_balanceAmount >= 1)
+            //{
+                var _currency = criteria.Currency == Constants.CURRENCY_LOCAL && _balanceAmount >= 1 ?
                            (_balanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                         :
-                        criteria.Currency;
+                        "dollars";
 
-                _inword = InWordCurrency.ConvertNumberCurrencyToString(_balanceAmount, _currency);
-            }
-            parameter.InwordVND = _inword;
+                _inword = criteria.Currency == Constants.CURRENCY_LOCAL && _balanceAmount >= 1 ?
+                        InWordCurrency.ConvertNumberCurrencyToString(_balanceAmount, _currency)
+                    : 
+                        InWordCurrency.ConvertNumberCurrencyToStringUSD(_balanceAmount, _currency);
+            //}
+            parameter.InwordVND = !string.IsNullOrEmpty(_inword) ? _inword.ToUpper() : string.Empty;
             parameter.IssueInv = string.Empty; //Tạm thời để trống
             parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
             parameter.OtherRef = string.Empty;//Tạm thời để trống
