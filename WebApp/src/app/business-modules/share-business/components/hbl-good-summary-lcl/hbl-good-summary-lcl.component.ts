@@ -1,19 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActionsSubject, Store } from '@ngrx/store';
+import { Params } from '@angular/router';
 
 import { ShareBussinessShipmentGoodSummaryComponent } from '../shipment-good-summary/shipment-good-summary.component';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ShareBussinessGoodsListPopupComponent } from '../goods-list/goods-list.popup';
 import { Unit, HouseBill } from 'src/app/shared/models';
+import { getParamsRouterState } from 'src/app/store';
 
 import _groupBy from 'lodash/groupBy';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromStore from '../../store';
-import { getParamsRouterState } from 'src/app/store';
-import { Params } from '@angular/router';
 
 
 @Component({
@@ -61,6 +61,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             .subscribe(
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
+                        this.isSave = true;
                         this.containers = action.payload;
                         this.updateData(action.payload);
                     }
