@@ -151,44 +151,11 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         if (model.CsMawbcontainers != null)
                         {
-                            var listConts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
-                            foreach (var item in listConts)
-                            {
-                                var isExist = model.CsMawbcontainers.FirstOrDefault(x => x.Id == item.Id);
-                                if (isExist == null)
-                                {
-                                    var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Id == item.Id);
-                                }
-                            }
-
-                            foreach (var item in model.CsMawbcontainers)
-                            {
-                                var cont = mapper.Map<CsMawbcontainer>(item);
-
-                                if (cont.Id == Guid.Empty)
-                                {
-                                    cont.Id = Guid.NewGuid();
-                                    cont.Hblid = hb.Id;
-                                    cont.UserModified = hb.UserModified;
-                                    cont.DatetimeModified = DateTime.Now;
-                                    var hsContainerAdd = csMawbcontainerRepo.Add(cont);
-                                }
-                                else
-                                {
-                                    cont.Hblid = hb.Id;
-                                    cont.UserModified = hb.UserModified;
-                                    cont.DatetimeModified = DateTime.Now;
-                                    var hsContainerUpdate = csMawbcontainerRepo.Update(cont, x => x.Id == cont.Id);
-                                }
-                            }
+                            var hscontainers = containerService.UpdateHouseBill(model.CsMawbcontainers, model.Id);
                         }
                         else
                         {
-                            var conts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
-                            foreach (var item in conts)
-                            {
-                                var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Id == item.Id);
-                            }
+                            var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Hblid == hb.Id);
                         }
                     }
                     trans.Commit();

@@ -455,14 +455,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == Guid.Empty)
             {
-                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEn.ToLower() || x.NameVn.ToLower() == model.NameVn.ToLower())))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && (x.NameEn.ToLower() == model.NameEn.ToLower() || x.NameVn.ToLower() == model.NameVn.ToLower()) && x.Id != id))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
