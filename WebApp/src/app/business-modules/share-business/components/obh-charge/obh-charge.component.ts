@@ -186,7 +186,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 || !charge.receiverName
                 || !charge.payerName
                 || charge.unitPrice === null
+                || charge.quantity === null
                 || charge.unitPrice < 0
+                || charge.quantity < 0
                 || charge.vatrate > 100
             ) {
                 valid = false;
