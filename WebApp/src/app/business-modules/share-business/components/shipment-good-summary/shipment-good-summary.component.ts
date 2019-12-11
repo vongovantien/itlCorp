@@ -102,8 +102,12 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         this.containerPopup.mblid = this.mblid;
         this.containerPopup.hblid = this.hblid;
 
-        if (!this.isSave && !!this.mblid) {
+        if ((!!this.mblid && !!this.hblid) && !this.isSave) {
             this._store.dispatch(new GetContainerAction({ mblid: this.mblid }));
+        }
+
+        if ((!!this.hblid && !!this.mblid) && !this.isSave) {
+            this._store.dispatch(new GetContainerAction({ hblId: this.hblid }));
         }
 
         this.containerPopup.show();

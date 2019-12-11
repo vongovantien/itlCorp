@@ -92,7 +92,16 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     }
 
     openContainerListPopup() {
+        if ((!!this.mblid && !!this.hblid) && !this.isSave) {
+            this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.mblid }));
+        }
+
+        if ((!!this.hblid && !!this.mblid) && !this.isSave) {
+            this._store.dispatch(new fromStore.GetContainerAction({ hblId: this.hblid }));
+        }
+
         this.containerPopup.show();
+
     }
 
     updateData(containers: Container[] | any) {
