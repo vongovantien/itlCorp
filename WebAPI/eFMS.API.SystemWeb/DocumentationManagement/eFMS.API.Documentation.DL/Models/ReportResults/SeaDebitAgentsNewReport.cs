@@ -78,6 +78,9 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string IssuedDate { get; set; }
         public string OtherRef { get; set; }
         public string InwordVND { get; set; }
-        public string Currency { get; set; }
+        public string Currency { get; set; }       
+        public string TotalDebit { get; set; }
+        public string TotalCredit { get; set; }
+        public string BalanceAmount { get; set; }
     }
 }
