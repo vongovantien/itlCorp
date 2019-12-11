@@ -39,6 +39,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CustomsDeclaration> customDeclarationRepository;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepository;
         private readonly IContextBase<CsMawbcontainer> csMawbcontainerRepository;
+        private readonly ICsMawbcontainerService mawbcontainerService;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
@@ -53,7 +54,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShipmentSurcharge> surchargeRepo,
             IContextBase<CustomsDeclaration> customDeclarationRepo,
             IContextBase<AcctCdnote> acctCdNoteRepo,
-            IContextBase<CsMawbcontainer> csMawbcontainerRepo) : base(repository, mapper)
+            IContextBase<CsMawbcontainer> csMawbcontainerRepo,
+            ICsMawbcontainerService containerService) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -71,6 +73,7 @@ namespace eFMS.API.Documentation.DL.Services
             customDeclarationRepository = customDeclarationRepo;
             acctCdNoteRepository = acctCdNoteRepo;
             csMawbcontainerRepository = csMawbcontainerRepo;
+            mawbcontainerService = containerService;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -79,7 +82,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.UserCreated = currentUser.UserID;
             model.DatetimeModified = model.DatetimeCreated;
             model.UserModified = model.UserCreated;
-            //model.CurrentStatus = "InSchedule";
+            model.CurrentStatus = "InSchedule";
             var dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
             if(dayStatus > 0)
             {
@@ -701,35 +704,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count > 0)
                 {
-                    var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
-
-                    var listIdOfCont = containers.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
-                    var idContainersNeedRemove = csMawbcontainerRepository.Get(x => x.Mblid == model.Id && !listIdOfCont.Contains(x.Id)).Select(s => s.Id);
-                    //Delete item of List Container MBL
-                    if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
-                    {
-                        var hsDelContHBL = csMawbcontainerRepository.Delete(x => idContainersNeedRemove.Contains(x.Id));
-                    }
-
-                    foreach (var container in containers)
-                    {
-                        //Insert & Update List Container MBL
-                        if (container.Id == Guid.Empty)
-                        {
-                            container.Id = Guid.NewGuid();
-                            container.Mblid = model.Id;
-                            container.UserModified = model.UserModified;
-                            container.DatetimeModified = DateTime.Now;
-                            var hsAddContMBL = csMawbcontainerRepository.Add(container);
-                        }
-                        else
-                        {
-                            container.Mblid = model.Id;
-                            container.UserModified = model.UserModified;
-                            container.DatetimeModified = DateTime.Now;
-                            var hsUpdateContMBL = csMawbcontainerRepository.Update(container, x => x.Id == container.Id);
-                        }
-                    }
+                    var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
                 }
             }
             return hs;

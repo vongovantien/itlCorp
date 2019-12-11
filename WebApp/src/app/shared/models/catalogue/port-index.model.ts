@@ -1,5 +1,5 @@
 export class PortIndex {
-    id: number;
+    id: string;
     code: string;
     nameEn: string;
     nameVn: string;
