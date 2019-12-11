@@ -20,7 +20,7 @@ declare var $: any;
 import * as dataHelper from 'src/helper/data.helper';
 import { NgForm } from '@angular/forms';
 import { SelectComponent } from 'ng2-select';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { ToastrService } from 'ngx-toastr';
@@ -31,7 +31,10 @@ import { NgProgress } from '@ngx-progressbar/core';
     templateUrl: './port-index.component.html'
 })
 export class PortIndexComponent extends AppList implements OnInit {
-
+    @ViewChild('formAddEdit', { static: false }) form: NgForm;
+    @ViewChild('chooseCountry', { static: false }) public ngSelectCountry: SelectComponent;
+    @ViewChild('chooseArea', { static: false }) public ngSelectArea: SelectComponent;
+    @ViewChild('chooseMode', { static: false }) public ngSelectMode: SelectComponent;
     portIndexSettings: ColumnSetting[] = PORTINDEXCOLUMNSETTING;
     portIndexs: Array<PortIndex>;
     portIndex: PortIndex = new PortIndex();
@@ -58,11 +61,6 @@ export class PortIndexComponent extends AppList implements OnInit {
         settingFields: this.portIndexSettings.filter(x => x.allowSearch == true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
         typeSearch: TypeSearch.outtab
     };
-    @ViewChild('formAddEdit', { static: false }) form: NgForm;
-    @ViewChild('chooseCountry', { static: false }) public ngSelectCountry: SelectComponent;
-    @ViewChild('chooseArea', { static: false }) public ngSelectArea: SelectComponent;
-    @ViewChild('chooseMode', { static: false }) public ngSelectMode: SelectComponent;
-    @ViewChild(AppPaginationComponent, { static: false }) child;
     countries: any[];
     areas: any[];
     modes: any[];
@@ -75,7 +73,8 @@ export class PortIndexComponent extends AppList implements OnInit {
         private api_menu: API_MENU,
         private sortService: SortService,
         private excelService: ExcelService,
-        protected catalogueRepo: CatalogueRepo,
+        private exportRepository: ExportRepo,
+        private catalogueRepo: CatalogueRepo,
         private toastService: ToastrService,
         private _progressService: NgProgress) {
         super();
@@ -84,20 +83,9 @@ export class PortIndexComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
-        // this.initPager();
         this.requestPortIndex();
         this.getDataCombobox();
     }
-    // setPage(pager: PagerSetting): any {
-    //     this.pager.currentPage = pager.currentPage;
-    //     this.pager.totalPages = pager.totalPages;
-    //     this.pager.pageSize = pager.pageSize;
-    //     this.getPortIndexs(pager);
-    // }
-    // initPager() {
-    //     this.pager.currentPage = 1;
-    //     this.pager.totalItems = 0;
-    // }
     requestPortIndex() {
         this.catalogueRepo.pagingPlace(this.page, this.pageSize, Object.assign({}, this.criteria))
             .pipe(
@@ -116,36 +104,6 @@ export class PortIndexComponent extends AppList implements OnInit {
                 },
             );
     }
-    // async getPortIndexs(pager: PagerSetting) {
-    //     this.catalogueRepo.pagingPlace(this.page, this.pageSize, Object.assign({}, this.criteria))
-    //         .pipe(
-    //             catchError(this.catchError),
-    //             finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
-    //             map((res: any) => {
-    //                 return {
-    //                     data: res.data,
-    //                     totalItems: res.totalItems,
-    //                 };
-    //             })
-    //         ).subscribe(
-    //             (res: any) => {
-    //                 this.totalItems = res.totalItems || 0;
-    //                 this.portIndexs = res.data;
-    //                 this.pager.totalItems = this.totalItems;
-
-    //                 console.log(this.totalItems);
-    //             },
-    //         );
-    //     // let responses = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
-    //     // if (responses != null) {
-    //     //     this.portIndexs = responses.data;
-    //     //     this.pager.totalItems = responses.totalItems;
-    //     // }
-    //     // else {
-    //     //     this.portIndexs = [];
-    //     //     this.pager.totalItems = 0;
-    //     // }
-    // }
     onSearch(event) {
         this.criteria = {
             placeType: PlaceTypeEnum.Port
@@ -184,9 +142,8 @@ export class PortIndexComponent extends AppList implements OnInit {
                 this.criteria.modeOfTransport = event.searchString;
             }
         }
+        this.page = 1;
         this.requestList();
-        // this.initPager();
-        // this.setPage(this.pager);
     }
     resetSearch(event) {
         this.criteria = {
@@ -271,7 +228,6 @@ export class PortIndexComponent extends AppList implements OnInit {
     onCancel() {
         this.initPortIndex();
         this.requestList();
-        // this.getPortIndexs(this.pager);
     }
 
     getDataCombobox() {
@@ -280,29 +236,26 @@ export class PortIndexComponent extends AppList implements OnInit {
         this.getModeOfTransport();
     }
     async getModeOfTransport() {
-        let responses = await this.baseService.getAsync(this.api_menu.Catalogue.CatPlace.getModeOfTransport, false, false);
+        const responses = await this.baseService.getAsync(this.api_menu.Catalogue.CatPlace.getModeOfTransport, false, false);
         if (responses != null) {
             this.modes = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
-        }
-        else {
+        } else {
             this.modes = [];
         }
     }
     async getAreas() {
-        let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Area.getAllByLanguage, false, false);
+        const responses = await this.baseService.getAsync(this.api_menu.Catalogue.Area.getAllByLanguage, false, false);
         if (responses != null) {
             this.areas = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
-        }
-        else {
+        } else {
             this.areas = [];
         }
     }
     async getCountries() {
-        let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Country.getAllByLanguage, false, true);
+        const responses = await this.baseService.getAsync(this.api_menu.Catalogue.Country.getAllByLanguage, false, true);
         if (responses != null) {
             this.countries = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
-        }
-        else {
+        } else {
             this.countries = [];
         }
     }
@@ -326,113 +279,64 @@ export class PortIndexComponent extends AppList implements OnInit {
         this.modeActive = this.getModeActive(this.portIndex.modeOfTransport);
     }
     getModeActive(modeOfTransport: string) {
-        let index = this.modes.findIndex(x => x.id == modeOfTransport);
+        const index = this.modes.findIndex(x => x.id === modeOfTransport);
         if (index > -1) {
             return [this.modes[index]];
-        }
-        else {
+        } else {
             return [];
         }
     }
     getDistrictAactive(areaID: string) {
-        let index = this.areas.findIndex(x => x.id == areaID);
+        const index = this.areas.findIndex(x => x.id === areaID);
         if (index > -1) {
             return [this.areas[index]];
-        }
-        else {
+        } else {
             return [];
         }
     }
     getCountryActive(countryID: number) {
-        let index = this.countries.findIndex(x => x.id == countryID);
+        const index = this.countries.findIndex(x => x.id === countryID);
         if (index > -1) {
             return [this.countries[index]];
-        }
-        else {
+        } else {
             return [];
         }
     }
 
 
-    async onDelete(event) {
-        console.log(event);
-        if (event) {
-            this.baseService.spinnerShow();
-            this.baseService.delete(this.api_menu.Catalogue.CatPlace.delete + this.portIndex.id).subscribe((response: any) => {
-                this.baseService.spinnerHide();
-                this.baseService.successToast(response.message);
-                this.setPageAfterDelete();
-            }, err => {
-                this.baseService.spinnerHide();
-                this.baseService.handleError(err);
-            });
-        }
+    onDelete(event) {
+        this.catalogueRepo.deletePlace(this.portIndex.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.toastService.success(res.message, '');
+
+                        this.page = 1;
+                        this.requestList();
+                    } else {
+                        this.toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
+
     }
 
-    setPageAfterDelete() {
-        this.pager.totalItems = this.pager.totalItems - 1;
-        let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
-        if (totalPages < this.pager.totalPages) {
-            this.pager.currentPage = totalPages;
-        }
-        this.child.setPage(this.pager.currentPage);
-    }
     onSortChange(column) {
-        let property = column.primaryKey;
+        const property = column.primaryKey;
         this.isDesc = !this.isDesc;
         this.portIndexs = this.sortService.sort(this.portIndexs, property, this.isDesc);
     }
-    async export() {
-        var portIndexes = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, this.criteria);
-        console.log(portIndexes);
-        if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-            portIndexes = _map(portIndexes, function (pi, index) {
-                return [
-                    index + 1,
-                    pi['code'],
-                    pi['nameEn'],
-                    pi['nameVn'],
-                    pi['countryNameEN'],
-                    pi['areaNameEN'],
-                    pi['modeOfTransport'],
-                    (pi['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH
-                ]
-            });
-        }
-
-        if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-            portIndexes = _map(portIndexes, function (pi, index) {
-                return [
-                    index + 1,
-                    pi['code'],
-                    pi['nameEn'],
-                    pi['nameVn'],
-                    pi['countryNameVN'],
-                    pi['areaNameVN'],
-                    pi['modeOfTransport'],
-                    (pi['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM
-                ]
-            });
-        }
-
-        const exportModel: ExportExcel = new ExportExcel();
-        exportModel.title = "PortIndex List";
-        const currrently_user = localStorage.getItem('currently_userName');
-        exportModel.author = currrently_user;
-        exportModel.header = [
-            { name: "No.", width: 10 },
-            { name: "Code", width: 20 },
-            { name: "Name EN", width: 20 },
-            { name: "Name VN", width: 20 },
-            { name: "Country", width: 20 },
-            { name: "Zone", width: 20 },
-            { name: "Mode", width: 20 },
-            { name: "Status", width: 20 }
-        ]
-        exportModel.data = portIndexes;
-        exportModel.fileName = "PortIndex";
-
-        this.excelService.generateExcel(exportModel);
+    export() {
+        this.exportRepository.exportPortIndex(this.criteria)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "PortIndex.xlsx");
+                },
+            );
 
 
     }

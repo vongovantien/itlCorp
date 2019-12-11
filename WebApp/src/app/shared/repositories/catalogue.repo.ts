@@ -342,6 +342,12 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+    deletePlace(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPlace/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
     updatePlace(id: string, body: any = {}) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPlace/` + id, body).pipe(
             map((data: any) => data)

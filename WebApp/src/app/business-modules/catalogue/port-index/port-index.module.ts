@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { PaginationModule } from 'ngx-bootstrap';
+import { AddPortIndexComponent } from './add/add-port-index.component';
 
 const routing: Routes = [
     { path: '', component: PortIndexComponent, data: { name: "Port Index", level: 2 } },
@@ -30,7 +31,8 @@ const routing: Routes = [
     bootstrap: [PortIndexComponent],
     declarations: [
         PortIndexComponent,
-        PortIndexImportComponent
+        PortIndexImportComponent,
+        AddPortIndexComponent
     ],
     providers: [],
 })

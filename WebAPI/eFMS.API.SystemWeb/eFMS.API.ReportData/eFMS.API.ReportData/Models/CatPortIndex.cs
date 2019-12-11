@@ -7,7 +7,7 @@
         public string NameEn { get; set; }
         public string ModeOfTransport { get; set; }
         public string AreaNameEN { get; set; }
-        public short? CountryNameEN { get; set; }
+        public string CountryNameEN { get; set; }
         public bool? Inactive { get; set; }
     }
 }

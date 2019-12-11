@@ -522,7 +522,6 @@ namespace eFMS.API.Documentation.DL.Services
                 return new HandleState(ex.Message);
             }
         }
-    }
 
         public List<CsMawbcontainerImportModel> CheckValidGoodsImport(List<CsMawbcontainerImportModel> list, Guid? mblid, Guid? hblid)
         {
