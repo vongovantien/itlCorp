@@ -114,6 +114,23 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("downloadGoodsFileExcel")]
+        public async Task<ActionResult> DownloadGoodsExcel()
+        {
+            string fileName = Templates.Goods.ExelImportFileName + Templates.ExelImportEx;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
+            if (result != null)
+            {
+                return result;
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        /// <summary>
         /// import list container
         /// </summary>
         /// <param name="data"></param>
@@ -177,6 +194,59 @@ namespace eFMS.API.Documentation.Controllers
                     list.Add(container);
                 }
                 var data = csContainerService.CheckValidContainerImport(list, mblid, hblid);
+                var totalValidRows = list.Count(x => x.IsValid == true);
+                var duplicatedError = list.FirstOrDefault(x => x.DuplicateError != null)?.DuplicateError;
+                var existedError = list.FirstOrDefault(x => x.ExistedError != null)?.ExistedError;
+                var results = new { list, totalValidRows, duplicatedError, existedError };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        /// <summary>
+        /// read data from file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <param name="id"></param>
+        /// <param name="isHouseBill"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("UploadGoodsFile")]
+        public IActionResult UploadGoodsFile(IFormFile uploadedFile, [Required]Guid id, bool isHouseBill = false)
+        {
+            Guid? hblid = null;
+            Guid? mblid = null;
+            if (isHouseBill) hblid = id;
+            else mblid = id;
+
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                List<CsMawbcontainerImportModel> list = new List<CsMawbcontainerImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var container = new CsMawbcontainerImportModel
+                    {
+                        IsValid = true,
+                        ContainerTypeName = worksheet.Cells[row, 1].Value == null ? string.Empty : worksheet.Cells[row, 1].Value.ToString().Trim(),
+                        QuantityError = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        GwError = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                        CbmError = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                        PackageTypeName = worksheet.Cells[row, 5].Value == null ? string.Empty : worksheet.Cells[row, 5].Value.ToString().Trim(),
+                        PackageQuantityError = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        ContainerNo = worksheet.Cells[row, 7].Value == null ? string.Empty : worksheet.Cells[row, 7].Value.ToString().Trim(),
+                        SealNo = worksheet.Cells[row, 8].Value == null ? string.Empty : worksheet.Cells[row, 8].Value.ToString().Trim(),
+                        MarkNo = worksheet.Cells[row, 9].Value == null ? string.Empty : worksheet.Cells[row, 9].Value.ToString().Trim(),
+                        CommodityName = worksheet.Cells[row, 10].Value == null ? string.Empty : worksheet.Cells[row, 10].Value.ToString().Trim(),
+                        Description = worksheet.Cells[row, 11].Value == null ? string.Empty : worksheet.Cells[row, 11].Value.ToString().Trim()
+                    };
+                    list.Add(container);
+                }
+                var data = csContainerService.CheckValidGoodsImport(list, mblid, hblid);
                 var totalValidRows = list.Count(x => x.IsValid == true);
                 var duplicatedError = list.FirstOrDefault(x => x.DuplicateError != null)?.DuplicateError;
                 var existedError = list.FirstOrDefault(x => x.ExistedError != null)?.ExistedError;

@@ -69,7 +69,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends ShareBussinessShip
             .pipe(skip(1))
             .subscribe(
                 (res: HouseBill) => {
-                    if (!!res) {
+                    if (!!res.id) {
                         this.totalCBM = res.cbm;
                         this.netWeight = res.netWeight;
                         this.totalChargeWeight = res.chargeWeight;

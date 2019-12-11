@@ -33,6 +33,8 @@
   "MSG_MAWBCONTAINER_COMMODITY_NAME_NOT_FOUND": "Commodity name is not found",
   "MSG_MAWBCONTAINER_UNIT_OF_MEASURE_NOT_FOUND": "Unit of measure name is not found",
   "MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1": "Quantity must be 1",
+  "MSG_MAWBCONTAINER_PACKAGE_TYPE_EMPTY": "Package type name is empty",
+  "MSG_MAWBCONTAINER_PACKAGE_QUANTITY_EMPTY": "Package quantity is empty",
 
   "MSG_SURCHARGE_NOT_FOUND": "Charge not found!",
   "MSG_SURCHARGE_NOT_ALLOW_DELETED": "Cannot delete, this charge is containing Credit Debit Note/SOA no!",
@@ -40,5 +42,19 @@
   "MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND": "Credit debit note not found !",
   "MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA": "Cannot delete, this credit debit not is containing at least one charge have SOA no!",
   "MSG_CDNOTE_NOT_NOT_FOUND": "CD Note not found !",
-  "MSG_SURCHARGE_ARE_DUPLICATE_INVOICE": "Surcharges have duplicated invoice charge"
+  "MSG_SURCHARGE_ARE_DUPLICATE_INVOICE": "Surcharges have duplicated invoice charge",
+
+  "MSG_NOT_FOUND_TRANSACTION_TYPE": "Không tìm thấy Transaction Type",
+  "MSG_MBL_REQUIRED": "MBL không được để trống!",
+  "MSG_POD_DIFFERENT_POL": "Port of Destination phải khác Port of Loading",
+  "MSG_POL_DIFFERENT_POD": "Port of Loading phải khác Port of Destination",
+  "MSG_ETD_BEFORE_ETA": "ETD date phải trước ETA date",
+  "MSG_ETA_AFTER_ETD": "ETA date phải sau ETD date",
+  "MSG_ETA_REQUIRED": "ETA không được để trống!",
+  "MSG_MBL_TYPE_REQUIRED": "Master Bill of Lading Type không được để trống!",
+  "MSG_SHIPMENT_TYPE_REQUIRED": "Shipment Type không được để trống!",
+  "MSG_POD_REQUIRED": "Port of Destination không được để trống!",
+  "MSG_PODELI_DIFFERENT_POL": "Place of Delivery phải khác Port of Loading",
+  "MSG_SERVICE_TYPE_REQUIRED": "Service Type không được để trống!",
+  "MSG_PERSON_IN_CHARGE_REQUIRED": "Person In Charge không được để trống!"
 }

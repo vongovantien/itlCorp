@@ -38,8 +38,8 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent, { static: false }) hblGoodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
-    @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
-    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
+    @ViewChild(ShareBusinessArrivalNoteComponent, { static: true, }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
+    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
 
     jobId: string = '';
     shipmentDetail: any = {}; // TODO model.
@@ -78,6 +78,9 @@ export class CreateHouseBillComponent extends AppForm {
             if (param.jobId) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
+                this.getDetailShipment();
+
             }
         });
 
@@ -95,27 +98,9 @@ export class CreateHouseBillComponent extends AppForm {
         this.hblGoodSummaryComponent.initContainer();
         this.hblGoodSummaryComponent.containerPopup.isAdd = true;
         this.hblGoodSummaryComponent.description = "AS PER BILL";
+        console.log(this.hblGoodSummaryComponent.description);
         this.formHouseBill.notifyPartyDescription.setValue("SAM AS CONSIGNEE");
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
-        this.getDetailShipment();
-
-        setTimeout(() => {
-            const objDelivery = {
-                deliveryOrderNo: this.hblDetail.jobNo + "-D01",
-                deliveryOrderPrintedDate: {
-                    startDate: new Date(),
-                    endDate: new Date()
-                }
-            };
-            const objArrival = {
-                arrivalNo: this.hblDetail.jobNo + "-A01",
-            };
-
-            this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
-            this.arrivalNoteComponent.hblArrivalNote.arrivalNo = objArrival.arrivalNo;
-            this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice = new Date();
-            this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
-        }, 700);
         this._cd.detectChanges();
 
     }
@@ -132,7 +117,22 @@ export class CreateHouseBillComponent extends AppForm {
                 (res: CommonInterface.IResult) => {
                     if (!!res) {
                         this.hblDetail = res;
-                        console.log(this.hblDetail);
+                        const objArrival = {
+                            arrivalNo: this.hblDetail.jobNo + "-A01",
+                            arrivalFirstNotice: new Date()
+                        };
+
+                        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(
+                            objArrival
+                        );
+                        const objDelivery = {
+                            deliveryOrderNo: this.hblDetail.jobNo + "-D01",
+                            deliveryOrderPrintedDate: {
+                                startDate: new Date(),
+                                endDate: new Date()
+                            }
+                        };
+                        this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                     }
                 },
             );

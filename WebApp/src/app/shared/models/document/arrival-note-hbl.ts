@@ -18,7 +18,7 @@ export class HBLArrivalNote {
                 self[key] = object[key];
             }
 
-            if (!!self.csArrivalFrieghtCharges) {
+            if (!!self.csArrivalFrieghtCharges.length) {
                 self.csArrivalFrieghtCharges = object.csArrivalFrieghtCharges.map((i: ArrivalFreightCharge) => new ArrivalFreightCharge(i));
             }
         }

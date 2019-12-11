@@ -1,0 +1,128 @@
+<div class="modal fade" id="add-port-index-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Port Index</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--begin::add-port-index-form-->
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && code.invalid }">
+                                    <label class="form-control-label">
+                                        Port code <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter detail"
+                                        name="code" autocomplete="nope" minlength="3"
+                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }"
+                                        required>
+                                    <!-- <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid">
+                                        Code is required least 3 characters
+                                    </div> -->
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndexeNameEN.invalid }">
+                                    <label class="form-control-label">
+                                        Name(EN) <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter name"
+                                        name="portIndexeNameEN" autocomplete="nope" minlength="3"
+                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && portIndexeNameEN.invalid }"
+                                        required>
+                                    <!-- <div class="form-control-feedback"
+                                        *ngIf="formAddEdit.submitted && portIndexeNameEN.invalid">
+                                        Name(EN) is required least 3 characters
+                                    </div> -->
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndexeNameLocal.invalid }">
+                                    <label class="form-control-label">
+                                        Name(Local) <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter name"
+                                        name="portIndexeNameLocal" autocomplete="nope" minlength="3"
+                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && portIndexeNameLocal.invalid }"
+                                        required>
+                                    <!-- <div class="form-control-feedback"
+                                        *ngIf="formAddEdit.submitted && portIndexeNameLocal.invalid">
+                                        Name(Local) is required least 3 characters
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndex.countryID == null }">
+                                    <label class="form-control-label">
+                                        Country <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="countries" [active]="countryActive"
+                                        (selected)="portIndex.countryID = $event.id"
+                                        (removed)="portIndex.countryID = null" placeholder="Select country">
+                                    </ng-select>
+                                    <!-- <div class="form-control-feedback"
+                                        *ngIf="formAddEdit.submitted && portIndex.countryID == null">
+                                        Country is required
+                                    </div> -->
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        Zone (Optional)
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="areas" placeholder="Select zone">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndex.modeOfTransport == null }">
+                                    <label class="form-control-label">
+                                        Mode <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="modes" placeholder="Select mode">
+                                    </ng-select>
+                                    <!-- <div class="form-control-feedback"
+                                        *ngIf="formAddEdit.submitted && portIndex.modeOfTransport == null">
+                                        Mode is required
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group m-form__group">
+                                    <div>
+                                        <label class="m-checkbox m-checkbox--bold">
+                                            <input type="checkbox">
+                                            Active
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end:add-port-index-form -->
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button> -->
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

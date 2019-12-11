@@ -523,4 +523,183 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
     }
+
+        public List<CsMawbcontainerImportModel> CheckValidGoodsImport(List<CsMawbcontainerImportModel> list, Guid? mblid, Guid? hblid)
+        {
+            var units = catUnitRepository.Get().ToList();
+            var commodities = catCommodityRepository.Get();
+            var containers = units.Where(x => x.UnitType == "Container");
+            var packages = units.Where(x => x.UnitType == "Package");
+            var unitOfMeasures = units.Where(x => x.UnitType == "Weight Measurement");
+            var containerShipments = DataContext.Get().ToList();
+            list.ForEach(item => {
+                var container = containers.FirstOrDefault(x => x.UnitNameEn == item.ContainerTypeName);
+                if (container == null)
+                {
+                    item.IsValid = false;
+                    item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_CONTAINERTYPE_NOT_FOUND, item.ContainerTypeName].Value;
+                }
+                else
+                {
+                    item.ContainerTypeId = container.Id;
+                }
+
+                if (!string.IsNullOrEmpty(item.PackageTypeName))
+                {
+                    var packageType = packages.FirstOrDefault(x => x.UnitNameEn == item.PackageTypeName);
+                    if (packageType == null)
+                    {
+                        item.IsValid = false;
+                        item.PackageTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_PACKAGE_TYPE_NOT_FOUND, item.PackageTypeName].Value;
+                    }
+                    else
+                    {
+                        item.PackageTypeId = packageType.Id;
+                        item.PackageTypeNameError = null;
+                    }
+                }
+                else {
+                    item.IsValid = false;
+                    item.PackageTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_PACKAGE_TYPE_EMPTY].Value;
+                }
+                if (Int32.TryParse(item.QuantityError, out int quant))
+                {
+                    item.Quantity = quant;
+                    item.QuantityError = null;
+
+                    if ((!string.IsNullOrEmpty(item.ContainerNo) || !string.IsNullOrEmpty(item.MarkNo) || !string.IsNullOrEmpty(item.SealNo)) && item.Quantity > 1)
+                    {
+                        item.IsValid = false;
+                        item.QuantityError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1].Value;
+                    }
+
+
+                    if (!string.IsNullOrEmpty(item.ContainerNo) && item.PackageTypeId != null)
+                    {
+                        //var index = list.IndexOf(item);
+                        var duplicateItems = list.Where(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId);
+                        if (duplicateItems.Count() > 1)
+                        {
+                            list.Where(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId).ToList().ForEach(cont =>
+                            {
+                                cont.IsValid = false;
+                                cont.DuplicateError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;
+                                cont.ContainerNoError = item.ContainerNo;
+                                cont.QuantityError = cont.Quantity + string.Empty;
+                                cont.ContainerTypeNameError = cont.ContainerTypeName;
+                                cont.PackageTypeNameError = cont.PackageTypeName;
+                            });
+                        }
+                        IEnumerable<CsMawbcontainer> existedItems = null;
+                        if (mblid != null)
+                        {
+                            existedItems = containerShipments.Where(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == mblid);
+                        }
+                        else
+                        {
+                            existedItems = containerShipments.Where(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == hblid);
+                        }
+                        if (existedItems.Any())
+                        {
+                            item.IsValid = false;
+                            item.ExistedError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;
+                            item.ContainerNoError = item.ContainerNo;
+                            item.QuantityError = item.Quantity + string.Empty;
+                            item.ContainerTypeNameError = item.ContainerTypeName;
+                            item.PackageTypeNameError = item.PackageTypeName;
+                        }
+                    }
+                }
+                else
+                {
+                    item.QuantityError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_QUANTITY_MUST_BE_NUMBER].Value;
+                    item.IsValid = false;
+                }
+                if (item.PackageQuantityError != null)
+                {
+                    if (Int64.TryParse(item.PackageQuantityError, out long x))
+                    {
+                        item.PackageQuantity = (short?)x;
+                        item.PackageQuantityError = null;
+                    }
+                    else
+                    {
+                        item.PackageQuantityError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_PACKAGE_QUANTITY_MUST_BE_NUMBER].Value;
+                        item.IsValid = false;
+                    }
+                }
+                else
+                {
+                    item.PackageQuantityError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_PACKAGE_QUANTITY_EMPTY].Value;
+                    item.IsValid = false;
+                }
+                if (item.NwError != null)
+                {
+                    if (Int64.TryParse(item.NwError, out long x))
+                    {
+                        item.Nw = x;
+                        item.NwError = null;
+                    }
+                    else
+                    {
+                        item.NwError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_NW_MUST_BE_NUMBER].Value;
+                        item.IsValid = false;
+                    }
+                }
+                if (item.GwError != null)
+                {
+                    if (Int64.TryParse(item.GwError, out long x))
+                    {
+                        item.Gw = x;
+                        item.GwError = null;
+                    }
+                    else
+                    {
+                        item.GwError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_GW_MUST_BE_NUMBER].Value;
+                        item.IsValid = false;
+                    }
+                }
+                if (item.CbmError != null)
+                {
+                    if (Int64.TryParse(item.CbmError, out long x))
+                    {
+                        item.Cbm = x;
+                        item.CbmError = null;
+                    }
+                    else
+                    {
+                        item.CbmError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_CBM_MUST_BE_NUMBER].Value;
+                        item.IsValid = false;
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.CommodityName))
+                {
+                    var commodity = commodities.FirstOrDefault(x => x.CommodityNameEn == item.CommodityName);
+                    if (commodity == null)
+                    {
+                        item.IsValid = false;
+                        item.CommodityNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_COMMODITY_NAME_NOT_FOUND].Value;
+                    }
+                    else
+                    {
+                        item.CommodityId = commodity.Id;
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.UnitOfMeasureName))
+                {
+                    var unitOfMeasure = unitOfMeasures.FirstOrDefault(x => x.UnitNameEn == item.UnitOfMeasureName);
+                    if (unitOfMeasure == null)
+                    {
+                        item.IsValid = false;
+                        item.UnitOfMeasureNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_UNIT_OF_MEASURE_NOT_FOUND].Value;
+                    }
+                    else
+                    {
+                        item.UnitOfMeasureId = unitOfMeasure.Id;
+                    }
+                }
+            });
+            return list;
+        }
+    }
 }

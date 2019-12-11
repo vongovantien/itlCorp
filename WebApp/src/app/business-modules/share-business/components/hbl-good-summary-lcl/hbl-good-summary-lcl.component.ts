@@ -14,6 +14,7 @@ import { catchError, takeUntil, skip } from 'rxjs/operators';
 import * as fromStore from '../../store';
 import { getParamsRouterState } from 'src/app/store';
 import { Params } from '@angular/router';
+import { GetContainerAction } from '../../store';
 
 
 @Component({
@@ -23,7 +24,7 @@ import { Params } from '@angular/router';
 
 export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShipmentGoodSummaryComponent implements OnInit {
 
-    @ViewChild(ShareBussinessGoodsListPopupComponent, { static: false }) containerPopup: ShareBussinessGoodsListPopupComponent;
+    @ViewChild(ShareBussinessGoodsListPopupComponent, { static: false }) goodsImportPopup: ShareBussinessGoodsListPopupComponent;
 
     packageQty: number = null;
 
@@ -91,7 +92,14 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     }
 
     openContainerListPopup() {
-        this.containerPopup.show();
+        this.goodsImportPopup.mblid = this.mblid;
+        this.goodsImportPopup.hblid = this.hblid;
+
+        if (!this.isSave && !!this.mblid) {
+            this._store.dispatch(new GetContainerAction({ mblid: this.mblid }));
+        }
+
+        this.goodsImportPopup.show();
     }
 
     updateData(containers: Container[] | any) {
