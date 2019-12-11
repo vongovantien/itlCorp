@@ -230,35 +230,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count > 0)
                         {
-                            var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
-
-                            var listIdOfCont = containers.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
-                            var idContainersNeedRemove = csMawbcontainerRepo.Get(x => x.Mblid == transaction.Id && !listIdOfCont.Contains(x.Id)).Select(s => s.Id);
-                            //Delete item of List Container MBL
-                            if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
-                            {
-                                var hsDelContHBL = csMawbcontainerRepo.Delete(x => idContainersNeedRemove.Contains(x.Id));
-                            }
-
-                            foreach (var container in containers)
-                            {
-                                //Insert & Update List Container MBL
-                                if (container.Id == Guid.Empty)
-                                {
-                                    container.Id = Guid.NewGuid();
-                                    container.Mblid = transaction.Id;
-                                    container.UserModified = transaction.UserModified;
-                                    container.DatetimeModified = DateTime.Now;
-                                    var hsAddContMBL = csMawbcontainerRepo.Add(container);
-                                }
-                                else
-                                {
-                                    container.Mblid = transaction.Id;
-                                    container.UserModified = transaction.UserModified;
-                                    container.DatetimeModified = DateTime.Now;
-                                    var hsUpdateContMBL = csMawbcontainerRepo.Update(container, x => x.Id == container.Id);
-                                }
-                            }
+                            var hscontainers = containerService.UpdateMasterBill(model.CsMawbcontainers, transaction.Id);
                         }
                     }
                     trans.Commit();

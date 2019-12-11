@@ -101,113 +101,135 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
-                using(var trans = DataContext.DC.Database.BeginTransaction())
+                if (masterId != null)
                 {
-                    try
+                    List<CsMawbcontainer> oldList = null;
+                    oldList = DataContext.Where(x => x.Mblid == masterId).ToList();
+                    foreach (var item in oldList)
                     {
-                        if (masterId != null)
+                        if (list.FirstOrDefault(x => x.Id == item.Id) == null)
                         {
-                            List<CsMawbcontainer> oldList = null;
-                            oldList = DataContext.Where(x => x.Mblid == masterId).ToList();
-                            foreach (var item in oldList)
-                            {
-                                if (list.FirstOrDefault(x => x.Id == item.Id) == null)
-                                {
-                                    DataContext.Delete(x => x.Id == item.Id, false);
-                                }
-                            }
+                            DataContext.Delete(x => x.Id == item.Id, false);
+                        }
+                    }
 
-                            if (housebillId != null)
-                            {
-                                List<CsMawbcontainer> oldHouseList = null;
-                                oldHouseList = DataContext.Where(x => x.Hblid == housebillId && x.Mblid == masterId).ToList();
-                                foreach (var item in oldHouseList)
-                                {
-                                    if (list.FirstOrDefault(x => x.Id == item.Id) == null)
-                                    {
-                                        DataContext.Delete(x => x.Id == item.Id, false);
-                                    }
-                                }
-                            }
-                        }
-                        Hashtable ht = new Hashtable();
-                        int sumCont = 0;decimal sumGW = 0; decimal sumNW = 0; decimal sumCW = 0; decimal sumCBM = 0; int sumPackages = 0;
-                        foreach (var item in list)
+                    if (housebillId != null)
+                    {
+                        List<CsMawbcontainer> oldHouseList = null;
+                        oldHouseList = DataContext.Where(x => x.Hblid == housebillId && x.Mblid == masterId).ToList();
+                        foreach (var item in oldHouseList)
                         {
-                            sumCont = sumCont + (int)item.Quantity;
-                            sumGW = sumGW + (item.Gw != null?(long)item.Gw: 0);
-                            sumNW = sumNW + (item.Nw != null?(long)item.Nw: 0);
-                            sumCW = sumCW + (item.ChargeAbleWeight != null?(long)item.ChargeAbleWeight: 0);
-                            sumCBM = sumCBM + (item.Cbm != null? (long)item.Cbm: 0);
-                            sumPackages = sumPackages + (item.PackageQuantity != null? (int)item.PackageQuantity: 0);
-                            if (ht.ContainsKey(item.ContainerTypeName))
+                            if (list.FirstOrDefault(x => x.Id == item.Id) == null)
                             {
-                                var sumContDes = Convert.ToInt32(ht[item.ContainerTypeName]) + item.Quantity;
-                                ht[item.ContainerTypeName] = sumContDes;
-                            }
-                            else
-                            {
-                                ht.Add(item.ContainerTypeName, item.Quantity);
-                            }
-                            if (item.Id == Guid.Empty)
-                            {
-                                item.Id = Guid.NewGuid();
-                                item.UserModified = currentUser.UserID;
-                                item.Mblid = (Guid)masterId;
-                                item.DatetimeModified = DateTime.Now;
-                                var hs = Add(item, false);
-                            }
-                            else
-                            {
-                                if (DataContext.Count(x => x.Id == item.Id) == 1)
-                                {
-                                    item.UserModified = currentUser.UserID;
-                                    item.DatetimeModified = DateTime.Now;
-                                    var hs = Update(item, x => x.Id == item.Id, false);
-                                }
+                                DataContext.Delete(x => x.Id == item.Id, false);
                             }
                         }
-                        var opstrans = opsTransRepository.First(x => x.Id == masterId);
+                    }
+                }
+                Hashtable ht = new Hashtable();
+                int sumCont = 0;decimal sumGW = 0; decimal sumNW = 0; decimal sumCW = 0; decimal sumCBM = 0; int sumPackages = 0;
+                foreach (var item in list)
+                {
+                    sumCont = sumCont + (int)item.Quantity;
+                    sumGW = sumGW + (item.Gw != null?(long)item.Gw: 0);
+                    sumNW = sumNW + (item.Nw != null?(long)item.Nw: 0);
+                    sumCW = sumCW + (item.ChargeAbleWeight != null?(long)item.ChargeAbleWeight: 0);
+                    sumCBM = sumCBM + (item.Cbm != null? (long)item.Cbm: 0);
+                    sumPackages = sumPackages + (item.PackageQuantity != null? (int)item.PackageQuantity: 0);
+                    if (ht.ContainsKey(item.ContainerTypeName))
+                    {
+                        var sumContDes = Convert.ToInt32(ht[item.ContainerTypeName]) + item.Quantity;
+                        ht[item.ContainerTypeName] = sumContDes;
+                    }
+                    else
+                    {
+                        ht.Add(item.ContainerTypeName, item.Quantity);
+                    }
+                    if (item.Id == Guid.Empty)
+                    {
+                        item.Id = Guid.NewGuid();
+                        item.UserModified = currentUser.UserID;
+                        item.Mblid = (Guid)masterId;
+                        item.DatetimeModified = DateTime.Now;
+                        var hs = Add(item, false);
+                    }
+                    else
+                    {
+                        if (DataContext.Count(x => x.Id == item.Id) == 1)
+                        {
+                            item.UserModified = currentUser.UserID;
+                            item.DatetimeModified = DateTime.Now;
+                            var hs = Update(item, x => x.Id == item.Id, false);
+                        }
+                    }
+                }
+                var opstrans = opsTransRepository.First(x => x.Id == masterId);
 
-                        if (ht.Count > 0)
-                        {
-                            var containerDes = string.Empty;
-                            ICollection keys = ht.Keys;
-                            foreach (var key in keys)
-                            {
-                                containerDes = containerDes + ht[key] + "x" + key + "; ";
-                            }
-                            containerDes = containerDes.Substring(0, containerDes.Length - 2);
-                            opstrans.SumCbm = sumCBM != 0? (decimal?)sumCBM: null;
-                            opstrans.SumChargeWeight = sumCW != 0 ? (decimal?)sumCW : null;
-                            opstrans.SumGrossWeight = sumGW != 0 ? (decimal?)sumGW : null;
-                            opstrans.SumNetWeight = sumNW != 0 ? (decimal?)sumNW : null;
-                            opstrans.SumPackages = sumPackages != 0 ? (int?)sumPackages : null;
-                            opstrans.SumContainers = sumCont != 0 ? (int?)sumCont : null ;
-                            opstrans.ContainerDescription = containerDes;
-                        }
-                        else
-                        {
-                            opstrans.SumCbm = opstrans.SumChargeWeight = opstrans.SumGrossWeight = opstrans.SumNetWeight = opstrans.SumPackages = opstrans.SumContainers = null;
-                            opstrans.ContainerDescription = null;
-                        }
-                        opstrans.DatetimeModified = DateTime.Now;
-                        opstrans.UserModified = currentUser.UserID;
-                        opsTransRepository.Update(opstrans, x => x.Id == masterId, false);
-                        DataContext.SubmitChanges();
-                        opsTransRepository.SubmitChanges();
-                        trans.Commit();
-                    }
-                    catch (Exception ex)
+                if (ht.Count > 0)
+                {
+                    var containerDes = string.Empty;
+                    ICollection keys = ht.Keys;
+                    foreach (var key in keys)
                     {
-                        trans.Rollback();
-                        return new HandleState(ex.Message);
+                        containerDes = containerDes + ht[key] + "x" + key + "; ";
                     }
-                    finally
+                    containerDes = containerDes.Substring(0, containerDes.Length - 2);
+                    opstrans.SumCbm = sumCBM != 0? (decimal?)sumCBM: null;
+                    opstrans.SumChargeWeight = sumCW != 0 ? (decimal?)sumCW : null;
+                    opstrans.SumGrossWeight = sumGW != 0 ? (decimal?)sumGW : null;
+                    opstrans.SumNetWeight = sumNW != 0 ? (decimal?)sumNW : null;
+                    opstrans.SumPackages = sumPackages != 0 ? (int?)sumPackages : null;
+                    opstrans.SumContainers = sumCont != 0 ? (int?)sumCont : null ;
+                    opstrans.ContainerDescription = containerDes;
+                }
+                else
+                {
+                    opstrans.SumCbm = opstrans.SumChargeWeight = opstrans.SumGrossWeight = opstrans.SumNetWeight = opstrans.SumPackages = opstrans.SumContainers = null;
+                    opstrans.ContainerDescription = null;
+                }
+                opstrans.DatetimeModified = DateTime.Now;
+                opstrans.UserModified = currentUser.UserID;
+                opsTransRepository.Update(opstrans, x => x.Id == masterId, false);
+                DataContext.SubmitChanges();
+                opsTransRepository.SubmitChanges();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+            return new HandleState();
+        }
+
+        public HandleState UpdateMasterBill(List<CsMawbcontainerModel> containers, Guid masterId)
+        {
+            try
+            {
+                var listIdOfCont = containers.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
+                var idContainersNeedRemove = DataContext.Get(x => x.Mblid == masterId && !listIdOfCont.Contains(x.Id)).Select(s => s.Id);
+                //Delete item of List Container MBL
+                if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
+                {
+                    var hsDelContHBL = DataContext.Delete(x => idContainersNeedRemove.Contains(x.Id));
+                }
+
+                foreach (var container in containers)
+                {
+                    //Insert & Update List Container MBL
+                    if (container.Id == Guid.Empty)
                     {
-                        trans.Dispose();
+                        container.Id = Guid.NewGuid();
+                        container.Mblid = masterId;
+                        container.UserModified = currentUser.UserID;
+                        container.DatetimeModified = DateTime.Now;
+                        var hsAddContMBL = Add(container);
                     }
-                    
+                    else
+                    {
+                        container.Mblid = masterId;
+                        container.UserModified = currentUser.UserID;
+                        container.DatetimeModified = DateTime.Now;
+                        var hsUpdateContMBL = Update(container, x => x.Id == container.Id);
+                    }
                 }
                 return new HandleState();
             }
@@ -460,6 +482,45 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             return new HandleState();
+        }
+
+        public HandleState UpdateHouseBill(List<CsMawbcontainerModel> containers, Guid housebillId)
+        {
+            try
+            {
+                var listIdOfCont = containers.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
+                var idContainersNeedRemove = DataContext.Get(x => x.Hblid == housebillId && !listIdOfCont.Contains(x.Id)).Select(s => s.Id);
+                //Delete item of List Container MBL
+                if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
+                {
+                    var hsDelContHBL = DataContext.Delete(x => idContainersNeedRemove.Contains(x.Id));
+                }
+
+                foreach (var container in containers)
+                {
+                    //Insert & Update List Container MBL
+                    if (container.Id == Guid.Empty)
+                    {
+                        container.Id = Guid.NewGuid();
+                        container.Mblid = housebillId;
+                        container.UserModified = currentUser.UserID;
+                        container.DatetimeModified = DateTime.Now;
+                        var hsAddContMBL = Add(container);
+                    }
+                    else
+                    {
+                        container.Mblid = housebillId;
+                        container.UserModified = currentUser.UserID;
+                        container.DatetimeModified = DateTime.Now;
+                        var hsUpdateContMBL = Update(container, x => x.Id == container.Id);
+                    }
+                }
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
     }
 }

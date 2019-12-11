@@ -19,5 +19,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState Importcontainer(List<CsMawbcontainerImportModel> data);
         List<CsMawbcontainerImportModel> CheckValidContainerImport(List<CsMawbcontainerImportModel> list, Guid? mblid, Guid? hblid);
         HandleState ValidateContainerList(List<CsMawbcontainerModel> csMawbcontainers, Guid? mblId, Guid? hblId);
+        HandleState UpdateMasterBill(List<CsMawbcontainerModel> containers, Guid masterId);
+        HandleState UpdateHouseBill(List<CsMawbcontainerModel> containers, Guid housebillId);
     }
 }

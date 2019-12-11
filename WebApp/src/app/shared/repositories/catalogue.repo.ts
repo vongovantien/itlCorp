@@ -353,6 +353,17 @@ export class CatalogueRepo {
                 map((data: any) => data)
             );
     }
+    pagingPlace(page: number, size: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
     //#endregion
 
     addCountry(body: any = {}) {

@@ -8,6 +8,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
+import { PaginationModule } from 'ngx-bootstrap';
 
 const routing: Routes = [
     { path: '', component: PortIndexComponent, data: { name: "Port Index", level: 2 } },
@@ -22,6 +23,7 @@ const routing: Routes = [
         FormsModule,
         SelectModule,
         NgProgressModule,
+        PaginationModule.forRoot(),
 
     ],
     exports: [],
