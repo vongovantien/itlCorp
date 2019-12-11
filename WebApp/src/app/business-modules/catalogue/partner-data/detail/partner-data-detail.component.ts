@@ -15,6 +15,7 @@ import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { SystemRepo } from 'src/app/shared/repositories';
+import { NgProgress } from '@ngx-progressbar/core';
 declare var $: any;
 
 @Component({
@@ -61,7 +62,7 @@ export class PartnerDataDetailComponent extends AppList {
     selectedSaleman: Saleman = null;
     saleMantoView: Saleman = new Saleman();
     isShowSaleMan: boolean = false;
-
+    currrently_user: string = '';
 
     @Output() isCloseModal = new EventEmitter();
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
@@ -82,10 +83,14 @@ export class PartnerDataDetailComponent extends AppList {
         private api_menu: API_MENU,
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
+        private _toastService: ToastrService,
+        private _progressService: NgProgress,
         private sortService: SortService) {
 
         super();
         this.requestList = this.getSalemanPagingByPartnerId;
+        this._progressRef = this._progressService.ref();
+
     }
     getDataCombobox() {
         this.status = this.getStatus();
@@ -145,7 +150,7 @@ export class PartnerDataDetailComponent extends AppList {
                 this.partner.id = prams.id;
                 this.dataSearchSaleman.partnerId = this.partner.id;
                 await this.getComboboxData();
-                await this.getParnerDetails();
+                this.getParnerDetails();
                 this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
                 this.isRequiredSaleman = this.checkRequireSaleman(this.partner.partnerGroup);
             }
@@ -153,10 +158,23 @@ export class PartnerDataDetailComponent extends AppList {
         this.getDataCombobox();
 
     }
-    async getParnerDetails() {
-        this.partner = await this.baseService.getAsync(this.api_menu.Catalogue.PartnerData.getById + this.partner.id, false, true);
-        console.log('day ne:', this.partner);
-        this.getReferenceData();
+    getParnerDetails() {
+        // this.partner = await this.baseService.getAsync(this.api_menu.Catalogue.PartnerData.getById + this.partner.id, false, true);
+        this._progressRef.start();
+        this._catalogueRepo.getDetailPartner(this.partner.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.partner = res;
+                        this.getReferenceData();
+                    }
+                }
+            );
+
     }
 
     getReferenceData(): any {
@@ -302,43 +320,29 @@ export class PartnerDataDetailComponent extends AppList {
             if (this.isRequiredSaleman) {
                 this.partner.salePersonId = this.saleMans[0].id;
                 this.updatePartner();
-            }
-            else {
+            } else {
                 if (this.isRequiredSaleman === false) {
-                    this.partner.accountNo = this.partner.id = this.partner.taxCode;
+                    this.partner.accountNo = this.partner.taxCode;
                     this.updatePartner();
                 }
             }
         }
     }
 
-    update(): any {
-        this.baseService.spinnerShow();
-        this.baseService.put(this.api_menu.Catalogue.PartnerData.update + this.partner.id, this.partner).subscribe((response: any) => {
-            this.baseService.spinnerHide();
-            this.baseService.successToast(response.message);
-            this.router.navigate(["/home/catalogue/partner-data"]);
-        }, err => {
-            this.baseService.handleError(err);
-            this.baseService.spinnerHide();
-        });
-    }
-
     updatePartner() {
+        this._progressRef.start();
         this._catalogueRepo.updatePartner(this.dataSearchSaleman.partnerId, this.partner)
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
-                (res: any) => {
+                (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this.baseService.spinnerHide();
-                        this.baseService.successToast(res.message);
+                        this._toastService.success(res.message);
                         this.router.navigate(["/home/catalogue/partner-data"]);
+                    } else {
+                        this._toastService.warning(res.message);
                     }
-
-                }, err => {
-                    this.baseService.spinnerHide();
-                    this.baseService.handleError(err);
-                });
+                }
+            );
     }
 
     onDelete(event) {
@@ -584,6 +588,7 @@ export class PartnerDataDetailComponent extends AppList {
     }
 
     showDetailSaleMan(saleman: Saleman) {
+        this.currrently_user = localStorage.getItem('currently_userName');
         $('#saleman-detail-modal').modal('show');
         this.saleMantoView.description = saleman.description;
         this.saleMantoView.effectDate = saleman.effectDate == null ? null : formatDate(saleman.effectDate, 'yyyy-MM-dd', 'en');

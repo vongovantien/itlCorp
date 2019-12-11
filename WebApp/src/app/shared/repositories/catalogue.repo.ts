@@ -307,6 +307,12 @@ export class CatalogueRepo {
         );
     }
 
+    getDetailPartner(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     createPartner(body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/Add`, body).pipe(
             map((data: any) => data)
