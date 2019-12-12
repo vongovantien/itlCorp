@@ -473,10 +473,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             if (
                 !charge.paymentObjectId
                 || !charge.chargeId
-                // || !charge.chargeCode
+                || charge.quantity === null
                 || !charge.unitId
                 || !charge.partnerShortName
                 || charge.unitPrice === null
+                || charge.quantity < 0
                 || charge.unitPrice < 0
                 || charge.vatrate > 100
             ) {

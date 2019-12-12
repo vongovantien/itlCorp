@@ -437,7 +437,7 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
-                                                    <span class="m--font-bolder">Create:</span>
+                                                    <span class="m--font-bolder">Created:</span>
                                                     <span
                                                         class="m--font-brand m--margin-left-5">{{ opsTransaction.datetimeCreated | date : "dd/MM/yyyy HH:mm:ss" }}</span>
                                                     <span class="m--font-bolder m--margin-left-5">by</span>
@@ -519,13 +519,16 @@
                                                         <label class="form-control-label" for="">
                                                             Packages Qty
                                                         </label>
-                                                        <div class="input-group m-input-group m-input-group--square">
-                                                            <input type="number" class="form-control m-input" min="1"
-                                                                autocomplete="nope" aria-label="" name="sumPackages"
-                                                                appIntergerInputCheck placeholder="Enter number"
-                                                                [(ngModel)]="opsTransaction.sumPackages"
-                                                                #sumPackages="ngModel">
-                                                            <div class="input-group-prepend">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <input type="number" class="form-control m-input"
+                                                                    min="1" autocomplete="nope" aria-label=""
+                                                                    name="sumPackages" appIntergerInputCheck
+                                                                    placeholder="Enter number"
+                                                                    [(ngModel)]="opsTransaction.sumPackages"
+                                                                    #sumPackages="ngModel">
+                                                            </div>
+                                                            <div class="col-md-6">
                                                                 <ng-select [allowClear]="false" [items]="packageTypes"
                                                                     [active]="packagesUnitActive"
                                                                     (selected)="opsTransaction.packageTypeId = $event.id"
@@ -656,7 +659,9 @@
 
 <!-- <app-container-list [jobId]="jobId" [lstMasterContainers]='lstMasterContainers'
     (outputContainers)="saveContainers($event)" *ngIf="jobId && lstMasterContainers"></app-container-list> -->
+
 <container-list-popup></container-list-popup>
+
 <pl-sheet-popup [jobId]="jobId"></pl-sheet-popup>
 
 <confirm-popup #confirmCancelUpdate (onSubmit)="onCancelUpdateJob()"

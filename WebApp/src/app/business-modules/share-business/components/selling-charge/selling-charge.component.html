@@ -107,10 +107,10 @@
                             </td>
                             <td>
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.quantity < 0)}">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.quantity === null || charge.quantity < 0)}">
                                     <div class="row quantity-hint">
                                         <div class="col-md-6 p-r-none">
-                                            <input type="text" class="form-control" [(ngModel)]="charge.quantity"
+                                            <input type="number" class="form-control" [(ngModel)]="charge.quantity"
                                                 placeholder="Quantity"
                                                 (ngModelChange)="onChangeQuantity($event, charge)"
                                                 [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">

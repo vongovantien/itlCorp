@@ -125,9 +125,9 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !consignee.value }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !consigneeDescription.value}">
                                 <label class="form-control-label" for="">
-                                    Consignee <span class="m--font-danger">(*)</span>
+                                    <span class="m--font-danger">(*)</span>
                                 </label>
 
                                 <app-combo-grid-virtual-scroll [dataSources]="consignees"
@@ -136,14 +136,16 @@
                                     [selectedDisplayFields]="['partnerNameEn']"
                                     [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                 </app-combo-grid-virtual-scroll>
-
-                                <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
-                                    name="consigneeDescription" formControlName="consigneeDescription"></textarea>
+                                <textarea class="form-control m-input--square" rows="3"
+                                    formControlName="consigneeDescription">
+                                </textarea>
 
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !consignee.value">
                                     Consignee is required
                                 </div>
-
+                                <div class="form-control-feedback" *ngIf="isSubmitted && !consigneeDescription.value">
+                                    Consignee description is required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4">

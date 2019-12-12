@@ -81,8 +81,8 @@
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !container.quantity}">
                                             <input type="number" class="form-control" [(ngModel)]="container.quantity"
-                                                (ngModelChange)="onChangeDataFormTable()" name="quantity" min="0"
-                                                step=".10">
+                                                (ngModelChange)="onChangeDataFormTable()" name="quantity"
+                                                appIntergerInputCheck min="0" step="1">
                                         </div>
                                     </td>
                                     <td>
@@ -112,7 +112,8 @@
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage }">
                                             <input type="number" class="form-control"
                                                 [(ngModel)]="container.packageQuantity" name="packageQuantity"
-                                                (ngModelChange)="onChangeDataFormTable()" min="0" step=".10">
+                                                (ngModelChange)="onChangeDataFormTable()" min="0" appIntergerInputCheck
+                                                min="0" step="1">
                                         </div>
                                     </td>
                                     <td>
