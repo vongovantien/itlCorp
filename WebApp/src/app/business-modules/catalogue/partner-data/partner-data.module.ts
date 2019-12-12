@@ -15,7 +15,7 @@ import { ConsigneeComponent } from './consignee/consignee.component';
 import { AirShipSupComponent } from './air-ship-sup/air-ship-sup.component';
 import { ShipperComponent } from './shipper/shipper.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -35,6 +35,7 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         NgProgressModule,
         FormsModule,
+        ReactiveFormsModule,
         SelectModule,
         NgxDaterangepickerMd,
         PaginationModule.forRoot(),
