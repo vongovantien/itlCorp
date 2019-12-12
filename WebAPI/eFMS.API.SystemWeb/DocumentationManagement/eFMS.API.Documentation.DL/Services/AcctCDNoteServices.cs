@@ -923,12 +923,14 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Subject = "LOCAL CHARGES";
                     charge.Description = item.NameEn;//Charge name
                     charge.Quantity = item.Quantity;
-                    charge.Unit = criteria.Currency;
-                    charge.QUnit = item.Unit;
+                    charge.Unit = item.Unit;
+                    charge.QUnit = criteria.Currency;
                     charge.UnitPrice = (item.UnitPrice != null ? item.UnitPrice : 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
                     charge.VAT = item.Vatrate != null ? item.Vatrate : 0;
-                    charge.Credit = (item.Type == Constants.CHARGE_BUY_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
-                    charge.Debit = (item.Type == Constants.CHARGE_SELL_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? item.Total * _exchangeRate : 0;
+                    var _credit = (item.Type == Constants.CHARGE_BUY_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
+                    charge.Credit = (criteria.Currency == Constants.CURRENCY_LOCAL) ? Math.Round(_credit.Value) : Math.Round(_credit.Value, 3);
+                    var _debit = (item.Type == Constants.CHARGE_SELL_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? item.Total * _exchangeRate : 0;
+                    charge.Debit = (criteria.Currency == Constants.CURRENCY_LOCAL) ? Math.Round(_debit.Value) : Math.Round(_debit.Value, 3);
                     listCharge.Add(charge);
                 }
             }
@@ -945,10 +947,26 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
             parameter.ReviseNotice = "Revised: " + DateTime.Now.ToString("dd/MM/yyyy");
 
+            var _totalDebit = (criteria.Currency == Constants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Debit).Value) : Math.Round(listCharge.Sum(x => x.Debit).Value, 3);
+            var _totalCredit = (criteria.Currency == Constants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Credit).Value) : Math.Round(listCharge.Sum(x => x.Credit).Value, 3);
+            parameter.TotalDebit = string.Empty;
+            if(_totalDebit != 0)
+            {
+                parameter.TotalDebit = (criteria.Currency == Constants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalDebit) : String.Format("{0:n}", _totalDebit);
+            }
+
+            parameter.TotalCredit = string.Empty;
+            if (_totalCredit != 0)
+            {
+                parameter.TotalCredit = (criteria.Currency == Constants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n}", _totalCredit);
+            }
+
+            var _blAmount = (_totalDebit - _totalCredit);
+            parameter.BalanceAmount = String.Format("{0:n}", _blAmount);
+
             //Chuyển tiền Amount thành chữ
-            decimal? _amount = listCharge.Sum(x => x.Debit) - listCharge.Sum(x => x.Credit);
-            decimal _balanceAmount = Math.Abs(_amount.Value);
-            _balanceAmount = Math.Round(_balanceAmount, 2);
+            decimal _balanceAmount = Math.Abs(_blAmount);
+            _balanceAmount = Math.Round(_balanceAmount, 3);
             var _inword = string.Empty;
             //if (_balanceAmount >= 1)
             //{
@@ -996,7 +1014,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             result = new Crystal
             {
-                ReportName = "SeaDebitAgentsNewVND.rpt",
+                ReportName = "SeaDebitAgentsNewVND_Copy.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
