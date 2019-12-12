@@ -73,8 +73,8 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             ).subscribe(
                 (dataCdNote: any) => {
                     dataCdNote.listSurcharges.forEach(element => {
-                        element.debit = (element.type === 'SELL' || (element.type === 'OBH' && dataCdNote.partnerId === element.paymentObjectId)) ? element.total * element.exchangeRate : null;
-                        element.credit = (element.type === 'BUY' || (element.type === 'OBH' && dataCdNote.partnerId === element.payerId)) ? element.total * element.exchangeRate  : null;
+                        element.debit = (element.type === 'SELL' || (element.type === 'OBH' && dataCdNote.partnerId === element.paymentObjectId)) ? element.total : null;
+                        element.credit = (element.type === 'BUY' || (element.type === 'OBH' && dataCdNote.partnerId === element.payerId)) ? element.total : null;
                     });
                     this.CdNoteDetail = dataCdNote;
                     //Tính toán Amount Credit, Debit, Balance
