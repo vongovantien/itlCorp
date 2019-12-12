@@ -25,6 +25,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+import { FormPortIndexComponent } from './components/form-port-index.component';
 
 @Component({
     selector: 'app-port-index',
@@ -35,6 +36,7 @@ export class PortIndexComponent extends AppList implements OnInit {
     @ViewChild('chooseCountry', { static: false }) public ngSelectCountry: SelectComponent;
     @ViewChild('chooseArea', { static: false }) public ngSelectArea: SelectComponent;
     @ViewChild('chooseMode', { static: false }) public ngSelectMode: SelectComponent;
+    @ViewChild(FormPortIndexComponent, { static: false }) formPopup: FormPortIndexComponent;
     portIndexSettings: ColumnSetting[] = PORTINDEXCOLUMNSETTING;
     portIndexs: Array<PortIndex>;
     portIndex: PortIndex = new PortIndex();
@@ -152,7 +154,10 @@ export class PortIndexComponent extends AppList implements OnInit {
         this.onSearch(event);
     }
     showAdd() {
-        this.initPortIndex();
+        // this.initPortIndex();
+        [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [false, false];
+        this.formPopup.title = "Add Port Index";
+        this.formPopup.show();
     }
     initPortIndex() {
         this.form.onReset();
