@@ -117,7 +117,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                results = list.Skip((page - 1) * size).Take(size).ToList();
+                results = list.OrderByDescending(x => x.ModifiedDate).Skip((page - 1) * size).Take(size).ToList();
             }
             return results;
         }

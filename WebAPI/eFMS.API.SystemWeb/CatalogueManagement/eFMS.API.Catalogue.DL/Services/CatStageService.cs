@@ -82,7 +82,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                returnList = returnList.Skip((page - 1)*size).Take(size);
+                returnList = returnList.OrderByDescending(x => x.DatetimeModified).Skip((page - 1)*size).Take(size);
             }
 
             return returnList;

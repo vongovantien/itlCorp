@@ -151,7 +151,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                results = data.Skip((page - 1) * size).Take(size).AsQueryable();
+                results = data.OrderByDescending(x => x.DatetimeModified).Skip((page - 1) * size).Take(size).AsQueryable();
             }
             return results;
         }

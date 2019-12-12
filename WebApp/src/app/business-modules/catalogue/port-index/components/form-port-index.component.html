@@ -3,13 +3,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">{{ title }}</h5>
-                <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
-                        <span aria-hidden="true">&times;</span>
-                    </button> -->
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <!--begin::add-port-index-form-->
-                <form class="m-form m-form--state">
+                <form class="m-form m-form--state" [formGroup]="portindexForm">
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
@@ -17,7 +17,7 @@
                                     Port code <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input" placeholder="Please enter detail"
-                                    name="code" autocomplete="nope" minlength="3" required>
+                                    name="code" autocomplete="nope" minlength="3" formControlName="code">
                                 <!-- <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid">
                                         Code is required least 3 characters
                                     </div> -->
@@ -29,7 +29,8 @@
                                     Name(EN) <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input" placeholder="Please enter name"
-                                    name="portIndexeNameEN" autocomplete="nope" minlength="3" required>
+                                    name="portIndexeNameEN" autocomplete="nope" minlength="3"
+                                    formControlName="portIndexeNameEN">
                                 <!-- <div class="form-control-feedback"
                                     *ngIf="formAddEdit.submitted && portIndexeNameEN.invalid">
                                     Name(EN) is required least 3 characters
@@ -42,7 +43,8 @@
                                     Name(Local) <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input" placeholder="Please enter name"
-                                    name="portIndexeNameLocal" autocomplete="nope" minlength="3" required>
+                                    name="portIndexeNameLocal" autocomplete="nope" minlength="3"
+                                    formControlName="portIndexeNameLocal">
                                 <div class="form-control-feedback">
                                     Name(Local) is required least 3 characters
                                 </div>
@@ -86,15 +88,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="form-group row">
                         <div class="col-lg-4">
-                            <div class="form-group m-form__group">
-                                <div>
-                                    <label class="m-checkbox m-checkbox--bold">
-                                        <input type="checkbox">
-                                        Active
-                                        <span></span>
-                                    </label>
+                            <div class="row">
+                                <label class="col-lg-4 col-form-label form-control-label"> Active </label>
+                                <div class="col-lg-8">
+                                    <app-switch [(toggle)]="active.value" (toggleChange)="active.setValue($event)">
+                                    </app-switch>
                                 </div>
                             </div>
                         </div>

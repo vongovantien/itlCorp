@@ -98,7 +98,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                                                 || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null", StringComparison.OrdinalIgnoreCase) > -1)
                                                                 && (x.Active == criteria.Active || criteria.Active == null);
             }
-            var data = Paging(query, page, size, out rowsCount);
+            var data = Paging(query, page, size, x => x.DatetimeModified, false, out rowsCount);
             return data;    
         }
 
