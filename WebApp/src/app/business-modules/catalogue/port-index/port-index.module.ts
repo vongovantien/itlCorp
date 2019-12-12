@@ -5,11 +5,11 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { PortIndexImportComponent } from '../port-index-import/port-index-import.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
-import { PaginationModule } from 'ngx-bootstrap';
-import { AddPortIndexComponent } from './add/add-port-index.component';
+import { PaginationModule, ModalModule } from 'ngx-bootstrap';
+import { FormPortIndexComponent } from './components/form-port-index.component';
 
 const routing: Routes = [
     { path: '', component: PortIndexComponent, data: { name: "Port Index", level: 2 } },
@@ -21,9 +21,11 @@ const routing: Routes = [
         CommonModule,
         RouterModule.forChild(routing),
         SharedModule,
+        ReactiveFormsModule,
         FormsModule,
         SelectModule,
         NgProgressModule,
+        ModalModule.forRoot(),
         PaginationModule.forRoot(),
 
     ],
@@ -32,7 +34,7 @@ const routing: Routes = [
     declarations: [
         PortIndexComponent,
         PortIndexImportComponent,
-        AddPortIndexComponent
+        FormPortIndexComponent
     ],
     providers: [],
 })
