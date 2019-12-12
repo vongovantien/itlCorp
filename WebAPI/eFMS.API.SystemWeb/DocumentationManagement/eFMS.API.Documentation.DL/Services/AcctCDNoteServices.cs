@@ -962,7 +962,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var _blAmount = (_totalDebit - _totalCredit);
-            parameter.BalanceAmount = String.Format("{0:n}", _blAmount);
+            parameter.BalanceAmount = (criteria.Currency == Constants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _blAmount) : String.Format("{0:n}", _blAmount);
 
             //Chuyển tiền Amount thành chữ
             decimal _balanceAmount = Math.Abs(_blAmount);
@@ -973,7 +973,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var _currency = criteria.Currency == Constants.CURRENCY_LOCAL && _balanceAmount >= 1 ?
                            (_balanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                         :
-                        "dollars";
+                        "U.S. dollar(s)";
 
                 _inword = criteria.Currency == Constants.CURRENCY_LOCAL && _balanceAmount >= 1 ?
                         InWordCurrency.ConvertNumberCurrencyToString(_balanceAmount, _currency)
@@ -1014,7 +1014,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             result = new Crystal
             {
-                ReportName = "SeaDebitAgentsNewVND_Copy.rpt",
+                ReportName = "SeaDebitAgentsNewVND.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
