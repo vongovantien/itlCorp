@@ -14,14 +14,13 @@ import { NgForm } from '@angular/forms';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { COMMODITYCOLUMNSETTING } from './commodity.column';
 import { SelectComponent } from 'ng2-select';
-import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
-import { ExcelService } from 'src/app/shared/services/excel.service';
 import _map from 'lodash/map';
-import { SystemConstants } from 'src/constants/system.const';
 import { SearchOptionsComponent } from '../../../shared/common/search-options/search-options.component';
 import { CatalogueRepo } from 'src/app/shared/repositories/catalogue.repo';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
+import { ExportRepo } from 'src/app/shared/repositories';
+import { AppList } from 'src/app/app.list';
 
 declare var $: any;
 
@@ -29,7 +28,7 @@ declare var $: any;
   selector: 'app-commodity',
   templateUrl: './commodity.component.html',
 })
-export class CommodityComponent implements OnInit {
+export class CommodityComponent extends AppList implements OnInit {
 
   /*
   declare variable
@@ -90,12 +89,11 @@ export class CommodityComponent implements OnInit {
   end declare variable
   */
 
-  constructor(private baseService: BaseService,
-    private excelService: ExcelService,
-    private api_menu: API_MENU,
-    private sortService: SortService,
+  constructor(private sortService: SortService,
     private catalogueRepo: CatalogueRepo,
-    private _toastService: ToastrService, ) {
+    private _toastService: ToastrService, 
+    private _exportRepo: ExportRepo,) {
+      super();
   }
 
   ngOnInit() {
@@ -445,89 +443,98 @@ export class CommodityComponent implements OnInit {
     this.value = value;
   }
   async exportCom() {
-    var commodities = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.query, this.criteria);
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      commodities = _map(commodities, function (com, index) {
-        return [
-          index + 1,
-          com['code'],
-          com['commodityNameEn'],
-          com['commodityNameVn'],
-          com['commodityGroupNameEn'],
-          (com['inactive'] === true) ? "Inactive" : "Active"
-        ]
-      });
-    }
+    // var commodities = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.query, this.criteria);
+    // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+    //   commodities = _map(commodities, function (com, index) {
+    //     return [
+    //       index + 1,
+    //       com['code'],
+    //       com['commodityNameEn'],
+    //       com['commodityNameVn'],
+    //       com['commodityGroupNameEn'],
+    //       (com['inactive'] === true) ? "Inactive" : "Active"
+    //     ]
+    //   });
+    // }
 
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      commodities = _map(commodities, function (com, index) {
-        return [
-          index + 1,
-          com['code'],
-          com['commodityNameEn'],
-          com['commodityNameVn'],
-          com['commodityGroupNameVn'],
-          (com['inactive'] === true) ? "Ngưng Hoạt Động" : "Đang Hoạt Động"
-        ]
-      });
-    }
-    const exportModel: ExportExcel = new ExportExcel();
-    exportModel.title = "Commodity List";
-    const currrently_user = localStorage.getItem('currently_userName');
-    exportModel.author = currrently_user;
-    exportModel.header = [
-      { name: "STT", width: 10 },
-      { name: "Code", width: 20 },
-      { name: "Name EN", width: 20 },
-      { name: "Name VN", width: 20 },
-      { name: "Commodity Group", width: 30 },
-      { name: "Inactive", width: 20 }
-    ]
-    exportModel.data = commodities;
-    exportModel.fileName = "Commodity";
+    // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+    //   commodities = _map(commodities, function (com, index) {
+    //     return [
+    //       index + 1,
+    //       com['code'],
+    //       com['commodityNameEn'],
+    //       com['commodityNameVn'],
+    //       com['commodityGroupNameVn'],
+    //       (com['inactive'] === true) ? "Ngưng Hoạt Động" : "Đang Hoạt Động"
+    //     ]
+    //   });
+    // }
+    // const exportModel: ExportExcel = new ExportExcel();
+    // exportModel.title = "Commodity List";
+    // const currrently_user = localStorage.getItem('currently_userName');
+    // exportModel.author = currrently_user;
+    // exportModel.header = [
+    //   { name: "STT", width: 10 },
+    //   { name: "Code", width: 20 },
+    //   { name: "Name EN", width: 20 },
+    //   { name: "Name VN", width: 20 },
+    //   { name: "Commodity Group", width: 30 },
+    //   { name: "Inactive", width: 20 }
+    // ]
+    // exportModel.data = commodities;
+    // exportModel.fileName = "Commodity";
 
-    this.excelService.generateExcel(exportModel);
+    // this.excelService.generateExcel(exportModel);
+    this._exportRepo.exportCommodity(this.criteria).subscribe(
+        (res: any) => {
+          this.downLoadFile(res, "application/ms-excel", "Commodity.xlsx");
+        },
+      );
 
   }
   async exportComGroup() {
-    var commodities_group = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.query, this.criteria);
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      commodities_group = _map(commodities_group, function (com_group, index) {
-        return [
-          index + 1,
-          com_group['groupNameEn'],
-          com_group['groupNameVn'],
-          (com_group['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-        ]
-      });
-    }
+    // var commodities_group = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.query, this.criteria);
+    // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+    //   commodities_group = _map(commodities_group, function (com_group, index) {
+    //     return [
+    //       index + 1,
+    //       com_group['groupNameEn'],
+    //       com_group['groupNameVn'],
+    //       (com_group['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+    //     ]
+    //   });
+    // }
 
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      commodities_group = _map(commodities_group, function (com_group, index) {
-        return [
-          index + 1,
-          com_group['groupNameEn'],
-          com_group['groupNameVn'],
-          (com_group['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
-        ]
-      });
-    }
+    // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+    //   commodities_group = _map(commodities_group, function (com_group, index) {
+    //     return [
+    //       index + 1,
+    //       com_group['groupNameEn'],
+    //       com_group['groupNameVn'],
+    //       (com_group['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+    //     ]
+    //   });
+    // }
 
-    const exportModel: ExportExcel = new ExportExcel();
-    exportModel.title = "Commodity Group List";
-    const currrently_user = localStorage.getItem('currently_userName');
-    exportModel.author = currrently_user;
-    exportModel.header = [
-      { name: "No.", width: 10 },
-      { name: "Name EN", width: 20 },
-      { name: "Name Local", width: 20 },
-      { name: "Inactive", width: 20 }
-    ]
-    exportModel.data = commodities_group;
-    exportModel.fileName = "Commodity Group";
+    // const exportModel: ExportExcel = new ExportExcel();
+    // exportModel.title = "Commodity Group List";
+    // const currrently_user = localStorage.getItem('currently_userName');
+    // exportModel.author = currrently_user;
+    // exportModel.header = [
+    //   { name: "No.", width: 10 },
+    //   { name: "Name EN", width: 20 },
+    //   { name: "Name Local", width: 20 },
+    //   { name: "Inactive", width: 20 }
+    // ]
+    // exportModel.data = commodities_group;
+    // exportModel.fileName = "Commodity Group";
 
-    this.excelService.generateExcel(exportModel);
-
+    // this.excelService.generateExcel(exportModel);
+    this._exportRepo.exportCommodityGroup(this.criteria).subscribe(
+      (res: any) => {
+        this.downLoadFile(res, "application/ms-excel", "CommodityGroup.xlsx");
+      },
+    );
   }
 
 }
