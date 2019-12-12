@@ -1,19 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommodityGroup } from 'src/app/shared/models/catalogue/commonity-group.model';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { COMMODITYGROUPCOLUMNSETTING } from './commonity-group.column';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
-import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgForm } from '@angular/forms';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { COMMODITYCOLUMNSETTING } from './commodity.column';
-import { SelectComponent } from 'ng2-select';
 import _map from 'lodash/map';
 import { SearchOptionsComponent } from '../../../shared/common/search-options/search-options.component';
 import { CatalogueRepo } from 'src/app/shared/repositories/catalogue.repo';
@@ -21,28 +13,31 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
 import { ExportRepo } from 'src/app/shared/repositories';
 import { AppList } from 'src/app/app.list';
-
-declare var $: any;
+import { catchError, finalize, map } from 'rxjs/operators';
+import { CommodityAddPopupComponent } from './components/form-create-commodity/form-create-commodity.popup';
+import { CommodityGroupAddPopupComponent } from './components/form-create-commodity-group/form-create-commodity-group.popup';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
   selector: 'app-commodity',
   templateUrl: './commodity.component.html',
 })
-export class CommodityComponent extends AppList implements OnInit {
+export class CommodityComponent extends AppList {
 
   /*
   declare variable
   */
   @ViewChild(AppPaginationComponent, { static: false }) child;
   @ViewChild(SearchOptionsComponent, { static: false }) searchOption;
-  @ViewChild('formCommodity', { static: false }) formCommodity: NgForm;
-  @ViewChild('formGroupCommodity', { static: false }) formGroupCommodity: NgForm;
-  @ViewChild('chooseGroup', { static: false }) public groupSelect: SelectComponent;
-  commodities: Array<Commodity>;
+  @ViewChild(CommodityAddPopupComponent, { static: false }) commodityAddPopupComponent: CommodityAddPopupComponent;
+  @ViewChild(CommodityGroupAddPopupComponent, { static: false }) commodityGroupAddPopupComponent: CommodityGroupAddPopupComponent;
+  @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+  
+  commodities: Commodity[] = [];
   commodity: Commodity;
-  commodityGroups: Array<CommodityGroup>;
+  commodityGroups: CommodityGroup[] = [];
   commodityGroup: CommodityGroup;
-  pager: PagerSetting = PAGINGSETTING;
   commoditySettings: ColumnSetting[] = COMMODITYCOLUMNSETTING;
   commodityGroupSettings: ColumnSetting[] = COMMODITYGROUPCOLUMNSETTING;
   groups: any[];
@@ -53,27 +48,7 @@ export class CommodityComponent extends AppList implements OnInit {
   };
   activeTab: string = this.tabName.commodity;
   groupActive: any[] = [];
-  addCommodityButtonSetting: ButtonModalSetting = {
-    dataTarget: "edit-commodity-modal",
-    typeButton: ButtonType.add
-  };
-  addGroupButtonSetting: ButtonModalSetting = {
-    dataTarget: "edit-commodity-group-modal",
-    typeButton: ButtonType.add
-  };
-  importButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.import
-  };
-  exportButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.export
-  };
-  saveButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.save
-  };
-
-  cancelButtonSetting: ButtonModalSetting = {
-    typeButton: ButtonType.cancel
-  };
+  
   configSearchGroup: any = {
     settingFields: this.commodityGroupSettings.filter(x => x.allowSearch == true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
     typeSearch: TypeSearch.intab,
@@ -85,159 +60,173 @@ export class CommodityComponent extends AppList implements OnInit {
     searchString: ''
   };
   isDesc = false;
+
+  headerCommodity: CommonInterface.IHeaderTable[];
+  headerCommodityGroup: CommonInterface.IHeaderTable[];
   /*
   end declare variable
   */
 
-  constructor(private sortService: SortService,
-    private catalogueRepo: CatalogueRepo,
-    private _toastService: ToastrService, 
-    private _exportRepo: ExportRepo,) {
-      super();
+  constructor(private catalogueRepo: CatalogueRepo,
+    private _toastService: ToastrService,
+    private _exportRepo: ExportRepo,
+    private _cd: ChangeDetectorRef,
+    private _ngProgessSerice: NgProgress,
+    private _sortService: SortService,) {
+    super();
+    this._progressRef = this._ngProgessSerice.ref();
+    this.requestList = this.getCommodities;
+    this.requestSort = this.sortCommodity;
   }
 
   ngOnInit() {
-    this.pager.totalItems = 0;
-    this.getCommodities(this.pager);
-    this.getGroups();
+    this.headerCommodity = [
+      { title: 'Code', sortable: true, field: 'code' },
+      { title: 'Name(EN)', sortable: true, field: 'commodityNameEn' },
+      { title: 'Name(Local)', sortable: true, field: 'commodityNameVn' },
+      { title: 'Group', sortable: true, field: 'commodityGroupNameVn' },
+      { title: 'Status', sortable: true, field: 'active' },
+    ];
+    this.headerCommodityGroup = [
+      { title: 'Id', sortable: true, field: 'id' },
+      { title: 'Name(EN)', sortable: true, field: 'groupNameEn' },
+      { title: 'Name(Local)', sortable: true, field: 'groupNameVn' },
+      { title: 'Status', sortable: true, field: 'active' },
+    ];
+    this.getCommodities();
+    this.getGroupCommodities();
   }
 
-  getGroups() {
-    this.catalogueRepo.getAllCommodityGroup().subscribe(
-      (data: any) => {
-        this.groups = data.map(x => ({ "text": x.groupName, "id": x.id }));
-      },
-    );
+  ngAfterViewInit() {
+    this._cd.detectChanges();
   }
 
-  setPage(pager: PagerSetting) {
-    this.pager.currentPage = pager.currentPage;
-    this.pager.pageSize = pager.pageSize;
-    this.pager.totalPages = pager.totalPages;
-    if (this.activeTab == this.tabName.commodityGroup) {
-      this.getGroupCommodities(pager);
-    }
-    if (this.activeTab == this.tabName.commodity) {
-      this.getCommodities(pager);
-    }
-  }
-  tabSelect(tabName: string) {
-    this.activeTab = tabName;
-    this.pager.currentPage = 1;
-    this.pager.pageSize = 15;
-    this.pager.totalItems = 0;
-    this.resetSearch({ field: "All", fieldDisplayName: "All" }, tabName);
-  }
-
-  getCommodities(pager: PagerSetting) {
-    this.catalogueRepo.getCommodityPaging(pager.currentPage, pager.pageSize, Object.assign({}, this.criteria))
-      .subscribe(
+  getCommodities() {
+    this._progressRef.start();
+    this.catalogueRepo.getCommodityPaging(this.page, this.pageSize, Object.assign({}, this.criteria))
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => {
+          this._progressRef.complete();
+        }),
+        map((data: any) => {
+          console.log(data)
+          return {
+            data: data.data.map((item: any) => new Commodity(item)),
+            totalItems: data.totalItems,
+          };
+        })
+      ).subscribe(
         (res: any) => {
-          this.pager.totalItems = res.totalItems || 0;
+          this.totalItems = res.totalItems || 0;
           this.commodities = res.data;
         },
       );
   }
 
-  getGroupCommodities(pager: PagerSetting) {
-    this.catalogueRepo.getCommodityGroupPaging(pager.currentPage, pager.pageSize, Object.assign({}, this.criteria))
-      .subscribe(
+  getGroupCommodities() {
+    this._progressRef.start();
+    this.catalogueRepo.getCommodityGroupPaging(this.page, this.pageSize, Object.assign({}, this.criteria))
+    .pipe(
+      catchError(this.catchError),
+      finalize(() => {
+        this._progressRef.complete();
+      }),
+      map((data: any) => {
+        console.log(data)
+        return {
+          data: data.data.map((item: any) => new CommodityGroup(item)),
+          totalItems: data.totalItems,
+        };
+      })
+    ).subscribe(
         (res: any) => {
-          this.pager.totalItems = res.totalItems || 0;
+          this.totalItems = res.totalItems || 0;
           this.commodityGroups = res.data;
         },
       );
   }
-
-  onSearch(event, tabName) {
-    if (this.activeTab == this.tabName.commodityGroup) {
-      this.searchCommodityGroup(event);
-    }
-    if (this.activeTab == this.tabName.commodity) {
-      this.searchCommodity(event);
-    }
-  }
-  searchCommodity(event: any): any {
-    if (event.field == "All") {
-      this.criteria.all = event.searchString;
-    }
-    else {
-      this.criteria = {};
-      if (event.field == "commodityNameEn") {
-        this.criteria.commodityNameEn = event.searchString;
-      }
-      if (event.field == "commodityNameVn") {
-        this.criteria.commodityNameVn = event.searchString;
-      }
-      if (event.field == "commodityGroupNameEn") {
-        this.criteria.commodityGroupNameEn = event.searchString;
-      }
-      if (event.field == "code") {
-        this.criteria.code = event.searchString;
-      }
-    }
-    this.pager.totalItems = 0;
-    this.getCommodities(this.pager);
-  }
-  searchCommodityGroup(event: any): any {
-    if (event.searchString == "") {
-      event.searchString = null;
-    }
-    if (event.field == "All") {
-      this.criteria.all = event.searchString;
-    }
-    else {
-      this.criteria = {};
-      if (event.field == "groupNameEn") {
-        this.criteria.groupNameEn = event.searchString;
-      }
-      if (event.field == "groupNameVn") {
-        this.criteria.groupNameVn = event.searchString;
-      }
-    }
-    this.pager.currentPage = 1;
-    this.getGroupCommodities(this.pager);
-  }
-  resetSearch(event, tabName) {
+  onSearch(event: { field: string, searchString: string, displayName: string }) {
     this.criteria = {};
-    if (tabName == this.tabName.commodityGroup) {
-      this.searchCommodityGroup(event);
-    }
-    if (tabName == this.tabName.commodity) {
-      this.searchCommodity(event);
-    }
-  }
-
-  onSortChange(column) {
-    let property = column.primaryKey;
-
-    this.isDesc = !this.isDesc;
-    if (this.activeTab == this.tabName.commodity) {
-      this.commodities = this.sortService.sort(this.commodities, property, this.isDesc);
-    }
+    this.criteria[event.field] = event.searchString;
     if (this.activeTab == this.tabName.commodityGroup) {
-      this.commodityGroups = this.sortService.sort(this.commodityGroups, property, this.isDesc);
+      this.getGroupCommodities();
+    }
+    if (this.activeTab == this.tabName.commodity) {
+      this.getCommodities();
     }
   }
+
+  resetSearch() {
+    this.criteria = {};
+    if (this.activeTab == this.tabName.commodityGroup) {
+      this.getGroupCommodities();
+    }
+    if (this.activeTab == this.tabName.commodity) {
+      this.getCommodities();
+    }
+  }
+
+  // searchCommodity(event: any): any {
+  //   if (event.field == "All") {
+  //     this.criteria.all = event.searchString;
+  //   }
+  //   else {
+  //     this.criteria = {};
+  //     if (event.field == "commodityNameEn") {
+  //       this.criteria.commodityNameEn = event.searchString;
+  //     }
+  //     if (event.field == "commodityNameVn") {
+  //       this.criteria.commodityNameVn = event.searchString;
+  //     }
+  //     if (event.field == "commodityGroupNameEn") {
+  //       this.criteria.commodityGroupNameEn = event.searchString;
+  //     }
+  //     if (event.field == "code") {
+  //       this.criteria.code = event.searchString;
+  //     }
+  //   }
+  //   this.getCommodities();
+  // }
+  // searchCommodityGroup(event: any): any {
+  //   if (event.searchString == "") {
+  //     event.searchString = null;
+  //   }
+  //   if (event.field == "All") {
+  //     this.criteria.all = event.searchString;
+  //   }
+  //   else {
+  //     this.criteria = {};
+  //     if (event.field == "groupNameEn") {
+  //       this.criteria.groupNameEn = event.searchString;
+  //     }
+  //     if (event.field == "groupNameVn") {
+  //       this.criteria.groupNameVn = event.searchString;
+  //     }
+  //   }
+  //   this.pager.currentPage = 1;
+  //   this.getGroupCommodities();
+  // }
+
   showDetail(item, tabName) {
     if (tabName == this.tabName.commodityGroup) {
       this.commodityGroup = item;
-      this.catalogueRepo.getDetailCommodityGroup(item.id).subscribe(
-        (res: any) => {
-          console.log(res)
-          if (res.id !== 0) {
-            this.commodityGroup = res;
-          } else {
-            this._toastService.error("Not found data");
-          }
-        },
-      );
+      this.catalogueRepo.getDetailCommodityGroup(item.id)
+        .pipe(catchError(this.catchError))
+        .subscribe(
+          (res: any) => {
+            if (res.id !== 0) {
+              this.commodityGroup = res;
+            } else {
+              this._toastService.error("Not found data");
+            }
+          },
+        );
     }
     if (tabName == this.tabName.commodity) {
       this.commodity = item;
       this.catalogueRepo.getDetailCommodity(item.id).subscribe(
         (res: any) => {
-          console.log(res)
           if (res.id !== 0) {
             this.commodity = res;
             let index = this.groups.findIndex(x => x.id == this.commodity.commodityGroupId);
@@ -252,289 +241,152 @@ export class CommodityComponent extends AppList implements OnInit {
 
     }
   }
-  onDelete(event) {
-    if (event) {
-      if (this.commodityGroup) {
-        this.deleteGroupCommodity();
-      }
-      if (this.commodity) {
-        this.deleteCommodity();
-      }
-    }
+
+  showDetailCommodity(commodity){
+    this.catalogueRepo.getDetailCommodity(commodity.id).subscribe(
+      (res: any) => {
+        if (res.id !== 0) {
+          console.log(res)
+          var _commodity = new Commodity(res);
+          this.commodityAddPopupComponent.action = "update";
+          this.commodityAddPopupComponent.commodity = _commodity;
+          this.commodityAddPopupComponent.getDetail();
+          this.commodityAddPopupComponent.show();
+        } else {
+          this._toastService.error("Not found data");
+        }
+      },
+    );
+  }
+
+  showDetailCommodityGroup(commodityGroup){
+    console.log(commodityGroup);
+    this.catalogueRepo.getDetailCommodityGroup(commodityGroup.id)
+        .pipe(catchError(this.catchError))
+        .subscribe(
+          (res: any) => {
+            console.log(res)
+            if (res.id !== 0) {
+              var _commodityGroup = new CommodityGroup(res);
+              this.commodityGroupAddPopupComponent.action = "update"
+              this.commodityGroupAddPopupComponent.commodityGroup = _commodityGroup;
+              this.commodityGroupAddPopupComponent.getDetail();
+              this.commodityGroupAddPopupComponent.show();
+            } else {
+              this._toastService.error("Not found data");
+            }
+          },
+        );
   }
 
   deleteCommodity() {
-    this.catalogueRepo.deleteCommodity(this.commodity.id).subscribe(
-      (res: CommonInterface.IResult) => {
-        if (res.status) {
-          this._toastService.success(res.message, '');
-          this.getCommodities(this.pager);
-          //this.setPageAfterDelete();
-        } else {
-          this._toastService.error(res.message || 'Có lỗi xảy ra', '');
-        }
-      },
-    );
+    console.log(this.commodity)
+    this.catalogueRepo.deleteCommodity(this.commodity.id)
+      .pipe(catchError(this.catchError))
+      .subscribe(
+        (res: CommonInterface.IResult) => {
+          if (res.status) {
+            this._toastService.success(res.message, '');
+            this.getCommodities();
+          } else {
+            this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+          }
+        },
+      );
   }
 
   deleteGroupCommodity() {
-    this.catalogueRepo.deleteCommodityGroup(this.commodityGroup.id).subscribe(
-      (res: CommonInterface.IResult) => {
-        if (res.status) {
-          this._toastService.success(res.message, '');
-          this.getGroups();
-          this.getGroupCommodities(this.pager);
-          //this.setPageAfterDelete();
-        } else {
-          this._toastService.error(res.message || 'Có lỗi xảy ra', '');
-        }
-      },
-    );
-  }
-  setPageAfterDelete() {
-    this.pager.totalItems = this.pager.totalItems - 1;
-    let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
-    if (totalPages < this.pager.totalPages) {
-      this.pager.currentPage = totalPages;
-    }
-    this.child.setPage(this.pager.currentPage);
-  }
-  setPageAfterAdd() {
-    this.child.setPage(this.pager.currentPage);
-    if (this.pager.currentPage < this.pager.totalPages) {
-      this.pager.currentPage = this.pager.totalPages;
-      this.child.setPage(this.pager.currentPage);
-    }
-  }
-  showAdd(tabName) {
-    if (tabName == this.tabName.commodityGroup) {
-      this.commodityGroup = new CommodityGroup();
-    }
-    if (tabName == this.tabName.commodity) {
-      this.commodity = new Commodity();
-      this.commodity.commodityGroupId = null;
-    }
-  }
-  onSubmit() {
-    if (this.formGroupCommodity) {
-      this.saveGroupCommodity();
-    }
-    if (this.formCommodity) {
-      this.saveCommodity();
-    }
-  }
-  saveCommodity(): any {
-    if (this.formCommodity.valid && this.commodity.commodityGroupId != null) {
-      if (this.commodity.id == null) {
-        this.addNewCommodity();
-      }
-      else {
-        this.updateCommodity();
-      }
-    }
-  }
-  saveGroupCommodity() {
-    if (this.formGroupCommodity.valid) {
-      if (this.commodityGroup.id == null) {
-        this.addNewGroup();
-      }
-      else {
-        this.updateGroup();
-      }
-    }
+    console.log(this.commodityGroup)
+    this.catalogueRepo.deleteCommodityGroup(this.commodityGroup.id)
+      .pipe(catchError(this.catchError))
+      .subscribe(
+        (res: CommonInterface.IResult) => {
+          if (res.status) {
+            this._toastService.success(res.message, '');
+            this.getGroupCommodities();
+          } else {
+            this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+          }
+        },
+      );
   }
 
-  updateCommodity() {
-    this.catalogueRepo.updateCommodity(this.commodity.id, this.commodity).subscribe(
-      (res: CommonInterface.IResult) => {
-        if (res.status) {
-          this._toastService.success(res.message);
-          this.resetCommodityForm();
-          this.getCommodities(this.pager);
-        } else {
-          this._toastService.error(res.message);
-        }
-      }
-    );
+  // showConfirmDelete(item, tabName: string) {
+  //   if (tabName == this.tabName.commodityGroup) {
+  //     this.commodityGroup = item;
+  //   }
+  //   if (tabName == this.tabName.commodity) {
+  //     this.commodity = item;
+  //   }
+  // }
+
+  openPopupAddCommodity() {
+    this.commodityAddPopupComponent.action = 'create';
+    this.commodityAddPopupComponent.show();
   }
 
-  addNewCommodity() {
-    this.catalogueRepo.addNewCommodity(this.commodity).subscribe(
-      (res: CommonInterface.IResult) => {
-        if (res.status) {
-          this._toastService.success(res.message);
-          this.resetCommodityForm();
-          this.pager.totalItems = 0;
-          this.pager.currentPage = 1;
-          this.getCommodities(this.pager);
-        } else {
-          this._toastService.error(res.message);
-        }
-      }
-    );
+  onRequestCommodity() {
+    console.log('reload list commodity');
+    this.getCommodities();
   }
 
-  resetCommodityForm() {
-    this.formCommodity.onReset();
-    this.groupSelect.active = [];
-    $('#edit-commodity-modal').modal('hide');
+  openPopupAddCommodityGroup() {
+    this.commodityGroupAddPopupComponent.action = 'create';
+    this.commodityGroupAddPopupComponent.show();
   }
 
-  updateGroup() {
-    this.catalogueRepo.updateCommodityGroup(this.commodityGroup.id, this.commodityGroup).subscribe(
-      (res: CommonInterface.IResult) => {
-        if (res.status) {
-          this._toastService.success(res.message);
-          this.resetCommodityGroupForm();
-          this.getGroupCommodities(this.pager);
-        } else {
-          this._toastService.error(res.message);
-        }
-      }
-    );
+  onRequestCommodityGroup() {
+    console.log('reload list commodity group');
+    this.getGroupCommodities();
   }
 
-  resetCommodityGroupForm() {
-    this.formGroupCommodity.onReset();
-    $('#edit-commodity-group-modal').modal('hide');
-  }
-
-  addNewGroup() {
-    this.catalogueRepo.addNewCommodityGroup(this.commodityGroup).subscribe(
-      (res: CommonInterface.IResult) => {
-        if (res.status) {
-          this._toastService.success(res.message);
-          this.getGroups();
-          this.pager.totalItems = 0;
-          this.pager.currentPage = 1;
-          this.getGroupCommodities(this.pager);
-          this.resetCommodityGroupForm();
-        } else {
-          this._toastService.error(res.message);
-        }
-      }
-    );
-  }
-
-  showConfirmDelete(item, tabName: string) {
-    if (tabName == this.tabName.commodityGroup) {
-      this.commodityGroup = item;
+  showConfirmDelete(data: any, tabName: string){
+    this.activeTab = tabName;
+    if(this.activeTab == this.tabName.commodity){
+      this.commodity = data;
+    } else {
+      this.commodityGroup = data;
     }
-    if (tabName == this.tabName.commodity) {
-      this.commodity = item;
-    }
+    console.log(data)
+    this.confirmDeletePopup.show();
   }
-  onCancel(tabName) {
-    if (tabName == this.tabName.commodityGroup) {
-      this.resetCommodityGroupForm();
-    }
-    if (tabName == this.tabName.commodity) {
-      this.resetCommodityForm();
-    }
-  }
-  public removed(value: any): void {
-    console.log('Removed value is: ', value);
-  }
-  public typed(value: any): void {
-    console.log('New search input: ', value);
-  }
-  value: any
-  refreshValue(value: any) {
-    this.value = value;
-  }
-  async exportCom() {
-    // var commodities = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.query, this.criteria);
-    // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-    //   commodities = _map(commodities, function (com, index) {
-    //     return [
-    //       index + 1,
-    //       com['code'],
-    //       com['commodityNameEn'],
-    //       com['commodityNameVn'],
-    //       com['commodityGroupNameEn'],
-    //       (com['inactive'] === true) ? "Inactive" : "Active"
-    //     ]
-    //   });
-    // }
 
-    // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-    //   commodities = _map(commodities, function (com, index) {
-    //     return [
-    //       index + 1,
-    //       com['code'],
-    //       com['commodityNameEn'],
-    //       com['commodityNameVn'],
-    //       com['commodityGroupNameVn'],
-    //       (com['inactive'] === true) ? "Ngưng Hoạt Động" : "Đang Hoạt Động"
-    //     ]
-    //   });
-    // }
-    // const exportModel: ExportExcel = new ExportExcel();
-    // exportModel.title = "Commodity List";
-    // const currrently_user = localStorage.getItem('currently_userName');
-    // exportModel.author = currrently_user;
-    // exportModel.header = [
-    //   { name: "STT", width: 10 },
-    //   { name: "Code", width: 20 },
-    //   { name: "Name EN", width: 20 },
-    //   { name: "Name VN", width: 20 },
-    //   { name: "Commodity Group", width: 30 },
-    //   { name: "Inactive", width: 20 }
-    // ]
-    // exportModel.data = commodities;
-    // exportModel.fileName = "Commodity";
+  onDelete(){
+    console.log(this.activeTab)
+    this.confirmDeletePopup.hide();
+    if(this.activeTab == this.tabName.commodity){
+      this.deleteCommodity();
+    } else {
+      this.deleteGroupCommodity();
+    }   
+  }
 
-    // this.excelService.generateExcel(exportModel);
-    this._exportRepo.exportCommodity(this.criteria).subscribe(
+  sortCommodity(sort: string): void {
+    this.commodities = this._sortService.sort(this.commodities, sort, this.order);
+  }
+
+  sortCommodityGroup(sort: string): void {
+    this.commodityGroups = this._sortService.sort(this.commodityGroups, sort, this.order);
+  }
+
+  exportCom() {
+    this._exportRepo.exportCommodity(this.criteria)
+      .pipe(catchError(this.catchError))
+      .subscribe(
         (res: any) => {
           this.downLoadFile(res, "application/ms-excel", "Commodity.xlsx");
         },
       );
 
   }
-  async exportComGroup() {
-    // var commodities_group = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.query, this.criteria);
-    // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-    //   commodities_group = _map(commodities_group, function (com_group, index) {
-    //     return [
-    //       index + 1,
-    //       com_group['groupNameEn'],
-    //       com_group['groupNameVn'],
-    //       (com_group['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-    //     ]
-    //   });
-    // }
-
-    // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-    //   commodities_group = _map(commodities_group, function (com_group, index) {
-    //     return [
-    //       index + 1,
-    //       com_group['groupNameEn'],
-    //       com_group['groupNameVn'],
-    //       (com_group['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
-    //     ]
-    //   });
-    // }
-
-    // const exportModel: ExportExcel = new ExportExcel();
-    // exportModel.title = "Commodity Group List";
-    // const currrently_user = localStorage.getItem('currently_userName');
-    // exportModel.author = currrently_user;
-    // exportModel.header = [
-    //   { name: "No.", width: 10 },
-    //   { name: "Name EN", width: 20 },
-    //   { name: "Name Local", width: 20 },
-    //   { name: "Inactive", width: 20 }
-    // ]
-    // exportModel.data = commodities_group;
-    // exportModel.fileName = "Commodity Group";
-
-    // this.excelService.generateExcel(exportModel);
-    this._exportRepo.exportCommodityGroup(this.criteria).subscribe(
-      (res: any) => {
-        this.downLoadFile(res, "application/ms-excel", "CommodityGroup.xlsx");
-      },
-    );
+  exportComGroup() {
+    this._exportRepo.exportCommodityGroup(this.criteria)
+      .pipe(catchError(this.catchError))
+      .subscribe(
+        (res: any) => {
+          this.downLoadFile(res, "application/ms-excel", "CommodityGroup.xlsx");
+        },
+      );
   }
 
 }
