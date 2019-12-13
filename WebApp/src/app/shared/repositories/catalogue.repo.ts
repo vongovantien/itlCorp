@@ -562,4 +562,38 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    downloadCommodityExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCommonity/downloadExcel`, null).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    upLoadCommodityFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/uploadFile`, files, "uploadedFile");
+    }
+
+    importCommodity(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCommonity/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    downloadCommodityGroupExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCommodityGroup/downloadExcel`, null).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    upLoadCommodityGroupFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/uploadFile`, files, "uploadedFile");
+    }
+
+    importCommodityGroup(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCommodityGroup/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }

@@ -11,6 +11,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { CommodityAddPopupComponent } from './components/form-create-commodity/form-create-commodity.popup';
 import { ModalModule, PaginationModule } from 'ngx-bootstrap';
 import { CommodityGroupAddPopupComponent } from './components/form-create-commodity-group/form-create-commodity-group.popup';
+import { CommodityGroupListComponent } from './components/list-commodity-group/list-commodity-group.component';
 
 const routing: Routes = [
     { path: '', component: CommodityComponent, data: { name: "Commodity", level: 2 } },
@@ -35,7 +36,8 @@ const routing: Routes = [
         CommodityImportComponent,
         CommodityGroupImportComponent,
         CommodityAddPopupComponent,
-        CommodityGroupAddPopupComponent
+        CommodityGroupAddPopupComponent,
+        CommodityGroupListComponent
     ],
     providers: [],
 })

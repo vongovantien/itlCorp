@@ -57,7 +57,7 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'MBL No.', field: 'mawb', sortable: true },
             { title: 'ETA', field: 'eta', sortable: true },
-            { title: 'Supplier', field: 'supplierName', sortable: true },
+            { title: 'Shipping Line', field: 'supplierName', sortable: true },
             { title: 'Agent', field: 'agentName', sortable: true },
             { title: 'POL', field: 'polName', sortable: true },
             { title: 'POD', field: 'podName', sortable: true },

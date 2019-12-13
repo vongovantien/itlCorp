@@ -19,7 +19,7 @@
         <div class="row">
           <div class="col-lg-4">
             <form #form>
-              <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder=""
+              <input type="file" #fileInput id="inputFile" class="form-control m-input m-input--square" placeholder=""
                 (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
             </form>
             <span class="m-form__help">
@@ -58,7 +58,8 @@
               </span>
             </span>
           </button>
-          <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+          <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="import(fileInput)">
             <span>
               <i class="la la-save"></i>
               <span>
@@ -164,7 +165,9 @@
                 </td>
 
                 <td>
-                  <span>{{ item.status }}</span>
+                  <span *ngIf="item.status.split('|').length == 1">{{ item.status }}</span>
+                  <span class="m--font-danger" *ngIf="item.status.split('|').length > 1">{{
+                      item.status.split('|')[0] }}</span>
                 </td>
               </tr>
             </ng-container>
@@ -209,33 +212,5 @@
   <!--end:: m-portlet-->
 </div>
 <!--end::m-content-->
-<!--begin::modal-->
-<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-  aria-hidden="true">
-  <div class="modal-dialog modal-sm" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Notification</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="confirm-text-block">
-          <span>There are invalid data. Please check Import!</span>
-        </div>
-      </div>
-      <div class="modal-footer m--align-center c-button-actions">
-        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-          <span>
-            <i class="la la-ban"></i>
-            <span>
-              OK
-            </span>
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-<!--end::modal-->
+
+<info-popup [body]="'There are invalid data. Please check Import!'"></info-popup>

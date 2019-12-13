@@ -1,5 +1,5 @@
 import { AppForm } from "src/app/app.form";
-import { Component, Output, EventEmitter } from "@angular/core";
+import { Component, Output, EventEmitter, Input } from "@angular/core";
 import { formatDate } from "@angular/common";
 import { CommonEnum } from "src/app/shared/enums/common.enum";
 import { CatalogueRepo, SystemRepo } from "src/app/shared/repositories";
@@ -15,6 +15,7 @@ import { User } from "src/app/shared/models";
 })
 export class ShareBusinessFormSearchSeaComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
+    @Input() transaction: number = 1;
     filterTypes: CommonInterface.ICommonTitleValue[];
 
     formSearch: FormGroup;
@@ -45,7 +46,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     agents: Observable<Customer[]>;
     salemans: Observable<User[]>;
     creators: Observable<User[]>;
-
+    
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -147,7 +148,6 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
 
     resetSearch() {
         this.formSearch.reset();
-
         this.resetFormControl(this.customer);
         this.resetFormControl(this.supplier);
         this.resetFormControl(this.agent);
