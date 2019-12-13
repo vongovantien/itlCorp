@@ -18,7 +18,8 @@
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
-                        <input type="file" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
+                        <input type="file" #fileInput class="form-control m-input m-input--square" placeholder=""
+                            (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                         <span class="m-form__help">
                             <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
                         </span>
@@ -44,17 +45,19 @@
                     </div>
                 </div>
                 <div class="form-actions m--margin-top-5 m--align-right">
-                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
+                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="hideInvalid()">
                         <span>
-                            <span *ngIf="isShowInvalid"> 
+                            <span *ngIf="isShowInvalid">
                                 Show invalid rows
                             </span>
-                            <span *ngIf="isShowInvalid == false"> 
+                            <span *ngIf="isShowInvalid == false">
                                 Show All
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="import(fileInput)">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -62,7 +65,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/port-index">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        routerLink="/home/catalogue/port-index">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -103,27 +107,33 @@
                             <th class="sorting_asc">
                                 <span>No</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
                                 (click)="sort('code')">
                                 <span>Port Code</span>
                             </th>
-                            <th  class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
                                 (click)="sort('nameEn')">
                                 <span>Name(EN)</span>
                             </th>
-                            <th  class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVn'), 'sorting_desc': (!isDesc && sortKey == 'nameVn') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVn'), 'sorting_desc': (!isDesc && sortKey == 'nameVn') }"
                                 (click)="sort('nameVn')">
                                 <span>Name(VI)</span>
                             </th>
-                            <th  class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
                                 (click)="sort('countryName')">
                                 <span>Country</span>
                             </th>
-                            <th  class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'areaName'), 'sorting_desc': (!isDesc && sortKey == 'areaName') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'areaName'), 'sorting_desc': (!isDesc && sortKey == 'areaName') }"
                                 (click)="sort('areaName')">
                                 <span>Zone</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'modeOfTransport'), 'sorting_desc': (!isDesc && sortKey == 'modeOfTransport') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'modeOfTransport'), 'sorting_desc': (!isDesc && sortKey == 'modeOfTransport') }"
                                 (click)="sort('modeOfTransport')">
                                 <span>Mode</span>
                             </th>
@@ -141,27 +151,34 @@
                                 </td>
                                 <td>
                                     <span *ngIf="item.code.split('|').length == 1">{{ item.code }}</span>
-                                    <span class="m--font-danger" *ngIf="item.code.split('|').length > 1">{{ item.code.split('|')[0] }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.code.split('|').length > 1">{{ item.code.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.nameEn.split('|').length == 1">{{ item.nameEn }}</span>
-                                    <span class="m--font-danger" *ngIf="item.nameEn.split('|').length > 1">{{ item.nameEn.split('|')[0] }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.nameEn.split('|').length > 1">{{ item.nameEn.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.nameVn.split('|').length == 1">{{ item.nameVn }}</span>
-                                    <span class="m--font-danger" *ngIf="item.nameVn.split('|').length > 1">{{ item.nameVn.split('|')[0] }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.nameVn.split('|').length > 1">{{ item.nameVn.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.countryName.split('|').length == 1">{{ item.countryName }}</span>
-                                    <span class="m--font-danger" *ngIf="item.countryName.split('|').length > 1">{{ item.countryName.split('|')[0] }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.countryName.split('|').length > 1">{{ item.countryName.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.areaName.split('|').length == 1">{{ item.areaName }}</span>
-                                    <span class="m--font-danger" *ngIf="item.areaName.split('|').length > 1">{{ item.areaName.split('|')[0] }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.areaName.split('|').length > 1">{{ item.areaName.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.modeOfTransport.split('|').length == 1">{{ item.modeOfTransport }}</span>
-                                    <span class="m--font-danger" *ngIf="item.modeOfTransport.split('|').length > 1">{{ item.modeOfTransport.split('|')[0] }}</span>
+                                    <span
+                                        *ngIf="item.modeOfTransport.split('|').length == 1">{{ item.modeOfTransport }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.modeOfTransport.split('|').length > 1">{{ item.modeOfTransport.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.status }}</span>
@@ -174,7 +191,8 @@
             <!--end: Datatable -->
 
             <!--begin::pagination-->
-            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)">
+            </app-pagination>
             <!--end::pagination-->
         </div>
     </div>
@@ -182,7 +200,8 @@
 </div>
 <!--end::m-content-->
 <!--begin::modal-->
-<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<info-popup [body]="'There are invalid data. Please check Import!'"></info-popup>
+<!-- <div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -208,5 +227,5 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 <!--end::modal-->

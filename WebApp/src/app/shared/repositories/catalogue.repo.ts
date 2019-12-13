@@ -7,7 +7,6 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 @Injectable()
 export class CatalogueRepo {
-
     private VERSION: string = 'v1';
     constructor(protected _api: ApiService, private _httpClient: HttpClient) {
     }
@@ -168,10 +167,6 @@ export class CatalogueRepo {
             .pipe(
                 map((data: any) => data)
             );
-        // return this._httpClient.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { params: { partnerId: partnerId } }).pipe(
-        //     catchError((error) => throwError(error)),
-        //     map((data: any) => data)
-        // );
     }
 
     deleteSaleman(id: string) {
@@ -205,10 +200,6 @@ export class CatalogueRepo {
             .pipe(
                 map((data: any) => data)
             );
-        // return this._httpClient.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { params: { partnerId: partnerId } }).pipe(
-        //     catchError((error) => throwError(error)),
-        //     map((data: any) => data)
-        // );
     }
 
     getSettlePaymentCharges(keyword: string, size: number = 10) {
@@ -298,6 +289,20 @@ export class CatalogueRepo {
             );
         }
 
+    }
+    getAreas() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatArea`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+    getModeOfTransport() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetModeOfTransport`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
     }
     getCharges(body?: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/Query`, body).pipe(
@@ -407,6 +412,21 @@ export class CatalogueRepo {
             })
         );
     }
+    downloadPlaceExcel(placeType: any) {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPlace/DownloadExcel`, null, { type: placeType }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    upLoadPlaceFile(files: any, placeType: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/UploadFile`, files, "uploadedFile", { type: placeType });
+    }
+    importPlace(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPlace/Import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
     //#endregion
 
     addCountry(body: any = {}) {
@@ -499,7 +519,7 @@ export class CatalogueRepo {
         );
     }
 
-    updateCommodity(id :number, body: any) {
+    updateCommodity(id: number, body: any) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/${id}`, body).pipe(
             map((data: any) => data)
         );
@@ -511,19 +531,19 @@ export class CatalogueRepo {
         );
     }
 
-    updateCommodityGroup(id :number, body: any) {
+    updateCommodityGroup(id: number, body: any) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/${id}`, body).pipe(
             map((data: any) => data)
         );
     }
 
-    getDetailCommodity(id: number){
+    getDetailCommodity(id: number) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/${id}`).pipe(
             map((data: any) => data)
         );
     }
 
-    getDetailCommodityGroup(id: number){
+    getDetailCommodityGroup(id: number) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/${id}`).pipe(
             map((data: any) => data)
         );

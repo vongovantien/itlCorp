@@ -13,8 +13,7 @@ declare var $: any;
 
 @Component({
   selector: 'app-partner-data-import',
-  templateUrl: './partner-data-import.component.html',
-  styleUrls: ['./partner-data-import.component.scss']
+  templateUrl: './partner-data-import.component.html'
 })
 export class PartnerDataImportComponent implements OnInit {
   data: any[];

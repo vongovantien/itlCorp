@@ -135,7 +135,6 @@ export class ShareGoodsImportComponent extends PopupBase implements OnInit {
         if (this.totalInvalidRow > 0) {
             this.importAlert.show();
         } else {
-            console.log("container from import excel", this.data);
             this._store.dispatch(new fromStore.AddContainersAction(this.data));
             this.hide();
         }

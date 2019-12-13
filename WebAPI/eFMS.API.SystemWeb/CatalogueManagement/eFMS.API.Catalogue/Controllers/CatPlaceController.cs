@@ -18,6 +18,7 @@ using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
 using System.Linq;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using Microsoft.AspNetCore.Hosting;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -33,6 +34,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// constructor
@@ -40,11 +42,16 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICatPlaceService</param>
         /// <param name="iMapper">inject interface IMapper</param>
-        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper)
+        /// <param name="hostingEnvironment"></param>
+        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, 
+            ICatPlaceService service, 
+            IMapper iMapper,
+            IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catPlaceService = service;
             mapper = iMapper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -246,16 +253,14 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
         {
-            string templateName = GetFileName(type);
-            var result = await new FileHelper().ExportExcel(templateName);
+            string fileName = GetFileName(type);
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)
             {
                 return result;
             }
-            else
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
-            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
         /// <summary>
@@ -415,15 +420,13 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody]List<CatPlaceImportModel> data)
         {
-            var result = catPlaceService.Import(data);
-            if (result.Success)
+            var hs = catPlaceService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
             {
-                return Ok(result);
+                return BadRequest(result);
             }
-            else
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
-            }
+            return Ok(result);
         }
 
         private string GetFileName(CatPlaceTypeEnum type)
