@@ -256,6 +256,13 @@ export class CatalogueRepo {
             })
         );
     }
+    getProvincesBycountry(id: any) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetProvinces`, { countryId: id }).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
 
     getAllProvinces() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetAllProvinces`).pipe(
@@ -268,6 +275,13 @@ export class CatalogueRepo {
 
     getDistricts() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetDistricts`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+    getDistrictsByProvince(id: any) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetDistricts`, { provinceId: id }).pipe(
             map((res: any) => {
                 return res;
             })

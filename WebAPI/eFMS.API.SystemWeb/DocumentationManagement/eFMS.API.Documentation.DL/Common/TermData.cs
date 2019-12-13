@@ -91,7 +91,7 @@ namespace eFMS.API.Documentation.DL.Common
             new BillofLadingType { Value = "Copy", DisplayName = "Copy" },
             new BillofLadingType { Value = "Original", DisplayName = "Original" },
             new BillofLadingType { Value = "Sea Waybill", DisplayName = "Sea Waybill" },
-            new BillofLadingType { Value = "Surendered", DisplayName = "Surendered" }
+            new BillofLadingType { Value = "Surrendered", DisplayName = "Surrendered" }
         };
         public static readonly List<ServiceType> ServiceTypes = new List<ServiceType>
         {

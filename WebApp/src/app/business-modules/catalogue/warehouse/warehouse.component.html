@@ -4,8 +4,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget"
-                (click)="showAdd()"></app-default-button>
+            <app-default-button [buttonSetting]="addButtonSetting" (click)="showAdd()"></app-default-button>
             <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
             <app-default-button [buttonSetting]="importButtonSetting"
                 [routerLink]="['/home/catalogue/ware-house/import']"></app-default-button>
@@ -27,333 +26,36 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <app-table-layout [id]="'warehouse-data-master'" [records]="warehouses" [settings]="warehouseSettings"
-                (sortChange)="onSortChange($event)" [nameEditModal]="'edit-ware-house-modal'"
-                (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
+                (sortChange)="onSortChange($event)" (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
             </app-table-layout>
-            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)">
-            </app-pagination>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal fade" *ngIf="warehouse" id="{{addButtonSetting.dataTarget}}" data-backdrop="static" role="dialog"
-    aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Warehouse</h5>
-                    <button id="closeButton" type="button" class="close" data-dismiss="modal" aria-label="Close"
-                        (click)="onCancel()">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="m-form m-form m-form--state">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && code.invalid }">
-                                    <label class="form-control-label">
-                                        Code <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter code"
-                                        name="code" autocomplete="nope" minlength="3" [(ngModel)]="warehouse.code"
-                                        #code="ngModel" (change)="warehouse.code = warehouse.code.trim()"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }"
-                                        required>
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid">
-                                        Code is required least 3 characters
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameEN.invalid }">
-                                    <label class="form-control-label">
-                                        Name(EN) <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter name"
-                                        name="warewhouseNameEN" autocomplete="nope" minlength="3"
-                                        [(ngModel)]="warehouse.nameEn" #warewhouseNameEN="ngModel"
-                                        (change)="warehouse.nameEn = warehouse.nameEn.trim()"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameEN.invalid }"
-                                        required>
-                                    <div class="form-control-feedback"
-                                        *ngIf="formAddEdit.submitted && warewhouseNameEN.invalid">
-                                        Name(EN) is required least 3 characters
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameLocal.invalid }">
-                                    <label class="form-control-label">
-                                        Name(Local) <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter name"
-                                        name="warewhouseNameLocal" autocomplete="nope" minlength="3"
-                                        [(ngModel)]="warehouse.nameVn" #warewhouseNameLocal="ngModel"
-                                        (change)="warehouse.nameVn = warehouse.nameVn.trim()"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameLocal.invalid }"
-                                        required>
-                                    <div class="form-control-feedback"
-                                        *ngIf="formAddEdit.submitted && warewhouseNameLocal.invalid">
-                                        Name(Local) is required least 3 characters
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.countryID == null }">
-                                    <label class="form-control-label">
-                                        Country <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"
-                                        (data)="refreshValue($event)" (selected)="onChange($event, 'country')"
-                                        (removed)="removed($event, 'country')" (typed)="typed($event)"
-                                        placeholder="Select country">
-                                    </ng-select>
-                                    <div class="form-control-feedback"
-                                        *ngIf="formAddEdit.submitted && warehouse.countryID == null">
-                                        Country is required
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
-                                    <label class="form-control-label">
-                                        City/ Province <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <ng-select #chooseProvince [allowClear]="true" [items]="provinces"
-                                        (data)="refreshValue($event)" (selected)="onChange($event, 'province')"
-                                        (removed)="removed($event, 'province')" (typed)="typed($event)"
-                                        placeholder="Select province">
-                                    </ng-select>
-                                    <div class="form-control-feedback"
-                                        *ngIf="formAddEdit.submitted && warehouse.provinceID == null">
-                                        Province is required
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.districtID == null }">
-                                    <label class="form-control-label">
-                                        District <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <ng-select #chooseDistrict [allowClear]="true" [items]="districts"
-                                        (data)="refreshValue($event)" (removed)="removed($event, 'district')"
-                                        (typed)="typed($event)" (selected)="onChange($event, 'district')"
-                                        placeholder="Select district">
-                                    </ng-select>
-                                    <div class="form-control-feedback"
-                                        *ngIf="formAddEdit.submitted && warehouse.districtID == null">
-                                        District is required
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && address.invalid }">
-                                    <label class="form-control-label">
-                                        Address <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter address"
-                                        name="address" autocomplete="nope"
-                                        (change)="warehouse.address = warehouse.address.trim()"
-                                        [(ngModel)]="warehouse.address" #address="ngModel"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && address.invalid }"
-                                        required>
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && address.invalid">
-                                        Address is required
-                                    </div>
-                                </div>
+            <div class="pagination-nav ">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="tatable__pager-size">
+                            <div class="select-box">
+                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                    (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                    <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                        <option [ngValue]="item">{{item}} line / screen</option>
+                                    </ng-container>
+                                </select>
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                        <div class="float-right">
+                            <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
+                                (pageChanged)="pageChanged($event)" [(ngModel)]="page" [maxSize]="10">
+                            </pagination>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer m--align-center c-button-actions">
-                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
-                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" *ngIf="warehouse" id="edit-ware-house-modal" data-backdrop="static" role="dialog"
-    aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid"
-                autocomplete="off">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Warehouse</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="m-form m-form m-form--state">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && code.invalid }">
-                                    <label class="form-control-label">
-                                        Code <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter code"
-                                        name="code" autocomplete="nope" minlength="3"
-                                        (change)="warehouse.code = warehouse.code.trim()" disabled
-                                        [(ngModel)]="warehouse.code" #code="ngModel"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }"
-                                        required>
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid">
-                                        Code is required least 3 characters
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouseNameEN.invalid }">
-                                    <label class="form-control-label">
-                                        Name(EN) <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter name"
-                                        name="warehouseNameEN" autocomplete="nope" minlength="3"
-                                        (change)="warehouse.nameEn = warehouse.nameEn.trim()"
-                                        [(ngModel)]="warehouse.nameEn" #warehouseNameEN="ngModel"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && warehouseNameEN.invalid }"
-                                        required>
-                                    <div class="form-control-feedback"
-                                        *ngIf="formAddEdit.submitted && warehouseNameEN.invalid">
-                                        Name(EN) is required least 3 characters
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warewhouseNameVN.invalid }">
-                                    <label class="form-control-label">
-                                        Name(VN) <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter name"
-                                        name="warewhouseNameVN" autocomplete="nope" minlength="3"
-                                        (change)="warehouse.nameVn = warehouse.nameVn.trim()"
-                                        [(ngModel)]="warehouse.nameVn" #warewhouseNameVN="ngModel"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && warewhouseNameVN.invalid }"
-                                        required>
-                                    <div class="form-control-feedback"
-                                        *ngIf="formAddEdit.submitted && warewhouseNameVN.invalid">
-                                        Name(VN) is required least 3 characters
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.countryID == null}">
-                                    <label class="form-control-label">
-                                        Country <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <ng-select #chooseCountry [allowClear]="true" [items]="countries"
-                                        [active]="countryActive" (data)="refreshValue($event)"
-                                        (selected)="onChange($event, 'country')" (removed)="removed($event, 'country')"
-                                        (typed)="typed($event)" placeholder="Select country">
-                                    </ng-select>
-                                    <div class="form-control-feedback"
-                                        *ngIf="formAddEdit.submitted && warehouse.countryID == null">
-                                        Country is required
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.provinceID == null }">
-                                    <label class="form-control-label">
-                                        City/ Province <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <ng-select #chooseProvince [allowClear]="true" [items]="provinces"
-                                        [active]="provinceActive" (data)="refreshValue($event)"
-                                        (selected)="onChange($event, 'province')"
-                                        (removed)="removed($event, 'province')" (typed)="typed($event)"
-                                        placeholder="Select province">
-                                    </ng-select>
-                                    <div class="form-control-feedback"
-                                        *ngIf="formAddEdit.submitted && warehouse.provinceID == null">
-                                        Province is required
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && warehouse.districtID == null }">
-                                    <label class="form-control-label">
-                                        District <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <ng-select #chooseDistrict [allowClear]="true" [items]="districts"
-                                        [active]="districtActive" (data)="refreshValue($event)"
-                                        (selected)="onChange($event, 'district')"
-                                        (removed)="removed($event, 'district')" (typed)="typed($event)"
-                                        placeholder="Select district">
-                                    </ng-select>
-                                    <div class="form-control-feedback"
-                                        *ngIf="formAddEdit.submitted && warehouse.districtID == null">
-                                        District is required
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && address.invalid }">
-                                    <label class="form-control-label">
-                                        Address <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <input type="text" class="form-control m-input" placeholder="Please enter address"
-                                        name="address" autocomplete="nope" [(ngModel)]="warehouse.address"
-                                        #address="ngModel"
-                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && address.invalid }"
-                                        required (change)="warehouse.address = warehouse.address.trim()">
-                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && address.invalid">
-                                        Address is required
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4" *ngIf="warehouse.id">
-                                <div class="form-group m-form__group">
-                                    <label class="form-control-label" for="">
-                                    </label>
-                                    <div>
-                                        <label class="m-checkbox m-checkbox--bold">
-                                            <input type="checkbox" [checked]="warehouse.active"
-                                                (change)="warehouse.active = !warehouse.active">
-                                            Active
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer m--align-center c-button-actions">
-                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
-                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<form-warehouse (saveSuccess)="resetSearch($event)"></form-warehouse>
 
 <app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this warehouse'">
 </app-delete-confirm-modal>

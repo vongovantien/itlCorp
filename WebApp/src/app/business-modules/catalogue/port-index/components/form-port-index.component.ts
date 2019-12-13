@@ -19,7 +19,6 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     modes: any[] = [];
     isSubmitted: boolean = false;
     isUpdate: boolean = false;
-    id: string = null;
     portIndex: PortIndex = new PortIndex();
 
     code: AbstractControl;
@@ -37,6 +36,9 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     }
 
     ngOnInit() {
+        this.initForm();
+    }
+    initForm() {
         this.portindexForm = this._fb.group({
             code: [null, Validators.required],
             portIndexeNameEN: [null, Validators.required],
@@ -68,7 +70,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
             this.portIndex.areaID = formData.zone[0].id;
             this.portIndex.active = !!this.isUpdate ? formData.active : true;
             if (this.isUpdate) {
-                this._catalogueRepo.updatePlace(this.id, this.portIndex)
+                this._catalogueRepo.updatePlace(this.portIndex.id, this.portIndex)
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             this.onHandleResult(res);
@@ -99,17 +101,29 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.hide();
     }
     setFormValue(res: any) {
-        const zoneActive = res.areaId != null ? [this.areas.find(x => x.id === res.areaId)] : [];
-        const countryActive = res.countryId != null ? [this.countries.find(x => x.id === res.countryId)] : [];
-        const modeActive = res.modeOfTransport != null ? [this.modes.find(x => x.id === res.modeOfTransport)] : [];
-        this.id = res.id;
+        let zoneActive = [];
+        let modeActive = [];
+        let countryActive = [];
+        const indexZone = this.areas.findIndex(x => x.id === res.areaId);
+        const indexMode = this.modes.findIndex(x => x.id === res.modeOfTransport);
+        const indexCountry = this.countries.findIndex(x => x.id === res.countryId);
+
+        if (indexZone > -1) {
+            zoneActive = [this.areas[indexZone]];
+        }
+        if (indexMode > -1) {
+            modeActive = [this.modes[indexMode]];
+        }
+        if (indexCountry > -1) {
+            countryActive = [this.countries[indexCountry]];
+        }
         this.portindexForm.setValue({
             code: res.code,
             portIndexeNameEN: res.nameEn,
             portIndexeNameLocal: res.nameVn,
-            country: countryActive,
-            zone: zoneActive,
-            mode: modeActive,
+            country: countryActive || [],
+            zone: zoneActive || [],
+            mode: modeActive || [],
             active: res.active
         });
     }

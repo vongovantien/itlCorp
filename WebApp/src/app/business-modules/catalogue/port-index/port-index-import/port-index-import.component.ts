@@ -1,19 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { API_MENU } from 'src/constants/api-menu.const';
+import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
+import { catchError, finalize } from 'rxjs/operators';
+
 import { PagingService } from 'src/app/shared/services/paging-service';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { BaseService } from 'src/app/shared/services/base.service';
 import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from 'src/app/app.base';
-import { catchError, finalize } from 'rxjs/operators';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-port-index-import',
@@ -72,7 +71,7 @@ export class PortIndexImportComponent extends AppPage implements OnInit {
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
 
-    async import(element) {
+    import(element) {
         this._progressRef.start();
         if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {

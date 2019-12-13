@@ -1,13 +1,16 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
-import { WarehouseComponent } from './warehouse.component';
-import { WarehouseImportComponent } from '../warehouse-import/warehouse-import.component';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { SelectModule } from 'ng2-select';
+import { ModalModule, PaginationModule } from 'ngx-bootstrap';
+
+import { SharedModule } from 'src/app/shared/shared.module';
+
+import { WarehouseComponent } from './warehouse.component';
+import { WarehouseImportComponent } from './warehouse-import/warehouse-import.component';
+import { FormWarehouseComponent } from './components/form-warehouse.component';
 
 
 const routing: Routes = [
@@ -20,17 +23,21 @@ const routing: Routes = [
         CommonModule,
         RouterModule.forChild(routing),
         SharedModule,
+        ReactiveFormsModule,
         FormsModule,
         NgProgressModule,
-        SelectModule
+        SelectModule,
+        ModalModule.forRoot(),
+        PaginationModule.forRoot()
     ],
     declarations: [
         WarehouseComponent,
-        WarehouseImportComponent
+        WarehouseImportComponent,
+        FormWarehouseComponent
     ],
     exports: [],
-    bootstrap: [WarehouseComponent],
+    bootstrap: [WarehouseComponent,],
     providers: [],
 })
-export class WareHouseModule { 
+export class WareHouseModule {
 }

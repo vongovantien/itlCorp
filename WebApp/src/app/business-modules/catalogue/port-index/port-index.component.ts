@@ -1,4 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
+import { catchError, finalize, map } from 'rxjs/operators';
+
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PORTINDEXCOLUMNSETTING } from './port-index.columns';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
@@ -10,10 +14,7 @@ import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import * as dataHelper from 'src/helper/data.helper';
 import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
 import { FormPortIndexComponent } from './components/form-port-index.component';
 
 @Component({
@@ -27,7 +28,6 @@ export class PortIndexComponent extends AppList implements OnInit {
     portIndex: PortIndex = new PortIndex();
     criteria: any = { placeType: PlaceTypeEnum.Port };
     addButtonSetting: ButtonModalSetting = {
-        dataTarget: 'edit-port-index-modal',
         typeButton: ButtonType.add
     };
     importButtonSetting: ButtonModalSetting = {
@@ -37,7 +37,7 @@ export class PortIndexComponent extends AppList implements OnInit {
         typeButton: ButtonType.export
     };
     configSearch: any = {
-        settingFields: this.portIndexSettings.filter(x => x.allowSearch == true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
+        settingFields: this.portIndexSettings.filter(x => x.allowSearch === true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
         typeSearch: TypeSearch.outtab
     };
     isDesc: boolean = false;
