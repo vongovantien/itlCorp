@@ -17,6 +17,7 @@ import { language } from 'src/languages/language.en';
 import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
 import { AppList } from 'src/app/app.list';
 import { FormWarehouseComponent } from './components/form-warehouse.component';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'app-warehouse',
@@ -47,9 +48,10 @@ export class WarehouseComponent extends AppList implements OnInit {
     constructor(private sortService: SortService,
         private _catalogueRepo: CatalogueRepo,
         private toastService: ToastrService,
-        private exportRepository: ExportRepo) {
+        private exportRepository: ExportRepo,
+        private _progressService: NgProgress) {
         super();
-
+        this._progressRef = this._progressService.ref();
         this.requestList = this.requestWarehouses;
     }
 

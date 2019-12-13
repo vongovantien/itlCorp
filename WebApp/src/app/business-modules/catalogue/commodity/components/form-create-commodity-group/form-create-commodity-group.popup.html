@@ -19,7 +19,7 @@
                                 </label>
                                 <div class="col-lg-8">
                                     <input type="text" class="form-control m-input m-input-group--square"
-                                        [ngClass]="{ 'm-input--square': formGroupCommodity.submitted && groupNameEN.invalid }"
+                                        [ngClass]="{ 'm-input--square': isSubmited && groupNameEN.invalid }"
                                         formControlName="groupNameEN" placeholder="Please enter group name (EN)">
                                     <div class="form-control-feedback"
                                         *ngIf="isSubmited && (groupNameEN.errors | equalError: 'required') || (groupNameEN.errors | equalError: 'required') && groupNameEN.dirty">

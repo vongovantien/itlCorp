@@ -30,12 +30,12 @@ export class CommodityComponent extends AppList {
   @ViewChild(CommodityAddPopupComponent, { static: false }) commodityAddPopupComponent: CommodityAddPopupComponent;
   @ViewChild(CommodityGroupAddPopupComponent, { static: false }) commodityGroupAddPopupComponent: CommodityGroupAddPopupComponent;
   @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-  
+
   commodities: Commodity[] = [];
   commodity: Commodity;
   commoditySettings: ColumnSetting[] = COMMODITYCOLUMNSETTING;
   //dataSearch: any = {};
-  
+
   configSearchCommonity: any = {
     settingFields: this.commoditySettings.filter(x => x.allowSearch == true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
     typeSearch: TypeSearch.intab,
@@ -52,7 +52,7 @@ export class CommodityComponent extends AppList {
     private _exportRepo: ExportRepo,
     private _cd: ChangeDetectorRef,
     private _ngProgessSerice: NgProgress,
-    private _sortService: SortService,) {
+    private _sortService: SortService, ) {
     super();
     this._progressRef = this._ngProgessSerice.ref();
     this.requestList = this.getCommodities;
@@ -67,7 +67,7 @@ export class CommodityComponent extends AppList {
       { title: 'Group', sortable: true, field: 'commodityGroupNameVn' },
       { title: 'Status', sortable: true, field: 'active' },
     ];
-    
+
     this.getCommodities();
   }
 
@@ -97,19 +97,19 @@ export class CommodityComponent extends AppList {
       );
   }
 
-  
+
   onSearch(event: { field: string, searchString: string, displayName: string }) {
     this.dataSearch = {};
-    this.dataSearch[event.field] = event.searchString;    
+    this.dataSearch[event.field] = event.searchString;
     this.getCommodities();
   }
 
-  resetSearch() {
+  resetSearch(event) {
     this.dataSearch = {};
     this.getCommodities();
   }
 
-  showDetailCommodity(commodity){
+  showDetailCommodity(commodity) {
     this.catalogueRepo.getDetailCommodity(commodity.id).subscribe(
       (res: any) => {
         if (res.id !== 0) {
@@ -148,13 +148,13 @@ export class CommodityComponent extends AppList {
   onRequestCommodity() {
     this.getCommodities();
   }
- 
-  showConfirmDelete(data: any){
-    this.commodity = data;   
+
+  showConfirmDelete(data: any) {
+    this.commodity = data;
     this.confirmDeletePopup.show();
   }
 
-  onDelete(){
+  onDelete() {
     this.confirmDeletePopup.hide();
     this.deleteCommodity();
   }

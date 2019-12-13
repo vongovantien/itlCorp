@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
 import { PagingService } from 'src/app/shared/services/paging-service';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
@@ -16,8 +14,7 @@ import { InfoPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
   selector: 'app-commodity-group-import',
-  templateUrl: './commodity-group-import.component.html',
-  styleUrls: ['./commodity-group-import.component.scss']
+  templateUrl: './commodity-group-import.component.html'
 })
 export class CommodityGroupImportComponent extends AppPage implements OnInit {
   @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;

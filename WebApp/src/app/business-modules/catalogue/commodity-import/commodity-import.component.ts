@@ -13,8 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-commodity-import',
-  templateUrl: './commodity-import.component.html',
-  styleUrls: ['./commodity-import.component.scss']
+  templateUrl: './commodity-import.component.html'
 })
 export class CommodityImportComponent extends AppPage implements OnInit {
   @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
@@ -110,7 +109,7 @@ export class CommodityImportComponent extends AppPage implements OnInit {
   }
 
 
-  async import(element) {    
+  async import(element) {
     if (this.data == null) { return; }
     if (this.totalRows - this.totalValidRows > 0) {
       this.importAlert.show();

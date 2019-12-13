@@ -7,6 +7,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'form-warehouse',
@@ -35,8 +36,10 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
 
     constructor(private _fb: FormBuilder,
         private _toastService: ToastrService,
-        private _catalogueRepo: CatalogueRepo) {
+        private _catalogueRepo: CatalogueRepo,
+        private _progressService: NgProgress) {
         super();
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {

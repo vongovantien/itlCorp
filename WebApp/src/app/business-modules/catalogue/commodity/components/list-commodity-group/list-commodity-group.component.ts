@@ -111,7 +111,7 @@ export class CommodityGroupListComponent extends AppList {
         this.getGroupCommodities();
     }
 
-    resetSearch() {
+    resetSearch(event) {
         this.dataSearch = {};
         this.getGroupCommodities();
     }

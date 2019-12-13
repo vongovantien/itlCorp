@@ -192,24 +192,26 @@ export class PortIndexComponent extends AppList implements OnInit {
     showConfirmDelete(item) {
         this.portIndex = item;
     }
-    onDelete() {
-        this.catalogueRepo.deletePlace(this.portIndex.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
-            ).subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this.toastService.success(res.message, '');
+    onDelete(event) {
+        if (event) {
+            this.catalogueRepo.deletePlace(this.portIndex.id)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+                ).subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this.toastService.success(res.message, '');
 
-                        this.page = 1;
-                        this.requestList();
-                    } else {
-                        this.toastService.error(res.message || 'Có lỗi xảy ra', '');
-                    }
-                },
-            );
+                            this.page = 1;
+                            this.requestList();
+                        } else {
+                            this.toastService.error(res.message || 'Có lỗi xảy ra', '');
+                        }
+                    },
+                );
 
+        }
     }
 
     onSortChange(column) {
