@@ -59,7 +59,8 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (shipmentType.dirty && !shipmentType.valid) || (isSubmitted && !shipmentType.valid)}">
                             <label required>Shipment Type</label>
                             <ng-select #selectShipmentType [items]="shipmentTypes" placeholder="Please Select"
                                 formControlName="shipmentType" (opened)="closeOtherSelects(selectShipmentType)">
