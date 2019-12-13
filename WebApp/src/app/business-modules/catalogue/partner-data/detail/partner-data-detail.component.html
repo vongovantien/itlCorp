@@ -101,17 +101,17 @@
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && nameAbreviation.invalid }">
                                 <label class="form-control-label" for="">
-                                    Partner Name Abreviation <span class="m--font-danger">(*)</span>
+                                    Partner Name Abbreviation <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
-                                    placeholder="please enter Name Abreviation" name="nameAbreviation"
+                                    placeholder="please enter Name Abbreviation" name="nameAbreviation"
                                     autocomplete="nope" minlength="3" maxlength="100" [(ngModel)]="partner.shortName"
                                     #nameAbreviation="ngModel" (change)="partner.shortName = partner.shortName.trim()"
                                     [ngClass]="{ 'm-input--square': formAddEdit.submitted && nameAbreviation.invalid }"
                                     ecusSpecicalCharacterNoSpace required>
                                 <div class="form-control-feedback"
                                     *ngIf="formAddEdit.submitted && nameAbreviation.invalid">
-                                    Partner Name Abreviation is required
+                                    Partner Name Abbreviation is required
                                 </div>
                             </div>
                             <div class="form-group">
