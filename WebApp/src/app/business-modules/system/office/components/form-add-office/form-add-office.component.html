@@ -1,4 +1,4 @@
-<div class="m-content form-add-office">
+<div class="m-content m-form m-form--state form-add-office">
     <form [formGroup]="formGroup">
         <div class="m-portlet">
             <ng-content></ng-content>
@@ -139,14 +139,11 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': selectedCompany.value == null}">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmited && selectedCompany.value == null}">
                             <label class="form-control-label">
                                 Company <span class="m--font-danger">(*)</span>
                             </label>
-                            <!-- <select formControlName="company" class="form-control">
-                                <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
-                                </option>
-                            </select> -->
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCompany"
                                 (itemSelected)="onSelectDataFormInfo($event)"
                                 [selectedDisplayFields]="configOffice.selectedDisplayFields"

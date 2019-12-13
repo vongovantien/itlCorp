@@ -101,6 +101,7 @@ export class PartnerDataAddnewComponent extends AppList {
                         it.service = item.id;
                     }
                 });
+
             }
         }
         this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.salemanToAdd.service && saleMane.office === this.salemanToAdd.office));
@@ -113,6 +114,8 @@ export class PartnerDataAddnewComponent extends AppList {
                 });
             }
         }
+
+
         if (this.salemanToAdd.service !== null && this.salemanToAdd.office !== null) {
             this._catalogueRepo.checkExistedSaleman(this.salemanToAdd.service, this.salemanToAdd.office)
                 .pipe(catchError(this.catchError))
@@ -126,17 +129,16 @@ export class PartnerDataAddnewComponent extends AppList {
                                 this.saleMandetail.push(this.salemanToAdd);
                                 this.poupSaleman.hide();
                                 for (const it of this.saleMandetail) {
-                                    if (it.status === true) {
-                                        it.statusstr = "Active";
-                                    } else {
-                                        it.statusstr = "InActive";
-                                    }
+
                                     this.services.forEach(item => {
                                         if (it.service === item.id) {
                                             it.service = item.text;
                                         }
                                     });
                                 }
+                                this.saleMandetail.forEach(element => {
+                                    element.status = element.status.value;
+                                });
 
                             }
                         }
@@ -154,8 +156,8 @@ export class PartnerDataAddnewComponent extends AppList {
     }
 
     showPopupSaleman() {
-        this.poupSaleman.resetForm();
         this.poupSaleman.isSave = false;
+        this.poupSaleman.isDetail = false;
         this.poupSaleman.show();
     }
 
@@ -238,12 +240,10 @@ export class PartnerDataAddnewComponent extends AppList {
                     if (!!res) {
                         console.log(res);
                         this.isExistedTaxcode = true;
-                        this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fille info to Internal Reference Info.`;
+                        this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fill info to Internal Reference Info.`;
                         this.confirmTaxcode.show();
-                    }
-                    else {
+                    } else {
                         this.isExistedTaxcode = false;
-
                     }
                 },
             );
@@ -404,11 +404,6 @@ export class PartnerDataAddnewComponent extends AppList {
 
             if (this.saleMandetail.length > 0) {
                 for (const it of this.saleMandetail) {
-                    if (it.status === true) {
-                        it.statusstr = "Active";
-                    } else {
-                        it.statusstr = "InActive";
-                    }
                     this.services.forEach(item => {
                         if (it.service === item.text) {
                             it.service = item.id;
@@ -430,13 +425,10 @@ export class PartnerDataAddnewComponent extends AppList {
 
     onCreatePartner() {
         this.baseService.spinnerShow();
-        this.partner.saleMans = this.saleMandetail;
-        this.partner.saleMans.forEach(element => {
-            if (element.effectDate.startDate === null) {
-                element.effectDate = null;
-            }
+        this.saleMandetail.forEach(element => {
+            element.status = element.status.value;
         });
-
+        this.partner.saleMans = this.saleMandetail;
         this._catalogueRepo.createPartner(this.partner)
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -637,38 +629,10 @@ export class PartnerDataAddnewComponent extends AppList {
     }
 
 
-    onCreateSaleman(ngform: NgForm) {
-        if (this.strSalemanCurrent.length > 0) {
-            this.baseService.spinnerShow();
-            const body = {
-                saleman_Id: this.strSalemanCurrent,
-                office: this.strOfficeCurrent,
-                company: this.strOfficeCurrent,
-                partnerId: this.partner.id,
-                effectdate: this.salemanToAdd.effectDate == null ? null : formatDate(this.salemanToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en'),
-                description: this.salemanToAdd.description,
-                status: this.selectedStatus.value,
-                service: this.selectedService.id
-
-            };
-            this._catalogueRepo.createSaleman(body)
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (res: any) => {
-                        if (res.status) {
-                            this.baseService.spinnerHide();
-                            $('#saleman-modal').modal('hide');
-                            this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
-
-                        }
-
-                    },
-                );
-        }
-    }
 
     showDetailSaleMan(saleman: Saleman, index: any) {
         this.poupSaleman.index = index;
+        this.poupSaleman.isDetail = true;
         const saleMane: any = {
             description: saleman.description,
             office: saleman.office,

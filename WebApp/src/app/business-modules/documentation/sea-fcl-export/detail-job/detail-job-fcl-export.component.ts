@@ -165,6 +165,9 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+
+
+
                     } else {
                         this._toastService.error(res.message);
                     }

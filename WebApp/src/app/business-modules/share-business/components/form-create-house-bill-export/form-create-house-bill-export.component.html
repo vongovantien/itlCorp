@@ -157,7 +157,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger':isSubmitted && !freightPayment.value}">
+                        [ngClass]="{'m-form__group has-danger':(freightPayment.dirty && !freightPayment.valid) || (isSubmitted && !freightPayment.valid)}">
                         <label required>Freight Payment </label>
                         <ng-select #selectTerm [items]="termTypes" placeholder="Please Select"
                             formControlName="freightPayment" (opened)="closeOtherSelects(selectTerm)"

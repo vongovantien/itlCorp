@@ -6,6 +6,7 @@ import { catchError } from "rxjs/operators";
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { PopupBase } from 'src/app/popup.base';
 import { formatDate } from '@angular/common';
+import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-saleman-popup',
@@ -18,7 +19,7 @@ export class SalemanPopupComponent extends PopupBase {
     saleMans: Saleman[] = [];
     headerSaleman: CommonInterface.IHeaderTable[];
     services: any[] = [];
-    status: CommonInterface.ICommonTitleValue[] = [];
+    statuss: any[] = [];
     offices: any[] = [];
     selectedService: any = {};
     saleManToAdd: Saleman = new Saleman();
@@ -35,27 +36,56 @@ export class SalemanPopupComponent extends PopupBase {
     selectedDataOffice: any;
     index: number = 0;
     currrently_user: string = '';
+    form: FormGroup;
+    saleman: AbstractControl;
+    service: AbstractControl;
+    office: AbstractControl;
+    status: AbstractControl;
+    effectiveDate: AbstractControl;
+    description: AbstractControl;
+
     @Input() popupData: Saleman;
     constructor(
         private baseService: BaseService,
         private api_menu: API_MENU,
         private _catalogueRepo: CatalogueRepo,
+        private _fb: FormBuilder
     ) {
 
         super();
     }
 
     ngOnInit() {
-        this.currrently_user = localStorage.getItem('currently_userName');
         this.getComboboxData();
+        this.currrently_user = localStorage.getItem('currently_userName');
+        this.form = this._fb.group({
+            saleman: [null, Validators.required],
+            office: [null, Validators.required],
+            status: [this.statuss[1]],
+            effectiveDate: [],
+            description: [],
+            service: [this.services[0]],
+
+        });
+        this.saleman = this.form.controls["saleman"];
+        this.service = this.form.controls["service"];
+        this.office = this.form.controls["office"];
+        this.status = this.form.controls["status"];
+        this.effectiveDate = this.form.controls["effectiveDate"];
+        this.description = this.form.controls["description"];
     }
 
-    showSaleman(saleman: Saleman) {
-        this.isDetail = true;
-        this.saleManToView = saleman;
-        if (this.saleManToView.effectDate.startDate !== undefined) {
-            this.saleManToView.effectDate = this.saleManToView.effectDate.startDate;
-        }
+    showSaleman(sm: Saleman) {
+        this.form.reset();
+        console.log(sm);
+        this.form.setValue({
+            office: sm.office,
+            effectiveDate: !!sm.effectDate ? { startDate: new Date(sm.effectDate), endDate: new Date(sm.effectDate) } : null,
+            service: this.services.filter(i => i.text === sm.service)[0],
+            status: this.statuss.filter(i => i.title === sm.status)[0],
+            saleman: sm.saleman_ID,
+            description: sm.description
+        });
     }
 
     onDeleteSaleman() {
@@ -70,7 +100,6 @@ export class SalemanPopupComponent extends PopupBase {
         this.saleManToAdd = new Saleman();
         this.saleManToAdd.saleman_ID = {};
         this.saleManToAdd.office = {};
-
     }
     closePoup() {
         this.isDetail = false;
@@ -82,8 +111,9 @@ export class SalemanPopupComponent extends PopupBase {
         this.getSalemans();
         this.getService();
         this.getOffice();
-        this.status = this.getStatus();
-        this.selectedStatus = this.status[1];
+        this.statuss = this.getStatus();
+        // this.selectedStatus = this.statuss[1];
+
     }
 
     getService() {
@@ -93,7 +123,7 @@ export class SalemanPopupComponent extends PopupBase {
                 (res: any) => {
                     if (!!res) {
                         this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
-                        this.selectedService = this.services[0];
+                        this.service.setValue(this.services.filter(i => i.value === res.value)[0]);
                     }
                 },
             );
@@ -111,6 +141,7 @@ export class SalemanPopupComponent extends PopupBase {
                 (res: any) => {
                     if (!!res) {
                         this.offices = res;
+                        console.log(this.offices);
                     }
                 },
             );
@@ -131,32 +162,48 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     onSelectSaleMan(saleMan: any) {
-        this.strSalemanCurrent = { field: 'username', value: saleMan.username };
+        this.saleman.setValue(saleMan.username);
         this.selectedDataSaleMan = saleMan;
     }
 
     onSelectOffice(office: any) {
-        this.strOfficeCurrent = { field: 'abbrCompany', value: office.abbrCompany };
+        this.office.setValue(office.abbrCompany);
         this.selectedDataOffice = office;
     }
 
     OnCreate() {
-        if (this.strOfficeCurrent.value !== undefined && this.strSalemanCurrent.value !== undefined) {
-            const salemaneffectdate = this.saleManToAdd.effectDate.startDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en');
+        this.isSave = true;
+        if (this.form.valid) {
             const saleMane: any = {
-                company: this.saleManToAdd.office,
-                office: this.saleManToAdd.office,
-                effectDate: salemaneffectdate,
-                status: this.selectedStatus.value,
+                company: this.office.value,
+                office: this.office.value,
+                effectDate: !!this.effectiveDate.value && this.effectiveDate.value.startDate != null ? formatDate(this.effectiveDate.value.startDate !== undefined ? this.effectiveDate.value.startDate : this.effectiveDate.value, 'yyyy-MM-dd', 'en') : null,
+                status: this.status.value,
                 partnerId: null,
-                saleman_ID: this.selectedDataSaleMan.username,
-                service: this.selectedService.id,
+                saleman_ID: this.saleman.value,
+                service: this.service.value.id,
                 createDate: new Date()
             };
             this.saleManToAdd = new Saleman(saleMane);
-
             this.onCreate.emit(this.saleManToAdd);
+            // return;
         }
+        // if (this.strOfficeCurrent.value !== undefined && this.strSalemanCurrent.value !== undefined) {
+        //     const salemaneffectdate = this.saleManToAdd.effectDate.startDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en');
+        //     const saleMane: any = {
+        //         company: this.saleManToAdd.office,
+        //         office: this.saleManToAdd.office,
+        //         effectDate: salemaneffectdate,
+        //         status: this.selectedStatus.value,
+        //         partnerId: null,
+        //         saleman_ID: this.selectedDataSaleMan.username,
+        //         service: this.selectedService.id,
+        //         createDate: new Date()
+        //     };
+        //     this.saleManToAdd = new Saleman(saleMane);
+
+        //     this.onCreate.emit(this.saleManToAdd);
+        // }
 
     }
 }

@@ -50,7 +50,7 @@
                         <ng-container *ngFor="let currency of currencies; let i = index; trackBy: trackByFn">
                             <tr>
                                 <td class="table-actions-col">
-                                    <div class="table-actions">
+                                    <div class="table-actions" style="width: 70px">
                                         <button
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                             title="Edit" (click)="showDetail(currency)">
@@ -62,8 +62,8 @@
                                         </button>
                                     </div>
                                 </td>
-                                <td>{{currency.id}}</td>
-                                <td>{{currency.currencyName}}</td>
+                                <td> <span>{{currency.id}}</span></td>
+                                <td> <span>{{currency.currencyName}}</span> </td>
                                 <td>
                                     <app-switch disabled [(toggle)]="currency.isDefault" size="sm"></app-switch>
                                 </td>

@@ -89,6 +89,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     isDetail: boolean = false;
     serviceTypesString: string[] = [];
     hbOfladingTypesString: string[] = [];
+
     hbOfladingTypes: CommonInterface.IValueDisplay[];
     serviceTypes: CommonInterface.IValueDisplay[];
     shipmentDetail: any = {}; // TODO model.
@@ -98,6 +99,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         { title: 'Three(3)', value: 3 }
 
     ];
+    object: any = { items: [] };
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -117,7 +119,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this.headersSaleman = [
             { title: 'User Name', field: 'username' },
         ];
-
         this.configPartner = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'id', label: 'Partner ID' },
@@ -212,6 +213,9 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         finally {
             this._spinner.hide();
         }
+    }
+    refreshValue(value: any) {
+        this.object.items = [value];
     }
 
     async getCommonData() {

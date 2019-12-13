@@ -185,7 +185,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmited && (hbltype.dirty && !hbltype.valid) || (isSubmited && !hbltype.valid)}">
+                                [ngClass]="{'m-form__group has-danger': (hbltype.dirty && !hbltype.valid) || (isSubmited && !hbltype.valid)}">
                                 <label class="form-control-label" for="">
                                     House Bill of Lading Type. <span class="m--font-danger">(*)</span>
                                 </label>
@@ -194,7 +194,7 @@
                                     formControlName="hbOfladingType">
                                 </ng-select>
                                 <div class="form-control-feedback"
-                                    *ngIf="isSubmited && (hbltype.errors | equalError: 'required') || (hbltype.errors | equalError: 'required') && hbltype.dirty">
+                                    *ngIf="(hbltype.dirty && !hbltype.valid) || (isSubmited && !hbltype.valid)">
                                     House Bill of Lading Type is required !
                                 </div>
                             </div>
