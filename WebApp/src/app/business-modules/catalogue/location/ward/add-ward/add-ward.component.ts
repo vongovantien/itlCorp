@@ -64,14 +64,14 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
             countryId: ['', Validators.compose([
                 Validators.required
             ])],
-            active: [],
-            id: [],
             provinceId: ['', Validators.compose([
                 Validators.required
             ])],
             districtId: ['', Validators.compose([
                 Validators.required
-            ])]
+            ])],
+            active: [],
+            id: [],
         });
         this.code = this.formAddWard.controls['code'];
         this.nameEn = this.formAddWard.controls['nameEn'];
