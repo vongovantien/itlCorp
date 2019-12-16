@@ -34,7 +34,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatCustomerPlace> CatCustomerPlace { get; set; }
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
-        public virtual DbSet<CatPartnerContact> CatPartnerContact { get; set; }
         public virtual DbSet<CatPartnerContract> CatPartnerContract { get; set; }
         public virtual DbSet<CatPartnerGroup> CatPartnerGroup { get; set; }
         public virtual DbSet<CatPlace> CatPlace { get; set; }
@@ -1184,128 +1183,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
-
-            modelBuilder.Entity<CatPartnerContact>(entity =>
-            {
-                entity.ToTable("catPartnerContact");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
-
-                entity.Property(e => e.Birthday).HasColumnType("datetime");
-
-                entity.Property(e => e.CellPhone)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ContactNameEn)
-                    .HasColumnName("ContactName_EN")
-                    .HasMaxLength(4000);
-
-                entity.Property(e => e.ContactNameVn)
-                    .HasColumnName("ContactName_VN")
-                    .HasMaxLength(4000);
-
-                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
-
-                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.Email)
-                    .HasMaxLength(150)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.FieldInterested).HasMaxLength(4000);
-
-                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
-
-                entity.Property(e => e.JobTitle).HasMaxLength(4000);
-
-                entity.Property(e => e.Notes).HasMaxLength(4000);
-
-                entity.Property(e => e.PartnerId)
-                    .IsRequired()
-                    .HasColumnName("PartnerID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.SugarId)
-                    .HasColumnName("SugarID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserCreated)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.HasOne(d => d.Partner)
-                    .WithMany(p => p.CatPartnerContact)
-                    .HasForeignKey(d => d.PartnerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_catPartnerContact_catPartner");
-            });
-
-            modelBuilder.Entity<CatPartnerContract>(entity =>
-            {
-                entity.ToTable("catPartnerContract");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
-
-                entity.Property(e => e.ActiveBy)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
-
-                entity.Property(e => e.ContractNo)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.CreditAmount).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
-
-                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.EffectiveOn).HasColumnType("datetime");
-
-                entity.Property(e => e.ExpiryOn).HasColumnType("datetime");
-
-                entity.Property(e => e.Note).HasMaxLength(4000);
-
-                entity.Property(e => e.PartnerId)
-                    .HasColumnName("PartnerID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.PaymentDeadlineUnit)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.SugarId)
-                    .HasColumnName("SugarID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserCreated)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-            });
-
+            
             modelBuilder.Entity<CatPartnerGroup>(entity =>
             {
                 entity.ToTable("catPartnerGroup");
