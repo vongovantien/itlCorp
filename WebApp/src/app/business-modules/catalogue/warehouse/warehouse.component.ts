@@ -8,9 +8,7 @@ import { ColumnSetting } from '../../../shared/models/layout/column-setting.mode
 import { SortService } from '../../../shared/services/sort.service';
 import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-setting.model';
 import { ButtonType } from '../../../shared/enums/type-button.enum';
-import { PagerSetting } from '../../../shared/models/layout/pager-setting.model';
 import { SystemConstants } from '../../../../constants/system.const';
-import { PAGINGSETTING } from 'src/constants/paging.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { language } from 'src/languages/language.en';
@@ -24,11 +22,13 @@ import { NgProgress } from '@ngx-progressbar/core';
     templateUrl: './warehouse.component.html',
 })
 export class WarehouseComponent extends AppList implements OnInit {
+
     @ViewChild(FormWarehouseComponent, { static: false }) formPopup: FormWarehouseComponent;
+
     warehouses: Array<Warehouse>;
     warehouse: Warehouse = new Warehouse();
     criteria: any = { placeType: PlaceTypeEnum.Warehouse };
-    pager: PagerSetting = PAGINGSETTING;
+
     addButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.add
     };
@@ -74,9 +74,9 @@ export class WarehouseComponent extends AppList implements OnInit {
                     this.formPopup.districts = this.utility.prepareNg2SelectData(districts || [], 'id', 'name_VN');
                 },
                 () => { },
-
             );
     }
+
     requestWarehouses() {
         this._catalogueRepo.pagingPlace(this.page, this.pageSize, Object.assign({}, this.criteria))
             .pipe(
@@ -101,6 +101,7 @@ export class WarehouseComponent extends AppList implements OnInit {
         this.isDesc = !this.isDesc;
         this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
     }
+
     showAdd() {
         this.formPopup.warehouseForm.reset();
         this.formPopup.code.enable();
@@ -108,7 +109,8 @@ export class WarehouseComponent extends AppList implements OnInit {
         this.formPopup.title = "Add Warehouse";
         this.formPopup.show();
     }
-    async showDetail(item: Warehouse) {
+
+    showDetail(item: Warehouse) {
         this.warehouse = item;
         [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
         this.formPopup.title = "Update Warehouse";
@@ -117,7 +119,8 @@ export class WarehouseComponent extends AppList implements OnInit {
         this.formPopup.setFormValue(item);
         this.formPopup.show();
     }
-    async onDelete(event) {
+
+    onDelete(event) {
         if (event) {
             this._catalogueRepo.deletePlace(this.warehouse.id)
                 .pipe(
@@ -184,10 +187,7 @@ export class WarehouseComponent extends AppList implements OnInit {
         this.requestWarehouses();
     }
 
-    /**
-     * EXPORT - IMPORT DATA 
-     */
-    async export() {
+    export() {
         this.exportRepository.exportPortIndex(this.criteria)
             .pipe(catchError(this.catchError))
             .subscribe(
