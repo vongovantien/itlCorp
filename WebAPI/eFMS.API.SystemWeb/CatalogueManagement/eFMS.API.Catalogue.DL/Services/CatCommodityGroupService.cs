@@ -142,7 +142,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.GroupNameEn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_EXISTED], item.GroupNameEn);
                         item.IsValid = false;
                     }
-                    if (list.Count(x => x.GroupNameEn.ToLower() == item.GroupNameEn.ToLower()) > 1){
+                    if (list.Count(x => x.GroupNameEn != null && x.GroupNameEn.ToLower() == item.GroupNameEn.ToLower()) > 1){
                         item.GroupNameEn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_CODE_DUPLICATE], item.GroupNameEn);
                         item.IsValid = false;
                     }
@@ -162,7 +162,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.GroupNameVn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_EXISTED], item.GroupNameVn);
                         item.IsValid = false;
                     }
-                    if (list.Count(x => x.GroupNameVn.ToLower() == item.GroupNameVn.ToLower()) > 1)
+                    if (list.Count(x => x.GroupNameVn != null && x.GroupNameVn.ToLower() == item.GroupNameVn.ToLower()) > 1)
                     {
                         item.GroupNameVn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_CODE_DUPLICATE], item.GroupNameVn);
                         item.IsValid = false;

@@ -104,9 +104,9 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string MSG_COMMOIDITY_CODE_EMPTY = "MSG_COMMOIDITY_CODE_EMPTY";
         public static readonly string MSG_COMMOIDITY_CODE_EXISTED= "MSG_COMMOIDITY_CODE_EXISTED";
         public static readonly string MSG_COMMOIDITY_CODE_DUPLICATED = "MSG_COMMOIDITY_CODE_DUPLICATED";
-        public static readonly string MSG_COMMOIDITY_NAME_EN_EMPTY = "MSG_COMMOIDITY_GROUP_NAME_EN_EMPTY";
-        public static readonly string MSG_COMMOIDITY_NAME_LOCAL_EMPTY = "MSG_COMMOIDITY_GROUP_NAME_LOCAL_EMPTY";
-        public static readonly string MSG_COMMOIDITY_STATUS_EMPTY = "MSG_COMMOIDITY_GROUP_STATUS_EMPTY";
+        public static readonly string MSG_COMMOIDITY_NAME_EN_EMPTY = "MSG_COMMOIDITY_NAME_EN_EMPTY";
+        public static readonly string MSG_COMMOIDITY_NAME_LOCAL_EMPTY = "MSG_COMMOIDITY_NAME_LOCAL_EMPTY";
+        public static readonly string MSG_COMMOIDITY_STATUS_EMPTY = "MSG_COMMOIDITY_STATUS_EMPTY";
         #endregion
 
         #region country

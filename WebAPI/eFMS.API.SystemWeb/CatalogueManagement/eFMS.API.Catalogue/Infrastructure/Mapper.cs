@@ -20,6 +20,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatCommodityGroupEditModel, CatCommodityGroupModel>();
             CreateMap<CatCommodityEditModel, CatCommodityModel>();
             CreateMap<CatPartnerEditModel, CatPartnerModel>();
+            CreateMap<CatPartner, CatPartnerModel>();
             CreateMap<CatPartner, CatPartnerViewModel>();
             CreateMap<CatPartnerModel, CatPartnerViewModel>();
             CreateMap<CatPartner, CatPartnerModel>();

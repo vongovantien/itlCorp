@@ -132,26 +132,22 @@ namespace eFMS.API.Documentation.DL.Common
         public static string ConvertNumberCurrencyToStringUSD(decimal number, string currency)
         {
             if (number == 0)
-                return "zero " + currency;
+                return currency + " zero";
 
             if (number < 0)
                 return "minus " + ConvertNumberCurrencyToStringUSD(Math.Abs(number), currency);
 
-            string words = "";
+            string words = string.Empty;
 
             int intPortion = (int)number;
             decimal fraction = (number - intPortion) * 100;
             int decPortion = (int)fraction;
 
-            words = NumberToWords(intPortion);
+            words = currency + " " + NumberToWords(intPortion);
             if (decPortion > 0)
             {
-                words += " " + currency + " and ";
-                words += NumberToWords(decPortion) + " cents";
-            }
-            else
-            {
-                words += " " + currency;
+                //words +=" and ";
+                words += ", cents " + NumberToWords(decPortion);
             }
             return words;
         }
@@ -186,8 +182,8 @@ namespace eFMS.API.Documentation.DL.Common
 
             if (number > 0)
             {
-                //if (words != "")
-                //    words += "and ";
+                if (words != "")
+                    words += "and ";
 
                 var unitsMap = new[] { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" };
                 var tensMap = new[] { "zero", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety" };

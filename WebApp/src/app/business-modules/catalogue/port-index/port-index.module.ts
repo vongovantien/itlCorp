@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { PortIndexComponent } from './port-index.component';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { PortIndexImportComponent } from '../port-index-import/port-index-import.component';
+import { PortIndexImportComponent } from './port-index-import/port-index-import.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';

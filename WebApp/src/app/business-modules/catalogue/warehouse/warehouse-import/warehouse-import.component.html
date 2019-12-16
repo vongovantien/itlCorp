@@ -18,7 +18,10 @@
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
-                        <input type="file" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
+                        <form #form>
+                            <input type="file" #fileInput id="inputFile" class="form-control m-input m-input--square"
+                                placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
+                        </form>
                         <span class="m-form__help">
                             <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
                         </span>
@@ -44,32 +47,28 @@
                     </div>
                 </div>
                 <div class="form-actions m--margin-top-5 m--align-right">
-                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
+                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="hideInvalid()">
                         <span>
-                            <span *ngIf="isShowInvalid"> 
+                            <span *ngIf="isShowInvalid">
                                 Show invalid rows
                             </span>
-                            <span *ngIf="isShowInvalid == false"> 
+                            <span *ngIf="isShowInvalid == false">
                                 Show All
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="import(fileInput)">
                         <span>
                             <i class="la la-save"></i>
                             <span>
-                                save
+                                Save
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/port-index">
-                        <span>
-                            <i class="la la-ban"></i>
-                            <span>
-                                close
-                            </span>
-                        </span>
-                    </button>
+                    <app-default-button [buttonSetting]="closeButtonSetting" routerLink="/home/catalogue/ware-house">
+                    </app-default-button>
                 </div>
             </div>
             <!--end::Form-->
@@ -79,21 +78,6 @@
     <!--begin:: m-portlet-->
     <div class="m-portlet" style="position: relative">
         <ng-progress [thick]="true" [color]="'#2ea2f4'" [spinner]="true"></ng-progress>
-        <!-- <div class="progress--block-ui">
-            <div class="progress--block-inner">
-                <div class="row">
-                    <div class="col-auto">
-                        <span class="progress-text">Processing...</span>
-                    </div>
-                    <div class="col">
-                        <div class="progress">
-                            <div class="progress-bar m--bg-success" role="progressbar" style="width: 65%;"
-                                aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
         <div class="m-portlet__body">
             <!--begin: Datatable -->
             <div class="table-wrapper" id="">
@@ -103,29 +87,40 @@
                             <th class="sorting_asc">
                                 <span>No</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
                                 (click)="sort('code')">
-                                <span>Port Code</span>
+                                <span>Code</span>
                             </th>
-                            <th  class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
                                 (click)="sort('nameEn')">
                                 <span>Name(EN)</span>
                             </th>
-                            <th  class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVn'), 'sorting_desc': (!isDesc && sortKey == 'nameVn') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVn'), 'sorting_desc': (!isDesc && sortKey == 'nameVn') }"
                                 (click)="sort('nameVn')">
                                 <span>Name(VI)</span>
                             </th>
-                            <th  class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'address'), 'sorting_desc': (!isDesc && sortKey == 'address') }"
+                                (click)="sort('address')">
+                                <span>Address</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
                                 (click)="sort('countryName')">
                                 <span>Country</span>
                             </th>
-                            <th  class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'areaName'), 'sorting_desc': (!isDesc && sortKey == 'areaName') }"
-                                (click)="sort('areaName')">
-                                <span>Zone</span>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'provinceName'), 'sorting_desc': (!isDesc && sortKey == 'provinceName') }"
+                                (click)="sort('provinceName')">
+                                <span>City</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'modeOfTransport'), 'sorting_desc': (!isDesc && sortKey == 'modeOfTransport') }"
-                                (click)="sort('modeOfTransport')">
-                                <span>Mode</span>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'districtName'), 'sorting_desc': (!isDesc && sortKey == 'districtName') }"
+                                (click)="sort('districtName')">
+                                <span>Ditrict</span>
                             </th>
                             <th>
                                 <span>Status</span>
@@ -134,34 +129,46 @@
                     </thead>
                     <tbody *ngIf="data">
                         <ng-container *ngFor="let item of pagedItems; let i = index">
-
                             <tr [ngClass]="{ 'invalid-row': !item.isValid }">
                                 <td>
                                     <span>{{ (i + this.pager.startIndex + 1) }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.code.split('|').length == 1">{{ item.code }}</span>
-                                    <span class="m--font-danger" *ngIf="item.code.split('|').length > 1">{{ item.code.split('|')[0] }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.code.split('|').length > 1">{{ item.code.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.nameEn.split('|').length == 1">{{ item.nameEn }}</span>
-                                    <span class="m--font-danger" *ngIf="item.nameEn.split('|').length > 1">{{ item.nameEn.split('|')[0] }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.nameEn.split('|').length > 1">{{ item.nameEn.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.nameVn.split('|').length == 1">{{ item.nameVn }}</span>
-                                    <span class="m--font-danger" *ngIf="item.nameVn.split('|').length > 1">{{ item.nameVn.split('|')[0] }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.nameVn.split('|').length > 1">{{ item.nameVn.split('|')[0] }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.address.split('|').length == 1">{{ item.address }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.address.split('|').length > 1">{{ item.address.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.countryName.split('|').length == 1">{{ item.countryName }}</span>
-                                    <span class="m--font-danger" *ngIf="item.countryName.split('|').length > 1">{{ item.countryName.split('|')[0] }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.countryName.split('|').length > 1">{{ item.countryName.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.areaName.split('|').length == 1">{{ item.areaName }}</span>
-                                    <span class="m--font-danger" *ngIf="item.areaName.split('|').length > 1">{{ item.areaName.split('|')[0] }}</span>
+                                    <span
+                                        *ngIf="item.provinceName.split('|').length == 1">{{ item.provinceName }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.provinceName.split('|').length > 1">{{ item.provinceName.split('|')[0] }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.modeOfTransport.split('|').length == 1">{{ item.modeOfTransport }}</span>
-                                    <span class="m--font-danger" *ngIf="item.modeOfTransport.split('|').length > 1">{{ item.modeOfTransport.split('|')[0] }}</span>
+                                    <span
+                                        *ngIf="item.districtName.split('|').length == 1">{{ item.districtName }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.districtName.split('|').length > 1">{{ item.districtName.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.status }}</span>
@@ -170,11 +177,13 @@
                         </ng-container>
                     </tbody>
                 </table>
+                <!-- <app-table-detail [records]="data" [settings]="WarehouseImportSettings" [hasOreder]="true" (sortChange)="onSortChange($event)"></app-table-detail> -->
             </div>
             <!--end: Datatable -->
 
             <!--begin::pagination-->
-            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)">
+            </app-pagination>
             <!--end::pagination-->
         </div>
     </div>
@@ -182,31 +191,5 @@
 </div>
 <!--end::m-content-->
 <!--begin::modal-->
-<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Notification</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="confirm-text-block">
-                    <span>There are invalid data. Please check Import!</span>
-                </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            OK
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<info-popup [body]="'There are invalid data. Please check Import!'"></info-popup>
 <!--end::modal-->

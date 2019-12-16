@@ -50,11 +50,10 @@ namespace eFMS.API.Operation.DL.Services
             var users = userRepository.Get();
             var employees = employeeRepository.Get();
             var query = (from con in cons
-                         join user in users on con.UserId equals user.Id into userGrps
-                         from u in users
-                         join em in employees on u.EmployeeId equals em.Id
+                         join user in users on con.UserId equals user.Id
+                         join em in employees on user.EmployeeId equals em.Id
 
-                         select new { con, u, em }
+                         select new { con, user, em }
                 );
             if (query == null)
             {
@@ -63,7 +62,7 @@ namespace eFMS.API.Operation.DL.Services
             foreach (var item in query)
             {
                 SetEcusConnectionModel ecus = item.con;
-                ecus.Username = item.u.Username;
+                ecus.Username = item.user.Username;
                 ecus.Fullname = item.em.EmployeeNameEn;
                 returnList.Add(ecus);
             }

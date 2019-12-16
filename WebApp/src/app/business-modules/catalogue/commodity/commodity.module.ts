@@ -6,8 +6,12 @@ import { CommodityGroupImportComponent } from '../commodity-group-import/commodi
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { SelectModule } from 'ng2-select';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgProgressModule } from '@ngx-progressbar/core';
+import { CommodityAddPopupComponent } from './components/form-create-commodity/form-create-commodity.popup';
+import { ModalModule, PaginationModule } from 'ngx-bootstrap';
+import { CommodityGroupAddPopupComponent } from './components/form-create-commodity-group/form-create-commodity-group.popup';
+import { CommodityGroupListComponent } from './components/list-commodity-group/list-commodity-group.component';
 
 const routing: Routes = [
     { path: '', component: CommodityComponent, data: { name: "Commodity", level: 2 } },
@@ -21,13 +25,19 @@ const routing: Routes = [
         SelectModule,
         FormsModule,
         NgProgressModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        ReactiveFormsModule,
+        ModalModule.forRoot(),
+        PaginationModule.forRoot(),
     ],
     exports: [],
     declarations: [
         CommodityComponent,
         CommodityImportComponent,
-        CommodityGroupImportComponent
+        CommodityGroupImportComponent,
+        CommodityAddPopupComponent,
+        CommodityGroupAddPopupComponent,
+        CommodityGroupListComponent
     ],
     providers: [],
 })

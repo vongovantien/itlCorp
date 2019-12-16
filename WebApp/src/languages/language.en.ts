@@ -1,5 +1,5 @@
 import { WAREHOUSEENCOLUMNSETTING } from "../app/business-modules/catalogue/warehouse/warehouse.columns";
-import { WAREHOUSEIMPORTENCOLUMNSETTING } from "src/app/business-modules/catalogue/warehouse-import/warehouse-import.columns";
+import { WAREHOUSEIMPORTENCOLUMNSETTING } from "src/app/business-modules/catalogue/warehouse/warehouse-import/warehouse-import.columns";
 
 export const language = {
     /**

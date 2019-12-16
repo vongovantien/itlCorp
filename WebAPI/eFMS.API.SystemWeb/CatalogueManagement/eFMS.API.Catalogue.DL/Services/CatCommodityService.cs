@@ -210,12 +210,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    if (commodities.Any(x => x.Code.ToLower() == item.Code.ToLower()))
+                    if (commodities.Any(x => x.Code != null && x.Code.ToLower() == item.Code.ToLower()))
                     {
                         item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_EXISTED, item.Code];
                         item.IsValid = false;
                     }
-                    else if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
+                    else if (list.Count(x => x.Code != null && x.Code.ToLower() == item.Code.ToLower()) > 1)
                     {
                         item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_DUPLICATED, item.Code];
                         item.IsValid = false;

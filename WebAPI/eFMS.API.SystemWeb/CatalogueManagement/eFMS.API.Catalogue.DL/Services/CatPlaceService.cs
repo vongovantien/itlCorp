@@ -581,7 +581,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => (i.NameEn ??"") == item.CountryName.ToLower());
+                    var country = countries.FirstOrDefault(i => (i.NameEn ??"").ToLower() == item.CountryName.ToLower());
                     if (country == null)
                     {
                         result.CountryName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NOT_FOUND], item.CountryName);

@@ -116,8 +116,8 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             else
             {
-                query = (x => (x.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                    && (x.CurrencyName ?? "").IndexOf(criteria.CurrencyName ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+                query = (x => (x.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    || (x.CurrencyName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }
             var data = Paging(query, pageNumber, pageSize, x => x.DatetimeModified, false, out rowsCount);
             return data;

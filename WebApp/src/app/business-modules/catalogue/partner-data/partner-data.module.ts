@@ -21,6 +21,7 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SalemanPopupComponent } from './components/saleman-popup.component';
 import { ModalModule } from 'ngx-bootstrap';
+import { FormAddPartnerComponent } from './components/form-add-partner/form-add-partner.component';
 
 const routing: Routes = [
     { path: '', component: PartnerComponent, data: { name: "Partner Data", level: 2 } },
@@ -54,7 +55,8 @@ const routing: Routes = [
         ConsigneeComponent,
         AirShipSupComponent,
         ShipperComponent,
-        SalemanPopupComponent
+        SalemanPopupComponent,
+        FormAddPartnerComponent
 
     ],
     providers: [],

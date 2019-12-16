@@ -269,22 +269,6 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && name.invalid }">
-                                    <label>
-                                        Name (Local) <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <input type="text" required minlength="6" #name="ngModel"
-                                        class="form-control m-input m-input--square"
-                                        [(ngModel)]="StageToAdd.stageNameVn" name="name"
-                                        placeholder="Please enter detail">
-                                    <!--  -->
-                                    <div class="form-control-feedback" *ngIf="addStageForm.submitted && name.invalid">
-                                        Name (Local) is required at least 6 characters
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && name_en.invalid }">
                                     <label>
                                         Name (EN) <span class="m--font-danger">(*)</span>
@@ -296,6 +280,22 @@
                                     <div class="form-control-feedback"
                                         *ngIf="addStageForm.submitted && name_en.invalid">
                                         Name (EN) is required at least 6 characters
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && name.invalid }">
+                                    <label>
+                                        Name (Local) <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" required minlength="6" #name="ngModel"
+                                        class="form-control m-input m-input--square"
+                                        [(ngModel)]="StageToAdd.stageNameVn" name="name"
+                                        placeholder="Please enter detail">
+                                    <!--  -->
+                                    <div class="form-control-feedback" *ngIf="addStageForm.submitted && name.invalid">
+                                        Name (Local) is required at least 6 characters
                                     </div>
                                 </div>
                             </div>
@@ -413,22 +413,6 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && name_local_edt.invalid }">
-                                    <label>
-                                        Name (Local) <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <input type="text" required minlength="6" #name_local_edt="ngModel"
-                                        name="name_local_edt" [(ngModel)]="ListStages[index_stage_edit].stageNameVn"
-                                        class="form-control m-input m-input--square" placeholder="Please enter detail"
-                                        value="Name (VN)">
-                                    <div class="form-control-feedback"
-                                        *ngIf="editStageForm.submitted && name_local_edt.invalid">
-                                        Name (Local) is required at least 6 characters
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && name_en_edt.invalid }">
                                     <label>
                                         Name (EN) <span class="m--font-danger">(*)</span>
@@ -440,6 +424,22 @@
                                     <div class="form-control-feedback"
                                         *ngIf="editStageForm.submitted && name_en_edt.invalid">
                                         Name (EN) is required at least 6 characters
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && name_local_edt.invalid }">
+                                    <label>
+                                        Name (Local) <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" required minlength="6" #name_local_edt="ngModel"
+                                        name="name_local_edt" [(ngModel)]="ListStages[index_stage_edit].stageNameVn"
+                                        class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                        value="Name (VN)">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editStageForm.submitted && name_local_edt.invalid">
+                                        Name (Local) is required at least 6 characters
                                     </div>
                                 </div>
                             </div>

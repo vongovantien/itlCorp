@@ -1,23 +1,23 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
 import { PagingService } from 'src/app/shared/services/paging-service';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { SystemConstants } from 'src/constants/system.const';
-import { language } from 'src/languages/language.en';
-declare var $: any;
+import { AppPage } from 'src/app/app.base';
+import { CatalogueRepo } from 'src/app/shared/repositories';
+import { ToastrService } from 'ngx-toastr';
+import { finalize, catchError } from 'rxjs/operators';
+import { InfoPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
   selector: 'app-commodity-group-import',
-  templateUrl: './commodity-group-import.component.html',
-  styleUrls: ['./commodity-group-import.component.scss']
+  templateUrl: './commodity-group-import.component.html'
 })
-export class CommodityGroupImportComponent implements OnInit {
-
+export class CommodityGroupImportComponent extends AppPage implements OnInit {
+  @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
   data: any[];
   pagedItems: any[] = [];
   inValidItems: any[] = [];
@@ -29,34 +29,40 @@ export class CommodityGroupImportComponent implements OnInit {
   constructor(
     public ngProgress: NgProgress,
     private pagingService: PagingService,
-    private baseService: BaseService,
-    private menu_api: API_MENU,
-    private sortService: SortService
-  ) { }
-
-  @ViewChild(AppPaginationComponent,{static:false}) child: any;
-  @ViewChild('form',{static:false}) form: any;
-  @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
-
-  ngOnInit() {
-    this.pager.totalItems =0 ;
+    private sortService: SortService,
+    private _progressService: NgProgress,
+    private catalogueRepo: CatalogueRepo,
+    private _toastService: ToastrService
+  ) {
+    super();
+    this._progressRef = this._progressService.ref();
   }
 
-  chooseFile(file:Event){
-    if (file.target['files'] == null) return;
-    this.progressBar.start();
-    this.baseService.uploadfile(this.menu_api.Catalogue.CommodityGroup.uploadFile, file.target['files'], "uploadedFile")
-      .subscribe(res=>{
-        this.data = res['data'];
+  @ViewChild(AppPaginationComponent, { static: false }) child: any;
+  @ViewChild('form', { static: false }) form: any;
+  @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
+
+  ngOnInit() {
+    this.pager.totalItems = 0;
+  }
+
+  chooseFile(file: Event) {
+    this.pager.totalItems = 0;
+    if (file.target['files'] == null) { return; }
+    this._progressRef.start();
+    this.catalogueRepo.upLoadCommodityGroupFile(file.target['files'])
+      .pipe(
+        finalize(() => {
+          this._progressRef.complete();
+        })
+      )
+      .subscribe((response: any) => {
+        this.data = response.data;
         this.pager.totalItems = this.data.length;
-        this.totalValidRows = res['totalValidRows'];
+        this.totalValidRows = response.totalValidRows;
         this.totalRows = this.data.length;
-        this.totalInValidRows = this.totalRows - this.totalValidRows;
         this.pagingData(this.data);
-        this.progressBar.complete();
-      },err=>{
-        this.progressBar.complete();
-        this.baseService.handleError(err);
+      }, () => {
       });
   }
 
@@ -105,33 +111,50 @@ export class CommodityGroupImportComponent implements OnInit {
     this.child.setPage(this.pager.currentPage);
   }
 
-  async import() {
-    if (this.data == null) return;
-    if (this.totalInValidRows > 0) {
-      $('#upload-alert-modal').modal('show');
-    }
-    else {      
-      let validItems = this.data.filter(x => x.isValid);
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.CommodityGroup.import, validItems);
-      if (response) {
-        this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);       
-        this.pager.totalItems = 0;
-        this.reset();
-      }     
+  async import(element) {
+    if (this.data == null) { return; }
+    if (this.totalRows - this.totalValidRows > 0) {
+      this.importAlert.show();
+    } else {
+      this._progressRef.start();
+      const data = this.data.filter(x => x.isValid);
+      this.catalogueRepo.importCommodityGroup(data)
+        .pipe(
+          finalize(() => {
+            this._progressRef.complete();
+          })
+        )
+        .subscribe(
+          (res) => {
+            if (res.success) {
+              this._toastService.success('Import commodity successful');
+              this.pager.totalItems = 0;
+              this.reset(element);
+            } else {
+              this._toastService.error(res.message);
+            }
+          }
+        );
     }
 
   }
 
-  
-  reset() {
+
+  reset(element) {
     this.data = null;
     this.pagedItems = null;
-    $("#inputFile").val('');
+    element.value = "";
     this.pager.totalItems = 0;
   }
 
-  async downloadSample(){
-    await this.baseService.downloadfile(this.menu_api.Catalogue.CommodityGroup.downloadExcel,'CommodityGroupTemplate.xlsx');
+  async downloadSample() {
+    this.catalogueRepo.downloadCommodityGroupExcel()
+      .pipe(catchError(this.catchError))
+      .subscribe(
+        (res: any) => {
+          this.downLoadFile(res, "application/ms-excel", "CommodityGroupTemplate.xlsx");
+        },
+      );
   }
 
 
