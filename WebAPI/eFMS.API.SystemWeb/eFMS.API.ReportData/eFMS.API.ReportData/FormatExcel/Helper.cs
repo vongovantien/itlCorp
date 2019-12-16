@@ -221,7 +221,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 3].Value = item.ChargeNameVn;
                 worksheet.Cells[i + 2, 4].Value = item.Type;
                 string inactivechar = "";
-                if (item.Inactive == true)
+                if (item.Active == true)
                 {
                     inactivechar = "Active";
                 }
