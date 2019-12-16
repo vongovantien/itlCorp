@@ -130,7 +130,7 @@
                                 <div class="float-right">
                                     <pagination [boundaryLinks]="true" [totalItems]="totalItems"
                                         [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                        [(ngModel)]="page">
+                                        [(ngModel)]="page" [maxSize]="5">
                                     </pagination>
                                 </div>
                             </div>
