@@ -470,11 +470,13 @@ export class CatalogueRepo {
     upLoadPlaceFile(files: any, placeType: any) {
         return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/UploadFile`, files, "uploadedFile", { type: placeType });
     }
+
     importPlace(body: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPlace/Import`, body).pipe(
             map((data: any) => data)
         );
     }
+
     //#endregion
 
     addCountry(body: any = {}) {
@@ -482,6 +484,7 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
     updateCountry(body: any = {}) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCountry/update`, body).pipe(
             map((data: any) => data)
@@ -508,6 +511,13 @@ export class CatalogueRepo {
 
     getDetailCountry(id: number) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/getById/` + id)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    deleteCountry(id: number) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/Delete/${id}`)
             .pipe(
                 map((data: any) => data)
             );
