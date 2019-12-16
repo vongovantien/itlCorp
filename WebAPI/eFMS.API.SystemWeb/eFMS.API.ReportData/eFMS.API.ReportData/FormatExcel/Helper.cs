@@ -190,7 +190,7 @@ namespace eFMS.API.ReportData
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    workSheet.Cells[3, 1].LoadFromCollection(list, true, TableStyles.None);
                     BindingFormatForCatChargeExcel(workSheet, list);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -205,31 +205,63 @@ namespace eFMS.API.ReportData
 
         public void BindingFormatForCatChargeExcel(ExcelWorksheet worksheet, List<CatCharge> listItems)
         {
+
             // Tạo header
-            worksheet.Cells[1, 1].Value = "Code";
-            worksheet.Cells[1, 2].Value = "English Name";
-            worksheet.Cells[1, 3].Value = "Local Name";
-            worksheet.Cells[1, 4].Value = "Type";
-            worksheet.Cells[1, 5].Value = "Inactive";
+            List<string> headers = new List<string>
+            {
+                "No.", "Code", "English Name", "Local Name", "Type", "Inactive"
+            };
+
+            for (int i = 0; i < headers.Count; i++)
+            {
+                worksheet.Cells[3, i + 1].Value = headers[i];
+                worksheet.Cells[3, i + 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+                worksheet.Cells[3, i + 1].Style.Font.Bold = true;
+                worksheet.Cells[3, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            }
+
+            worksheet.Cells[1, 1, 1, 6].Merge = true;
+            worksheet.Cells["A1"].Value = "CHARGE INFORMATION";
+            worksheet.Cells["A1"].Style.Font.Size = 16;
+            worksheet.Cells["A1"].Style.Font.Bold = true;
+            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
             worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
             for (int i = 0; i < listItems.Count; i++)
             {
                 var item = listItems[i];
-                worksheet.Cells[i + 2, 1].Value = item.Code;
-                worksheet.Cells[i + 2, 2].Value = item.ChargeNameEn;
-                worksheet.Cells[i + 2, 3].Value = item.ChargeNameVn;
-                worksheet.Cells[i + 2, 4].Value = item.Type;
-                string inactivechar = "";
-                if (item.Active == true)
+                worksheet.Cells[i + 4, 1].Value = i + 1;
+                worksheet.Cells[i + 4, 2].Value = item.Code;
+                worksheet.Cells[i + 4, 3].Value = item.ChargeNameEn;
+                worksheet.Cells[i + 4, 4].Value = item.ChargeNameVn;
+                worksheet.Cells[i + 4, 5].Value = item.Type;
+                worksheet.Cells[i + 4, 6].Value = item.Active == true ? "Active" : "Inactive";
+
+                worksheet.Cells[i + 4, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[i + 4, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                //Add border left right for cells
+                for (int j = 0; j < headers.Count; j++)
                 {
-                    inactivechar = "Active";
+                    worksheet.Cells[i + 4, j + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                    worksheet.Cells[i + 4, j + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
                 }
-                else
+
+                //Add border bottom for last cells
+                if (i == listItems.Count - 1)
                 {
-                    inactivechar = "Inactive";
+                    for (int j = 0; j < headers.Count; j++)
+                    {
+                        worksheet.Cells[i + 4, j + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    }
                 }
-                worksheet.Cells[i + 2, 5].Value = inactivechar;
             }
         }
 

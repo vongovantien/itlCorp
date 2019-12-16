@@ -8,12 +8,15 @@ import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catCharg
 import { CatChargeDefaultAccount } from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { AddChargeComponent } from '../add-charge/add-charge.component';
+import { CatalogueRepo } from 'src/app/shared/repositories';
+import { NgProgress } from '@ngx-progressbar/core';
 @Component({
     selector: 'detail-charge',
     templateUrl: './detail-charge.component.html',
     styleUrls: ['./detail-charge.component.scss']
 })
-export class DetailChargeComponent implements OnInit {
+export class DetailChargeComponent extends AddChargeComponent {
     isAddNewLine: boolean = false;
     isMaximumAccountRow: boolean = false;
     isSameVoucherType: boolean = false;
@@ -58,7 +61,11 @@ export class DetailChargeComponent implements OnInit {
         private toastr: ToastrService,
         private api_menu: API_MENU,
         private route: ActivatedRoute,
-        private router: Router) {
+        protected router: Router,
+        protected _catalogueRepo: CatalogueRepo,
+        protected _toastService: ToastrService,
+        protected _progressService: NgProgress, ) {
+        super(router, _catalogueRepo, _toastService, _progressService);
     }
     async ngOnInit() {
         await this.getNeccessaryData();

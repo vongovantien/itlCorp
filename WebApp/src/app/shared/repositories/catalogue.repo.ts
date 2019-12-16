@@ -350,14 +350,12 @@ export class CatalogueRepo {
         );
     }
 
-
     checkExistedSaleman(service: string, office: string) {
         const body = { service: service, office: office };
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/CheckExisted`, body).pipe(
             map((data: any) => data)
         );
     }
-
 
     getListSaleManDetail(page?: number, size?: number, body: any = {}) {
         if (!!page && !!size) {
@@ -596,4 +594,23 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    deleteCharge(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/delete/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    addCharge(data: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/addNew`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+
+
 }

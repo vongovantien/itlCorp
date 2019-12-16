@@ -103,5 +103,12 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportCharge(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCharge`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
 }
 
