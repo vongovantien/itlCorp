@@ -47,7 +47,7 @@ export class ChargeComponent extends AppList implements OnInit {
     searchKey: string = "";
     searchObject: any = {};
 
-    async ngOnInit() {
+    ngOnInit() {
         this.headers = [
             { title: 'Code', field: 'code', sortable: true },
             { title: 'Name EN', field: 'chargeNameEn', sortable: true },

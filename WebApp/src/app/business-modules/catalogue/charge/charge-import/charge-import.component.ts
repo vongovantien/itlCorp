@@ -10,12 +10,17 @@ import { AppPaginationComponent } from 'src/app/shared/common/pagination/paginat
 import { language } from 'src/languages/language.en';
 import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
+import { AppPage } from 'src/app/app.base';
+import { CatalogueRepo } from 'src/app/shared/repositories';
+import { ToastrService } from 'ngx-toastr';
+import { finalize, catchError } from 'rxjs/operators';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 
 @Component({
     selector: 'app-charge-import',
     templateUrl: './charge-import.component.html'
 })
-export class ChargeImportComponent implements OnInit {
+export class ChargeImportComponent extends AppPage implements OnInit {
     @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
@@ -29,14 +34,18 @@ export class ChargeImportComponent implements OnInit {
 
 
     constructor(
-        public ngProgress: NgProgress,
+        private _catalogueRepo: CatalogueRepo,
         private pagingService: PagingService,
-        private baseService: BaseService,
-        private menu_api: API_MENU,
-        private sortService: SortService
-    ) { }
+        private sortService: SortService,
+        private _progressService: NgProgress,
+        private _toastService: ToastrService
+    ) {
+        super();
+        this._progressRef = this._progressService.ref();
+    }
     @ViewChild(AppPaginationComponent, { static: false }) child: any;
     @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
 
     ngOnInit() {
         this.pager.totalItems = 0;
@@ -44,19 +53,22 @@ export class ChargeImportComponent implements OnInit {
 
 
     chooseFile(file: Event) {
+        this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
-        this.progressBar.start();
-        this.baseService.uploadfile(this.menu_api.Catalogue.Charge.uploadExel, file.target['files'], "uploadedFile")
-            .subscribe(res => {
-                this.data = res['data'];
+        this._progressRef.start();
+        this._catalogueRepo.upLoadChargeFile(file.target['files'])
+            .pipe(
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            )
+            .subscribe((response: any) => {
+                this.data = response.data;
                 this.pager.totalItems = this.data.length;
-                this.totalValidRows = res['totalValidRows'];
+                this.totalValidRows = response.totalValidRows;
                 this.totalRows = this.data.length;
                 this.pagingData(this.data);
-                this.progressBar.complete();
-            }, err => {
-                this.progressBar.complete();
-                this.baseService.handleError(err);
+            }, () => {
             });
     }
 
@@ -105,28 +117,47 @@ export class ChargeImportComponent implements OnInit {
     }
 
 
-    async import() {
+    import(element) {
+        this._progressRef.start();
         if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {
-            this.invaliDataAlert.show();
+            this.importAlert.show();
+            this._progressRef.complete();
         } else {
-            const validItems = this.data.filter(x => x.isValid);
-            const response = await this.baseService.postAsync(this.menu_api.Catalogue.Charge.import, validItems);
-            if (response) {
-                this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
-                this.pager.totalItems = 0;
-                this.reset();
-            }
+            const data = this.data.filter(x => x.isValid);
+            this._catalogueRepo.importCharge(data)
+                .pipe(
+                    finalize(() => {
+                        this._progressRef.complete();
+                    })
+                )
+                .subscribe(
+                    (res) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            this.pager.totalItems = 0;
+                            this.reset(element);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
         }
     }
-
-    async downloadSample() {
-        await this.baseService.downloadfile(this.menu_api.Catalogue.Charge.downloadExcel, 'ImportChargeTemplate.xlsx');
+    downloadSample() {
+        this._catalogueRepo.downloadChargeExcel()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "ImportChargeTemplate.xlsx");
+                },
+            );
     }
 
-    reset() {
+    reset(element) {
         this.data = null;
         this.pagedItems = null;
+        element.value = "";
         this.pager.totalItems = 0;
     }
 

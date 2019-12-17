@@ -55,6 +55,17 @@ export class VoucherListComponent extends AppList {
 
     }
 
+    getActiveVoucherType(index) {
+        const voucherType = this.ChargeToAdd.listChargeDefaultAccount[index].type;
+        if (voucherType === null || voucherType === undefined) {
+            return [];
+        } else {
+            const indexCurrenVoucher = findIndex(this.ngDataTypeChargeDefault, function (o) { return o.text === voucherType; });
+            const aciveVoucherType = [this.ngDataTypeChargeDefault[indexCurrenVoucher]];
+            return aciveVoucherType;
+        }
+    }
+
     removedTypeDefault(value: any, index: number) {
         this.ChargeToAdd.listChargeDefaultAccount[index].type = null;
     }

@@ -37,8 +37,9 @@
                                 </div>
                             </td>
                             <td>
-                                <ng-select [allowClear]="true" [items]="ngDataTypeChargeDefault"
-                                    (data)="refreshValue($event)" (selected)="selectedTypeDefault($event,index)"
+                                <ng-select [active]="getActiveVoucherType(index)" [allowClear]="true"
+                                    [items]="ngDataTypeChargeDefault" (data)="refreshValue($event)"
+                                    (selected)="selectedTypeDefault($event,index)"
                                     (removed)="removedTypeDefault($event,index)" placeholder="Select Type">
                                 </ng-select>
 

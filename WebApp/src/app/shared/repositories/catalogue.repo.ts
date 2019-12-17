@@ -611,6 +611,53 @@ export class CatalogueRepo {
         );
     }
 
+    getChargeById(id: any) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/getById/` + id).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    updateCharge(body: any = {}) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    upLoadChargeFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/UploadFile`, files, "uploadedFile");
+    }
+
+    importCharge(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 
 
+
+    downloadChargeExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/downloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    importChargeVoucher(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatChargeDefaultAccount/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    downloadChargeVoucherExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChargeDefaultAccount/downloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    upLoadChargeVoucher(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChargeDefaultAccount/UploadFile`, files, "uploadedFile");
+    }
 }

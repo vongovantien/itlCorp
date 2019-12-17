@@ -58,7 +58,8 @@
                                     Unit <span class="m--font-danger">(*)</span>
                                 </label>
 
-                                <ng-select [items]="ngDataUnit" placeholder="Select Unit" formControlName="unit">
+                                <ng-select #unitt [allowClear]="true" [items]="ngDataUnit" placeholder="Select Unit"
+                                    formControlName="unit" (opened)="closeOtherSelects(unitt)">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !unit.valid">
                                     Unit is required !
@@ -87,8 +88,9 @@
                                     Currency <span class="m--font-danger">(*)</span>
                                 </label>
 
-                                <ng-select [items]="ngDataCurrentcyUnit" placeholder="Select Currency"
-                                    formControlName="currency">
+                                <ng-select #currenCy [allowClear]="true" [items]="ngDataCurrentcyUnit"
+                                    placeholder="Select Currency" formControlName="currency"
+                                    (opened)="closeOtherSelects(currenCy)">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !currency.valid">
                                     Currency is required !
@@ -118,7 +120,8 @@
                                     Type <span class="m--font-danger">(*)</span>
                                 </label>
 
-                                <ng-select [items]="ngDataType" placeholder="Select Type" formControlName="type">
+                                <ng-select #types [allowClear]="true" [items]="ngDataType" placeholder="Select Type"
+                                    (opened)="closeOtherSelects(types)" formControlName="type">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !type.valid">
                                     Type is required !
@@ -127,15 +130,16 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted && !service.valid}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && !service.valid || requiredService}">
                                 <label class="form-control-label" for="">
                                     Service <span class="m--font-danger">(*)</span>
                                 </label>
 
-                                <ng-select [multiple]="true" [items]="ngDataService" placeholder="Select Service"
-                                    formControlName="service">
+                                <ng-select [active]="activeServices" (selected)="selected($event)" [multiple]="true"
+                                    [items]="ngDataService" placeholder="Select Service" formControlName="service">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !service.valid">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && !service.valid || requiredService">
                                     Service is required !
                                 </div>
                             </div>

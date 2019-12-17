@@ -3,6 +3,8 @@ import { AppForm } from 'src/app/app.form';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'form-add-charge',
@@ -23,6 +25,11 @@ export class FormAddChargeComponent extends AppForm {
     service: AbstractControl;
     ngDataUnit: any = [];
     ngDataCurrentcyUnit: any = [];
+    activeServices: any = [];
+    Charge: CatChargeToAddOrUpdate = null;
+    serviceTypeId: string = '';
+    requiredService: boolean = false;
+
     ngDataType = [
         { id: "CREDIT", text: "CREDIT" },
         { id: "DEBIT", text: "DEBIT" },
@@ -64,7 +71,7 @@ export class FormAddChargeComponent extends AppForm {
             currency: [null, Validators.required],
             vat: [null, Validators.required],
             type: [null, Validators.required],
-            service: ['', Validators.required]
+            service: [null, Validators.required]
         });
         this.code = this.formGroup.controls["code"];
         this.nameEn = this.formGroup.controls["nameEn"];
@@ -76,6 +83,18 @@ export class FormAddChargeComponent extends AppForm {
         this.type = this.formGroup.controls["type"];
         this.service = this.formGroup.controls["service"];
     }
+
+
+    checkValidateForm() {
+        let valid: boolean = true;
+        this.setError(this.service);
+        if (!this.formGroup.valid) {
+            valid = false;
+        }
+
+        return valid;
+    }
+
 
     addCharge() {
         this.isSubmitted = true;
@@ -98,6 +117,50 @@ export class FormAddChargeComponent extends AppForm {
                 this.ngDataCurrentcyUnit = currencies.map(x => ({ text: x.id + " - " + x.currencyName, id: x.id }));
             }
         });
+    }
+
+    getCurrentActiveService(ChargeService: any) {
+        const listService = ChargeService.split(";");
+        const activeServiceList: any = [];
+        listService.forEach(item => {
+            const element = this.ngDataService.find(x => x.id === item);
+            if (element !== undefined) {
+                const activeService = element;
+                activeServiceList.push(activeService);
+            }
+        });
+        return activeServiceList;
+    }
+
+    selected(value: any) {
+        if (value !== undefined) {
+            this.requiredService = false;
+        }
+
+
+    }
+
+    updateDataToForm(res: CatChargeToAddOrUpdate) {
+        this.serviceTypeId = res.charge.serviceTypeId;
+        this.formGroup.patchValue({
+            code: res.charge.code,
+            nameEn: res.charge.chargeNameEn,
+            nameVn: res.charge.chargeNameVn,
+
+            unitPrice: res.charge.unitPrice,
+            currency: [<CommonInterface.INg2Select>{ id: res.charge.currencyId, text: res.charge.currencyId }],
+            vat: res.charge.vatrate,
+            type: [<CommonInterface.INg2Select>{ id: res.charge.type, text: res.charge.type }],
+            service: [<CommonInterface.INg2Select>{ id: res.charge.serviceTypeId, text: '' }]
+        });
+        const itemUnit = this.ngDataUnit.find(x => x.id === res.charge.unitId);
+        this.unit.setValue([<CommonInterface.INg2Select>{ id: res.charge.unitId, text: itemUnit.text }]);
+        const itemCurrency = this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId);
+        this.currency.setValue([<CommonInterface.INg2Select>{ id: res.charge.currencyId, text: itemCurrency.text }]);
+
+
+
+
     }
 
 }

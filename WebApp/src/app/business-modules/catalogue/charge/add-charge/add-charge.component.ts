@@ -39,16 +39,43 @@ export class AddChargeComponent extends AppPage {
         this.ChargeToAdd.charge.unitPrice = this.formAddCharge.unitPrice.value;
         this.ChargeToAdd.charge.currencyId = this.formAddCharge.currency.value[0].id;
         this.ChargeToAdd.charge.vatrate = this.formAddCharge.vat.value;
+        let serviceTypeId = '';
         this.ChargeToAdd.charge.type = this.formAddCharge.type.value[0].id;
-        this.ChargeToAdd.charge.serviceTypeId = this.formAddCharge.service.value[0].id;
-        this.ChargeToAdd.charge.id = SystemConstants.EMPTY_GUID;
-        this.ChargeToAdd.listChargeDefaultAccount = this.voucherList.ChargeToAdd.listChargeDefaultAccount;
+        if (this.formAddCharge.service.value !== null) {
+            if (this.formAddCharge.service.value.length > 0) {
+                this.formAddCharge.requiredService = false;
+                this.formAddCharge.service.value.forEach(element => {
+                    serviceTypeId += ";" + element.id;
+                });
+            } else {
+                this.formAddCharge.service.setValue(null);
+                this.formAddCharge.requiredService = true;
+                return null;
+            }
+            this.ChargeToAdd.charge.serviceTypeId = serviceTypeId;
+            this.ChargeToAdd.charge.id = SystemConstants.EMPTY_GUID;
+            this.ChargeToAdd.listChargeDefaultAccount = this.voucherList.ChargeToAdd.listChargeDefaultAccount;
+            return this.ChargeToAdd;
+        } else {
+            return null;
+        }
+
     }
+
 
     addCharge() {
         this.formAddCharge.isSubmitted = true;
         this.voucherList.isSubmitted = true;
-        if (this.formAddCharge.formGroup.valid && this.voucherList.validatateDefaultAcountLine()) {
+        if (this.formAddCharge.service.value == null) {
+            this.formAddCharge.requiredService = true;
+            return;
+        } else if (this.formAddCharge.service.value.length === 0) {
+            this.formAddCharge.requiredService = true;
+            return;
+        } else {
+            this.formAddCharge.requiredService = false;
+        }
+        if (this.formAddCharge.checkValidateForm() && this.voucherList.validatateDefaultAcountLine()) {
             this.onsubmitData();
             this._catalogueRepo.addCharge(this.ChargeToAdd)
                 .pipe(
