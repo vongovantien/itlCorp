@@ -97,32 +97,32 @@
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
-                                (click)="sort('code')">
+                                (click)="sortData('code')">
                                 <span>Code</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
-                                (click)="sort('nameEn')">
+                                (click)="sortData('nameEn')">
                                 <span>Name(EN)</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVn'), 'sorting_desc': (!isDesc && sortKey == 'nameVn') }"
-                                (click)="sort('nameVn')">
+                                (click)="sortData('nameVn')">
                                 <span>Name(Local)</span>
                             </th>
                             <th *ngIf="type != 'country'" class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
-                                (click)="sort('countryName')">
+                                (click)="sortData('countryName')">
                                 <span>Country</span>
                             </th>
                             <th *ngIf="type != 'province' && type != 'country'" class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'provinceName'), 'sorting_desc': (!isDesc && sortKey == 'provinceName') }"
-                                (click)="sort('provinceName')">
+                                (click)="sortData('provinceName')">
                                 <span>Province</span>
                             </th>
                             <th *ngIf="type != 'province' && type != 'country' && type != 'district'" class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'districtName'), 'sorting_desc': (!isDesc && sortKey == 'districtName') }"
-                                (click)="sort('districtName')">
+                                (click)="sortData('districtName')">
                                 <span>District</span>
                             </th>
                             <th>

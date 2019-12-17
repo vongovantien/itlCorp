@@ -23,8 +23,8 @@
                 </th>
             </thead>
             <tbody class="tbody-group">
-                <ng-container *ngFor="let country of countries; let i = index; trackBy: trackByFn">
-                    <tr>
+                <ng-container *ngIf="!!countries.length">
+                    <tr *ngFor="let country of countries; let i = index; trackBy: trackByFn">
                         <td class="table-actions-col">
                             <div class="table-actions" style="width: 70px">
                                 <button class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -44,7 +44,9 @@
                             {{country.active ? 'Active' : 'Inactive'}}</td>
                     </tr>
                 </ng-container>
-                <tr *ngIf="!countries.length" app-table-none-record></tr>
+                <tr *ngIf="!isLoading && !countries.length" app-table-none-record></tr>
+                <tr *ngIf="isLoading" app-table-row-loading></tr>
+
             </tbody>
         </table>
     </div>

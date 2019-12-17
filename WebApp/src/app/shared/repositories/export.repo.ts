@@ -77,7 +77,7 @@ export class ExportRepo {
         );
     }
 
-    exportCurrency(searchObject) {
+    exportCurrency(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCurrency`, searchObject).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
@@ -91,22 +91,50 @@ export class ExportRepo {
         );
     }
 
-    exportCommodity(searchObject) {
+    exportCommodity(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCommodityList`, searchObject).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
-    exportCommodityGroup(searchObject) {
+    exportCommodityGroup(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCommodityGroup`, searchObject).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
-    exportUnit(searchObject) {
+    exportUnit(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportUnit`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    exportCountry(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCountry`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    exportProvince(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportProvince`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    exportDistrict(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportDistrict`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    exportTownWard(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportTownWard`, searchObject).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

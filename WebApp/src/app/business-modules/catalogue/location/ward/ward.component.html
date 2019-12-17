@@ -48,6 +48,8 @@
                     </tr>
                 </ng-container>
                 <tr *ngIf="!wards.length" app-table-none-record></tr>
+                <tr *ngIf="isLoading" app-table-row-loading></tr>
+
             </tbody>
         </table>
     </div>

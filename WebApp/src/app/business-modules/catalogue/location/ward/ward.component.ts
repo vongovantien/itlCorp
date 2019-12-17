@@ -75,9 +75,13 @@ export class AppWardComponent extends AppList implements OnInit {
     }
 
     getWards() {
+        this.isLoading = true;
         this._progressRef.start();
         this._catalogueRepo.pagingPlace(this.page, this.pageSize, this.dataSearch)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(catchError(this.catchError), finalize(() => {
+                this.isLoading = false;
+                this._progressRef.complete();
+            }))
             .subscribe(
                 (res: CommonInterface.IResponsePaging) => {
                     this.wards = res.data || [];

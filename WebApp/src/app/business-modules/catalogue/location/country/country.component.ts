@@ -68,10 +68,13 @@ export class AppCountryComponent extends AppList implements OnInit {
     }
 
     getCountries() {
+        this.isLoading = true;
         this._progressRef.start();
         this._catalogueRepo.pagingCountry(this.page, this.pageSize, this.dataSearch)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
+            .pipe(catchError(this.catchError), finalize(() => {
+                this._progressRef.complete();
+                this.isLoading = false;
+            })).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
                     this.countries = res.data || [];
                     this.totalItems = res.totalItems;

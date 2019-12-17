@@ -443,12 +443,14 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
     getDetailPlace(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/` + id)
             .pipe(
                 map((data: any) => data)
             );
     }
+
     pagingPlace(page: number, size: number, body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/paging`, body, {
             page: '' + page,
@@ -460,6 +462,7 @@ export class CatalogueRepo {
             })
         );
     }
+
     downloadPlaceExcel(placeType: any) {
         return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPlace/DownloadExcel`, null, { type: placeType }).pipe(
             catchError((error) => throwError(error)),
@@ -521,6 +524,23 @@ export class CatalogueRepo {
             .pipe(
                 map((data: any) => data)
             );
+    }
+
+    downloadExcelTemplateCountry() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/DownloadExcel`, null).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    uploadCountry(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/UpLoadFile`, files, "uploadedFile");
+    }
+
+    importCountry(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCountry/Import`, body).pipe(
+            map((data: any) => data)
+        );
     }
 
     convertExchangeRate(date: string, fromCurrency: string, localCurrency: string = 'VND') {

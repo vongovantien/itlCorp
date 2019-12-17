@@ -32,6 +32,8 @@ export class SystemConstants {
     public static readonly DEFAULT_LANGUAGE: string = "en-US";
     public static readonly DEFAULT_HOME_PAGE: string = "/app/main/home";
 
+    public static readonly FILE_EXCEL: string = 'application/ms-excel';
+
     // Page size for ngx-pageination options
     public static readonly OPTIONS_PAGE_SIZE: number = 15;
     public static readonly OPTIONS_NUMBERPAGES_DISPLAY: number = 10;

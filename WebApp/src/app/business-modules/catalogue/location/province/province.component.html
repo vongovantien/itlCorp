@@ -46,6 +46,8 @@
                     </tr>
                 </ng-container>
                 <tr *ngIf="!provinces.length" app-table-none-record></tr>
+                <tr *ngIf="isLoading" app-table-row-loading></tr>
+
             </tbody>
         </table>
     </div>
