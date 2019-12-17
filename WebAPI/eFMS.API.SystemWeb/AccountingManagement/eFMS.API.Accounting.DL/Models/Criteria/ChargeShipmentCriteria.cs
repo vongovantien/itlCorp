@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.DL.Models.Criteria
 {
@@ -15,5 +16,7 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string StrCharges { get; set; }
         public short? CommodityGroupID { get; set; }
         public string StrServices { get; set; }
+        public List<string> JobIds { get; set; }
+        public List<string> Hbls { get; set; }
     }
 }

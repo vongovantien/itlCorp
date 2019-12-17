@@ -6,17 +6,23 @@ export abstract class AppList extends AppPage {
     totalItems: number = 10;
     numberToShow: number[] = [3, 15, 30, 50];
     pageSize: number = this.numberToShow[1];
+    maxSize: number = 5;
 
     sort: string = null;
     order: any = false;
     keyword: string = '';
+
     requestList: any = null;
     requestSort: any = null;
+    requestSearch: any = null;
+
     dataSearch: any = {};
 
     // * header table.
     right: string = 'right';
     left: string = 'left';
+
+    headers: CommonInterface.IHeaderTable[];
 
     constructor() {
         super();
@@ -64,6 +70,10 @@ export abstract class AppList extends AppPage {
         this.page = 1;  // TODO reset page to initial
         this.totalItems = 0;
         this.requestList(data);
+    }
+
+    onSearch($event) {
+        this.requestSearch($event);
     }
 
 }

@@ -486,4 +486,10 @@ export class DocumentationRepo {
             })
         );
     }
+
+    GetShipmentNotExist(typeSearch: string, shipments: string[] = []) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentNotExist`, { typeSearch: typeSearch, shipments: shipments }).pipe(
+            map((data: any) => data)
+        );
+    }
 }

@@ -1,275 +1,160 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgForm } from '@angular/forms';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
+
 import { Unit } from 'src/app/shared/models/catalogue/catUnit.model';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import _map from 'lodash/map';
-import { ExcelService } from 'src/app/shared/services/excel.service';
-import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
-import { SystemConstants } from 'src/constants/system.const';
-// import {DataHelper} from 'src/helper/data.helper';
-declare var $: any;
+import { AppList } from 'src/app/app.list';
+import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
+import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { FormCreateUnitPopupComponent } from './components/form/form-unit.popup';
+
+import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-unit',
-  templateUrl: './unit.component.html',
+    selector: 'app-unit',
+    templateUrl: './unit.component.html',
 })
-export class UnitComponent implements OnInit {
-  listUnitFilter = [
-    { filter: "All", field: "all" }, { filter: "Code", field: "code" },
-    { filter: "English Name", field: "unitNameEn" }, { filter: "Local Name", field: "unitNameVn" }];
-  selectedUnitFilter = this.listUnitFilter[0].filter;
-  pager: PagerSetting = PAGINGSETTING;
-  searchKey: string = "";
-  ListUnits: any = [];
-  UnitToAdd: Unit = new Unit();
-  UnitToUpdate: Unit = new Unit();
-  idUnitToUpdate: any = "";
-  idUnitToDelete: any = "";
-  searchObject: any = {};
-  unitTypes: any[];
-  currentUnitType: any = [];
-  titleConfirmDelete = "Do you want to delete this unit";
-  @ViewChild(AppPaginationComponent, { static: false }) child;
+export class UnitComponent extends AppList implements OnInit {
 
-  constructor(
-    private excelService: ExcelService,
-    private baseServices: BaseService,
-    private api_menu: API_MENU,
-    private sortService: SortService) {
-    // this.sourceData = this.baseServices.dataStorage.subscribe(data=>{
-    //   this.sourceData = data;
-    //   console.log(this.sourceData);
-    // });
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePoup: ConfirmPopupComponent;
+    @ViewChild(FormCreateUnitPopupComponent, { static: false }) formUnitPopup: FormCreateUnitPopupComponent;
 
-  }
+    configSearch: CommonInterface.IConfigSearchOption = {
+        settingFields: [
+            { fieldName: 'code', displayName: 'Code' },
+            { fieldName: 'unitNameEn', displayName: 'English Name' },
+            { fieldName: 'unitNameVn', displayName: 'Local Name' }
+        ],
+        typeSearch: TypeSearch.outtab
+    };
 
-  async ngOnInit() {
-    this.initPager();
-    this.getUnitTypes();
-    await this.getUnits();
-    // this.sourceData = await this.baseServices.getDataStorageByKey("default");
-    // console.log(this.sourceData)
-  }
-  initPager(): any {
-    this.pager.totalItems = 0;
-    this.pager.currentPage = 1;
-  }
+    ListUnits: Unit[] = [];
 
-  async searchUnit() {
-    this.initPager();
-    this.searchObject = {};
-    if (this.selectedUnitFilter == "All") {
-      this.searchObject.All = this.searchKey;
-    } else {
-      this.searchObject = {};
-      for (var i = 1; i < this.listUnitFilter.length; i++) {
-        console.log(this.listUnitFilter[i].field);
-        if (this.selectedUnitFilter == this.listUnitFilter[i].filter) {
-          eval("this.searchObject[this.listUnitFilter[i].field]=this.searchKey");
+    selectedUnit: Unit = null;
+
+    constructor(
+        private _sortService: SortService,
+        private _catalogueRepo: CatalogueRepo,
+        private _ngProgressService: NgProgress,
+        private _exportRepo: ExportRepo,
+        private _toastService: ToastrService
+    ) {
+        super();
+
+        this._progressRef = this._ngProgressService.ref();
+
+        this.requestList = this.getUnits;
+        this.requestSearch = this.searchUnit;
+        this.requestSort = this.sortUnit;
+    }
+
+    ngOnInit() {
+
+        this.headers = [
+            { title: 'Code', field: 'code', sortable: true },
+            { title: 'Name EN', field: 'unitNameEn', sortable: true },
+            { title: 'Name Local', field: 'unitNameVn', sortable: true },
+            { title: 'Type', field: 'unitType', sortable: true },
+            { title: 'Description EN', field: 'descriptionEn', sortable: true },
+            { title: 'Description Local', field: 'descriptionVn', sortable: true },
+            { title: 'Status', field: 'active', sortable: true },
+        ];
+
+        this.getUnits();
+    }
+
+    searchUnit(event: CommonInterface.ISearchOption) {
+        this.dataSearch = {};
+        this.dataSearch[event.field] = event.searchString;
+        this.getUnits();
+    }
+
+    resetSearch() {
+        this.dataSearch = {};
+        this.getUnits();
+    }
+
+    sortUnit() {
+        this.ListUnits = this._sortService.sort(this.ListUnits, this.sort, this.order);
+    }
+
+    getUnits() {
+        this._progressRef.start();
+        this._catalogueRepo.getUnit(this.dataSearch, this.page, this.pageSize)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResponsePaging) => {
+                    this.totalItems = res.totalItems || 0;
+                    this.ListUnits = res.data || [];
+                }
+            );
+    }
+
+    showUpdateUnit(unit: Unit) {
+        this.formUnitPopup.isSubmitted = false;
+        this.selectedUnit = unit;
+
+        if (!!this.selectedUnit.code) {
+            this.formUnitPopup.isUpdate = true;
+
+            this.formUnitPopup.form.patchValue({
+                unitType: [this.formUnitPopup.unitTypes.find(type => type.id === this.selectedUnit.unitType)],
+                id: unit.id,
+                code: unit.code,
+                unitNameEn: unit.unitNameEn,
+                unitNameVn: unit.unitNameVn,
+                descriptionEn: unit.descriptionEn,
+                descriptionVn: unit.descriptionVn,
+                active: unit.active
+            });
+
+            this.formUnitPopup.show();
         }
-
-      }
-    }
-    console.log(JSON.stringify(this.searchObject));
-    await this.getUnits();
-  }
-
-  async resetSearch() {
-    this.searchKey = "";
-    this.searchObject = {};
-    this.selectedUnitFilter = this.listUnitFilter[0].filter;
-    this.initPager();
-    await this.getUnits();
-  }
-
-  async setPage(pager: PagerSetting) {
-    this.pager.currentPage = pager.currentPage;
-    this.pager.pageSize = pager.pageSize;
-    this.pager.totalPages = pager.totalPages;
-    await this.getUnits();
-  }
-  setPageAfterAdd() {
-    this.child.setPage(this.pager.currentPage);
-    if (this.pager.currentPage < this.pager.totalPages) {
-      this.pager.currentPage = this.pager.totalPages;
-      this.child.setPage(this.pager.currentPage);
-    }
-  }
-
-  setPageAfterDelete() {
-    this.child.setPage(this.pager.currentPage);
-    if (this.pager.currentPage > this.pager.totalPages) {
-      this.pager.currentPage = this.pager.totalPages;
-      this.child.setPage(this.pager.currentPage);
-    }
-  }
-
-  async getUnitTypes() {
-    const response = await this.baseServices.getAsync(this.api_menu.Catalogue.Unit.getUnitTypes, false, false);
-    if (response) {
-      this.unitTypes = response.map(x => ({ "text": x.displayName, "id": x.value }));
-    }
-    else {
-      this.unitTypes = [];
-    }
-  }
-  async getUnits() {
-    const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject, false, true);
-    this.ListUnits = response.data;
-    this.pager.totalItems = response.totalItems;
-  }
-
-  async showUpdateUnit(id) {
-    this.currentUnitType = [];
-    this.UnitToUpdate = await this.baseServices.getAsync(this.api_menu.Catalogue.Unit.getById + id, false, true);
-    if (this.UnitToUpdate != null) {
-      const index = this.unitTypes.findIndex(x => x.id == this.UnitToUpdate.unitType);
-      if (index > -1) {
-        this.currentUnitType = [this.unitTypes[index]];
-      }
-    }
-  }
-
-  async updateUnit(form: NgForm, action) {
-    if (action == "yes") {
-      if (form.form.status != "INVALID") {
-        const res = await this.baseServices.putAsync(this.api_menu.Catalogue.Unit.update, this.UnitToUpdate);
-        if (res) {
-          this.initPager();
-          await this.getUnits();
-          form.onReset();
-          $('#update-unit-modal').modal('hide');
-        }
-      }
-    } else {
-      form.onReset();
-      $('#update-unit-modal').modal('hide');
-    }
-  }
-
-
-  async addNewUnit(form: NgForm, action: string) {
-    if (action == "yes") {
-      delete this.UnitToAdd.id;
-      if (form.form.status != "INVALID" && this.UnitToAdd.unitType != null) {
-        const respone = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.addNew, this.UnitToAdd, true, true);
-        //await this.getUnits();
-        if (respone) {
-          //this.setPageAfterAdd();
-          this.initPager();
-          this.getUnits();
-          form.onReset();
-          $('#add-unit-modal').modal('hide');
-        }
-      }
-    } else {
-      this.UnitToAdd = new Unit();
-      form.onReset();
-      $('#add-unit-modal').modal('hide');
-    }
-  }
-
-  prepareDeleteUnit(id: any) {
-    this.idUnitToDelete = id;
-  }
-  async onDelete(event: any) {
-    console.log(event);
-    if (event) {
-      await this.baseServices.deleteAsync(this.api_menu.Catalogue.Unit.delete + this.idUnitToDelete, true, true);
-      await this.getUnits();
-      this.setPageAfterDelete();
-    }
-  }
-  // async delete() {
-  //   await this.baseServices.deleteAsync(this.api_menu.Catalogue.Unit.delete + this.idUnitToDelete, true, true);
-  //   await this.getUnits();
-  //   this.setPageAfterDelete();
-
-  // }
-  isDesc = true;
-  sortKey: string = "";
-  sort(property) {
-    this.isDesc = !this.isDesc;
-    this.sortKey = property;
-    this.ListUnits = this.sortService.sort(this.ListUnits, property, this.isDesc);
-  }
-
-
-  async export() {
-    /**Prepare data */
-    var units = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, this.searchObject);
-
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-
-      units = _map(units, function (unit, index) {
-        return [
-          index + 1,
-          unit.code,
-          unit.unitNameVn,
-          unit.unitNameEn,
-          unit.descriptionEn,
-          unit.descriptionVn,
-          (unit.inactive === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-        ]
-      });
-    }
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      units = _map(units, function (unit, index) {
-        return [
-          index + 1,
-          unit.code,
-          unit.unitNameVn,
-          unit.unitNameEn,
-          unit.descriptionEn,
-          unit.descriptionVn,
-          (unit.inactive === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
-        ]
-      });
     }
 
+    addNewUnit() {
+        this.formUnitPopup.isUpdate = false;
+        this.formUnitPopup.isSubmitted = false;
 
-    /**Set up stylesheet */
-    var exportModel: ExportExcel = new ExportExcel();
-    exportModel.fileName = "Unit Report";
-    const currrently_user = localStorage.getItem('currently_userName');
-    exportModel.title = "Unit Report ";
-    exportModel.author = currrently_user;
-    exportModel.header = [
-      { name: "No.", width: 10 },
-      { name: "Code", width: 10 },
-      { name: "Name Vn", width: 25 },
-      { name: "Name En", width: 25 },
-      { name: "Description En", width: 25 },
-      { name: "Description Vn", width: 25 },
-      { name: "Inactive", width: 25 }];
+        this.formUnitPopup.form.reset();
+        this.formUnitPopup.show();
+    }
 
-    exportModel.data = units;
-    this.excelService.generateExcel(exportModel);
-  }
+    deleteUnit(unit: Unit) {
+        this.selectedUnit = new Unit(unit);
+        this.confirmDeletePoup.show();
+    }
 
-  import() {
+    onDelete() {
+        this.confirmDeletePoup.hide();
+        this._progressRef.start();
 
-  }
+        this._catalogueRepo.deleteUnit(this.selectedUnit.id)
+            .pipe(finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
 
-  /*ng-select 2
-  */
-  value: any;
-  selected(value: any): void {
-    this.UnitToAdd.unitType = value.id;
-    this.UnitToUpdate.unitType = value.id;
-  }
-  refreshValue(value: any): void {
-    this.value = value;
-  }
-  public removed(value: any): void {
-    console.log('Removed value is: ', value);
-  }
-  public typed(value: any): void {
-    console.log('New search input: ', value);
-  }
+                        this.resetSearch();
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+
+    export() {
+        this._progressRef.start();
+        this._exportRepo.exportUnit(this.dataSearch)
+            .pipe((finalize(() => this._progressRef.complete())))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "eFms_Units.xlsx");
+                },
+            );
+    }
+
 }

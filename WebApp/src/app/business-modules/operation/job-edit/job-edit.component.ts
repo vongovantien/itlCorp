@@ -417,7 +417,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getUnits() {
-        this._catalogueRepo.getUnit().pipe(
+        this._catalogueRepo.getUnit({ active: true }).pipe(
             catchError(this.catchError),
             finalize(() => this._progressRef.complete())
         ).subscribe(
