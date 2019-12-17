@@ -122,17 +122,15 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     emitSelected(item: any) {
-        if (this.currentItemSelected !== item) {
-            this.itemSelected.emit(item);
-            this.setCurrentActiveItem(item);
+        // if (this.currentItemSelected !== item) {
+        this.itemSelected.emit(item);
+        this.setCurrentActiveItem(item);
 
-            this.currentItemSelected = item;
-            if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
-                this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
-            }
+        this.currentItemSelected = item;
+        if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
+            this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
         }
-
-
+        // }
     }
 
     setCurrentActiveItem(item: any) {
@@ -188,5 +186,4 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     getValue(item: any, field: string) {
         return item[field] || null;
     }
-
 }

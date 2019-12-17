@@ -2,15 +2,15 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
-
-import { catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { AddDistrictPopupComponent } from '../district/add-district/add-district.component';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { AddWardPopupComponent } from './add-ward/add-ward.component';
+
+import { catchError, finalize } from 'rxjs/operators';
+
 
 
 @Component({
@@ -21,10 +21,10 @@ import { AddWardPopupComponent } from './add-ward/add-ward.component';
 export class AppWardComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(AddWardPopupComponent, { static: false }) districtPopup: AddWardPopupComponent;
+    @ViewChild(AddWardPopupComponent, { static: false }) wardPopup: AddWardPopupComponent;
 
     wards: any[] = [];
-    selectedDistrict: any;
+    selectedWard: any;
 
     configSearch: CommonInterface.IConfigSearchOption = {
         settingFields: [
@@ -96,26 +96,26 @@ export class AppWardComponent extends AppList implements OnInit {
     }
 
     showAdd() {
-        this.districtPopup.isSubmitted = false;
-        this.districtPopup.isUpdate = false;
+        this.wardPopup.isSubmitted = false;
+        this.wardPopup.isUpdate = false;
 
-        this.districtPopup.formAddWard.reset();
-        this.districtPopup.show();
+        this.wardPopup.formAddWard.reset();
+        this.wardPopup.show();
     }
 
-    showDetail(district: any) {
-        this.selectedDistrict = district;
-        if (this.selectedDistrict.id) {
-            this.districtPopup.isUpdate = true;
-            this.districtPopup.isSubmitted = false;
+    showDetail(ward: any) {
+        this.selectedWard = ward;
+        if (this.selectedWard.id) {
+            this.wardPopup.isUpdate = true;
+            this.wardPopup.isSubmitted = false;
 
-            this.districtPopup.formAddWard.patchValue(this.selectedDistrict);
-            this.districtPopup.show();
+            this.wardPopup.formAddWard.patchValue(this.selectedWard);
+            this.wardPopup.show();
         }
     }
 
-    showConfirmDelete(district: any) {
-        this.selectedDistrict = district;
+    showConfirmDelete(ward: any) {
+        this.selectedWard = ward;
         this.confirmDeletePopup.show();
     }
 
@@ -123,7 +123,7 @@ export class AppWardComponent extends AppList implements OnInit {
         this.confirmDeletePopup.hide();
 
         this._progressRef.start();
-        this._catalogueRepo.deletePlace(this.selectedDistrict.id)
+        this._catalogueRepo.deletePlace(this.selectedWard.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
