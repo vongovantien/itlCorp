@@ -4,10 +4,7 @@ import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { NgForm } from '@angular/forms';
-import { SelectComponent } from 'ng2-select';
 import { SortService } from 'src/app/shared/services/sort.service';
-import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { SalemanAdd } from 'src/app/shared/models/catalogue/salemanadd.model';
@@ -35,7 +32,7 @@ export class AddPartnerDataComponent extends AppList {
     activeNg: boolean = true;
     partner: Partner = new Partner();
     partnerGroups: any;
-    partnerGroupActives: any = [];
+    // partnerGroupActives: any = [];
     countries: any[];
     billingProvinces: any[];
     shippingProvinces: any[];
@@ -43,7 +40,7 @@ export class AddPartnerDataComponent extends AppList {
     parentCustomers: any[];
     departments: any[];
     partnerType: any;
-    isRequiredSaleman = false;
+    // isRequiredSaleman = false;
     employee: any = {};
     users: any[] = [];
     saleMandetail: any[] = [];
@@ -71,11 +68,8 @@ export class AddPartnerDataComponent extends AppList {
 
     constructor(private route: ActivatedRoute,
         private baseService: BaseService,
-        private api_menu: API_MENU,
         private router: Router,
         private _catalogueRepo: CatalogueRepo,
-        private _systemRepo: SystemRepo,
-        private sortService: SortService,
         private toastr: ToastrService,
     ) {
         super();
@@ -291,17 +285,6 @@ export class AddPartnerDataComponent extends AppList {
                 }
             );
     }
-    // getSalemans() {
-    //     this._systemRepo.getSystemUsers()
-    //         .pipe(catchError(this.catchError), finalize(() => { }))
-    //         .subscribe(
-    //             (res) => {
-    //                 if (res) {
-    //                     this.saleMans = res.map(x => ({ "text": x.code + ' - ' + x.nameVn, "id": x.id }));
-    //                 } else { this.saleMans = []; }
-    //             }
-    //         );
-    // }
     getPartnerGroups(): any {
         this._catalogueRepo.getPartnerGroup().subscribe((response: any) => {
             if (response != null) {
@@ -315,35 +298,35 @@ export class AddPartnerDataComponent extends AppList {
     }
     getPartnerGroupActive(partnerGroup: any): any {
         if (partnerGroup === PartnerGroupEnum.AGENT) {
-            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "AGENT"));
+            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "AGENT"));
         }
         if (partnerGroup === PartnerGroupEnum.AIRSHIPSUP) {
-            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "AIRSHIPSUP"));
+            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "AIRSHIPSUP"));
         }
         if (partnerGroup === PartnerGroupEnum.CARRIER) {
-            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CARRIER"));
+            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CARRIER"));
         }
         if (partnerGroup === PartnerGroupEnum.CONSIGNEE) {
-            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CONSIGNEE"));
+            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CONSIGNEE"));
         }
         if (partnerGroup === PartnerGroupEnum.CUSTOMER) {
-            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CUSTOMER"));
-            this.isRequiredSaleman = true;
+            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CUSTOMER"));
+            this.formPartnerComponent.isShowSaleMan = true;
         }
         if (partnerGroup === PartnerGroupEnum.SHIPPER) {
-            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SHIPPER"));
+            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SHIPPER"));
         }
         if (partnerGroup === PartnerGroupEnum.SUPPLIER) {
-            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SUPPLIER"));
+            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SUPPLIER"));
         }
         if (partnerGroup === PartnerGroupEnum.ALL) {
-            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
+            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
         }
-        if (this.partnerGroupActives.find(x => x.id === "ALL")) {
+        if (this.formPartnerComponent.partnerGroupActives.find(x => x.id === "ALL")) {
             this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
-            this.isRequiredSaleman = true;
+            this.formPartnerComponent.isShowSaleMan = true;
         }
-        this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.partnerGroupActives);
+        this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.formPartnerComponent.partnerGroupActives);
     }
 
     onSubmit() {
@@ -370,4 +353,6 @@ export class AddPartnerDataComponent extends AppList {
                     this.baseService.spinnerHide();
                     this.baseService.handleError(err);
 
-                }
+                });
+    }
+}

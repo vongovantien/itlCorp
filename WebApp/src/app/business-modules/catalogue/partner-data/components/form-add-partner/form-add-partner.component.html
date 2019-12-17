@@ -95,7 +95,7 @@
                             Category <span class="m--font-danger">(*)</span>
                         </label>
                         <ng-select [multiple]="true" [items]="partnerGroups" placeholder="Select partner group"
-                            formControlName="partnerGroup">
+                            formControlName="partnerGroup" (selected)="onChange($event, 'category')">
                         </ng-select>
                         <div class="form-control-feedback" *ngIf="isSubmitted && partnerGroup.invalid">
                             Category is required
@@ -394,13 +394,6 @@
                 </div>
                 <div class="col-lg-2">
                     <div class="form-group">
-                        <!-- <label class=" form-control-label">Public</label>
-                        <div class="m-checkbox-inline">
-                            <label class="m-checkbox"><input type="checkbox" name="publicCheckbox" checked="checked"
-                                    [checked]="partner.public"
-                                    (change)="partner.public = !partner.public"><span></span></label>
-                            
-                        </div> -->
                         <label class="form-control-label"> Public </label>
                         <div class="m-checkbox-inline">
                             <app-switch [(toggle)]="public.value" (toggleChange)="public.setValue($event)">
@@ -411,12 +404,6 @@
                 <div class="col-lg-2">
                     <div class="form-group">
                         <label class="form-control-label">Active</label>
-
-                        <!-- <div class="m-checkbox-inline">
-                            <label class="m-checkbox"><input type="checkbox" name="inactiveCheckbox" checked="checked"
-                                    [checked]="partner.active"
-                                    (change)="partner.active = !partner.active"><span></span></label>
-                        </div> -->
                         <label class="form-control-label"> Active </label>
                         <div class="m-checkbox-inline">
                             <app-switch [(toggle)]="active.value" (toggleChange)="active.setValue($event)">

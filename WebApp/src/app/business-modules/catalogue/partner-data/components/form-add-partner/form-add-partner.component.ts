@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
+import { SalemanPopupComponent } from '../saleman-popup.component';
 
 @Component({
     selector: 'form-add-partner',
@@ -10,6 +11,7 @@ import { catchError, finalize } from 'rxjs/operators';
 })
 
 export class FormAddPartnerComponent extends AppForm {
+    @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     parentCustomers: any[] = [];
     partnerGroups: any[] = [];
     countries: any[] = [];
@@ -72,7 +74,30 @@ export class FormAddPartnerComponent extends AppForm {
             case 'billingCountry':
                 this.getBillingProvinces(event.id);
                 break;
+            case 'category':
+                console.log(this.partnerGroup);
+                this.isShowSaleMan = this.checkRequireSaleman(this.partnerGroup.value);
+                break;
         }
+    }
+    checkRequireSaleman(partnerGroup: string): boolean {
+        // this.isShowSaleMan = false;
+        if (partnerGroup != null) {
+            if (partnerGroup.includes('CUSTOMER')) {
+                return true;
+            }
+        } else {
+            return false;
+        }
+        if (partnerGroup == null) {
+            return false;
+        } else if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
+
+            return true;
+        } else {
+            return false;
+        }
+
     }
     removed(type: string) {
         switch (type) {
@@ -222,6 +247,10 @@ export class FormAddPartnerComponent extends AppForm {
         this.active = this.partnerForm.controls['active'];
         this.public = this.partnerForm.controls['public'];
     }
-    showPopupSaleman() { }
+    showPopupSaleman() {
+        this.poupSaleman.isSave = false;
+        this.poupSaleman.isDetail = false;
+        this.poupSaleman.show();
+    }
     onSubmit() { }
 }
