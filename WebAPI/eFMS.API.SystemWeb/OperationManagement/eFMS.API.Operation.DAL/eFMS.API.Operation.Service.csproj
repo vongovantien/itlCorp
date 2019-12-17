@@ -30,7 +30,6 @@
     <Compile Remove="Models\CsMawbcontainer.cs" />
     <Compile Remove="Models\CsShipmentSurcharge.cs" />
     <Compile Remove="Models\CsShippingInstruction.cs" />
-    <Compile Remove="Models\CsTransactionDetail.cs" />
     <Compile Remove="ViewModels\ChangeLog.cs" />
   </ItemGroup>
 

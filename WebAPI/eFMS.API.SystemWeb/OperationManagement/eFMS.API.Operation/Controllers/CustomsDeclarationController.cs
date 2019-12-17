@@ -404,5 +404,17 @@ namespace eFMS.API.Operation.Controllers
             }
         }
 
+        /// <summary>
+        /// Get list custom of shipment operation (not locked)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetCustomsShipmentNotLocked")]
+        [Authorize]
+        public IActionResult GetCustomsShipmentNotLocked()
+        {
+            var data = customsDeclarationService.GetCustomsShipmentNotLocked();
+            return Ok(data);
+        }
+
     }
 }

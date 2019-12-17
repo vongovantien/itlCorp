@@ -70,5 +70,6 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? VoucherIdredate { get; set; }
         public decimal? FinalExchangeRate { get; set; }
         public bool? Kb { get; set; }
+        public string AdvanceNo { get; set; }
     }
 }
