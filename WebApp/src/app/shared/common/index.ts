@@ -24,6 +24,9 @@ export * from './table-body/table-body.component';
 export * from './table-cell/table-cell.component';
 
 
+export * from './popup/index';
+
+
 
 
 
