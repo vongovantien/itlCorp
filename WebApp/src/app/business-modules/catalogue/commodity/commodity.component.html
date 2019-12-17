@@ -65,14 +65,13 @@
                         </div>
                         <div class="bg-secondary m--padding-10">
                             <app-search-options [configSearch]="configSearchCommonity" (search)="onSearch($event)"
-                                (reset_search)="resetSearch($event)"></app-search-options>
+                                (reset_search)="resetSearch()"></app-search-options>
                         </div>
                     </div>
                     <!--end:: Search-form-->
                     <div class="table-wrapper">
                         <table class="table table-brand table-striped dataTable">
-                            <thead app-table-header [headers]="headerCommodity"
-                                (onClick)="sortBy($event)">
+                            <thead app-table-header [headers]="headerCommodity" (onClick)="sortBy($event)">
                                 <th class="m--w-50 first table-actions-col">
                                     Actions
                                 </th>
@@ -129,8 +128,8 @@
                             <div class="col-sm-6" *ngIf="totalItems > pageSize">
                                 <div class="float-right">
                                     <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                        [(ngModel)]="page" [maxSize]="5">
+                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)" [(ngModel)]="page"
+                                        [maxSize]="5">
                                     </pagination>
                                 </div>
                             </div>

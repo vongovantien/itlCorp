@@ -1,7 +1,6 @@
 <div class="country-wrapper">
     <div class="m-form">
-        <app-search-options [configSearch]="configSearch" (search)="onSearch($event)"
-            (reset_search)=resetSearch($event)>
+        <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" (reset_search)=resetSearch()>
             <div class="col-md-auto">
                 <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                     (click)="showAdd()">
