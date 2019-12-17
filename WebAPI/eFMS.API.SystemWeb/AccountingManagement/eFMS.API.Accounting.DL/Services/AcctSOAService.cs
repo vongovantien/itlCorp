@@ -698,6 +698,16 @@ namespace eFMS.API.Accounting.DL.Services
                 charge = charge.Where(chg => criteria.CommodityGroupID == chg.CommodityGroupID);
             }
 
+            if(criteria.JobIds != null && criteria.JobIds.Count > 0)
+            {
+                charge = charge.Where(chg => criteria.JobIds.Contains(chg.JobId));
+            }
+
+            if(criteria.Hbls != null && criteria.Hbls.Count > 0)
+            {
+                charge = charge.Where(chg => criteria.Hbls.Contains(chg.HBL));
+            }
+
             var query = charge.Select(chg => new ChargeShipmentModel
             {
                 ID = chg.ID,

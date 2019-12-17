@@ -522,7 +522,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.#ctor(eFMS.API.Documentation.DL.IService.IShipmentService)">
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.#ctor(eFMS.API.Documentation.DL.IService.IShipmentService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub})">
             <summary>
             Constructor
             </summary>

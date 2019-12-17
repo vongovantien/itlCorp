@@ -15,6 +15,8 @@ export class SOASearchCharge {
     inSoa: boolean = false;
     commodityGroupId: any = null;
     strServices: string = '';
+    jobIds: any[] = [];
+    hbls: any[] = [];
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
