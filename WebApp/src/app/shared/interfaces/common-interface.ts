@@ -89,6 +89,7 @@ namespace CommonInterface {
     export interface ISearchOption {
         fieldName: string;
         displayName: string;
+        searchString?: string;
         [name: string]: any;
     }
 }

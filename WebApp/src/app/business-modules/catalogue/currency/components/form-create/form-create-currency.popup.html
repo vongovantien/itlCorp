@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-xs" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add currency</h5>
+                <h5 class="modal-title">{{isUpdate ? 'Update' : 'Add'}} currency</h5>
                 <button type="button" class="close" aria-label="Close" (click)=hide()>
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -14,7 +14,8 @@
                         <label class="col-lg-4 col-form-label form-control-label" required> Currency Code </label>
                         <div class="col-lg-8">
                             <input type="text" class="form-control m-input m-input--square"
-                                placeholder="Please enter currency code" formControlName="code">
+                                placeholder="Please enter currency code" formControlName="code"
+                                [attr.disabled]="!isUpdate ? null : 'disabled'">
                         </div>
                     </div>
                     <div class="form-group row"

@@ -53,6 +53,7 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
     ngOnInit() {
         this.pager.totalItems = 0;
     }
+
     chooseFile(file: Event) {
         this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
@@ -72,6 +73,7 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
             }, () => {
             });
     }
+
     pagingData(data: any[]) {
         this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
         this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
@@ -79,6 +81,7 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
         console.log(this.pager);
     }
+
     downloadSample() {
         this._catalogueRepo.downloadPlaceExcel(PlaceTypeEnum.Warehouse)
             .pipe(catchError(this.catchError))
@@ -101,6 +104,7 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
         }
         this.child.setPage(this.pager.currentPage);
     }
+
     import(element) {
         this._progressRef.start();
         if (this.data == null) { return; }
@@ -127,12 +131,14 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
                 );
         }
     }
+
     sort(property: string) {
         this.isDesc = !this.isDesc;
         this.sortKey = property;
         this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
     }
-    async setPage(pager: PagerSetting) {
+
+    setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;
         this.pager.pageSize = pager.pageSize;
         this.pager.totalPages = pager.totalPages;
@@ -149,6 +155,7 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
             }
         }
     }
+
     reset(element) {
         this.data = null;
         this.pagedItems = null;

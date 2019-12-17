@@ -1,21 +1,23 @@
 import { NgModule } from '@angular/core';
-import { LocationImportComponent } from '../location-import/location-import.component';
-import { Routes, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from 'src/app/shared/shared.module';
+import { Routes, RouterModule } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { LocationImportComponent } from '../location-import/location-import.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 import { LocationComponent } from './location.component';
-import { AddCountryComponent } from './country/add-country/add-country.component';
-import { ModalModule } from 'ngx-bootstrap';
-import { AddProvinceComponent } from './province/add-province/add-province.component';
-import { UpdateProvinceComponent } from './province/update-province/update-province.component';
-import { UpdateCountryComponent } from './country/update-country/update-country.component';
-import { AddDistrictComponent } from './district/add-district/add-district.component';
-import { UpdateDistrictComponent } from './district/update-district/update-district.component';
-import { AddWardComponent } from './ward/add-ward/add-ward.component';
-import { UpdateWardComponent } from './ward/update-ward/update-ward.component';
+import { FormCountryPopupComponent } from './country/add-country/add-country.component';
+import { ModalModule, TabsModule, PaginationModule } from 'ngx-bootstrap';
+import { AddProvincePopupComponent } from './province/add-province/add-province.component';
+import { AddDistrictPopupComponent } from './district/add-district/add-district.component';
+import { AddWardPopupComponent } from './ward/add-ward/add-ward.component';
+import { AppCountryComponent } from './country/country.component';
+import { AppProvinceComponent } from './province/province.component';
+import { AppDistrictComponent } from './district/district.component';
+import { AppWardComponent } from './ward/ward.component';
 
 const routing: Routes = [
     { path: '', component: LocationComponent, data: { name: "Location", level: 2 } },
@@ -31,20 +33,23 @@ const routing: Routes = [
         FormsModule,
         ReactiveFormsModule,
         RouterModule.forChild(routing),
-        ModalModule.forRoot()
+        ModalModule.forRoot(),
+        TabsModule.forRoot(),
+        PaginationModule.forRoot()
     ],
     exports: [],
     declarations: [
         LocationComponent,
+        AppCountryComponent,
+        FormCountryPopupComponent,
+        AppProvinceComponent,
+        AppDistrictComponent,
+        AppWardComponent,
+
         LocationImportComponent,
-        AddCountryComponent,
-        AddProvinceComponent,
-        UpdateProvinceComponent,
-        UpdateCountryComponent,
-        AddDistrictComponent,
-        UpdateDistrictComponent,
-        AddWardComponent,
-        UpdateWardComponent
+        AddProvincePopupComponent,
+        AddDistrictPopupComponent,
+        AddWardPopupComponent,
     ],
     providers: [],
 })

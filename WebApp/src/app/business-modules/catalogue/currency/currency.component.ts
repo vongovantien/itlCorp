@@ -67,7 +67,6 @@ export class CurrencyComponent extends AppList implements OnInit {
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (response: CommonInterface.IResponsePaging) => {
-                    console.log(response);
                     this.currencies = response.data;
                     this.totalItems = response.totalItems;
                     this.pageSize = response.size;
@@ -93,7 +92,6 @@ export class CurrencyComponent extends AppList implements OnInit {
     showAdd() {
         [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [false, false];
 
-        this.formPopup.code.enable();
         this.formPopup.form.reset();
         this.formPopup.show();
     }
@@ -102,7 +100,6 @@ export class CurrencyComponent extends AppList implements OnInit {
         this.currency = currency;
         [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
 
-        this.formPopup.code.disable();
 
         this.formPopup.form.setValue({
             code: this.currency.id,
