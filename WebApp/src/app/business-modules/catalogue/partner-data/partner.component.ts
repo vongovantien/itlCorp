@@ -23,8 +23,7 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 
 @Component({
     selector: 'app-partner',
-    templateUrl: './partner.component.html',
-    styleUrls: ['./partner.component.sass']
+    templateUrl: './partner.component.html'
 })
 export class PartnerComponent implements OnInit {
     pager: PagerSetting = PAGINGSETTING;
@@ -230,7 +229,7 @@ export class PartnerComponent implements OnInit {
     }
 
     addPartner() {
-        this.router.navigate(["/home/catalogue/partner-data/addnew", { partnerType: this.criteria.partnerGroup }]);
+        this.router.navigate(["/home/catalogue/partner-data/add", { partnerType: this.criteria.partnerGroup }]);
     }
     setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;

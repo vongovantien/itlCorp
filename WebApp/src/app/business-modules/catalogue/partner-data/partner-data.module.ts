@@ -22,11 +22,13 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SalemanPopupComponent } from './components/saleman-popup.component';
 import { ModalModule } from 'ngx-bootstrap';
 import { FormAddPartnerComponent } from './components/form-add-partner/form-add-partner.component';
+import { AddPartnerDataComponent } from './add/add-partner.component';
 
 const routing: Routes = [
     { path: '', component: PartnerComponent, data: { name: "Partner Data", level: 2 } },
     { path: 'import', component: PartnerDataImportComponent, data: { name: "Partner Data Import", level: 3 } },
-    { path: 'addnew', component: PartnerDataAddnewComponent, data: { name: "Partner Data Addnew", level: 3 } },
+    // { path: 'addnew', component: PartnerDataAddnewComponent, data: { name: "Partner Data Addnew", level: 3 } },
+    { path: 'add', component: AddPartnerDataComponent, data: { name: "Partner Data Addnew", level: 3 } },
     { path: 'detail/:id', component: PartnerDataDetailComponent, data: { name: "Partner Data Details", level: 3 } },
 ]
 @NgModule({
@@ -56,7 +58,8 @@ const routing: Routes = [
         AirShipSupComponent,
         ShipperComponent,
         SalemanPopupComponent,
-        FormAddPartnerComponent
+        FormAddPartnerComponent,
+        AddPartnerDataComponent
 
     ],
     providers: [],
