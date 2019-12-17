@@ -660,4 +660,52 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    getStagePaging(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/getAll/${page}/${size}`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteStage(id: number) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/delete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addNewStage(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/addNew`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateStage(body: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDetailStage(id: number) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage//getById/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    downloadStageExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStage/downloadExcel`, null).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    upLoadStageFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/uploadFile`, files, "uploadedFile");
+    }
+
+    importStage(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStage/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }

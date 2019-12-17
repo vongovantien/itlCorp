@@ -1,21 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PagingService } from 'src/app/shared/services/paging-service';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
 import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { language } from 'src/languages/language.en';
 import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
+import { CatalogueRepo } from 'src/app/shared/repositories';
+import { ToastrService } from 'ngx-toastr';
+import { AppPage } from 'src/app/app.base';
+import { finalize, catchError } from 'rxjs/operators';
 @Component({
   selector: 'app-stage-import',
-  templateUrl: './stage-import.component.html',
-  styleUrls: ['./stage-import.component.scss']
+  templateUrl: './stage-import.component.html'
 })
-export class StageImportComponent implements OnInit {
+export class StageImportComponent extends AppPage implements OnInit {
+  @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
   data: any[];
   pagedItems: any[] = [];
   inValidItems: any[] = [];
@@ -27,10 +28,14 @@ export class StageImportComponent implements OnInit {
   constructor(
     public ngProgress: NgProgress,
     private pagingService: PagingService,
-    private baseService: BaseService,
-    private menu_api: API_MENU,
-    private sortService: SortService
-  ) { }
+    private sortService: SortService,
+    private _progressService: NgProgress,
+    private catalogueRepo: CatalogueRepo,
+    private _toastService: ToastrService
+  ) { 
+    super();
+    this._progressRef = this._progressService.ref();
+  }
   @ViewChild(AppPaginationComponent, { static: false }) child: any;
   @ViewChild('form', { static: false }) form: any;
   @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
@@ -45,20 +50,37 @@ export class StageImportComponent implements OnInit {
   }
 
   chooseFile(file: Event) {
+    // if (file.target['files'] == null) { return; }
+    // this.progressBar.start();
+    // this.baseService.uploadfile(this.menu_api.Catalogue.Stage_Management.uploadExel, file.target['files'], "uploadedFile")
+    //   .subscribe(res => {
+    //     this.data = res['data'];
+    //     this.pager.totalItems = this.data.length;
+    //     this.totalValidRows = res['totalValidRows'];
+    //     this.totalRows = this.data.length;
+    //     this.pagingData(this.data);
+    //     this.progressBar.complete();
+    //   }, err => {
+    //     this.progressBar.complete();
+    //     this.baseService.handleError(err);
+    //   })
+    this.pager.totalItems = 0;
     if (file.target['files'] == null) { return; }
-    this.progressBar.start();
-    this.baseService.uploadfile(this.menu_api.Catalogue.Stage_Management.uploadExel, file.target['files'], "uploadedFile")
-      .subscribe(res => {
-        this.data = res['data'];
+    this._progressRef.start();
+    this.catalogueRepo.upLoadStageFile(file.target['files'])
+      .pipe(
+        finalize(() => {
+          this._progressRef.complete();
+        })
+      )
+      .subscribe((response: any) => {
+        this.data = response.data;
         this.pager.totalItems = this.data.length;
-        this.totalValidRows = res['totalValidRows'];
+        this.totalValidRows = response.totalValidRows;
         this.totalRows = this.data.length;
         this.pagingData(this.data);
-        this.progressBar.complete();
-      }, err => {
-        this.progressBar.complete();
-        this.baseService.handleError(err);
-      })
+      }, () => {
+      });
   }
 
   pagingData(data: any[]) {
@@ -102,29 +124,60 @@ export class StageImportComponent implements OnInit {
   }
 
 
-  async import() {
+  async import(element) {
+    // if (this.data == null) { return; }
+    // if (this.totalRows - this.totalValidRows > 0) {
+    //   this.invaliDataAlert.show();
+    // } else {
+    //   const validItems = this.data.filter(x => x.isValid);
+    //   const response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems, true, true);
+    //   if (response) {
+    //     this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
+    //     this.pager.totalItems = 0;
+    //     this.reset();
+    //   }
+    // }
     if (this.data == null) { return; }
     if (this.totalRows - this.totalValidRows > 0) {
-      this.invaliDataAlert.show();
+      this.importAlert.show();
     } else {
-      const validItems = this.data.filter(x => x.isValid);
-      const response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems, true, true);
-      if (response) {
-        this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
-        this.pager.totalItems = 0;
-        this.reset();
-      }
+      this._progressRef.start();
+      const data = this.data.filter(x => x.isValid);
+      this.catalogueRepo.importStage(data)
+        .pipe(
+          finalize(() => {
+            this._progressRef.complete();
+          })
+        )
+        .subscribe(
+          (res) => {
+            if (res.success) {
+              this._toastService.success('Import commodity successful');
+              this.pager.totalItems = 0;
+              this.reset(element);
+            } else {
+              this._toastService.error(res.message);
+            }
+          }
+        );
     }
   }
 
   async downloadSample() {
-    await this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel, 'ImportStageTemplate.xlsx');
+    //await this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel, 'ImportStageTemplate.xlsx');
+    this.catalogueRepo.downloadStageExcel()
+      .pipe(catchError(this.catchError))
+      .subscribe(
+        (res: any) => {
+          this.downLoadFile(res, "application/ms-excel", "ImportStageTemplate.xlsx");
+        },
+      );
   }
 
-  reset() {
+  reset(element) {
     this.data = null;
     this.pagedItems = null;
-    this.inputFile = null;
+    element.value = "";
     this.pager.totalItems = 0;
   }
 

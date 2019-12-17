@@ -81,5 +81,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_PODELI_DIFFERENT_POL = "MSG_PODELI_DIFFERENT_POL";
         public static readonly string MSG_SERVICE_TYPE_REQUIRED = "MSG_SERVICE_TYPE_REQUIRED";
         public static readonly string MSG_PERSON_IN_CHARGE_REQUIRED = "MSG_PERSON_IN_CHARGE_REQUIRED";
+
+        public static readonly string MSG_NOT_EXIST_SHIPMENT = "MSG_NOT_EXIST_SHIPMENT";
     }
 }

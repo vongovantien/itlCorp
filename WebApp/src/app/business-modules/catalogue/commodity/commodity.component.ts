@@ -1,11 +1,9 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { COMMODITYCOLUMNSETTING } from './commodity.column';
 import _map from 'lodash/map';
-import { SearchOptionsComponent } from '../../../shared/common/search-options/search-options.component';
 import { CatalogueRepo } from 'src/app/shared/repositories/catalogue.repo';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
@@ -104,7 +102,7 @@ export class CommodityComponent extends AppList {
     this.getCommodities();
   }
 
-  resetSearch(event) {
+  resetSearch() {
     this.dataSearch = {};
     this.getCommodities();
   }

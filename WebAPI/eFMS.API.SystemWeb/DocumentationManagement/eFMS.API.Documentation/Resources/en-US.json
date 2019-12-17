@@ -58,5 +58,6 @@
   "MSG_POD_REQUIRED": "Port of Destination is required!",
   "MSG_PODELI_DIFFERENT_POL": "Place of Delivery must be different from Port of Loading",
   "MSG_SERVICE_TYPE_REQUIRED": "Service Type is required!",
-  "MSG_PERSON_IN_CHARGE_REQUIRED": "Person In Charge is required!"
+  "MSG_PERSON_IN_CHARGE_REQUIRED": "Person In Charge is required!",
+  "MSG_NOT_EXIST_SHIPMENT": "These shipment don't exist on system: "
 }

@@ -5,10 +5,11 @@ import { RouterModule, Routes } from '@angular/router';
 import { StageImportComponent } from '../stage-import/stage-import.component';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
-import { ModalModule } from 'ngx-bootstrap';
+import { ModalModule, PaginationModule } from 'ngx-bootstrap';
+import { StageManagementAddPopupComponent } from './components/form-create/form-create-stage-management.popup';
 
 
 const routing: Routes = [
@@ -24,12 +25,15 @@ const routing: Routes = [
         FormsModule,
         SelectModule,
         NgProgressModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        ReactiveFormsModule,
+        PaginationModule.forRoot(),
     ],
     exports: [],
     declarations: [
         StageManagementComponent,
-        StageImportComponent
+        StageImportComponent,
+        StageManagementAddPopupComponent
     ],
     providers: [],
 })

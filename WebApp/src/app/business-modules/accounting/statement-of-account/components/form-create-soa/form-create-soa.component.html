@@ -144,6 +144,12 @@
                         </option>
                     </select>
                 </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label"></label>
+                        <div><a class="pointer" style="text-decoration: underline;" (click)="openInputShipment()">Shipment List</a></div>
+                    </div>
+                </div>
             </div>
             <div class="row form-charge">
                 <div class="col-12">
@@ -182,3 +188,5 @@
         </div>
     </div>
 </div>
+
+<input-shipment-popup (onInputShipment) = "onShipmentList($event)"></input-shipment-popup>
