@@ -20,6 +20,15 @@ import { AppPaginationComponent } from 'src/app/shared/common/pagination/paginat
 import { SystemConstants } from 'src/constants/system.const';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
+type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
+enum PartnerDataTab {
+    ALL = 'allTab',
+    CUSTOMER = 'Customer',
+    AGENT = 'Agent',
+    CARRIER = 'Carrier',
+    CONSIGNEE = 'Consignee',
+    SHIPPER = 'Shipper'
+}
 
 @Component({
     selector: 'app-partner',
@@ -33,6 +42,7 @@ export class PartnerComponent implements OnInit {
         settingFields: this.partnerDataSettings.filter(x => x.allowSearch == true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
         typeSearch: TypeSearch.intab
     };
+
     criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
     partner: Partner;
     tabName = {
@@ -64,6 +74,8 @@ export class PartnerComponent implements OnInit {
     @ViewChild(AirShipSupComponent, { static: false }) airShipSupComponent: any;
     @ViewChild(CarrierComponent, { static: false }) carrierComponent: any;
     @ViewChild(ShipperComponent, { static: false }) shipperComponent: any;
+
+    selectedTab: PARTNERDATA_TAB = PartnerDataTab.ALL; // Default tab.
 
     constructor(private baseService: BaseService,
         private api_menu: API_MENU,
@@ -227,6 +239,11 @@ export class PartnerComponent implements OnInit {
             this.pager.totalItems = this.allPartnerComponent.getPartnerData(this.pager, this.criteria);
             this.setPageAfterDelete();
         }
+    }
+
+    onSelectTabPartner(tabname: PARTNERDATA_TAB) {
+        this.selectedTab = tabname;
+        this.tabSelect(this.selectedTab);
     }
 
     addPartner() {
