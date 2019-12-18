@@ -186,24 +186,6 @@ export class SalemanPopupComponent extends PopupBase {
             };
             this.saleManToAdd = new Saleman(saleMane);
             this.onCreate.emit(this.saleManToAdd);
-            // return;
         }
-        // if (this.strOfficeCurrent.value !== undefined && this.strSalemanCurrent.value !== undefined) {
-        //     const salemaneffectdate = this.saleManToAdd.effectDate.startDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en');
-        //     const saleMane: any = {
-        //         company: this.saleManToAdd.office,
-        //         office: this.saleManToAdd.office,
-        //         effectDate: salemaneffectdate,
-        //         status: this.selectedStatus.value,
-        //         partnerId: null,
-        //         saleman_ID: this.selectedDataSaleMan.username,
-        //         service: this.selectedService.id,
-        //         createDate: new Date()
-        //     };
-        //     this.saleManToAdd = new Saleman(saleMane);
-
-        //     this.onCreate.emit(this.saleManToAdd);
-        // }
-
     }
 }

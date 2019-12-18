@@ -16,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
+import { AppForm } from 'src/app/app.form';
 
 @Component({
     selector: 'app-partner-data-add',
@@ -32,7 +33,7 @@ export class AddPartnerDataComponent extends AppList {
     activeNg: boolean = true;
     partner: Partner = new Partner();
     partnerGroups: any;
-    // partnerGroupActives: any = [];
+    partnerGroupActives: any = [];
     countries: any[];
     billingProvinces: any[];
     shippingProvinces: any[];
@@ -70,6 +71,7 @@ export class AddPartnerDataComponent extends AppList {
         private baseService: BaseService,
         private router: Router,
         private _catalogueRepo: CatalogueRepo,
+        private _sortService: SortService,
         private toastr: ToastrService,
     ) {
         super();
@@ -175,7 +177,6 @@ export class AddPartnerDataComponent extends AppList {
             { title: 'CreatedDate', field: 'createDate', sortable: true }
         ];
         this.route.params.subscribe(prams => {
-            console.log({ param: prams });
             if (prams.partnerType !== undefined) {
                 this.partnerType = Number(prams.partnerType);
                 if (this.partnerType === '3') {
@@ -183,9 +184,7 @@ export class AddPartnerDataComponent extends AppList {
                 }
             }
         });
-
         this.partner.departmentId = "Head Office";
-
         this.getDataCombobox();
     }
     getDataCombobox() {
@@ -298,38 +297,120 @@ export class AddPartnerDataComponent extends AppList {
     }
     getPartnerGroupActive(partnerGroup: any): any {
         if (partnerGroup === PartnerGroupEnum.AGENT) {
-            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "AGENT"));
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "AGENT"));
         }
         if (partnerGroup === PartnerGroupEnum.AIRSHIPSUP) {
-            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "AIRSHIPSUP"));
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "AIRSHIPSUP"));
         }
         if (partnerGroup === PartnerGroupEnum.CARRIER) {
-            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CARRIER"));
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CARRIER"));
         }
         if (partnerGroup === PartnerGroupEnum.CONSIGNEE) {
-            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CONSIGNEE"));
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CONSIGNEE"));
         }
         if (partnerGroup === PartnerGroupEnum.CUSTOMER) {
-            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CUSTOMER"));
-            this.formPartnerComponent.isShowSaleMan = true;
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CUSTOMER"));
+            this.isShowSaleMan = true;
         }
         if (partnerGroup === PartnerGroupEnum.SHIPPER) {
-            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SHIPPER"));
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SHIPPER"));
         }
         if (partnerGroup === PartnerGroupEnum.SUPPLIER) {
-            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SUPPLIER"));
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SUPPLIER"));
         }
         if (partnerGroup === PartnerGroupEnum.ALL) {
-            this.formPartnerComponent.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
         }
-        if (this.formPartnerComponent.partnerGroupActives.find(x => x.id === "ALL")) {
+        if (this.partnerGroupActives.find(x => x.id === "ALL")) {
             this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
-            this.formPartnerComponent.isShowSaleMan = true;
+            this.isShowSaleMan = true;
         }
-        this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.formPartnerComponent.partnerGroupActives);
+        this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.partnerGroupActives);
     }
 
     onSubmit() {
+        this.formPartnerComponent.isSubmitted = true;
+        this.partner.saleMans = this.saleMandetail;
+        this.getFormPartnerData();
+        if (this.partner.taxCode !== '') {
+            this.checkTaxcode();
+
+        }
+        if (this.partner.countryId == null || this.partner.provinceId == null
+            || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
+            return;
+        }
+        if (this.formPartnerComponent.partnerForm.valid) {
+            this.partner.accountNo = this.partner.id = this.partner.taxCode;
+            if (this.saleMandetail.length === 0) {
+                if (this.isShowSaleMan) {
+                    this.toastr.error('Please add saleman and service for customer!');
+                    return;
+                }
+            }
+
+            if (this.saleMandetail.length > 0) {
+                for (const it of this.saleMandetail) {
+                    this.services.forEach(item => {
+                        if (it.service === item.text) {
+                            it.service = item.id;
+                        }
+                    });
+                }
+            }
+
+            if (this.isShowSaleMan) {
+                if (this.saleMandetail.length === 0) {
+                    this.toastr.error('Please add saleman and service for customer!');
+                } else {
+                    this.partner.salePersonId = this.saleMandetail[0].id;
+                    this.onCreatePartner();
+                }
+            } else {
+                this.onCreatePartner();
+            }
+        }
+    }
+    getFormPartnerData() {
+        const formBody = this.formPartnerComponent.partnerForm.getRawValue();
+        this.partner.id = formBody.internalReferenceNo + "." + formBody.taxCode;
+        this.partner.partnerGroup = formBody.partnerGroup;
+        this.partner.partnerNameVn = formBody.nameLocalFull;
+        this.partner.partnerNameEn = formBody.nameENFull;
+        this.partner.contactPerson = formBody.partnerContactPerson;
+        this.partner.addressVn = formBody.billingAddressLocal;
+        this.partner.addressEn = formBody.billingAddressEN;
+        this.partner.addressShippingVn = formBody.shippingAddressVN;
+        this.partner.addressShippingEn = formBody.shippingAddressEN;
+        this.partner.shortName = formBody.shortName;
+        this.partner.countryId = formBody.billingCountry[0].id;
+        this.partner.countryShippingId = formBody.shippingCountry[0].id;
+        this.partner.accountNo = formBody.partnerAccountNo;
+        this.partner.tel = formBody.partnerContactNumber;
+        this.partner.fax = formBody.partnerContactFaxNo;
+        this.partner.taxCode = formBody.taxCode;
+        this.partner.email = formBody.employeeEmail;
+        this.partner.website = formBody.partnerWebsite;
+        this.partner.bankAccountNo = formBody.partnerbankAccountNo;
+        this.partner.bankAccountName = formBody.partnerBankAccountName;
+        this.partner.bankAccountAddress = formBody.partnerBankAccountAddress;
+        this.partner.note = formBody.note;
+        this.partner.public = formBody.public;
+        this.partner.provinceId = formBody.billingProvince[0].id;
+        this.partner.provinceShippingId = formBody.shippingProvince[0].id;
+        this.partner.parentId = formBody.partnerAccountRef[0].id;
+        this.partner.zipCode = formBody.billingZipcode;
+        this.partner.zipCodeShipping = formBody.zipCodeShipping;
+        this.partner.swiftCode = formBody.partnerSwiftCode;
+        // userCreated: string = '';
+        // datetimeCreated: string = '';
+        // userModified: string = '';
+        // datetimeModified: string = '';
+        this.partner.active = formBody.active.value;
+        // inactiveOn?: string = '';
+        this.partner.workPlaceId = formBody.partnerWorkPlace[0].id;
+        // userCreatedName: string = '';
+        this.partner.internalReferenceNo = formBody.internalReferenceNo.value;
     }
 
     onCreatePartner() {
@@ -337,7 +418,6 @@ export class AddPartnerDataComponent extends AppList {
         this.saleMandetail.forEach(element => {
             element.status = element.status.value;
         });
-        this.partner.saleMans = this.saleMandetail;
         this._catalogueRepo.createPartner(this.partner)
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -354,5 +434,27 @@ export class AddPartnerDataComponent extends AppList {
                     this.baseService.handleError(err);
 
                 });
+    }
+    sortBySaleMan(sortData: CommonInterface.ISortData): void {
+        if (!!sortData.sortField) {
+            this.saleMandetail = this._sortService.sort(this.saleMandetail, sortData.sortField, sortData.order);
+        }
+    }
+    showDetailSaleMan(saleman: Saleman, index: any) {
+        this.poupSaleman.index = index;
+        this.poupSaleman.isDetail = true;
+        const saleMane: any = {
+            description: saleman.description,
+            office: saleman.office,
+            effectDate: saleman.effectDate,
+            status: saleman.status === true ? 'Active' : 'Inactive',
+            partnerId: null,
+            saleman_ID: saleman.saleman_ID,
+            service: saleman.service,
+            createDate: saleman.createDate
+
+        };
+        this.poupSaleman.showSaleman(saleMane);
+        this.poupSaleman.show();
     }
 }

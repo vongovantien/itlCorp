@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from 'src/app/shared/repositories';
@@ -12,6 +12,7 @@ import { SalemanPopupComponent } from '../saleman-popup.component';
 
 export class FormAddPartnerComponent extends AppForm {
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
+    @Output() requireSaleman = new EventEmitter<boolean>();
     parentCustomers: any[] = [];
     partnerGroups: any[] = [];
     countries: any[] = [];
@@ -19,8 +20,6 @@ export class FormAddPartnerComponent extends AppForm {
     billingProvinces: any[] = [];
     workPlaces: any[] = [];
     isExistedTaxcode: boolean = false;
-    isShowSaleMan: boolean = false;
-    partnerGroupActives: any[] = [];
 
     partnerForm: FormGroup;
     isSubmitted: boolean = false;
@@ -55,6 +54,7 @@ export class FormAddPartnerComponent extends AppForm {
     partnerWorkPlace: AbstractControl;
     active: AbstractControl;
     public: AbstractControl;
+    note: AbstractControl;
 
     constructor(
         private _fb: FormBuilder,
@@ -75,31 +75,13 @@ export class FormAddPartnerComponent extends AppForm {
                 this.getBillingProvinces(event.id);
                 break;
             case 'category':
-                console.log(this.partnerGroup);
-                this.isShowSaleMan = this.checkRequireSaleman(this.partnerGroup.value);
+                const isShowSaleMan = this.checkRequireSaleman(event.id);
+                this.requireSaleman.emit(isShowSaleMan);
                 break;
         }
     }
-    checkRequireSaleman(partnerGroup: string): boolean {
-        // this.isShowSaleMan = false;
-        if (partnerGroup != null) {
-            if (partnerGroup.includes('CUSTOMER')) {
-                return true;
-            }
-        } else {
-            return false;
-        }
-        if (partnerGroup == null) {
-            return false;
-        } else if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
 
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-    removed(type: string) {
+    removed(event, type: string) {
         switch (type) {
             case 'shippingCountry':
                 this.getShippingProvinces();
@@ -109,6 +91,35 @@ export class FormAddPartnerComponent extends AppForm {
                 this.getBillingProvinces();
                 this.partnerForm.controls['billingProvince'].setValue([]);
                 break;
+            case 'category':
+                const isShowSaleMan = this.checkRequireSaleman(event.id, false);
+                this.requireSaleman.emit(isShowSaleMan);
+                break;
+        }
+    }
+    checkRequireSaleman(partnerGroup: string, isAdded = true): boolean {
+        if (isAdded) {
+            if (partnerGroup != null) {
+                if (partnerGroup.includes('CUSTOMER')) {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+            if (partnerGroup == null) {
+                return false;
+            } else if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
+
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if (partnerGroup != null) {
+                if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
+                    return false;
+                }
+            }
         }
     }
     getBillingProvinces(countryId?: number) {
@@ -151,69 +162,68 @@ export class FormAddPartnerComponent extends AppForm {
     }
     initForm() {
         this.partnerForm = this._fb.group({
-            partnerAccountNo: ['', Validators.compose([
-                Validators.required,
-            ])],
-            internalReferenceNo: ['', Validators.compose([
+            partnerAccountNo: [{ value: null, disabled: true }],
+            internalReferenceNo: [null, Validators.compose([
                 Validators.required
             ])],
-            nameENFull: ['', Validators.compose([
+            nameENFull: [null, Validators.compose([
                 Validators.required,
             ])],
-            nameLocalFull: ['', Validators.compose([
+            nameLocalFull: [null, Validators.compose([
                 Validators.required,
             ])],
-            shortName: ['', Validators.compose([
+            shortName: [null, Validators.compose([
                 Validators.required
             ])],
             partnerAccountRef: [null],
-            taxCode: ['', Validators.compose([
+            taxCode: [null, Validators.compose([
                 Validators.required
             ])],
-            partnerGroup: ['', Validators.compose([
+            partnerGroup: [null, Validators.compose([
                 Validators.required
             ])],
             shippingCountry: [null, Validators.compose([
                 Validators.required
             ])],
-            shippingProvince: ['', Validators.compose([
+            shippingProvince: [null, Validators.compose([
                 Validators.required
             ])],
-            zipCodeShipping: [''],
-            shippingAddressEN: ['', Validators.compose([
+            zipCodeShipping: [null],
+            shippingAddressEN: [null, Validators.compose([
                 Validators.required
             ])],
-            shippingAddressVN: ['', Validators.compose([
+            shippingAddressVN: [null, Validators.compose([
                 Validators.required
             ])],
-            billingCountry: ['', Validators.compose([
+            billingCountry: [null, Validators.compose([
                 Validators.required
             ])],
-            billingProvince: ['', Validators.compose([
+            billingProvince: [null, Validators.compose([
                 Validators.required
             ])],
-            billingZipcode: ['', Validators.compose([
+            billingZipcode: [null, Validators.compose([
                 Validators.required
             ])],
-            billingAddressEN: ['', Validators.compose([
+            billingAddressEN: [null, Validators.compose([
                 Validators.required
             ])],
-            billingAddressLocal: ['', Validators.compose([
+            billingAddressLocal: [null, Validators.compose([
                 Validators.required
             ])],
-            partnerContactPerson: [''],
-            partnerContactNumber: [''],
-            partnerContactFaxNo: [''],
-            employeeWorkPhone: [{ value: '', disabled: true }],
-            employeeEmail: [{ value: '', disabled: true }],
-            partnerWebsite: [''],
-            partnerbankAccountNo: [''],
-            partnerBankAccountName: [''],
-            partnerBankAccountAddress: [''],
-            partnerSwiftCode: [''],
-            partnerWorkPlace: [''],
+            partnerContactPerson: [null],
+            partnerContactNumber: [null],
+            partnerContactFaxNo: [null],
+            employeeWorkPhone: [{ value: null, disabled: true }],
+            employeeEmail: [{ value: null, disabled: true }],
+            partnerWebsite: [null],
+            partnerbankAccountNo: [null],
+            partnerBankAccountName: [null],
+            partnerBankAccountAddress: [null],
+            partnerSwiftCode: [null],
+            partnerWorkPlace: [null],
             public: [false],
-            active: [true]
+            active: [true],
+            note: [null]
         });
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
@@ -252,5 +262,4 @@ export class FormAddPartnerComponent extends AppForm {
         this.poupSaleman.isDetail = false;
         this.poupSaleman.show();
     }
-    onSubmit() { }
 }

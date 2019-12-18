@@ -12,9 +12,9 @@
                         <label class="form-control-label" for="">
                             Partner ID <span class="m--font-danger"></span>
                         </label>
-                        <input type="text" class="form-control m-input m-input--square" placeholder="" disabled
+                        <input type="text" class="form-control m-input m-input--square" placeholder=""
                             name="partnerAccountNo" autocomplete="nope" minlength="3" maxlength="20"
-                            specialIsAlphaNumeric
+                            formControlName="partnerAccountNo" specialIsAlphaNumeric
                             [ngClass]="{ 'm-input--square': isSubmitted && partnerAccountNo.invalid }" required>
                         <div class="form-control-feedback" *ngIf="isSubmitted && partnerAccountNo.invalid">
                             Partner ID required least 3 characters
@@ -27,10 +27,10 @@
                         <label class="form-control-label" for="">
                             Partner Name EN Full <span class="m--font-danger">(*)</span>
                         </label>
-                        <input type="text" class="form-control m-input m-input--square" autofocus
-                            placeholder="Please enter Name EN Full" name="nameENFull" autocomplete="nope" minlength="3"
-                            maxlength="100" [ngClass]="{ 'm-input--square': isSubmitted && nameENFull.invalid }"
-                            required>
+                        <input type="text" class="form-control m-input m-input--square" formControlName="nameENFull"
+                            autofocus placeholder="Please enter Name EN Full" name="nameENFull" autocomplete="nope"
+                            minlength="3" maxlength="100"
+                            [ngClass]="{ 'm-input--square': isSubmitted && nameENFull.invalid }" required>
                         <div class="form-control-feedback" *ngIf="isSubmitted && nameENFull.invalid">
                             Partner Name EN Full is required
                         </div>
@@ -42,7 +42,7 @@
                         <label class="form-control-label" for="">
                             Partner Name Local Full <span class="m--font-danger">(*)</span>
                         </label>
-                        <input type="text" class="form-control m-input m-input--square"
+                        <input type="text" class="form-control m-input m-input--square" formControlName="nameLocalFull"
                             placeholder="Please enter Name Local" name="nameLocalFull" autocomplete="nope" minlength="3"
                             maxlength="100" [ngClass]="{ 'm-input--square': isSubmitted && nameLocalFull.invalid }"
                             required>
@@ -60,7 +60,7 @@
                         <label class="form-control-label" for="">
                             Partner Name Abbreviation <span class="m--font-danger">(*)</span>
                         </label>
-                        <input type="text" class="form-control m-input m-input--square"
+                        <input type="text" class="form-control m-input m-input--square" formControlName="shortName"
                             placeholder="please enter Name Abbreviation" name="shortName" autocomplete="nope"
                             [ngClass]="{ 'm-input--square': isSubmitted && shortName.invalid }" required>
                         <div class="form-control-feedback" *ngIf="isSubmitted && shortName.invalid">
@@ -83,7 +83,7 @@
                         </label>
                         <input type="text" min="0" class="form-control m-input m-input--square"
                             title="Tax code must be number" placeholder="Please enter Tax Code" autocomplete="nope"
-                            minlength="3" maxlength="100" ecusSpecicalCharacterNoSpace
+                            formControlName="taxCode" minlength="3" maxlength="100" ecusSpecicalCharacterNoSpace
                             [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required>
                         <div class="form-control-feedback" *ngIf="isSubmitted && taxCode.invalid">
                             Partner Tax Code is required and must be number
@@ -95,7 +95,8 @@
                             Category <span class="m--font-danger">(*)</span>
                         </label>
                         <ng-select [multiple]="true" [items]="partnerGroups" placeholder="Select partner group"
-                            formControlName="partnerGroup" (selected)="onChange($event, 'category')">
+                            formControlName="partnerGroup" (selected)="onChange($event, 'category')"
+                            (removed)="removed($event, 'category')">
                         </ng-select>
                         <div class="form-control-feedback" *ngIf="isSubmitted && partnerGroup.invalid">
                             Category is required
@@ -142,7 +143,7 @@
                                     <ng-select #chooseShippingCountry [allowClear]="true" [items]="countries"
                                         formControlName="shippingCountry"
                                         (selected)="onChange($event, 'shippingCountry')"
-                                        (removed)="removed('shippingCountry')" placeholder="Select country">
+                                        (removed)="removed($event, 'shippingCountry')" placeholder="Select country">
                                     </ng-select>
                                     <div class="form-control-feedback" *ngIf="isSubmitted && shippingCountry.invalid">
                                         Country is required
@@ -183,7 +184,7 @@
                                 Address EN <span class="m--font-danger">(*)</span>
                             </label>
                             <textarea class="form-control m-input m-input--square" id="" rows="6" autocomplete="nope"
-                                name="shippingAddressEN" formControlName="shippingAddressEN" required></textarea>
+                                name="shippingAddressEN" formControlName="shippingAddressEN"></textarea>
                             <div class="form-control-feedback" *ngIf="isSubmitted && shippingAddressEN.invalid">
                                 Address EN is required
                             </div>
@@ -196,7 +197,7 @@
                                 Address Local <span class="m--font-danger">(*)</span>
                             </label>
                             <textarea class="form-control m-input m-input--square" id="" rows="6" autocomplete="nope"
-                                name="shippingAddressVN" required></textarea>
+                                formControlName="shippingAddressVN" name="shippingAddressVN" required></textarea>
                             <div class="form-control-feedback" *ngIf="isSubmitted && shippingAddressVN.invalid">
                                 Address Local is required
                             </div>
@@ -212,16 +213,15 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': isSubmitted && billingCountry == null }">
+                                    [ngClass]="{ 'm-form__group has-danger': isSubmitted && billingCountry.invalid }">
                                     <label class="form-control-label">
                                         Country <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="countries"
+                                    <ng-select [allowClear]="true" [items]="countries" formControlName="billingCountry"
                                         (selected)="onChange($event, 'billingCountry')"
-                                        (removed)="removed('billingCountry')" placeholder="Select country">
+                                        (removed)="removed($event, 'billingCountry')" placeholder="Select country">
                                     </ng-select>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && billingCountry == null"
-                                        formControlName="billingCountry">
+                                    <div class="form-control-feedback" *ngIf="isSubmitted && billingCountry.invalid">
                                         Country is required
                                     </div>
                                 </div>
@@ -256,15 +256,15 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && billingAddressEN }">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && billingAddressEN.invalid }">
                             <label class="form-control-label">
-                                Address EN <span class="m--font-danger">(*)</span>
+                                Address Local <span class="m--font-danger">(*)</span>
                             </label>
-                            <textarea class="form-control m-input m-input--square" id="" name="billingAddressEN"
-                                rows="6" maxlength="300" autocomplete="nope" required
-                                formControlName="billingAddressEN"></textarea>
-                            <div class="form-control-feedback" *ngIf="isSubmitted && billingAddressEN">
-                                Address EN required
+                            <textarea class="form-control m-input m-input--square" id="" rows="6" maxlength="300"
+                                autocomplete="nope" name="billingAddressEN" formControlName="billingAddressEN"
+                                required></textarea>
+                            <div class="form-control-feedback" *ngIf="isSubmitted && billingAddressEN.invalid">
+                                Address Local is required
                             </div>
                         </div>
                     </div>
@@ -413,117 +413,19 @@
                 </div>
 
             </div>
-        </div>
-    </div>
-    <!--end::m-portlet -->
-
-    <!--begin::m-portlet -->
-
-    <!--end::m-portlet -->
-
-    <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered" *ngIf="isShowSaleMan">
-        <div class="alert-block__heading">
-            <h3 class="alert-block__title">Sale Man</h3>
-        </div>
-        <div class="m-portlet__body">
-            <!--begin: Datatable -->
             <div class="row">
-                <div class="col-lg-4">
+                <div class="col-lg-12">
                     <div class="form-group">
-                        <div class="m-input-icon m-input-icon--right">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search"
-                                [(ngModel)]="keyword" name=keyword>
-                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                <span>
-                                    <i class="la la-search"></i>
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-8 m--align-right">
-                    <div class="form-group">
-                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                            data-toggle="modal" (click)='showPopupSaleman()'>
-                            <span>
-                                <i class="la la-plus"></i>
-                                <span>
-                                    Add new
-                                </span>
-                            </span>
-                        </button>
+                        <label class="form-control-label" for="">
+                            Note
+                        </label>
+                        <textarea class="form-control m-input m-input--square" id="" name="partnerNote"
+                            formControlName="note" autocomplete="nope" rows="6"></textarea>
                     </div>
                 </div>
 
             </div>
-            <!-- <div class="table-wrapper" id="">
-                <table class="table table-striped table-brand dataTable">
-                    <thead app-table-header [headers]="headerSaleman" (onClick)="sortBySaleMan($event)">
-                    </thead>
-                    <tbody>
-                        <ng-container *ngIf="!!saleMandetail && !isLoading ;">
-                            <tr
-                                *ngFor="let sale of saleMandetail | filter : keyword : ['company','saleman_ID','service','office']; let i = index; trackBy: trackByFn">
-                                <td class="table-actions-col">
-                                    <div class="table-actions" style="width: 50px">
-                                        <button type="button"
-                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove" data-toggle="modal" (click)="deleteSaleman(i)">
-                                            <i class="la la-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span><a style="cursor:pointer;"
-                                            (click)="showDetailSaleMan(sale,i)">{{sale.saleman_ID}}</a>
-                                    </span>
-                                </td>
-                                <td>
-                                    <span>{{sale.service}}</span>
-                                </td>
-                                <td>
-                                    <span>{{sale.office}}</span>
-                                </td>
-                                <td>
-                                    <span>{{sale.company}}</span>
-                                </td>
-                                <td [ngClass]="sale.status ? 'text-success' : 'text-danger'">
-                                    {{sale.status ? 'Active' : 'Inactive'}}</td>
-                                <td>
-                                    <span>{{sale.createDate  | date: 'dd/MM/yyyy'}}</span>
-                                </td>
-                            </tr>
-
-                        </ng-container>
-                        <tr *ngIf="!isLoading && saleMandetail.length == 0" app-table-none-record>
-                        </tr>
-                        <tr *ngIf="!isLoading  && !saleMandetail" app-table-none-record></tr>
-                        <tr *ngIf="isLoading" app-table-row-loading></tr>
-                    </tbody>
-                </table>
-            </div> -->
-            <!--end: Datatable -->
         </div>
     </div>
-    <!--begin:: form-actions-->
-    <div class="form-actions m--align-right">
-        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
-            <span>
-                <i class="la la la-save"></i>
-                <span>
-                    save
-                </span>
-            </span>
-        </button>
-        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-            routerLink="/home/catalogue/partner-data">
-            <span>
-                <i class="la la-ban"></i>
-                <span>
-                    cancel
-                </span>
-            </span>
-        </button>
-    </div>
-    <!--end:: form-actions-->
+    <!--end::m-portlet -->
 </form>
