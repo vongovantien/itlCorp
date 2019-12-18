@@ -35,6 +35,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysGroup> sysGroupRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
+        readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -51,7 +52,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysGroup> sysGroup,
             IContextBase<SysOffice> sysOffice,
-            IContextBase<OpsStageAssigned> opsStageAssigned) : base(repository, mapper)
+            IContextBase<OpsStageAssigned> opsStageAssigned,
+            IContextBase<CsShipmentSurcharge> csShipmentSurcharge) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = url;
@@ -67,6 +69,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysGroupRepo = sysGroup;
             sysOfficeRepo = sysOffice;
             opsStageAssignedRepo = opsStageAssigned;
+            csShipmentSurchargeRepo = csShipmentSurcharge;
         }
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
@@ -1755,11 +1758,12 @@ namespace eFMS.API.Accounting.DL.Services
 
         #endregion APPROVAL ADVANCE PAYMENT
 
-        public List<AcctAdvanceRequestModel> GetAdvanceOfShipment()
+        public List<AcctAdvanceRequestModel> GetAdvancesOfShipment()
         {
             var request = acctAdvanceRequestRepo.Get();
             var opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false);
             var docShipment = csTransactionRepo.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var surcharge = csShipmentSurchargeRepo.Get();
 
             //Sort tăng dần theo ngày RequestDate của Advance
             var requestOrder = from req in request
@@ -1777,9 +1781,11 @@ namespace eFMS.API.Accounting.DL.Services
                            join doc in docShipment on req.JobId equals doc.JobNo into doc2
                            from doc in doc2
                            select req;
-            var merge = queryOps.Union(queryDoc);
+            var mergeAdvRequest = queryOps.Union(queryDoc);
 
-            var result = mapper.Map<List<AcctAdvanceRequestModel>>(merge);
+            var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo));
+
+            var result = mapper.Map<List<AcctAdvanceRequestModel>>(data);
             return result;
         }
     }
