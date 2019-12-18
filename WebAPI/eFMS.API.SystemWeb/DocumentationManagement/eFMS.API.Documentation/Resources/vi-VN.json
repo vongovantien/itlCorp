@@ -56,5 +56,7 @@
   "MSG_POD_REQUIRED": "Port of Destination không được để trống!",
   "MSG_PODELI_DIFFERENT_POL": "Place of Delivery phải khác Port of Loading",
   "MSG_SERVICE_TYPE_REQUIRED": "Service Type không được để trống!",
-  "MSG_PERSON_IN_CHARGE_REQUIRED": "Person In Charge không được để trống!"
+  "MSG_PERSON_IN_CHARGE_REQUIRED": "Person In Charge không được để trống!",
+
+  "MSG_NOT_EXIST_SHIPMENT": "Những lô hàng này không tồn tại trên hệ thống: "
 }

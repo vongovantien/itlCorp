@@ -220,7 +220,7 @@ export class TariffChargePopupComponent extends PopupBase {
     }
 
     getUnit() {
-        this._catalogueRepo.getUnit()
+        this._catalogueRepo.getUnit({ active: true })
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: [] = []) => { this.units = res; },

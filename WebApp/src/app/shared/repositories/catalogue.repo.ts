@@ -3,10 +3,11 @@ import { ApiService } from "../services";
 import { environment } from "src/environments/environment";
 import { throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 
 @Injectable()
 export class CatalogueRepo {
+
     private VERSION: string = 'v1';
     constructor(protected _api: ApiService, private _httpClient: HttpClient) {
     }
@@ -72,16 +73,18 @@ export class CatalogueRepo {
         );
     }
 
-
-    getUnit(body?: any) {
-        if (!!body) {
+    getUnit(body?: any, page?: number, size?: number) {
+        if (!!body && !page && !size) {
             return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatUnit/Query`, body).pipe(
                 map((res: any) => {
                     return res;
                 })
             );
         } else {
-            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatUnit`).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatUnit/Paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
                 map((res: any) => {
                     return res;
                 })
@@ -89,6 +92,37 @@ export class CatalogueRepo {
         }
     }
 
+    deleteUnit(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatUnit/Delete/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getUnitTypes() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatUnit/GetUnitTypes`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
+    addUnit(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatUnit/Add`, body).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    updateUnit(body: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatUnit/Update`, body).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
 
     getListCurrency(page?: number, size?: number, body?: any) {
         if (!!page && !!size && !!body) {
@@ -434,11 +468,13 @@ export class CatalogueRepo {
     upLoadPlaceFile(files: any, placeType: any) {
         return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/UploadFile`, files, "uploadedFile", { type: placeType });
     }
+
     importPlace(body: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPlace/Import`, body).pipe(
             map((data: any) => data)
         );
     }
+
     //#endregion
 
     addCountry(body: any = {}) {
@@ -446,6 +482,7 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
     updateCountry(body: any = {}) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCountry/update`, body).pipe(
             map((data: any) => data)
@@ -472,6 +509,13 @@ export class CatalogueRepo {
 
     getDetailCountry(id: number) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/getById/` + id)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    deleteCountry(id: number) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/Delete/${id}`)
             .pipe(
                 map((data: any) => data)
             );
@@ -598,6 +642,10 @@ export class CatalogueRepo {
     deleteCharge(id: string) {
         return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/delete/${id}`).pipe(
             catchError((error) => throwError(error)),
+        );
+    }
+    getStagePaging(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/getAll/${page}/${size}`, body).pipe(
             map((data: any) => data)
         );
     }
@@ -625,6 +673,24 @@ export class CatalogueRepo {
         );
     }
 
+    deleteStage(id: number) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/delete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addNewStage(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/addNew`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateStage(body: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     upLoadChargeFile(files: any) {
         return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/UploadFile`, files, "uploadedFile");
     }
@@ -635,10 +701,21 @@ export class CatalogueRepo {
         );
     }
 
-
+    getDetailStage(id: number) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage//getById/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 
     downloadChargeExcel() {
         return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/downloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    downloadStageExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStage/downloadExcel`, null).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -653,6 +730,16 @@ export class CatalogueRepo {
     downloadChargeVoucherExcel() {
         return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChargeDefaultAccount/downloadExcel`).pipe(
             catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    upLoadStageFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/uploadFile`, files, "uploadedFile");
+    }
+
+    importStage(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStage/import`, body).pipe(
             map((data: any) => data)
         );
     }

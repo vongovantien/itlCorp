@@ -101,7 +101,7 @@ export class FormAddChargeComponent extends AppForm {
     }
 
     getUnit() {
-        this._catalogueRepo.getUnit().subscribe((res: any) => {
+        this._catalogueRepo.getUnit({}).subscribe((res: any) => {
             if (!!res) {
                 const units = res;
                 this.ngDataUnit = units.map(x => ({ text: x.code, id: x.id }));

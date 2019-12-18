@@ -53,6 +53,7 @@ export class VoucherListComponent extends AppList {
             this.ChargeToAdd.listChargeDefaultAccount[index].type = value.text;
         }
 
+
     }
 
     getActiveVoucherType(index) {

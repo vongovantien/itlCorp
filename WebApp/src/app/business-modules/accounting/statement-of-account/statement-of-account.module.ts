@@ -16,6 +16,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { StatementOfAccountSummaryComponent } from './components/summary/summary-soa.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
+import { InputShipmentPopupComponent } from './components/poup/input-shipment/input-shipment.popup';
 
 const routing: Routes = [
     {
@@ -56,7 +57,8 @@ const COMPONENTS = [
     StatementOfAccountSearchComponent,
     StatementOfAccountAddChargeComponent,
     StatementOfAccountSummaryComponent,
-    StatementOfAccountFormCreateComponent
+    StatementOfAccountFormCreateComponent,
+    InputShipmentPopupComponent
 ];
 
 @NgModule({

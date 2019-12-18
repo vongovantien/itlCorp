@@ -58,4 +58,6 @@
     <div class="col-md-auto">
         <app-default-button [buttonSetting]="resetButtonSetting" (click)="resetSearch()"></app-default-button>
     </div>
+    <ng-content select="div.col-md-auto">
+    </ng-content>
 </div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { Charge, SOASearchCharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -10,6 +10,7 @@ import _uniq from 'lodash/uniq';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
+import { InputShipmentPopupComponent } from '../poup/input-shipment/input-shipment.popup';
 
 @Component({
     selector: 'soa-form-create',
@@ -19,6 +20,7 @@ import { ToastrService } from 'ngx-toastr';
 export class StatementOfAccountFormCreateComponent extends AppPage {
     @Output() onApply: EventEmitter<any> = new EventEmitter<any>();
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChild(InputShipmentPopupComponent, { static: false }) inputShipmentPopupComponent: InputShipmentPopupComponent;
 
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -67,6 +69,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     commodityGroup: any[] = [];
     commodity: any = null;
+
+    shipmentInput: any = null;
 
     constructor(
         private _toastService: ToastrService,
@@ -356,7 +360,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 note: this.note,
                 serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
                 commodityGroupId: !!this.commodity ? this.commodity.id : null,
-                strServices: this.selectedService[0].id === 'All' ? '' : this.selectedService.map(service => service.id).toString()
+                strServices: this.selectedService[0].id === 'All' ? '' : this.selectedService.map(service => service.id).toString(),
+                jobIds: this.mapShipment("JOBID"),
+                hbls: this.mapShipment("HBL"),
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);
@@ -410,5 +416,24 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         }
 
         return serviceTypeId;
+    }
+
+    openInputShipment() {
+        this.inputShipmentPopupComponent.show();
+    }
+
+    onShipmentList(data: any) {
+        this.shipmentInput = data;
+    }
+
+    mapShipment(type: string) {
+        var _shipment = [];
+        if (this.shipmentInput !== null) {
+            const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
+            if (this.shipmentInput.type === type) {
+                _shipment = _keyword;
+            }
+        }
+        return _shipment;
     }
 }

@@ -101,7 +101,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getById/{id}")]
         public IActionResult Get(int id)
         {
-            var results = catStageService.Get(x => x.Id == id);
+            var results = catStageService.Get(x => x.Id == id).FirstOrDefault();
             return Ok(results);
         }
 

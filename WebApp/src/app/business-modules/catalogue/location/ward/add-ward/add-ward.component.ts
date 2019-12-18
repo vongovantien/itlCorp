@@ -12,36 +12,44 @@ import { catchError, finalize } from 'rxjs/operators';
     selector: 'app-add-ward',
     templateUrl: './add-ward.component.html'
 })
-export class AddWardComponent extends PopupBase implements OnInit {
-    @Output() isSaveSuccess = new EventEmitter<boolean>();
-    wardToAdd = new CatPlaceModel();
-    formAddWard: FormGroup;
-    isSubmitted = false;
+export class AddWardPopupComponent extends PopupBase implements OnInit {
 
+    @Output() onChange = new EventEmitter<boolean>();
+    wardToAdd = new CatPlaceModel();
+
+    formAddWard: FormGroup;
     code: AbstractControl;
     nameEn: AbstractControl;
     nameVn: AbstractControl;
-    country: AbstractControl;
+    countryId: AbstractControl;
+    id: AbstractControl;
+    active: AbstractControl;
+    provinceId: AbstractControl;
+    districtId: AbstractControl;
 
-    ngSelectDataCountries: any[] = [];
-    ngSelectDataProvinces: any[] = [];
-    ngSelectDataDistricts: any[] = [];
-    resetNg2SelectProvince: boolean = true;
-    resetNg2SelectDistrict: boolean = true;
     provinces: any[] = [];
     districts: any[] = [];
+    countries: any[];
+    initProvince: any[];
+
+    isUpdate: boolean = false;
+    isSubmitted = false;
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         protected _progressService: NgProgress,
-        private toastService: ToastrService) {
+        private _toastService: ToastrService) {
         super();
         this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
         this.initForm();
+        this.getCountry();
+        this.getProvince();
+        this.getDistrict();
     }
+
     initForm() {
         this.formAddWard = this._fb.group({
             code: ['', Validators.compose([
@@ -53,95 +61,51 @@ export class AddWardComponent extends PopupBase implements OnInit {
             nameVn: ['', Validators.compose([
                 Validators.required
             ])],
-            country: ['', Validators.compose([
+            countryId: ['', Validators.compose([
                 Validators.required
-            ])]
+            ])],
+            provinceId: ['', Validators.compose([
+                Validators.required
+            ])],
+            districtId: ['', Validators.compose([
+                Validators.required
+            ])],
+            active: [],
+            id: [],
         });
         this.code = this.formAddWard.controls['code'];
         this.nameEn = this.formAddWard.controls['nameEn'];
         this.nameVn = this.formAddWard.controls['nameVn'];
-        this.country = this.formAddWard.controls['country'];
+        this.countryId = this.formAddWard.controls['countryId'];
     }
-    refreshValue(event) { }
-    typed(event) { }
-    removed(value: { id: any, text: any }, type: string) {
-        if (type === 'country') {
-            this.wardToAdd.countryId = null;
-            this.wardToAdd.provinceId = null;
-            this.wardToAdd.districtId = null;
-            this.ngSelectDataProvinces = [];
-            this.ngSelectDataDistricts = [];
-            this.resetNgSelect('province');
-        }
-        if (type === 'province') {
-            this.wardToAdd.provinceId = null;
-            this.wardToAdd.districtId = null;
-            this.ngSelectDataDistricts = [];
-            this.resetNgSelect('district');
-        }
-        if (type === 'district') {
-            this.wardToAdd.districtId = null;
-        }
+
+    getCountry() {
+        this._catalogueRepo.getListAllCountry()
+            .subscribe(
+                (res: any) => {
+                    this.countries = res;
+                }
+            );
     }
-    selected(value: { id: any, text: any }, type: string) {
-        if (type === 'country') {
-            this.wardToAdd.countryId = value.id;
-            this.wardToAdd.provinceId = null;
-            this.wardToAdd.districtId = null;
-            this.getProvinceByCountry(value.id);
-            this.resetNgSelect('province');
-        }
-        if (type === 'province') {
-            this.wardToAdd.provinceId = value.id;
-            this.wardToAdd.districtId = null;
-            this.getWardByProvince(value.id);
-            this.resetNgSelect('district');
-        }
-        if (type === 'district') {
-            this.wardToAdd.districtId = value.id;
-        }
+
+    getProvince() {
+        this._catalogueRepo.getAllProvinces()
+            .subscribe(
+                (res: any) => {
+                    this.provinces = this.initProvince = res;
+                }
+            );
     }
-    resetNgSelect(selectName: string) {
-        if (selectName === 'province') {
-            this.resetNg2SelectProvince = false;
-            setTimeout(() => {
-                this.resetNg2SelectProvince = true;
-            }, 10);
-        }
-        if (selectName === 'district') {
-            this.resetNg2SelectDistrict = false;
-            setTimeout(() => {
-                this.resetNg2SelectDistrict = true;
-            }, 10);
-        } else {
-            this.resetNg2SelectProvince = false;
-            this.resetNg2SelectDistrict = false;
-            setTimeout(() => {
-                this.resetNg2SelectProvince = true;
-                this.resetNg2SelectDistrict = true;
-            }, 10);
-        }
+
+    getDistrict() {
+        // this._catalogueRepo.getAll()
+        //     .subscribe(
+        //         (res: any) => {
+        //             this.provinces = this.initProvince = res;
+        //         }
+        //     );
     }
-    getProvinceByCountry(id: any) {
-        if (this.provinces.length === 0) {
-            this.ngSelectDataProvinces = [];
-        } else {
-            const data = this.provinces.filter(x => x.countryID === id);
-            this.ngSelectDataProvinces = this.ngSelectData(data, id);
-        }
-    }
-    getWardByProvince(id: any) {
-        if (this.districts.length === 0) {
-            this.ngSelectDataProvinces = [];
-        } else {
-            const data = this.districts.filter(x => x.provinceID === id);
-            this.ngSelectDataDistricts = this.ngSelectData(data, id);
-        }
-    }
-    ngSelectData(sourceData: any[], id: any) {
-        if (sourceData === null) { return []; }
-        return sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));
-    }
+
     saveWard() {
         this.isSubmitted = true;
         if (this.formAddWard.valid && this.wardToAdd.countryId != null
@@ -160,28 +124,26 @@ export class AddWardComponent extends PopupBase implements OnInit {
                 )
                 .subscribe(
                     (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this.toastService.success(res.message, '');
-                            this.isSubmitted = false;
-                            this.initForm();
-                            this.isSaveSuccess.emit(true);
-                            this.ngSelectDataProvinces = [];
-                            this.ngSelectDataDistricts = [];
-                            this.resetNgSelect('');
-                            this.hide();
-                        } else {
-                            this.toastService.error(res.message, '');
-                        }
+                        this.onHandleResult(res);
                     }
                 );
         }
     }
+
     cancelAdd() {
         this.hide();
         this.isSubmitted = false;
         this.formAddWard.reset();
-        this.ngSelectDataProvinces = [];
-        this.ngSelectDataDistricts = [];
-        this.resetNgSelect('');
+    }
+
+    onHandleResult(res: CommonInterface.IResult) {
+        if (res.status) {
+            this.hide();
+
+            this._toastService.success(res.message);
+            this.onChange.emit(true);
+        } else {
+            this._toastService.error(res.message);
+        }
     }
 }

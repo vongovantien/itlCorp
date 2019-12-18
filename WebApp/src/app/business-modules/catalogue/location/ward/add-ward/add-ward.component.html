@@ -4,7 +4,7 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">Add Town - Ward</h5>
+                <h5 class="modal-title">{{isUpdate ? 'Update' : 'Add'}} Town - Ward</h5>
                 <button type="button" class="close" aria-label="Close" (click)="cancelAdd()">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -12,11 +12,10 @@
             <div class="modal-body">
                 <form [formGroup]="formAddWard">
                     <div class="m-form m-form m-form--state">
-
                         <div class="form-group row"
                             [ngClass]="{ 'm-form__group has-danger': isSubmitted && code.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Town - Ward Code <span class="m--font-danger">(*)</span>
+                            <label class="col-lg-4 col-form-label form-control-label" required>
+                                Town - Ward Code
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" formControlName="code" class="form-control m-input m-input--square"
@@ -28,8 +27,8 @@
                         </div>
                         <div class="form-group row"
                             [ngClass]="{ 'm-form__group has-danger': isSubmitted && nameEn.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                English Name <span class="m--font-danger">(*)</span>
+                            <label class="col-lg-4 col-form-label form-control-label" required>
+                                English Name
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" formControlName="nameEn" class="form-control m-input m-input--square"
@@ -41,8 +40,8 @@
                         </div>
                         <div class="form-group row"
                             [ngClass]="{ 'm-form__group has-danger': isSubmitted && nameVn.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name <span class="m--font-danger">(*)</span>
+                            <label class="col-lg-4 col-form-label form-control-label" required>
+                                Local Name
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" formControlName="nameVn" class="form-control m-input m-input--square"
@@ -53,80 +52,62 @@
                             </div>
                         </div>
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && wardToAdd.countryId==null }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Country <span class="m--font-danger">(*)</span>
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !countryId.valid}">
+                            <label class="col-lg-4 col-form-label form-control-label" required>
+                                Country
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries" formControlName="country"
-                                    (data)="refreshValue($event)" (selected)="selected($event,'country')"
-                                    (removed)="removed($event,'country')" placeholder="Select Country">
-                                </ng-select>
-                                <div class="form-control-feedback" *ngIf="isSubmitted && wardToAdd.countryId==null">
+
+                                <div class="form-control-feedback" *ngIf="isSubmitted && !countryId.valid">
                                     Country is required
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && wardToAdd.provinceId==null }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City <span class="m--font-danger">(*)</span>
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !provinceId.valid }">
+                            <label class="col-lg-4 col-form-label form-control-label" required>
+                                Province - City
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataProvinces"
-                                    *ngIf="resetNg2SelectProvince && ngSelectDataCountries.length>0"
-                                    (data)="refreshValue($event)" (selected)="selected($event,'province')"
-                                    (removed)="removed($event,'province')" placeholder="Select province">
-                                </ng-select>
-                                <div class="form-control-feedback" *ngIf="isSubmitted && wardToAdd.countryId==null">
+
+                                <div class="form-control-feedback" *ngIf="isSubmitted && !provinceId.valid">
                                     Province is required
                                 </div>
                             </div>
-
                         </div>
 
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && wardToAdd.districtId==null }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                District <span class="m--font-danger">(*)</span>
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !districtId.valid }">
+                            <label class="col-lg-4 col-form-label form-control-label" required>
+                                District
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataDistricts"
-                                    *ngIf="resetNg2SelectDistrict" (data)="refreshValue($event)"
-                                    (selected)="selected($event,'district')" (removed)="removed($event,'district')"
-                                    placeholder="Select district">
-                                </ng-select>
-                                <div class="form-control-feedback" *ngIf="isSubmitted && wardToAdd.districtId==null">
+
+                                <div class="form-control-feedback" *ngIf="isSubmitted && !districtId.valid">
                                     District is required
                                 </div>
                             </div>
 
                         </div>
-                    </div>
-                    <div class="modal-footer m--align-center c-button-actions">
-                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="saveWard()">
-                            <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    save
-                                </span>
-                            </span>
-                        </button>
-                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="cancelAdd()">
-                            <span>
-                                <i class="la la-ban"></i>
-                                <span>
-                                    cancel
-                                </span>
-                            </span>
-                        </button>
+                        <ng-container *ngIf="!!isUpdate">
+                            <div class="form-group row">
+                                <label class="col-lg-4 col-form-label form-control-label" required>
+                                    Active
+                                </label>
+
+                                <div class="col-lg-8">
+                                    <app-switch [(toggle)]="active.value"></app-switch>
+                                </div>
+                            </div>
+                        </ng-container>
                     </div>
                 </form>
             </div>
-
+            <div class="modal-footer m--align-center c-button-actions">
+                <app-default-button [buttonSetting]="saveButtonSetting" (click)="saveWard()"></app-default-button>
+                <app-default-button [buttonSetting]="cancelButtonSetting" (click)="cancelAdd()"></app-default-button>
+            </div>
         </div>
     </div>
 </div>

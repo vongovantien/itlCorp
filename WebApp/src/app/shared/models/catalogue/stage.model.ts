@@ -1,11 +1,12 @@
 // import { moment } from "ngx-bootstrap/chronos/test/chain";
 export class StageModel {
 
-    public id: number = -1;
+    public id: number = 0;
     public code: string = '';
     public stageNameVn: string = '';
     public stageNameEn: string = '';
-    public departmentId: number = 1;
+    public departmentId: number = 0;
+    public deptName: string = '';
     public descriptionVn: string = '';
     public descriptionEn: string = '';
     public userCreated: string = '';
