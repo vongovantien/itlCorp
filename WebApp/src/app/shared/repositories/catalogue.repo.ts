@@ -384,14 +384,12 @@ export class CatalogueRepo {
         );
     }
 
-
     checkExistedSaleman(service: string, office: string) {
         const body = { service: service, office: office };
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/CheckExisted`, body).pipe(
             map((data: any) => data)
         );
     }
-
 
     getListSaleManDetail(page?: number, size?: number, body: any = {}) {
         if (!!page && !!size) {
@@ -661,8 +659,36 @@ export class CatalogueRepo {
         );
     }
 
+    deleteCharge(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/delete/${id}`).pipe(
+            catchError((error) => throwError(error)),
+        );
+    }
     getStagePaging(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/getAll/${page}/${size}`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addCharge(data: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/addNew`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getChargeById(id: any) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/getById/` + id).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    updateCharge(body: any = {}) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/update`, body).pipe(
             map((data: any) => data)
         );
     }
@@ -685,14 +711,44 @@ export class CatalogueRepo {
         );
     }
 
+    upLoadChargeFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/UploadFile`, files, "uploadedFile");
+    }
+
+    importCharge(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getDetailStage(id: number) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage//getById/${id}`).pipe(
             map((data: any) => data)
         );
     }
 
+    downloadChargeExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/downloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     downloadStageExcel() {
         return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStage/downloadExcel`, null).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    importChargeVoucher(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatChargeDefaultAccount/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    downloadChargeVoucherExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChargeDefaultAccount/downloadExcel`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -708,4 +764,7 @@ export class CatalogueRepo {
         );
     }
 
+    upLoadChargeVoucher(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChargeDefaultAccount/UploadFile`, files, "uploadedFile");
+    }
 }

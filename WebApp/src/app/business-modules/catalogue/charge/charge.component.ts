@@ -10,11 +10,12 @@ import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
 import { AppList } from 'src/app/app.list';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map, tap } from 'rxjs/operators';
 import { Charge } from 'src/app/shared/models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-charge',
@@ -28,12 +29,11 @@ export class ChargeComponent extends AppList implements OnInit {
 
     constructor(
         private _progressService: NgProgress,
-        private baseServices: BaseService,
-        private excelService: ExcelService,
-        private api_menu: API_MENU,
-        private router: Router,
         private sortService: SortService,
-        private cataloguage: CatalogueRepo) {
+        private _catalogueRepo: CatalogueRepo,
+        private _exportRepo: ExportRepo,
+        private _toastService: ToastrService
+    ) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestList = this.searchCharge;
@@ -47,7 +47,7 @@ export class ChargeComponent extends AppList implements OnInit {
     searchKey: string = "";
     searchObject: any = {};
 
-    async ngOnInit() {
+    ngOnInit() {
         this.headers = [
             { title: 'Code', field: 'code', sortable: true },
             { title: 'Name EN', field: 'chargeNameEn', sortable: true },
@@ -86,7 +86,7 @@ export class ChargeComponent extends AppList implements OnInit {
     searchCharge(dataSearch: any) {
         this.isLoading = true;
         this._progressRef.start();
-        this.cataloguage.getListCharge(this.page, this.pageSize, Object.assign({}, dataSearch))
+        this._catalogueRepo.getListCharge(this.page, this.pageSize, Object.assign({}, dataSearch))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
@@ -109,10 +109,24 @@ export class ChargeComponent extends AppList implements OnInit {
         this.confirmDeletePopup.show();
     }
 
-    async onDeleteCharge() {
-        await this.baseServices.deleteAsync(this.api_menu.Catalogue.Charge.delete + this.idChargeToDelete, true, true);
-        this.searchCharge(this.dataSearch);
+    onDeleteCharge() {
         this.confirmDeletePopup.hide();
+        this.isLoading = true;
+        this._progressRef.start();
+        this._catalogueRepo.deleteCharge(this.idChargeToDelete)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.searchCharge(this.dataSearch);
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
     }
 
     public itemsToString(value: Array<any> = []): string {
@@ -122,50 +136,15 @@ export class ChargeComponent extends AppList implements OnInit {
             }).join(',');
     }
 
-    async export() {
-        let charges = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.query, this.searchObject);
-        if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-            charges = _map(charges, function (chrg, index) {
-                return [
-                    index + 1,
-                    chrg['code'],
-                    chrg['chargeNameEn'],
-                    chrg['chargeNameVn'],
-                    chrg['type'],
-                    (chrg['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-                ]
-            });
-        }
-
-        if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-            charges = _map(charges, function (chrg, index) {
-                return [
-                    index + 1,
-                    chrg['code'],
-                    chrg['chargeNameEn'],
-                    chrg['chargeNameVn'],
-                    chrg['type'],
-                    (chrg['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
-                ]
-            });
-        }
-        const exportModel: ExportExcel = new ExportExcel();
-        exportModel.title = "Charge List";
-        const currrently_user = localStorage.getItem('currently_userName');
-        exportModel.author = currrently_user;
-        exportModel.header = [
-            { name: "No.", width: 10 },
-            { name: "Code", width: 20 },
-            { name: "English Name", width: 20 },
-            { name: "Local Name", width: 20 },
-            { name: "Type", width: 20 },
-            { name: "Inactive", width: 20 }
-        ]
-        exportModel.data = charges;
-        exportModel.fileName = "Charges";
-
-        this.excelService.generateExcel(exportModel);
-
+    export() {
+        this._exportRepo.exportCharge(this.dataSearch)
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'Charge.xlsx');
+                },
+                (errors: any) => {
+                },
+                () => { }
+            );
     }
-
 }
