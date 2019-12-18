@@ -1,12 +1,15 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { CatPlaceModel } from 'src/app/shared/models/catalogue/catPlace.model';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { PopupBase } from 'src/app/popup.base';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgProgress } from '@ngx-progressbar/core';
-import { CatalogueRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
+
+import { CatPlaceModel } from 'src/app/shared/models/catalogue/catPlace.model';
+import { PopupBase } from 'src/app/popup.base';
+import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
+
 import { catchError, finalize } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-add-ward',
@@ -21,16 +24,17 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
     code: AbstractControl;
     nameEn: AbstractControl;
     nameVn: AbstractControl;
-    countryId: AbstractControl;
+    countryID: AbstractControl;
     id: AbstractControl;
     active: AbstractControl;
-    provinceId: AbstractControl;
-    districtId: AbstractControl;
+    provinceID: AbstractControl;
+    districtID: AbstractControl;
 
     provinces: any[] = [];
     districts: any[] = [];
-    countries: any[];
-    initProvince: any[];
+    countries: any[] = [];
+    initProvince: any[] = [];
+    initDistrict: any[] = [];
 
     isUpdate: boolean = false;
     isSubmitted = false;
@@ -61,13 +65,13 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
             nameVn: ['', Validators.compose([
                 Validators.required
             ])],
-            countryId: ['', Validators.compose([
+            countryID: ['', Validators.compose([
                 Validators.required
             ])],
-            provinceId: ['', Validators.compose([
+            provinceID: ['', Validators.compose([
                 Validators.required
             ])],
-            districtId: ['', Validators.compose([
+            districtID: ['', Validators.compose([
                 Validators.required
             ])],
             active: [],
@@ -76,7 +80,11 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
         this.code = this.formAddWard.controls['code'];
         this.nameEn = this.formAddWard.controls['nameEn'];
         this.nameVn = this.formAddWard.controls['nameVn'];
-        this.countryId = this.formAddWard.controls['countryId'];
+        this.countryID = this.formAddWard.controls['countryID'];
+        this.provinceID = this.formAddWard.controls['provinceID'];
+        this.districtID = this.formAddWard.controls['districtID'];
+        this.active = this.formAddWard.controls['active'];
+        this.id = this.formAddWard.controls['id'];
     }
 
     getCountry() {
@@ -98,35 +106,59 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
     }
 
     getDistrict() {
-        // this._catalogueRepo.getAll()
-        //     .subscribe(
-        //         (res: any) => {
-        //             this.provinces = this.initProvince = res;
-        //         }
-        //     );
+        this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.District })
+            .subscribe(
+                (res: any) => {
+                    this.districts = this.initDistrict = res;
+                }
+            );
     }
 
     saveWard() {
         this.isSubmitted = true;
-        if (this.formAddWard.valid && this.wardToAdd.countryId != null
-            && this.wardToAdd.provinceId != null
-            && this.wardToAdd.districtId) {
-            this.wardToAdd.placeType = PlaceTypeEnum.Ward;
-            this.wardToAdd.code = this.code.value;
-            this.wardToAdd.nameEn = this.nameEn.value;
-            this.wardToAdd.nameVn = this.nameVn.value;
-            this._catalogueRepo.addPlace(this.wardToAdd)
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => {
-                        this._progressRef.complete();
-                    })
-                )
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        this.onHandleResult(res);
-                    }
-                );
+        if (this.formAddWard.valid) {
+
+            const formData = this.formAddWard.getRawValue();
+            const body = {
+                placeType: CommonEnum.PlaceTypeEnum.Ward,
+                code: formData.code,
+                nameEn: formData.nameEn,
+                nameVn: formData.nameVn,
+                id: formData.id,
+                active: !!this.isUpdate ? formData.active : true,
+                countryID: formData.countryID,
+                provinceID: formData.provinceID,
+                districtID: formData.districtID,
+                placeTypeId: 'Ward'
+            };
+
+            if (!!this.isUpdate) {
+                this._catalogueRepo.updatePlace(formData.id, body)
+                    .pipe(
+                        catchError(this.catchError),
+                        finalize(() => {
+                            this._progressRef.complete();
+                        })
+                    )
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            this.onHandleResult(res);
+                        }
+                    );
+            } else {
+                this._catalogueRepo.addPlace(body)
+                    .pipe(
+                        catchError(this.catchError),
+                        finalize(() => {
+                            this._progressRef.complete();
+                        })
+                    )
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            this.onHandleResult(res);
+                        }
+                    );
+            }
         }
     }
 
@@ -145,5 +177,37 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
         } else {
             this._toastService.error(res.message);
         }
+    }
+
+    onSelectDataFormInfo(data: any, type: string) {
+        switch (type) {
+            case 'country':
+                this.countryID.setValue(data.id);
+                this.provinceID.setValue(null);
+                this.districtID.setValue(null);
+
+                this.provinces = this.getProvinceByCountryId(data.id, this.initProvince);
+                break;
+            case 'province':
+                this.provinceID.setValue(data.id);
+                this.districtID.setValue(null);
+
+                this.districts = this.getDistricyByProvinceId(data.id, this.initDistrict);
+                console.log(this.districts);
+                break;
+            case 'district':
+                this.districtID.setValue(data.id);
+                break;
+            default:
+                break;
+        }
+    }
+
+    getProvinceByCountryId(id: string, sources: any[]) {
+        return sources.filter(x => x.countryID === id);
+    }
+
+    getDistricyByProvinceId(id: string, sources: any[]) {
+        return sources.filter(x => x.provinceID === id);
     }
 }

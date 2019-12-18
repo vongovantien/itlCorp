@@ -1,7 +1,6 @@
 <div class="country-wrapper">
     <div class="m-form">
-        <app-search-options [configSearch]="configSearch" (search)="onSearch($event)"
-            (reset_search)=resetSearch($event)>
+        <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" (reset_search)=resetSearch()>
             <div class="col-md-auto">
                 <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                     (click)="showAdd()">
@@ -23,8 +22,8 @@
                 </th>
             </thead>
             <tbody class="tbody-group">
-                <ng-container *ngFor="let district of districts; let i = index; trackBy: trackByFn">
-                    <tr>
+                <ng-container *ngIf="!!districts.length">
+                    <tr *ngFor="let district of districts; let i = index; trackBy: trackByFn">
                         <td class="table-actions-col">
                             <div class="table-actions" style="width: 70px">
                                 <button class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -46,7 +45,8 @@
                             {{district.active ? 'Active' : 'Inactive'}}</td>
                     </tr>
                 </ng-container>
-                <tr *ngIf="!districts.length" app-table-none-record></tr>
+                <tr *ngIf="!isLoading && !districts.length" app-table-none-record></tr>
+                <tr *ngIf="isLoading" app-table-row-loading></tr>
             </tbody>
         </table>
     </div>
