@@ -22,5 +22,6 @@ namespace eFMS.API.Operation.DL.IService
         HandleState DeleteMultiple(List<CustomsDeclarationModel> customs);
         List<CustomClearanceImportModel> CheckValidImport(List<CustomClearanceImportModel> list);
         HandleState Import(List<CustomsDeclarationModel> data);
+        List<CustomsDeclarationModel> GetCustomsShipmentNotLocked();
     }
 }

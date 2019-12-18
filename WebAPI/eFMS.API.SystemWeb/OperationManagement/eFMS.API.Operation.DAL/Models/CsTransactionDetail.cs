@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Documentation.Service.Models
+namespace eFMS.API.Operation.Service.Models
 {
     public partial class CsTransactionDetail
     {

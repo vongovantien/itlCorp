@@ -37,6 +37,8 @@ namespace eFMS.API.Operation.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatCommodity> commodityRepository;
+        private readonly IContextBase<OpsTransaction> opsTransactionRepo;
+        private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, 
             ICacheServiceBase<CustomsDeclaration> cacheService, 
@@ -48,7 +50,10 @@ namespace eFMS.API.Operation.DL.Services
             , ICatCommodityApiService commodity
             , ICurrentUser user,
             IStringLocalizer<LanguageSub> localizer,
-            IContextBase<CatCommodity> commodityRepo) : base(repository, cacheService, mapper)
+            IContextBase<CatCommodity> commodityRepo,
+            IContextBase<OpsTransaction> opsTransaction,
+            IContextBase<OpsStageAssigned> opsStageAssigned
+            ) : base(repository, cacheService, mapper)
         {
             ecusCconnectionService = ecusCconnection;
             catPartnerApi = catPartner;
@@ -58,6 +63,8 @@ namespace eFMS.API.Operation.DL.Services
             currentUser = user;
             stringLocalizer = localizer;
             commodityRepository = commodityRepo;
+            opsTransactionRepo = opsTransaction;
+            opsStageAssignedRepo = opsStageAssigned;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -942,6 +949,27 @@ namespace eFMS.API.Operation.DL.Services
             {
                 return new HandleState(ex.Message);
             }
+        }
+
+        public List<CustomsDeclarationModel> GetCustomsShipmentNotLocked()
+        {
+            //Get list custom có shipment operation chưa bị lock & list shipment đã được assign cho current user
+            var userCurrent = currentUser.UserID;
+            var customs = DataContext.Get();
+            var shipmentsOperation = from ops in opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false)
+                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId into osa2
+                                     from osa in osa2.DefaultIfEmpty()
+                                     where osa.MainPersonInCharge == userCurrent
+                                     select ops;
+            
+            //Join theo số HBL
+            var query = from cus in customs
+                        join ope in shipmentsOperation on cus.Hblid equals ope.Hwbno into ope2
+                        from ope in ope2
+                        select cus;
+
+            var data = mapper.Map<List<CustomsDeclarationModel>>(query);
+            return data;
         }
     }
 }

@@ -71,7 +71,7 @@ namespace eFMS.API.Documentation.DL.Services
                 HBLID = s.Key.HBLID
             });
             //End change request
-            var transactions = csRepository.Get(x => x.IsLocked == false);
+            var transactions = csRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
             var shipmentsDocumention = transactions.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
             {
                 Id = x.x.Id,

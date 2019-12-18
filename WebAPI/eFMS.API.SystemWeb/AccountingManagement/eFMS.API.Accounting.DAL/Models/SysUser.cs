@@ -5,6 +5,11 @@ namespace eFMS.API.Accounting.Service.Models
 {
     public partial class SysUser
     {
+        public SysUser()
+        {
+            SysUserGroup = new HashSet<SysUserGroup>();
+        }
+
         public string Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
@@ -22,5 +27,7 @@ namespace eFMS.API.Accounting.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string WorkingStatus { get; set; }
+
+        public virtual ICollection<SysUserGroup> SysUserGroup { get; set; }
     }
 }

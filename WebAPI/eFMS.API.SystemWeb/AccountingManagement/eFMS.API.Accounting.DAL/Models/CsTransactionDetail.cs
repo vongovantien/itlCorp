@@ -37,7 +37,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string FreightPayment { get; set; }
         public string PlaceFreightPay { get; set; }
         public DateTime? ClosingDate { get; set; }
-        public DateTime SailingDate { get; set; }
+        public DateTime? SailingDate { get; set; }
         public string ForwardingAgentDescription { get; set; }
         public string ForwardingAgentId { get; set; }
         public string GoodsDeliveryDescription { get; set; }
@@ -57,12 +57,15 @@ namespace eFMS.API.Accounting.Service.Models
         public string ShippingMark { get; set; }
         public string Remark { get; set; }
         public string Commodity { get; set; }
+        public string ContSealNo { get; set; }
         public string PackageContainer { get; set; }
         public string DesOfGoods { get; set; }
         public decimal? NetWeight { get; set; }
         public decimal? GrossWeight { get; set; }
         public decimal? ChargeWeight { get; set; }
         public decimal? Cbm { get; set; }
+        public int? PackageQty { get; set; }
+        public short? PackageType { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string InWord { get; set; }
@@ -82,5 +85,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string DosentTo1 { get; set; }
         public string DosentTo2 { get; set; }
         public string Dofooter { get; set; }
+
+        public virtual CsTransaction Job { get; set; }
     }
 }

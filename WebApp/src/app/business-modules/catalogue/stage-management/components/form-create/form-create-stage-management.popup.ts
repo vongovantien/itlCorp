@@ -88,7 +88,6 @@ export class StageManagementAddPopupComponent extends PopupBase {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (data: any) => {
-                    console.log(data)
                     this.listDepartment = data.map(x => ({ "text": x.code, "id": x.id }));
                 },
             );
