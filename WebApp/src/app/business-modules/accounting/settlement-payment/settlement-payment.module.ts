@@ -25,6 +25,7 @@ import { ApporveSettlementPaymentComponent } from '../approve-payment/settlement
 import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
 import { SettlementFormCopyPopupComponent } from './components/popup/copy-settlement/copy-settlement.popup';
 
+
 const routing: Routes = [
     {
         path: '', component: SettlementPaymentComponent, pathMatch: 'full', data: {
