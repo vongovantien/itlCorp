@@ -1765,28 +1765,52 @@ namespace eFMS.API.Accounting.DL.Services
             var docShipment = csTransactionRepo.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
             var surcharge = csShipmentSurchargeRepo.Get();
 
-            //Sort tăng dần theo ngày RequestDate của Advance
-            var requestOrder = from req in request
-                               join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
-                               from adv in adv2
-                               orderby adv.RequestDate
-                               select req;
+            var requestOrder = request.GroupBy(g => new { g.AdvanceNo, g.Hbl }).Select(s => new AcctAdvanceRequest
+            {
+                Amount = s.Sum(a => a.Amount),
+                AdvanceNo = s.First().AdvanceNo,
+                RequestCurrency = s.First().RequestCurrency,
+                JobId = s.First().JobId,
+                Hbl = s.First().Hbl
+            });
+
             //So sánh bằng
             var queryOps = from req in requestOrder
                            join ops in opsShipment on req.JobId equals ops.JobNo into ops2
                            from ops in ops2
-                           select req;
+                           join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
+                           from adv in adv2
+                           select new AcctAdvanceRequestModel
+                           {
+                               Id = req.Id,
+                               JobId = req.JobId,
+                               Hbl = req.Hbl,
+                               RequestDate = adv.RequestDate,
+                               Amount = req.Amount,
+                               AdvanceNo = req.AdvanceNo,
+                               RequestCurrency = req.RequestCurrency
+                           };
+
             //So sánh bằng
             var queryDoc = from req in requestOrder
                            join doc in docShipment on req.JobId equals doc.JobNo into doc2
                            from doc in doc2
-                           select req;
+                           join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
+                           from adv in adv2
+                           select new AcctAdvanceRequestModel {
+                               Id = req.Id,
+                               JobId = req.JobId,
+                               Hbl = req.Hbl,
+                               RequestDate = adv.RequestDate,
+                               Amount = req.Amount,
+                               AdvanceNo = req.AdvanceNo,
+                               RequestCurrency = req.RequestCurrency
+                           };
             var mergeAdvRequest = queryOps.Union(queryDoc);
 
+            //Get advance chưa làm settlement
             var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo));
-
-            var result = mapper.Map<List<AcctAdvanceRequestModel>>(data);
-            return result;
+            return data.ToList();
         }
     }
 }
