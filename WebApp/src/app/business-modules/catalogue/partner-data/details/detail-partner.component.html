@@ -91,7 +91,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <span>{{sale.service}}</span>
+                                        <span>{{sale.serviceName}}</span>
                                     </td>
                                     <td>
                                         <span>{{sale.office}}</span>
@@ -118,30 +118,45 @@
             </div>
         </div>
         <!--begin:: form-actions-->
-        <div class="form-actions m--align-right">
-            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
-                <span>
-                    <i class="la la la-save"></i>
-                    <span>
-                        save
-                    </span>
-                </span>
-            </button>
-            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-                routerLink="/home/catalogue/partner-data">
-                <span>
-                    <i class="la la-ban"></i>
-                    <span>
-                        cancel
-                    </span>
-                </span>
-            </button>
+        <div class="form-actions">
+            <div class="row">
+                <div class="col-6">
+                    <button type="button" class="btn btn-danger m-btn--square  m-btn--icon  m-btn--uppercase">
+                        <span>
+                            <i class="la la-trash"></i>
+                            <span>
+                                Delete
+                            </span>
+                        </span>
+                    </button>
+                </div>
+                <div class="col-6 m--align-right">
+                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                Edit
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        routerLink="/home/catalogue/partner-data">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
         </div>
         <!--end:: form-actions-->
     </div>
     <!--end::m-content of Partner-data-addnew-->
 </form>
-<app-saleman-popup [popupData]="saleMantoView" (onCreate)="closepp($event)"
+<app-saleman-popup [popupData]="saleMantoView" (onCreate)="closePopupSaleman($event)"
     (onDelete)="closeppAndDeleteSaleman($event)">
 </app-saleman-popup>
 <confirm-popup (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>

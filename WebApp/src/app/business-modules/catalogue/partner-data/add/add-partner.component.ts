@@ -405,22 +405,13 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.zipCode = formBody.billingZipcode;
         this.partner.zipCodeShipping = formBody.zipCodeShipping;
         this.partner.swiftCode = formBody.partnerSwiftCode;
-        // userCreated: string = '';
-        // datetimeCreated: string = '';
-        // userModified: string = '';
-        // datetimeModified: string = '';
         this.partner.active = formBody.active;
-        // inactiveOn?: string = '';
         this.partner.workPlaceId = formBody.partnerWorkPlace[0].id;
-        // userCreatedName: string = '';
         this.partner.internalReferenceNo = formBody.internalReferenceNo;
     }
 
     onCreatePartner() {
         this.baseService.spinnerShow();
-        this.saleMandetail.forEach(element => {
-            element.status = element.status.value;
-        });
         this._catalogueRepo.createPartner(this.partner)
             .pipe(catchError(this.catchError))
             .subscribe(

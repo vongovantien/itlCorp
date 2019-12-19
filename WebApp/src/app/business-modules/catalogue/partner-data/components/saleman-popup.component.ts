@@ -81,7 +81,7 @@ export class SalemanPopupComponent extends PopupBase {
         this.form.setValue({
             office: sm.office,
             effectiveDate: !!sm.effectDate ? { startDate: new Date(sm.effectDate), endDate: new Date(sm.effectDate) } : null,
-            service: this.services.filter(i => i.text === sm.service)[0],
+            service: this.services.filter(i => i.id === sm.service)[0],
             status: this.statuss.filter(i => i.title === sm.status)[0],
             saleman: sm.saleman_ID,
             description: sm.description
@@ -178,7 +178,7 @@ export class SalemanPopupComponent extends PopupBase {
                 company: this.office.value,
                 office: this.office.value,
                 effectDate: !!this.effectiveDate.value && this.effectiveDate.value.startDate != null ? formatDate(this.effectiveDate.value.startDate !== undefined ? this.effectiveDate.value.startDate : this.effectiveDate.value, 'yyyy-MM-dd', 'en') : null,
-                status: this.status.value,
+                status: this.status.value.value,
                 partnerId: null,
                 saleman_ID: this.saleman.value,
                 service: this.service.value.id,
