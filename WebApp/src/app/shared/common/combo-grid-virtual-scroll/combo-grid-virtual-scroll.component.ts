@@ -16,7 +16,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Input() disabled: boolean;
     @Input() height: number = 100;
     @Input() isTooltip: boolean = false;
-
+    @Input() placeholder: string = '';
     @Output() itemSelected = new EventEmitter<any>();
 
     currentItemSelected: any = null;
@@ -86,7 +86,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     setDisplayFields(data: { field: string, label: string }[]) {
-        if (data.length > 0) {
+        if (!!data && data.length > 0) {
             this.DisplayFields = data;
         }
     }
@@ -136,11 +136,15 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     setCurrentActiveItem(item: any) {
         this.displaySelectedStr = '';
         if (this.SelectedDisplayFields.length === 1) {
-            this.displaySelectedStr += this.getValue(item, this.SelectedDisplayFields[0]);
+            this.displaySelectedStr += item[this.SelectedDisplayFields[0]];
         } else {
-            for (const field of this.SelectedDisplayFields) {
-                this.displaySelectedStr += this.getValue(item, field) + " - ";
-            }
+            this.SelectedDisplayFields.forEach((data: string, index: number) => {
+                if (index === this.selectedDisplayFields.length - 1) {
+                    this.displaySelectedStr += item[data];
+                } else {
+                    this.displaySelectedStr += item[data] + ' - ';
+                }
+            });
         }
     }
 
