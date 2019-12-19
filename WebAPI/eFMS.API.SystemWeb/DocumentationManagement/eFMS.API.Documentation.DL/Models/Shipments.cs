@@ -12,5 +12,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string MBL { get; set; }
         public string CustomerId { get; set; }
         public Guid HBLID { get; set; }
+        public string Service { get; set; }
     }
 }

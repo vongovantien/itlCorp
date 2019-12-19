@@ -68,7 +68,8 @@ namespace eFMS.API.Documentation.DL.Services
                 HBL = s.Key.HBL,
                 MBL = s.Key.MBL,
                 CustomerId = s.Key.CustomerId,
-                HBLID = s.Key.HBLID
+                HBLID = s.Key.HBLID,
+                Service = "CL"
             });
             //End change request
             var transactions = csRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
@@ -79,7 +80,8 @@ namespace eFMS.API.Documentation.DL.Services
                 HBL = x.y.Hwbno,
                 MBL = x.y.Mawb,
                 CustomerId = x.y.CustomerId,
-                HBLID = x.y.Id
+                HBLID = x.y.Id,
+                Service = x.x.TransactionType
             });
             var shipments = shipmentsOperation.Union(shipmentsDocumention);
             return shipments;
