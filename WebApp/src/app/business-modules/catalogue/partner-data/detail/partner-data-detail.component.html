@@ -656,7 +656,7 @@
                                         </td>
                                         <td>
                                             <span><a style="cursor:pointer;"
-                                                    (click)="showDetailSaleMan(sale)">{{sale.saleman_ID}}</a>
+                                                    (click)="showDetailSaleMan(sale)">{{sale.salemanName}}</a>
                                             </span>
                                         </td>
                                         <td>
@@ -815,7 +815,7 @@
                                     [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && strSalemanCurrent.trim().length==0 }">
                                     <label>Sale Man <span class="m--font-danger">(*)</span></label>
                                     <app-combo-grid-virtual-scroll [selectedDisplayFields]="['username']"
-                                        (itemSelected)="strSalemanCurrent=$event.username" [dataSources]="users"
+                                        (itemSelected)="strSalemanCurrent=$event.id" [dataSources]="users"
                                         [displayFields]="[{'field':'username','label':'Username'},{'field':'employeeNameEn','label':'Name EN'}]">
                                     </app-combo-grid-virtual-scroll>
                                     <div class="form-control-feedback"
@@ -1025,7 +1025,6 @@
     </div>
 </div>
 <!--end::saleman-modal-->
-
 
 <confirm-popup (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 <app-saleman-popup [popupData]="saleMantoView">

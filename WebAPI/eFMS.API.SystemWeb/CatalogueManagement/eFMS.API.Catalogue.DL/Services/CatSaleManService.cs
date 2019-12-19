@@ -47,6 +47,7 @@ namespace eFMS.API.Catalogue.DL.Services
         #region CRUD
         public override HandleState Add(CatSaleManModel entity)
         {
+            entity.Id = Guid.NewGuid();
             var saleMan = mapper.Map<CatSaleman>(entity);
             saleMan.CreateDate = DateTime.Now;
             saleMan.UserCreated = currentUser.UserID;

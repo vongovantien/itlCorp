@@ -96,6 +96,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.Charge.DatetimeModified = DateTime.Now;
                     var hs = DataContext.Update(model.Charge, x => x.Id == model.Charge.Id, false);
                     if (hs.Success == false) return hs;
+
                     foreach (var item in model.ListChargeDefaultAccount)
                     {
                         if (item.Id == 0)
@@ -107,9 +108,11 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         else
                         {
+                            chargeDefaultRepository.Delete(x => x.ChargeId == item.ChargeId);
                             item.UserModified = currentUser.UserID;
                             item.DatetimeModified = DateTime.Now;
-                            chargeDefaultRepository.Update(item, x => x.Id == item.Id, false);
+                            item.Id = 0;
+                            chargeDefaultRepository.Add(item,false);
                         }
                     }
                     chargeDefaultRepository.SubmitChanges();

@@ -29,9 +29,11 @@
                     </span>
                 </span>
             </button> -->
-            <app-default-button [buttonSetting]="addButtonSetting" href="javascript:void(0)"  (click)=addPartner()></app-default-button>
+            <app-default-button [buttonSetting]="addButtonSetting" href="javascript:void(0)" (click)=addPartner()>
+            </app-default-button>
             <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
-            <app-default-button [buttonSetting]="importButtonSetting" [routerLink]="['/home/catalogue/partner-data/import']"></app-default-button>
+            <app-default-button [buttonSetting]="importButtonSetting"
+                [routerLink]="['/home/catalogue/partner-data/import']"></app-default-button>
         </div>
     </div>
 </div>
@@ -97,7 +99,8 @@
                         </button>
                     </div>
                 </div> -->
-                <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" (reset_search)=resetSearch($event)></app-search-options>
+                <app-search-options [configSearch]="configSearch" (search)="onSearch($event)"
+                    (reset_search)=resetSearch($event)></app-search-options>
             </div>
             <!--end::Form-->
         </div>
@@ -108,27 +111,32 @@
         <div class="col-12">
             <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#all-tabview-data" role="tab" (click)="tabSelect(tabName.allTab)">
+                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#all-tabview-data" role="tab"
+                        (click)="tabSelect(tabName.allTab)">
                         All
                     </a>
                 </li>
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#customer-tabview-tab" role="tab" (click)="tabSelect(tabName.customerTab)">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#customer-tabview-tab" role="tab"
+                        (click)="tabSelect(tabName.customerTab)">
                         Customer
                     </a>
                 </li>
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#agent-tabview-tab" role="tab" (click)="tabSelect(tabName.agentTab)">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#agent-tabview-tab" role="tab"
+                        (click)="tabSelect(tabName.agentTab)">
                         Agent
                     </a>
                 </li>
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#carrier-tabview-data" role="tab" (click)="tabSelect(tabName.carrierTab)">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#carrier-tabview-data" role="tab"
+                        (click)="tabSelect(tabName.carrierTab)">
                         Carrier
                     </a>
                 </li>
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#consignee-tabview-data" role="tab" (click)="tabSelect(tabName.consigneeTab)">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#consignee-tabview-data" role="tab"
+                        (click)="tabSelect(tabName.consigneeTab)">
                         Consignee
                     </a>
                 </li>
@@ -138,7 +146,8 @@
                     </a>
                 </li> -->
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#shipper-tabview-data" role="tab" (click)="tabSelect(tabName.shipperTab)">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#shipper-tabview-data" role="tab"
+                        (click)="tabSelect(tabName.shipperTab)">
                         Shipper
                     </a>
                 </li>
@@ -151,31 +160,37 @@
             <div class="tab-content" id="partnerDataTabContent">
 
                 <div class="tab-pane fade show active" id="all-tabview-data" role="tabpanel" aria-labelledby="">
-                    <app-all-partner (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-all-partner>
+                    <app-all-partner (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)">
+                    </app-all-partner>
                 </div>
                 <div class="tab-pane fade" role="tabpanel" id="customer-tabview-tab">
-                    <app-customer (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-customer>
+                    <app-customer (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)">
+                    </app-customer>
                 </div>
                 <div class="tab-pane fade" id="agent-tabview-tab" role="tabpanel" aria-labelledby="">
-                <app-agent (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-agent>
+                    <app-agent (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-agent>
                 </div>
 
                 <div class="tab-pane fade" id="carrier-tabview-data" role="tabpanel" aria-labelledby="">
-                    <app-carrier (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-carrier>
+                    <app-carrier (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)">
+                    </app-carrier>
                 </div>
 
                 <div class="tab-pane fade" id="consignee-tabview-data" role="tabpanel" aria-labelledby="">
-                <app-consignee (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-consignee>
+                    <app-consignee (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)">
+                    </app-consignee>
                 </div>
 
                 <div class="tab-pane fade" id="air-ship-sup-tabview-data" role="tabpanel" aria-labelledby="">
-                    <app-air-ship-sup (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-air-ship-sup>
+                    <app-air-ship-sup (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)">
+                    </app-air-ship-sup>
                 </div>
 
                 <div class="tab-pane fade" id="shipper-tabview-data" role="tabpanel" aria-labelledby="">
-                    <app-shipper (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"></app-shipper>
+                    <app-shipper (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)">
+                    </app-shipper>
                 </div>
-                
+
                 <!--begin::pagination-->
                 <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
                     (pagerObject)="setPage($event)"></app-pagination>
@@ -188,5 +203,6 @@
 <!--end::m-content of Partner-data-->
 
 <!--begin::confirm-delete-modal-->
-<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'Do you want to delete this partner?'"></app-delete-confirm-modal>
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'Do you want to delete this partner?'">
+</app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->

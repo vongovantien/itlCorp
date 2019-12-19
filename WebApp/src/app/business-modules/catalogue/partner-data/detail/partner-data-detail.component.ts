@@ -535,8 +535,11 @@ export class PartnerDataDetailComponent extends AppList {
                 (res: any) => {
                     this.saleMandetail = (res.data || []).map((item: Saleman) => new Saleman(item));
                     console.log(this.saleMandetail);
+
                     if (this.saleMandetail.length > 0) {
                         for (const it of this.saleMandetail) {
+                            const salemanName = this.users.find(x => x.id === it.saleman_ID);
+                            it.salemanName = salemanName.username;
                             if (it.status === true) {
                                 it.statusString = "Active";
                             } else {
@@ -587,7 +590,7 @@ export class PartnerDataDetailComponent extends AppList {
         }
     }
 
-    showDetailSaleMan(saleman: Saleman) {
+    showDetailSaleMan(saleman: any) {
         this.currrently_user = localStorage.getItem('currently_userName');
         $('#saleman-detail-modal').modal('show');
         this.saleMantoView.description = saleman.description;
@@ -595,7 +598,7 @@ export class PartnerDataDetailComponent extends AppList {
         this.saleMantoView.statusString = saleman.status === true ? 'Active' : 'Inactive';
         this.saleMantoView.office = saleman.office;
         this.saleMantoView.service = saleman.service;
-        this.saleMantoView.saleman_ID = saleman.saleman_ID;
+        this.saleMantoView.saleman_ID = saleman.salemanName;
         this.saleMantoView.id = saleman.id;
         this.saleMantoView.createDate = saleman.createDate;
         this.saleMantoView.userCreated = saleman.userCreated;

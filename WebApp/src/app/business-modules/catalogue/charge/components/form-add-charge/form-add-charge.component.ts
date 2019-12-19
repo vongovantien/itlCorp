@@ -157,10 +157,5 @@ export class FormAddChargeComponent extends AppForm {
         this.unit.setValue([<CommonInterface.INg2Select>{ id: res.charge.unitId, text: itemUnit.text }]);
         const itemCurrency = this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId);
         this.currency.setValue([<CommonInterface.INg2Select>{ id: res.charge.currencyId, text: itemCurrency.text }]);
-
-
-
-
     }
-
 }
