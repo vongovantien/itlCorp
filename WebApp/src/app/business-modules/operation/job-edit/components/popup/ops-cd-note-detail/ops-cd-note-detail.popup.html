@@ -2,9 +2,9 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content" *ngIf="!!CdNoteDetail">
             <div class="modal-header">
-                <h5 class="modal-title">Detail<span
-                    class="m--margin-left-5">{{CdNoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note': CdNoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span>
-                No: {{CdNoteDetail.cdNote.code}}</h5>
+                <h5 class="modal-title">Detail
+                    <b><span class="text-warning">{{CdNoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note': CdNoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
+                No: <b class="text-warning">{{CdNoteDetail.cdNote.code}}</b></h5>
                 <button type="button" class="close" (click)="closePopup()">
                     <span aria-hidden="true">&times;</span>
                 </button>
