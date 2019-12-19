@@ -35,6 +35,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysGroup> sysGroupRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
+        readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -51,7 +52,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysGroup> sysGroup,
             IContextBase<SysOffice> sysOffice,
-            IContextBase<OpsStageAssigned> opsStageAssigned) : base(repository, mapper)
+            IContextBase<OpsStageAssigned> opsStageAssigned,
+            IContextBase<CsShipmentSurcharge> csShipmentSurcharge) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = url;
@@ -67,6 +69,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysGroupRepo = sysGroup;
             sysOfficeRepo = sysOffice;
             opsStageAssignedRepo = opsStageAssigned;
+            csShipmentSurchargeRepo = csShipmentSurcharge;
         }
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
@@ -1755,5 +1758,59 @@ namespace eFMS.API.Accounting.DL.Services
 
         #endregion APPROVAL ADVANCE PAYMENT
 
+        public List<AcctAdvanceRequestModel> GetAdvancesOfShipment()
+        {
+            var request = acctAdvanceRequestRepo.Get();
+            var opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var docShipment = csTransactionRepo.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var surcharge = csShipmentSurchargeRepo.Get();
+
+            var requestOrder = request.GroupBy(g => new { g.AdvanceNo, g.Hbl }).Select(s => new AcctAdvanceRequest
+            {
+                Amount = s.Sum(a => a.Amount),
+                AdvanceNo = s.First().AdvanceNo,
+                RequestCurrency = s.First().RequestCurrency,
+                JobId = s.First().JobId,
+                Hbl = s.First().Hbl
+            });
+
+            //So sánh bằng
+            var queryOps = from req in requestOrder
+                           join ops in opsShipment on req.JobId equals ops.JobNo into ops2
+                           from ops in ops2
+                           join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
+                           from adv in adv2
+                           select new AcctAdvanceRequestModel
+                           {
+                               Id = req.Id,
+                               JobId = req.JobId,
+                               Hbl = req.Hbl,
+                               RequestDate = adv.RequestDate,
+                               Amount = req.Amount,
+                               AdvanceNo = req.AdvanceNo,
+                               RequestCurrency = req.RequestCurrency
+                           };
+
+            //So sánh bằng
+            var queryDoc = from req in requestOrder
+                           join doc in docShipment on req.JobId equals doc.JobNo into doc2
+                           from doc in doc2
+                           join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
+                           from adv in adv2
+                           select new AcctAdvanceRequestModel {
+                               Id = req.Id,
+                               JobId = req.JobId,
+                               Hbl = req.Hbl,
+                               RequestDate = adv.RequestDate,
+                               Amount = req.Amount,
+                               AdvanceNo = req.AdvanceNo,
+                               RequestCurrency = req.RequestCurrency
+                           };
+            var mergeAdvRequest = queryOps.Union(queryDoc);
+
+            //Get advance chưa làm settlement
+            var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo));
+            return data.ToList();
+        }
     }
 }

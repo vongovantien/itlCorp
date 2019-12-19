@@ -162,7 +162,7 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     onSelectSaleMan(saleMan: any) {
-        this.saleman.setValue(saleMan.username);
+        this.saleman.setValue(saleMan.id);
         this.selectedDataSaleMan = saleMan;
     }
 

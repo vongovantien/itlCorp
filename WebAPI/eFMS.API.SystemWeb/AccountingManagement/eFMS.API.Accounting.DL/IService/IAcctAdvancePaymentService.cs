@@ -47,6 +47,6 @@ namespace eFMS.API.Accounting.DL.IService
 
         AcctApproveAdvanceModel GetInfoApproveAdvanceByAdvanceNo(string advanceNo);
 
-
+        List<AcctAdvanceRequestModel> GetAdvancesOfShipment();
     }
 }

@@ -5,6 +5,11 @@ namespace eFMS.API.Accounting.Service.Models
 {
     public partial class SysGroup
     {
+        public SysGroup()
+        {
+            SysUserGroup = new HashSet<SysUserGroup>();
+        }
+
         public short Id { get; set; }
         public string Code { get; set; }
         public string NameEn { get; set; }
@@ -19,5 +24,8 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
+
+        public virtual CatDepartment Department { get; set; }
+        public virtual ICollection<SysUserGroup> SysUserGroup { get; set; }
     }
 }

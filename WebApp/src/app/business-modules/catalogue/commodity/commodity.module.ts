@@ -9,7 +9,7 @@ import { SelectModule } from 'ng2-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { CommodityAddPopupComponent } from './components/form-create-commodity/form-create-commodity.popup';
-import { ModalModule, PaginationModule } from 'ngx-bootstrap';
+import { ModalModule, PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { CommodityGroupAddPopupComponent } from './components/form-create-commodity-group/form-create-commodity-group.popup';
 import { CommodityGroupListComponent } from './components/list-commodity-group/list-commodity-group.component';
 
@@ -29,6 +29,7 @@ const routing: Routes = [
         ReactiveFormsModule,
         ModalModule.forRoot(),
         PaginationModule.forRoot(),
+        TabsModule.forRoot(),
     ],
     exports: [],
     declarations: [

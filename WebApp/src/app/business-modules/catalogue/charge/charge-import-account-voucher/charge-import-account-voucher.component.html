@@ -45,7 +45,8 @@
                     </div>
                 </div>
                 <div class="form-actions m--margin-top-5 m--align-right">
-                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
+                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="hideInvalid()">
                         <span>
                             <span *ngIf="isShowInvalid">
                                 Show invalid rows
@@ -55,7 +56,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="import()">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -63,7 +65,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/charge">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        routerLink="/home/catalogue/charge">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -89,28 +92,34 @@
                             <th>
                                 <span>No.</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeCode'), 'sorting_desc': (!isDesc && sortKey == 'chargeCode') }"
-                            (click)="sort('chargeCode')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeCode'), 'sorting_desc': (!isDesc && sortKey == 'chargeCode') }"
+                                (click)="sort('chargeCode')">
                                 <span>Charge Code</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
-                            (click)="sort('type')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
+                                (click)="sort('type')">
                                 <span>Voucher Type</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'debitAccountNo'), 'sorting_desc': (!isDesc && sortKey == 'debitAccountNo') }"
-                            (click)="sort('debitAccountNo')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'debitAccountNo'), 'sorting_desc': (!isDesc && sortKey == 'debitAccountNo') }"
+                                (click)="sort('debitAccountNo')">
                                 <span>Account Debit No</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'creditAccountNo'), 'sorting_desc': (!isDesc && sortKey == 'creditAccountNo') }"
-                            (click)="sort('creditAccountNo')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'creditAccountNo'), 'sorting_desc': (!isDesc && sortKey == 'creditAccountNo') }"
+                                (click)="sort('creditAccountNo')">
                                 <span>Account Credit No</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'debitVat'), 'sorting_desc': (!isDesc && sortKey == 'debitVat') }"
-                            (click)="sort('debitVat')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'debitVat'), 'sorting_desc': (!isDesc && sortKey == 'debitVat') }"
+                                (click)="sort('debitVat')">
                                 <span>Account Debit No (VAT)</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'creditVat'), 'sorting_desc': (!isDesc && sortKey == 'creditVat') }"
-                            (click)="sort('creditVat')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'creditVat'), 'sorting_desc': (!isDesc && sortKey == 'creditVat') }"
+                                (click)="sort('creditVat')">
                                 <span>Account Credit No (VAT)</span>
                             </th>
                             <th class="sorting">
@@ -120,60 +129,66 @@
                     </thead>
                     <tbody *ngIf="data">
                         <ng-container *ngFor="let item of pagedItems; let i = index">
-                        <tr [ngClass]="{ 'invalid-row': !item.isValid }">
-                            <td class="">
+                            <tr [ngClass]="{ 'invalid-row': !item.isValid }">
+                                <td class="">
                                     <span>{{ (i + this.pager.startIndex + 1) }}</span>
-                            </td>
-                            <td class="">
+                                </td>
+                                <td class="">
                                     <span *ngIf="item.chargeCode.split('|').length == 1">{{ item.chargeCode }}</span>
                                     <span class="m--font-danger" *ngIf="item.chargeCode.split('|').length > 1">{{
                                         item.chargeCode.split('|')[0] }}</span>
-                            </td>
-                            <td class="">
+                                </td>
+                                <td class="">
                                     <span *ngIf="item.type.split('|').length == 1">{{ item.type }}</span>
                                     <span class="m--font-danger" *ngIf="item.type.split('|').length > 1">{{
                                         item.type.split('|')[0] }}</span>
-                            </td>
-                            <td class="">
-                                    <span *ngIf="item.debitAccountNo.split('|').length == 1">{{ item.debitAccountNo }}</span>
+                                </td>
+                                <td class="">
+                                    <span
+                                        *ngIf="item.debitAccountNo.split('|').length == 1">{{ item.debitAccountNo }}</span>
                                     <span class="m--font-danger" *ngIf="item.debitAccountNo.split('|').length > 1">{{
                                         item.debitAccountNo.split('|')[0] }}</span>
-                            </td>
-                            <td class="">
-                                    <span *ngIf="item.creditAccountNo.split('|').length == 1">{{ item.creditAccountNo }}</span>
+                                </td>
+                                <td class="">
+                                    <span
+                                        *ngIf="item.creditAccountNo.split('|').length == 1">{{ item.creditAccountNo }}</span>
                                     <span class="m--font-danger" *ngIf="item.creditAccountNo.split('|').length > 1">{{
                                         item.creditAccountNo.split('|')[0] }}</span>
-                            </td>
-                            <td class="">
+                                </td>
+                                <td class="">
                                     <span *ngIf="item.debitVat != -1">{{ item.debitVat }}</span>
-                                    <span class="m--font-danger" *ngIf="item.debitVat== -1">Debit account VAT is not allow to null and
+                                    <span class="m--font-danger" *ngIf="item.debitVat== -1">Debit account VAT is not
+                                        allow to null and
                                         must be number </span>
-                            </td>
-                            <td class="">
+                                </td>
+                                <td class="">
                                     <span *ngIf="item.creditVat != -1">{{ item.creditVat }}</span>
-                                    <span class="m--font-danger" *ngIf="item.creditVat== -1">Credit account VAT is not allow to null and
+                                    <span class="m--font-danger" *ngIf="item.creditVat== -1">Credit account VAT is not
+                                        allow to null and
                                         must be number </span>
-                            </td>
-                            <td class="">
+                                </td>
+                                <td class="">
                                     <span>{{ item.status }}</span>
-                            </td>
-                        </tr>
-                    </ng-container>
+                                </td>
+                            </tr>
+                        </ng-container>
                     </tbody>
                 </table>
             </div>
             <!--end: Datatable -->
 
-        <!--begin::pagination-->
-        <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
-        <!--end::pagination-->
+            <!--begin::pagination-->
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)">
+            </app-pagination>
+            <!--end::pagination-->
         </div>
     </div>
     <!--end:: m-portlet-->
 </div>
 <!--end::m-content-->
 <!--begin::modal-->
-<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -201,3 +216,5 @@
     </div>
 </div>
 <!--end::modal-->
+<info-popup [body]="'There are invalid data. Please check Import!'" [title]="'Notification'" [label]="'Ok'">
+</info-popup>

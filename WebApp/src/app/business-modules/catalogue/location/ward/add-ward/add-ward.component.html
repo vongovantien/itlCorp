@@ -52,39 +52,54 @@
                             </div>
                         </div>
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !countryId.valid}">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !countryID.valid}">
                             <label class="col-lg-4 col-form-label form-control-label" required>
                                 Country
                             </label>
                             <div class="col-lg-8">
-
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !countryId.valid">
+                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event,'country')"
+                                    [currentActiveItemId]="{ field: 'id', value: countryID.value}"
+                                    [selectedDisplayFields]="['nameEn']" [dataSources]="countries"
+                                    [displayFields]="[{field: 'code', label: 'Code'}, {field: 'nameEn', label: 'Name' }]"
+                                    [height]="150">
+                                </app-combo-grid-virtual-scroll>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && !countryID.valid">
                                     Country is required
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !provinceId.valid }">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !provinceID.valid }">
                             <label class="col-lg-4 col-form-label form-control-label" required>
                                 Province - City
                             </label>
                             <div class="col-lg-8">
-
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !provinceId.valid">
+                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event,'province')"
+                                    [currentActiveItemId]="{ field: 'id', value: provinceID.value}"
+                                    [selectedDisplayFields]="['name_EN']" [dataSources]="provinces"
+                                    [displayFields]="[{field: 'code', label: 'Code'}, {field: 'name_EN', label: 'Name' }]"
+                                    [height]="150" [disabled]="!countryID.valid">
+                                </app-combo-grid-virtual-scroll>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && !provinceID.valid">
                                     Province is required
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !districtId.valid }">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !districtID.valid }">
                             <label class="col-lg-4 col-form-label form-control-label" required>
                                 District
                             </label>
                             <div class="col-lg-8">
-
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !districtId.valid">
+                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event,'district')"
+                                    [currentActiveItemId]="{ field: 'id', value: districtID.value}"
+                                    [selectedDisplayFields]="['nameEn']" [dataSources]="districts"
+                                    [displayFields]="[{field: 'code', label: 'Code'}, {field: 'nameEn', label: 'Name' }]"
+                                    [height]="150" [disabled]="!provinceID.valid">
+                                </app-combo-grid-virtual-scroll>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && !districtID.valid">
                                     District is required
                                 </div>
                             </div>

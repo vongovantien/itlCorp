@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Accounting.DL.Common;
+using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ReportResults;
@@ -41,6 +42,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
+        readonly IAcctAdvancePaymentService acctAdvancePaymentService;
 
         public AcctSettlementPaymentService(IContextBase<AcctSettlementPayment> repository,
             IMapper mapper,
@@ -63,7 +65,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatCharge> catCharge,
             IContextBase<CatUnit> catUnit,
             IContextBase<CatPartner> catPartner,
-            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> sysOffice,
+            IAcctAdvancePaymentService advance) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = url;
@@ -85,6 +88,7 @@ namespace eFMS.API.Accounting.DL.Services
             catUnitRepo = catUnit;
             catPartnerRepo = catPartner;
             sysOfficeRepo = sysOffice;
+            acctAdvancePaymentService = advance;
         }
 
         #region --- LIST SETTLEMENT PAYMENT ---
@@ -1506,6 +1510,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             foreach (var shipment in criteria.shipments)
             {
+                //Lấy ra advance cũ nhất chưa có settlement của shipment(JobId)
+                var advance = acctAdvancePaymentService.GetAdvancesOfShipment().Where(x => x.JobId == shipment.JobId).FirstOrDefault()?.AdvanceNo;
                 foreach (var charge in criteria.charges)
                 {
                     var chargeCopy = new ShipmentChargeSettlement();
@@ -1546,6 +1552,7 @@ namespace eFMS.API.Accounting.DL.Services
                     chargeCopy.IsFromShipment = charge.IsFromShipment;
                     chargeCopy.PaySoano = charge.PaySoano;
                     chargeCopy.TypeOfFee = charge.TypeOfFee;
+                    chargeCopy.AdvanceNo = advance;
 
                     chargesCopy.Add(chargeCopy);
                 }

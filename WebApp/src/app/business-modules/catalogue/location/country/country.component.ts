@@ -3,14 +3,17 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { AppList } from 'src/app/app.list';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { CatalogueRepo } from 'src/app/shared/repositories';
-import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
-import { SortService } from 'src/app/shared/services';
+
+import { SortService } from '@services';
+import { CatalogueRepo } from '@repositories';
+import { ConfirmPopupComponent } from '@common';
+import { CommonEnum } from '@enums';
+
 import { FormCountryPopupComponent } from './add-country/add-country.component';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 
 import { catchError, finalize } from 'rxjs/operators';
+
 
 
 @Component({
@@ -68,10 +71,13 @@ export class AppCountryComponent extends AppList implements OnInit {
     }
 
     getCountries() {
+        this.isLoading = true;
         this._progressRef.start();
         this._catalogueRepo.pagingCountry(this.page, this.pageSize, this.dataSearch)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
+            .pipe(catchError(this.catchError), finalize(() => {
+                this._progressRef.complete();
+                this.isLoading = false;
+            })).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
                     this.countries = res.data || [];
                     this.totalItems = res.totalItems;

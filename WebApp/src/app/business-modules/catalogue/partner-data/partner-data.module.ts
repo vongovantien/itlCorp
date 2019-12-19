@@ -20,7 +20,7 @@ import { SelectModule } from 'ng2-select';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SalemanPopupComponent } from './components/saleman-popup.component';
-import { ModalModule } from 'ngx-bootstrap';
+import { ModalModule, TabsModule } from 'ngx-bootstrap';
 import { FormAddPartnerComponent } from './components/form-add-partner/form-add-partner.component';
 import { AddPartnerDataComponent } from './add/add-partner.component';
 import { PartnerDetailComponent } from './details/detail-partner.component';
@@ -43,7 +43,8 @@ const routing: Routes = [
         SelectModule,
         NgxDaterangepickerMd,
         PaginationModule.forRoot(),
-        ModalModule.forRoot()
+        ModalModule.forRoot(),
+        TabsModule.forRoot()
     ],
     exports: [],
     declarations: [

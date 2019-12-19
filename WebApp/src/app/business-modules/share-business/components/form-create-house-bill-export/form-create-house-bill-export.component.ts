@@ -381,6 +381,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
+                console.log(data);
                 this.customer.setValue(data.id);
                 this.saleMans.forEach((item: User) => {
                     if (item.id === data.salePersonId) {

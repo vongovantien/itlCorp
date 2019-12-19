@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 
 import { ChargeComponent } from './charge.component';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -13,6 +13,8 @@ import { PaginationModule } from 'ngx-bootstrap';
 import { FormSearchChargeComponent } from './components/form-search-charge/form-search-charge.component';
 import { AddChargeComponent } from './add-charge/add-charge.component';
 import { DetailChargeComponent } from './detail-charge/detail-charge.component';
+import { FormAddChargeComponent } from './components/form-add-charge/form-add-charge.component';
+import { VoucherListComponent } from './components/voucher-list/voucher-list.component';
 
 const routing: Routes = [
     { path: '', component: ChargeComponent, data: { name: "Charge", level: 2 } },
@@ -30,7 +32,8 @@ const routing: Routes = [
         NgProgressModule,
         SharedModule,
         PaginationModule.forRoot(),
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        ReactiveFormsModule,
     ],
     exports: [],
     declarations: [
@@ -39,7 +42,9 @@ const routing: Routes = [
         ChargeImportAccountVoucherComponent,
         FormSearchChargeComponent,
         AddChargeComponent,
-        DetailChargeComponent
+        DetailChargeComponent,
+        FormAddChargeComponent,
+        VoucherListComponent
     ],
     providers: [],
 })

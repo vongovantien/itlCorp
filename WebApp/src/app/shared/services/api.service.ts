@@ -65,7 +65,7 @@ export class ApiService {
     }
 
     downloadfile(url: string, data?: any, params?: any, headers?: any) {
-        if (data !== null) {
+        if (data !== null && data !== undefined) {
             console.log(headers);
             return this._http.post(this.setUrl(url), data, {
                 params,
