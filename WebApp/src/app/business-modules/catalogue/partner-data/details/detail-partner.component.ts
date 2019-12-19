@@ -1,3 +1,4 @@
+
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
@@ -15,13 +16,15 @@ import { ToastrService } from 'ngx-toastr';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
+import { NgProgress } from '@ngx-progressbar/core';
+
 
 @Component({
-    selector: 'app-partner-data-add',
-    templateUrl: './add-partner.component.html',
-    styleUrls: ['./add-partner.component.scss']
+    selector: 'app-partner-detail',
+    templateUrl: './detail-partner.component.html',
+    styleUrls: ['./detail-partner.component.scss']
 })
-export class AddPartnerDataComponent extends AppList {
+export class PartnerDetailComponent extends AppList {
     @ViewChild(FormAddPartnerComponent, { static: false }) formPartnerComponent: FormAddPartnerComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmTaxcode: ConfirmPopupComponent;
@@ -61,25 +64,97 @@ export class AddPartnerDataComponent extends AppList {
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
         private toastr: ToastrService,
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        private _progressService: NgProgress,
+        private _toastService: ToastrService
     ) {
         super();
+        this._progressRef = this._progressService.ref();
     }
 
-    ngOnInit() {
 
+    ngOnInit() {
         this.getComboboxData();
         this.initHeaderSalemanTable();
-        this.route.params.subscribe(prams => {
-            if (prams.partnerType !== undefined) {
-                this.partnerType = Number(prams.partnerType);
-                if (this.partnerType === '3') {
-                    this.isShowSaleMan = true;
-                }
+        // this.route.params.subscribe(prams => {
+        //     if (prams.partnerType !== undefined) {
+        //         this.partnerType = Number(prams.partnerType);
+        //         if (this.partnerType === '3') {
+        //             this.isShowSaleMan = true;
+        //         }
+        //     }
+        // });
+        this.route.params.subscribe(async (prams: any) => {
+            if (!!prams.id) {
+                this.partner.id = prams.id;
+                this.dataSearchSaleman.partnerId = this.partner.id;
+                this.getParnerDetails();
+                this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
             }
         });
         this.partner.departmentId = "Head Office";
         this.getDataCombobox();
+    }
+    checkRequireSaleman(partnerGroup: string): boolean {
+        this.isShowSaleMan = false;
+        if (partnerGroup != null) {
+            if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    getParnerDetails() {
+        // this.partner = await this.baseService.getAsync(this.api_menu.Catalogue.PartnerData.getById + this.partner.id, false, true);
+        this._progressRef.start();
+        this._catalogueRepo.getDetailPartner(this.partner.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.partner = res;
+                        this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
+                        this.formPartnerComponent.setFormData(this.partner);
+                        console.log(this.partner);
+                        // this.getReferenceData();
+                    }
+                }
+            );
+
+    }
+    getSalemanPagingByPartnerId(dataSearchSaleman?: any) {
+        this.isLoading = true;
+        this._catalogueRepo.getListSaleManDetail(this.page, this.pageSize, Object.assign({}, dataSearchSaleman, { partnerId: this.partner.id }))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; })
+            ).subscribe(
+                (res: any) => {
+                    this.saleMandetail = (res.data || []).map((item: Saleman) => new Saleman(item));
+                    console.log(this.saleMandetail);
+                    if (this.saleMandetail.length > 0) {
+                        for (const it of this.saleMandetail) {
+                            if (it.status === true) {
+                                it.statusString = "Active";
+                            } else {
+                                it.statusString = "InActive";
+                            }
+                            this.services.forEach(item => {
+                                if (it.service === item.id) {
+                                    it.service = item.text;
+                                }
+                            });
+                        }
+                    }
+                    this.totalItems = res.totalItems || 0;
+                },
+            );
     }
 
     initHeaderSalemanTable() {
@@ -336,10 +411,6 @@ export class AddPartnerDataComponent extends AppList {
         this.formPartnerComponent.isSubmitted = true;
         this.partner.saleMans = this.saleMandetail;
         this.getFormPartnerData();
-        if (this.partner.taxCode !== '') {
-            this.checkTaxcode();
-
-        }
         if (this.partner.countryId == null || this.partner.provinceId == null
             || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
             return;
@@ -367,17 +438,19 @@ export class AddPartnerDataComponent extends AppList {
                 if (this.saleMandetail.length === 0) {
                     this.toastr.error('Please add saleman and service for customer!');
                 } else {
-                    this.onCreatePartner();
+                    this.updatePartner();
                 }
             } else {
-                this.onCreatePartner();
+                this.updatePartner();
             }
         }
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
         this.partner.id = formBody.internalReferenceNo + "." + formBody.taxCode;
-        this.partner.partnerGroup = formBody.partnerGroup[0].id;
+        if (formBody.partnerGroup != null) {
+            this.partner.partnerGroup = formBody.partnerGroup[0].id;
+        }
         this.partner.partnerNameVn = formBody.nameLocalFull;
         this.partner.partnerNameEn = formBody.nameENFull;
         this.partner.contactPerson = formBody.partnerContactPerson;
@@ -386,8 +459,12 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.addressShippingVn = formBody.shippingAddressVN;
         this.partner.addressShippingEn = formBody.shippingAddressEN;
         this.partner.shortName = formBody.shortName;
-        this.partner.countryId = formBody.billingCountry[0].id;
-        this.partner.countryShippingId = formBody.shippingCountry[0].id;
+        if (formBody.billingCountry.length > 0) {
+            this.partner.countryId = formBody.billingCountry[0].id;
+        }
+        if (formBody.shippingCountry.length > 0) {
+            this.partner.countryShippingId = formBody.shippingCountry[0].id;
+        }
         this.partner.accountNo = formBody.partnerAccountNo;
         this.partner.tel = formBody.partnerContactNumber;
         this.partner.fax = formBody.partnerContactFaxNo;
@@ -399,9 +476,15 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.bankAccountAddress = formBody.partnerBankAccountAddress;
         this.partner.note = formBody.note;
         this.partner.public = formBody.public;
-        this.partner.provinceId = formBody.billingProvince[0].id;
-        this.partner.provinceShippingId = formBody.shippingProvince[0].id;
-        this.partner.parentId = formBody.partnerAccountRef[0].id;
+        if (formBody.billingProvince.length > 0) {
+            this.partner.provinceId = formBody.billingProvince[0].id;
+        }
+        if (formBody.shippingProvince.length > 0) {
+            this.partner.provinceShippingId = formBody.shippingProvince[0].id;
+        }
+        if (formBody.partnerAccountRef.length > 0) {
+            this.partner.parentId = formBody.partnerAccountRef[0].id;
+        }
         this.partner.zipCode = formBody.billingZipcode;
         this.partner.zipCodeShipping = formBody.zipCodeShipping;
         this.partner.swiftCode = formBody.partnerSwiftCode;
@@ -411,32 +494,27 @@ export class AddPartnerDataComponent extends AppList {
         // datetimeModified: string = '';
         this.partner.active = formBody.active;
         // inactiveOn?: string = '';
-        this.partner.workPlaceId = formBody.partnerWorkPlace[0].id;
+        if (formBody.partnerWorkPlace.length > 0) {
+            this.partner.workPlaceId = formBody.partnerWorkPlace[0].id;
+        }
         // userCreatedName: string = '';
         this.partner.internalReferenceNo = formBody.internalReferenceNo;
     }
 
-    onCreatePartner() {
-        this.baseService.spinnerShow();
-        this.saleMandetail.forEach(element => {
-            element.status = element.status.value;
-        });
-        this._catalogueRepo.createPartner(this.partner)
-            .pipe(catchError(this.catchError))
+    updatePartner() {
+        this._progressRef.start();
+        this._catalogueRepo.updatePartner(this.partner.id, this.partner)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
-                (res: any) => {
+                (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this.baseService.spinnerHide();
-                        this.baseService.successToast(res.message);
+                        this._toastService.success(res.message);
                         this.router.navigate(["/home/catalogue/partner-data"]);
-
+                    } else {
+                        this._toastService.warning(res.message);
                     }
-
-                }, err => {
-                    this.baseService.spinnerHide();
-                    this.baseService.handleError(err);
-
-                });
+                }
+            );
     }
     sortBySaleMan(sortData: CommonInterface.ISortData): void {
         if (!!sortData.sortField) {

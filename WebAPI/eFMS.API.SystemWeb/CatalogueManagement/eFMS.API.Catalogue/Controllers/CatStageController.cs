@@ -36,7 +36,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatStageService catStageService;
         private readonly ICurrentUser currentUser;
-        private readonly IDistributedCache cache;
 
         /// <summary>
         /// constructor
@@ -44,12 +43,11 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="localizer">inject IStringLocalizer service</param>
         /// <param name="service">inject ICatStageService service</param>
         /// <param name="user">inject ICurrentUser service</param>
-        public CatStageController(IStringLocalizer<LanguageSub> localizer, ICatStageService service, ICurrentUser user, IDistributedCache distributedCache)
+        public CatStageController(IStringLocalizer<LanguageSub> localizer, ICatStageService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             catStageService = service;
             currentUser = user;
-            cache = distributedCache;
         }
 
         /// <summary>
@@ -125,7 +123,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(result);
             }
-            cache.Remove(Templates.CatStage.NameCaching.ListName);
             return Ok(result);           
         }
 
@@ -148,7 +145,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(result);
             }
-            cache.Remove(Templates.CatStage.NameCaching.ListName);
             return Ok(result);
         }
 
@@ -170,7 +166,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(result);
             }
-            cache.Remove(Templates.CatStage.NameCaching.ListName);
             return Ok(result);
         }
 

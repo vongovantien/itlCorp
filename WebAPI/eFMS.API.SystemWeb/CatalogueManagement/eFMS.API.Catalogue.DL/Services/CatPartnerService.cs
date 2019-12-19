@@ -88,15 +88,18 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 partner.Id = partner.TaxCode;
             }
-            var hs = DataContext.Add(partner, false);
+            var hs = DataContext.Add(partner, true);
             if (hs.Success)
             {
                 var salemans = mapper.Map<List<CatSaleman>>(entity.SaleMans);
                 salemans.ForEach(x => {
+                    x.Id = Guid.NewGuid();
                     x.PartnerId = partner.Id;
                     x.CreateDate = DateTime.Now;
                     x.UserCreated = currentUser.UserID;
                 });
+                partner.SalePersonId = salemans.FirstOrDefault().Id.ToString();
+                DataContext.Update(partner, x => x.Id == partner.Id);
                 salemanRepository.Add(salemans, false);
                 DataContext.SubmitChanges();
                 salemanRepository.SubmitChanges();

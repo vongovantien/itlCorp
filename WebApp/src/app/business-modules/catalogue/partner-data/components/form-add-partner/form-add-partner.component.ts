@@ -4,6 +4,7 @@ import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { SalemanPopupComponent } from '../saleman-popup.component';
+import { Partner } from 'src/app/shared/models';
 
 @Component({
     selector: 'form-add-partner',
@@ -201,9 +202,7 @@ export class FormAddPartnerComponent extends AppForm {
             billingProvince: [null, Validators.compose([
                 Validators.required
             ])],
-            billingZipcode: [null, Validators.compose([
-                Validators.required
-            ])],
+            billingZipcode: [null],
             billingAddressEN: [null, Validators.compose([
                 Validators.required
             ])],
@@ -256,6 +255,91 @@ export class FormAddPartnerComponent extends AppForm {
         this.partnerWorkPlace = this.partnerForm.controls['partnerWorkPlace'];
         this.active = this.partnerForm.controls['active'];
         this.public = this.partnerForm.controls['public'];
+    }
+
+    setFormData(partner: Partner) {
+        const isShowSaleMan = this.checkRequireSaleman(partner.partnerGroup);
+        this.requireSaleman.emit(isShowSaleMan);
+        // if (this.partner.partnerGroup || [].includes('CUSTOMER')) {
+        //     this.isRequiredSaleman = true;
+        //     this.isShowSaleMan = true;
+        // }
+        // console.log(this.isRequiredSaleman);
+        // console.log(this.partner.salePersonId);
+        const partnerGroupActives = this.getPartnerGroupActives(partner.partnerGroup.split(';'));
+        let index = -1;
+        let parentCustomerActive = [];
+        let workPlaceActive = [];
+        let billingCountryActive = [];
+        let shippingCountryActive = [];
+        let billingProvinceActive = [];
+        let shippingProvinceActive = [];
+        index = this.parentCustomers.findIndex(x => x.id === partner.parentId);
+        if (index > -1) { parentCustomerActive = [this.parentCustomers[index]]; }
+        index = this.workPlaces.findIndex(x => x.id === partner.workPlaceId);
+        if (index > -1) { workPlaceActive = [this.workPlaces[index]]; }
+        index = this.countries.findIndex(x => x.id === partner.countryId);
+        if (index > - 1) {
+            billingCountryActive = [this.countries[index]];
+        }
+        index = this.countries.findIndex(x => x.id === partner.countryShippingId);
+        if (index > -1) {
+            shippingCountryActive = [this.countries[index]];
+        }
+        index = this.billingProvinces.findIndex(x => x.id === partner.provinceId);
+        if (index > -1) {
+            billingProvinceActive = [this.billingProvinces[index]];
+        }
+        index = this.shippingProvinces.findIndex(x => x.id === partner.provinceShippingId);
+        if (index > -1) {
+            shippingProvinceActive = [this.shippingProvinces[index]];
+        }
+        this.partnerForm.setValue({
+            partnerAccountNo: partner.accountNo,
+            internalReferenceNo: partner.internalReferenceNo,
+            nameENFull: partner.partnerNameEn,
+            nameLocalFull: partner.partnerNameVn,
+            shortName: partner.shortName,
+            partnerAccountRef: parentCustomerActive,
+            taxCode: partner.taxCode,
+            partnerGroup: partnerGroupActives,
+            shippingCountry: shippingCountryActive,
+            shippingProvince: shippingProvinceActive,
+            zipCodeShipping: partner.zipCodeShipping,
+            shippingAddressEN: partner.addressShippingEn,
+            shippingAddressVN: partner.addressShippingVn,
+            billingCountry: billingCountryActive,
+            billingProvince: billingProvinceActive,
+            billingZipcode: partner.zipCode,
+            billingAddressEN: partner.addressEn,
+            billingAddressLocal: partner.addressVn,
+            partnerContactPerson: partner.contactPerson,
+            partnerContactNumber: partner.tel,
+            partnerContactFaxNo: partner.fax,
+            employeeWorkPhone: '',
+            employeeEmail: '',
+            partnerWebsite: partner.website,
+            partnerbankAccountNo: partner.bankAccountNo,
+            partnerBankAccountName: partner.bankAccountName,
+            partnerBankAccountAddress: partner.bankAccountAddress,
+            partnerSwiftCode: partner.swiftCode,
+            partnerWorkPlace: workPlaceActive,
+            active: partner.active,
+            public: partner.public,
+            note: partner.note
+        });
+    }
+    getPartnerGroupActives(arg0: string[]): any {
+        const partnerGroupActives = [];
+        if (arg0.length > 0) {
+            for (let i = 0; i < arg0.length; i++) {
+                const group = this.partnerGroups.find(x => x.id === arg0[i]);
+                if (group) {
+                    partnerGroupActives.push(group);
+                }
+            }
+        }
+        return partnerGroupActives;
     }
     showPopupSaleman() {
         this.poupSaleman.isSave = false;
