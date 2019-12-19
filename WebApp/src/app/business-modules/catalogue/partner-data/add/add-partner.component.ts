@@ -345,7 +345,7 @@ export class AddPartnerDataComponent extends AppList {
             return;
         }
         if (this.formPartnerComponent.partnerForm.valid) {
-            this.partner.accountNo = this.partner.id = this.partner.taxCode;
+            this.partner.accountNo = this.partner.id;
             if (this.saleMandetail.length === 0) {
                 if (this.isShowSaleMan) {
                     this.toastr.error('Please add saleman and service for customer!');

@@ -74,21 +74,12 @@ export class PartnerDetailComponent extends AppList {
 
 
     ngOnInit() {
-        this.getComboboxData();
+        this.getComboboxDataSaleman();
         this.initHeaderSalemanTable();
-        // this.route.params.subscribe(prams => {
-        //     if (prams.partnerType !== undefined) {
-        //         this.partnerType = Number(prams.partnerType);
-        //         if (this.partnerType === '3') {
-        //             this.isShowSaleMan = true;
-        //         }
-        //     }
-        // });
         this.route.params.subscribe(async (prams: any) => {
             if (!!prams.id) {
                 this.partner.id = prams.id;
                 this.dataSearchSaleman.partnerId = this.partner.id;
-                this.getParnerDetails();
                 this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
             }
         });
@@ -108,7 +99,6 @@ export class PartnerDetailComponent extends AppList {
         }
     }
     getParnerDetails() {
-        // this.partner = await this.baseService.getAsync(this.api_menu.Catalogue.PartnerData.getById + this.partner.id, false, true);
         this._progressRef.start();
         this._catalogueRepo.getDetailPartner(this.partner.id)
             .pipe(
@@ -121,8 +111,6 @@ export class PartnerDetailComponent extends AppList {
                         this.partner = res;
                         this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
                         this.formPartnerComponent.setFormData(this.partner);
-                        console.log(this.partner);
-                        // this.getReferenceData();
                     }
                 }
             );
@@ -203,6 +191,9 @@ export class PartnerDetailComponent extends AppList {
                                 console.log("dup");
                                 this.toastr.error('Duplicate service, office with sale man!');
                             } else {
+                                console.log(this.saleMandetail);
+                                console.log(this.salemanToAdd);
+
                                 this.saleMandetail.push(this.salemanToAdd);
                                 console.log(this.saleMandetail[0]);
                                 /// get detail employee --- to be continue
@@ -259,23 +250,28 @@ export class PartnerDetailComponent extends AppList {
     getDataCombobox() {
         forkJoin([
             this._catalogueRepo.getCountryByLanguage(),
-            this._catalogueRepo.getProvinces()
+            this._catalogueRepo.getProvinces(),
+            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CUSTOMER),
+            this._catalogueRepo.getPartnerGroup(),
+            this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Branch })
         ])
             .pipe(catchError(this.catchError))
             .subscribe(
-                ([countries, provinces]) => {
+                ([countries, provinces, customers, partnerGroups, workPlaces]) => {
                     this.formPartnerComponent.countries = this.utility.prepareNg2SelectData(countries || [], 'id', 'name');
                     this.formPartnerComponent.billingProvinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
                     this.formPartnerComponent.shippingProvinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
+                    this.formPartnerComponent.parentCustomers = this.utility.prepareNg2SelectData(customers || [], 'id', 'partnerNameVn');
+                    this.formPartnerComponent.partnerGroups = this.utility.prepareNg2SelectData(partnerGroups || [], 'id', 'id');
+                    this.getPartnerGroupActive(this.partnerType);
+                    this.formPartnerComponent.workPlaces = this.utility.prepareNg2SelectData(workPlaces || [], 'id', 'nameVn');
+                    this.getParnerDetails();
                 },
                 () => { },
 
             );
     }
-    getComboboxData(): any {
-        this.getPartnerGroups();
-        this.getWorkPlaces();
-        this.getparentCustomers();
+    getComboboxDataSaleman(): any {
         this.getService();
         this.getOffice();
         this.getStatus();
@@ -341,39 +337,28 @@ export class PartnerDetailComponent extends AppList {
                 }
             );
     }
-    getparentCustomers() {
-        this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CUSTOMER)
-            .pipe(catchError(this.catchError), finalize(() => { }))
-            .subscribe(
-                (res) => {
-                    if (res) {
-                        this.formPartnerComponent.parentCustomers = res.map(x => ({ "text": x.partnerNameVn, "id": x.id }));
-                    } else { this.formPartnerComponent.parentCustomers = []; }
-                }
-            );
-    }
-    getWorkPlaces() {
-        this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Branch })
-            .pipe(catchError(this.catchError), finalize(() => { }))
-            .subscribe(
-                (res) => {
-                    if (res) {
-                        this.formPartnerComponent.workPlaces = res.map(x => ({ "text": x.code + ' - ' + x.nameVn, "id": x.id }));
-                    } else { this.formPartnerComponent.workPlaces = []; }
-                }
-            );
-    }
-    getPartnerGroups(): any {
-        this._catalogueRepo.getPartnerGroup().subscribe((response: any) => {
-            if (response != null) {
-                console.log(response);
-                this.formPartnerComponent.partnerGroups = response.map(x => ({ "text": x.id, "id": x.id }));
-                this.getPartnerGroupActive(this.partnerType);
-            }
-        }, err => {
-            this.baseService.handleError(err);
-        });
-    }
+    // getWorkPlaces() {
+    //     this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Branch })
+    //         .pipe(catchError(this.catchError), finalize(() => { }))
+    //         .subscribe(
+    //             (res) => {
+    //                 if (res) {
+    //                     this.formPartnerComponent.workPlaces = res.map(x => ({ "text": x.code + ' - ' + x.nameVn, "id": x.id }));
+    //                 } else { this.formPartnerComponent.workPlaces = []; }
+    //             }
+    //         );
+    // }
+    // getPartnerGroups(): any {
+    //     this._catalogueRepo.getPartnerGroup().subscribe((response: any) => {
+    //         if (response != null) {
+    //             console.log(response);
+    //             this.formPartnerComponent.partnerGroups = response.map(x => ({ "text": x.id, "id": x.id }));
+    //             this.getPartnerGroupActive(this.partnerType);
+    //         }
+    //     }, err => {
+    //         this.baseService.handleError(err);
+    //     });
+    // }
     getPartnerGroupActive(partnerGroup: any): any {
         if (partnerGroup === PartnerGroupEnum.AGENT) {
             this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "AGENT"));
@@ -416,7 +401,7 @@ export class PartnerDetailComponent extends AppList {
             return;
         }
         if (this.formPartnerComponent.partnerForm.valid) {
-            this.partner.accountNo = this.partner.id = this.partner.taxCode;
+            this.partner.accountNo = this.partner.id;
             if (this.saleMandetail.length === 0) {
                 if (this.isShowSaleMan) {
                     this.toastr.error('Please add saleman and service for customer!');
