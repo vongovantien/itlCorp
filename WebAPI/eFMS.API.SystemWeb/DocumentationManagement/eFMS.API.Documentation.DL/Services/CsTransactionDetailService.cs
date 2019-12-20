@@ -679,7 +679,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
             parameter.Contact = _currentUser;//Get user login
             parameter.DecimalNo = 0; // set 0  temporary

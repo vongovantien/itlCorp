@@ -403,7 +403,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
             parameter.MAWB = houserBill != null ? houserBill.Mawb: string.Empty;
             parameter.Contact = _currentUser;
@@ -518,11 +518,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 Consignee = "s",
                 No = "s",
-                CompanyName = "Công ty IndoTrans",
+                CompanyName = Constants.COMPANY_NAME,
                 CompanyDescription = "Company Description",
-                CompanyAddress1 = "52 Trường Sơn, Phường 2, Tân Bình",
-                CompanyAddress2 = "52 Trường Sơn, Phường 2, Tân Bình",
-                Website = "itlvn.com.vn",
+                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                CompanyAddress2 = Constants.COMPANY_CONTACT,
+                Website = Constants.COMPANY_WEBSITE,
                 MAWB = detail.Mawb,
                 Contact = currentUser.UserName,
                 DecimalNo = 2
