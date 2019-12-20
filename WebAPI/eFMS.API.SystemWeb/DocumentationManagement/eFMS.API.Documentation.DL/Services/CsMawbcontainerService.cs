@@ -502,14 +502,14 @@ namespace eFMS.API.Documentation.DL.Services
                     if (container.Id == Guid.Empty)
                     {
                         container.Id = Guid.NewGuid();
-                        container.Mblid = housebillId;
+                        container.Hblid = housebillId;
                         container.UserModified = currentUser.UserID;
                         container.DatetimeModified = DateTime.Now;
                         var hsAddContMBL = Add(container);
                     }
                     else
                     {
-                        container.Mblid = housebillId;
+                        container.Hblid = housebillId;
                         container.UserModified = currentUser.UserID;
                         container.DatetimeModified = DateTime.Now;
                         var hsUpdateContMBL = Update(container, x => x.Id == container.Id);
