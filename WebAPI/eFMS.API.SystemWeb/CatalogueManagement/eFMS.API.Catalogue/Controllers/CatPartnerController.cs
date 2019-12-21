@@ -13,6 +13,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -32,6 +33,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatPartnerService catPartnerService;
         private readonly IMapper mapper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// constructor
@@ -39,11 +41,16 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICatPartnerService</param>
         /// <param name="iMapper">inject interface IMapper</param>
-        public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper)
+        /// <param name="hostingEnvironment"></param>
+        public CatPartnerController(IStringLocalizer<LanguageSub> localizer, 
+            ICatPartnerService service, 
+            IMapper iMapper, 
+            IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catPartnerService = service;
             mapper = iMapper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -269,8 +276,9 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            string templateName = Templates.CatPartner.ExelImportFileName + Templates.ExelImportEx;
-            var result = await new FileHelper().ExportExcel(templateName);
+            string fileName = Templates.CatPartner.ExelImportFileName + Templates.ExelImportEx;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)
             {
                 return result;
