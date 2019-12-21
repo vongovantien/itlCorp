@@ -162,15 +162,16 @@ export class CatalogueRepo {
     }
     getListPartner(page?: number, size?: number, data?: any) {
         if (!!page && !!size) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/paging`, {}, {
-                page: '' + page,
-                size: '' + size
-            }).pipe(
-                catchError((error) => throwError(error)),
-                map((res: any) => {
-                    return res;
-                })
-            );
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/paging`, data
+                , {
+                    page: '' + page,
+                    size: '' + size
+                }).pipe(
+                    catchError((error) => throwError(error)),
+                    map((res: any) => {
+                        return res;
+                    })
+                );
         } else {
             return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/Query`, data).pipe(
                 catchError((error) => throwError(error)),

@@ -2,7 +2,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
-import { BaseService } from 'src/app/shared/services/base.service';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
@@ -17,7 +16,6 @@ import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { NgProgress } from '@ngx-progressbar/core';
-import { isNgTemplate } from '@angular/compiler';
 
 
 @Component({
@@ -396,7 +394,15 @@ export class PartnerDetailComponent extends AppList {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
         this.partner.id = formBody.internalReferenceNo + "." + formBody.taxCode;
         if (formBody.partnerGroup != null) {
-            this.partner.partnerGroup = formBody.partnerGroup[0].id;
+            if (formBody.partnerGroup.find(x => x.id === "ALL")) {
+                this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+            } else {
+                let s = '';
+                for (const item of formBody.partnerGroup) {
+                    s = item['id'] + ';';
+                }
+                this.partner.partnerGroup = s.substring(0, s.length - 1);
+            }
         }
         this.partner.partnerNameVn = formBody.nameLocalFull;
         this.partner.partnerNameEn = formBody.nameENFull;

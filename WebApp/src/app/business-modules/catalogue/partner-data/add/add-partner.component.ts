@@ -378,6 +378,17 @@ export class AddPartnerDataComponent extends AppList {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
         this.partner.id = formBody.internalReferenceNo + "." + formBody.taxCode;
         this.partner.partnerGroup = formBody.partnerGroup[0].id;
+        if (formBody.partnerGroup != null) {
+            if (formBody.partnerGroup.find(x => x.id === "ALL")) {
+                this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+            } else {
+                let s = '';
+                for (const item of formBody.partnerGroup) {
+                    s = item['id'] + ';';
+                }
+                this.partner.partnerGroup = s.substring(0, s.length - 1);
+            }
+        }
         this.partner.partnerNameVn = formBody.nameLocalFull;
         this.partner.partnerNameEn = formBody.nameENFull;
         this.partner.contactPerson = formBody.partnerContactPerson;
