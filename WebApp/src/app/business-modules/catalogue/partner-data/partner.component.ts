@@ -15,9 +15,10 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 import { PartnerListComponent } from './components/partner-list/partner-list.component';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
-import { ExportRepo } from '@repositories';
+import { ExportRepo, CatalogueRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
-import { DeleteConfirmModalComponent, ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent } from '@common';
+import { ToastrService } from 'ngx-toastr';
 type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
 enum PartnerDataTab {
     ALL = 'allTab',
@@ -33,6 +34,8 @@ enum PartnerDataTab {
     templateUrl: './partner.component.html'
 })
 export class PartnerComponent extends AppList implements OnInit {
+    @ViewChild(PartnerListComponent, { static: false }) allPartnerComponent: any;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: any;
     pager: PagerSetting = PAGINGSETTING;
     partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
     configSearch: any = {
@@ -60,16 +63,14 @@ export class PartnerComponent extends AppList implements OnInit {
         typeButton: ButtonType.export
     };
     activeTab: string = this.tabName.allTab;
-    @ViewChild(PartnerListComponent, { static: false }) allPartnerComponent: any;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: any;
 
     selectedTab: PARTNERDATA_TAB = PartnerDataTab.ALL; // Default tab.
 
-    constructor(private baseService: BaseService,
-        private api_menu: API_MENU,
-        private router: Router,
+    constructor(private router: Router,
         private _ngProgressService: NgProgress,
-        private _exportRepo: ExportRepo) {
+        private _exportRepo: ExportRepo,
+        private _catalogueRepo: CatalogueRepo,
+        private _toastService: ToastrService) {
         super();
         this._progressRef = this._ngProgressService.ref();
     }
@@ -111,7 +112,6 @@ export class PartnerComponent extends AppList implements OnInit {
         }
         this.allPartnerComponent.dataSearch = this.criteria;
         this.allPartnerComponent.getPartners();
-        this.baseService.spinnerHide();
     }
     tabSelect(tabName) {
         this.pager.currentPage = 1;
@@ -136,7 +136,6 @@ export class PartnerComponent extends AppList implements OnInit {
         if (tabName === this.tabName.allTab) {
             this.criteria.partnerGroup = PartnerGroupEnum.ALL;
         }
-        this.baseService.spinnerHide();
     }
 
     showConfirmDelete(event) {
@@ -148,13 +147,21 @@ export class PartnerComponent extends AppList implements OnInit {
         this.router.navigate([`/home/catalogue/partner-data/detail/${this.partner.id}`]);
     }
     async onDelete() {
-        this.baseService.delete(this.api_menu.Catalogue.PartnerData.delete + this.partner.id).subscribe((response: any) => {
-            this.tabSelect(this.activeTab);
-            this.baseService.successToast(response.message);
+        this._catalogueRepo.deletePartner(this.partner.id)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
 
-        }, err => {
-            this.baseService.errorToast(err.error.message);
-        });
+                        this.allPartnerComponent.dataSearch = this.criteria;
+                        this.allPartnerComponent.getPartners();
+                        this.confirmDeletePopup.hide();
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
     }
 
     addPartner() {

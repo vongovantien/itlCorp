@@ -5,8 +5,6 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
 import { PartnerDataImportComponent } from './import/partner-data-import.component';
-import { PartnerDataAddnewComponent } from './addnew/partner-data-addnew.component';
-import { PartnerDataDetailComponent } from './detail/partner-data-detail.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
@@ -16,8 +14,8 @@ import { SalemanPopupComponent } from './components/saleman-popup.component';
 import { ModalModule, TabsModule } from 'ngx-bootstrap';
 import { FormAddPartnerComponent } from './components/form-add-partner/form-add-partner.component';
 import { AddPartnerDataComponent } from './add/add-partner.component';
-import { PartnerDetailComponent } from './details/detail-partner.component';
 import { PartnerListComponent } from './components/partner-list/partner-list.component';
+import { PartnerDetailComponent } from './detail/detail-partner.component';
 
 const routing: Routes = [
     { path: '', component: PartnerComponent, data: { name: "Partner Data", level: 2 } },
@@ -44,8 +42,6 @@ const routing: Routes = [
     declarations: [
         PartnerComponent,
         PartnerDataImportComponent,
-        PartnerDataAddnewComponent,
-        PartnerDataDetailComponent,
         SalemanPopupComponent,
         FormAddPartnerComponent,
         AddPartnerDataComponent,

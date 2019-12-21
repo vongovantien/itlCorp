@@ -7,6 +7,15 @@
                 <app-breadcrumb></app-breadcrumb>
             </div>
             <div class="c-button-actions">
+                <button type="button" class="btn btn-danger m-btn--square  m-btn--icon  m-btn--uppercase"
+                    (click)="showConfirmDelete()">
+                    <span>
+                        <i class="la la-trash"></i>
+                        <span>
+                            Delete
+                        </span>
+                    </span>
+                </button>
                 <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                     <span>
                         <i class="la la la-save"></i>
@@ -121,7 +130,11 @@
         <div class="form-actions">
             <div class="row">
                 <div class="col-6">
-                    <button type="button" class="btn btn-danger m-btn--square  m-btn--icon  m-btn--uppercase">
+
+                </div>
+                <div class="col-6 m--align-right">
+                    <button type="button" class="btn btn-danger m-btn--square  m-btn--icon  m-btn--uppercase"
+                        (click)="showConfirmDelete()">
                         <span>
                             <i class="la la-trash"></i>
                             <span>
@@ -129,13 +142,11 @@
                             </span>
                         </span>
                     </button>
-                </div>
-                <div class="col-6 m--align-right">
                     <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                         <span>
                             <i class="la la-save"></i>
                             <span>
-                                Edit
+                                Save
                             </span>
                         </span>
                     </button>
@@ -159,4 +170,7 @@
 <app-saleman-popup [popupData]="saleMantoView" (onCreate)="closePopupSaleman($event)"
     (onDelete)="closeppAndDeleteSaleman($event)">
 </app-saleman-popup>
-<confirm-popup (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
+<confirm-popup #popupDeleteSaleman (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'">
+</confirm-popup>
+<confirm-popup #popupDeletePartner (onSubmit)="onDelete()" [body]="deleteMessage" [labelConfirm]="'Ok'">
+</confirm-popup>

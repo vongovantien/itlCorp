@@ -25,7 +25,8 @@ import { NgProgress } from '@ngx-progressbar/core';
 })
 export class PartnerDetailComponent extends AppList {
     @ViewChild(FormAddPartnerComponent, { static: false }) formPartnerComponent: FormAddPartnerComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild("popupDeleteSaleman", { static: false }) confirmDeleteSalemanPopup: ConfirmPopupComponent;
+    @ViewChild("popupDeletePartner", { static: false }) confirmDeletePartnerPopup: ConfirmPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmTaxcode: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
@@ -83,8 +84,7 @@ export class PartnerDetailComponent extends AppList {
         });
         this.partner.departmentId = "Head Office";
         this.getDataCombobox();
-    }
-    checkRequireSaleman(partnerGroup: string): boolean {
+    } RequireSaleman(partnerGroup: string): boolean {
         this.isShowSaleMan = false;
         if (partnerGroup != null) {
             if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
@@ -114,6 +114,20 @@ export class PartnerDetailComponent extends AppList {
             );
 
     }
+    checkRequireSaleman(partnerGroup: string): boolean {
+        this.isShowSaleMan = false;
+        if (partnerGroup != null) {
+            if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+
     getSalemanPagingByPartnerId(dataSearchSaleman?: any) {
         this.isLoading = true;
         this._catalogueRepo.getListSaleManDetail(this.page, this.pageSize, Object.assign({}, dataSearchSaleman, { partnerId: this.partner.id }))
@@ -216,7 +230,7 @@ export class PartnerDetailComponent extends AppList {
     onDeleteSaleman() {
         if (this.saleMandetail.length > 0) {
             this.saleMandetail = [...this.saleMandetail.slice(0, this.index), ...this.saleMandetail.slice(this.index + 1)];
-            this.confirmDeleteJobPopup.hide();
+            this.confirmDeleteSalemanPopup.hide();
             this.toastr.success('Delete Success !');
         }
         if (this.isExistedTaxcode) {
@@ -227,7 +241,7 @@ export class PartnerDetailComponent extends AppList {
     deleteSaleman(index: any) {
         this.index = index;
         this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].saleman_ID}?`;
-        this.confirmDeleteJobPopup.show();
+        this.confirmDeleteSalemanPopup.show();
     }
     getDataCombobox() {
         forkJoin([
@@ -484,5 +498,25 @@ export class PartnerDetailComponent extends AppList {
         };
         this.poupSaleman.showSaleman(saleMane);
         this.poupSaleman.show();
+    }
+    showConfirmDelete() {
+        this.deleteMessage = `Do you want to delete this partner  ${this.partner.partnerNameEn}?`;
+        this.confirmDeletePartnerPopup.show();
+    }
+    check
+    onDelete() {
+        this._catalogueRepo.deletePartner(this.partner.id)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.confirmDeletePartnerPopup.hide();
+                        this.router.navigate(["/home/catalogue/partner-data"]);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
     }
 }
