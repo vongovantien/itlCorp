@@ -81,11 +81,13 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
                         this.totalChargeWeight = res.chargeWeight;
                         this.grossWeight = res.grossWeight;
                         this.containerDetail = res.packageContainer;
+                        console.log(this.containerDetail);
                         this.commodities = res.commodity;
                         this.description = res.desOfGoods;
                         this.selectedPackage = [this.packages.find(p => p.id === res.packageType)];
                         this.packageQty = res.packageQty;
                         this.selectedPackage = res.packageType;
+                        console.log(this.totalCBM);
                     }
                 }
             );
@@ -105,6 +107,8 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     }
 
     updateData(containers: Container[] | any) {
+        console.log(containers);
+
         // * Description, Commondity.
         if (!this.description) {
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
@@ -119,9 +123,11 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         }
 
         // * GW, Nw, CW, CBM
-        this.grossWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
-        this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
-        this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
+        if (!!containers.length) {
+            this.grossWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
+            this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
+            this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
+        }
 
         if (!!containers.length && !this.selectedPackage || containers.length === 1 && !this.selectedPackage) {
             if (!!containers[0].packageTypeId) {
@@ -152,6 +158,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         for (const item of contData) {
             this.containerDetail += this.handleStringCont(item);
         }
+
     }
 
     initContainer() {

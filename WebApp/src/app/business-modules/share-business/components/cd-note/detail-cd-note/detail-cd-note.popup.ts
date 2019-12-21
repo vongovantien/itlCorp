@@ -84,30 +84,15 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     calculatorAmount() {
-        // this.totalCredit = '';
-        // this.totalDebit = '';
-        // this.balanceAmount = '';
-        // const _credit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
-        // const _debit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
-        // const _balance = _debit - _credit;
-        // this.totalCredit = this.formatNumberCurrency(_credit);
-        // this.totalDebit = this.formatNumberCurrency(_debit);
-        // this.balanceAmount = (_balance > 0 ? this.formatNumberCurrency(_balance) : '(' + this.formatNumberCurrency(Math.abs(_balance)) + ')');
-
         //List currency có trong listCharges
         const listCurrency = [];
         const listCharge = [];
-        console.log(this.CdNoteDetail)
-        //for (const charges of this.CdNoteDetail) {
-            for (const currency of this.CdNoteDetail.listSurcharges.map(m => m.currencyId)) {
-                listCurrency.push(currency)
-            }
-            for (const charge of this.CdNoteDetail.listSurcharges) {
-                listCharge.push(charge);
-            }
-        //}
-        console.log(listCurrency)
-        console.log(listCharge)
+        for (const currency of this.CdNoteDetail.listSurcharges.map(m => m.currencyId)) {
+            listCurrency.push(currency)
+        }
+        for (const charge of this.CdNoteDetail.listSurcharges) {
+            listCharge.push(charge);
+        }
         //List currency unique      
         const uniqueCurrency = [...new Set(listCurrency)] // Remove duplicate
         this.totalCredit = '';
@@ -185,7 +170,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         this.cdNoteEditPopupComponent.show();
     }
 
-    onUpdateCdNote(data: any) {
+    onUpdateCdNote() {
         this.onDeleted.emit();
         this.getDetailCdNote(this.jobId, this.cdNote);
     }

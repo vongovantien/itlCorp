@@ -5,8 +5,8 @@
                 <h5 class="modal-title" *ngIf="action !== 'update' else updateTitle">Create Credit/Debit Note</h5>
                 <ng-template #updateTitle class="modal-title">
                     <h5 class="modal-title">Edit
-                        {{CDNote.type === 'CREDIT' ? '"Credit Note"': CDNote.type === 'DEBIT' ? '"Debit Note"' : '"Invoice"'}}
-                        No: {{CDNote.code}}</h5>
+                        <b><span class="text-warning">{{CDNote.type === 'CREDIT' ? 'Credit Note': CDNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
+                        No: <b class="text-warning">{{CDNote.code}}</b></h5>
                 </ng-template>
 
                 <button type="button" (click)="closePopup()" class="close">
@@ -198,7 +198,7 @@
                     </span>
                 </button>
                 <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="closePopup()">
+                    (click)="cancel()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -222,3 +222,8 @@
 </info-popup>
 
 <ops-cd-note-add-remaining-charge (onAddCharge)="onAddMoreCharge($event)"></ops-cd-note-add-remaining-charge>
+
+<confirm-popup #confirmCloseAddPopup (onSubmit)="onSubmitConfirmCloseAdd()" [title]="'Alert'"
+    (onCancel)="onCancelConfirmCloseAdd()"
+    [body]="'Do you want to exit without saving?'" [labelCancel]="'No'">
+</confirm-popup>

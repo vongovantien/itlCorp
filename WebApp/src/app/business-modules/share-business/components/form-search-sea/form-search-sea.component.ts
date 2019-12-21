@@ -1,5 +1,5 @@
 import { AppForm } from "src/app/app.form";
-import { Component, Output, EventEmitter, Input } from "@angular/core";
+import { Component, Output, EventEmitter, Input, ViewChildren, QueryList } from "@angular/core";
 import { formatDate } from "@angular/common";
 import { CommonEnum } from "src/app/shared/enums/common.enum";
 import { CatalogueRepo, SystemRepo } from "src/app/shared/repositories";
@@ -7,6 +7,7 @@ import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
 import { Observable } from "rxjs";
 import { Customer } from "src/app/shared/models/catalogue/customer.model";
 import { User } from "src/app/shared/models";
+import { ComboGridVirtualScrollComponent } from "@common";
 
 @Component({
     selector: 'form-search-sea',
@@ -147,6 +148,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     resetSearch() {
+        this.resetKeywordSearchCombogrid();
         this.formSearch.reset();
         this.resetFormControl(this.customer);
         this.resetFormControl(this.supplier);
@@ -158,6 +160,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     collapsed() {
+        this.resetKeywordSearchCombogrid();
         this.resetFormControl(this.customer);
         this.resetFormControl(this.supplier);
         this.resetFormControl(this.agent);

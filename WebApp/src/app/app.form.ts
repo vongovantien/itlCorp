@@ -4,10 +4,11 @@ import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.
 import { ButtonType } from './shared/enums/type-button.enum';
 import { SelectComponent } from 'ng2-select';
 import { ViewChildren, QueryList } from '@angular/core';
+import { ComboGridVirtualScrollComponent } from './shared/common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
 
 export abstract class AppForm extends AppPage {
     @ViewChildren(SelectComponent) selectElements: QueryList<SelectComponent>;
-
+    @ViewChildren(ComboGridVirtualScrollComponent) comboGrids: QueryList<ComboGridVirtualScrollComponent>;
 
     requestSearch: any = null;
     requestReset: any = null;
@@ -101,6 +102,14 @@ export abstract class AppForm extends AppPage {
         }
     }
 
+    resetKeywordSearchCombogrid() {
+        if (this.comboGrids) {
+            const arrayCombo = this.comboGrids.toArray();
+            if (arrayCombo.length > 0) {
+                arrayCombo.forEach((c: ComboGridVirtualScrollComponent) => { c.keyword = ''; c.Search(c.keyword); });
+            }
+        }
+    }
 
 }
 
