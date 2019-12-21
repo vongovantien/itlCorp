@@ -503,7 +503,6 @@ export class PartnerDetailComponent extends AppList {
         this.deleteMessage = `Do you want to delete this partner  ${this.partner.partnerNameEn}?`;
         this.confirmDeletePartnerPopup.show();
     }
-    check
     onDelete() {
         this._catalogueRepo.deletePartner(this.partner.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
