@@ -267,6 +267,12 @@ export class SystemRepo {
         );
     }
 
+    getEmployeeByUserId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysEmployee/GetEmployeeByUser?userId=${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getPermissionSample(id: string) {
         /* 
         * Create id = null

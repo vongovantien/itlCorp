@@ -229,14 +229,14 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id.Length == 0)
             {
-                if (catPartnerService.Any(x => x.PartnerNameEn == model.PartnerNameEn || x.PartnerNameVn == model.PartnerNameVn || x.ShortName == model.ShortName))
+                if (catPartnerService.Any(x => x.AccountNo == model.AccountNo))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }
             }
             else
             {
-                if (catPartnerService.Any(x => (x.PartnerNameEn == model.PartnerNameEn || x.PartnerNameVn == model.PartnerNameVn) && x.Id != id))
+                if (catPartnerService.Any(x => x.AccountNo == model.AccountNo && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }

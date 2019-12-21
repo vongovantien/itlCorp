@@ -11,6 +11,7 @@ export class Saleman {
     effectDate: any = '';
     statusString: string = '';
     userCreated: string = '';
+    serviveName: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

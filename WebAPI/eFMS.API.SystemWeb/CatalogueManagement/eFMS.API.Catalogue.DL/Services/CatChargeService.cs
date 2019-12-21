@@ -193,6 +193,30 @@ namespace eFMS.API.Catalogue.DL.Services
                                    && (x.Active == criteria.Active || criteria.Active == null);
             }
             var list = Get(query);
+            var currencies = currencyService.Get();
+            var units = catUnitService.Get();
+            list = list.Join(currencies, x => x.CurrencyId, y => y.Id, (x, y) => new { x, y.CurrencyName })
+                        .Join(units, x => x.x.UnitId, y => y.Id, (x, y) => new CatChargeModel {
+                            Id = x.x.Id,
+                            Code = x.x.Code,
+                            ChargeNameVn = x.x.ChargeNameVn,
+                            ChargeNameEn = x.x.ChargeNameEn,
+                            ServiceTypeId = x.x.ServiceTypeId,
+                            Type = x.x.Type,
+                            CurrencyId = x.x.CurrencyId,
+                            UnitPrice = x.x.UnitPrice,
+                            UnitId = x.x.UnitId,
+                            Vatrate = x.x.Vatrate,
+                            IncludedVat = x.x.IncludedVat,
+                            UserCreated = x.x.UserCreated,
+                            DatetimeCreated = x.x.DatetimeCreated,
+                            UserModified = x.x.UserModified,
+                            DatetimeModified = x.x.DatetimeModified,
+                            Active = x.x.Active,
+                            InactiveOn = x.x.InactiveOn,
+                            currency = y.UnitNameEn,
+                            unit = y.UnitNameEn
+                        });
             return list;
         }
 
