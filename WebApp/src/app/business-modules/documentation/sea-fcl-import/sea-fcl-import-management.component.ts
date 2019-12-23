@@ -35,7 +35,7 @@ export class SeaFCLImportManagementComponent extends AppList {
 
     selectedMasterBill: CsTransaction = null;
     deleteMessage: string = '';
-
+    transactionService: number = CommonEnum.TransactionTypeEnum.SeaFCLImport;
     constructor(
         private _router: Router,
         private _documentationRepo: DocumentationRepo,
@@ -73,7 +73,7 @@ export class SeaFCLImportManagementComponent extends AppList {
         this.headerHouseBills = [
             { title: 'HBL No', field: 'hwbno', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
-            { title: 'SalesMan', field: 'saleManName', sortable: true },
+            { title: 'Salesman', field: 'saleManName', sortable: true },
             { title: 'Notify Party', field: 'notifyParty', sortable: true },
             { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
             { title: 'Containers', field: 'containers', sortable: true },
@@ -83,7 +83,7 @@ export class SeaFCLImportManagementComponent extends AppList {
         ];
 
         this.dataSearch = {
-            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport,
+            transactionType: this.transactionService,
             //fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
             //toDate: new Date(),
         };
@@ -136,7 +136,7 @@ export class SeaFCLImportManagementComponent extends AppList {
 
     onSearchMasterBills(data: any) {
         this.page = 1; // reset page.
-        data.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
+        data.transactionType = this.transactionService;
 
         this.dataSearch = data;
         this.requestSearchShipment();

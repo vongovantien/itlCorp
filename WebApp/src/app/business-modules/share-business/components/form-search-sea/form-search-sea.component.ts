@@ -7,7 +7,6 @@ import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
 import { Observable } from "rxjs";
 import { Customer } from "src/app/shared/models/catalogue/customer.model";
 import { User } from "src/app/shared/models";
-import { ComboGridVirtualScrollComponent } from "@common";
 
 @Component({
     selector: 'form-search-sea',
@@ -29,6 +28,9 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     saleman: AbstractControl;
     creator: AbstractControl;
     transactionType: any;
+
+    labelColoader: string = 'Supplier/ Co-Loader';
+
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'id', label: 'Partner ID' },
         { field: 'shortName', label: 'Name ABBR' },
@@ -64,19 +66,41 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
         this.salemans = this._systemRepo.getSystemUsers({ active: true });
         this.creators = this._systemRepo.getSystemUsers({ active: true });
 
+        this.setDataForFilterType();                       
+        this.setLabelColoader();
+    }
 
-        this.filterTypes = [
-            { title: 'Job ID', value: 'jobNo' },
-            { title: 'MBL No', value: 'mawb' },
-            { title: 'HBL No', value: 'hwbno' },
-            { title: 'Cont No', value: 'containerNo' },
-            { title: 'Seal No', value: 'sealNo' },
-            { title: 'Mark No', value: 'markNo' },
-            { title: 'C/D No', value: 'creditDebitNo' },
-            { title: 'SOA No', value: 'soaNo' },
-        ];
-
+    setDataForFilterType(){
+        if(this.transaction === 2 || this.transaction === 3){
+            this.filterTypes = [
+                { title: 'Job ID', value: 'jobNo' },
+                { title: 'MAWB No', value: 'mawb' },
+                { title: 'HAWB No', value: 'hwbno' },
+                { title: 'C/D No', value: 'creditDebitNo' },
+                { title: 'SOA No', value: 'soaNo' },
+            ];
+        } else {
+            this.filterTypes = [
+                { title: 'Job ID', value: 'jobNo' },
+                { title: 'MBL No', value: 'mawb' },
+                { title: 'HBL No', value: 'hwbno' },
+                { title: 'Cont No', value: 'containerNo' },
+                { title: 'Seal No', value: 'sealNo' },
+                { title: 'Mark No', value: 'markNo' },
+                { title: 'C/D No', value: 'creditDebitNo' },
+                { title: 'SOA No', value: 'soaNo' },
+            ];
+        }
         this.filterType.setValue(this.filterTypes[0]);
+    }
+
+    setLabelColoader(){
+        if(this.transaction === 9){
+            this.labelColoader = "Shipping Line/ Co-Loader";
+        }
+        if(this.transaction === 2 || this.transaction === 3){
+            this.labelColoader = "Airline/ Co-Loader";
+        }
     }
 
     initFormSearch() {
