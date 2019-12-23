@@ -1,0 +1,103 @@
+﻿using AutoMapper;
+using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.Service.Models;
+using ITL.NetCore.Common;
+using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.EF;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Linq;
+using eFMS.IdentityServer.DL.UserManager;
+
+namespace eFMS.API.Documentation.DL.Services
+{
+    public class CsDimensionDetailService : RepositoryBase<CsDimensionDetail, CsDimensionDetailModel>, ICsDimensionDetailService
+    {
+        private readonly ICurrentUser currentUser;
+        public CsDimensionDetailService(IContextBase<CsDimensionDetail> repository, IMapper mapper,
+            ICurrentUser currUser) : base(repository, mapper)
+        {
+            currentUser = currUser;
+        }
+
+        public HandleState UpdateHouseBill(List<CsDimensionDetailModel> dimensionDetails, Guid housebillId)
+        {
+            try
+            {
+                var listIdOfDimension = dimensionDetails.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
+                var idContainersNeedRemove = DataContext.Get(x => x.Hblid == housebillId && !listIdOfDimension.Contains(x.Id)).Select(s => s.Id);
+                //Delete item of List Container MBL
+                if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
+                {
+                    var hsDelContHBL = DataContext.Delete(x => idContainersNeedRemove.Contains(x.Id));
+                }
+
+                foreach (var dimesion in dimensionDetails)
+                {
+                    //Insert & Update List Container MBL
+                    if (dimesion.Id == Guid.Empty)
+                    {
+                        dimesion.Id = Guid.NewGuid();
+                        dimesion.Hblid = housebillId;
+                        dimesion.UserModified = currentUser.UserID;
+                        dimesion.DatetimeModified = DateTime.Now;
+                        var hsAddDemension = Add(dimesion);
+                    }
+                    else
+                    {
+                        dimesion.Hblid = housebillId;
+                        dimesion.UserModified = currentUser.UserID;
+                        dimesion.DatetimeModified = DateTime.Now;
+                        var hsUpdateContMBL = Update(dimesion, x => x.Id == dimesion.Id);
+                    }
+                }
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public HandleState UpdateMasterBill(List<CsDimensionDetailModel> dimensionDetails, Guid masterId)
+        {
+            try
+            {
+                var listIdOfDimension = dimensionDetails.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
+                var idContainersNeedRemove = DataContext.Get(x => x.Mblid == masterId && !listIdOfDimension.Contains(x.Id)).Select(s => s.Id);
+                //Delete item of List Container MBL
+                if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
+                {
+                    var hsDelContHBL = DataContext.Delete(x => idContainersNeedRemove.Contains(x.Id));
+                }
+
+                foreach (var dimesion in dimensionDetails)
+                {
+                    //Insert & Update List Container MBL
+                    if (dimesion.Id == Guid.Empty)
+                    {
+                        dimesion.Id = Guid.NewGuid();
+                        dimesion.Mblid = masterId;
+                        dimesion.UserModified = currentUser.UserID;
+                        dimesion.DatetimeModified = DateTime.Now;
+                        var hsAddDemension = Add(dimesion);
+                    }
+                    else
+                    {
+                        dimesion.Mblid = masterId;
+                        dimesion.UserModified = currentUser.UserID;
+                        dimesion.DatetimeModified = DateTime.Now;
+                        var hsUpdateContMBL = Update(dimesion, x => x.Id == dimesion.Id);
+                    }
+                }
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+    }
+}

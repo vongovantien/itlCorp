@@ -22,6 +22,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsArrivalFrieghtCharge, CsArrivalFrieghtChargeModel>();
             CreateMap<CsTransactionDetailAddManifest, CsTransactionDetail>();
             CreateMap<CsTransactionDetail, CsTransactionDetailAddManifest>();
+            CreateMap<CsDimensionDetail, CsDimensionDetailModel>();
 
 
 
@@ -42,6 +43,8 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<spc_GetSurchargeByHouseBill, CsShipmentSurchargeDetailsModel>();
 
             CreateMap<AcctCdnote, AcctCdnoteModel>();
+
+            CreateMap<CsDimensionDetailModel, CsDimensionDetail>();
         }
     }
 }

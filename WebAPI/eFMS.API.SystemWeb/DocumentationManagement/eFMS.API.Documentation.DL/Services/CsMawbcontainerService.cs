@@ -461,7 +461,11 @@ namespace eFMS.API.Documentation.DL.Services
 
                 foreach (var item in csMawbcontainers)
                 {
-                    bool existedItems = containerShipments.Any(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == hblId);
+                    bool existedItems = containerShipments.Any(cont => cont.ContainerTypeId == item.ContainerTypeId 
+                    && cont.Quantity == item.Quantity 
+                    && cont.ContainerNo == item.ContainerNo 
+                    && cont.PackageTypeId == item.PackageTypeId 
+                    && cont.Hblid == hblId);
                     if (existedItems)
                     {
                         return new HandleState(stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED].Value);
@@ -474,7 +478,11 @@ namespace eFMS.API.Documentation.DL.Services
 
                 foreach (var item in csMawbcontainers)
                 {
-                    var existedItems = containerShipments.Count(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == mblId);
+                    var existedItems = containerShipments.Count(cont => cont.ContainerTypeId == item.ContainerTypeId 
+                        && cont.Quantity == item.Quantity 
+                        && cont.ContainerNo == item.ContainerNo 
+                        && cont.PackageTypeId == item.PackageTypeId 
+                        && cont.Mblid == mblId);
                     if (existedItems > 1)
                     {
                         return new HandleState(stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED].Value);
