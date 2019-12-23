@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { AirExportComponent } from './air-export/air-export.component';
-import { AirImportComponent } from './air-import/air-import.component';
 import { InlandTruckingComponent } from './inland-trucking/inland-trucking.component';
 import { SeaConsolExportComponent } from './sea-consol-export/sea-consol-export.component';
 import { SeaConsolImportComponent } from './sea-consol-import/sea-consol-import.component';
