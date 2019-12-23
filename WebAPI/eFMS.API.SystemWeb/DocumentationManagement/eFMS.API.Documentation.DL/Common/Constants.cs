@@ -50,5 +50,8 @@ namespace eFMS.API.Documentation.DL.Common
         public const string HBLOFLANDING_ITL_FRAME_KESCO = "ITL_FRAME_KESCO";
         public const string HBLOFLANDING_ITL_SEKO = "ITL_SEKO";
         public const string HBLOFLANDING_ITL_FRAME_SAMKIP = "ITL_FRAME_SAMKIP";
+
+        public const string HOUSEAIRWAYBILLLASTEST_ITL = "LASTEST_ITL";
+        public const string HOUSEAIRWAYBILLLASTEST_ITL_FRAME = "LASTEST_ITL_FRAME";
     }
 }

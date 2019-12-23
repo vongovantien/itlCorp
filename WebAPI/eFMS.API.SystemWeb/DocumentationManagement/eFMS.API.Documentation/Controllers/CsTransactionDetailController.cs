@@ -220,5 +220,18 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.PreviewSeaHBLofLading(hblId, reportType);
             return Ok(result);
         }
+
+        /// <summary>
+        /// preview house airway bill lastest
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <param name="reportType"></param>
+        /// <returns></returns>
+        [HttpGet("PreviewHouseAirwayBillLastest")]
+        public IActionResult PreviewHouseAirwayBillLastest(Guid hblId, string reportType)
+        {
+            var result = csTransactionDetailService.PreviewHouseAirwayBillLastest(hblId, reportType);
+            return Ok(result);
+        }
     }
 }

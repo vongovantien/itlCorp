@@ -71,7 +71,7 @@ export class AirExportComponent extends AppList {
       { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
       { title: 'Containers', field: 'containers', sortable: true },
       { title: 'Packages', field: 'packages', sortable: true },
-      { title: 'G.W', field: 'grossWeight', sortable: true },
+      { title: 'G.W', field: 'gw', sortable: true },
       { title: 'CBM', field: 'cbm', sortable: true },
     ];
 
