@@ -206,13 +206,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         ).subscribe(
             (res: any[]) => {
                 this.listCharges = res;
-                console.log(this.listCharges);
             }
         );
     }
 
     onSelectDataFormInfo(data: OperationInteface.IShipment | IAdvanceShipment | any, type: string) {
-        console.log(data);
         this.isSubmitted = false;
 
         switch (type) {
@@ -266,7 +264,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     }
 
     onSelectDataTableInfo(data: any, chargeItem: Surcharge, type: string) {
-        console.log(data);
         this.isSubmitted = false;
         [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
 
@@ -313,8 +310,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             default:
                 break;
         }
-
-        console.log(this.charges);
     }
 
     onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string, ) {
@@ -377,7 +372,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             chargeId: null,
             unitId: null
         }));
-        console.log(this.charges);
     }
 
     duplicateCharge(index: number) {
