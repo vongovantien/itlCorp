@@ -39,6 +39,7 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? GrossWeight { get; set; }
         public decimal? ChargeWeight { get; set; }
         public decimal? Cbm { get; set; }
+        public decimal? Hw { get; set; }
         public int? PackageQty { get; set; }
         public string PackageType { get; set; }
         public string Notes { get; set; }
@@ -46,6 +47,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string CurrentStatus { get; set; }
         public DateTime? LockedDate { get; set; }
         public bool? IsLocked { get; set; }
+        public DateTime? FlightDate { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

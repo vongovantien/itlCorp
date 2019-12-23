@@ -7,6 +7,5 @@ namespace eFMS.API.Catalogue.DL.Models
 {
     public class CatSaleManModel : CatSaleman
     {
-
     }
 }

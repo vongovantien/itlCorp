@@ -406,20 +406,25 @@ namespace eFMS.API.Documentation.DL.Services
                           OnBoardStatus = detail.OnBoardStatus,
                           Remark = detail.Remark,
                           PurchaseOrderNo = detail.PurchaseOrderNo,
-                          OriginCountryId = detail.OriginCountryId
+                          OriginCountryId = detail.OriginCountryId,
+                          CBM = detail.Cbm,
+                          GW = detail.GrossWeight,
+                          PackageContainer = detail.PackageContainer,
+                          PackageQty = detail.PackageQty,
+                          PackageType = detail.PackageType
 
 
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.ToList();
-            results.ForEach(fe => {
-                fe.Containers = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
-                                                                        .Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));
-                fe.Packages = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
-                                                                        .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + "x" + GetUnitNameById(s.PackageTypeId)) : string.Empty));
-                fe.GW = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Sum(s => s.Gw);
-                fe.CBM = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Sum(s => s.Cbm);
-            });
+            //results.ForEach(fe => {
+            //    fe.Containers = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
+            //                                                            .Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));
+            //    fe.Packages = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
+            //                                                            .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + "x" + GetUnitNameById(s.PackageTypeId)) : string.Empty));
+            //    fe.GW = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Sum(s => s.Gw);
+            //    fe.CBM = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Sum(s => s.Cbm);
+            //});
             return results;
         }
 
@@ -674,7 +679,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
             parameter.Contact = _currentUser;//Get user login
             parameter.DecimalNo = 0; // set 0  temporary

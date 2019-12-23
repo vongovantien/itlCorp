@@ -446,6 +446,7 @@ namespace eFMS.API.Documentation.DL.Services
                         POLName = pol.NameEn,
                         CreatorName = creator.Username,
                         HblId = houseBill.Id == Guid.Empty || houseBill.Id == null ? Guid.Empty : houseBill.Id,
+                        PackageQty = masterBill.PackageQty
                     };
 
             return query;

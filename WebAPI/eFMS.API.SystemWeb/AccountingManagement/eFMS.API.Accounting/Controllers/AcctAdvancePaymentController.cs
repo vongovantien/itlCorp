@@ -457,10 +457,10 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        [HttpGet("GetAdvanceOfShipment")]
-        public IActionResult GetAdvanceOfShipment()
+        [HttpGet("GetAdvancesOfShipment")]
+        public IActionResult GetAdvancesOfShipment()
         {
-            var data = acctAdvancePaymentService.GetAdvanceOfShipment();
+            var data = acctAdvancePaymentService.GetAdvancesOfShipment();
             return Ok(data);
         }
     }

@@ -81,7 +81,7 @@ export class SalemanPopupComponent extends PopupBase {
         this.form.setValue({
             office: sm.office,
             effectiveDate: !!sm.effectDate ? { startDate: new Date(sm.effectDate), endDate: new Date(sm.effectDate) } : null,
-            service: this.services.filter(i => i.text === sm.service)[0],
+            service: this.services.filter(i => i.id === sm.service)[0],
             status: this.statuss.filter(i => i.title === sm.status)[0],
             saleman: sm.saleman_ID,
             description: sm.description
@@ -162,7 +162,7 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     onSelectSaleMan(saleMan: any) {
-        this.saleman.setValue(saleMan.username);
+        this.saleman.setValue(saleMan.id);
         this.selectedDataSaleMan = saleMan;
     }
 
@@ -178,7 +178,7 @@ export class SalemanPopupComponent extends PopupBase {
                 company: this.office.value,
                 office: this.office.value,
                 effectDate: !!this.effectiveDate.value && this.effectiveDate.value.startDate != null ? formatDate(this.effectiveDate.value.startDate !== undefined ? this.effectiveDate.value.startDate : this.effectiveDate.value, 'yyyy-MM-dd', 'en') : null,
-                status: this.status.value,
+                status: this.status.value.value,
                 partnerId: null,
                 saleman_ID: this.saleman.value,
                 service: this.service.value.id,
@@ -186,24 +186,6 @@ export class SalemanPopupComponent extends PopupBase {
             };
             this.saleManToAdd = new Saleman(saleMane);
             this.onCreate.emit(this.saleManToAdd);
-            // return;
         }
-        // if (this.strOfficeCurrent.value !== undefined && this.strSalemanCurrent.value !== undefined) {
-        //     const salemaneffectdate = this.saleManToAdd.effectDate.startDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en');
-        //     const saleMane: any = {
-        //         company: this.saleManToAdd.office,
-        //         office: this.saleManToAdd.office,
-        //         effectDate: salemaneffectdate,
-        //         status: this.selectedStatus.value,
-        //         partnerId: null,
-        //         saleman_ID: this.selectedDataSaleMan.username,
-        //         service: this.selectedService.id,
-        //         createDate: new Date()
-        //     };
-        //     this.saleManToAdd = new Saleman(saleMane);
-
-        //     this.onCreate.emit(this.saleManToAdd);
-        // }
-
     }
 }

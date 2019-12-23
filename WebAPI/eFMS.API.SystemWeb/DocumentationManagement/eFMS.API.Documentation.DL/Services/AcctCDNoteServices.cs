@@ -458,27 +458,24 @@ namespace eFMS.API.Documentation.DL.Services
 
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
-            /*if(warehouseId != null)
-            {
-                soaDetails.WarehouseName = places.FirstOrDefault(x => x.Id == new Guid(warehouseId))?.NameEn;
-            }*/
+            
             soaDetails.CreatedDate = ((DateTime)cdNote.DatetimeCreated).ToString("dd'/'MM'/'yyyy");
             foreach (var item in charges)
             {
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                 var hb = trandetailRepositoty.Get(x => x.Id == item.Hblid).FirstOrDefault();
-                var catCharge = catchargeRepository.First(x => x.Id == charge.ChargeId);
+                var catCharge = catchargeRepository.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
 
                 //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
                 var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
-                var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == Constants.CURRENCY_LOCAL && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
 
-                charge.Currency = currencyRepository.First(x => x.Id == charge.CurrencyId).CurrencyName;
+                charge.Currency = currencyRepository.Get(x => x.Id == charge.CurrencyId).FirstOrDefault()?.CurrencyName;
                 charge.ExchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
                 charge.Hwbno = hb != null ? hb.Hwbno : opsTransaction?.Hwbno;
-                charge.Unit = unitRepository.First(x => x.Id == charge.UnitId).UnitNameEn;
-                charge.ChargeCode = catCharge.Code;
-                charge.NameEn = catCharge.ChargeNameEn;
+                charge.Unit = unitRepository.Get(x => x.Id == charge.UnitId).FirstOrDefault()?.UnitNameEn;
+                charge.ChargeCode = catCharge?.Code;
+                charge.NameEn = catCharge?.ChargeNameEn;
                 listSurcharges.Add(charge);
                 if (hb != null)
                 {
@@ -657,19 +654,19 @@ namespace eFMS.API.Documentation.DL.Services
                                 surchargeRepository.Update(item, x => x.Id == item.Id, false);
                             }
                             DataContext.SubmitChanges();
-                            var jobOpsTrans = opstransRepository.Get(x => x.Id == cdNote.JobId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
+                            var jobOpsTrans = opstransRepository.Get(x => x.Id == cdNote.JobId).FirstOrDefault();
                             if (jobOpsTrans != null)
                             {
                                 jobOpsTrans.UserModified = currentUser.UserID;
                                 jobOpsTrans.DatetimeModified = DateTime.Now;
-                                opstransRepository.Update(jobOpsTrans, x => x.Id == jobOpsTrans.Id, false);//((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
+                                opstransRepository.Update(jobOpsTrans, x => x.Id == jobOpsTrans.Id, false);
                             }
-                            var jobCSTrans = cstransRepository.Get(x => x.Id == cdNote.JobId).FirstOrDefault(); //((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
+                            var jobCSTrans = cstransRepository.Get(x => x.Id == cdNote.JobId).FirstOrDefault();
                             if (jobCSTrans != null)
                             {
                                 jobCSTrans.UserModified = currentUser.UserID;
                                 jobCSTrans.DatetimeModified = DateTime.Now;
-                                cstransRepository.Update(jobCSTrans, x => x.Id == jobCSTrans.Id, false);//((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
+                                cstransRepository.Update(jobCSTrans, x => x.Id == jobCSTrans.Id, false);
                             }
                         }
                         DataContext.SubmitChanges();
@@ -874,7 +871,6 @@ namespace eFMS.API.Documentation.DL.Services
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
                     //Exchange Rate theo Currency truyền vào
                     var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    //decimal? _exchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
                     decimal? _exchangeRate;
                     if ((exchangeRate != null && exchangeRate.Rate != 0))
                     {
@@ -937,7 +933,7 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new SeaDebitAgentsNewReportParams();
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
             parameter.Contact = _currentUser;//Get user login
             parameter.CompanyDescription = string.Empty;

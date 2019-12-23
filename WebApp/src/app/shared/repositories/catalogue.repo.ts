@@ -153,17 +153,25 @@ export class CatalogueRepo {
             })
         );
     }
+    getPartnerGroup() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerGroup`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
     getListPartner(page?: number, size?: number, data?: any) {
         if (!!page && !!size) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/paging`, {}, {
-                page: '' + page,
-                size: '' + size
-            }).pipe(
-                catchError((error) => throwError(error)),
-                map((res: any) => {
-                    return res;
-                })
-            );
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/paging`, data
+                , {
+                    page: '' + page,
+                    size: '' + size
+                }).pipe(
+                    catchError((error) => throwError(error)),
+                    map((res: any) => {
+                        return res;
+                    })
+                );
         } else {
             return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/Query`, data).pipe(
                 catchError((error) => throwError(error)),
@@ -371,9 +379,25 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+    upLoadPartnerFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/uploadFile`, files, "uploadedFile");
+    }
+    downloadPartnerExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/DownloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 
     updatePartner(id: string, body: any = {}) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/` + id, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deletePartner(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/${id}`).pipe(
+            catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }

@@ -10,6 +10,7 @@ namespace eFMS.API.System.DL.IService
 {
     public interface ISysEmployeeService : IRepositoryBase<SysEmployee, SysEmployeeModel>
     {
+        SysEmployeeModel GetByUser(string userId);
         HandleState Update(SysEmployeeModel sysEmployeeModel);
         HandleState Insert(SysEmployeeModel sysEmployeeModel);
 

@@ -62,7 +62,7 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
             { title: 'POL', field: 'polName', sortable: true },
             { title: 'POD', field: 'podName', sortable: true },
             { title: "Cont Qty", field: 'sumCont', sortable: true },
-            { title: "Package Qty", field: 'sumPackage', sortable: true },
+            { title: "Package Qty", field: 'packageQty', sortable: true },
             { title: 'G.W', field: 'grossWeight', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
             { title: 'Creator', field: 'creatorName', sortable: true },

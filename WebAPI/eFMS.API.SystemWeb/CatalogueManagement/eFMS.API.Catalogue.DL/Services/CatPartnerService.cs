@@ -88,16 +88,22 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 partner.Id = partner.TaxCode;
             }
-            var hs = DataContext.Add(partner, false);
+            var hs = DataContext.Add(partner);
             if (hs.Success)
             {
-                var salemans = mapper.Map<List<CatSaleman>>(entity.SaleMans);
-                salemans.ForEach(x => {
-                    x.PartnerId = partner.Id;
-                    x.CreateDate = DateTime.Now;
-                    x.UserCreated = currentUser.UserID;
-                });
-                salemanRepository.Add(salemans, false);
+                if(entity.SaleMans.Count() > 0)
+                {
+                    var salemans = mapper.Map<List<CatSaleman>>(entity.SaleMans);
+                    salemans.ForEach(x => {
+                        x.Id = Guid.NewGuid();
+                        x.PartnerId = partner.Id;
+                        x.CreateDate = DateTime.Now;
+                        x.UserCreated = currentUser.UserID;
+                    });
+                    partner.SalePersonId = salemans.FirstOrDefault().Id.ToString();
+                    DataContext.Update(partner, x => x.Id == partner.Id);
+                    salemanRepository.Add(salemans);
+                }
                 DataContext.SubmitChanges();
                 salemanRepository.SubmitChanges();
                 ClearCache();
@@ -113,10 +119,31 @@ namespace eFMS.API.Catalogue.DL.Services
             if (entity.Active == false)
             {
                 entity.InactiveOn = DateTime.Now;
-            }
+            } 
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
+                var hsoldman = salemanRepository.Delete(x => x.PartnerId == model.Id && !model.SaleMans.Any(sale => sale.Id == x.Id));
+                var salemans = mapper.Map<List<CatSaleman>>(model.SaleMans);
+
+                foreach (var item in model.SaleMans)
+                {
+                    if(item.Id == Guid.Empty)
+                    {
+                        item.Id = Guid.NewGuid();
+                        item.PartnerId = entity.Id;
+                        item.CreateDate = DateTime.Now;
+                        item.UserCreated = currentUser.UserID;
+                        salemanRepository.Add(item);
+                    }
+                    else
+                    {
+                        item.ModifiedDate = DateTime.Now;
+                        item.UserModified = currentUser.UserID;
+                        salemanRepository.Update(item, x=> x.Id == item.Id);
+                    }
+                }
+                salemanRepository.SubmitChanges();
                 ClearCache();
                 Get();
             }

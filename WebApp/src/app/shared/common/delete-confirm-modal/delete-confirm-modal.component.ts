@@ -5,14 +5,14 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
   templateUrl: './delete-confirm-modal.component.html'
 })
 export class DeleteConfirmModalComponent implements OnInit {
-  @Input() title:String;
-  @Output() delete:EventEmitter<Boolean>= new EventEmitter<any>();
+  @Input() title: string;
+  @Output() delete: EventEmitter<Boolean> = new EventEmitter<any>();
 
   constructor() { }
 
   ngOnInit() {
   }
-  onDelete(){
+  onDelete() {
     this.delete.emit(true);
   }
 }

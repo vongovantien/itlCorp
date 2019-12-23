@@ -43,5 +43,6 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public bool? IsFromShipment { get; set; }
         public string PaySoano { get; set; }
         public string TypeOfFee { get; set; }
+        public string AdvanceNo { get; set; }
     }
 }

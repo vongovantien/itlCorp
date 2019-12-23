@@ -96,6 +96,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.Charge.DatetimeModified = DateTime.Now;
                     var hs = DataContext.Update(model.Charge, x => x.Id == model.Charge.Id, false);
                     if (hs.Success == false) return hs;
+
                     foreach (var item in model.ListChargeDefaultAccount)
                     {
                         if (item.Id == 0)
@@ -107,9 +108,11 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         else
                         {
+                            chargeDefaultRepository.Delete(x => x.ChargeId == item.ChargeId);
                             item.UserModified = currentUser.UserID;
                             item.DatetimeModified = DateTime.Now;
-                            chargeDefaultRepository.Update(item, x => x.Id == item.Id, false);
+                            item.Id = 0;
+                            chargeDefaultRepository.Add(item,false);
                         }
                     }
                     chargeDefaultRepository.SubmitChanges();
@@ -190,6 +193,30 @@ namespace eFMS.API.Catalogue.DL.Services
                                    && (x.Active == criteria.Active || criteria.Active == null);
             }
             var list = Get(query);
+            var currencies = currencyService.Get();
+            var units = catUnitService.Get();
+            list = list.Join(currencies, x => x.CurrencyId, y => y.Id, (x, y) => new { x, y.CurrencyName })
+                        .Join(units, x => x.x.UnitId, y => y.Id, (x, y) => new CatChargeModel {
+                            Id = x.x.Id,
+                            Code = x.x.Code,
+                            ChargeNameVn = x.x.ChargeNameVn,
+                            ChargeNameEn = x.x.ChargeNameEn,
+                            ServiceTypeId = x.x.ServiceTypeId,
+                            Type = x.x.Type,
+                            CurrencyId = x.x.CurrencyId,
+                            UnitPrice = x.x.UnitPrice,
+                            UnitId = x.x.UnitId,
+                            Vatrate = x.x.Vatrate,
+                            IncludedVat = x.x.IncludedVat,
+                            UserCreated = x.x.UserCreated,
+                            DatetimeCreated = x.x.DatetimeCreated,
+                            UserModified = x.x.UserModified,
+                            DatetimeModified = x.x.DatetimeModified,
+                            Active = x.x.Active,
+                            InactiveOn = x.x.InactiveOn,
+                            currency = y.UnitNameEn,
+                            unit = y.UnitNameEn
+                        });
             return list;
         }
 

@@ -14,6 +14,11 @@ import { CommodityAddPopupComponent } from './components/form-create-commodity/f
 import { CommodityGroupAddPopupComponent } from './components/form-create-commodity-group/form-create-commodity-group.popup';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+type COMMODITY_TAB = 'Commodity list' | 'Commodity group';
+enum CommodityTab {
+  LIST = 'Commodity list',
+  GROUP = 'Commodity group',
+}
 
 @Component({
   selector: 'app-commodity',
@@ -39,6 +44,7 @@ export class CommodityComponent extends AppList {
     typeSearch: TypeSearch.intab,
     searchString: ''
   };
+  selectedTab: COMMODITY_TAB = CommodityTab.LIST; // Default tab.
 
   headerCommodity: CommonInterface.IHeaderTable[];
   /*
@@ -57,6 +63,7 @@ export class CommodityComponent extends AppList {
     this.requestSort = this.sortCommodity;
   }
 
+
   ngOnInit() {
     this.headerCommodity = [
       { title: 'Code', sortable: true, field: 'code' },
@@ -67,6 +74,10 @@ export class CommodityComponent extends AppList {
     ];
 
     this.getCommodities();
+  }
+
+  onSelectTabCommodity(tabname: COMMODITY_TAB) {
+    this.selectedTab = tabname;
   }
 
   ngAfterViewInit() {

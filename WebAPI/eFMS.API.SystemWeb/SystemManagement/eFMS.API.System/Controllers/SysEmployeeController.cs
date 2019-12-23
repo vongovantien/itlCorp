@@ -43,5 +43,13 @@ namespace eFMS.API.System.Controllers
                 return Ok(new ResultHandle { Status = true, Message = "Success", Data = result });
             }
         }
+
+        [HttpGet]
+        [Route("GetEmployeeByUser")]
+        public IActionResult GetEmployeeByUser(string userId)
+        {
+            var result = sysEmployeeService.GetByUser(userId);
+            return Ok(result);
+        }
     }
 }

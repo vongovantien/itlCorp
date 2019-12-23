@@ -85,6 +85,40 @@ namespace eFMS.API.Operation.Service.Models
         public string DosentTo1 { get; set; }
         public string DosentTo2 { get; set; }
         public string Dofooter { get; set; }
+        public string FirstCarrierBy { get; set; }
+        public string FirstCarrierTo { get; set; }
+        public string TransitPlaceTo1 { get; set; }
+        public string TransitPlaceBy1 { get; set; }
+        public string TransitPlaceTo2 { get; set; }
+        public string TransitPlaceBy2 { get; set; }
+        public string FlightNo { get; set; }
+        public DateTime? FlightDate { get; set; }
+        public string IssuranceAmount { get; set; }
+        public string CurrencyId { get; set; }
+        public string Chgs { get; set; }
+        public string WtorValpayment { get; set; }
+        public string OtherPayment { get; set; }
+        public string Dclrca { get; set; }
+        public string Dclrcus { get; set; }
+        public string HandingInformation { get; set; }
+        public string Notify { get; set; }
+        public string Rclass { get; set; }
+        public string KgIb { get; set; }
+        public decimal? RateCharge { get; set; }
+        public bool? Min { get; set; }
+        public decimal? Total { get; set; }
+        public string SeaAir { get; set; }
+        public string IssuedBy { get; set; }
+        public string Sci { get; set; }
+        public string OtherCharge { get; set; }
+        public string CurrConvertRate { get; set; }
+        public string Wt { get; set; }
+        public string Val { get; set; }
+        public string Tax { get; set; }
+        public string DueAgent { get; set; }
+        public string DueCarrier { get; set; }
+        public string TotalPp { get; set; }
+        public string AttachList { get; set; }
 
         public virtual CsTransaction Job { get; set; }
     }

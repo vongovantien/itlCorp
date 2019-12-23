@@ -33,9 +33,9 @@ export class VoucherListComponent extends AppList {
             { title: 'Account Debit No (VAT)', field: '', sortable: false },
             { title: 'Account Crebit No (VAT)', field: '', sortable: false },
         ];
-
     }
-    RemoveDefaultAccount(index) {
+
+    removeDefaultAccount(index) {
         this.ChargeToAdd.listChargeDefaultAccount.splice(index, 1);
         this.isMaximumAccountRow = false;
     }

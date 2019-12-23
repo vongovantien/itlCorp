@@ -19,6 +19,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     @ViewChild('changePartnerPopup', { static: false }) changePartnerPopup: ConfirmPopupComponent;
     @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
     @ViewChild(ShareBussinessCdNoteAddRemainingChargePopupComponent, { static: false }) addRemainChargePopup: ShareBussinessCdNoteAddRemainingChargePopupComponent;
+    @ViewChild('confirmCloseAddPopup', { static: false }) confirmCloseAddPopup: ConfirmPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -57,6 +58,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     totalDebit: string = '';
     balanceAmount: string = '';
 
+    isChangeCharge: boolean = false;
+
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
@@ -91,6 +94,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.partnerCurrent = {};
         this.listChargePartner = [];
         this.initGroup = [];
+        this.isChangeCharge = false;
+        this.isCheckAllCharge = false;
     }
 
     getListSubjectPartner(mblId: any) {
@@ -151,6 +156,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.partnerCurrent = Object.assign({}, this.selectedPartner);
         this.keyword = '';
         this.isCheckAllCharge = false;
+        this.isChangeCharge = true;
     }
 
     onSubmitChangePartnerPopup() {
@@ -193,6 +199,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     }
 
     removeCharge() {
+        this.isChangeCharge = true;
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges.filter(group => group.isSelected)) {
@@ -394,4 +401,21 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             this.listChargePartner = this.initGroup;
         }
     }
+
+    cancel(){
+        if(this.isChangeCharge === false){
+            this.closePopup();
+        } else {
+            this.confirmCloseAddPopup.show();
+        }
+    }
+
+    onSubmitConfirmCloseAdd(){
+        this.confirmCloseAddPopup.hide();
+        this.closePopup();
+    }
+    
+    onCancelConfirmCloseAdd(){
+        this.confirmCloseAddPopup.hide();
+    }    
 }

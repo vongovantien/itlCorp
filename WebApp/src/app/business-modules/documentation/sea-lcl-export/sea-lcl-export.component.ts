@@ -59,7 +59,7 @@ export class SeaLCLExportComponent extends AppList {
             { title: 'Agent', field: 'agentName', sortable: true },
             { title: 'POL', field: 'polName', sortable: true },
             { title: 'POD', field: 'podName', sortable: true },
-            { title: 'Total Cont', field: 'sumCont', sortable: true },
+            { title: 'Total Pkgs', field: 'packageQty', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
             { title: 'Creator', field: 'userCreated', sortable: true },
             { title: 'Created Date', field: 'datetimeCreated', sortable: true },

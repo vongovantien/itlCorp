@@ -76,7 +76,6 @@ export class OpsCDNoteComponent extends AppList {
                 (res: any) => {
                     this.cdNoteGroups = res;
                     this.initGroup = res;
-                    console.log(this.cdNoteGroups)
                 },
             );
     }
@@ -158,6 +157,7 @@ export class OpsCDNoteComponent extends AppList {
         this.cdNoteGroups = this.initGroup;
         //TODO improve search.
         if (!!keyword) {
+            if(keyword.indexOf('\\') != -1) return this.cdNoteGroups = [];
             keyword = keyword.toLowerCase();
             // Search group
             let dataGrp = this.cdNoteGroups.filter((item: any) => item.partnerNameEn.toLowerCase().toString().search(keyword) !== -1)

@@ -18,7 +18,7 @@
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
-                        <input type="file" class="form-control m-input m-input--square" placeholder=""
+                        <input #fileInput type="file" class="form-control m-input m-input--square" placeholder=""
                             (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                         <span class="m-form__help">
                             <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
@@ -64,7 +64,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="import()">
+                        (click)="import(fileInput)">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -401,34 +401,6 @@
             <!--end: Datatable -->
 
             <!--begin::pagination-->
-            <!-- <div class="pagination-nav">
-              <div class="row">
-                  <div class="col-sm-6">
-                      <div class="tatable__pager-size" style="max-width: 190px">
-                          <div class="select-box">
-                              <select class="form-control m-input m-input--square" id="" aria-label="">
-                                  <option value="1">15 line/screen</option>
-                                  <option value="2">30 line/screen</option>
-                                  <option value="3">50 line/screen</option>
-                              </select>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="col-sm-6">
-                      <nav aria-label="">
-                          <ul class="pagination justify-content-end">
-                              <li class="page-item"><a class="page-link" href="#">First</a></li>
-                              <li class="page-item"><a class="page-link" href="#">Back</a></li>
-                              <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                              <li class="page-item"><a class="page-link" href="#">2</a></li>
-                              <li class="page-item"><a class="page-link" href="#">3</a></li>
-                              <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                              <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                          </ul>
-                      </nav>
-                  </div>
-              </div>
-          </div> -->
             <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)">
             </app-pagination>
             <!--end::pagination-->
@@ -438,32 +410,5 @@
 </div>
 <!--end::m-content-->
 <!--begin::modal-->
-<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Notification</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="confirm-text-block">
-                    <span>There are invalid data. Please check Import!</span>
-                </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            OK
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<info-popup [body]="'There are invalid data. Please check Import!'"></info-popup>
 <!--end::modal-->

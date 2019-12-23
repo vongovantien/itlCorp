@@ -36,16 +36,6 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<Shipments> GetShipmentNotLocked()
         {
             var userCurrent = currentUser.UserID;
-            //var shipmentsOperation = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false)
-            //                        .Select(x => new Shipments
-            //                        {
-            //                            Id = x.Id,
-            //                            JobId = x.JobNo,
-            //                            HBL = x.Hwbno,
-            //                            MBL = x.Mblno,
-            //                            CustomerId = x.CustomerId,
-            //                            HBLID = x.Hblid
-            //                        });
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
             var shipmentsOperation = from ops in opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false)
@@ -59,16 +49,21 @@ namespace eFMS.API.Documentation.DL.Services
                                          HBL = ops.Hwbno,
                                          MBL = ops.Mblno,
                                          CustomerId = ops.CustomerId,
+                                         AgentId = ops.AgentId,
+                                         CarrierId = ops.SupplierId,
                                          HBLID = ops.Hblid
                                      };
-            shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.HBLID }).Select(s => new Shipments
+            shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.AgentId, x.CarrierId, x.HBLID }).Select(s => new Shipments
             {
                 Id = s.Key.Id,
                 JobId = s.Key.JobId,
                 HBL = s.Key.HBL,
                 MBL = s.Key.MBL,
                 CustomerId = s.Key.CustomerId,
-                HBLID = s.Key.HBLID
+                AgentId = s.Key.AgentId,
+                CarrierId = s.Key.CarrierId,
+                HBLID = s.Key.HBLID,
+                Service = "CL"
             });
             //End change request
             var transactions = csRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
@@ -79,7 +74,10 @@ namespace eFMS.API.Documentation.DL.Services
                 HBL = x.y.Hwbno,
                 MBL = x.y.Mawb,
                 CustomerId = x.y.CustomerId,
-                HBLID = x.y.Id
+                AgentId = x.x.AgentId,
+                CarrierId = x.x.ColoaderId,
+                HBLID = x.y.Id,
+                Service = x.x.TransactionType
             });
             var shipments = shipmentsOperation.Union(shipmentsDocumention);
             return shipments;
