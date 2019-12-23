@@ -370,7 +370,6 @@ export class PartnerDetailComponent extends AppList {
 
     onSubmit() {
         this.formPartnerComponent.isSubmitted = true;
-        this.partner.saleMans = this.saleMandetail;
         this.getFormPartnerData();
         if (this.partner.countryId == null || this.partner.provinceId == null
             || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
@@ -399,9 +398,11 @@ export class PartnerDetailComponent extends AppList {
                 if (this.saleMandetail.length === 0) {
                     this.toastr.error('Please add saleman and service for customer!');
                 } else {
+                    this.partner.saleMans = this.saleMandetail;
                     this.updatePartner();
                 }
             } else {
+                this.partner.saleMans = [];
                 this.updatePartner();
             }
         }
@@ -415,7 +416,7 @@ export class PartnerDetailComponent extends AppList {
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {
-                    s = item['id'] + ';';
+                    s = s + item['id'] + ';';
                 }
                 this.partner.partnerGroup = s.substring(0, s.length - 1);
             }
