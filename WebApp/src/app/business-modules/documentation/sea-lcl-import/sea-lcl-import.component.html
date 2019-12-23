@@ -13,7 +13,7 @@
         </div>
     </app-sub-header>
     <div class="m-content">
-        <form-search-sea [transaction] = "9" (onSearch)="onSearchMasterBills($event)"></form-search-sea>
+        <form-search-sea [transaction] = "transactionService" (onSearch)="onSearchMasterBills($event)"></form-search-sea>
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="table-wrapper table-scrollable" id="masterbill-list-table">

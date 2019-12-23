@@ -22,20 +22,10 @@ const routes: Routes = [
         },
     },
     {
-        path: 'air-export',
-        component: AirExportComponent,
-        data: {
-            name: "Air Export",
-            level: 2
-        }
+        path: 'air-export', loadChildren: () => import('./air-export/air-export.module').then(m => m.AirExportModule),
     },
     {
-        path: 'air-import',
-        component: AirImportComponent,
-        data: {
-            name: "Air Import",
-            level: 2
-        }
+        path: 'air-import', loadChildren: () => import('./air-import/air-import.module').then(m => m.AirImportModule),
     },
     {
         path: 'sea-consol-export',

@@ -32,7 +32,7 @@ export class SeaFCLExportComponent extends AppList {
     houseBills: CsTransactionDetail[] = [];
 
     itemToDelete: any = null;
-
+    transactionService: number = CommonEnum.TransactionTypeEnum.SeaFCLExport;
     constructor(
         private _router: Router,
         private _toastService: ToastrService,
@@ -51,7 +51,7 @@ export class SeaFCLExportComponent extends AppList {
         this.isLoading = <any>this._store.select(fromShare.getTransationLoading);
 
         this.dataSearch = {
-            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport,
+            transactionType: this.transactionService,
             fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
             toDate: new Date(),
         };
@@ -61,7 +61,7 @@ export class SeaFCLExportComponent extends AppList {
     ngOnInit() {
         this.headers = [
             { title: 'Job ID', field: 'jobNo', sortable: true },
-            { title: 'MBL No', field: 'mawb', sortable: true },
+            { title: 'MBL No.', field: 'mawb', sortable: true },
             { title: 'ETD', field: 'etd', sortable: true },
             { title: 'ETA', field: 'eta', sortable: true },
             { title: 'Supplier', field: 'supplierName', sortable: true },
@@ -77,7 +77,7 @@ export class SeaFCLExportComponent extends AppList {
         this.headersHBL = [
             { title: 'HBL No', field: 'hwbno', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
-            { title: 'Sale Man', field: 'saleManName', sortable: true },
+            { title: 'Salesman', field: 'saleManName', sortable: true },
             { title: 'Notify Party', field: 'notifyParty', sortable: true },
             { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
             { title: 'Containers', field: 'containers', sortable: true },
@@ -130,7 +130,7 @@ export class SeaFCLExportComponent extends AppList {
     }
 
     onSearchShipment($event: any) {
-        $event.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLExport;
+        $event.transactionType = this.transactionService;
         this.dataSearch = $event;
         this.requestSearchShipment();
     }

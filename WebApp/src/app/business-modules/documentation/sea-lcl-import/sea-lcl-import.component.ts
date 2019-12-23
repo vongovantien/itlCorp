@@ -33,7 +33,7 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
 
     selectedMasterBill: CsTransaction = null;
     deleteMessage: string = '';
-
+    transactionService: number = CommonEnum.TransactionTypeEnum.SeaLCLImport;
     constructor(
         private _router: Router,
         private _documentationRepo: DocumentationRepo,
@@ -72,7 +72,7 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
         this.headerHouseBills = [
             { title: 'HBL No', field: 'hwbno', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
-            { title: 'SalesMan', field: 'saleManName', sortable: true },
+            { title: 'Salesman', field: 'saleManName', sortable: true },
             { title: 'Notify Party', field: 'notifyParty', sortable: true },
             { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
             { title: 'Containers', field: 'containers', sortable: true },
@@ -81,7 +81,7 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
         this.dataSearch = {
-            transactionType: CommonEnum.TransactionTypeEnum.SeaLCLImport,
+            transactionType: this.transactionService,
             //fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
             //toDate: new Date(),
         };
@@ -134,7 +134,7 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
 
     onSearchMasterBills(data: any) {
         this.page = 1; // reset page.
-        data.transactionType = CommonEnum.TransactionTypeEnum.SeaLCLImport;
+        data.transactionType = this.transactionService;
 
         this.dataSearch = data;
         this.requestSearchShipment();
