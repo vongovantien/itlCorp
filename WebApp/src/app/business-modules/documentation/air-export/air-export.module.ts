@@ -11,6 +11,8 @@ import { ShareBussinessModule } from '../../share-business/share-bussines.module
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { AirExportComponent } from './air-export.component';
 import { AirExportLazyLoadModule } from './air-export-lazy-load.module';
+import { AirExportCreateJobComponent } from './create-job/create-job-air-export.component';
+import { AirExportDetailJobComponent } from './detail-job/detail-job-air-export.component';
 
 const routing: Routes = [
     {
@@ -18,14 +20,14 @@ const routing: Routes = [
             name: "Air Export", path: "air-export", level: 2
         },
     },
-    // {
-    //     path: 'new', component: AirExportCreateJobComponent,
-    //     data: { name: "Create New Job", path: "new", level: 3 }
-    // },
-    // {
-    //     path: ':jobId', component: AirExportDetailJobComponent,
-    //     data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.AirExport },
-    // },
+    {
+        path: 'new', component: AirExportCreateJobComponent,
+        data: { name: "Create New Job", path: "new", level: 3 }
+    },
+    {
+        path: ':jobId', component: AirExportDetailJobComponent,
+        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.AirExport },
+    },
     // {
     //     path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/Air-export-hbl.module').then(m => m.AirExportHBLModule),
     // },
@@ -62,7 +64,9 @@ const LIB = [
     ],
     exports: [],
     declarations: [
-        AirExportComponent
+        AirExportComponent,
+        AirExportCreateJobComponent,
+        AirExportDetailJobComponent
     ],
     providers: [],
 })
