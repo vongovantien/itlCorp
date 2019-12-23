@@ -15,6 +15,7 @@ import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 import * as fromShareBussiness from './../../../../share-business/store';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/share-business/components/selling-charge/selling-charge.component';
+import { SortService } from '@services';
 
 
 @Component({
@@ -48,9 +49,11 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
+        private _sortService: SortService
     ) {
         super();
         this._progressRef = this._progressService.ref();
+        this.requestSort = this.sortHBL;
     }
 
     ngOnInit() {
@@ -95,6 +98,10 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
                     }
                 }
             );
+    }
+
+    sortHBL() {
+        this.houseBills = this._sortService.sort(this.houseBills, this.sort, this.order);
     }
 
     showDeletePopup(hbl: CsTransactionDetail, event: Event) {
