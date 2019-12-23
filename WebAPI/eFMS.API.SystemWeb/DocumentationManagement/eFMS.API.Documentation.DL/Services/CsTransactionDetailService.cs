@@ -44,7 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> catUnit,
             IContextBase<CatCommodity> catCommodity,
             IContextBase<CatSaleman> catSaleman,
-            IContextBase<CsShipmentSurcharge> surchareRepo , 
+            IContextBase<CsShipmentSurcharge> surchareRepo,
             IContextBase<CatCountry> countryRepo,
             IContextBase<CsTransactionDetail> csTransactiondetail,
             ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mapper)
@@ -270,7 +270,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var queryDetail = csTransactionDetailRepo.Get(x => x.Id == Id).FirstOrDefault();
                 var detail = mapper.Map<CsTransactionDetailModel>(queryDetail);
-                if(detail != null)
+                if (detail != null)
                 {
                     var resultPartner = catPartnerRepo.Get(x => x.Id == detail.CustomerId).FirstOrDefault();
                     var resultNoti = catPartnerRepo.Get(x => x.Id == detail.NotifyPartyId).FirstOrDefault();
@@ -286,12 +286,12 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.PODName = pod?.NameEn;
                     detail.ShipmentEta = shipment.Eta;
                     return detail;
+                }
             }
-        }
             catch (Exception ex)
             {
 
-        }
+            }
             return null;
 
         }
@@ -308,7 +308,7 @@ namespace eFMS.API.Documentation.DL.Services
                          select new { detail, tran, cus, sale });
             if (criteria.All == null)
             {
-               if(criteria.TypeFCL == "Export")
+                if (criteria.TypeFCL == "Export")
                 {
                     query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
                  && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -318,7 +318,7 @@ namespace eFMS.API.Documentation.DL.Services
                  && (x.detail.Etd <= criteria.ToDate || criteria.ToDate == null)
                  && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
                 }
-               else
+                else
                 {
                     query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
                                          && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -354,7 +354,8 @@ namespace eFMS.API.Documentation.DL.Services
                       from notify in notifys.DefaultIfEmpty()
                       join port in catPlaceRepo.Get() on detail.Pod equals port.Id into portDetail
                       from pod in portDetail.DefaultIfEmpty()
-                      select new CsTransactionDetailModel {
+                      select new CsTransactionDetailModel
+                      {
                           Id = detail.Id,
                           JobId = detail.JobId,
                           Hwbno = detail.Hwbno,
@@ -393,7 +394,7 @@ namespace eFMS.API.Documentation.DL.Services
                           ServiceType = detail.ServiceType,
                           ContSealNo = detail.ContSealNo,
                           SailingDate = detail.SailingDate,
-                          FreightPayment = detail.FreightPayment, 
+                          FreightPayment = detail.FreightPayment,
                           PickupPlace = detail.PickupPlace,
                           DeliveryPlace = detail.DeliveryPlace,
                           GoodsDeliveryDescription = detail.GoodsDeliveryDescription,
@@ -441,7 +442,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 results = data.Skip((page - 1) * size).Take(size).ToList();
             }
-            
+
             return results;
         }
 
@@ -468,7 +469,7 @@ namespace eFMS.API.Documentation.DL.Services
                     commodities += string.Join(",", containersHbl.Select(x => GetCommodityNameById(x.CommodityId)));
                 }
             }
-            return new { totalGW, totalNW, totalCW, totalCbm , containers , commodities };
+            return new { totalGW, totalNW, totalCW, totalCbm, containers, commodities };
         }
 
         private string GetUnitNameById(short? id)
@@ -646,7 +647,7 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = null;
             var _currentUser = currentUser.UserID;
             if (data != null)
-            { 
+            {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
                 var dataPOL = catPlaceRepo.First(x => x.Id == data.Pol);
                 var dataATTN = catPartnerRepo.First(x => x.Id == data.AlsoNotifyPartyId);
@@ -664,9 +665,9 @@ namespace eFMS.API.Documentation.DL.Services
                 var csMawbcontainers = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
                 foreach (var item in csMawbcontainers)
                 {
-                    proofOfDelivery.Description += item.Description  + string.Join(",",  data.Commodity);
+                    proofOfDelivery.Description += item.Description + string.Join(",", data.Commodity);
                 }
-                if(csMawbcontainers.Count() > 0)
+                if (csMawbcontainers.Count() > 0)
                 {
                     proofOfDelivery.NoPieces = csMawbcontainers.Sum(x => x.Quantity) ?? 0;
                     proofOfDelivery.GW = csMawbcontainers.Sum(x => x.Gw) ?? 0;
@@ -724,16 +725,16 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.LocalVessel = data.LocalVoyNo;
                 housebill.FromSea = string.Empty; //NOT USE
                 housebill.OceanVessel = data.OceanVoyNo;
-                if(dataPOL != null)
+                if (dataPOL != null)
                 {
                     var polCountry = countryRepository.Get(x => x.Id == dataPOL.CountryId).FirstOrDefault()?.NameEn;
                     housebill.DepartureAirport = dataPOL?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty); //POL
-                }                
-                if(dataPOD != null)
+                }
+                if (dataPOD != null)
                 {
                     var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
                     housebill.PortofDischarge = dataPOD?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //POD
-                }               
+                }
                 housebill.TranShipmentTo = string.Empty; //NOT USE
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription; //Good delivery
                 housebill.CleanOnBoard = data.OnBoardStatus; //On board status                
@@ -748,7 +749,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var contUnit = catUnitRepo.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
                         if (contUnit != null)
                         {
-                            hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + (!cont.Equals(contLast) ? ", " : string.Empty) );
+                            hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + (!cont.Equals(contLast) ? ", " : string.Empty));
                         }
                     }
                     housebill.Qty = hbConstainers; //Qty Container (Số Lượng container + Cont Type)
@@ -836,22 +837,22 @@ namespace eFMS.API.Documentation.DL.Services
             result.AddDataSource(housebills);
             result.AddSubReport("Freightcharges", freightCharges);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            if (    reportType == Constants.HBLOFLANDING_ITL 
-                ||  reportType == Constants.HBLOFLANDING_ITL_FRAME 
-                ||  reportType == Constants.HBLOFLANDING_ITL_SEKO)
+            if (reportType == Constants.HBLOFLANDING_ITL
+                || reportType == Constants.HBLOFLANDING_ITL_FRAME
+                || reportType == Constants.HBLOFLANDING_ITL_SEKO)
             {
                 var parameter = new SeaHBillofLadingReportParams1()
                 {
                     Packages = string.Empty, //Tạm thời để trống (sao này sẽ thay thế bằng field Package)
-                    GrossWeight = data?.GrossWeight.ToString(), 
+                    GrossWeight = data?.GrossWeight.ToString(),
                     Measurement = data?.Cbm.ToString(),
                 };
                 result.SetParameter(parameter);
             }
 
-            if (    reportType == Constants.HBLOFLANDING_ITL_KESCO 
-                ||  reportType == Constants.HBLOFLANDING_ITL_FRAME_KESCO 
-                ||  reportType == Constants.HBLOFLANDING_ITL_FRAME_SAMKIP)
+            if (reportType == Constants.HBLOFLANDING_ITL_KESCO
+                || reportType == Constants.HBLOFLANDING_ITL_FRAME_KESCO
+                || reportType == Constants.HBLOFLANDING_ITL_FRAME_SAMKIP)
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {
@@ -865,5 +866,120 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        public Crystal PreviewHouseAirwayBillLastest(Guid hblId, string reportType)
+        {
+            Crystal result = null;
+            var data = GetById(hblId);
+            var housebills = new List<HouseAirwayBillLastestReport>();
+            if(data != null)
+            {
+                var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
+                var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
+
+                var housebill = new HouseAirwayBillLastestReport();
+                housebill.MAWB = string.Empty; //NOT USE
+                housebill.HWBNO = data.Hwbno; //Housebill No
+                housebill.ATTN = data.ShipperDescription; //ShipperName & Address
+                housebill.ISSUED = string.Empty; //NOT USE
+                housebill.ConsigneeID = string.Empty; //NOT USE
+                housebill.Consignee = data.ConsigneeDescription; //Consignee & Address
+                housebill.ICASNC = string.Empty; //NOT USE
+                housebill.AccountingInfo = string.Empty; //Chưa biết
+                housebill.AgentIATACode = string.Empty; //Chưa biết
+                housebill.AccountNo = string.Empty; //NOT USE
+                if (dataPOL != null)
+                {
+                    var polCountry = countryRepository.Get(x => x.Id == dataPOL.CountryId).FirstOrDefault()?.NameEn;
+                    housebill.DepartureAirport = dataPOL?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty); //AOL - Departure
+                }
+                housebill.ReferrenceNo = string.Empty; //NOT USE
+                housebill.OSI = string.Empty; //NOT USE
+                housebill.FirstDestination = data.FirstCarrierTo;
+                housebill.FirstCarrier = data.FirstCarrierBy;
+                housebill.SecondDestination = data.TransitPlaceTo1;
+                housebill.SecondCarrier = data.TransitPlaceBy1;
+                housebill.ThirdDestination = data.TransitPlaceTo2;
+                housebill.ThirdCarrier = data.TransitPlaceBy2;
+                housebill.Currency = data.CurrencyId; //Currency
+                housebill.CHGSCode = string.Empty; //Chưa biết
+                housebill.WTPP = string.Empty; //Chưa biết
+                housebill.WTCLL = string.Empty; //Chưa biết
+                housebill.ORPP = string.Empty; //Chưa biết
+                housebill.ORCLL = string.Empty; //Chưa biết
+                housebill.DlvCarriage = string.Empty; //Chưa biết
+                housebill.DlvCustoms = string.Empty; //Chưa biết
+                housebill.LastDestination = string.Empty; //Chưa biết
+                housebill.FlightNo = data.FlightNo; //Flight No
+                housebill.FlightDate =data.FlightDate; //Flight Date
+                housebill.ConnectingFlight = string.Empty; //Chưa biết
+                housebill.ConnectingFlightDate = DateTime.Now; //Chưa biết
+                housebill.insurAmount = data.IssuranceAmount; //Issurance Amount
+                housebill.HandlingInfo = data.HandingInformation; //Handing Information
+                housebill.Notify = data.Notify; //Notify
+                housebill.SCI = string.Empty; //NOT USE
+                housebill.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
+                housebill.GrossWeight = data.GrossWeight; //GrossWeight
+                housebill.GrwDecimal = 2; //NOT USE
+                housebill.Wlbs = string.Empty; //Chưa biết
+                housebill.RateClass = string.Empty; //NOT USE
+                housebill.ItemNo = string.Empty; //Chưa biết
+                housebill.WChargeable = 0; //Chưa biết
+                housebill.ChWDecimal = 2; //NOT USE
+                housebill.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
+                housebill.Ttal = data.Total != null ? data.Total.ToString() : string.Empty;
+                housebill.Description = string.Empty; //Chưa biết
+                housebill.WghtPP = string.Empty; //Chưa biết
+                housebill.WghtCC = string.Empty; //Chưa biết
+                housebill.ValChPP = string.Empty; //NOT USE
+                housebill.ValChCC = string.Empty; //NOT USE
+                housebill.TxPP = string.Empty; //NOT USE
+                housebill.TxCC = string.Empty; //NOT USE
+                housebill.OrchW = string.Empty; //Chưa biết
+                housebill.OChrVal = string.Empty; //NOT USE
+                housebill.TTChgAgntPP = string.Empty; //Chưa biết
+                housebill.TTChgAgntCC = string.Empty; //Chưa biết
+                housebill.TTCarrPP = string.Empty; //NOT USE
+                housebill.TTCarrCC = string.Empty; //NOT USE
+                housebill.TtalPP = string.Empty; //Chưa biết
+                housebill.TtalCC = string.Empty; //Chưa biết
+                housebill.CurConvRate = string.Empty; //NOT USE
+                housebill.CCChgDes = string.Empty; //NOT USE
+                housebill.SpecialNote = string.Empty; //Chưa biết
+                housebill.ShipperCertf = string.Empty; //NOT USE
+                housebill.ExecutedOn = string.Empty; //Chưa biết
+                housebill.ExecutedAt = string.Empty; //Chưa biết
+                housebill.Signature = string.Empty; //NOT USE
+                housebill.Dimensions = string.Empty; //Chưa biết
+                housebill.ShipPicture = null; //NOT USE
+                housebill.PicMarks = string.Empty; //Chưa biết
+                housebill.GoodsDelivery = string.Empty; //Chưa biết
+
+                housebills.Add(housebill);
+            }
+            string _reportName = string.Empty;
+            switch (reportType)
+            {
+                case Constants.HOUSEAIRWAYBILLLASTEST_ITL:
+                    _reportName = "HouseAirwayBillLastestITL.rpt";
+                    break;
+                case Constants.HOUSEAIRWAYBILLLASTEST_ITL_FRAME:
+                    _reportName = "HouseAirwayBillLastestITLFrame.rpt";
+                    break;
+            }
+            result = new Crystal
+            {
+                ReportName = _reportName,
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(housebills);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            var parameter = new HouseAirwayBillLastestReportParams()
+            {
+                MAWBN = data.Mawb
+            };
+            result.SetParameter(parameter);
+            return result;
+        }
     }
 }
