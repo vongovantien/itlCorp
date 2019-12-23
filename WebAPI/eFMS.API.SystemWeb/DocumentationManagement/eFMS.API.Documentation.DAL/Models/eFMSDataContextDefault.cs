@@ -48,7 +48,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<CsArrivalAndDeliveryDefault> CsArrivalAndDeliveryDefault { get; set; }
         public virtual DbSet<CsArrivalFrieghtCharge> CsArrivalFrieghtCharge { get; set; }
         public virtual DbSet<CsArrivalFrieghtChargeDefault> CsArrivalFrieghtChargeDefault { get; set; }
-        public virtual DbSet<CsDetailDimension> CsDetailDimension { get; set; }
+        public virtual DbSet<CsDimensionDetail> CsDimensionDetail { get; set; }
         public virtual DbSet<CsManifest> CsManifest { get; set; }
         public virtual DbSet<CsMawbcontainer> CsMawbcontainer { get; set; }
         public virtual DbSet<CsShipmentSellingRate> CsShipmentSellingRate { get; set; }
@@ -1820,9 +1820,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnType("decimal(18, 4)");
             });
 
-            modelBuilder.Entity<CsDetailDimension>(entity =>
+            modelBuilder.Entity<CsDimensionDetail>(entity =>
             {
-                entity.ToTable("csDetailDimension");
+                entity.ToTable("csDimensionDetail");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -1838,10 +1838,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Hw)
                     .HasColumnName("HW")
-                    .HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.Hwconstant)
-                    .HasColumnName("HWConstant")
                     .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Lenght).HasColumnType("decimal(18, 4)");
@@ -2475,6 +2471,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("HW")
                     .HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.Hwconstant)
+                    .HasColumnName("HWConstant")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.IsLocked).HasDefaultValueSql("((0))");
@@ -2867,12 +2867,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("WTorVALPayment")
                     .HasMaxLength(10)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Job)
-                    .WithMany(p => p.CsTransactionDetail)
-                    .HasForeignKey(d => d.JobId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>

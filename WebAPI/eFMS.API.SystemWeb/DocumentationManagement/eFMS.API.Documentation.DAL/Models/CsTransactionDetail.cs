@@ -119,7 +119,5 @@ namespace eFMS.API.Documentation.Service.Models
         public string DueCarrier { get; set; }
         public string TotalPp { get; set; }
         public string AttachList { get; set; }
-
-        public virtual CsTransaction Job { get; set; }
     }
 }
