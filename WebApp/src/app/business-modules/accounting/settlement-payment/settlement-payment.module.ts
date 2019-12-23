@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { PaginationModule, AccordionModule, ModalModule } from 'ngx-bootstrap';
+import { PaginationModule, AccordionModule, ModalModule, BsDropdownModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from 'ngx-currency';
@@ -24,6 +24,7 @@ import { SettlementPaymentDetailComponent } from './detail/detail-settlement-pay
 import { ApporveSettlementPaymentComponent } from '../approve-payment/settlement/approve.settlement.component';
 import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
 import { SettlementFormCopyPopupComponent } from './components/popup/copy-settlement/copy-settlement.popup';
+import { SettlementTableListChargePopupComponent } from './components/popup/table-list-charge/table-list-charge.component';
 
 
 const routing: Routes = [
@@ -56,7 +57,8 @@ const COMPONENT = [
     SettlementFormChargePopupComponent,
     SettlementShipmentItemComponent,
     SettlementTableSurchargeComponent,
-    SettlementFormCopyPopupComponent
+    SettlementFormCopyPopupComponent,
+    SettlementTableListChargePopupComponent
 ];
 
 const customCurrencyMaskConfig = {
@@ -85,7 +87,9 @@ const customCurrencyMaskConfig = {
         RouterModule.forChild(routing),
         AccordionModule.forRoot(),
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
-        ShareApprovePaymentModule
+        ShareApprovePaymentModule,
+        BsDropdownModule.forRoot(),
+
 
     ],
     exports: [],

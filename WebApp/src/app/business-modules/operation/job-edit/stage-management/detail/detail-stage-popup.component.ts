@@ -190,46 +190,43 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         if ((this.statusStageActive[0].id === 'Pending' || this.statusStageActive[0].id === "Deleted") && !form.value.comment) {
             return;
         }
-        if (!this.selectedMainPersonInCharge.value || this.selectedMainPersonInCharge.value === this.selectedRealPersonInCharge.value) {
-            return;
-        } else {
-            const body = {
-                id: this.data.id,
-                jobId: this.data.jobId,
-                stageId: this.data.stageId,
-                name: this.data.name,
-                orderNumberProcessed: this.data.orderNumberProcessed,
-                mainPersonInCharge: this.selectedMainPersonInCharge.value || "admin",
-                realPersonInCharge: this.selectedRealPersonInCharge.value,
-                processTime: form.value.processTime,
-                comment: form.value.comment,
-                description: form.value.description,
-                deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
-                status: this.statusStageActive[0].id || this.statusStage[0].id
-            };
-            this._operationRepo.updateStageToJob(body).pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError),
-                finalize(() => { }),
-            ).subscribe(
-                (res: any) => {
-                    if (!res.status) {
-                        this._toaster.error(res.message, '', { positionClass: 'toast-bottom-right' });
-                    } else {
-                        this.onSuccess.emit();
-                        this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
-                        this.hide();
-                    }
-                },
-                // error
-                (errs: any) => {
-                },
-                // complete
-                () => {
-                    this.isSummited = false;
+
+        const body = {
+            id: this.data.id,
+            jobId: this.data.jobId,
+            stageId: this.data.stageId,
+            name: this.data.name,
+            orderNumberProcessed: this.data.orderNumberProcessed,
+            mainPersonInCharge: this.selectedMainPersonInCharge.value || "admin",
+            realPersonInCharge: this.selectedRealPersonInCharge.value,
+            processTime: form.value.processTime,
+            comment: form.value.comment,
+            description: form.value.description,
+            deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
+            status: this.statusStageActive[0].id || this.statusStage[0].id
+        };
+        this._operationRepo.updateStageToJob(body).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+            finalize(() => { }),
+        ).subscribe(
+            (res: any) => {
+                if (!res.status) {
+                    this._toaster.error(res.message);
+                } else {
+                    this.onSuccess.emit();
+                    this._toaster.success(res.message);
+                    this.hide();
                 }
-            );
-        }
+            },
+            // error
+            (errs: any) => {
+            },
+            // complete
+            () => {
+                this.isSummited = false;
+            }
+        );
     }
 
     getListSystemUser() {

@@ -10,6 +10,7 @@ import { SettlementShipmentItemComponent } from '../shipment-item/shipment-item.
 import { SortService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
 import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
+import { SettlementTableListChargePopupComponent } from '../popup/table-list-charge/table-list-charge.component';
 
 @Component({
     selector: 'settle-payment-list-charge',
@@ -23,6 +24,7 @@ export class SettlementListChargeComponent extends AppList {
     @ViewChild(SettlementFormChargePopupComponent, { static: false }) formChargePopup: SettlementFormChargePopupComponent;
     @ViewChild(SettlementPaymentManagementPopupComponent, { static: false }) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
     @ViewChild(SettlementFormCopyPopupComponent, { static: false }) copyChargePopup: SettlementFormCopyPopupComponent;
+    @ViewChild(SettlementTableListChargePopupComponent, { static: false }) tableListChargePopup: SettlementTableListChargePopupComponent;
 
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
@@ -79,15 +81,18 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     showCreateCharge() {
-        this.formChargePopup.settlementCode = this.settlementCode;
-        this.stateFormCharge = 'create';
-        this.formChargePopup.action = 'create';
-        this.formChargePopup.show();
+        // this.formChargePopup.settlementCode = this.settlementCode;
+        // this.stateFormCharge = 'create';
+        // this.formChargePopup.action = 'create';
+        // this.formChargePopup.show();
+        this.tableListChargePopup.initTableListCharge();
+        this.tableListChargePopup.show();
     }
 
     onRequestSurcharge(surcharge: any) {
         // this.surcharges.push(surcharge);
         this.surcharges = [...this.surcharges, ...surcharge];
+        console.log(this.surcharges);
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
     }
 
@@ -129,7 +134,8 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     changeCurrency(currency: Currency) {
-        this.formChargePopup.currency.setValue(currency.id);
+        // this.formChargePopup.currency.setValue(currency.id);
+        this.tableListChargePopup.currencyId = currency.id || 'VND';
     }
 
     returnShipmet(item: any) {

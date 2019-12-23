@@ -5,6 +5,8 @@ namespace OperationInteface {
         mbl: string;
         id?: string;
         customerId?: string;
+        agentId?: string;
+        carrierId?: string;
         hblid?: string;
         service?: string;
     }

@@ -23,6 +23,8 @@ export abstract class PopupBase extends AppPage {
     requestList: any = null;
     requestSort: any = null;
 
+    isSubmitted: boolean = false;
+
     constructor() {
         super();
 
