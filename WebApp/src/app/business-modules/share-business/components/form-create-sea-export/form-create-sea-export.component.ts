@@ -12,7 +12,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { User, CsTransactionDetail } from 'src/app/shared/models';
 
-import { takeUntil, skip } from 'rxjs/operators';
+import { takeUntil, skip, finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../share-business/store';
@@ -84,31 +84,38 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.getUserLogged();
 
         // * Subscribe state to update form.
+        this._spinner.show();
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), skip(1))
             .subscribe(
                 (res: CsTransactionDetail | any) => {
                     if (!!res) {
-                        this.formGroup.setValue({
-                            jobID: res.jobNo,
-                            etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
-                            eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
-                            mawb: res.mawb,
-                            mbltype: [this.ladingTypes.find(type => type.id === res.mbltype)],
-                            coloader: res.coloaderId,
-                            bookingNo: res.bookingNo,
-                            typeOfService: [this.serviceTypes.find(type => type.id === res.typeOfService)],
-                            pol: res.pol,
-                            pod: res.pod,
-                            agent: res.agentId,
-                            flightVesselName: res.flightVesselName,
-                            voyNo: res.voyNo,
-                            term: [this.termTypes.find(type => type.id === res.paymentTerm)],
-                            shipmentType: [this.shipmentTypes.find(type => type.id === res.shipmentType)],
-                            personalIncharge: res.personIncharge,
-                            notes: res.notes,
-                            pono: res.pono
-                        });
+                        try {
+                            this.formGroup.setValue({
+                                jobID: res.jobNo,
+                                etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
+                                eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
+                                mawb: res.mawb,
+                                mbltype: [this.ladingTypes.find(type => type.id === res.mbltype) || this.ladingTypes[0]],
+                                coloader: res.coloaderId,
+                                bookingNo: res.bookingNo,
+                                typeOfService: [this.serviceTypes.find(type => type.id === res.typeOfService)],
+                                pol: res.pol,
+                                pod: res.pod,
+                                agent: res.agentId,
+                                flightVesselName: res.flightVesselName,
+                                voyNo: res.voyNo,
+                                term: [this.termTypes.find(type => type.id === res.paymentTerm)],
+                                shipmentType: [this.shipmentTypes.find(type => type.id === res.shipmentType)],
+                                personalIncharge: res.personIncharge,
+                                notes: res.notes,
+                                pono: res.pono
+                            });
+                        } catch (error) {
+                            console.log(error);
+                        }
+
+                        this._spinner.hide()
                     }
                 }
             );
