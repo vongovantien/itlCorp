@@ -174,7 +174,10 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsTrans = DataContext.Add(transaction);
                     if (hsTrans.Success)
                     {
-                        var t = containerService.Add(model.CsMawbcontainers);
+                        if(model.CsMawbcontainers.Count > 0)
+                        {
+                            var t = containerService.Add(model.CsMawbcontainers);
+                        }
                     }
                     var result = hsTrans;
                     trans.Commit();

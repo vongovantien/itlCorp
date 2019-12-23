@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.Service.Models
 {
-    public partial class CsDetailDimension
+    public partial class CsDimensionDetail
     {
         public Guid Id { get; set; }
         public Guid? Mblid { get; set; }
@@ -13,7 +13,6 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? Height { get; set; }
         public decimal? Package { get; set; }
         public decimal? Hw { get; set; }
-        public decimal? Hwconstant { get; set; }
         public decimal? Cbm { get; set; }
         public string TotalHw { get; set; }
     }
