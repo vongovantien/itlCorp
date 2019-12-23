@@ -198,16 +198,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'hbl':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
+                this._router.navigate([`home/documentation/air-export/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }
