@@ -2,7 +2,7 @@
     <input class="form-control m-input m-input--square dropdown-toggle" [disabled]="Disabled" type="text" readonly
         data-toggle="dropdown" placeholder="Please select"
         [value]="displaySelectedStr == '' ? null : displaySelectedStr"
-        [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''">
+        [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''" [placeholder]="placeholder">
 
     <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
         <div class="tabel-wrapper table-fixed">

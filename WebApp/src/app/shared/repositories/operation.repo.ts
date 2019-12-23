@@ -102,6 +102,11 @@ export class OperationRepo {
             );
     }
 
+    getCustomsShipmentNotLocked(): any {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetCustomsShipmentNotLocked`);
+
+    }
+
 
 
 }

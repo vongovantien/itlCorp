@@ -1,11 +1,13 @@
 namespace OperationInteface {
     export interface IShipment {
-        jobId: string; 
+        jobId: string;
         hbl: string;
         mbl: string;
         id?: string;
         customerId?: string;
+        agentId?: string;
+        carrierId?: string;
         hblid?: string;
-        
+        service?: string;
     }
 }

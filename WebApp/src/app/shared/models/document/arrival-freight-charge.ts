@@ -19,8 +19,8 @@ export class ArrivalFreightCharge extends BaseModel {
     quantity: number = null;
     unitPrice: number = null;
 
-    isShow: boolean = false;
-    isFull: boolean = false;
+    isShow: boolean = true;
+    isFull: boolean = true;
     isTick: boolean = false;
 
     isShowCharge: boolean = false;

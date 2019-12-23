@@ -67,6 +67,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
     fclImportDetail: any; // TODO model;
     minDateETA: any;
 
+    commonData: any;
 
     constructor(
         protected _documentRepo: DocumentationRepo,
@@ -98,35 +99,40 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                 (res: any) => {
                     if (!!res) {
                         this.fclImportDetail = res;
+                        try {
+                            this.formCreate.setValue({
+                                jobId: this.fclImportDetail.jobNo,
+                                mawb: this.fclImportDetail.mawb,
+                                subColoader: this.fclImportDetail.subColoader,
+                                flightVesselName: this.fclImportDetail.flightVesselName,
+                                voyNo: this.fclImportDetail.voyNo,
+                                pono: this.fclImportDetail.pono,
+                                notes: this.fclImportDetail.notes,
 
-                        this.formCreate.setValue({
-                            jobId: this.fclImportDetail.jobNo,
-                            mawb: this.fclImportDetail.mawb,
-                            subColoader: this.fclImportDetail.subColoader,
-                            flightVesselName: this.fclImportDetail.flightVesselName,
-                            voyNo: this.fclImportDetail.voyNo,
-                            pono: this.fclImportDetail.pono,
-                            notes: this.fclImportDetail.notes,
+                                etd: !!this.fclImportDetail.etd ? { startDate: new Date(this.fclImportDetail.etd), endDate: new Date(this.fclImportDetail.etd) } : null,
+                                eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null,
+                                serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
 
-                            etd: !!this.fclImportDetail.etd ? { startDate: new Date(this.fclImportDetail.etd), endDate: new Date(this.fclImportDetail.etd) } : null,
-                            eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null,
-                            serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
+                                mbltype: [(this.ladingTypes || []).find(type => type.id === this.fclImportDetail.mbltype)],
+                                shipmentType: [(this.shipmentTypes || []).find(type => type.id === this.fclImportDetail.shipmentType)],
+                                typeOfService: [(this.serviceTypes || []).find(type => type.id === this.fclImportDetail.typeOfService)],
+                                personIncharge: this.fclImportDetail.personIncharge || this.userLogged.id,
 
-                            mbltype: [(this.ladingTypes || []).find(type => type.id === this.fclImportDetail.mbltype)],
-                            shipmentType: [(this.shipmentTypes || []).find(type => type.id === this.fclImportDetail.shipmentType)],
-                            typeOfService: [(this.serviceTypes || []).find(type => type.id === this.fclImportDetail.typeOfService)],
-                            personIncharge: this.fclImportDetail.personIncharge || this.userLogged.id,
+                                pod: this.fclImportDetail.pod,
+                                pol: this.fclImportDetail.pol,
+                                agentId: this.fclImportDetail.agentId,
+                                coloader: this.fclImportDetail.coloaderId,
+                                deliveryPlace: this.fclImportDetail.deliveryPlace
+                            });
 
-                            pod: this.fclImportDetail.pod,
-                            pol: this.fclImportDetail.pol,
-                            agentId: this.fclImportDetail.agentId,
-                            coloader: this.fclImportDetail.coloaderId,
-                            deliveryPlace: this.fclImportDetail.deliveryPlace
-                        });
+                            if (!!this.formCreate.value.etd) {
+                                this.minDateETA = this.createMoment(this.fclImportDetail.etd);
+                            }
+                        } catch (error) {
+                            console.log(error);
 
-                        if (!!this.formCreate.value.etd) {
-                            this.minDateETA = this.createMoment(this.fclImportDetail.etd);
                         }
+
                     }
                 }
             );
@@ -216,21 +222,22 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         this._spinner.show();
         try {
             if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
-                const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-                this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
-                this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
-                this.shipmentTypes = this.utility.prepareNg2SelectData(commonData.shipmentTypes, 'value', 'displayName');
+                this.commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
+
+                this.serviceTypes = this.utility.prepareNg2SelectData(this.commonData.serviceTypes, 'value', 'displayName');
+                this.ladingTypes = this.utility.prepareNg2SelectData(this.commonData.billOfLadings, 'value', 'displayName');
+                this.shipmentTypes = this.utility.prepareNg2SelectData(this.commonData.shipmentTypes, 'value', 'displayName');
 
                 this.shipmentType.setValue([this.shipmentTypes[0]]);
             } else {
-                const commonData: any = await this._documentRepo.getShipmentDataCommon().toPromise();
-                this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
-                this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
-                this.shipmentTypes = this.utility.prepareNg2SelectData(commonData.shipmentTypes, 'value', 'displayName');
+                this.commonData = await this._documentRepo.getShipmentDataCommon().toPromise();
+                this.serviceTypes = this.utility.prepareNg2SelectData(this.commonData.serviceTypes, 'value', 'displayName');
+                this.ladingTypes = this.utility.prepareNg2SelectData(this.commonData.billOfLadings, 'value', 'displayName');
+                this.shipmentTypes = this.utility.prepareNg2SelectData(this.commonData.shipmentTypes, 'value', 'displayName');
 
                 this.shipmentType.setValue([this.shipmentTypes[0]]);
 
-                this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
+                this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, this.commonData);
             }
         } catch (error) {
         }

@@ -7,8 +7,8 @@ export interface ButtonModalSetting {
 }
 export interface ButtonAttributeSetting {
     type?: string;
-    titleButton: string;
-    classStyle: string;
+    titleButton?: string;
+    classStyle?: string;
     //targetModal?: string;
     icon?: string;
 }

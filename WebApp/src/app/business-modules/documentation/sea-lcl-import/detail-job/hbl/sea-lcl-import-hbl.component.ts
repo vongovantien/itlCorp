@@ -15,6 +15,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { takeUntil, take, catchError, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../share-business/store';
+import { SortService } from '@services';
 
 @Component({
     selector: 'app-sea-lcl-import-hbl',
@@ -45,9 +46,12 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
         private _router: Router,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         private _documentRepo: DocumentationRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _sortService: SortService
     ) {
         super();
+
+        this.requestSort = this.sortHBL;
     }
 
     ngOnInit() {
@@ -67,7 +71,6 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
             { title: 'SaleMan', field: 'saleManName', sortable: true },
             { title: 'Notify Party', field: 'notifyParty', sortable: true },
             { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
-            { title: 'Containers', field: 'containers', sortable: true },
             { title: 'Package', field: 'packages', sortable: true },
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true }
@@ -92,6 +95,10 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
                     }
                 }
             );
+    }
+
+    sortHBL() {
+        this.houseBills = this._sortService.sort(this.houseBills, this.sort, this.order);
     }
 
     selectHBL(hbl: HouseBill) {

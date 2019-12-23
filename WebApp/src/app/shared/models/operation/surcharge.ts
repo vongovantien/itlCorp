@@ -6,7 +6,7 @@ export class Surcharge {
     contNo: number = 0;
     currencyId: string = '';
     hbl: string = '';
-    invoiceDate: string = '';
+    invoiceDate: any = null;
     invoiceNo: string = '';
     isFromShipment: boolean = false;
     jobId: string = '';
@@ -40,6 +40,9 @@ export class Surcharge {
     paymentRequestType: string = '';
     soaclosed: boolean = false;
     soano: string = '';
+
+    // * Custom
+    obhId: string = null;
 
     constructor(object?: any) {
         const self = this;

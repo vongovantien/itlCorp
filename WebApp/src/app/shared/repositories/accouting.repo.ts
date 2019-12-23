@@ -297,6 +297,12 @@ export class AccountingRepo {
         );
     }
 
+    getAdvanceOfShipment(): Observable<any> {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetAdvancesOfShipment`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 
 
