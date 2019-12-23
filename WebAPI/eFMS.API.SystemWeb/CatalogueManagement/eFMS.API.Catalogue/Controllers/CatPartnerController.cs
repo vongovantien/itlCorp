@@ -185,6 +185,8 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Put(string id, CatPartnerEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+
+            model.AccountNo = model.TaxCode + "." + model.InternalReferenceNo;
             var checkExistMessage = CheckExist(id, model);
             if (checkExistMessage.Length > 0)
             {

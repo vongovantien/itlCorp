@@ -1,4 +1,4 @@
-import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from 'src/app/shared/repositories';
@@ -14,6 +14,7 @@ import { Partner } from 'src/app/shared/models';
 export class FormAddPartnerComponent extends AppForm {
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     @Output() requireSaleman = new EventEmitter<boolean>();
+    @Input() isUpdate: true;
     parentCustomers: any[] = [];
     partnerGroups: any[] = [];
     countries: any[] = [];
@@ -54,8 +55,9 @@ export class FormAddPartnerComponent extends AppForm {
     partnerSwiftCode: AbstractControl;
     partnerWorkPlace: AbstractControl;
     active: AbstractControl;
-    public: AbstractControl;
+    // public: AbstractControl;
     note: AbstractControl;
+    isPublic: boolean = false;
 
     constructor(
         private _fb: FormBuilder,
@@ -81,7 +83,6 @@ export class FormAddPartnerComponent extends AppForm {
                 break;
         }
     }
-
     removed(event, type: string) {
         switch (type) {
             case 'shippingCountry':
@@ -220,10 +221,11 @@ export class FormAddPartnerComponent extends AppForm {
             partnerBankAccountAddress: [null],
             partnerSwiftCode: [null],
             partnerWorkPlace: [null],
-            public: [false],
+            // public: [false],
             active: [true],
             note: [null]
         });
+
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
         this.nameENFull = this.partnerForm.controls['nameENFull'];
@@ -254,10 +256,12 @@ export class FormAddPartnerComponent extends AppForm {
         this.partnerSwiftCode = this.partnerForm.controls['partnerSwiftCode'];
         this.partnerWorkPlace = this.partnerForm.controls['partnerWorkPlace'];
         this.active = this.partnerForm.controls['active'];
-        this.public = this.partnerForm.controls['public'];
+        // this.public = this.partnerForm.controls['public'];
+
     }
 
     setFormData(partner: Partner) {
+        console.log(partner);
         const isShowSaleMan = this.checkRequireSaleman(partner.partnerGroup);
         this.requireSaleman.emit(isShowSaleMan);
         // if (this.partner.partnerGroup || [].includes('CUSTOMER')) {
@@ -294,6 +298,9 @@ export class FormAddPartnerComponent extends AppForm {
         if (index > -1) {
             shippingProvinceActive = [this.shippingProvinces[index]];
         }
+        this.isPublic = partner.public;
+
+        console.log(this.isPublic);
         this.partnerForm.setValue({
             partnerAccountNo: partner.accountNo,
             internalReferenceNo: partner.internalReferenceNo,
@@ -324,8 +331,8 @@ export class FormAddPartnerComponent extends AppForm {
             partnerBankAccountAddress: partner.bankAccountAddress,
             partnerSwiftCode: partner.swiftCode,
             partnerWorkPlace: workPlaceActive,
-            active: partner.active,
-            public: partner.public,
+            active: partner.active === null ? false : partner.active,
+            // public: partner.public === null ? false : partner.public,
             note: partner.note
         });
     }

@@ -396,12 +396,12 @@
                     <div class="form-group">
                         <label class="form-control-label"> Public </label>
                         <div class="m-checkbox-inline">
-                            <app-switch [(toggle)]="public.value" (toggleChange)="public.setValue($event)">
+                            <app-switch [(toggle)]="isPublic" (toggleChange)="isPublic = $event">
                             </app-switch>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-2">
+                <div class="col-lg-2" *ngIf="isUpdate">
                     <div class="form-group">
                         <label class="form-control-label">Active</label>
                         <div class="m-checkbox-inline">

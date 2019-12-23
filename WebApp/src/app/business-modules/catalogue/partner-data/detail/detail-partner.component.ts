@@ -84,7 +84,9 @@ export class PartnerDetailComponent extends AppList {
         });
         this.partner.departmentId = "Head Office";
         this.getDataCombobox();
-    } RequireSaleman(partnerGroup: string): boolean {
+    }
+
+    RequireSaleman(partnerGroup: string): boolean {
         this.isShowSaleMan = false;
         if (partnerGroup != null) {
             if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
@@ -442,7 +444,10 @@ export class PartnerDetailComponent extends AppList {
         this.partner.bankAccountName = formBody.partnerBankAccountName;
         this.partner.bankAccountAddress = formBody.partnerBankAccountAddress;
         this.partner.note = formBody.note;
-        this.partner.public = formBody.public;
+        // console.log(formBody.public);
+        // this.partner.public = formBody.public;
+
+        this.partner.public = this.formPartnerComponent.isPublic;
         if (formBody.billingProvince.length > 0) {
             this.partner.provinceId = formBody.billingProvince[0].id;
         }
@@ -456,6 +461,7 @@ export class PartnerDetailComponent extends AppList {
         this.partner.zipCodeShipping = formBody.zipCodeShipping;
         this.partner.swiftCode = formBody.partnerSwiftCode;
         this.partner.active = formBody.active;
+        console.log(formBody.active);
         if (formBody.partnerWorkPlace.length > 0) {
             this.partner.workPlaceId = formBody.partnerWorkPlace[0].id;
         }

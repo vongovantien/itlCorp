@@ -82,7 +82,7 @@ namespace eFMS.API.Catalogue.DL.Services
             partner.Active = true;
             if(!String.IsNullOrEmpty(partner.InternalReferenceNo))
             {
-                partner.Id =  partner.TaxCode + "." + partner.InternalReferenceNo;
+                partner.Id = partner.AccountNo = partner.TaxCode + "." + partner.InternalReferenceNo;
             }
             else
             {

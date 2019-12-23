@@ -18,8 +18,8 @@
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
-                        <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder=""
-                            (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
+                        <input type="file" #inputFile id="inputFile" class="form-control m-input m-input--square"
+                            placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                         <span class="m-form__help">
                             <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
                         </span>
@@ -57,7 +57,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="import()">
+                        (click)="import(inputFile)">
                         <span>
                             <i class="la la-save"></i>
                             <span>

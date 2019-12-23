@@ -40,7 +40,7 @@
     <!--begin::m-content of Partner-data-addnew-->
     <div class="m-content">
         <!--begin::Form-->
-        <form-add-partner (requireSaleman)="isShowSaleMan=$event"></form-add-partner>
+        <form-add-partner (requireSaleman)="isShowSaleMan=$event" [isUpdate]=true></form-add-partner>
         <!--end::Form-->
         <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered" *ngIf="isShowSaleMan">
             <div class="alert-block__heading">
