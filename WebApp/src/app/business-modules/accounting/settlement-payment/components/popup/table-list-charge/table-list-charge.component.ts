@@ -25,6 +25,7 @@ import cloneDeep from 'lodash/cloneDeep';
 export class SettlementTableListChargePopupComponent extends PopupBase implements OnInit {
 
     @Output() onChange: EventEmitter<Surcharge[]> = new EventEmitter<Surcharge[]>();
+    @Output() onUpdate: EventEmitter<Surcharge[]> = new EventEmitter<Surcharge[]>();
 
     headers: CommonInterface.IHeaderTable[];
     headerPartner: CommonInterface.IHeaderTable[] = [];
@@ -33,7 +34,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     listCharges: any[];
 
     listUnits: Observable<Unit[]>;
-    shipments: Observable<OperationInteface.IShipment[]>;
+    shipments: OperationInteface.IShipment[];
     cds: CustomDeclaration[] = [];
     advs: IAdvanceShipment[];
     listPartner: Partner[] = [];
@@ -54,11 +55,13 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     serviceTypeId: string; // * service id for get charge catalogue.
     currencyId: string = 'VND'; // * Currency from form create.
-
-
     settlementCode: string = null; // * Settlement Code current if update, === null if create.
 
     charges: Surcharge[] = [];
+
+    isUpdate: boolean = false;
+    isDuplicateChargeCode: boolean = false;
+    isDuplicateInvoice: boolean = false;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -124,7 +127,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             { title: 'Partner Code', field: 'taxCode' },
         ];
 
-        // this.getMasterCharges();
+        this.getMasterCharges();
         this.getShipmentCommonData();
         this.getCustomDecleration();
         this.getAdvances();
@@ -146,7 +149,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     }
 
     getShipmentCommonData() {
-        this.shipments = this._documentRepo.getShipmentNotLocked().pipe(catchError(this.catchError));
+        this._documentRepo.getShipmentNotLocked().pipe(catchError(this.catchError))
+            .subscribe(
+                (res: OperationInteface.IShipment[]) => {
+                    this.shipments = res;
+                }
+            );
     }
 
     getCustomDecleration() {
@@ -189,8 +197,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     getMasterCharges(serviceTypeId: string = ChargeConstants.CL_CODE) {
         forkJoin([
-            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId }),
-            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH, serviceTypeId: serviceTypeId }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH }),
         ]).pipe(
             map(([chargeCredit, chargeOBH]) => {
                 return [...chargeCredit, ...chargeOBH];
@@ -212,7 +220,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 this.serviceTypeId = data.service;
                 this.selectedShipment = data;
 
-                this.shipment.setValue(this.selectedShipment.jobId);
+                this.shipment.setValue(this.selectedShipment.hblid);
                 this.getMasterCharges(this.serviceTypeId);
 
                 // * FINDING ITEM ADVANCE BELONG TO SELECTED SHIPMENT.
@@ -260,6 +268,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     onSelectDataTableInfo(data: any, chargeItem: Surcharge, type: string) {
         console.log(data);
         this.isSubmitted = false;
+        [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
+
         switch (type) {
             case 'charge':
                 chargeItem.chargeCode = data.code;
@@ -300,14 +310,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 chargeItem.objectBePaid = null;
                 chargeItem.payerId = chargeItem.paymentObjectId;
                 break;
-            case 'partner-type':
-
-                break;
-            case 'obh-type':
-                break;
             default:
                 break;
         }
+
+        console.log(this.charges);
     }
 
     onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string, ) {
@@ -374,7 +381,19 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     }
 
     duplicateCharge(index: number) {
-        this.charges.push(this.charges[index]);
+        this.isSubmitted = false;
+
+        const newCharge = this.charges[index];
+        newCharge.currencyId = this.currencyId;
+        newCharge.id = SystemConstants.EMPTY_GUID;
+        newCharge.hblid = this.selectedShipment.hblid;
+        newCharge.isFromShipment = false;
+        newCharge.jobId = this.selectedShipment.jobId;
+        newCharge.mbl = this.selectedShipment.mbl;
+        newCharge.hbl = this.selectedShipment.hbl;
+        newCharge.settlementCode = this.settlementCode;
+
+        this.charges.push(new Surcharge(newCharge));
     }
 
     deleteCharge(index: number) {
@@ -384,12 +403,17 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     saveChargeList() {
         this.isSubmitted = true;
+
+        if (!this.charges.length) {
+            this._toastService.warning("Please add charge");
+            return;
+        }
+
         if (!this.checkValidate()) {
             return;
         }
 
-        if (!this.charges.length) {
-            this._toastService.warning("Please add charge");
+        if (!this.checkDuplicate()) {
             return;
         }
 
@@ -411,7 +435,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
         console.log("lit charge to save", listChargesToSave);
 
-        this.onChange.emit(listChargesToSave);
+        if (this.isUpdate) {
+            this.onUpdate.emit(listChargesToSave);
+        } else {
+            this.onChange.emit(listChargesToSave);
+        }
+
         this.hide();
     }
 
@@ -449,6 +478,23 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
         return valid;
     }
+
+    checkDuplicate() {
+        let valid: boolean = true;
+        if (this.utility.checkDuplicateInObject("chargeId", this.charges) && this.utility.checkDuplicateInObject("invoiceNo", this.charges)) {
+            this.isDuplicateChargeCode = true;
+            this.isDuplicateInvoice = true;
+            valid = false;
+            this._toastService.warning("The Charge code and InvoiceNo is duplicated");
+            return;
+        } else {
+            valid = true;
+            this.isDuplicateChargeCode = false;
+            this.isDuplicateInvoice = false;
+        }
+        return valid;
+    }
+
 }
 
 interface IAdvanceShipment {

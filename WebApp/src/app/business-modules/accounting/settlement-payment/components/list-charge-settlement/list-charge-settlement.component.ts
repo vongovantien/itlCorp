@@ -2,7 +2,7 @@ import { Component, ViewChild, ViewChildren, QueryList, Output, EventEmitter } f
 import { AppList } from 'src/app/app.list';
 import { SettlementExistingChargePopupComponent } from '../popup/existing-charge/existing-charge.popup';
 import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-charge.popup';
-import { Surcharge, Currency } from 'src/app/shared/models';
+import { Surcharge, Currency, Partner } from 'src/app/shared/models';
 import { BehaviorSubject } from 'rxjs';
 import { SettlementPaymentManagementPopupComponent } from '../popup/payment-management/payment-management.popup';
 import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surcharge.component';
@@ -12,6 +12,9 @@ import { ToastrService } from 'ngx-toastr';
 import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 import { SettlementTableListChargePopupComponent } from '../popup/table-list-charge/table-list-charge.component';
 
+import _includes from 'lodash/includes';
+import _cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -49,7 +52,7 @@ export class SettlementListChargeComponent extends AppList {
 
     constructor(
         private _sortService: SortService,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
     ) {
         super();
     }
@@ -85,6 +88,9 @@ export class SettlementListChargeComponent extends AppList {
         // this.stateFormCharge = 'create';
         // this.formChargePopup.action = 'create';
         // this.formChargePopup.show();
+        this.tableListChargePopup.isSubmitted = false;
+        this.tableListChargePopup.isUpdate = false;
+        this.tableListChargePopup.formGroup.reset();
         this.tableListChargePopup.initTableListCharge();
         this.tableListChargePopup.show();
     }
@@ -92,13 +98,37 @@ export class SettlementListChargeComponent extends AppList {
     onRequestSurcharge(surcharge: any) {
         // this.surcharges.push(surcharge);
         this.surcharges = [...this.surcharges, ...surcharge];
-        console.log(this.surcharges);
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
+    }
+
+    onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
+        if (charges.length === 1) {
+            const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === charges[0].hblid);
+            if (indexChargeUpdating !== -1) {
+                this.surcharges[indexChargeUpdating] = this.surcharges.find(item => item.hblid === charges[0].hblid);
+                this.surcharges = [...this.surcharges];
+            }
+        } else {
+            for (const i of charges) {
+                const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === i.hblid && item.id === i.id);
+                if (indexChargeUpdating !== -1) {
+                    this.updateSurchargeWithIndex(indexChargeUpdating, i);
+                } else {
+                    this.surcharges = [...this.surcharges, i];
+                }
+            }
+        }
+    }
+
+    updateSurchargeWithIndex(index: number, surcharge: Surcharge) {
+        this.surcharges[index] = surcharge;
+        this.surcharges = [...this.surcharges];
     }
 
     onUpdateRequestSurcharge(surcharge: any) {
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
         this.surcharges[this.selectedIndexSurcharge] = surcharge;
+        this.surcharges = [...this.surcharges];
 
         if (this.formChargePopup.isContinue) {
             // * Update next charge.
@@ -248,6 +278,39 @@ export class SettlementListChargeComponent extends AppList {
     showCopyCharge() {
         this.copyChargePopup.show();
     }
+
+    updateChargeWithJob(charge: Surcharge, index?: number) {
+        this.selectedIndexSurcharge = index;
+        const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
+        if (!!shipment) {
+            this.tableListChargePopup.selectedShipment = shipment;
+
+            // * Update value form.
+            this.tableListChargePopup.formGroup.patchValue({
+                shipment: shipment.hblid,
+            });
+
+            // * Filter charge with hblID.
+            const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid);
+
+            if (!!surcharges.length) {
+                this.tableListChargePopup.charges = cloneDeep(surcharges);
+
+                this.tableListChargePopup.charges.forEach(item => {
+                    const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.paymentObjectId);
+                    if (!!partner) {
+                        item.payer = partner.shortName;
+                    }
+                });
+                this.tableListChargePopup.isUpdate = true;
+                this.tableListChargePopup.show();
+            }
+        } else {
+            this._toastService.warning("Shipment was not found !");
+        }
+    }
+
+
 }
 
 

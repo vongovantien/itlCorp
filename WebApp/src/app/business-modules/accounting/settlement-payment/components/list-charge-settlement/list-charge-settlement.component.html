@@ -126,7 +126,11 @@
                                             </span>
                                         </div>
                                     </td>
-                                    <td>{{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}</td>
+                                    <td>
+                                        <a (click)="updateChargeWithJob(surcharge,i)" class="pointer">
+                                            {{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}
+                                        </a>
+                                    </td>
                                     <td class="text-primary pointer"
                                         (click)="openSurchargeDetail(surcharge, i, 'update')"
                                         [class.text-underline]="!surcharge.isFromShipment">
@@ -142,7 +146,9 @@
                                     <td>{{surcharge.obhPartnerName }}</td>
                                     <td>{{surcharge.invoiceNo}}</td>
                                     <td>{{surcharge.seriesNo}}</td>
-                                    <td>{{surcharge.invoiceDate | date: 'dd/MM/yyyy'}}</td>
+                                    <td>
+                                        {{!!surcharge.invoiceDate ? (surcharge.invoiceDate | date: 'dd/MM/yyyy') : ''}}
+                                    </td>
                                     <td>{{surcharge.clearanceNo}}</td>
                                     <td>{{surcharge.contNo}}</td>
                                     <td>{{surcharge.notes}}</td>
@@ -169,4 +175,5 @@
 
 <copy-settlement-popup (onCopy)="onRequestSurcharge($event)"></copy-settlement-popup>
 
-<table-list-charge-popup (onChange)="onRequestSurcharge($event)"></table-list-charge-popup>
+<table-list-charge-popup (onChange)="onRequestSurcharge($event)"
+    (onUpdate)="onUpdateSurchargeFromTableChargeList($event)"></table-list-charge-popup>

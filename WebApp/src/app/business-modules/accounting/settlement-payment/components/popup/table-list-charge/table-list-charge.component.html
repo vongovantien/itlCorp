@@ -14,9 +14,9 @@
                             <div class="form-group">
                                 <label required> Shipment </label>
                                 <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{field:'jobId', value:shipment.value}"
+                                    [currentActiveItemId]="{field:'hblid', value:shipment.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
-                                    [selectedDisplayFields]="['jobId','mbl','hbl']" [dataSources]="shipments | async"
+                                    [selectedDisplayFields]="['jobId','mbl','hbl']" [dataSources]="shipments"
                                     [displayFields]="configShipmentDisplayFields" [height]="150"
                                     [placeholder]="'Please Select Shipment'">
                                 </app-combo-grid-virtual-scroll>
@@ -64,7 +64,7 @@
                                                     title="Duplicate" (click)="duplicateCharge(i)"><i
                                                         class="la la-copy"></i>
                                                 </button>
-                                                <button type="button" (click)="deleteCharge(i)"
+                                                <button type="button" (click)="deleteCharge(i)" *ngIf="!isUpdate"
                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                     title="Remove">
                                                     <i class="la la-trash"></i>
@@ -72,9 +72,9 @@
                                             </div>
                                         <td>
                                             <div class="form-group"
-                                                [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.chargeId }">
+                                                [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || isDuplicateChargeCode) }">
                                                 <app-combo-grid-virtual-scroll
-                                                    [currentActiveItemId]="{field:'id', value:charge.chargeName}"
+                                                    [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                                     (itemSelected)="onSelectDataTableInfo($event, charge, 'charge')"
                                                     [selectedDisplayFields]="['chargeNameEn']"
                                                     [dataSources]="listCharges"
@@ -85,7 +85,7 @@
                                         </td>
                                         <td>
                                             <div class="form-group col-md-12 dropdown-partner" dropdown
-                                                [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.payer}">
+                                                [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.paymentObjectId}">
                                                 <input type="text" class="dropdown-toggle form-control" dropdownToggle
                                                     readonly placeholder="Please Select" [(ngModel)]="charge.payer">
                                                 <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
@@ -172,8 +172,10 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="form-group ">
-                                                <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo">
+                                            <div class="form-group "
+                                                [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateInvoice}">
+                                                <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
+                                                    (ngModelChange)="isDuplicateInvoice = false">
                                             </div>
                                         </td>
                                         <td>
@@ -206,7 +208,7 @@
                                 </ng-container>
                                 <tr app-table-none-record *ngIf="!charges.length">
                                 </tr>
-                                <tr>
+                                <tr *ngIf="!isUpdate">
                                     <td colspan=1 class="fixed-side">
                                         <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"
                                             (click)="addCharge()">
