@@ -411,9 +411,8 @@ namespace eFMS.API.Documentation.DL.Services
                           GW = detail.GrossWeight,
                           PackageContainer = detail.PackageContainer,
                           PackageQty = detail.PackageQty,
-                          PackageType = detail.PackageType
-
-
+                          PackageType = detail.PackageType, 
+                          CW = detail.ChargeWeight,
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.OrderBy(o => o.Hwbno).ToList();

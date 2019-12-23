@@ -41,6 +41,9 @@ export class AirExportHBLComponent extends AppList implements OnInit {
 
     totalCBM: number;
     totalGW: number;
+    totalCW: number;
+
+
 
     constructor(
         private _router: Router,
@@ -69,10 +72,10 @@ export class AirExportHBLComponent extends AppList implements OnInit {
             { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
             { title: 'Customer', field: 'customerName', sortable: true },
             { title: 'SaleMan', field: 'saleManName', sortable: true },
-            { title: 'Notify Party', field: 'notifyParty', sortable: true },
+            { title: 'Departure', field: 'finalDestinationPlace', sortable: true },
             { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
-            { title: 'Containers', field: 'containers', sortable: true },
             { title: 'Package', field: 'packages', sortable: true },
+            { title: 'C.W', field: 'cw', sortable: true },
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
@@ -86,9 +89,13 @@ export class AirExportHBLComponent extends AppList implements OnInit {
             .subscribe(
                 (hbls: any[]) => {
                     this.houseBills = hbls;
+                    console.log(this.houseBills);
                     if (!!this.houseBills.length) {
                         this.totalGW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
                         this.totalCBM = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
+                        this.totalCW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cw, 0);
+
+
                         this.selectHBL(this.houseBills[0]);
                     } else {
                         this.selectedHbl = null;
