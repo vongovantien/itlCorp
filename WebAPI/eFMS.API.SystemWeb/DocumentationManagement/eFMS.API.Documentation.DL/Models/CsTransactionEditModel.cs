@@ -10,6 +10,6 @@ namespace eFMS.API.Documentation.DL.Models
     {
         public TransactionTypeEnum TransactionTypeEnum { get; set; }
         public List<CsMawbcontainerModel> CsMawbcontainers { get; set; }
-        public List<CsTransactionDetailModel> CsTransactionDetails { get; set; }
+        public List<CsDimensionDetailModel> CsDimensionDetailModels { get; set; }
     }
 }

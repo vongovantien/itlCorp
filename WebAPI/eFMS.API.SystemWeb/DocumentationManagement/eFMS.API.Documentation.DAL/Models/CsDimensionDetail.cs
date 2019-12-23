@@ -14,6 +14,10 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? Package { get; set; }
         public decimal? Hw { get; set; }
         public decimal? Cbm { get; set; }
-        public string TotalHw { get; set; }
+        public decimal? TotalHw { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? DatetimeModified { get; set; }
     }
 }

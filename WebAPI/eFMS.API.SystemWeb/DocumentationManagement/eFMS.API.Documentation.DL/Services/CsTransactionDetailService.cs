@@ -33,6 +33,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
         readonly IContextBase<CatCountry> countryRepository;
+        readonly ICsDimensionDetailService dimensionDetailService;
         private readonly ICurrentUser currentUser;
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -47,7 +48,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShipmentSurcharge> surchareRepo,
             IContextBase<CatCountry> countryRepo,
             IContextBase<CsTransactionDetail> csTransactiondetail,
-            ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mapper)
+            ICsMawbcontainerService contService, ICurrentUser user,
+            ICsDimensionDetailService dimensionService) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -62,6 +64,7 @@ namespace eFMS.API.Documentation.DL.Services
             csTransactionDetailRepo = csTransactiondetail;
             currentUser = user;
             countryRepository = countryRepo;
+            dimensionDetailService = dimensionService;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -79,24 +82,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.DatetimeModified = model.DatetimeCreated = DateTime.Now;
             model.Active = true;
             string contSealNo = string.Empty;
-            var containers = new List<CsMawbcontainerModel>();
-            foreach (var x in model.CsMawbcontainers)
-            {
-                if (!string.IsNullOrEmpty(x.ContainerNo))
-                {
-                    contSealNo = contSealNo + x.ContainerNo;
-                }
-                if (!string.IsNullOrEmpty(x.SealNo))
-                {
-                    contSealNo = contSealNo + "/ " + x.SealNo + "; ";
-                }
-                var cont = mapper.Map<CsMawbcontainerModel>(x);
-                cont.Id = Guid.NewGuid();
-                cont.Hblid = model.Id;
-                cont.UserModified = model.UserModified;
-                cont.DatetimeModified = DateTime.Now;
-                containers.Add(cont);
-            }
+            
             model.ContSealNo = contSealNo;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -105,7 +91,35 @@ namespace eFMS.API.Documentation.DL.Services
                     var hs = Add(model);
                     if (hs.Success)
                     {
-                        var t = containerService.Add(containers);
+                        if(model.CsMawbcontainers != null)
+                        {
+                            model.CsMawbcontainers.ForEach(x =>
+                            {
+                                if (!string.IsNullOrEmpty(x.ContainerNo))
+                                {
+                                    contSealNo = contSealNo + x.ContainerNo;
+                                }
+                                if (!string.IsNullOrEmpty(x.SealNo))
+                                {
+                                    contSealNo = contSealNo + "/ " + x.SealNo + "; ";
+                                }
+                                x.Id = Guid.NewGuid();
+                                x.Hblid = model.Id;
+                                x.UserModified = model.UserModified;
+                                x.DatetimeModified = DateTime.Now;
+                            });
+
+                            var t = containerService.Add(model.CsMawbcontainers);
+                        }
+                        if (model.CsDimensionDetailModels != null)
+                        {
+                            model.CsDimensionDetailModels.ForEach(x =>
+                            {
+                                x.Id = Guid.NewGuid();
+                                x.Mblid = model.Id;
+                            });
+                            var d = dimensionDetailService.Add(model.CsDimensionDetailModels);
+                        }
                     }
                     DataContext.SubmitChanges();
                     trans.Commit();
@@ -156,6 +170,14 @@ namespace eFMS.API.Documentation.DL.Services
                         else
                         {
                             var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Hblid == hb.Id);
+                        }
+                        if(model.CsDimensionDetailModels != null)
+                        {
+                            var hsDimension = dimensionDetailService.UpdateHouseBill(model.CsDimensionDetailModels, model.Id);
+                        }
+                        else
+                        {
+                            var hsDimensionDelete = dimensionDetailService.Delete(x => x.Hblid == model.Id);
                         }
                     }
                     trans.Commit();

@@ -1832,6 +1832,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("CBM")
                     .HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
                 entity.Property(e => e.Height).HasColumnType("decimal(18, 4)");
@@ -1848,7 +1852,15 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.TotalHw)
                     .HasColumnName("TotalHW")
-                    .HasMaxLength(10);
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Width).HasColumnType("decimal(18, 4)");
             });

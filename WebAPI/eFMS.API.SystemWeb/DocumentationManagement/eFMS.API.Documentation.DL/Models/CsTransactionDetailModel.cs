@@ -9,6 +9,7 @@ namespace eFMS.API.Documentation.DL.Models
     public class CsTransactionDetailModel: CsTransactionDetail
     {
         public List<CsMawbcontainerModel> CsMawbcontainers { get; set; }
+        public List<CsDimensionDetailModel> CsDimensionDetailModels { get; set; }
         public string CustomerName { get; set; }
         public string SaleManName { get; set; }
         public string ShipperName { get; set; }

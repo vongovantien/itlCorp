@@ -37,7 +37,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsShipmentSurchargeService surchargeService;
         readonly ICsTransactionDetailService transactionDetailService;
         readonly ICsArrivalFrieghtChargeService csArrivalFrieghtChargeService;
-        private readonly IStringLocalizer stringLocalizer;
+        readonly ICsDimensionDetailService dimensionDetailService;
+        readonly IStringLocalizer stringLocalizer;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -56,7 +57,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCountry> catCountry,
             ICsMawbcontainerService contService,
             ICsShipmentSurchargeService surService,
-            ICsTransactionDetailService tranDetailService, ICsArrivalFrieghtChargeService arrivalFrieghtChargeService ) : base(repository, mapper)
+            ICsTransactionDetailService tranDetailService, 
+            ICsArrivalFrieghtChargeService arrivalFrieghtChargeService,
+            ICsDimensionDetailService dimensionService) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -75,6 +78,7 @@ namespace eFMS.API.Documentation.DL.Services
             catCountryRepo = catCountry;
             transactionDetailService = tranDetailService;
             csArrivalFrieghtChargeService = arrivalFrieghtChargeService;
+            dimensionDetailService = dimensionService;
         }
 
         #region -- INSERT & UPDATE --
@@ -137,7 +141,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var transaction = mapper.Map<CsTransaction>(model);
             transaction.Id = Guid.NewGuid();
-            if (model.CsMawbcontainers.Count > 0)
+            if (model.CsMawbcontainers != null)
             {
                 var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, transaction.Id, null);
                 if (checkDuplicateCont.Success == false)
@@ -161,12 +165,6 @@ namespace eFMS.API.Documentation.DL.Services
                     transaction.BranchId = (Guid)branchOfUser;
                 }
             }
-            model.CsMawbcontainers.ForEach(x => {
-                x.Id = Guid.NewGuid();
-                x.Mblid = transaction.Id;
-                x.UserModified = transaction.UserCreated;
-                x.DatetimeModified = DateTime.Now;
-            });
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -174,9 +172,25 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsTrans = DataContext.Add(transaction);
                     if (hsTrans.Success)
                     {
-                        if(model.CsMawbcontainers.Count > 0)
+                        if(model.CsMawbcontainers != null)
                         {
+                            model.CsMawbcontainers.ForEach(x => {
+                                x.Id = Guid.NewGuid();
+                                x.Mblid = transaction.Id;
+                                x.UserModified = transaction.UserCreated;
+                                x.DatetimeModified = DateTime.Now;
+                            });
                             var t = containerService.Add(model.CsMawbcontainers);
+                        }
+                        if(model.CsDimensionDetailModels != null)
+                        {
+                            model.CsDimensionDetailModels.ForEach(x =>
+                            {
+                                x.Id = Guid.NewGuid();
+                                x.Mblid = transaction.Id;
+                            });
+
+                            var d = dimensionDetailService.Add(model.CsDimensionDetailModels);
                         }
                     }
                     var result = hsTrans;
@@ -231,9 +245,21 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);
                     if (hsTrans.Success)
                     {
-                        if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count > 0)
+                        if (model.CsMawbcontainers != null)
                         {
                             var hscontainers = containerService.UpdateMasterBill(model.CsMawbcontainers, transaction.Id);
+                        }
+                        else
+                        {
+                            var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Mblid == model.Id);
+                        }
+                        if (model.CsDimensionDetailModels != null)
+                        {
+                            var hscontainers = dimensionDetailService.UpdateMasterBill(model.CsDimensionDetailModels, transaction.Id);
+                        }
+                        else
+                        {
+                            var hsContainerDetele = dimensionDetailService.Delete(x => x.Mblid == model.Id);
                         }
                     }
                     trans.Commit();

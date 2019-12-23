@@ -50,6 +50,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<IOpsTransactionService, OpsTransactionService>();
             services.AddTransient<IShipmentService, ShipmentService>();
             services.AddTransient<ICsArrivalFrieghtChargeService, CsArrivalFrieghtChargeService>();
+            services.AddTransient<ICsDimensionDetailService, CsDimensionDetailService>();
         }
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
         {
