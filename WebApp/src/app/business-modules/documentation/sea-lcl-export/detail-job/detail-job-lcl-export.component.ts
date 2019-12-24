@@ -4,7 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SeaLCLExportCreateJobComponent } from '../create-job/create-job-lcl-export.component';
 
@@ -22,7 +22,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 })
 
 export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobComponent implements OnInit {
-
+    @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
@@ -93,10 +93,8 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
 
                         // * reset field duplicate
                         if (this.ACTION === "COPY") {
-                            this.resetFormControl(this.formCreateComponent.etd);
-                            this.resetFormControl(this.formCreateComponent.mawb);
-                            this.resetFormControl(this.formCreateComponent.eta);
                             this.formCreateComponent.getUserLogged();
+                            this.headerComponent.resetBreadcrumb("Create Job");
                         }
                     }
                 },

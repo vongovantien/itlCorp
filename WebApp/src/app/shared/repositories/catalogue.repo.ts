@@ -236,9 +236,9 @@ export class CatalogueRepo {
     }
 
 
-    checkTaxCode(taxcode: string) {
+    checkTaxCode(body) {
         // const header: HttpHeaders = new HttpHeaders();
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/CheckTaxCode`, { taxcode: taxcode })
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/CheckTaxCode`, body)
             .pipe(
                 map((data: any) => data)
             );

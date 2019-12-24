@@ -8,7 +8,7 @@ import { SeaLCLImportCreateJobComponent } from '../create-job/create-job-lcl-imp
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CsTransactionDetail } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
 
 import { combineLatest, of } from 'rxjs';
 import { switchMap, map, tap, skip, takeUntil, catchError, finalize } from 'rxjs/operators';
@@ -24,7 +24,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 })
 
 export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit {
-
+    @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
@@ -98,11 +98,8 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
 
                         // * reset field duplicate
                         if (this.ACTION === "COPY") {
-
-                            this.resetFormControl(this.formCreateComponent.etd);
-                            this.resetFormControl(this.formCreateComponent.mawb);
-                            this.resetFormControl(this.formCreateComponent.eta);
                             this.formCreateComponent.getUserLogged();
+                            this.headerComponent.resetBreadcrumb("Create Job");
                         }
                     }
                 },

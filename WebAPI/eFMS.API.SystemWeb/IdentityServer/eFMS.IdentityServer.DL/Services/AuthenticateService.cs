@@ -101,6 +101,12 @@ namespace eFMS.IdentityServer.DL.Services
                 }
             }
             var user = DataContext.Get(x => x.Username == username).FirstOrDefault();
+
+            if (user == null)
+            {
+                modelReturn = null;
+                return -2;
+            }
             if (isAuthenticated)
             {
                 if (user != null)
@@ -126,15 +132,11 @@ namespace eFMS.IdentityServer.DL.Services
                 LogUserLogin(user, employee.WorkPlaceId);
                 return 1;
             }
-            if (user == null)
+            else
             {
                 modelReturn = null;
                 return -2;
             }
-            employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
-            modelReturn = SetLoginReturnModel(user, employee);
-            LogUserLogin(user, employee.WorkPlaceId);
-            return 1;
         }
         private LoginReturnModel SetLoginReturnModel(SysUser user, SysEmployee employee)
         {

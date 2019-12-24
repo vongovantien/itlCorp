@@ -136,13 +136,25 @@ namespace eFMS.API.Catalogue.Controllers
         /// <summary>
         /// check tax code
         /// </summary>
-        /// <param name="taxcode"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
-        [HttpGet("CheckTaxCode")]
-        public IActionResult CheckTaxCode(string taxcode)
+        [HttpPost("CheckTaxCode")]
+        public IActionResult CheckTaxCode(CatPartnerEditModel model)
         {
-            var result = catPartnerService.Get(x => x.TaxCode.Trim() == taxcode.Trim()).FirstOrDefault();
-            return Ok(result);
+            if(model.Id == null)
+            {
+                var result = catPartnerService.Get(x => x.TaxCode.Trim() == model.TaxCode.Trim().ToLower()
+                                                    && ((x.InternalReferenceNo == null? "": x.InternalReferenceNo.Trim()) == model.InternalReferenceNo.Trim().ToLower() || string.IsNullOrEmpty(model.InternalReferenceNo))
+                            )?.FirstOrDefault();
+                return Ok(result);
+            }
+            else
+            {
+                var result = catPartnerService.Get(x => x.TaxCode.Trim() == model.TaxCode.Trim().ToLower() && x.Id != model.Id
+                                                    && ((x.InternalReferenceNo == null ? "" : x.InternalReferenceNo.Trim()) == model.InternalReferenceNo.Trim().ToLower() || string.IsNullOrEmpty(model.InternalReferenceNo))
+                            )?.FirstOrDefault();
+                return Ok(result);
+            }
         }
 
 

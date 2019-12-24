@@ -24,7 +24,7 @@ import { FormAddPartnerComponent } from '../components/form-add-partner/form-add
 export class AddPartnerDataComponent extends AppList {
     @ViewChild(FormAddPartnerComponent, { static: false }) formPartnerComponent: FormAddPartnerComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmTaxcode: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) confirmTaxcode: InfoPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     saleMans = [];
@@ -48,7 +48,6 @@ export class AddPartnerDataComponent extends AppList {
     dataSearchSaleman: any = {};
     isShowSaleMan: boolean = false;
     index: number = 0;
-    isExistedTaxcode: boolean = false;
 
 
     list: any[] = [];
@@ -171,9 +170,6 @@ export class AddPartnerDataComponent extends AppList {
             this.confirmDeleteJobPopup.hide();
             this.toastr.success('Delete Success !');
         }
-        if (this.isExistedTaxcode) {
-            this.confirmTaxcode.hide();
-        }
 
     }
     deleteSaleman(index: any) {
@@ -214,23 +210,6 @@ export class AddPartnerDataComponent extends AppList {
                     if (!!res) {
                         this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
                         this.selectedService = this.services[0];
-                    }
-                },
-            );
-    }
-
-    checkTaxcode() {
-        this._catalogueRepo.checkTaxCode(this.partner.taxCode)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        console.log(res);
-                        this.isExistedTaxcode = true;
-                        this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fill info to Internal Reference Info.`;
-                        this.confirmTaxcode.show();
-                    } else {
-                        this.isExistedTaxcode = false;
                     }
                 },
             );
@@ -336,14 +315,13 @@ export class AddPartnerDataComponent extends AppList {
         this.formPartnerComponent.isSubmitted = true;
         this.partner.saleMans = this.saleMandetail;
         this.getFormPartnerData();
-        if (this.partner.taxCode !== '') {
-            this.checkTaxcode();
-
-        }
         if (this.partner.countryId == null || this.partner.provinceId == null
             || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
             return;
         }
+
+        this.formPartnerComponent.partnerWorkPlace.setErrors(null);
+        this.formPartnerComponent.partnerAccountRef.setErrors(null);
         if (this.formPartnerComponent.partnerForm.valid) {
             this.partner.accountNo = this.partner.id;
             if (this.saleMandetail.length === 0) {
@@ -376,7 +354,7 @@ export class AddPartnerDataComponent extends AppList {
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
-        this.partner.id = formBody.internalReferenceNo + "." + formBody.taxCode;
+        this.partner.accountNo = formBody.internalReferenceNo + "." + formBody.taxCode;
         this.partner.partnerGroup = formBody.partnerGroup[0].id;
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
@@ -397,8 +375,12 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.addressShippingVn = formBody.shippingAddressVN;
         this.partner.addressShippingEn = formBody.shippingAddressEN;
         this.partner.shortName = formBody.shortName;
-        this.partner.countryId = formBody.billingCountry[0].id;
-        this.partner.countryShippingId = formBody.shippingCountry[0].id;
+        if (formBody.billingCountry.length > 0) {
+            this.partner.countryId = formBody.billingCountry[0].id;
+        }
+        if (formBody.shippingCountry.length > 0) {
+            this.partner.countryShippingId = formBody.shippingCountry[0].id;
+        }
         this.partner.accountNo = formBody.partnerAccountNo;
         this.partner.tel = formBody.partnerContactNumber;
         this.partner.fax = formBody.partnerContactFaxNo;
@@ -411,18 +393,42 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.note = formBody.note;
         this.partner.public = this.formPartnerComponent.isPublic;
         // this.partner.public = formBody.public;
-        this.partner.provinceId = formBody.billingProvince[0].id;
-        this.partner.provinceShippingId = formBody.shippingProvince[0].id;
-        this.partner.parentId = formBody.partnerAccountRef[0].id;
+        if (formBody.billingProvince.length > 0) {
+            this.partner.provinceId = formBody.billingProvince[0].id;
+        }
+        if (formBody.shippingProvince.length > 0) {
+            this.partner.provinceShippingId = formBody.shippingProvince[0].id;
+        }
+        if (formBody.partnerAccountRef != null) {
+            this.partner.parentId = formBody.partnerAccountRef.length > 0 ? formBody.partnerAccountRef[0].id : null;
+        }
         this.partner.zipCode = formBody.billingZipcode;
         this.partner.zipCodeShipping = formBody.zipCodeShipping;
         this.partner.swiftCode = formBody.partnerSwiftCode;
         this.partner.active = formBody.active;
-        this.partner.workPlaceId = formBody.partnerWorkPlace[0].id;
+        if (formBody.partnerWorkPlace != null) {
+            this.partner.workPlaceId = formBody.partnerWorkPlace.length > 0 ? formBody.partnerWorkPlace[0].id : null;
+        }
         this.partner.internalReferenceNo = formBody.internalReferenceNo;
     }
 
     onCreatePartner() {
+        this._catalogueRepo.checkTaxCode(this.partner)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        console.log(res);
+                        this.formPartnerComponent.isExistedTaxcode = true;
+                        this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fill info to Internal Reference Info.`;
+                        this.confirmTaxcode.show();
+                    } else {
+                        this.onSave();
+                    }
+                },
+            );
+    }
+    onSave() {
         this.baseService.spinnerShow();
         this._catalogueRepo.createPartner(this.partner)
             .pipe(catchError(this.catchError))

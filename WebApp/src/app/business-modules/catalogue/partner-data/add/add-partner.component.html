@@ -145,3 +145,5 @@
     (onDelete)="closeppAndDeleteSaleman($event)">
 </app-saleman-popup>
 <confirm-popup (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
+<info-popup [body]="deleteMessage">
+</info-popup>

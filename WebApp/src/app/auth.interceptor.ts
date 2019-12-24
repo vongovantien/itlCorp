@@ -35,7 +35,12 @@ export class AuthInterceptor implements HttpInterceptor {
 
                 if (!!error.error) {
                     if (!!error.error.error) {
-                        message = error.error.error.Message;
+
+                        if (error.error.error === 'invalid_grant') {
+                            message = error.error.error_description;
+                        } else {
+                            message = error.error.error.Message;
+                        }
                     } else if (!!error.error.message) {
                         message = `${error.error.message}`;
                     } else {

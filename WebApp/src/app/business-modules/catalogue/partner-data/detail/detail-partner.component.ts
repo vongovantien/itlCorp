@@ -27,7 +27,7 @@ export class PartnerDetailComponent extends AppList {
     @ViewChild(FormAddPartnerComponent, { static: false }) formPartnerComponent: FormAddPartnerComponent;
     @ViewChild("popupDeleteSaleman", { static: false }) confirmDeleteSalemanPopup: ConfirmPopupComponent;
     @ViewChild("popupDeletePartner", { static: false }) confirmDeletePartnerPopup: ConfirmPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmTaxcode: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) confirmTaxcode: InfoPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     saleMans = [];
@@ -235,9 +235,6 @@ export class PartnerDetailComponent extends AppList {
             this.confirmDeleteSalemanPopup.hide();
             this.toastr.success('Delete Success !');
         }
-        if (this.isExistedTaxcode) {
-            this.confirmTaxcode.hide();
-        }
 
     }
     deleteSaleman(index: any) {
@@ -283,23 +280,6 @@ export class PartnerDetailComponent extends AppList {
                     if (!!res) {
                         this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
                         this.selectedService = this.services[0];
-                    }
-                },
-            );
-    }
-
-    checkTaxcode() {
-        this._catalogueRepo.checkTaxCode(this.partner.taxCode)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        console.log(res);
-                        this.isExistedTaxcode = true;
-                        this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fill info to Internal Reference Info.`;
-                        this.confirmTaxcode.show();
-                    } else {
-                        this.isExistedTaxcode = false;
                     }
                 },
             );
@@ -375,6 +355,9 @@ export class PartnerDetailComponent extends AppList {
             || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
             return;
         }
+
+        this.formPartnerComponent.partnerWorkPlace.setErrors(null);
+        this.formPartnerComponent.partnerAccountRef.setErrors(null);
         if (this.formPartnerComponent.partnerForm.valid) {
             this.partner.accountNo = this.partner.id;
             if (this.saleMandetail.length === 0) {
@@ -409,7 +392,9 @@ export class PartnerDetailComponent extends AppList {
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
-        this.partner.id = formBody.internalReferenceNo + "." + formBody.taxCode;
+        if (formBody.internalReferenceNo != null) {
+            this.partner.accountNo = formBody.internalReferenceNo + "." + formBody.taxCode;
+        }
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
                 this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
@@ -445,9 +430,6 @@ export class PartnerDetailComponent extends AppList {
         this.partner.bankAccountName = formBody.partnerBankAccountName;
         this.partner.bankAccountAddress = formBody.partnerBankAccountAddress;
         this.partner.note = formBody.note;
-        // console.log(formBody.public);
-        // this.partner.public = formBody.public;
-
         this.partner.public = this.formPartnerComponent.isPublic;
         if (formBody.billingProvince.length > 0) {
             this.partner.provinceId = formBody.billingProvince[0].id;
@@ -455,21 +437,38 @@ export class PartnerDetailComponent extends AppList {
         if (formBody.shippingProvince.length > 0) {
             this.partner.provinceShippingId = formBody.shippingProvince[0].id;
         }
-        if (formBody.partnerAccountRef.length > 0) {
-            this.partner.parentId = formBody.partnerAccountRef[0].id;
+        if (formBody.partnerAccountRef != null) {
+            this.partner.parentId = formBody.partnerAccountRef.length > 0 ? formBody.partnerAccountRef[0].id : null;
         }
         this.partner.zipCode = formBody.billingZipcode;
         this.partner.zipCodeShipping = formBody.zipCodeShipping;
         this.partner.swiftCode = formBody.partnerSwiftCode;
         this.partner.active = formBody.active;
         console.log(formBody.active);
-        if (formBody.partnerWorkPlace.length > 0) {
-            this.partner.workPlaceId = formBody.partnerWorkPlace[0].id;
+        if (formBody.partnerWorkPlace != null) {
+            this.partner.workPlaceId = formBody.partnerWorkPlace.length > 0 ? formBody.partnerWorkPlace[0].id : null;
         }
         this.partner.internalReferenceNo = formBody.internalReferenceNo;
     }
 
     updatePartner() {
+        this._catalogueRepo.checkTaxCode(this.partner)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        console.log(res);
+                        this.formPartnerComponent.isExistedTaxcode = true;
+                        this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fill info to Internal Reference Info.`;
+                        this.confirmTaxcode.show();
+                    } else {
+                        this.onSave();
+                    }
+                },
+            );
+    }
+    onSave() {
+
         this._progressRef.start();
         this._catalogueRepo.updatePartner(this.partner.id, this.partner)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))

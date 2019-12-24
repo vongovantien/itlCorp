@@ -12,10 +12,11 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { User, CsTransactionDetail } from 'src/app/shared/models';
 
-import { takeUntil, skip, finalize } from 'rxjs/operators';
+import { takeUntil, skip, finalize, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../share-business/store';
+import { ActivatedRoute, Params } from '@angular/router';
 
 @Component({
     selector: 'form-create-sea-export',
@@ -41,6 +42,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
+    minDateETA: any;
 
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name Abbr' },
@@ -67,7 +69,8 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
         private _fb: FormBuilder,
-        private _store: Store<fromShare.IShareBussinessState>
+        private _store: Store<fromShare.IShareBussinessState>,
+        private _route: ActivatedRoute
 
     ) {
         super();
@@ -84,13 +87,22 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.getUserLogged();
 
         // * Subscribe state to update form.
-        this._spinner.show();
+        // this._spinner.show();
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), skip(1))
             .subscribe(
                 (res: CsTransactionDetail | any) => {
                     if (!!res) {
                         try {
+
+                            this._route.queryParams.subscribe((param: Params) => {
+                                if (param.action === 'copy') {
+                                    res.jobNo = null;
+                                    res.etd = null;
+                                    res.mawb = null;
+                                    res.eta = null;
+                                }
+                            });
                             this.formGroup.setValue({
                                 jobID: res.jobNo,
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
@@ -111,6 +123,9 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                                 notes: res.notes,
                                 pono: res.pono
                             });
+                            if (!!this.formGroup.value.etd) {
+                                this.minDateETA = this.createMoment(res.etd);
+                            }
                         } catch (error) {
                             console.log(error);
                         }
@@ -156,6 +171,18 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.pol = this.formGroup.controls["pol"];
         this.pod = this.formGroup.controls["pod"];
         this.agent = this.formGroup.controls["agent"];
+
+        this.formGroup.controls['etd'].valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((value: { startDate: any, endDate: any }) => {
+                this.minDateETA = value.startDate; // * Update min date
+
+                this.isSubmitted = false;
+                this.resetFormControl(this.formGroup.controls["eta"]);
+            });
     }
 
     getUserLogged() {

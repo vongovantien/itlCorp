@@ -55,7 +55,6 @@ export class FormAddPartnerComponent extends AppForm {
     partnerSwiftCode: AbstractControl;
     partnerWorkPlace: AbstractControl;
     active: AbstractControl;
-    // public: AbstractControl;
     note: AbstractControl;
     isPublic: boolean = false;
 
@@ -165,9 +164,7 @@ export class FormAddPartnerComponent extends AppForm {
     initForm() {
         this.partnerForm = this._fb.group({
             partnerAccountNo: [{ value: null, disabled: true }],
-            internalReferenceNo: [null, Validators.compose([
-                Validators.required
-            ])],
+            internalReferenceNo: [null],
             nameENFull: [null, Validators.compose([
                 Validators.required,
             ])],
@@ -221,7 +218,6 @@ export class FormAddPartnerComponent extends AppForm {
             partnerBankAccountAddress: [null],
             partnerSwiftCode: [null],
             partnerWorkPlace: [null],
-            // public: [false],
             active: [true],
             note: [null]
         });
@@ -256,20 +252,12 @@ export class FormAddPartnerComponent extends AppForm {
         this.partnerSwiftCode = this.partnerForm.controls['partnerSwiftCode'];
         this.partnerWorkPlace = this.partnerForm.controls['partnerWorkPlace'];
         this.active = this.partnerForm.controls['active'];
-        // this.public = this.partnerForm.controls['public'];
-
     }
 
     setFormData(partner: Partner) {
         console.log(partner);
         const isShowSaleMan = this.checkRequireSaleman(partner.partnerGroup);
         this.requireSaleman.emit(isShowSaleMan);
-        // if (this.partner.partnerGroup || [].includes('CUSTOMER')) {
-        //     this.isRequiredSaleman = true;
-        //     this.isShowSaleMan = true;
-        // }
-        // console.log(this.isRequiredSaleman);
-        // console.log(this.partner.salePersonId);
         const partnerGroupActives = this.getPartnerGroupActives(partner.partnerGroup.split(';'));
         let index = -1;
         let parentCustomerActive = [];

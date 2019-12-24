@@ -7,7 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { SeaFCLImportCreateJobComponent } from '../create-job/create-job-fcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
 
 import { combineLatest, of } from 'rxjs';
 import { map, tap, switchMap, skip, catchError, takeUntil, finalize } from 'rxjs/operators';
@@ -22,7 +22,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
     templateUrl: './detail-job-fcl-import.component.html',
 })
 export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobComponent {
-
+    @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild("confirmLockShipment", { static: false }) confirmLockShipmentPopup: ConfirmPopupComponent;
@@ -95,10 +95,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.fclImportDetail = res; // TODO Model.
                     // * reset field duplicate
                     if (this.ACTION === "COPY") {
-                        this.resetFormControl(this.formCreateComponent.etd);
-                        this.resetFormControl(this.formCreateComponent.mawb);
-                        this.resetFormControl(this.formCreateComponent.eta);
                         this.formCreateComponent.getUserLogged();
+                        this.headerComponent.resetBreadcrumb("Create Job");
                     }
                 },
             );

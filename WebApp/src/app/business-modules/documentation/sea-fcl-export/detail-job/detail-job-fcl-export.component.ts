@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { SeaFCLExportCreateJobComponent } from '../create-job/create-job-fcl-export.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 import { combineLatest, of } from 'rxjs';
@@ -27,6 +27,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
+    @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
@@ -95,10 +96,8 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
                         // * reset field duplicate
                         if (this.ACTION === "COPY") {
-                            this.resetFormControl(this.formCreateComponent.etd);
-                            this.resetFormControl(this.formCreateComponent.mawb);
-                            this.resetFormControl(this.formCreateComponent.eta);
                             this.formCreateComponent.getUserLogged();
+                            this.headerComponent.resetBreadcrumb("Create Job");
                         }
                     }
                 },

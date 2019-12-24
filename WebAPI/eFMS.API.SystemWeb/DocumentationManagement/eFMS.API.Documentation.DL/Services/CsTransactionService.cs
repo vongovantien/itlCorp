@@ -38,6 +38,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsTransactionDetailService transactionDetailService;
         readonly ICsArrivalFrieghtChargeService csArrivalFrieghtChargeService;
         readonly ICsDimensionDetailService dimensionDetailService;
+        readonly IContextBase<CsDimensionDetail> dimensionDetailRepository;
         readonly IStringLocalizer stringLocalizer;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
@@ -59,7 +60,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentSurchargeService surService,
             ICsTransactionDetailService tranDetailService, 
             ICsArrivalFrieghtChargeService arrivalFrieghtChargeService,
-            ICsDimensionDetailService dimensionService) : base(repository, mapper)
+            ICsDimensionDetailService dimensionService,
+            IContextBase<CsDimensionDetail> dimensionDetailRepo) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -79,6 +81,7 @@ namespace eFMS.API.Documentation.DL.Services
             transactionDetailService = tranDetailService;
             csArrivalFrieghtChargeService = arrivalFrieghtChargeService;
             dimensionDetailService = dimensionService;
+            dimensionDetailRepository = dimensionDetailRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -1019,7 +1022,7 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.UserModified = model.UserCreated;
                 transaction.Active = true;
                 var hsTrans = transactionRepository.Add(transaction, false);
-                if (model.CsMawbcontainers.Count > 0)
+                if (model.CsMawbcontainers != null)
                 {
                     model.CsMawbcontainers.ForEach(x => {
                         x.Id = Guid.NewGuid();
@@ -1028,6 +1031,17 @@ namespace eFMS.API.Documentation.DL.Services
                         x.DatetimeModified = DateTime.Now;
                     });
                     var hsCont = containerService.Add(model.CsMawbcontainers, false);
+                }
+                if(model.CsDimensionDetailModels != null)
+                {
+                    model.CsDimensionDetailModels.ForEach(x =>
+                    {
+                        x.Id = Guid.NewGuid();
+                        x.Mblid = transaction.Id;
+                        x.UserCreated = transaction.UserCreated;
+                        x.DatetimeCreated = DateTime.Now;
+                    });
+                    dimensionDetailService.Add(model.CsDimensionDetailModels, false);
                 }
                 var detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
                 if (detailTrans != null)
@@ -1060,13 +1074,24 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 x.Id = Guid.NewGuid();
                                 x.Hblid = item.Id;
-                                x.Mblid = Guid.Empty;
                                 x.ContainerNo = string.Empty;
                                 x.SealNo = string.Empty;
                                 x.MarkNo = string.Empty;
                                 x.UserModified = transaction.UserCreated;
                                 x.DatetimeModified = DateTime.Now;
                                 csMawbcontainerRepo.Add(x, false);
+                            }
+                        }
+                        var houseDimensions = dimensionDetailRepository.Get(x => x.Hblid == item.Id);
+                        if(houseDimensions != null)
+                        {
+                            foreach(var x in houseDimensions)
+                            {
+                                x.Id = Guid.NewGuid();
+                                x.Hblid = item.Id;
+                                x.UserCreated = transaction.UserCreated;
+                                x.DatetimeCreated = DateTime.Now;
+                                dimensionDetailRepository.Add(x, false);
                             }
                         }
                         var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == houseId);
@@ -1106,6 +1131,7 @@ namespace eFMS.API.Documentation.DL.Services
                 containerService.SubmitChanges();
                 csShipmentSurchargeRepo.SubmitChanges();
                 csArrivalFrieghtChargeService.SubmitChanges();
+                dimensionDetailRepository.SubmitChanges();
                 return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
             }
             catch (Exception ex)

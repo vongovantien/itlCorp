@@ -17,6 +17,7 @@ import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import * as fromShare from '../../store';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
+import { ActivatedRoute, Params } from '@angular/router';
 
 @Component({
     selector: 'form-create-sea-import',
@@ -76,7 +77,8 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         protected _baseService: BaseService,
         private _dataService: DataService,
         private _spinner: NgxSpinnerService,
-        private _store: Store<fromShare.ITransactionState>
+        private _store: Store<fromShare.ITransactionState>,
+        private _route: ActivatedRoute
 
     ) {
         super();
@@ -99,6 +101,14 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                 (res: any) => {
                     if (!!res) {
                         this.fclImportDetail = res;
+                        this._route.queryParams.subscribe((param: Params) => {
+                            if (param.action === 'copy') {
+                                this.fclImportDetail.jobNo = null;
+                                this.fclImportDetail.etd = null;
+                                this.fclImportDetail.mawb = null;
+                                this.fclImportDetail.eta = null;
+                            }
+                        });
                         try {
                             this.formCreate.setValue({
                                 jobId: this.fclImportDetail.jobNo,
