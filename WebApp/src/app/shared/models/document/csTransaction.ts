@@ -1,7 +1,7 @@
-
 import { Container } from "src/app/shared/models/document/container.model";
 import { CsTransactionDetail } from "src/app/shared/models/document/csTransactionDetail";
 import { TransactionTypeEnum } from "../../enums/transaction-type.enum";
+import { DIM } from "./dimension";
 
 export class CsTransaction {
     id: string = "00000000-0000-0000-0000-000000000000";
@@ -64,6 +64,14 @@ export class CsTransaction {
     hblId: string = "00000000-0000-0000-0000-000000000000";
     packageQty: number = null;
     packageType: string = null;
+
+    // * AIR
+    flightDate: any = null;
+    hw: number = null;
+    hwConstant: number = 6000;
+    netweight: number = null;
+
+    dimensionDetails: DIM[] = [];
 
     constructor(object?: any) {
         const self = this;

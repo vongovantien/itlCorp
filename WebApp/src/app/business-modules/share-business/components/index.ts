@@ -28,6 +28,7 @@ export * from './form-search-sea/form-search-sea.component';
 export * from './form-create-house-bill-import/form-create-house-bill-import.component';
 export * from './form-create-sea-export/form-create-sea-export.component';
 export * from './form-create-house-bill-export/form-create-house-bill-export.component';
+export * from './form-create-air/form-create-air.component';
 
 export * from './stage-management/assign-stage/assign-stage.popup';
 export * from './asignment/asignment.component';
@@ -40,6 +41,8 @@ export * from './hbl/arrival-note/arrival-note.component';
 export * from './hbl/delivery-order/delivery-order.component';
 export * from './hbl/import-detail/import-house-bill-detail.component';
 export * from './hbl/form-search-house-bill/form-search-house-bill.component';
+
+export * from './dim-volume/dim-volume.popup';
 
 
 // TODO export components from shareBussiness.

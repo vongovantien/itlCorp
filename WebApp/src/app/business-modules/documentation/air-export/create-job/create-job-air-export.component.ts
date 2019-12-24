@@ -13,7 +13,8 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import {
     ShareBussinessFormCreateSeaExportComponent,
     ShareBussinessShipmentGoodSummaryComponent,
-    ShareBusinessImportJobDetailPopupComponent
+    ShareBusinessImportJobDetailPopupComponent,
+    ShareBusinessFormCreateAirComponent
 } from 'src/app/business-modules/share-business';
 
 import * as fromShareBussiness from '../../../share-business/store';
@@ -27,7 +28,7 @@ import { catchError, takeUntil } from 'rxjs/operators';
 
 export class AirExportCreateJobComponent extends AppForm implements OnInit {
 
-    @ViewChild(ShareBussinessFormCreateSeaExportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaExportComponent;
+    @ViewChild(ShareBusinessFormCreateAirComponent, { static: false }) formCreateComponent: ShareBusinessFormCreateAirComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
@@ -61,50 +62,35 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
 
     ngAfterViewInit() {
         // * Init container
-        this.shipmentGoodSummaryComponent.initContainer();
-        this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
+        // this.shipmentGoodSummaryComponent.initContainer();
+        // this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
         this._cdr.detectChanges();
     }
 
     onSubmitData() {
         const form: any = this.formCreateComponent.formGroup.getRawValue();
+        console.log(form);
 
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDate: !!form.serviceDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
-
-            mawb: form.mawb,
-            voyNo: form.voyNo,
-            notes: form.notes,
-            personIncharge: form.personalIncharge, // TODO user with Role = CS.
-            coloader: form.coloader,
-            bookingNo: form.bookingNo,
-            flightVesselName: form.flightVesselName,
-            pono: form.pono,
+            flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             shipmentType: !!form.shipmentType ? form.shipmentType[0].id : null,
             typeOfService: !!form.typeOfService ? form.typeOfService[0].id : null,
-            mbltype: !!form.mbltype ? form.mbltype[0].id : null,
-            paymentTerm: !!form.term ? form.term[0].id : null,
+            paymentTerm: !!form.paymentTerm ? form.paymentTerm[0].id : null,
+            packageType: !!form.packageType ? form.packageType[0].id : null,
+            commodity: !!form.commodity ? form.commodity.map(i => i.id).toString() : null,
 
-            agentId: form.agent,
+            agentId: form.agentId,
             pol: form.pol,
             pod: form.pod,
-            coloaderId: form.coloader,
-
-            // * containers summary
-            commodity: this.shipmentGoodSummaryComponent.commodities,
-            desOfGoods: this.shipmentGoodSummaryComponent.description,
-            packageContainer: this.shipmentGoodSummaryComponent.containerDetail,
-            netWeight: this.shipmentGoodSummaryComponent.netWeight,
-            grossWeight: this.shipmentGoodSummaryComponent.grossWeight,
-            chargeWeight: this.shipmentGoodSummaryComponent.totalChargeWeight,
-            cbm: this.shipmentGoodSummaryComponent.totalCBM,
+            coloaderId: form.coloaderId,
         };
 
-        const fclExportAddModel: CsTransaction = new CsTransaction(formData);
-        fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaFCLExport;
+        const fclExportAddModel: CsTransaction = new CsTransaction(Object.assign({}, form, formData));
+        fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.AirExport;
 
         return fclExportAddModel;
     }
@@ -119,27 +105,20 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
 
     onSaveJob() {
         this.formCreateComponent.isSubmitted = true;
-        if (Object.keys(this.selectedJob).length > 0) {
-            this.containers = this.selectedJob.containers;
-        }
+
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;
         }
 
-        if (!this.containers.length) {
-            this._toastService.warning('Please add container to create new job');
-            return;
-        }
-
         const modelAdd = this.onSubmitData();
-        modelAdd.csMawbcontainers = this.containers; // * Update containers model
 
         if (this.isImport === true) {
             modelAdd.id = this.selectedJob.id;
             this.importJob(modelAdd);
         } else {
-            this.saveJob(modelAdd);
+            console.log(modelAdd);
+            // this.saveJob(modelAdd);
         }
     }
 
