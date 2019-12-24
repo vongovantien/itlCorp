@@ -1020,6 +1020,13 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        public Crystal PreviewAir(PreviewCdNoteCriteria criteria)
+        {
+            Crystal result = null;
+            var _currentUser = currentUser.UserID;
+            return result;
+        }
+
         private SysOffice GetInfoBankOfOfficeByUserId(string userId)
         {
             SysOffice result = null;
