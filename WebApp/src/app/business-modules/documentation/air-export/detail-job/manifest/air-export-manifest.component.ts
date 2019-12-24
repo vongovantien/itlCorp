@@ -59,6 +59,7 @@ export class AirExportManifestComponent extends AppList {
     }
 
     ngOnInit() {
+
         this.headers = [
             { title: 'HBL No', field: 'hwbNo', sortable: true, width: 100 },
             { title: 'No of Pieces', field: 'packageContainer', sortable: true },
@@ -74,10 +75,12 @@ export class AirExportManifestComponent extends AppList {
 
     }
     ngAfterViewInit() {
+        this.formManifest.isAir = true;
         this._store.select(getParamsRouterState)
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
+
                     this.formManifest.jobId = this.jobId;
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);
                     this.getHblList(this.jobId);
@@ -111,7 +114,7 @@ export class AirExportManifestComponent extends AppList {
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}`]);
+        this._router.navigate([`/home/documentation/air-export/${this.jobId}`]);
     }
 
 

@@ -92,8 +92,11 @@
                     <div class="col-lg-4">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedPortOfLoading.value }">
-                            <label class="form-control-label">
+                            <label class="form-control-label" *ngIf="!isAir">
                                 Port of Loading <span class="m--font-danger">(*)</span>
+                            </label>
+                            <label class="form-control-label" *ngIf="isAir">
+                                Airport Departure <span class="m--font-danger">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfLoading"
                                 [selectedDisplayFields]="configPort.selectedDisplayFields"
@@ -109,8 +112,11 @@
                     <div class="col-lg-4">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted  && !selectedPortOfDischarge.value }">
-                            <label class="form-control-label">
+                            <label class="form-control-label" *ngIf="!isAir">
                                 Port of Discharge <span class="m--font-danger">(*)</span>
+                            </label>
+                            <label class="form-control-label" *ngIf="isAir">
+                                Airport Arrival <span class="m--font-danger">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfDischarge"
                                 [selectedDisplayFields]="configPort.selectedDisplayFields"
