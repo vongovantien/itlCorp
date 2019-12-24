@@ -29,7 +29,7 @@ const routing: Routes = [
         data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.AirExport },
     },
     {
-        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/Air-export-hbl.module').then(m => m.AirExportHBLModule),
+        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/air-export-hbl.module').then(m => m.AirExportHBLModule),
     },
     // {
     //     path: ':id/manifest', component: AirExportManifestComponent,

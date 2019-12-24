@@ -49,5 +49,7 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? HbGrossweight { get; set; }
         public string HbShippers { get; set; }
         public string HbConsignees { get; set; }
+        public DateTime? VesselDate { get; set; }
+        public decimal? CW { get; set; }
     }
 }

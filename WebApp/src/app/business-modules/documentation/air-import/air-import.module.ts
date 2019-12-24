@@ -15,7 +15,7 @@ import { AirImportLazyLoadModule } from './air-import-lazy-load.module';
 const routing: Routes = [
     {
         path: '', pathMatch: 'full', component: AirImportComponent, data: {
-            name: "Air Export", path: "air-export", level: 2
+            name: "Air Import", path: "air-export", level: 2
         },
     },
     // {

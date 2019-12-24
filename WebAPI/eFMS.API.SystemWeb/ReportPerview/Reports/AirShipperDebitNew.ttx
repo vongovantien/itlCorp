@@ -1,0 +1,42 @@
+IndexSort	Number		
+Subject	String	255	
+PartnerID	String	50	
+PartnerName	String	150	
+PersonalContact	String	150	
+Address	String	255	
+Workphone	String	50	
+Fax	String	50	
+Cell	String	50	
+TaxCode	String	50	
+TransID	String	50	
+LoadingDate	DateTime		
+MAWB	String	50	
+HWBNO	String	50	
+FlightNo	String	50	
+FlightDate	DateTime		
+DepartureAirport	String	150	
+LastDestination	String	50	
+Consignee	String	250	
+ATTN	String	255	
+GrossWeight	Number		
+WChargeable	Number		
+Description	String	150	
+Quantity	Number		
+QUnit	String	50	
+Unit	String	50	
+UnitPrice	Number		
+VAT	Number		
+Debit	Number		
+Credit	Number		
+ExtVND	Number		
+Notes	String	255	
+InputData	String	50	
+CTNSQty	Number		
+CTNSUnit	String	255	
+Deposit	Number		
+DepositCurr	String	255	
+Commodity	String	255	
+DecimalSymbol	String	255	
+DigitSymbol	String	255	
+DecimalNo	Number		
+CurrDecimalNo	Number		

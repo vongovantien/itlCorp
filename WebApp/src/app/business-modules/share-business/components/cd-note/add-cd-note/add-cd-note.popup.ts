@@ -60,6 +60,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
 
     isChangeCharge: boolean = false;
 
+    labelHblNo: string = 'HBL No';
+
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
@@ -71,8 +73,16 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+    }
+
+    setHeader() {
+        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
+            this.labelHblNo = 'HAWB No';
+        } else {
+            this.labelHblNo = 'HBL No';
+        }
         this.headers = [
-            { title: 'HBL No', field: 'hwbno', sortable: true },
+            { title: this.labelHblNo, field: 'hwbno', sortable: true },
             { title: 'Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'nameEn', sortable: true },
             { title: 'Quantity', field: 'quantity', sortable: true },
@@ -319,12 +329,16 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             this.totalDebit += this.formatNumberCurrency(_debit) + ' ' + currency + ' | ';
             this.balanceAmount += (_balance > 0 ? this.formatNumberCurrency(_balance) : '(' + this.formatNumberCurrency(Math.abs(_balance)) + ')') + ' ' + currency + ' | ';
         }
-        this.totalCredit += "]";
-        this.totalDebit += "]";
-        this.balanceAmount += "]";
-        this.totalCredit = this.totalCredit.replace("| ]", "").replace("]", "");
-        this.totalDebit = this.totalDebit.replace("| ]", "").replace("]", "");
-        this.balanceAmount = this.balanceAmount.replace("| ]", "").replace("]", "");
+        // this.totalCredit += "]";
+        // this.totalDebit += "]";
+        // this.balanceAmount += "]";
+        // this.totalCredit = this.totalCredit.replace("| ]", "").replace("]", "");
+        // this.totalDebit = this.totalDebit.replace("| ]", "").replace("]", "");
+        // this.balanceAmount = this.balanceAmount.replace("| ]", "").replace("]", "");
+
+        this.totalCredit = this.totalCredit === ' | ' ? '' : this.totalCredit.replace("| ", "");
+        this.totalDebit = this.totalDebit === ' | ' ? '' : this.totalDebit.replace("| ", "");
+        this.balanceAmount = this.balanceAmount === ' | ' ? '' : this.balanceAmount.replace("| ", "");
     }
 
     formatNumberCurrency(input: number) {
@@ -340,7 +354,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);
         this.addRemainChargePopup.partner = this.selectedPartner.value;
         this.addRemainChargePopup.listChargePartner = this.listChargePartner;
-
+        this.addRemainChargePopup.transactionType = this.transactionType;
+        this.addRemainChargePopup.setHeader();
         this._documentationRepo.getChargesByPartnerNotExitstCdNote(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, this.listChargePartner)
             .pipe(
                 catchError(this.catchError),

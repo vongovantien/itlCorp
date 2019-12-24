@@ -40,6 +40,7 @@ export class ShareBusinessFormManifestComponent extends AppList {
     shipmentDetail: any = {}; // TODO model.
     manifest: CsManifest;
     jobId: string = '';
+    isAir: boolean = false;
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,

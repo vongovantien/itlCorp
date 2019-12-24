@@ -35,7 +35,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string FlightNo { get; set; }
         public DateTime? FlightDate { get; set; }
         public string ConnectingFlight { get; set; }
-        public DateTime ConnectingFlightDate { get; set; }
+        public DateTime? ConnectingFlightDate { get; set; }
         public string insurAmount { get; set; }
         public string HandlingInfo { get; set; }
         public string Notify { get; set; }
@@ -46,7 +46,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Wlbs { get; set; }
         public string RateClass { get; set; }
         public string ItemNo { get; set; }
-        public decimal WChargeable { get; set; }
+        public decimal? WChargeable { get; set; }
         public decimal ChWDecimal { get; set; }
         public string Rchge { get; set; }
         public string Ttal { get; set; }

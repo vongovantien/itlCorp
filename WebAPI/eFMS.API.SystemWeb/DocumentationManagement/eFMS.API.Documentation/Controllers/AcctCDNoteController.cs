@@ -32,6 +32,11 @@ namespace eFMS.API.Documentation.Controllers
             currentUser = user;
         }
 
+        /// <summary>
+        /// Add New CD Note
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         [Authorize]
@@ -48,7 +53,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-
+        /// <summary>
+        /// Update CD Note
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("Update")]
         [Authorize]
@@ -67,6 +76,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Delete CD Note
+        /// </summary>
+        /// <param name="cdNoteId"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("Delete")]
         [Authorize]
@@ -96,6 +110,11 @@ namespace eFMS.API.Documentation.Controllers
             return cdNoteServices.GetCDNoteDetails(jobId, cdNo);
         }
 
+        /// <summary>
+        /// Preview CD Note (OPS)
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("PreviewOpsCdNote")]
         public IActionResult PreviewOpsCdNote(AcctCDNoteDetailsModel model)
@@ -115,11 +134,29 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(cdNoteServices.CheckAllowDelete(cdNoteId));
         }
 
+        /// <summary>
+        /// Preview CD Note (Sea)
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("PreviewSIFCdNote")]
         public IActionResult PreviewSIFCdNote(PreviewCdNoteCriteria criteria)
         {
             var result = cdNoteServices.PreviewSIF(criteria);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Preview CD Note (AIR)
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewAirCdNote")]
+        public IActionResult PreviewAirCdNote(PreviewCdNoteCriteria criteria)
+        {
+            var result = cdNoteServices.PreviewAir(criteria);
             return Ok(result);
         }
     }

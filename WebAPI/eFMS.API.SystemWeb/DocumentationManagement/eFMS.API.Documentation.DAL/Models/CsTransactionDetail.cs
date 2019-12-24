@@ -103,6 +103,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string HandingInformation { get; set; }
         public string Notify { get; set; }
         public string Rclass { get; set; }
+        public string ComItemNo { get; set; }
         public string KgIb { get; set; }
         public decimal? RateCharge { get; set; }
         public bool? Min { get; set; }
@@ -119,5 +120,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string DueCarrier { get; set; }
         public string TotalPp { get; set; }
         public string AttachList { get; set; }
+
+        public virtual CsTransaction Job { get; set; }
     }
 }
