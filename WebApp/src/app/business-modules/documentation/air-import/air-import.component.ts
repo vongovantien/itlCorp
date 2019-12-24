@@ -51,7 +51,7 @@ export class AirImportComponent extends AppList {
     this.headers = [
       { title: 'Job ID', field: 'jobNo', sortable: true },
       { title: 'MAWB No.', field: 'mawb', sortable: true },
-      { title: 'ETD', field: 'etd', sortable: true },
+      { title: 'ETA', field: 'eta', sortable: true },
       { title: 'Airline', field: 'supplierName', sortable: true },
       { title: 'Agent', field: 'agentName', sortable: true },
       { title: 'AOL', field: 'polName', sortable: true },

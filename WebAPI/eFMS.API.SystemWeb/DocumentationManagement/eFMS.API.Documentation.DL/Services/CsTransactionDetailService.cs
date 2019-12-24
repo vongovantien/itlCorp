@@ -905,8 +905,8 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ConsigneeID = string.Empty; //NOT USE
                 housebill.Consignee = data.ConsigneeDescription; //Consignee & Address
                 housebill.ICASNC = string.Empty; //NOT USE
-                housebill.AccountingInfo = string.Empty; //Chưa biết
-                housebill.AgentIATACode = string.Empty; //Chưa biết
+                housebill.AccountingInfo = "FREIGHT " + data.FreightPayment; //'FREIGHT ' + Air Freight
+                housebill.AgentIATACode = string.Empty; //Gán rỗng
                 housebill.AccountNo = string.Empty; //NOT USE
                 if (dataPOL != null)
                 {
@@ -922,18 +922,22 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ThirdDestination = data.TransitPlaceTo2;
                 housebill.ThirdCarrier = data.TransitPlaceBy2;
                 housebill.Currency = data.CurrencyId; //Currency
-                housebill.CHGSCode = string.Empty; //Chưa biết
-                housebill.WTPP = string.Empty; //Chưa biết
-                housebill.WTCLL = string.Empty; //Chưa biết
-                housebill.ORPP = string.Empty; //Chưa biết
-                housebill.ORCLL = string.Empty; //Chưa biết
-                housebill.DlvCarriage = string.Empty; //Chưa biết
-                housebill.DlvCustoms = string.Empty; //Chưa biết
-                housebill.LastDestination = string.Empty; //Chưa biết
+                housebill.CHGSCode = data.Chgs; //CHGS
+                housebill.WTPP = data.WtorValpayment; //WT/VAL là PP
+                housebill.WTCLL = data.WtorValpayment; //WT/VAL là CLL
+                housebill.ORPP = data.OtherPayment; //Other Là PP
+                housebill.ORCLL = data.OtherPayment; //Other Là CLL
+                housebill.DlvCarriage = data.Dclrca; //DCLR-CA
+                housebill.DlvCustoms = data.Dclrcus; //DCLR-CUS
+                if (dataPOD != null)
+                {
+                    var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
+                    housebill.LastDestination = dataPOL?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
+                }
                 housebill.FlightNo = data.FlightNo; //Flight No
                 housebill.FlightDate =data.FlightDate; //Flight Date
-                housebill.ConnectingFlight = string.Empty; //Chưa biết
-                housebill.ConnectingFlightDate = DateTime.Now; //Chưa biết
+                housebill.ConnectingFlight = string.Empty; //Để rỗng
+                housebill.ConnectingFlightDate = null; //Tạm gán null
                 housebill.insurAmount = data.IssuranceAmount; //Issurance Amount
                 housebill.HandlingInfo = data.HandingInformation; //Handing Information
                 housebill.Notify = data.Notify; //Notify
@@ -941,38 +945,38 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
                 housebill.GrossWeight = data.GrossWeight; //GrossWeight
                 housebill.GrwDecimal = 2; //NOT USE
-                housebill.Wlbs = string.Empty; //Chưa biết
+                housebill.Wlbs = data.KgIb; //KgIb
                 housebill.RateClass = string.Empty; //NOT USE
-                housebill.ItemNo = string.Empty; //Chưa biết
-                housebill.WChargeable = 0; //Chưa biết
+                housebill.ItemNo = string.Empty; //ComItemNo (chưa sửa) - Commodity Item no
+                housebill.WChargeable = data.ChargeWeight; //CW
                 housebill.ChWDecimal = 2; //NOT USE
                 housebill.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
                 housebill.Ttal = data.Total != null ? data.Total.ToString() : string.Empty;
-                housebill.Description = string.Empty; //Chưa biết
+                housebill.Description = data.DesOfGoods; //Natural and Quality Goods
                 housebill.WghtPP = string.Empty; //Chưa biết
                 housebill.WghtCC = string.Empty; //Chưa biết
                 housebill.ValChPP = string.Empty; //NOT USE
                 housebill.ValChCC = string.Empty; //NOT USE
                 housebill.TxPP = string.Empty; //NOT USE
                 housebill.TxCC = string.Empty; //NOT USE
-                housebill.OrchW = string.Empty; //Chưa biết
+                housebill.OrchW = string.Empty; //OtherCharge (chưa sửa) - Other Charge
                 housebill.OChrVal = string.Empty; //NOT USE
-                housebill.TTChgAgntPP = string.Empty; //Chưa biết
-                housebill.TTChgAgntCC = string.Empty; //Chưa biết
+                housebill.TTChgAgntPP = string.Empty; //Chưa biết (chưa sửa) - Due to agent (prepaid)
+                housebill.TTChgAgntCC = string.Empty; //Chưa biết (chưa sửa) - Due to agent (Collect)
                 housebill.TTCarrPP = string.Empty; //NOT USE
                 housebill.TTCarrCC = string.Empty; //NOT USE
-                housebill.TtalPP = string.Empty; //Chưa biết
-                housebill.TtalCC = string.Empty; //Chưa biết
+                housebill.TtalPP = string.Empty; //Chưa biết (chưa sửa) - Total (prepaid)
+                housebill.TtalCC = string.Empty; //Chưa biết (chưa sửa) - Total (Collect)
                 housebill.CurConvRate = string.Empty; //NOT USE
                 housebill.CCChgDes = string.Empty; //NOT USE
-                housebill.SpecialNote = string.Empty; //Chưa biết
+                housebill.SpecialNote = data.ShippingMark; //Shipping Mark
                 housebill.ShipperCertf = string.Empty; //NOT USE
-                housebill.ExecutedOn = string.Empty; //Chưa biết
-                housebill.ExecutedAt = string.Empty; //Chưa biết
+                housebill.ExecutedOn = data.IssueHblplace; //Issue On
+                housebill.ExecutedAt = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy") : string.Empty; //Issue At
                 housebill.Signature = string.Empty; //NOT USE
-                housebill.Dimensions = string.Empty; //Chưa biết
+                housebill.Dimensions = string.Empty; //Chưa biết (chưa sửa) - Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
                 housebill.ShipPicture = null; //NOT USE
-                housebill.PicMarks = string.Empty; //Chưa biết
+                housebill.PicMarks = string.Empty; //Gán rỗng
                 housebill.GoodsDelivery = string.Empty; //Chưa biết
 
                 housebills.Add(housebill);
@@ -997,7 +1001,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             var parameter = new HouseAirwayBillLastestReportParams()
             {
-                MAWBN = data.Mawb
+                MAWBN = data != null ? data.Mawb : string.Empty
             };
             result.SetParameter(parameter);
             return result;
