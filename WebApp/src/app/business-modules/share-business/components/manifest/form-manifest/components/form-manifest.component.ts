@@ -9,6 +9,7 @@ import { finalize, catchError } from 'rxjs/operators';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
+import { FormValidators } from '@validators';
 
 @Component({
     selector: 'form-manifest',
@@ -22,6 +23,9 @@ export class ShareBusinessFormManifestComponent extends AppList {
     marksOfNationality: AbstractControl;
     vesselNo: AbstractControl;
     date: AbstractControl;
+    pol: AbstractControl;
+    pod: AbstractControl;
+
     configPortOfLoading: CommonInterface.IComboGirdConfig | any = {};
     configPortOfDischarge: CommonInterface.IComboGirdConfig | any = {};
     configPort: CommonInterface.IComboGirdConfig | any = {};
@@ -104,32 +108,53 @@ export class ShareBusinessFormManifestComponent extends AppList {
     onSelectDataFormInfo(data: any, key: string) {
         switch (key) {
             case 'PortOfLoading':
-                this.selectedPortOfLoading = { field: 'nameVn', value: data.id, data: data };
+                this.pol.setValue(data.id);
                 break;
             case 'PortOfDischarge':
-                this.selectedPortOfDischarge = { field: 'nameVn', value: data.id, data: data };
+                this.pod.setValue(data.id);
                 break;
         }
+    }
+
+    updateDataToForm(res: CsManifest) {
+        this.formGroup.setValue({
+            referenceNo: res.refNo,
+            supplier: res.supplier,
+            attention: res.attention,
+            marksOfNationality: res.masksOfRegistration,
+            vesselNo: res.voyNo,
+            date: !!res.invoiceDate ? { startDate: new Date(res.invoiceDate), endDate: new Date(res.invoiceDate) } : null,
+            freightCharge: [<CommonInterface.INg2Select>{ id: res.paymentTerm, text: res.paymentTerm }],
+            consolidator: res.consolidator,
+            deconsolidator: res.deConsolidator,
+            weight: res.weight,
+            volume: res.volume,
+            agent: res.manifestIssuer,
+            pol: res.pol,
+            pod: res.pod
+        });
     }
 
     initForm() {
         this.formGroup = this._fb.group({
             referenceNo: [],
-            supplier: [''
+            supplier: [null
                 , Validators.required],
             attention: [],
-            marksOfNationality: ['', Validators.required],
-            vesselNo: ['', Validators.required],
-            date: ['', Validators.required],
-            freightCharge: ['', Validators.required],
+            marksOfNationality: [null, Validators.required],
+            vesselNo: [null, Validators.required],
+            date: [null, Validators.required],
+            freightCharge: [null, Validators.required],
             consolidator: [],
             deconsolidator: [],
             weight: [],
             volume: [],
-            agent: [''
-                , Validators.required]
+            agent: [null
+                , Validators.required],
+            pol: [null, Validators.required],
+            pod: [null, Validators.required]
 
-        });
+        }, { validator: FormValidators.comparePort });
         this.referenceNo = this.formGroup.controls['referenceNo'];
         this.supplier = this.formGroup.controls['supplier'];
         this.attention = this.formGroup.controls['attention'];
@@ -142,11 +167,21 @@ export class ShareBusinessFormManifestComponent extends AppList {
         this.weight = this.formGroup.controls['weight'];
         this.volume = this.formGroup.controls['volume'];
         this.agent = this.formGroup.controls['agent'];
+        this.pol = this.formGroup.controls['pol'];
+        this.pod = this.formGroup.controls['pod'];
         setTimeout(() => {
             if (this.shipmentDetail !== null) {
-                this.supplier.setValue(this.shipmentDetail.supplierName);
-                this.selectedPortOfLoading = { field: 'id', value: this.shipmentDetail.pol };
-                this.selectedPortOfDischarge = { field: 'id', value: this.shipmentDetail.pod };
+                if (this.supplier.value === null) {
+                    this.supplier.setValue(this.shipmentDetail.supplierName);
+
+                }
+                if (this.pol.value === null) {
+                    this.pol.setValue(this.shipmentDetail.pol);
+                }
+                if (this.pod.value === null) {
+                    this.pod.setValue(this.shipmentDetail.pod);
+                }
+
                 // const date = new Date().toISOString().substr(0, 19);
                 // const jobNo = this.shipmentDetail.jobNo;
                 // if (jobNo != null) {
@@ -155,10 +190,6 @@ export class ShareBusinessFormManifestComponent extends AppList {
                 // }
             }
         }, 500);
-
-
-
-
     }
 
 }
