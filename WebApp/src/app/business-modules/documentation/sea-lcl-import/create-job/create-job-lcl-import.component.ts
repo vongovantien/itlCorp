@@ -168,7 +168,4 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
                 }
             );
     }
-
-
-
 }

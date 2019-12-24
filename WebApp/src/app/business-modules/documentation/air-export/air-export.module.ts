@@ -2,10 +2,12 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { TabsModule, CollapseModule, PaginationModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -66,7 +68,7 @@ const LIB = [
     declarations: [
         AirExportComponent,
         AirExportCreateJobComponent,
-        AirExportDetailJobComponent
+        AirExportDetailJobComponent,
     ],
     providers: [],
 })

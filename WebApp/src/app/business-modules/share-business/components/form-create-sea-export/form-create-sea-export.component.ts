@@ -25,6 +25,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 
 export class ShareBussinessFormCreateSeaExportComponent extends AppForm implements OnInit {
 
+
     formGroup: FormGroup;
     etd: AbstractControl;
     eta: AbstractControl;
@@ -87,7 +88,6 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.getUserLogged();
 
         // * Subscribe state to update form.
-        // this._spinner.show();
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), skip(1))
             .subscribe(
@@ -129,8 +129,6 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                         } catch (error) {
                             console.log(error);
                         }
-
-                        this._spinner.hide()
                     }
                 }
             );

@@ -9,6 +9,9 @@ export * from './catalogue/partner.model';
 export * from './catalogue/catCurrency.model';
 export * from './catalogue/catCharge.model';
 export * from './catalogue/catUnit.model';
+export * from './catalogue/port-index.model';
+export * from './catalogue/customer.model';
+export { SaleManRequest } from './catalogue/customer.model';
 
 export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
@@ -22,6 +25,7 @@ export * from './document/fcl-import';
 export * from './document/arrival-freight-charge';
 export * from './document/delivery-order';
 export * from './document/house-bill';
+export * from './document/dimension';
 
 export * from './tool-setting/tariff';
 
