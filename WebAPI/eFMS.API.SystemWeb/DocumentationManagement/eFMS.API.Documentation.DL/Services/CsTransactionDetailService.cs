@@ -959,7 +959,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ValChCC = string.Empty; //NOT USE
                 housebill.TxPP = string.Empty; //NOT USE
                 housebill.TxCC = string.Empty; //NOT USE
-                housebill.OrchW = string.Empty; //OtherCharge (chưa sửa) - Other Charge
+                housebill.OrchW = data.OtherCharge; //Other Charge
                 housebill.OChrVal = string.Empty; //NOT USE
                 housebill.TTChgAgntPP = string.Empty; //Chưa biết (chưa sửa) - Due to agent (prepaid)
                 housebill.TTChgAgntCC = string.Empty; //Chưa biết (chưa sửa) - Due to agent (Collect)

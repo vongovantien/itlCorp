@@ -4,11 +4,53 @@
         <name>eFMS.API.Documentation</name>
     </assembly>
     <members>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.AddNew(eFMS.API.Documentation.DL.Models.AcctCdnoteModel)">
+            <summary>
+            Add New CD Note
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.Update(eFMS.API.Documentation.DL.Models.AcctCdnoteModel)">
+            <summary>
+            Update CD Note
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.Delete(System.Guid)">
+            <summary>
+            Delete CD Note
+            </summary>
+            <param name="cdNoteId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewOpsCdNote(eFMS.API.Documentation.DL.Models.AcctCDNoteDetailsModel)">
+            <summary>
+            Preview CD Note (OPS)
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.CheckAllowDelete(System.Guid)">
             <summary>
             check allow delete an existed item
             </summary>
             <param name="cdNoteId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewSIFCdNote(eFMS.API.Documentation.DL.Models.PreviewCdNoteCriteria)">
+            <summary>
+            Preview CD Note (Sea)
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewAirCdNote(eFMS.API.Documentation.DL.Models.PreviewCdNoteCriteria)">
+            <summary>
+            Preview CD Note (AIR)
+            </summary>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController">
