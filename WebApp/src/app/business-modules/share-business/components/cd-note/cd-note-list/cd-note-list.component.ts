@@ -85,6 +85,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         this.cdNoteAddPopupComponent.action = 'create';
         this.cdNoteAddPopupComponent.transactionType = this.transactionType;
         this.cdNoteAddPopupComponent.currentMBLId = this.idMasterBill;
+        this.cdNoteAddPopupComponent.setHeader();
         this.cdNoteAddPopupComponent.show();
     }
 
@@ -92,6 +93,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         this.cdNoteDetailPopupComponent.jobId = jobId;
         this.cdNoteDetailPopupComponent.cdNote = cdNote;
         this.cdNoteDetailPopupComponent.transactionType = this.transactionType;
+        this.cdNoteDetailPopupComponent.setHeader();
         this.cdNoteDetailPopupComponent.getDetailCdNote(jobId, cdNote);
         this.cdNoteDetailPopupComponent.show();
     }

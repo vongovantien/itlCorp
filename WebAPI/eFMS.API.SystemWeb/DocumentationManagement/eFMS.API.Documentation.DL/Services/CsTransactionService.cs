@@ -1528,11 +1528,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (transactionType == TermData.AirExport)
             {
-                shipmentType = "Air Export ";
+                shipmentType = "Export (Air) ";
             }
             if (transactionType == TermData.AirImport)
             {
-                shipmentType = "Air Import ";
+                shipmentType = "Import (Air) ";
             }
             if (transactionType == TermData.SeaConsolExport)
             {

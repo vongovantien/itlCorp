@@ -501,4 +501,10 @@ export class DocumentationRepo {
             })
         );
     }
+
+    previewAirCdNote(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewAirCdNote`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }

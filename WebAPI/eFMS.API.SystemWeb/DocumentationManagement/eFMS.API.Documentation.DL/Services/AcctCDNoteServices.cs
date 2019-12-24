@@ -85,13 +85,13 @@ namespace eFMS.API.Documentation.DL.Services
                     code = Constants.LG_SHIPMENT;
                     break;
                 case TransactionTypeEnum.InlandTrucking:
-                    code = "AAA";
+                    code = Constants.IT_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirExport:
-                    code = "AAA";
+                    code = Constants.AE_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirImport:
-                    code = "AAA";
+                    code = Constants.AI_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaConsolExport:
                     code = Constants.SEC_SHIPMENT;

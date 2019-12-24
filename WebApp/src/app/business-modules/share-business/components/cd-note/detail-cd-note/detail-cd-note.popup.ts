@@ -39,6 +39,10 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
 
     dataReport: any = null;
 
+    labelHblNo: string = 'HBL No';
+
+    labelDetail: any = {};
+
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
@@ -51,8 +55,53 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+    }
+
+    setHeader() {
+        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
+            this.labelDetail = {
+                subjectTo: 'Subject To',
+                address: 'Address',
+                tel: 'Tel',
+                taxCode: 'Taxcode',
+                hbl: 'HAWB/ HBL',
+                jobId: 'JOB ID',
+                mbl: 'MAWB/ MBL No',
+                pol: 'A.O.L',
+                pod: 'P.O.L',
+                etd: 'ETD',
+                eta: 'ETA',
+                vessel: 'Flight',
+                volume: 'Volume',
+                packageQty: 'Package Quantity',
+                soa: 'SOA',
+                locked: 'Locked'
+            };
+            this.labelHblNo = 'HAWB No';
+        } else {
+            this.labelDetail = {
+                subjectTo: 'Subject To',
+                address: 'Address',
+                tel: 'Tel',
+                taxCode: 'Taxcode',
+                hbl: 'House Bill of Lading',
+                jobId: 'JOB ID',
+                mbl: 'Master Bill of Lading',
+                pol: 'Port of loading',
+                pod: 'Port of destination',
+                etd: 'Estimated Time of Departure',
+                eta: 'Estimated Time of Arrival',
+                vessel: 'Vessel',
+                volume: 'Volume',
+                packageQty: 'Package Quantity',
+                soa: 'SOA',
+                locked: 'Locked'
+            };
+            this.labelHblNo = 'HBL No';
+        }
+
         this.headers = [
-            { title: 'HBL No', field: 'hwbno', sortable: true },
+            { title: this.labelHblNo, field: 'hwbno', sortable: true },
             { title: 'Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'nameEn', sortable: true },
             { title: 'Quantity', field: 'quantity', sortable: true },
@@ -106,12 +155,16 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             this.totalDebit += this.formatNumberCurrency(_debit) + ' ' + currency + ' | ';
             this.balanceAmount += (_balance > 0 ? this.formatNumberCurrency(_balance) : '(' + this.formatNumberCurrency(Math.abs(_balance)) + ')') + ' ' + currency + ' | ';
         }
-        this.totalCredit += "]";
-        this.totalDebit += "]";
-        this.balanceAmount += "]";
-        this.totalCredit = this.totalCredit.replace("| ]", "").replace("]", "");
-        this.totalDebit = this.totalDebit.replace("| ]", "").replace("]", "");
-        this.balanceAmount = this.balanceAmount.replace("| ]", "").replace("]", "");
+        // this.totalCredit += "]";
+        // this.totalDebit += "]";
+        // this.balanceAmount += "]";
+        // this.totalCredit = this.totalCredit.replace("| ]", "").replace("]", "");
+        // this.totalDebit = this.totalDebit.replace("| ]", "").replace("]", "");
+        // this.balanceAmount = this.balanceAmount.replace("| ]", "").replace("]", "");
+
+        this.totalCredit = this.totalCredit === ' | ' ? '' : this.totalCredit.replace("| ", "");
+        this.totalDebit = this.totalDebit === ' | ' ? '' : this.totalDebit.replace("| ", "");
+        this.balanceAmount = this.balanceAmount === ' | ' ? '' : this.balanceAmount.replace("| ", "");
     }
 
     formatNumberCurrency(input: number) {
@@ -166,6 +219,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         this.cdNoteEditPopupComponent.selectedNoteType = this.CdNoteDetail.cdNote.type;
         this.cdNoteEditPopupComponent.CDNote = this.CdNoteDetail.cdNote;
         this.cdNoteEditPopupComponent.currentMBLId = this.CdNoteDetail.jobId;
+        this.cdNoteEditPopupComponent.setHeader();
         this.cdNoteEditPopupComponent.getListCharges(this.CdNoteDetail.jobId, this.CdNoteDetail.partnerId, this.isHouseBillID, this.CdNoteDetail.cdNote.code);
         this.cdNoteEditPopupComponent.show();
     }
@@ -182,7 +236,36 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     previewCdNote(data: string) {
+        if(this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport){
+            this.previewAirCdNote(data);
+        } else {
+            this.previewSeaCdNote(data);
+        }
+    }
+
+    previewSeaCdNote(data: string){
         this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = JSON.stringify(res);
+                    if (res != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            if (!this.popupReport.isShown) {
+                                this.popupReport.config = this.options;
+                                this.popupReport.show();
+                            }
+                            this.submitFormPreview();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    previewAirCdNote(data: string){
+        this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: Crystal) => {

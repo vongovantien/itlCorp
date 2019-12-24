@@ -4,7 +4,8 @@
         <div class="modal-content" *ngIf="CdNoteDetail">
             <div class="modal-header">
                 <h5 class="modal-title">Detail
-                     <b><span class="text-warning">{{CdNoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note': CdNoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
+                    <b><span
+                            class="text-warning">{{CdNoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note': CdNoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
                     No: <b class="text-warning">{{CdNoteDetail.cdNote.code}}</b></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closePopup()">
                     <span aria-hidden="true">&times;</span>
@@ -31,32 +32,32 @@
                                 <div class="m--margin-bottom-10">
                                     <div class="m--margin-top-5">
                                         <span class="m--font-bolder">
-                                            Subject To :
+                                            {{labelDetail.subjectTo}}:
                                         </span>
                                         <span>{{CdNoteDetail.partnerNameEn}}</span>
                                     </div>
                                     <div class="m--margin-top-5">
                                         <span class="m--font-bolder">
-                                            Address:
+                                            {{labelDetail.address}}:
                                         </span>
                                         <span>{{CdNoteDetail.partnerShippingAddress}}</span>
                                     </div>
                                     <div class="m--margin-top-5">
                                         <span class="m--font-bolder">
-                                            Tel:
+                                            {{labelDetail.tel}}:
                                         </span>
                                         <span>{{CdNoteDetail.partnerTel}}</span>
                                     </div>
                                     <div class="m--margin-top-5">
                                         <span class="m--font-bolder">
-                                            Taxcode:
+                                            {{labelDetail.taxCode}}:
                                         </span>
                                         <span>{{CdNoteDetail.partnerTaxcode}}</span>
                                     </div>
                                 </div>
                                 <div class="m--margin-bottom-10">
                                     <span class="m--font-bolder">
-                                        House Bill of Lading:
+                                        {{labelDetail.hbl}}:
                                     </span>
                                     <span>{{CdNoteDetail.hbLadingNo}}</span>
                                 </div>
@@ -66,7 +67,7 @@
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                Job ID:
+                                                {{labelDetail.jobId}}:
                                             </span>
                                             <span>{{CdNoteDetail.jobNo}}</span>
                                         </div>
@@ -74,7 +75,7 @@
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                Master Bill of Lading:
+                                                {{labelDetail.mbl}}:
                                             </span>
                                             <span>{{CdNoteDetail.mbLadingNo}}</span>
                                         </div>
@@ -84,7 +85,7 @@
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                Port of loading:
+                                                {{labelDetail.pol}}:
                                             </span>
                                             <span>{{CdNoteDetail.pol}} , {{CdNoteDetail.polCountry}}</span>
                                         </div>
@@ -92,7 +93,7 @@
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                Port of destination:
+                                                {{labelDetail.pod}}:
                                             </span>
                                             <span>{{CdNoteDetail.pod}} , {{CdNoteDetail.podCountry}}</span>
                                         </div>
@@ -102,7 +103,7 @@
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                Estimated Time of Departure:
+                                                {{labelDetail.etd}}:
                                             </span>
                                             <span>{{CdNoteDetail.etd | date : 'dd/MM/yyyy'}}</span>
                                         </div>
@@ -110,7 +111,7 @@
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                Estimated Time of Arrival:
+                                                {{labelDetail.eta}}:
                                             </span>
                                             <span>{{CdNoteDetail.eta | date : 'dd/MM/yyyy'}}</span>
                                         </div>
@@ -120,7 +121,7 @@
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                Vessel:
+                                                {{labelDetail.vessel}}:
                                             </span>
                                             <span>{{CdNoteDetail.vessel}}</span>
                                         </div>
@@ -128,7 +129,7 @@
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                Volume:
+                                                {{labelDetail.volume}}:
                                             </span>
                                             <span>{{CdNoteDetail.volum}} CBM</span>
                                         </div>
@@ -138,7 +139,7 @@
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                Package Quantity:
+                                                {{labelDetail.packageQty}}:
                                             </span>
                                             <span>{{CdNoteDetail.hbPackages}}</span>
                                         </div>
@@ -146,13 +147,13 @@
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                SOA:
+                                                {{labelDetail.soa}}:
                                             </span>
                                             <span>{{CdNoteDetail.soaNo}}</span>
                                         </div>
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                Locked:
+                                                {{labelDetail.locked}}:
                                             </span>
                                             <span
                                                 [ngClass]="CdNoteDetail.isLoocked ? 'm--font-danger' : ''">{{CdNoteDetail.isLoocked ? 'Yes' : 'No'}}</span>

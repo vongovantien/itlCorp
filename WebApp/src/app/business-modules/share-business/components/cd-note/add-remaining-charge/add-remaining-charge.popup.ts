@@ -2,6 +2,7 @@ import { Component, Output, EventEmitter } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
 import { ChargeCdNote } from "src/app/shared/models/document/chargeCdNote.model";
 import { SortService } from "src/app/shared/services";
+import { TransactionTypeEnum } from "@enums";
 
 @Component({
     selector: 'add-remaining-charge-popup',
@@ -15,14 +16,25 @@ export class ShareBussinessCdNoteAddRemainingChargePopupComponent extends PopupB
     listChargePartnerAddMore: ChargeCdNote[] = [];
     listChargePartner: ChargeCdNote[] = [];
     partner: string = "";
+    
+    transactionType: TransactionTypeEnum = 0;
+    labelHblNo: string = 'HBL No';
     constructor(private _sortService: SortService) {
         super();
         this.requestSort = this.sortRemainingCharge;
     }
 
     ngOnInit() {
+    }
+
+    setHeader() {
+        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
+            this.labelHblNo = 'HAWB No';
+        } else {
+            this.labelHblNo = 'HBL No';
+        }
         this.headers = [
-            { title: 'HBL No', field: 'hwbno', sortable: true },
+            { title: this.labelHblNo, field: 'hwbno', sortable: true },
             { title: 'Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'nameEn', sortable: true },
             { title: 'Quantity', field: 'quantity', sortable: true },
