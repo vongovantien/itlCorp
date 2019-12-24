@@ -2596,6 +2596,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ComItemNo).HasMaxLength(250);
+
                 entity.Property(e => e.Commodity).HasMaxLength(1600);
 
                 entity.Property(e => e.ConsigneeDescription).HasMaxLength(500);
@@ -2879,6 +2881,12 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("WTorVALPayment")
                     .HasMaxLength(10)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.CsTransactionDetail)
+                    .HasForeignKey(d => d.JobId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>
