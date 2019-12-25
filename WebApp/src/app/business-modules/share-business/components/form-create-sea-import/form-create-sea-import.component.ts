@@ -123,9 +123,9 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                                 eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null,
                                 serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
 
-                                mbltype: [(this.ladingTypes || []).find(type => type.id === this.fclImportDetail.mbltype)],
-                                shipmentType: [(this.shipmentTypes || []).find(type => type.id === this.fclImportDetail.shipmentType)],
-                                typeOfService: [(this.serviceTypes || []).find(type => type.id === this.fclImportDetail.typeOfService)],
+                                mbltype: !!this.fclImportDetail.mbltype ? [(this.ladingTypes || []).find(type => type.id === this.fclImportDetail.mbltype)] : null,
+                                shipmentType: !!this.fclImportDetail.shipmentType ? [(this.shipmentTypes || []).find(type => type.id === this.fclImportDetail.shipmentType)] : null,
+                                typeOfService: !!this.fclImportDetail.typeOfService ? [(this.serviceTypes || []).find(type => type.id === this.fclImportDetail.typeOfService)] : null,
                                 personIncharge: this.fclImportDetail.personIncharge || this.userLogged.id,
 
                                 pod: this.fclImportDetail.pod,

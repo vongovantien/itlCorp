@@ -107,18 +107,21 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                                 jobID: res.jobNo,
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
                                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
-                                mawb: res.mawb,
-                                mbltype: [this.ladingTypes.find(type => type.id === res.mbltype) || this.ladingTypes[0]],
+
+                                mbltype: !!res.mbltype ? [this.ladingTypes.find(type => type.id === res.mbltype)] : null,
+                                typeOfService: !!res.typeOfService ? [this.serviceTypes.find(type => type.id === res.typeOfService)] : null,
+                                term: !!res.shipmentType ? [this.termTypes.find(type => type.id === res.paymentTerm)] : null,
+                                shipmentType: !!res.shipmentType ? [this.shipmentTypes.find(type => type.id === res.shipmentType)] : null,
+
                                 coloader: res.coloaderId,
                                 bookingNo: res.bookingNo,
-                                typeOfService: [this.serviceTypes.find(type => type.id === res.typeOfService)],
                                 pol: res.pol,
                                 pod: res.pod,
                                 agent: res.agentId,
                                 flightVesselName: res.flightVesselName,
                                 voyNo: res.voyNo,
-                                term: [this.termTypes.find(type => type.id === res.paymentTerm)],
-                                shipmentType: [this.shipmentTypes.find(type => type.id === res.shipmentType)],
+                                mawb: res.mawb,
+
                                 personalIncharge: res.personIncharge,
                                 notes: res.notes,
                                 pono: res.pono

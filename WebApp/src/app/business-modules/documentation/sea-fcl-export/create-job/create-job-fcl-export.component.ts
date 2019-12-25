@@ -83,10 +83,10 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             flightVesselName: form.flightVesselName,
             pono: form.pono,
 
-            shipmentType: !!form.shipmentType ? form.shipmentType[0].id : null,
-            typeOfService: !!form.typeOfService ? form.typeOfService[0].id : null,
-            mbltype: !!form.mbltype ? form.mbltype[0].id : null,
-            paymentTerm: !!form.term ? form.term[0].id : null,
+            shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
+            typeOfService: !!form.typeOfService && !!form.typeOfService.length ? form.typeOfService[0].id : null,
+            mbltype: !!form.mbltype && !!form.mbltype.length ? form.mbltype[0].id : null,
+            paymentTerm: !!form.term && !!form.term.length ? form.term[0].id : null,
 
             agentId: form.agent,
             pol: form.pol,

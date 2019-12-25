@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { Store } from '@ngrx/store';
 
 import { CatalogueRepo } from '@repositories';
 import { CommonEnum } from '@enums';
@@ -7,14 +9,12 @@ import { User, Unit, Customer, PortIndex, DIM, CsTransaction } from '@models';
 import { FormValidators } from '@validators';
 import { AppForm } from '@app';
 
-import { distinctUntilChanged, takeUntil, skip, mergeMap, tap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.popup';
-
-import * as fromStore from './../../store/index';
-import { Store } from '@ngrx/store';
 import { SystemConstants } from 'src/constants/system.const';
 
+import * as fromStore from './../../store/index';
+import { distinctUntilChanged, takeUntil, skip, mergeMap, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 @Component({
     selector: 'form-create-air',
     templateUrl: './form-create-air.component.html',
@@ -73,7 +73,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _fb: FormBuilder,
-        private _store: Store<fromStore.IShareBussinessState>
+        private _store: Store<fromStore.IShareBussinessState>,
+        private _spinner: NgxSpinnerService
     ) {
         super();
     }
@@ -110,7 +111,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             .subscribe(
                 (res: CsTransaction) => {
                     if (!!res) {
-                        console.log("detail air export shipment from store", res);
                         try {
                             const formData: any = {
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
@@ -121,7 +121,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                                 typeOfService: !!res.typeOfService ? [this.billTypes.find(type => type.id === res.typeOfService)] : null,
                                 paymentTerm: !!res.paymentTerm ? [this.termTypes.find(type => type.id === res.paymentTerm)] : null,
                                 shipmentType: !!res.shipmentType ? [this.shipmentTypes.find(type => type.id === res.shipmentType)] : null,
-                                // packageType: [this.units.find(u => u.id === 114)],
 
                                 pol: res.pol,
                                 pod: res.pod,
@@ -149,6 +148,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
                         } catch (error) {
                             console.log(error + '');
+                        } finally {
                         }
                     }
                 }
