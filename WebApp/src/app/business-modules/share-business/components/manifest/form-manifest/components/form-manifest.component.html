@@ -1,4 +1,4 @@
-<div class="m-content form-manifest m-form--state">
+<div class="m-content form-manifest m-form m-form--state">
     <form [formGroup]="formGroup">
         <div class="m-portlet">
             <div class="m-portlet__body">
@@ -90,36 +90,45 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedPortOfLoading.value }">
-                            <label class="form-control-label">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !pol.value }">
+                            <label class="form-control-label" *ngIf="!isAir">
                                 Port of Loading <span class="m--font-danger">(*)</span>
                             </label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfLoading"
+                            <label class="form-control-label" *ngIf="isAir">
+                                Airport Departure <span class="m--font-danger">(*)</span>
+                            </label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                 [selectedDisplayFields]="configPort.selectedDisplayFields"
                                 [dataSources]="configPortOfLoading.dataSource"
                                 [displayFields]="configPort.displayFields"
                                 (itemSelected)="onSelectDataFormInfo($event, 'PortOfLoading')">
                             </app-combo-grid-virtual-scroll>
-                            <div class="form-control-feedback" *ngIf="isSubmitted &&  !selectedPortOfLoading.value  ">
+                            <div class="form-control-feedback" *ngIf="isSubmitted &&  !pol.value  ">
                                 Port of Loading is required!
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted  && !selectedPortOfDischarge.value }">
-                            <label class="form-control-label">
+                            [ngClass]="{'m-form__group has-danger': isSubmitted  && !pod.value || (formGroup.errors | equalError:'invalidPort') }">
+                            <label class="form-control-label" *ngIf="!isAir">
                                 Port of Discharge <span class="m--font-danger">(*)</span>
                             </label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortOfDischarge"
+                            <label class="form-control-label" *ngIf="isAir">
+                                Airport Arrival <span class="m--font-danger">(*)</span>
+                            </label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                 [selectedDisplayFields]="configPort.selectedDisplayFields"
                                 [dataSources]="configPortOfDischarge.dataSource"
                                 [displayFields]="configPort.displayFields"
                                 (itemSelected)="onSelectDataFormInfo($event, 'PortOfDischarge')">
                             </app-combo-grid-virtual-scroll>
-                            <div class="form-control-feedback" *ngIf="isSubmitted &&  !selectedPortOfDischarge.value">
+                            <div class="form-control-feedback" *ngIf="isSubmitted &&  !pod.value">
                                 Port of Discharge is required!
+                            </div>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted &&  formGroup.errors | equalError :'invalidPort'">
+                                Port of Discharge must be different from Port of Loading!
                             </div>
                         </div>
                     </div>

@@ -34,7 +34,6 @@ export class AirExportManifestComponent extends AppList {
     saveButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.save
     };
-
     cancelButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.cancel
     };
@@ -68,16 +67,18 @@ export class AirExportManifestComponent extends AppList {
             { title: 'Shipper', field: 'shipperName', sortable: true },
             { title: 'Consignee', field: 'consignee', sortable: true },
             { title: 'Description', field: 'desOfGoods', sortable: true },
-            { title: 'Freight Charge', field: '', sortable: true },
-
+            { title: 'Freight Charge', field: '', sortable: true }
         ];
 
     }
+
     ngAfterViewInit() {
+        this.formManifest.isAir = true;
         this._store.select(getParamsRouterState)
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
+
                     this.formManifest.jobId = this.jobId;
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);
                     this.getHblList(this.jobId);
@@ -88,10 +89,9 @@ export class AirExportManifestComponent extends AppList {
     }
 
     showPopupAddHbl() {
-
         this.AddHblToManifestPopup.show();
-
     }
+
     removeAllChecked() {
         this.checkAll = false;
     }
@@ -111,9 +111,8 @@ export class AirExportManifestComponent extends AppList {
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}`]);
+        this._router.navigate([`/home/documentation/air-export/${this.jobId}`]);
     }
-
 
     getTotalWeight() {
         this.totalCBM = 0;
@@ -136,24 +135,7 @@ export class AirExportManifestComponent extends AppList {
             (res: any) => {
                 if (!!res) {
                     this.manifest = res;
-                    setTimeout(() => {
-                        this.formManifest.supplier.setValue(res.supplier);
-                        this.formManifest.referenceNo.setValue(res.refNo);
-                        this.formManifest.attention.setValue(res.attention);
-                        this.formManifest.marksOfNationality.setValue(res.masksOfRegistration);
-                        this.formManifest.vesselNo.setValue(res.voyNo);
-                        !!res.invoiceDate ? this.formManifest.date.setValue({ startDate: new Date(res.invoiceDate), endDate: new Date(res.invoiceDate) }) : this.formManifest.date.setValue(null);
-                        this.formManifest.selectedPortOfLoading = { field: 'id', value: res.pol };
-                        this.formManifest.selectedPortOfDischarge = { field: 'id', value: res.pod };
-                        this.formManifest.freightCharge.setValue([<CommonInterface.INg2Select>{ id: res.paymentTerm, text: res.paymentTerm }]);
-                        this.formManifest.consolidator.setValue(res.consolidator);
-                        this.formManifest.deconsolidator.setValue(res.deConsolidator);
-                        this.formManifest.agent.setValue(res.manifestIssuer);
-                        this.formManifest.weight.setValue(res.weight);
-                        this.formManifest.volume.setValue(res.volume);
-
-                    }, 500);
-
+                    this.formManifest.updateDataToForm(this.manifest);
                 }
             }
         );
@@ -172,9 +154,9 @@ export class AirExportManifestComponent extends AppList {
                 masksOfRegistration: this.formManifest.marksOfNationality.value,
                 voyNo: this.formManifest.vesselNo.value,
                 invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
-                pol: !!this.formManifest.selectedPortOfLoading.value ? this.formManifest.selectedPortOfLoading.value : null,
-                pod: !!this.formManifest.selectedPortOfDischarge.value ? this.formManifest.selectedPortOfDischarge.value : null,
-                paymentTerm: this.formManifest.freightCharge.value !== "" ? this.formManifest.freightCharge.value[0].text : null,
+                pol: this.formManifest.pol.value,
+                pod: this.formManifest.pod.value,
+                paymentTerm: this.formManifest.freightCharge.value !== null ? this.formManifest.freightCharge.value[0].text : null,
                 consolidator: this.formManifest.consolidator.value,
                 deConsolidator: this.formManifest.deconsolidator.value,
                 volume: this.formManifest.volume.value,
@@ -197,8 +179,19 @@ export class AirExportManifestComponent extends AppList {
         }
     }
 
+    checkIsChecked() {
+        let isChecked = false;
+        isChecked = this.housebills.find(t => t.isChecked === true);
+        if (!isChecked) {
+            return false;
+        }
+        return true;
+    }
 
     onRemove() {
+        if (this.checkIsChecked() === false) {
+            return;
+        }
         this.housebills.forEach(x => {
             if (x.isChecked) {
                 x.isRemoved = true;
@@ -207,13 +200,16 @@ export class AirExportManifestComponent extends AppList {
             }
 
         });
+
         this.getTotalWeight();
         this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
         this.AddHblToManifestPopup.checkAll = false;
     }
 
     onAdd() {
-
+        if (this.checkIsChecked() === false) {
+            return;
+        }
         this.housebills.forEach(x => {
             if (x.isChecked) {
                 x.isRemoved = false;
@@ -268,6 +264,7 @@ export class AirExportManifestComponent extends AppList {
                 },
             );
     }
+
     previewManifest() {
         if (this.formManifest.referenceNo.value === null) {
             this._toastService.warning('There is no data to display preview');
@@ -281,9 +278,9 @@ export class AirExportManifestComponent extends AppList {
             masksOfRegistration: this.formManifest.marksOfNationality.value,
             voyNo: this.formManifest.vesselNo.value,
             invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
-            pol: !!this.formManifest.selectedPortOfLoading.value ? this.formManifest.selectedPortOfLoading.value : null,
-            pod: !!this.formManifest.selectedPortOfDischarge.value ? this.formManifest.selectedPortOfDischarge.value : null,
-            paymentTerm: this.formManifest.freightCharge.value !== "" ? this.formManifest.freightCharge.value[0].text : null,
+            pol: this.formManifest.pol.value,
+            pod: this.formManifest.pod.value,
+            paymentTerm: this.formManifest.freightCharge.value !== null ? this.formManifest.freightCharge.value[0].text : null,
             consolidator: this.formManifest.consolidator.value,
             deConsolidator: this.formManifest.deconsolidator.value,
             volume: this.formManifest.volume.value,

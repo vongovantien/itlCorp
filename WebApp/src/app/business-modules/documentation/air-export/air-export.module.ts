@@ -15,6 +15,7 @@ import { AirExportComponent } from './air-export.component';
 import { AirExportLazyLoadModule } from './air-export-lazy-load.module';
 import { AirExportCreateJobComponent } from './create-job/create-job-air-export.component';
 import { AirExportDetailJobComponent } from './detail-job/detail-job-air-export.component';
+import { AirExportManifestComponent } from './detail-job/manifest/air-export-manifest.component';
 
 const routing: Routes = [
     {
@@ -33,10 +34,10 @@ const routing: Routes = [
     {
         path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/air-export-hbl.module').then(m => m.AirExportHBLModule),
     },
-    // {
-    //     path: ':id/manifest', component: AirExportManifestComponent,
-    //     data: { name: "Manifest", path: ":id", level: 4 },
-    // },
+    {
+        path: ':id/manifest', component: AirExportManifestComponent,
+        data: { name: "Manifest", path: ":id", level: 4 },
+    },
     // {
     //     path: ':jobId/si', component: AirExportShippingInstructionComponent, data: {
     //         name: "Shipping Instructions", path: ":jobId", level: 4
@@ -69,6 +70,7 @@ const LIB = [
         AirExportComponent,
         AirExportCreateJobComponent,
         AirExportDetailJobComponent,
+        AirExportManifestComponent
     ],
     providers: [],
 })

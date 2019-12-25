@@ -23,7 +23,6 @@ import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules
 })
 export class SeaLclExportManifestComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
-
     @ViewChild(ShareBusinessFormManifestComponent, { static: false }) formManifest: ShareBusinessFormManifestComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(ShareBusinessAddHblToManifestComponent, { static: false }) AddHblToManifestPopup: ShareBusinessAddHblToManifestComponent;
@@ -128,7 +127,6 @@ export class SeaLclExportManifestComponent extends AppList {
         this.manifest.volume = this.totalCBM;
         this.formManifest.volume.setValue(this.manifest.volume);
         this.formManifest.weight.setValue(this.manifest.weight);
-
     }
 
     getManifest(id: string) {
@@ -136,27 +134,7 @@ export class SeaLclExportManifestComponent extends AppList {
             (res: any) => {
                 if (!!res) {
                     this.manifest = res;
-                    setTimeout(() => {
-                        this.formManifest.supplier.setValue(res.supplier);
-
-                        if (res.refNo != null) {
-                            this.formManifest.referenceNo.setValue(res.refNo);
-                        }
-                        this.formManifest.attention.setValue(res.attention);
-                        this.formManifest.marksOfNationality.setValue(res.masksOfRegistration);
-                        this.formManifest.vesselNo.setValue(res.voyNo);
-                        !!res.invoiceDate ? this.formManifest.date.setValue({ startDate: new Date(res.invoiceDate), endDate: new Date(res.invoiceDate) }) : this.formManifest.date.setValue(null);
-                        this.formManifest.selectedPortOfLoading = { field: 'id', value: res.pol };
-                        this.formManifest.selectedPortOfDischarge = { field: 'id', value: res.pod };
-                        this.formManifest.freightCharge.setValue([<CommonInterface.INg2Select>{ id: res.paymentTerm, text: res.paymentTerm }]);
-                        this.formManifest.consolidator.setValue(res.consolidator);
-                        this.formManifest.deconsolidator.setValue(res.deConsolidator);
-                        this.formManifest.agent.setValue(res.manifestIssuer);
-                        this.formManifest.weight.setValue(res.weight);
-                        this.formManifest.volume.setValue(res.volume);
-
-                    }, 500);
-
+                    this.formManifest.updateDataToForm(this.manifest);
                 }
             }
         );
@@ -164,8 +142,7 @@ export class SeaLclExportManifestComponent extends AppList {
 
     addOrUpdateManifest() {
         this.formManifest.isSubmitted = true;
-        if (this.formManifest.formGroup.valid && this.formManifest.selectedPortOfDischarge.value && this.formManifest.selectedPortOfLoading.value) {
-
+        if (this.formManifest.formGroup.valid) {
             this._progressRef.start();
             const body: any = {
                 jobId: this.jobId,
@@ -175,8 +152,8 @@ export class SeaLclExportManifestComponent extends AppList {
                 masksOfRegistration: this.formManifest.marksOfNationality.value,
                 voyNo: this.formManifest.vesselNo.value,
                 invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
-                pol: !!this.formManifest.selectedPortOfLoading.value ? this.formManifest.selectedPortOfLoading.value : null,
-                pod: !!this.formManifest.selectedPortOfDischarge.value ? this.formManifest.selectedPortOfDischarge.value : null,
+                pol: this.formManifest.pol.value,
+                pod: this.formManifest.pod.value,
                 paymentTerm: this.formManifest.freightCharge.value[0].text,
                 consolidator: this.formManifest.consolidator.value,
                 deConsolidator: this.formManifest.deconsolidator.value,
@@ -200,8 +177,19 @@ export class SeaLclExportManifestComponent extends AppList {
         }
     }
 
+    checkIsChecked() {
+        let isChecked = false;
+        isChecked = this.housebills.find(t => t.isChecked === true);
+        if (!isChecked) {
+            return false;
+        }
+        return true;
+    }
 
     onRemove() {
+        if (this.checkIsChecked() === false) {
+            return;
+        }
         this.housebills.forEach(x => {
             if (x.isChecked) {
                 x.isRemoved = true;
@@ -216,7 +204,9 @@ export class SeaLclExportManifestComponent extends AppList {
     }
 
     onAdd() {
-
+        if (this.checkIsChecked() === false) {
+            return;
+        }
         this.housebills.forEach(x => {
             if (x.isChecked) {
                 x.isRemoved = false;
@@ -285,9 +275,9 @@ export class SeaLclExportManifestComponent extends AppList {
             masksOfRegistration: this.formManifest.marksOfNationality.value,
             voyNo: this.formManifest.vesselNo.value,
             invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
-            pol: !!this.formManifest.selectedPortOfLoading.value ? this.formManifest.selectedPortOfLoading.value : null,
-            pod: !!this.formManifest.selectedPortOfDischarge.value ? this.formManifest.selectedPortOfDischarge.value : null,
-            paymentTerm: this.formManifest.freightCharge.value !== "" ? this.formManifest.freightCharge.value[0].text : null,
+            pol: this.formManifest.pol.value,
+            pod: this.formManifest.pod.value,
+            paymentTerm: this.formManifest.freightCharge.value !== null ? this.formManifest.freightCharge.value[0].text : null,
             consolidator: this.formManifest.consolidator.value,
             deConsolidator: this.formManifest.deconsolidator.value,
             volume: this.formManifest.volume.value,
