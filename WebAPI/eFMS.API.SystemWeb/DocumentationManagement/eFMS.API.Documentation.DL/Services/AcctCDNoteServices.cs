@@ -1029,6 +1029,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (data != null)
             {
                 _hbllist = string.Join("\r\n", data.ListSurcharges.Select(s => s.Hwbno));
+                int i = 0;
                 foreach (var item in data.ListSurcharges)
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
@@ -1047,7 +1048,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
 
                     var charge = new AirShipperDebitNewReport();
-                    charge.IndexSort = 1;
+                    charge.IndexSort = i++;
 
                     //Thông tin Partner
                     charge.PartnerID = data.PartnerId;
