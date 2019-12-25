@@ -46,6 +46,8 @@ export class SeaFclExportManifestComponent extends AppList {
     fistOpen: boolean = true;
     dataReport: Crystal;
 
+
+
     constructor(
         protected _store: Store<any>,
         private _progressService: NgProgress,
@@ -114,7 +116,6 @@ export class SeaFclExportManifestComponent extends AppList {
         this._router.navigate([`/home/documentation/sea-fcl-export/${this.jobId}`]);
     }
 
-
     getTotalWeight() {
         this.totalCBM = 0;
         this.totalGW = 0;
@@ -170,6 +171,8 @@ export class SeaFclExportManifestComponent extends AppList {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message, '');
+                            this.getManifest(this.jobId);
+                            this.getHblList(this.jobId);
                         } else {
                             this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                         }
@@ -257,7 +260,13 @@ export class SeaFclExportManifestComponent extends AppList {
                         }
                     });
                     this.housebills = res;
-                    console.log(this.housebills);
+                    const hasHbl = this.housebills.some(element => element.isRemoved === false);
+                    if (!hasHbl) {
+                        this.housebills.forEach(element => {
+                            element.isRemoved = false;
+                        });
+                    }
+                    console.log(hasHbl);
                     this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
                 },
             );
