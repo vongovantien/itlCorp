@@ -316,10 +316,10 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this.eta = this.formGroup.controls['eta'];
         this.pickupPlace = this.formGroup.controls['placeofReceipt'];
         this.finalDestinationPlace = this.formGroup.controls['finalDestination'];
-        this.localVessel = this.formGroup.controls['feederVessel1'];
-        this.localVoyNo = this.formGroup.controls['feederVoyageNo'];
-        this.oceanVessel = this.formGroup.controls['arrivalVessel'];
-        this.oceanVoyNo = this.formGroup.controls['arrivalVoyage'];
+        this.localVessel = this.formGroup.controls['arrivalVessel'];
+        this.localVoyNo = this.formGroup.controls['arrivalVoyage'];
+        this.oceanVessel = this.formGroup.controls['feederVessel1'];
+        this.oceanVoyNo = this.formGroup.controls['feederVoyageNo'];
         this.documentDate = this.formGroup.controls['documnentDate'];
         this.documentNo = this.formGroup.controls['documentNo'];
         this.etawarehouse = this.formGroup.controls['dateETA'];
@@ -407,10 +407,10 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null, // * Date;
             finalDestination: res.finalDestinationPlace,
             shipper: res.shipperId,
-            feederVessel1: res.localVessel,
-            feederVoyageNo: res.localVoyNo,
-            arrivalVoyage: res.oceanVoyNo,
-            arrivalVessel: res.oceanVessel,
+            feederVessel1: res.oceanVoyNo,
+            feederVoyageNo: res.oceanVessel,
+            arrivalVoyage: res.localVoyNo,
+            arrivalVessel: res.localVessel,
             documnentDate: !!res.documentDate ? { startDate: new Date(res.documentDate), endDate: new Date(res.documentDate) } : null,
             documentNo: res.documentNo,
             dateETA: !!res.etawarehouse ? { startDate: new Date(res.etawarehouse), endDate: new Date(res.etawarehouse) } : null, // * Date;

@@ -78,6 +78,9 @@ namespace eFMS.API.Documentation.DL.Services
                     return checkDuplicateCont;
                 }
             }
+            model.UserCreated = currentUser.UserID;
+            model.DatetimeCreated = DateTime.Now;
+            model.Id = Guid.NewGuid();
             model.UserModified = model.UserCreated = currentUser.UserID;
             model.DatetimeModified = model.DatetimeCreated = DateTime.Now;
             model.Active = true;

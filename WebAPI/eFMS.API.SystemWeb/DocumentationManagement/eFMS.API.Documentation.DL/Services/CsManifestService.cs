@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.DL.Common;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -21,19 +22,25 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsMawbcontainerService containerService;
         readonly ICsTransactionService csTransactionService;
         readonly IContextBase<CsTransaction> transactionRepository;
+        readonly IContextBase<CatUnit> unitRepository;
+        readonly ICurrentUser currentUser;
         public CsManifestService(IContextBase<CsManifest> repository, 
             IMapper mapper,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
             IContextBase<CatPlace> placeRepo,
             ICsMawbcontainerService contService,
             ICsTransactionService transactionService,
-            IContextBase<CsTransaction> transactionRepo) : base(repository, mapper)
+            IContextBase<CsTransaction> transactionRepo,
+            IContextBase<CatUnit> unitRepo,
+            ICurrentUser currUser) : base(repository, mapper)
         {
             transactionDetailRepository = transactionDetailRepo;
             placeRepository = placeRepo;
             containerService = contService;
             csTransactionService = transactionService;
             transactionRepository = transactionRepo;
+            unitRepository = unitRepo;
+            currentUser = currUser;
         }
 
         public HandleState AddOrUpdateManifest(CsManifestEditModel model)
@@ -141,21 +148,21 @@ namespace eFMS.API.Documentation.DL.Services
                 Agent = "Agent",
                 QtyPacks = string.Empty,
                 TotalShipments = "1",
-                CompanyName = "CompanyName",
+                CompanyName = Constants.COMPANY_NAME,
                 CompanyDescription = "CompanyDescription",
-                CompanyAddress1 = "CompanyAddress1",
-                CompanyAddress2 = "CompanyAddress2",
-                Website = "Website",
-                Contact = "Contact"
+                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
+                Website = Constants.COMPANY_WEBSITE,
+                Contact = currentUser.UserID
             };
-            var manifests = new List<SeaCargoManifest>();
+            var manifests = new List<SeaFCLExportCargoManifest>();
             var freightManifests = new List<FreightManifest>();
             if (model.CsTransactionDetails.Count > 0)
             {
 
                 foreach (var item in model.CsTransactionDetails)
                 {
-                    var manifest = new SeaCargoManifest
+                    var manifest = new SeaFCLExportCargoManifest
                     {
                         //TransID = item.JobNo,
                         HBL = item.Hwbno,
@@ -163,8 +170,8 @@ namespace eFMS.API.Documentation.DL.Services
                         //ReferrenceNo = item.ReferenceNo,
                         Marks = item.ShippingMark,
                         Nofpiece = item.PackageContainer,
-                        GW = item.GW ?? (decimal)item.GW,
-                        SeaCBM = item.CBM ?? (decimal)item.CBM,
+                        GrossWeight = item.GW,
+                        SeaCBM = item.CBM,
                         NoOfAWB = 0,
                         Destination = item.FinalDestinationPlace ?? string.Empty,
                         Shipper = item.ShipperDescription ?? string.Empty,
@@ -175,9 +182,7 @@ namespace eFMS.API.Documentation.DL.Services
                         OnboardNote = item.OnBoardStatus ?? string.Empty,
                         MaskNos = string.Empty,
                         TranShipmentTo = item.PlaceFreightPay ?? string.Empty,
-                        BillType = item.ServiceType ?? string.Empty,
-                        NW = item.NetWeight ?? (decimal)item.NetWeight,
-                        PortofDischarge = item.PODName, 
+                        BillType = item.ServiceType ?? string.Empty
                     };
                     manifests.Add(manifest);
                 }
@@ -207,80 +212,62 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = new Crystal();
             var manifests = new List<ManifestFCLImportReport>();
 
-            string noPieces = string.Empty;
-            string totalPackages = string.Empty;
             var containers = new List<SeaImportCargoManifestContainer>();
             var transaction = csTransactionService.GetById(model.JobId);
+            var units = unitRepository.Get().ToList();
             if (model.CsTransactionDetails.Count > 0)
             {
-                foreach(var item in model.CsTransactionDetails)
+                var shipmentContainers = containerService.Get(x => x.Mblid == model.JobId);
+                if (shipmentContainers.Count() > 0)
                 {
-              
-                        var houseContainers = containerService.Query(new Models.Criteria.CsMawbcontainerCriteria { Hblid = item.Id });
-                        if (houseContainers.Count() > 0)
+                    foreach (var container in shipmentContainers)
+                    {
+                        //totalPackages = totalPackages + container.Quantity + "X" + container.ContainerTypeName + "\n"
+                        //    + container.ContainerNo + container.SealNo + ";\n";
+                        container.ContainerTypeName = units.Where(x => x.Id == container.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn;
+                        var containerTemp = new SeaImportCargoManifestContainer
                         {
-                            foreach (var container in houseContainers)
-                            {
-                                if (container.PackageTypeId != null)
-                                {
-                                    noPieces = noPieces + container.PackageQuantity + " " + container.PackageTypeName + "\n";
-                                }
-                                totalPackages = totalPackages + container.Quantity + "X" + container.ContainerTypeName + "\n"
-                                    + container.ContainerNo + container.SealNo + ";\n";
-                                var containerTemp = new SeaImportCargoManifestContainer
-                                {
-                                    Qty = container.Quantity,
-                                    ContType = container.ContainerTypeName,
-                                    ContainerNo = container.ContainerNo,
-                                    SealNo = container.SealNo,
-                                    TotalPackages = container.PackageQuantity,
-                                    UnitPack = container.PackageTypeName,
-                                    GrossWeight = container.Gw,
-                                    CBM = container.Cbm,
-                                    DecimalNo = 2
-                                };
-                                containers.Add(containerTemp);
-                            }
-                        }
-                        else
-                        {
-                            var containerTemp = new SeaImportCargoManifestContainer
-                            {
-                                Qty = 0,
-                                ContType = null,
-                                ContainerNo = null,
-                                SealNo = null,
-                                TotalPackages = 0,
-                                UnitPack = null,
-                                GrossWeight = 0,
-                                CBM =0,
-                                DecimalNo = 0
-                            };
-                            containers.Add(containerTemp);
-                        }
-
-                        var manifest = new ManifestFCLImportReport
-                        {
-                            DateConfirm = model.InvoiceDate,
-                            LoadingDate = transaction.Etd,
-                            LocalVessel = transaction.FlightVesselName,
-                            ContSealNo = transaction.VoyNo,
-                            PortofDischarge = model.PodName,
-                            PlaceDelivery = transaction.PlaceDeliveryName,
-                            HWBNO = item.Hwbno,
-                            ATTN = item.ShipperDescription,
-                            Consignee = item.ConsigneeDescription,
-                            Notify = item.NotifyPartyDescription,
-                            TotalPackages = totalPackages,
-                            ShippingMarkImport = item.ShippingMark,
-                            Description = item.DesOfGoods,
-                            NoPieces = noPieces,
-                            GrossWeight = item.GrossWeight == null ? 0 : item.GrossWeight ,
-                            CBM = item.CBM,
-                            Liner = item.ColoaderId,
-                            OverseasAgent = transaction.AgentName
+                            Qty = container.Quantity,
+                            ContType = container.ContainerTypeName,
+                            ContainerNo = container.ContainerNo,
+                            SealNo = container.SealNo,
+                            TotalPackages = container.PackageQuantity,
+                            UnitPack = container.PackageTypeName,
+                            GrossWeight = container.Gw,
+                            CBM = container.Cbm,
+                            DecimalNo = 2
                         };
-                        manifests.Add(manifest);
+                        containers.Add(containerTemp);
+                    }
+                }
+
+                foreach (var item in model.CsTransactionDetails)
+                {
+                    string totalPackages = item.PackageContainer + "\n" + item.ContSealNo;
+                    var packageType = item.PackageType != null ? units.Where(x => x.Id == item.PackageType)?.FirstOrDefault()?.UnitNameEn: null;
+                    string noPieces = item.PackageQty + packageType;
+                    var manifest = new ManifestFCLImportReport
+                    {
+                        DateConfirm = model.InvoiceDate,
+                        LoadingDate = transaction.Etd,
+                        LocalVessel = transaction.FlightVesselName,
+                        ContSealNo = transaction.VoyNo,
+                        PortofDischarge = model.PodName,
+                        PlaceDelivery = transaction.PlaceDeliveryName,
+                        HWBNO = item.Hwbno,
+                        ATTN = item.ShipperDescription,
+                        Consignee = item.ConsigneeDescription,
+                        Notify = item.NotifyPartyDescription,
+                        TotalPackages = totalPackages,
+                        ShippingMarkImport = item.ShippingMark,
+                        Description = item.DesOfGoods,
+                        NoPieces = noPieces,
+                        GrossWeight = item.GrossWeight ?? 0,
+                        CBM = item.CBM,
+                        Liner = item.ColoaderId,
+                        OverseasAgent = transaction.AgentName
+                    };
+                    manifests.Add(manifest);
                     
                    
                 }
@@ -292,11 +279,11 @@ namespace eFMS.API.Documentation.DL.Services
                 SumCarton = string.Empty,
                 MBL = transaction.Mawb,
                 LCL = "FCL",
-                CompanyName = "Indo Trans",
-                CompanyAddress1 = "52, Trường Sơn, Phường 2, Tân Bình",
-                CompanyAddress2 = "52, Trường Sơn, Phường 2, Tân Bình",
-                Website = "itlvn.com.vn",
-                Contact = "admin"
+                CompanyName = Constants.COMPANY_NAME,
+                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
+                Website = Constants.COMPANY_WEBSITE,
+                Contact = currentUser.UserID
             };
             result = new Crystal
             {

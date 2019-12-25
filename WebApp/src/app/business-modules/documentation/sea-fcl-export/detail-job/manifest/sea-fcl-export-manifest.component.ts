@@ -276,8 +276,8 @@ export class SeaFclExportManifestComponent extends AppList {
             masksOfRegistration: this.formManifest.marksOfNationality.value,
             voyNo: this.formManifest.vesselNo.value,
             invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
-            pol: this.formManifest.pol,
-            pod: this.formManifest.pod,
+            pol: this.formManifest.pol.value,
+            pod: this.formManifest.pod.value,
             paymentTerm: this.formManifest.freightCharge.value !== null ? this.formManifest.freightCharge.value[0].text : null,
             consolidator: this.formManifest.consolidator.value,
             deConsolidator: this.formManifest.deconsolidator.value,
@@ -286,7 +286,7 @@ export class SeaFclExportManifestComponent extends AppList {
             manifestIssuer: this.formManifest.agent.value,
             csTransactionDetails: this.housebills.filter(x => x.isRemoved === false)
         };
-        this._documentationRepo.previewFCLImportManifest(body)
+        this._documentationRepo.previewFCLExportManifest(body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })

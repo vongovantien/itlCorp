@@ -104,6 +104,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
             deliveryOrderPrintedDate: !!this.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
         };
 
+        this.deliveryOrder.hblid = this.hblid;
         this._documentRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryOrder, printedDate))
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(

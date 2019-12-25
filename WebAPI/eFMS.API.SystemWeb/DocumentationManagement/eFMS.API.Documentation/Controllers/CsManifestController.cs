@@ -82,8 +82,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("PreviewFCLManifest")]
-        public IActionResult PreviewFCLManifest(ManifestReportModel model)
+        [Route("PreviewFCLExportManifest")]
+        [Authorize]
+        public IActionResult PreviewFCLExportManifest(ManifestReportModel model)
         {
             var result = manifestService.PreviewFCLExportManifest(model);
             return Ok(result);

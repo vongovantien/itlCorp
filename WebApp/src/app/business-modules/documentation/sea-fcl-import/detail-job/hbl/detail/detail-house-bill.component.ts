@@ -209,10 +209,10 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
-    
+
     onPreview(type: string) {
         this.isClickSubMenu = false;
-        
+
         // Preview Delivery Order
         if (type === 'DELIVERY_ORDER') {
             this.previewDeliveryOrder();
@@ -276,6 +276,10 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             );
     }
     previewDeliveryOrder() {
+        if (this.hblDetail.deliveryOrderNo === null) {
+            this._toastService.warning('There is no delivery order information. You must save delivery order information');
+            return;
+        }
         this._documentationRepo.previewDeliveryOrder(this.hblId)
             .pipe(
                 catchError(this.catchError),

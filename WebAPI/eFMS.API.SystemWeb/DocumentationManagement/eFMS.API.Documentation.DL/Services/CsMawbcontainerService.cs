@@ -457,20 +457,7 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<CsMawbcontainer> containerShipments = null;
             if (hblId != null)
             {
-                containerShipments = DataContext.Get(x => x.Hblid == hblId);
-
-                foreach (var item in csMawbcontainers)
-                {
-                    bool existedItems = containerShipments.Any(cont => cont.ContainerTypeId == item.ContainerTypeId 
-                    && cont.Quantity == item.Quantity 
-                    && cont.ContainerNo == item.ContainerNo 
-                    && cont.PackageTypeId == item.PackageTypeId 
-                    && cont.Hblid == hblId);
-                    if (existedItems)
-                    {
-                        return new HandleState(stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED].Value);
-                    }
-                }
+                return ValidateContainerListInHousebill(csMawbcontainers, (Guid)hblId);
             }
             if (mblId != null)
             {
@@ -482,11 +469,40 @@ namespace eFMS.API.Documentation.DL.Services
                         && cont.Quantity == item.Quantity 
                         && cont.ContainerNo == item.ContainerNo 
                         && cont.PackageTypeId == item.PackageTypeId 
-                        && cont.Mblid == mblId);
+                        && cont.Mblid != mblId);
                     if (existedItems > 1)
                     {
                         return new HandleState(stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED].Value);
                     }
+                }
+            }
+            return new HandleState();
+        }
+
+        private HandleState ValidateContainerListInHousebill(List<CsMawbcontainerModel> csMawbcontainers, Guid hblId)
+        {
+            if(hblId == Guid.Empty)
+            {
+                var s = csMawbcontainers.GroupBy(cont => new
+                    {
+                        cont.ContainerTypeId,
+                        cont.Quantity,
+                        cont.ContainerNo,
+                        cont.PackageTypeId
+                    }).Any(x => x.Count() > 1);
+            }
+            var containerShipments = DataContext.Get(x => x.Hblid == hblId);
+
+            foreach (var item in csMawbcontainers)
+            {
+                bool existedItems = containerShipments.Any(cont => cont.ContainerTypeId == item.ContainerTypeId
+                && cont.Quantity == item.Quantity
+                && cont.ContainerNo == item.ContainerNo
+                && cont.PackageTypeId == item.PackageTypeId
+                && cont.Hblid != hblId);
+                if (existedItems)
+                {
+                    return new HandleState(stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED].Value);
                 }
             }
             return new HandleState();

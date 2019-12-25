@@ -185,15 +185,15 @@ namespace eFMS.API.Documentation.DL.Services
                             });
                             var t = containerService.Add(model.CsMawbcontainers);
                         }
-                        if(model.CsDimensionDetailModels != null)
+                        if(model.DimensionDetails != null)
                         {
-                            model.CsDimensionDetailModels.ForEach(x =>
+                            model.DimensionDetails.ForEach(x =>
                             {
                                 x.Id = Guid.NewGuid();
                                 x.Mblid = transaction.Id;
                             });
 
-                            var d = dimensionDetailService.Add(model.CsDimensionDetailModels);
+                            var d = dimensionDetailService.Add(model.DimensionDetails);
                         }
                     }
                     var result = hsTrans;
@@ -256,9 +256,9 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Mblid == model.Id);
                         }
-                        if (model.CsDimensionDetailModels != null)
+                        if (model.DimensionDetails != null)
                         {
-                            var hscontainers = dimensionDetailService.UpdateMasterBill(model.CsDimensionDetailModels, transaction.Id);
+                            var hscontainers = dimensionDetailService.UpdateMasterBill(model.DimensionDetails, transaction.Id);
                         }
                         else
                         {
@@ -1166,16 +1166,16 @@ namespace eFMS.API.Documentation.DL.Services
                     });
                     var hsCont = containerService.Add(model.CsMawbcontainers, false);
                 }
-                if(model.CsDimensionDetailModels != null)
+                if(model.DimensionDetails != null)
                 {
-                    model.CsDimensionDetailModels.ForEach(x =>
+                    model.DimensionDetails.ForEach(x =>
                     {
                         x.Id = Guid.NewGuid();
                         x.Mblid = transaction.Id;
                         x.UserCreated = transaction.UserCreated;
                         x.DatetimeCreated = DateTime.Now;
                     });
-                    dimensionDetailService.Add(model.CsDimensionDetailModels, false);
+                    dimensionDetailService.Add(model.DimensionDetails, false);
                 }
                 var detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
                 if (detailTrans != null)

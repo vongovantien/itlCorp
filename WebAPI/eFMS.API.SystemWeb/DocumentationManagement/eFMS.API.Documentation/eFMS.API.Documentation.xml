@@ -163,7 +163,7 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewFCLManifest(eFMS.API.Documentation.DL.Models.ManifestReportModel)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewFCLExportManifest(eFMS.API.Documentation.DL.Models.ManifestReportModel)">
             <summary>
             preview manifest
             </summary>

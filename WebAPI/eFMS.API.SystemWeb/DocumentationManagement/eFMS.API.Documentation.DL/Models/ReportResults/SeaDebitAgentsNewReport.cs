@@ -82,7 +82,5 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string TotalDebit { get; set; }
         public string TotalCredit { get; set; }
         public string BalanceAmount { get; set; }
-        public string HBLList { get; set; }
-        public decimal RateVND { get; set; }
     }
 }

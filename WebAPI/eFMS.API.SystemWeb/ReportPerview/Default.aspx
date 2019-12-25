@@ -10,7 +10,7 @@
 <body>
    <form id="form1" runat="server">
         <asp:Panel ID="pReport" Width="100%" Height="100%" runat="server">
-            <CR:CrystalReportViewer ID="rptViewer" runat="server" DisplayGroupTree = "true" HasCrystalLogo="true"/>
+            <CR:CrystalReportViewer ID="rptViewer" runat="server" DisplayGroupTree = "true" HasCrystalLogo="true" BestFitPage="False" Width="800px"/>
         </asp:Panel>
     </form>
 </body>

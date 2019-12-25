@@ -1828,10 +1828,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.Cbm)
-                    .HasColumnName("CBM")
-                    .HasColumnType("decimal(18, 4)");
-
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
@@ -1844,15 +1840,11 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("HW")
                     .HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.Lenght).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.Length).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Mblid).HasColumnName("MBLID");
 
                 entity.Property(e => e.Package).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.TotalHw)
-                    .HasColumnName("TotalHW")
-                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -2881,12 +2873,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("WTorVALPayment")
                     .HasMaxLength(10)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Job)
-                    .WithMany(p => p.CsTransactionDetail)
-                    .HasForeignKey(d => d.JobId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>

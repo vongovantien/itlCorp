@@ -294,6 +294,8 @@
     <Content Include="Reports\AdvancePaymentRequest.rpt" />
     <Content Include="Reports\AdvancePaymentRequest.ttx" />
     <Content Include="Reports\SeaImpProofofDelivery.rpt" />
+    <Content Include="Reports\SeaDeliveryCommand.rpt" />
+    <Content Include="Reports\SeaDeliveryCommand.ttx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

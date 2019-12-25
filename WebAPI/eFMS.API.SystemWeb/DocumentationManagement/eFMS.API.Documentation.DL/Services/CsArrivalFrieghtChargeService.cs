@@ -32,7 +32,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatPlace> placeRepository;
         private readonly IContextBase<CsMawbcontainer> containerRepository;
-        IContextBase<CatPartner> partnerRepositoty;
+        readonly IContextBase<CatPartner> partnerRepositoty;
         ICsTransactionDetailService houseBills;
 
         public CsArrivalFrieghtChargeService(IStringLocalizer<LanguageSub> localizer,
@@ -265,8 +265,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var polName = placeRepository.Get(x => x.Id == houserBill.Pol).FirstOrDefault()?.NameEn;
                 var podName = placeRepository.Get(x => x.Id == houserBill.Pod).FirstOrDefault()?.NameEn;
 
-                var _arrivalHeader = ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
-                var _arrivalFooter = ReplaceHtmlBaseForPreviewReport(arrival.ArrivalFooter);
+                var _arrivalHeader = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
+                var _arrivalFooter = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalFooter);
 
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
                 {
@@ -531,38 +531,42 @@ namespace eFMS.API.Documentation.DL.Services
             var podName = placeRepository.Get(x => x.Id == detail.Pod).FirstOrDefault().NameEn;
             var dataSources = new List<SeaDeliveryCommandResult>();
             var containers = containerRepository.Get(x => x.Hblid == hblid);
+
+            string totalPackages = detail.PackageContainer + "\n" + detail.ContSealNo;
+            string nopieces = string.Empty;
+            string unitOfMeasures = string.Empty;
             foreach (var cont in containers)
             {
-                string totalPackages = cont.ContainerTypeId != null ? (cont.Quantity + "X" + unitRepository.Get(x => x.Id == cont.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn) : null;
-                string nopieces = cont.PackageTypeId != null ? (cont.PackageQuantity + " " + unitRepository.Get(x => x.Id == cont.PackageTypeId)?.FirstOrDefault()?.UnitNameEn) : null;
-                string unitOfMeasures = cont.UnitOfMeasureId != null ? (unitRepository.Get(x => x.Id == cont.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn) : null;
-                var item = new SeaDeliveryCommandResult
-                {
-                    DONo = detail.DeliveryOrderNo,
-                    LocalVessel = detail.LocalVessel,
-                    Consignee = detail.ConsigneeDescription,
-                    OceanVessel = detail.OceanVessel,
-                    DepartureAirport = polName,
-                    PortofDischarge = podName,
-                    PlaceDelivery = podName,
-                    HWBNO = detail.Hwbno,
-                    ShippingMarkImport = detail.ShippingMark,
-                    SpecialNote = "",
-                    Description = cont.Description,
-                    ContSealNo = cont.SealNo, //continue
-                    TotalPackages = totalPackages,
-                    NoPieces = nopieces,
-                    GrossWeight = cont.Gw,
-                    Unit = unitOfMeasures,
-                    CBM = cont.Cbm != null?cont.Cbm: 0,
-                    DeliveryOrderNote = detail.Dofooter,
-                    FirstDestination = detail.DosentTo1,
-                    SecondDestination = detail.DosentTo2,
-                    ArrivalNote = detail.ArrivalNo,
-                    FlightDate = detail.Eta
-                };
-                dataSources.Add(item);
+                nopieces = nopieces +  cont.PackageTypeId != null ? (cont.PackageQuantity + " " + unitRepository.Get(x => x.Id == cont.PackageTypeId)?.FirstOrDefault()?.UnitNameEn) : null;
+                unitOfMeasures = cont.UnitOfMeasureId != null ? (unitRepository.Get(x => x.Id == cont.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn) : null;
             }
+            var item = new SeaDeliveryCommandResult
+            {
+                DONo = detail.DeliveryOrderNo,
+                LocalVessel = detail.LocalVessel,
+                Consignee = ReportUltity.ReplaceNullAddressDescription(detail.ConsigneeDescription),
+                OceanVessel = detail.OceanVessel,
+                DepartureAirport = polName,
+                PortofDischarge = podName,
+                PlaceDelivery = podName,
+                HWBNO = detail.Hwbno,
+                ShippingMarkImport = detail.ShippingMark,
+                SpecialNote = "",
+                Description = detail.DesOfGoods,
+                ContSealNo = detail.LocalVoyNo, //continue
+                TotalPackages = totalPackages,
+                NoPieces = nopieces,
+                GrossWeight = detail.GrossWeight,
+                Unit = unitOfMeasures,
+                CBM = detail.Cbm ?? 0,
+                DeliveryOrderNote = ReportUltity.ReplaceHtmlBaseForPreviewReport(detail.Dofooter),
+                FirstDestination = detail.DosentTo1,
+                SecondDestination = detail.DosentTo2,
+                ArrivalNote = detail.ArrivalNo,
+                FlightDate = detail.Eta,
+                BillType = detail.ServiceType
+            };
+            dataSources.Add(item);
             var result = new Crystal
             {
                 ReportName = "SeaDeliveryCommand.rpt",
@@ -575,27 +579,5 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
         #endregion
-
-        private string ReplaceHtmlBaseForPreviewReport(string html)
-        {
-            if (string.IsNullOrEmpty(html)) return html;
-            if (html.Contains("<strong>"))
-            {
-                html = html.Replace("<strong>", "<b>");
-            }
-            if (html.Contains("</strong>"))
-            {
-                html = html.Replace("</strong>", "</b>");
-            }
-            if (html.Contains("<em>"))
-            {
-                html = html.Replace("<em>", "<i>");
-            }
-            if (html.Contains("</em>"))
-            {
-                html = html.Replace("</em>", "</i>");
-            }
-            return html;
-        }
     }
 }

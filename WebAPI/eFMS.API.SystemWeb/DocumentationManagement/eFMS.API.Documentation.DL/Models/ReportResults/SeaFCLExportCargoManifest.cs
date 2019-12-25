@@ -4,16 +4,14 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Models.ReportResults
 {
-    public class SeaCargoManifest
+    public class SeaFCLExportCargoManifest
     {
         public string TransID { get; set; }
         public string HBL { get; set; }
-        public string ArrivalNo { get; set; }
-        public string ReferrenceNo { get; set; }
         public string Marks { get; set; }
         public string Nofpiece { get; set; }
-        public decimal GW { get; set; }
-        public decimal SeaCBM { get; set; }
+        public decimal? GrossWeight { get; set; }
+        public decimal? SeaCBM { get; set; }
         public decimal NoOfAWB { get; set; }
         public string Destination { get; set; }
         public string Shipper { get; set; }
@@ -25,8 +23,26 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string MaskNos { get; set; }
         public string TranShipmentTo { get; set; }
         public string BillType { get; set; }
-        public decimal NW { get; set; }
-        public string PortofDischarge { get; set; }
+
+        //public string ArrivalNo { get; set; }
+        //public string ReferrenceNo { get; set; }
+        //public string Marks { get; set; }
+        //public string Nofpiece { get; set; }
+        //public decimal? GW { get; set; }
+        //public decimal? SeaCBM { get; set; }
+        //public decimal NoOfAWB { get; set; }
+        //public string Destination { get; set; }
+        //public string Shipper { get; set; }
+        //public string Consignee { get; set; }
+        //public string Descriptions { get; set; }
+        //public string FreightCharge { get; set; }
+        //public string Notify { get; set; }
+        //public string OnboardNote { get; set; }
+        //public string MaskNos { get; set; }
+        //public string TranShipmentTo { get; set; }
+        //public string BillType { get; set; }
+        //public decimal? NW { get; set; }
+        //public string PortofDischarge { get; set; }
     }
     public class SeaCargoManifestParameter
     {

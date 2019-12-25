@@ -123,7 +123,7 @@ export class SalemanPopupComponent extends PopupBase {
                 (res: any) => {
                     if (!!res) {
                         this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
-                        this.service.setValue(this.services.filter(i => i.value === res.value)[0]);
+                        this.service.setValue(this.services.filter(i => i.value === res.value)[1]);
                     }
                 },
             );
