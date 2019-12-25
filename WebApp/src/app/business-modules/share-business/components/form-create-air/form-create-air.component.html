@@ -10,9 +10,14 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mawb.valid}">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid}">
                             <label required>MAWB No </label>
                             <input class="form-control" formControlName="mawb">
+                            <div class="form-control-feedback"
+                                *ngIf="mawb.dirty && (mawb.errors | equalError:'maxlength' || mawb.errors | equalError:'maxlength')">
+                                MAWB invalid
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -21,7 +26,7 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && !typeOfService.valid}">
                                     <label required>HAWB Type </label>
-                                    <ng-select #hawb [items]="billTypes" placeholder="Please select"
+                                    <ng-select #hawb [items]="billTypes" placeholder="Please select" [allowClear]="true"
                                         (opened)="closeOtherSelects(hawb)" formControlName="typeOfService">
                                     </ng-select>
                                 </div>
@@ -30,8 +35,8 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && !shipmentType.valid}">
                                     <label required>Shipment Type</label>
-                                    <ng-select #shipmentType [items]="shipmentTypes" placeholder="Please select"
-                                        (opened)="closeOtherSelects(shipmentType)" formControlName="shipmentType">
+                                    <ng-select #typeSipment [items]="shipmentTypes" placeholder="Please select"
+                                        (opened)="closeOtherSelects(typeSipment)" formControlName="shipmentType">
                                     </ng-select>
                                 </div>
                             </div>
@@ -43,7 +48,7 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [currentActiveItemId]="{ field: 'id', value: coloaderId.value}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
-                                [displayFields]="displayFieldsSupplier" [height]="200">
+                                [displayFields]="displayFieldsSupplier" [height]="200" placeholder="Select airline">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -53,7 +58,7 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                                 [currentActiveItemId]="{ field: 'id', value: agentId.value}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                                [displayFields]="displayFieldsSupplier" [height]="200">
+                                [displayFields]="displayFieldsSupplier" [height]="200" placeholder="Select agent">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -67,7 +72,7 @@
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
-                                            placeholder="Select" readonly formControlName="etd" />
+                                            placeholder="Select ETD" readonly formControlName="etd" />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
@@ -83,7 +88,7 @@
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
-                                            placeholder="Select" readonly formControlName="eta"
+                                            placeholder="Select ETA" readonly formControlName="eta"
                                             [minDate]="minDateETA" />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
@@ -101,7 +106,7 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                                 [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                                [displayFields]="displayFieldPort" [height]="200">
+                                [displayFields]="displayFieldPort" [height]="200" placeholder="Select A.O.L">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -112,7 +117,7 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                                 [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                                [displayFields]="displayFieldPort" [height]="200">
+                                [displayFields]="displayFieldPort" [height]="200" placeholder="Please select A.O.D">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmitted && formGroup.errors | equalError:'invalidPort'">Port of
@@ -123,8 +128,8 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Payment Method</label>
-                            <ng-select #pmethod [items]="termTypes" placeholder="Please select"
-                                (opened)="closeOtherSelects(pmethod)" formControlName="paymentTerm">
+                            <ng-select #pmethod [items]="termTypes" placeholder="Select payment method"
+                                [allowClear]="true" (opened)="closeOtherSelects(pmethod)" formControlName="paymentTerm">
                             </ng-select>
                         </div>
                     </div>
@@ -181,14 +186,15 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Package Qty</label>
-                                    <input type="number" class="form-control" formControlName="packageQty">
+                                    <input type="number" class="form-control" formControlName="packageQty"
+                                        placeholder="Package Quantity">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Unit</label>
-                                    <ng-select #unit [items]="units | async" (opened)="closeOtherSelects(unit)"
-                                        formControlName="packageType">
+                                    <ng-select #unit [items]="units" (opened)="closeOtherSelects(unit)"
+                                        [allowClear]="true" formControlName="packageType" placeholder="Select unit">
                                     </ng-select>
                                 </div>
                             </div>
@@ -199,14 +205,14 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>GW (KGS)</label>
-                                    <input type="number" class="form-control" formControlName="grossWeight">
+                                    <input type="number" class="form-control" formControlName="grossWeight"
+                                        placeholder="Gross weight">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>CW (KGS)</label>
                                     <input type="number" class="form-control" formControlName="chargeWeight">
-
                                 </div>
                             </div>
                         </div>
@@ -238,22 +244,24 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Commodities</label>
-                            <ng-select #commoditiy [items]="commodities | async"
-                                (opened)="closeOtherSelects(commoditiy)" [multiple]="true" formControlName="commodity">
+                            <ng-select #commoditiy [items]="commodities" (opened)="closeOtherSelects(commoditiy)"
+                                [multiple]="true" formControlName="commodity" [allowClear]="true"
+                                placeholder="Select commodity">
                             </ng-select>
                         </div>
                     </div>
                     <div class="col-md-8">
                         <div class="form-group">
                             <label>Note</label>
-                            <textarea name="" id="" cols="30" rows="8" class="form-control"
-                                formControlName="notes"></textarea>
+                            <textarea name="" id="" cols="30" rows="6" class="form-control" formControlName="notes"
+                                placeholder="notes"></textarea>
                         </div>
                     </div>
                 </div>
+                <ng-content></ng-content>
             </div>
         </div>
     </div>
 </div>
 
-<dim-volume-popup></dim-volume-popup>
+<dim-volume-popup (onUpdate)="onUpdateDIM($event)"></dim-volume-popup>

@@ -94,4 +94,8 @@ export class SystemConstants {
     };
 
     public static EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
+
+    public static readonly HW_AIR_CONSTANT: number = 6000;
+    public static readonly CBM_AIR_CONSTANT: number = 166.67;
+
 }

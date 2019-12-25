@@ -9,17 +9,13 @@ import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CsTransaction } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { Container } from 'src/app/shared/models/document/container.model';
 import {
-    ShareBussinessFormCreateSeaExportComponent,
-    ShareBussinessShipmentGoodSummaryComponent,
     ShareBusinessImportJobDetailPopupComponent,
     ShareBusinessFormCreateAirComponent
 } from 'src/app/business-modules/share-business';
 
-import * as fromShareBussiness from '../../../share-business/store';
 
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-job-air-export',
@@ -30,10 +26,8 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareBusinessFormCreateAirComponent, { static: false }) formCreateComponent: ShareBusinessFormCreateAirComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
-    containers: Container[] = [];
     isImport: boolean = false;
     selectedJob: any = {}; // TODO model.
 
@@ -48,22 +42,10 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     ngOnInit() {
-        this._actionStoreSubject
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (action: fromShareBussiness.ContainerAction) => {
-                    if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
-                        this.containers = action.payload;
-                    }
-                });
+
     }
 
     ngAfterViewInit() {
-        // * Init container
-        // this.shipmentGoodSummaryComponent.initContainer();
-        // this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
         this._cdr.detectChanges();
     }
 
@@ -77,11 +59,11 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
             serviceDate: !!form.serviceDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            shipmentType: !!form.shipmentType ? form.shipmentType[0].id : null,
-            typeOfService: !!form.typeOfService ? form.typeOfService[0].id : null,
-            paymentTerm: !!form.paymentTerm ? form.paymentTerm[0].id : null,
-            packageType: !!form.packageType ? form.packageType[0].id : null,
-            commodity: !!form.commodity ? form.commodity.map(i => i.id).toString() : null,
+            shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
+            typeOfService: !!form.typeOfService && !!form.typeOfService.length ? form.typeOfService[0].id : null,
+            paymentTerm: !!form.paymentTerm && !!form.paymentTerm.length ? form.paymentTerm[0].id : null,
+            packageType: !!form.packageType && !!form.packageType.length ? form.packageType[0].id : null,
+            commodity: !!form.commodity && !!form.commodity.length ? form.commodity.map(i => i.id).toString() : null,
 
             agentId: form.agentId,
             pol: form.pol,
@@ -96,6 +78,10 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     checkValidateForm() {
+        this.setError(this.formCreateComponent.shipmentType);
+        this.setError(this.formCreateComponent.packageType);
+        this.setError(this.formCreateComponent.commodity);
+        this.setError(this.formCreateComponent.paymentTerm);
         let valid: boolean = true;
         if (!this.formCreateComponent.formGroup.valid || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)) {
             valid = false;
@@ -112,13 +98,13 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
         }
 
         const modelAdd = this.onSubmitData();
+        modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
         if (this.isImport === true) {
             modelAdd.id = this.selectedJob.id;
             this.importJob(modelAdd);
         } else {
-            console.log(modelAdd);
-            // this.saveJob(modelAdd);
+            this.saveJob(modelAdd);
         }
     }
 
@@ -132,7 +118,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        this._router.navigate([`home/documentation/sea-fcl-export/${res.model.id}`]);
+                        this._router.navigate([`home/documentation/air-export/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
@@ -143,13 +129,6 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     onImport(selectedData: any) {
         this.selectedJob = selectedData;
         this.isImport = true;
-        this.shipmentGoodSummaryComponent.commodities = this.selectedJob.commodity;
-        this.shipmentGoodSummaryComponent.containerDetail = this.selectedJob.packageContainer;
-        this.shipmentGoodSummaryComponent.description = this.selectedJob.desOfGoods;
-        this.shipmentGoodSummaryComponent.grossWeight = this.selectedJob.grossWeight;
-        this.shipmentGoodSummaryComponent.netWeight = this.selectedJob.netWeight;
-        this.shipmentGoodSummaryComponent.totalChargeWeight = this.selectedJob.chargeWeight;
-        this.shipmentGoodSummaryComponent.totalCBM = this.selectedJob.cbm;
     }
 
     showImportPopup() {
@@ -166,7 +145,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
                     if (res.status) {
                         this._toastService.success(res.message);
                         // TODO goto detail.
-                        this._router.navigate([`home/documentation/sea-fcl-export/${res.data.id}`]);
+                        this._router.navigate([`home/documentation/air-export/${res.data.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }

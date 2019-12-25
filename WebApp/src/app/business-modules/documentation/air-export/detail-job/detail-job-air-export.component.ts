@@ -12,6 +12,7 @@ import { combineLatest, of } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, take, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
+import { DIM, CsTransaction } from '@models';
 
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
@@ -33,8 +34,10 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     action: any = {};
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
-    shipmentDetail: any;
+    shipmentDetail: CsTransaction;
     dataReport: any = null;
+
+    dimensionDetails: DIM[];
 
     constructor(
         private _store: Store<fromShareBussiness.TransactionActions>,
@@ -72,17 +75,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             (jobId: string) => {
                 if (!!jobId) {
                     this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
-                    this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
+                    this._store.dispatch(new fromShareBussiness.GetDimensionAction(jobId));
 
-                    this.getListContainer();
-                    this.getDetailSeaFCLImport();
+                    this.getDetailShipment();
                 }
             }
         );
     }
 
-    getDetailSeaFCLImport() {
+    getDetailShipment() {
         this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
             .pipe(
                 skip(1),
@@ -112,10 +114,12 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             return;
         }
         const modelAdd = this.onSubmitData();
-        modelAdd.csMawbcontainers = this.containers; // * Update containers model
+        modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
+        for (const item of modelAdd.dimensionDetails) {
+            item.mblId = this.shipmentDetail.id;
+        }
         //  * Update field
-        modelAdd.csMawbcontainers = this.containers;
         modelAdd.id = this.jobId;
         modelAdd.branchId = this.shipmentDetail.branchId;
         modelAdd.transactionType = this.shipmentDetail.transactionType;
@@ -143,7 +147,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                         // * get detail & container list.
-                        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                        this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
                     } else {
                         this._toastService.error(res.message);
@@ -151,6 +155,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 }
             );
     }
+
     saveJob(body: any) {
         this._documenRepo.updateCSTransaction(body)
             .pipe(
@@ -161,35 +166,10 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        // * get detail & container list.
+                        // * get detail.
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-
-                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
-
-
-
                     } else {
                         this._toastService.error(res.message);
-                    }
-                }
-            );
-    }
-
-    getListContainer() {
-        this._store.select<any>(fromShareBussiness.getContainerSaveState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (containers: any) => {
-                    this.containers = containers || [];
-                    this.shipmentGoodSummaryComponent.containers = this.containers;
-                    if (this.ACTION === 'COPY') {
-                        this.containers.forEach(item => {
-                            item.sealNo = null;
-                            item.containerNo = null;
-                            item.markNo = null;
-                        });
                     }
                 }
             );
@@ -231,7 +211,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-fcl-export"]);
+        this._router.navigate(["home/documentation/air-export"]);
     }
 
     deleteJob() {
@@ -265,7 +245,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
     duplicateConfirm() {
         this.action = { action: 'copy' };
-        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], {
+        this._router.navigate([`home/documentation/air/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
         this.confirmDuplicatePopup.hide();
@@ -279,10 +259,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         this.confirmLockPopup.hide();
 
         const modelAdd = this.onSubmitData();
-        modelAdd.csMawbcontainers = this.containers;
 
         //  * Update field
-        modelAdd.csMawbcontainers = this.containers;
         modelAdd.id = this.jobId;
         modelAdd.branchId = this.shipmentDetail.branchId;
         modelAdd.transactionType = this.shipmentDetail.transactionType;
