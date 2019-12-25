@@ -67,8 +67,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     configConsignee: CommonInterface.IComboGirdConfig | any = {};
     configNotifyParty: CommonInterface.IComboGirdConfig | any = {};
     configAlsoNotifyParty: CommonInterface.IComboGirdConfig | any = {};
-    configPortOfLoading: CommonInterface.IComboGirdConfig | any = {};
-    configPortOfDischarge: CommonInterface.IComboGirdConfig | any = {};
     configSupplier: CommonInterface.IComboGirdConfig | any = {};
     configPlaceOfIssued: CommonInterface.IComboGirdConfig | any = {};
     configPartner: CommonInterface.IComboGirdConfig | any = {};
@@ -199,13 +197,11 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this._spinner.show();
         try {
             if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
-                this.configPortOfLoading.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
-                this.configPortOfDischarge.dataSource = this.configPortOfLoading.dataSource;
+                this.configPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
             } else {
                 const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }).toPromise();
-                this.configPortOfLoading.dataSource = ports || [];
+                this.configPort = ports || [];
                 this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
-                this.configPortOfDischarge.dataSource = this.configPortOfLoading.dataSource;
             }
         } catch (error) {
 

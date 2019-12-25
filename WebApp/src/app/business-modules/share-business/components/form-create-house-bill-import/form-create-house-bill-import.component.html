@@ -217,7 +217,7 @@
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                     [selectedDisplayFields]="configPort.selectedDisplayFields"
-                                    [dataSources]="configPortOfLoading.dataSource"
+                                    [dataSources]="configPort.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'PortOfLoading')"
                                     [displayFields]="configPort.displayFields">
                                 </app-combo-grid-virtual-scroll>
@@ -235,7 +235,7 @@
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                     [selectedDisplayFields]="configPort.selectedDisplayFields"
-                                    [dataSources]="configPortOfDischarge.dataSource"
+                                    [dataSources]="configPort.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'PortOfDischarge')"
                                     [displayFields]="configPort.displayFields">
                                 </app-combo-grid-virtual-scroll>
