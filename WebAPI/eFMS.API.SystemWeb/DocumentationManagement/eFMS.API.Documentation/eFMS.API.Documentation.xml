@@ -469,7 +469,7 @@
             <summary>
             preview sea house bill of lading
             </summary>
-            <param name="hblId"></param>
+            <param name="hblId">Id of Housebill</param>
             <param name="reportType"></param>
             <returns></returns>
         </member>
@@ -477,8 +477,15 @@
             <summary>
             preview house airway bill lastest
             </summary>
-            <param name="hblId"></param>
+            <param name="hblId">Id of Housebill</param>
             <param name="reportType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.PreviewAirAttachList(System.Guid)">
+            <summary>
+            preview attach list (Air)
+            </summary>
+            <param name="hblId">Id of Housebill</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">
