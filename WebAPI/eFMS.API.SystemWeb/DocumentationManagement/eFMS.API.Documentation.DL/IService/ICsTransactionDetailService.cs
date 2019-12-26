@@ -33,5 +33,7 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewSeaHBLofLading(Guid hblId, string reportType);
 
         Crystal PreviewHouseAirwayBillLastest(Guid hblId, string reportType);
+
+        Crystal PreviewAirAttachList(Guid hblId);
     }
 }

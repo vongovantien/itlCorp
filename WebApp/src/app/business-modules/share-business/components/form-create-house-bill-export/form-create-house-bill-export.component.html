@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mawb.value}">
-                        <label required>Master Bill of Landing</label>
+                        <label required>Master Bill of Lading</label>
                         <input type="text" class="form-control" formControlName="mawb">
                     </div>
                 </div>
@@ -72,13 +72,13 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !hwbno.value}">
-                        <label required>House Bill of Landing No</label>
+                        <label required>House Bill of Lading No</label>
                         <input type="text" class="form-control" formControlName="hwbno">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !hbltype.value}">
-                        <label required>House Bill of Landing Type</label>
+                        <label required>House Bill of Lading Type</label>
                         <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
                             formControlName="hbltype" (opened)="closeOtherSelects(selectMBL)">
                         </ng-select>

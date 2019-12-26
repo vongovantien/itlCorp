@@ -51,7 +51,7 @@
                     <div class="col-md-4">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger':   (mbltype.dirty && !mbltype.valid) || (isSubmitted && !mbltype.valid)}">
-                            <label required>Master Bill of Landing Type</label>
+                            <label required>Master Bill of Lading Type</label>
                             <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
                                 formControlName="mbltype" (opened)="closeOtherSelects(selectMBL)">
                             </ng-select>

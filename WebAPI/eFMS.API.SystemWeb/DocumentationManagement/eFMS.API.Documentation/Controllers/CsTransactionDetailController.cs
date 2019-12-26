@@ -207,7 +207,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <summary>
         /// preview sea house bill of lading
         /// </summary>
-        /// <param name="hblId"></param>
+        /// <param name="hblId">Id of Housebill</param>
         /// <param name="reportType"></param>
         /// <returns></returns>
         [HttpGet("PreviewSeaHBLofLading")]
@@ -220,13 +220,25 @@ namespace eFMS.API.Documentation.Controllers
         /// <summary>
         /// preview house airway bill lastest
         /// </summary>
-        /// <param name="hblId"></param>
+        /// <param name="hblId">Id of Housebill</param>
         /// <param name="reportType"></param>
         /// <returns></returns>
         [HttpGet("PreviewHouseAirwayBillLastest")]
         public IActionResult PreviewHouseAirwayBillLastest(Guid hblId, string reportType)
         {
             var result = csTransactionDetailService.PreviewHouseAirwayBillLastest(hblId, reportType);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// preview attach list (Air)
+        /// </summary>
+        /// <param name="hblId">Id of Housebill</param>
+        /// <returns></returns>
+        [HttpGet("PreviewAirAttachList")]
+        public IActionResult PreviewAirAttachList(Guid hblId)
+        {
+            var result = csTransactionDetailService.PreviewAirAttachList(hblId);
             return Ok(result);
         }
     }

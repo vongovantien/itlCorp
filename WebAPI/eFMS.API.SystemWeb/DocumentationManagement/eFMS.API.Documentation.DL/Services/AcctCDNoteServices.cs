@@ -1029,6 +1029,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (data != null)
             {
                 _hbllist = string.Join("\r\n", data.ListSurcharges.Select(s => s.Hwbno));
+                int i = 0;
                 foreach (var item in data.ListSurcharges)
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
@@ -1047,7 +1048,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
 
                     var charge = new AirShipperDebitNewReport();
-                    charge.IndexSort = 1;
+                    charge.IndexSort = i++;
 
                     //Thông tin Partner
                     charge.PartnerID = data.PartnerId;
@@ -1072,7 +1073,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.FlightDate = data.VesselDate; //Flight Date
                     charge.MAWB = data.MbLadingNo; //MBLNO
                     charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
-                    charge.GrossWeight = data.HbGrossweight != null ? data.HbGrossweight.Value : 0;//Total GW of HBL
+                    charge.GrossWeight = data.HbGrossweight;//Total GW of HBL
                     charge.HWBNO = data.HbLadingNo; //HBLNOs
                     charge.GrossWeight = data.GW; //Gross Weight
                     charge.WChargeable = data.CW; //Charge Weigh
@@ -1180,6 +1181,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.Currency = criteria.Currency;
             parameter.HBLList = _hbllist;
 
+            //Exchange Rate USD to VND
             var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == Constants.CURRENCY_USD && x.CurrencyToId == Constants.CURRENCY_LOCAL && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
             parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;
 

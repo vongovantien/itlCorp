@@ -1,0 +1,36 @@
+HWBNO	String	50	
+ArrivalNo	String	50	
+Consignee	String	250	
+ReferrenceNo	String	255	
+FlightNo	String	50	
+DepartureAirport	String	150	
+CussignedDate	DateTime		
+LastDestination	String	50	
+ShippingMarkImport	Memo		
+DatePackage	DateTime		
+NoPieces	String	150	
+Description	Memo		
+WChargeable	Number		
+blnShow	Boolean		
+blnStick	Boolean		
+blnRoot	Boolean		
+FreightCharge	String	255	
+Qty	Number		
+Unit	String	50	
+TotalValue	Number		
+Curr	String	50	
+VAT	Number		
+Notes	String	255	
+ArrivalFooterNotice	Memo		
+Shipper	String	255	
+CBM	Number		
+AOL	String	50	
+KilosUnit	String	50	
+DOPickup	DateTime		
+ExVND	Number		
+AgentName	String	255	
+Notify	String	255	
+DecimalSymbol	String	255	
+DigitSymbol	String	255	
+DecimalNo	Number		
+CurrDecimalNo	Number		

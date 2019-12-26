@@ -940,7 +940,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.FlightNo = data.FlightNo; //Flight No
                 housebill.FlightDate =data.FlightDate; //Flight Date
                 housebill.ConnectingFlight = string.Empty; //Để rỗng
-                housebill.ConnectingFlightDate = null; //Tạm gán null
+                housebill.ConnectingFlightDate = null; //Gán null
                 housebill.insurAmount = data.IssuranceAmount; //Issurance Amount
                 housebill.HandlingInfo = data.HandingInformation; //Handing Information
                 housebill.Notify = data.Notify; //Notify
@@ -1007,6 +1007,30 @@ namespace eFMS.API.Documentation.DL.Services
                 MAWBN = data != null ? data.Mawb : string.Empty
             };
             result.SetParameter(parameter);
+            return result;
+        }
+
+        public Crystal PreviewAirAttachList(Guid hblId)
+        {
+            Crystal result = null;
+            var data = GetById(hblId);
+            var housebills = new List<AirAttachedListReport>();
+            if (data != null)
+            {
+                var housebill = new AirAttachedListReport();
+                housebill.HBLNo = data.Hwbno;
+                housebill.IssuedDate = data.Etd;//ETD of Housebill
+                housebill.AttachedList = data.AttachList;
+                housebills.Add(housebill);
+            }
+            result = new Crystal
+            {
+                ReportName = "AirAttachedList.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(housebills);
+            result.FormatType = ExportFormatType.PortableDocFormat;
             return result;
         }
     }
