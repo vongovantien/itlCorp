@@ -45,6 +45,8 @@ export class ShareBusinessFormManifestComponent extends AppList {
     manifest: CsManifest;
     jobId: string = '';
     isAir: boolean = false;
+    isImport: boolean = false;
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -99,6 +101,35 @@ export class ShareBusinessFormManifestComponent extends AppList {
             (res: any) => {
                 if (!!res) {
                     this.shipmentDetail = res;
+                    console.log(this.shipmentDetail);
+                    if (this.supplier.value === null) {
+                        this.supplier.setValue(this.shipmentDetail.supplierName);
+                    }
+                    if (this.pol.value === null) {
+                        this.pol.setValue(this.shipmentDetail.pol);
+                    }
+                    if (this.pod.value === null) {
+                        this.pod.setValue(this.shipmentDetail.pod);
+                    }
+                    if (this.marksOfNationality.value === null) {
+                        this.marksOfNationality.setValue('VN');
+                    }
+                    if (this.freightCharge.value === null) {
+                        if (this.shipmentDetail.paymentTerm !== null) {
+                            this.freightCharge.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.paymentTerm, text: this.shipmentDetail.paymentTerm }]);
+                        }
+                    }
+                    if (this.vesselNo.value === null) {
+                        this.vesselNo.setValue(this.shipmentDetail.voyNo);
+                    }
+                    if (!this.isImport) {
+                        this.date.setValue({ startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) });
+                    } else {
+                        this.date.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
+                    }
+                    if (this.agent.value === null) {
+                        this.agent.setValue('TYPE NAME OF AGENT WHO ASSEMBLED THIS MANIFEST: INDO TRANS LOGISTICS CORPORATION \nSIGNATURE OF ASSEMBLING AGENT: PHONE# OF ASSEMBLING AGENT: (84 - 8) 3948 6888 \nRECEIVED BY CUSTOMS');
+                    }
                 }
 
             }
@@ -169,27 +200,6 @@ export class ShareBusinessFormManifestComponent extends AppList {
         this.agent = this.formGroup.controls['agent'];
         this.pol = this.formGroup.controls['pol'];
         this.pod = this.formGroup.controls['pod'];
-        setTimeout(() => {
-            if (this.shipmentDetail !== null) {
-                if (this.supplier.value === null) {
-                    this.supplier.setValue(this.shipmentDetail.supplierName);
-
-                }
-                if (this.pol.value === null) {
-                    this.pol.setValue(this.shipmentDetail.pol);
-                }
-                if (this.pod.value === null) {
-                    this.pod.setValue(this.shipmentDetail.pod);
-                }
-
-                // const date = new Date().toISOString().substr(0, 19);
-                // const jobNo = this.shipmentDetail.jobNo;
-                // if (jobNo != null) {
-                //     this.referenceNo.setValue("MSIF" + date.substring(2, 4) + date.substring(5, 7) + jobNo.substring(jobNo.length - 5, jobNo.length));
-
-                // }
-            }
-        }, 500);
     }
 
 }
