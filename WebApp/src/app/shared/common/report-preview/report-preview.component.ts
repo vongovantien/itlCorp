@@ -3,6 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { Crystal } from '../../models/report/crystal.model';
 import { PopupBase } from 'src/app/popup.base';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-report-preview',
@@ -38,6 +39,7 @@ export class ReportPreviewComponent extends PopupBase {
     }
     get scr() {
         //return this.sanitizer.bypassSecurityTrustResourceUrl('http://localhost:53717');
-        return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
+        // return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
+        return this.sanitizer.bypassSecurityTrustResourceUrl('http://' + `${environment.HOST.REPORT}`);
     }
 }

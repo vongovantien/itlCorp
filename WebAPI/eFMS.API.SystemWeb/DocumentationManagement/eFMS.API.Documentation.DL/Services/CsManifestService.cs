@@ -129,15 +129,17 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = new Crystal();
             string noPieces = string.Empty;
             string totalPackages = string.Empty;
-            
+            var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
+            model.PolName = model.Pol != null ? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn : null;
+            model.PodName = model.Pod != null ? ports.Where(x => x.Id == model.Pod)?.FirstOrDefault()?.NameEn : null;
             var parameter = new SeaCargoManifestParameter
             {
                 ManifestNo = model.RefNo,
                 Owner = model.ManifestIssuer ?? string.Empty,
                 Marks = model.MasksOfRegistration ?? string.Empty,
                 Flight = model.VoyNo ?? string.Empty,
-                PortLading = model.PolName ?? string.Empty,
-                PortUnlading = model.PodName ?? string.Empty,
+                PortLading = model.PolName,
+                PortUnlading = model.PodName,
                 FlightDate = model.InvoiceDate?.ToString("dd/MM/yyyy"),
                 Eta = "Eta test",
                 Consolidater = model.Consolidator ?? string.Empty,
@@ -170,8 +172,8 @@ namespace eFMS.API.Documentation.DL.Services
                         //ReferrenceNo = item.ReferenceNo,
                         Marks = item.ShippingMark,
                         Nofpiece = item.PackageContainer,
-                        GrossWeight = item.GW,
-                        SeaCBM = item.CBM,
+                        GrossWeight = item.GW ??0,
+                        SeaCBM = item.CBM ?? 0,
                         NoOfAWB = 0,
                         Destination = item.FinalDestinationPlace ?? string.Empty,
                         Shipper = item.ShipperDescription ?? string.Empty,
@@ -215,6 +217,8 @@ namespace eFMS.API.Documentation.DL.Services
             var containers = new List<SeaImportCargoManifestContainer>();
             var transaction = csTransactionService.GetById(model.JobId);
             var units = unitRepository.Get().ToList();
+            var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
+            model.PolName = model.Pol != null? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn: null;
             if (model.CsTransactionDetails.Count > 0)
             {
                 var shipmentContainers = containerService.Get(x => x.Mblid == model.JobId);
