@@ -44,6 +44,11 @@ export class ShareBusinessFormSearchImportJobComponent extends AppForm {
 
 
     resetSearch() {
+        const date = new Date();
+        this.serviceDate.setValue({
+            startDate: new Date(date.getFullYear(), date.getMonth(), 1),
+            endDate: new Date()
+        });
         const body: ISearchDataJobDetail = {
             all: null,
             jobNo: null,
@@ -52,7 +57,6 @@ export class ShareBusinessFormSearchImportJobComponent extends AppForm {
             fromDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null
         };
-        // this.formSearch.reset();
         this.searchText.reset();
         this.filterType.setValue(this.filterTypes[0]);
         this.onSearch.emit(body);
