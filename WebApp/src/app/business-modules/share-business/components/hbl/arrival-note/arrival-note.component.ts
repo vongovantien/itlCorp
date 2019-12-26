@@ -1,6 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
+
 import { AppList } from 'src/app/app.list';
 import { ArrivalFreightCharge, Unit, Currency, Charge, User } from 'src/app/shared/models';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
@@ -10,12 +13,13 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { Container } from 'src/app/shared/models/document/container.model';
-import { NgProgress } from '@ngx-progressbar/core';
-import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-import * as fromShareBussiness from './../../../store';
 import { ChargeConstants } from 'src/constants/charge.const';
+
+import { Observable } from 'rxjs';
+import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators';
+
+import * as fromShareBussiness from './../../../store';
+
 
 @Component({
     selector: 'hbl-arrival-note',
@@ -32,8 +36,6 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
     headers: CommonInterface.IHeaderTable[];
 
     userLogged: User = new User();
-
-    freightCharges: ArrivalFreightCharge[] = new Array<ArrivalFreightCharge>();
 
     listCharges: Charge[] = [];
     listUnits: Observable<Unit[]>;
@@ -103,7 +105,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
             .subscribe(
                 (res: HBLArrivalNote) => {
                     if (!!res) {
-                        if (res.arrivalNo !== null) {
+                        if (!!res.hblid) {
                             this.hblArrivalNote = res;
                             this.hblArrivalNote.arrivalFirstNotice = !!res.arrivalFirstNotice ? { startDate: new Date(res.arrivalFirstNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
                             this.hblArrivalNote.arrivalSecondNotice = !!res.arrivalSecondNotice ? { startDate: new Date(res.arrivalSecondNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
@@ -182,8 +184,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
     }
 
     duplicateFreightCharge(indexFreightCharge: number) {
-        const newCharge: ArrivalFreightCharge = new ArrivalFreightCharge(this.freightCharges[indexFreightCharge]);
-
+        const newCharge: ArrivalFreightCharge = new ArrivalFreightCharge(this.hblArrivalNote.csArrivalFrieghtCharges[indexFreightCharge]);
         this.hblArrivalNote.csArrivalFrieghtCharges.push(newCharge);
     }
 
