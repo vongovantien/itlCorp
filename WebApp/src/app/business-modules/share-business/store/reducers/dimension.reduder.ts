@@ -4,8 +4,8 @@ import { DimensionActionTypes, DimensionActions } from "../actions";
 
 export interface IDimensionState {
     dims: DIM[];
-    isLoading: boolean;
-    isLoaded: boolean;
+    isLoading?: boolean;
+    isLoaded?: boolean;
 }
 
 const initialDimensionState: IDimensionState = {
@@ -16,6 +16,10 @@ const initialDimensionState: IDimensionState = {
 
 export function DimensionReducer(state = initialDimensionState, action: DimensionActions): IDimensionState {
     switch (action.type) {
+        case DimensionActionTypes.INIT_DIMENSION: {
+            return { ...state, dims: action.payload };
+        }
+
         case DimensionActionTypes.GET_DIMENSION: {
             return { ...state, isLoaded: false, isLoading: true };
         }

@@ -7,7 +7,7 @@ import { CatalogueRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { User, Unit, Customer, PortIndex, DIM, CsTransaction } from '@models';
 import { FormValidators } from '@validators';
-import { AppForm } from '@app';
+import { AppForm } from 'src/app/app.form';
 
 import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.popup';
 import { SystemConstants } from 'src/constants/system.const';
@@ -29,7 +29,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     etd: AbstractControl;
     eta: AbstractControl;
     mawb: AbstractControl;
-    typeOfService: AbstractControl;
+    mbltype: AbstractControl;
     shipmentType: AbstractControl;
     personalIncharge: AbstractControl;
     coloaderId: AbstractControl; // * Airline/Coloader
@@ -42,9 +42,9 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     commodity: AbstractControl;
     packageType: AbstractControl;
 
-    shipmentTypes: CommonInterface.INg2Select[] = [];
-    billTypes: CommonInterface.INg2Select[] = [];
-    termTypes: CommonInterface.INg2Select[] = [];
+    shipmentTypes: CommonInterface.INg2Select[];
+    billTypes: CommonInterface.INg2Select[];
+    termTypes: CommonInterface.INg2Select[];
 
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
@@ -70,11 +70,13 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
     dimensionDetails: DIM[] = [];
 
+    isUpdate: boolean = false;
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _fb: FormBuilder,
         private _store: Store<fromStore.IShareBussinessState>,
-        private _spinner: NgxSpinnerService
+        private _spinner: NgxSpinnerService,
     ) {
         super();
     }
@@ -118,7 +120,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                                 flightDate: !!res.flightDate ? { startDate: new Date(res.flightDate), endDate: new Date(res.flightDate) } : null,
                                 serviceDate: !!res.serviceDate ? { startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) } : null,
 
-                                typeOfService: !!res.typeOfService ? [this.billTypes.find(type => type.id === res.typeOfService)] : null,
+                                mbltype: !!res.mbltype ? [this.billTypes.find(type => type.id === res.mbltype)] : null,
                                 paymentTerm: !!res.paymentTerm ? [this.termTypes.find(type => type.id === res.paymentTerm)] : null,
                                 shipmentType: !!res.shipmentType ? [this.shipmentTypes.find(type => type.id === res.shipmentType)] : null,
 
@@ -186,6 +188,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             )
             .subscribe(
                 (res: CsTransaction) => {
+                    console.log(res);
                     if (res.id !== SystemConstants.EMPTY_GUID && !!res.commodity) {
                         // * Update commodity
                         const commodities: CommonInterface.INg2Select[] =
@@ -242,7 +245,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             flightDate: [],
 
             // * select
-            typeOfService: [null, Validators.required],
+            mbltype: [null, Validators.required],
             shipmentType: [[this.shipmentTypes[0]], Validators.required],
             paymentTerm: [],
             commodity: [],
@@ -262,7 +265,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.serviceDate = this.formGroup.controls["serviceDate"];
         this.flightDate = this.formGroup.controls["flightDate"];
 
-        this.typeOfService = this.formGroup.controls["typeOfService"];
+        this.mbltype = this.formGroup.controls["mbltype"];
         this.shipmentType = this.formGroup.controls["shipmentType"];
         this.paymentTerm = this.formGroup.controls["paymentTerm"];
         this.commodity = this.formGroup.controls['commodity'];
@@ -319,6 +322,9 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     showDIMVolume() {
+        if (!this.isUpdate) {
+            this._store.dispatch(new fromStore.InitDimensionAction([new DIM(), new DIM(), new DIM()]));  // * Dimension default = 3
+        }
         this.dimVolumePopup.show();
     }
 

@@ -93,12 +93,12 @@
                     </div>
                     <div class="col-md-2 text-right">
                         <div class="form-group m-form__group">
-                            CMB: <span class="text-danger">{{totalCBM}}</span>
+                            CMB: <span class="text-danger">{{totalCBM | number: '.0-3'}}</span>
                         </div>
                     </div>
                     <div class="col-md-3 text-right">
                         <div class="form-group m-form__group">
-                            Total H.W: <span class="text-danger">{{totalHW}} KGS</span>
+                            Total H.W: <span class="text-danger">{{totalHW | number: '.0-3'}} KGS</span>
                         </div>
                     </div>
                 </div>

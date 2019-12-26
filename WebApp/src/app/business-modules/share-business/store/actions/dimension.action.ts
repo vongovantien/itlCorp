@@ -5,6 +5,7 @@ import { Action } from '@ngrx/store';
  * enum object for all of this group's action types.
  */
 export enum DimensionActionTypes {
+    INIT_DIMENSION = '[DIMENSION] INIT',
     GET_DIMENSION = '[DIMENSION] Get',
     GET_DIMENSION_SUCESS = '[DIMENSION] Get Success',
     GET_DIMENSION_FAIL = '[DIMENSION] Get Fail',
@@ -15,6 +16,11 @@ export enum DimensionActionTypes {
  * payload. Expressing actions as classes enables powerful 
  * type checking in reducer functions.
  */
+export class InitDimensionAction implements Action {
+    readonly type = DimensionActionTypes.INIT_DIMENSION;
+
+    constructor(public payload: any) { }
+}
 export class GetDimensionAction implements Action {
     readonly type = DimensionActionTypes.GET_DIMENSION;
 
@@ -39,5 +45,6 @@ export class GetDimensionFailAction implements Action {
  */
 export type DimensionActions
     = GetDimensionAction
+    | InitDimensionAction
     | GetDimensionSuccessAction
     | GetDimensionFailAction;
