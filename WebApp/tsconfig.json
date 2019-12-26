@@ -32,7 +32,10 @@
                 "src/app/app.base",
                 "src/app/app.list",
                 "src/app/popup.base"
-            ]
+            ],
+            "@constants": ["src/constants"],
+            "@share-bussiness": ["src/app/business-modules/share-business"],
+            "@store": ["src/app/store"]
         }
     }
 }

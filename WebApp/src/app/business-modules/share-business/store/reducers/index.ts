@@ -3,18 +3,21 @@ import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/s
 import { IContainerState, ContainerReducer } from './container.reducer';
 import { ITransactionState, TransactionReducer } from './transaction.reducer';
 import { IHBLState, HBLReducer } from './hbl.reducer';
+import { IDimensionState, DimensionReducer } from './dimension.reduder';
+
 
 export * from './surcharge.reducer';
 export * from './container.reducer';
 export * from './transaction.reducer';
 export * from './hbl.reducer';
-
+export * from './dimension.reduder';
 
 export interface IShareBussinessState {
     surcharge: ISurcharge;
     csMawbcontainers: IContainerState;
     transaction: ITransactionState;
     houseBill: IHBLState;
+    dimensions: IDimensionState;
 }
 
 export const shareBussinessState = createFeatureSelector<IShareBussinessState>('share-bussiness');
@@ -44,11 +47,15 @@ export const getDetailHBlState = createSelector(shareBussinessState, (state: ISh
 
 export const getHBLContainersState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.houseBill && state.houseBill.containers);
 
+export const getDimensionState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.dimensions);
+export const getDimensionVolumesState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.dimensions.dims);
+
 
 
 export const reducers: ActionReducerMap<IShareBussinessState> = {
     surcharge: SurchargeReducer,
     csMawbcontainers: ContainerReducer,
     transaction: TransactionReducer,
-    houseBill: HBLReducer
+    houseBill: HBLReducer,
+    dimensions: DimensionReducer
 };

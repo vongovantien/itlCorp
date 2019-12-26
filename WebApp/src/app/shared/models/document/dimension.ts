@@ -10,6 +10,9 @@ export class DIM {
     mblId: string = SystemConstants.EMPTY_GUID;
     hblId: string = SystemConstants.EMPTY_GUID;
 
+
+    // * Custom
+    cbm: number = null;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

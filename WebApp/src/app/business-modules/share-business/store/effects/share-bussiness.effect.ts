@@ -6,9 +6,9 @@ import { DocumentationRepo } from "src/app/shared/repositories";
 
 import { Observable, of } from "rxjs";
 
-import { switchMap, catchError, map } from "rxjs/operators";
+import { mergeMap, catchError, map, } from "rxjs/operators";
 import {
-    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction, TransactionLoadListSuccessAction, TransactionLoadListFailAction, GetListHBLSuccessAction, GetListHBLFailAction
+    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction, TransactionLoadListSuccessAction, TransactionLoadListFailAction, GetListHBLSuccessAction, GetListHBLFailAction, DimensionActionTypes, GetDimensionSuccessAction, GetDimensionFailAction
 } from "../actions";
 import { ITransactionProfit } from "../reducers";
 
@@ -26,7 +26,7 @@ export class ShareBussinessEffects {
         pipe(
             ofType<TransactionActions>(TransactionActionTypes.LOAD_LIST),
             map((payload: any) => payload.payload),
-            switchMap(
+            mergeMap(
                 (param: any) => this._documentRepo.getListShipmentDocumentation(param.page, param.size, param.dataSearch)
                     .pipe(
                         map((data: any) => new TransactionLoadListSuccessAction(data)),
@@ -40,7 +40,7 @@ export class ShareBussinessEffects {
         pipe(
             ofType<TransactionActions>(TransactionActionTypes.GET_DETAIL),
             map((payload: any) => payload.payload),
-            switchMap(
+            mergeMap(
                 (id: string) => this._documentRepo.getDetailTransaction(id)
                     .pipe(
                         map((data: any) => new TransactionGetDetailSuccessAction(data)),
@@ -54,7 +54,7 @@ export class ShareBussinessEffects {
         .pipe(
             ofType<TransactionActions>(TransactionActionTypes.UPDATE),
             map((payload: any) => payload.payload),
-            switchMap(
+            mergeMap(
                 (param: any) => this._documentRepo.updateCSTransaction(param)
                     .pipe(
                         map((data: CommonInterface.IResult) => new TransactionUpdateSuccessAction(data.data)),
@@ -68,7 +68,7 @@ export class ShareBussinessEffects {
         .pipe(
             ofType<ContainerAction>(ContainerActionTypes.GET_CONTAINER),
             map((payload: any) => payload.payload), // jobId
-            switchMap(
+            mergeMap(
                 (param: any) => this._documentRepo.getListContainersOfJob(param)
                     .pipe(
                         map((data: any) => new GetContainerSuccessAction(data)),
@@ -81,7 +81,7 @@ export class ShareBussinessEffects {
         .pipe(
             ofType<TransactionActions>(TransactionActionTypes.GET_PROFIT),
             map((payload: any) => payload.payload),
-            switchMap(
+            mergeMap(
                 (jobId: string) => this._documentRepo.getShipmentTotalProfit(jobId)
                     .pipe(
                         map((data: ITransactionProfit[]) => new TransactionGetProfitSuccessAction(data)),
@@ -94,7 +94,7 @@ export class ShareBussinessEffects {
         .pipe(
             ofType<HBLActions>(HBLActionTypes.GET_DETAIL),
             map((payload: any) => payload.payload),
-            switchMap(
+            mergeMap(
                 (id: string) => this._documentRepo.getDetailHbl(id)
                     .pipe(
                         map((data: any) => new GetDetailHBLSuccessAction(data)),
@@ -108,7 +108,7 @@ export class ShareBussinessEffects {
         .pipe(
             ofType<HBLActions>(HBLActionTypes.GET_LIST),
             map((payload: any) => payload.payload),
-            switchMap(
+            mergeMap(
                 (body: any) => this._documentRepo.getListHouseBillOfJob(body)
                     .pipe(
                         map((data: any) => new GetListHBLSuccessAction(data)),
@@ -122,7 +122,7 @@ export class ShareBussinessEffects {
         .pipe(
             ofType<HBLActions>(HBLActionTypes.GET_PROFIT),
             map((payload: any) => payload.payload),
-            switchMap(
+            mergeMap(
                 (hblid: string) => this._documentRepo.getHBLTotalProfit(hblid)
                     .pipe(
                         map((data: any) => new GetProfitHBLSuccessAction(data)),
@@ -136,11 +136,24 @@ export class ShareBussinessEffects {
         .pipe(
             ofType<HBLActions>(HBLActionTypes.GET_CONTAINERS),
             map((payload: any) => payload.payload), // jobId
-            switchMap(
+            mergeMap(
                 (param: any) => this._documentRepo.getListContainersOfJob(param)
                     .pipe(
                         map((data: any) => new GetContainersHBLSuccessAction(data)),
                         catchError(err => of(new GetContainersHBLFailAction(err)))
+                    ))
+        );
+
+    @Effect()
+    getListDimension$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<HBLActions>(DimensionActionTypes.GET_DIMENSION),
+            map((payload: any) => payload.payload), // jobId
+            mergeMap(
+                (jobId: string) => this._documentRepo.getShipmentDemensionDetail(jobId)
+                    .pipe(
+                        map((data: any) => new GetDimensionSuccessAction(data)),
+                        catchError(err => of(new GetDimensionFailAction(err)))
                     ))
         );
 

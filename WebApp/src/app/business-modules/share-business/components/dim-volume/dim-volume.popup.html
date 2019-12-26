@@ -9,7 +9,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body pb-0">
                 <div class="row align-items-center m--margin-bottom-10">
                     <div class="col-md-2">Length</div>
                     <div class="col-md-2">Width</div>
@@ -21,21 +21,40 @@
                 </div>
                 <ng-container *ngIf="!!dims.length; else placeholder">
                     <ng-container *ngFor="let item of dims; let i=index; trackBy: trackByFn">
-                        <div class="row m--align-center m--margin-bottom-20">
+                        <div class="row m--align-center m--margin-bottom-20 m-form m-form--state">
                             <div class="col-md-2">
-                                <input type="number" class="form-control" [(ngModel)]="item.length">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && item.length === null}">
+                                    <input type="number" class="form-control" [(ngModel)]="item.length"
+                                        (ngModelChange)="updateHeightWeight(item)">
+                                </div>
                             </div>
                             <div class="col-md-2">
-                                <input type="number" class="form-control" [(ngModel)]="item.width">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && item.width === null}">
+                                    <input type="number" class="form-control" [(ngModel)]="item.width"
+                                        (ngModelChange)="updateHeightWeight(item)">
+                                </div>
                             </div>
                             <div class="col-md-2">
-                                <input type="number" class="form-control" [(ngModel)]="item.height">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && item.height === null}">
+                                    <input type="number" class="form-control" [(ngModel)]="item.height"
+                                        (ngModelChange)="updateHeightWeight(item)">
+                                </div>
                             </div>
                             <div class="col-md-2">
-                                <input type="number" class="form-control" [(ngModel)]="item.package">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && item.package === null}">
+                                    <input type="number" class="form-control" [(ngModel)]="item.package"
+                                        (ngModelChange)="updateHeightWeight(item)">
+                                </div>
+
                             </div>
                             <div class="col-md-3">
-                                <input type="number" class="form-control" [(ngModel)]="item.hw">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" [(ngModel)]="item.hw" disabled currencyMask>
+                                </div>
                             </div>
                             <div class="col-md-1 pointer text-center">
                                 <a title="Delete" (click)="delete(i)">
@@ -54,43 +73,40 @@
                 <a title="Add" class="pointer" (click)="addDIM()">
                     <i class="fa fa-plus-circle fa-2x text-success"></i>
                 </a>
-                <div class="row m--margin-top-20">
+                <div class="row pt-2 border border-bottom-0 mt-2 align-items-center pb-2">
                     <div class="col-md-5">
                         <div class="hw-constant d-flex justify-content-center align-items-center">
                             <div class="font-12">HW Constant</div>
-                            <input type="number"
-                                class="form-control mw-100 m--margin-left-10 m--margin-right-10 flex-grow-1">
-                            <div>
-                                <i class=" fa fa-repeat fa-lg"></i>
-                            </div>
+                            <input type="number" style="max-width: 100px"
+                                class="form-control mw-100 m--margin-left-10 m--margin-right-10 flex-grow-1"
+                                [(ngModel)]="hwContstant" (ngModelChange)="calculateHWDimension()">
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-2 text-right">
                         <div class="form-group m-form__group">
-                            <label class="m-checkbox m-checkbox--state-success">
-                                <input type="checkbox">
+                            <label class="m-checkbox m-checkbox--state-success mb-0">
+                                <input type="checkbox" [(ngModel)]="isCBMChecked">
                                 Use CBM
                                 <span> </span>
                             </label>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-2 text-right">
                         <div class="form-group m-form__group">
-                            CMB: <span class="text-danger">2.1</span>
+                            CMB: <span class="text-danger">{{totalCBM}}</span>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 text-right">
                         <div class="form-group m-form__group">
-                            Total H.W: <span class="text-danger">123 KGS</span>
+                            Total H.W: <span class="text-danger">{{totalHW}} KGS</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer m--align-center m--margin-top-10">
-
+            <div class="modal-footer m--align-center">
                 <div class="row">
                     <div class="col-12">
-                        <div class="m--align-center m--margin-top-20">
+                        <div class="m--align-center">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
                                 title="Save" (click)="saveDIM()">

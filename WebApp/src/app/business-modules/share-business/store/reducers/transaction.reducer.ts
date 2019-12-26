@@ -19,7 +19,7 @@ export interface ITransactionProfit {
 export interface ITransactionState {
     profits: ITransactionProfit[];
     cstransaction: CsTransaction;
-    cstransactions: CsTransaction[],
+    cstransactions: CsTransaction[];
     isLoading: boolean;
     isLoaded: boolean;
 }

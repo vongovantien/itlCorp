@@ -512,4 +512,17 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    getShipmentDemensionDetail(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsDimensionDetail/GetByMasterBill`, { mblId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getHBLDemensionDetail(hblId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsDimensionDetail/GetByHouseBill`, { hblId: hblId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
