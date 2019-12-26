@@ -45,7 +45,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public decimal VAT { get; set; }
         public string Notes { get; set; }
         public string ArrivalFooterNotice { get; set; }
-        public string SeaFCL { get; set; }
+        public bool SeaFCL { get; set; }
         public string MaskNos { get; set; }
         public string DlvCustoms { get; set; }
         public string InsurAmount { get; set; }
