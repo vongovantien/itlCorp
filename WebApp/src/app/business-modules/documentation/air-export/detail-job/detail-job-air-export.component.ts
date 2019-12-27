@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { Store, ActionsSubject } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
@@ -7,12 +7,12 @@ import { AirExportCreateJobComponent } from '../create-job/create-job-air-export
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { DIM, CsTransaction } from '@models';
 
 import { combineLatest, of } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, take, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
-import { DIM, CsTransaction } from '@models';
 
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
@@ -40,17 +40,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     dimensionDetails: DIM[];
 
     constructor(
-        private _store: Store<fromShareBussiness.TransactionActions>,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
-        protected _actionStoreSubject: ActionsSubject,
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo
 
     ) {
-        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
+        super(_toastService, _documenRepo, _router, _store);
     }
 
     ngAfterViewInit() {
@@ -94,7 +93,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 (res: any) => {
                     if (!!res) {
                         this.shipmentDetail = res;
-
+                        this.formCreateComponent.isUpdate = true;
                         // * reset field duplicate
                         if (this.ACTION === "COPY") {
                             this.resetFormControl(this.formCreateComponent.etd);
