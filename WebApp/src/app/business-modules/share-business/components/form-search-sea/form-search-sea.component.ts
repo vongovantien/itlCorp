@@ -7,6 +7,7 @@ import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
 import { Observable } from "rxjs";
 import { Customer } from "src/app/shared/models/catalogue/customer.model";
 import { User } from "src/app/shared/models";
+import { TransactionTypeEnum } from "@enums";
 
 @Component({
     selector: 'form-search-sea',
@@ -71,7 +72,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     setDataForFilterType(){
-        if(this.transaction === 2 || this.transaction === 3){
+        if(this.transaction === TransactionTypeEnum.AirExport || this.transaction === TransactionTypeEnum.AirImport){
             this.filterTypes = [
                 { title: 'Job ID', value: 'jobNo' },
                 { title: 'MAWB No', value: 'mawb' },
@@ -95,10 +96,10 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     setLabelColoader(){
-        if(this.transaction === 9){
+        if(this.transaction === TransactionTypeEnum.SeaLCLImport){
             this.labelColoader = "Shipping Line/ Co-Loader";
         }
-        if(this.transaction === 2 || this.transaction === 3){
+        if(this.transaction === TransactionTypeEnum.AirExport || this.transaction === TransactionTypeEnum.AirImport){
             this.labelColoader = "Airline/ Co-Loader";
         }
     }
