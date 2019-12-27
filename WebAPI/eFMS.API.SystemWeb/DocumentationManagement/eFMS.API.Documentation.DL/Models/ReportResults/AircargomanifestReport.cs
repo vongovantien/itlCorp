@@ -4,12 +4,12 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Models.ReportResults
 {
-    public class AircargomanifestReport
+    public class AirCargoManifestReport
     {
         public string Billype { get; set; }
         public string HWBNO { get; set; }
         public string Pieces { get; set; }
-        public decimal GrossWeight { get; set; }
+        public decimal? GrossWeight { get; set; }
         public string ShipperName { get; set; }
         public string Consignees { get; set; }
         public string Description { get; set; }
@@ -18,7 +18,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string ThirdDest { get; set; }
         public string Notify { get; set; }
     }
-    public class AircargomanifestParameter
+    public class AirCargoManifestReportParameter
     {
         public string AWB { get; set; }
         public string Marks { get; set; }

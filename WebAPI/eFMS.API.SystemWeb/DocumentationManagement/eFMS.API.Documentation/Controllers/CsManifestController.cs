@@ -82,11 +82,11 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("PreviewFCLExportManifest")]
+        [Route("PreviewSeaExportManifest")]
         [Authorize]
-        public IActionResult PreviewFCLExportManifest(ManifestReportModel model)
+        public IActionResult PreviewSeaExportManifest(ManifestReportModel model)
         {
-            var result = manifestService.PreviewFCLExportManifest(model);
+            var result = manifestService.PreviewSeaExportManifest(model);
             return Ok(result);
         }
 
@@ -96,10 +96,23 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("PreviewFCLImportManifest")]
-        public IActionResult PreviewFCLImportManifest(ManifestReportModel model)
+        [Route("PreviewSeaImportManifest")]
+        public IActionResult PreviewSeaImportManifest(ManifestReportModel model)
         {
-            var result = manifestService.PreviewFCLImportManifest(model);
+            var result = manifestService.PreviewSeaImportManifest(model);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// preview air export manifest
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewAirExportManifest")]
+        public IActionResult PreviewAirExportManifest(ManifestReportModel model)
+        {
+            var result = manifestService.PreviewAirExportManifest(model);
             return Ok(result);
         }
     }

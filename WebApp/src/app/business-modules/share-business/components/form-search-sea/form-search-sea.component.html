@@ -34,10 +34,11 @@
                                     Customer
                                 </label>
                                 <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{ field: 'id', value: customer.value, hardValue: 'hardValue'}"
+                                    [currentActiveItemId]="{ field: 'id', value: customer.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                                     [selectedDisplayFields]="['partnerNameEn']" [dataSources]="customers | async"
-                                    [displayFields]="displayFieldsCustomer" [height]="150">
+                                    [displayFields]="displayFieldsCustomer" [height]="150"
+                                    placeholder="Select Customer">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -50,7 +51,8 @@
                                     [currentActiveItemId]="{ field: 'id', value: supplier.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                     [selectedDisplayFields]="['partnerNameEn']" [dataSources]="suppliers | async"
-                                    [displayFields]="displayFieldsCustomer" [height]="150">
+                                    [displayFields]="displayFieldsCustomer" [height]="150"
+                                    [placeholder]="'Select ' + labelColoader">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -63,7 +65,8 @@
                                     [currentActiveItemId]="{ field: 'id', value: agent.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                                     [selectedDisplayFields]="['partnerNameEn']" [dataSources]="agents | async"
-                                    [displayFields]="displayFieldsCustomer" [height]="150">
+                                    [displayFields]="displayFieldsCustomer" [height]="150"
+                                    [placeholder]="'Select Agent'">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -78,7 +81,7 @@
                                     [currentActiveItemId]="{ field: 'id', value: saleman.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'saleman')"
                                     [selectedDisplayFields]="['employeeNameVn']" [dataSources]="salemans | async"
-                                    [displayFields]="displayFieldsSaleMan" [height]="150">
+                                    [displayFields]="displayFieldsSaleMan" [height]="150" placeholder="Select Salesman">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -91,7 +94,8 @@
                                     [currentActiveItemId]="{ field: 'id', value: creator.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'creator')"
                                     [selectedDisplayFields]="['employeeNameVn']" [dataSources]="creators | async"
-                                    [displayFields]="displayFieldsSaleMan" [height]="150">
+                                    [displayFields]="displayFieldsSaleMan" [height]="150"
+                                    [placeholder]="'Select Creator'">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>

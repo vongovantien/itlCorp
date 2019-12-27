@@ -13,7 +13,8 @@ namespace eFMS.API.Documentation.DL.IService
     {
         HandleState AddOrUpdateManifest(CsManifestEditModel model);
         CsManifestModel GetById(Guid jobId);
-        Crystal PreviewFCLExportManifest(ManifestReportModel model);
-        Crystal PreviewFCLImportManifest(ManifestReportModel model);
+        Crystal PreviewSeaExportManifest(ManifestReportModel model);
+        Crystal PreviewSeaImportManifest(ManifestReportModel model);
+        Crystal PreviewAirExportManifest(ManifestReportModel model);
     }
 }

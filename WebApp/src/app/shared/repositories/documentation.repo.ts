@@ -450,13 +450,18 @@ export class DocumentationRepo {
         );
     }
 
-    previewFCLImportManifest(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewFCLImportManifest`, body).pipe(
+    PreviewSeaImportManifest(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewSeaImportManifest`, body).pipe(
             map((data: any) => data)
         );
     }
-    previewFCLExportManifest(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewFCLExportManifest`, body).pipe(
+    PreviewSeaExportManifest(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewSeaExportManifest`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    previewAirExportManifest(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewAirExportManifest`, body).pipe(
             map((data: any) => data)
         );
     }

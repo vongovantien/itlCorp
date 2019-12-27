@@ -1,5 +1,5 @@
 import { AppForm } from "src/app/app.form";
-import { Component, Output, EventEmitter, Input, ViewChildren, QueryList } from "@angular/core";
+import { Component, Output, EventEmitter, Input } from "@angular/core";
 import { formatDate } from "@angular/common";
 import { CommonEnum } from "src/app/shared/enums/common.enum";
 import { CatalogueRepo, SystemRepo } from "src/app/shared/repositories";
@@ -7,6 +7,7 @@ import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
 import { Observable } from "rxjs";
 import { Customer } from "src/app/shared/models/catalogue/customer.model";
 import { User } from "src/app/shared/models";
+import { TransactionTypeEnum } from "@enums";
 
 @Component({
     selector: 'form-search-sea',
@@ -60,9 +61,9 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     ngOnInit(): void {
         this.initFormSearch();
 
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        this.suppliers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
-        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
+        this.customers = this._catalogueRepo.getListPartner(null,null,{ partnerGroup: CommonEnum.PartnerGroupEnum.CUSTOMER });
+        this.suppliers = this._catalogueRepo.getListPartner(null,null,{ partnerGroup: CommonEnum.PartnerGroupEnum.CARRIER });
+        this.agents = this._catalogueRepo.getListPartner(null,null,{ partnerGroup: CommonEnum.PartnerGroupEnum.AGENT });
         this.salemans = this._systemRepo.getSystemUsers({ active: true });
         this.creators = this._systemRepo.getSystemUsers({ active: true });
 
@@ -71,7 +72,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     setDataForFilterType(){
-        if(this.transaction === 2 || this.transaction === 3){
+        if(this.transaction === TransactionTypeEnum.AirExport || this.transaction === TransactionTypeEnum.AirImport){
             this.filterTypes = [
                 { title: 'Job ID', value: 'jobNo' },
                 { title: 'MAWB No', value: 'mawb' },
@@ -95,10 +96,10 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     setLabelColoader(){
-        if(this.transaction === 9){
+        if(this.transaction === TransactionTypeEnum.SeaLCLImport){
             this.labelColoader = "Shipping Line/ Co-Loader";
         }
-        if(this.transaction === 2 || this.transaction === 3){
+        if(this.transaction === TransactionTypeEnum.AirExport || this.transaction === TransactionTypeEnum.AirImport){
             this.labelColoader = "Airline/ Co-Loader";
         }
     }
