@@ -317,7 +317,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach(var item in model.CsTransactionDetails)
                 {
                     var manifest = new AirCargoManifestReport {
-                        Billype = string.Empty,
+                        Billype = "H",
                         HWBNO = item.Hwbno,
                         Pieces = item.PackageQty?.ToString(),
                         GrossWeight = item.GrossWeight,
