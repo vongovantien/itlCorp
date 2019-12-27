@@ -57,7 +57,7 @@ export class SeaLCLExportComponent extends AppList {
             { title: 'MBL No.', field: 'mawb', sortable: true },
             { title: 'ETD', field: 'etd', sortable: true },
             { title: 'ETA', field: 'eta', sortable: true },
-            { title: 'Supplier', field: 'supplierName', sortable: true },
+            { title: 'Shipping Line', field: 'supplierName', sortable: true },
             { title: 'Agent', field: 'agentName', sortable: true },
             { title: 'POL', field: 'polName', sortable: true },
             { title: 'POD', field: 'podName', sortable: true },

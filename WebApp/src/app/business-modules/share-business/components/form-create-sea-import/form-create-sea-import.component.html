@@ -69,7 +69,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>Supplier/Co-Loader</label>
+                            <label>Shipping Line/Co-Loader</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: coloader.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"

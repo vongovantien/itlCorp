@@ -66,7 +66,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         if (!!data && data.length > 0) {
             this.DataSources = data;
             this.ConstDataSources = cloneDeep(data);
-            console.log(this.CurrentActiveItemIdObj)
             if (this.CurrentActiveItemIdObj !== null) {
                 const activeItemData = this.CurrentActiveItemIdObj;
                 const itemIndex = this.ConstDataSources.findIndex(o => o[activeItemData.field] === activeItemData.value);
@@ -104,7 +103,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     setCurrentActiveItemId(data: any) {
-        console.log(data);
         if (data.value != null) {
             this.CurrentActiveItemIdObj = data;
 
