@@ -11,6 +11,8 @@ import { ShareBussinessModule } from 'src/app/business-modules/share-business/sh
 import { ChargeConstants } from 'src/constants/charge.const';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { AirExportHBLComponent } from './air-export-hbl.component';
+import { AirExportCreateHBLComponent } from './create/create-house-bill.component';
+import { AirExportHBLFormCreateComponent } from './components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
 
 
 const routing: Routes = [
@@ -18,10 +20,10 @@ const routing: Routes = [
         path: '', component: AirExportHBLComponent,
         data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.SFE_CODE }
     },
-    // {
-    //     path: 'new', component: SeaFCLExportCreateHBLComponent,
-    //     data: { name: 'New House Bill Detail', path: ':id', level: 5 }
-    // },
+    {
+        path: 'new', component: AirExportCreateHBLComponent,
+        data: { name: 'New House Bill Detail', path: ':id', level: 5 }
+    },
     // {
     //     path: ':hblId', component: SeaFCLExportDetailHBLComponent,
     //     data: { name: 'House Bill Detail', path: ':id', level: 5 }
@@ -49,7 +51,9 @@ const LIB = [
     ],
     exports: [],
     declarations: [
-        AirExportHBLComponent
+        AirExportHBLComponent,
+        AirExportCreateHBLComponent,
+        AirExportHBLFormCreateComponent
     ],
     providers: [],
 })

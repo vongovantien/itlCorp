@@ -43,8 +43,6 @@ export class AirExportHBLComponent extends AppList implements OnInit {
     totalGW: number;
     totalCW: number;
 
-
-
     constructor(
         private _router: Router,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -163,11 +161,11 @@ export class AirExportHBLComponent extends AppList implements OnInit {
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-fcl-export"]);
+        this._router.navigate(["home/documentation/air-export"]);
     }
 
     gotoCreate() {
-        this._router.navigate([`/home/documentation/sea-fcl-export/${this.jobId}/hbl/new`]);
+        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/new`]);
     }
 
     selectHBL(hbl: HouseBill) {
@@ -220,13 +218,13 @@ export class AirExportHBLComponent extends AppList implements OnInit {
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
+                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }

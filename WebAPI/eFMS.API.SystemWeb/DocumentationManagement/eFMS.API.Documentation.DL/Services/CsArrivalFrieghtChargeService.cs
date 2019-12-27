@@ -421,6 +421,138 @@ namespace eFMS.API.Documentation.DL.Services
             result.SetParameter(parameter);
             return result;
         }
+
+        public Crystal PreviewArrivalNoticeAir(PreviewArrivalNoticeCriteria criteria)
+        {
+            Crystal result = null;
+            var _currentUser = currentUser.UserID;
+            var listCharge = new List<AirImptArrivalReport>();
+            var arrival = GetArrival(criteria.HblId, string.Empty);
+            var houseBill = houseBills.GetById(criteria.HblId);
+            if (arrival != null && houseBill != null)
+            {
+                var _polName = placeRepository.Get(x => x.Id == houseBill.Pol).FirstOrDefault()?.NameEn;
+                var _podName = placeRepository.Get(x => x.Id == houseBill.Pod).FirstOrDefault()?.NameEn;
+                var _shipperName = partnerRepositoty.Get(x => x.Id == houseBill.ShipperId).FirstOrDefault()?.PartnerNameEn;
+                var _consigneeName = partnerRepositoty.Get(x => x.Id == houseBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
+
+                var _arrivalHeader = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
+                var _arrivalFooter = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalFooter);
+
+                if (arrival.CsArrivalFrieghtCharges.Count > 0)
+                {
+                    foreach (var frieght in arrival.CsArrivalFrieghtCharges)
+                    {
+                        var charge = new AirImptArrivalReport();
+                        charge.HWBNO = houseBill.Hwbno; //HWBNO
+                        charge.ArrivalNo = arrival.ArrivalNo; //ArrivalNo
+                        charge.Consignee = _consigneeName;  //Consignee
+                        charge.ReferrenceNo = houseBill.ReferenceNo;
+                        charge.FlightNo = houseBill.FlightNo; //FlightNo (Arrival)
+                        charge.DepartureAirport = _polName; //DepartureAirport (POL)
+                        charge.CussignedDate = houseBill.FlightDate; //FlightDate (Arrival)
+                        charge.LastDestination = _podName; //Destination Air Port (POD)
+                        charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader
+                        charge.DatePackage = DateTime.Now; //Current Date
+                        charge.NoPieces = string.Empty; //Quantity + Unit Qty
+                        charge.Description = houseBill.DesOfGoods; //Description of Goods
+                        charge.WChargeable = houseBill.GrossWeight; //G.W (GrossWeight)
+                        charge.blnShow = frieght.IsShow != null ? frieght.IsShow.Value : false; //isShow of charge arrival
+                        charge.blnStick = frieght.IsTick != null ? frieght.IsTick.Value : false;//isStick of charge arrival
+                        charge.blnRoot = frieght.IsFull != null ? frieght.IsFull.Value : false; //isRoot of charge arrival
+                        charge.FreightCharge = chargeRepository.Get(x => x.Id == frieght.ChargeId).FirstOrDefault()?.ChargeNameEn;//Charge name of charge arrival
+                        charge.Qty = frieght.Quantity;//Quantity of charge
+                        charge.Unit = frieght.UnitName;//Unit name of charge arrival
+                        charge.TotalValue = frieght.UnitPrice;//Unit price of charge arrival
+                        charge.Curr = frieght.CurrencyId; //Currency of charge arrival
+                        charge.VAT = frieght.Vatrate; //VAT of charge arrival
+                        charge.Notes = frieght.Notes;//Note of charge arrival
+                        charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer
+                        charge.Shipper = _shipperName; //Shipper Name
+                        charge.CBM = houseBill.ChargeWeight; //C.W (ChargeWeight)
+                        charge.AOL = string.Empty; //NOT USE
+                        charge.KilosUnit = string.Empty; //NOT USE
+                        charge.DOPickup = DateTime.Now; //NOT USE
+                        charge.ExVND = frieght.ExchangeRate != null ? frieght.ExchangeRate.Value : 0;
+                        charge.AgentName = string.Empty; //Tạm thời để trống vì chưa có field
+                        charge.Notify = houseBill.NotifyParty; //Notify Party
+                        charge.DecimalSymbol = string.Empty;
+                        charge.DigitSymbol = string.Empty;
+                        charge.DecimalNo = 0; //NOT USE
+                        charge.CurrDecimalNo = 0; //NOT USE
+
+                        listCharge.Add(charge);
+                    }
+                }
+                else
+                {
+                    var charge = new AirImptArrivalReport();
+                    charge.HWBNO = houseBill.Hwbno; //HWBNO
+                    charge.ArrivalNo = arrival.ArrivalNo; //ArrivalNo
+                    charge.Consignee = _consigneeName; //Consignee
+                    charge.ReferrenceNo = houseBill.ReferenceNo;
+                    charge.FlightNo = houseBill.FlightNo; //FlightNo (Arrival)
+                    charge.DepartureAirport = _polName; //DepartureAirport (POL)
+                    charge.CussignedDate = houseBill.FlightDate; //FlightDate (Arrival)
+                    charge.LastDestination = _podName; //Destination Air Port (POD)
+                    charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader
+                    charge.DatePackage = DateTime.Now; //Current Date
+                    charge.NoPieces = string.Empty; //Quantity + Unit Qty (Tạm thời để trống vì chưa có field)
+                    charge.Description = houseBill.DesOfGoods; //Description of Goods
+                    charge.WChargeable = houseBill.GrossWeight; //G.W (GrossWeight)
+                    charge.blnShow = false; //isShow of charge arrival
+                    charge.blnStick = false;//isStick of charge arrival
+                    charge.blnRoot = false; //isRoot of charge arrival
+                    charge.FreightCharge = string.Empty;
+                    charge.Qty = 0; //Quantity of charge
+                    charge.Unit = string.Empty; //Unit of charge
+                    charge.TotalValue = 0;
+                    charge.Curr = string.Empty;
+                    charge.VAT = 0; //VAT of charge
+                    charge.Notes = string.Empty;//Note of charge
+                    charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer
+                    charge.Shipper = _shipperName; //Shipper
+                    charge.CBM = houseBill.ChargeWeight; //C.W (ChargeWeight)
+                    charge.AOL = string.Empty; //NOT USE
+                    charge.KilosUnit = string.Empty; //NOT USE
+                    charge.DOPickup = DateTime.Now; //NOT USE
+                    charge.ExVND = 0;
+                    charge.AgentName = string.Empty; //Tạm thời để trống vì chưa có field
+                    charge.Notify = houseBill.NotifyParty;
+                    charge.DecimalSymbol = string.Empty;
+                    charge.DigitSymbol = string.Empty;
+                    charge.DecimalNo = 0; //NOT USE
+                    charge.CurrDecimalNo = 0; //NOT USE
+
+                    listCharge.Add(charge);
+                }
+            }
+            
+
+            var parameter = new AirImptArrivalReportParams();
+            parameter.No = string.Empty;
+            parameter.MAWB = houseBill != null ? houseBill.Mawb : string.Empty;
+            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyDescription = string.Empty;
+            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
+            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.AccountInfo = string.Empty;
+            parameter.Contact = _currentUser;
+            parameter.DecimalNo = 2;
+            parameter.CurrDecimalNo = 2;
+
+            result = new Crystal
+            {
+                ReportName = criteria.Currency == Constants.CURRENCY_LOCAL ? "AirImptArrival.rpt" : "AirImptArrivalOG.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listCharge);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
         #endregion
 
         #region Delivery Order

@@ -272,7 +272,7 @@ export class SeaLclExportManifestComponent extends AppList {
 
     previewManifest() {
         if (this.formManifest.referenceNo.value === null) {
-            this._toastService.warning('There is no data to display preview');
+            this._toastService.warning('The manifest refernce no is not existed. Please save infomation manifest');
             return;
         }
         const body: any = {
@@ -293,7 +293,7 @@ export class SeaLclExportManifestComponent extends AppList {
             manifestIssuer: this.formManifest.agent.value,
             csTransactionDetails: this.housebills.filter(x => x.isRemoved === false)
         };
-        this._documentationRepo.previewFCLImportManifest(body)
+        this._documentationRepo.previewFCLExportManifest(body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })

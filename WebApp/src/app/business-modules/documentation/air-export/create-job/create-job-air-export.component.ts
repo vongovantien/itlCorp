@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { ActionsSubject } from '@ngrx/store';
+import { Store } from '@ngrx/store';
+import { AbstractControl } from '@angular/forms';
 
 import { AppForm } from 'src/app/app.form';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
@@ -14,6 +15,7 @@ import {
     ShareBusinessFormCreateAirComponent
 } from 'src/app/business-modules/share-business';
 
+import * as fromShareBusiness from './../../../share-business/store';
 
 import { catchError } from 'rxjs/operators';
 
@@ -35,23 +37,17 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
-        protected _actionStoreSubject: ActionsSubject,
-        protected _cdr: ChangeDetectorRef,
+        protected _store: Store<fromShareBusiness.IShareBussinessState>
     ) {
         super();
     }
 
     ngOnInit() {
-
-    }
-
-    ngAfterViewInit() {
-        this._cdr.detectChanges();
+        this._store.dispatch(new fromShareBusiness.TransactionGetDetailSuccessAction({}));
     }
 
     onSubmitData() {
         const form: any = this.formCreateComponent.formGroup.getRawValue();
-        console.log(form);
 
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -60,7 +56,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
-            typeOfService: !!form.typeOfService && !!form.typeOfService.length ? form.typeOfService[0].id : null,
+            mbltype: !!form.mbltype && !!form.mbltype.length ? form.mbltype[0].id : null,
             paymentTerm: !!form.paymentTerm && !!form.paymentTerm.length ? form.paymentTerm[0].id : null,
             packageType: !!form.packageType && !!form.packageType.length ? form.packageType[0].id : null,
             commodity: !!form.commodity && !!form.commodity.length ? form.commodity.map(i => i.id).toString() : null,
@@ -78,10 +74,11 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     checkValidateForm() {
-        this.setError(this.formCreateComponent.shipmentType);
-        this.setError(this.formCreateComponent.packageType);
-        this.setError(this.formCreateComponent.commodity);
-        this.setError(this.formCreateComponent.paymentTerm);
+        [this.formCreateComponent.shipmentType,
+        this.formCreateComponent.packageType,
+        this.formCreateComponent.commodity,
+        this.formCreateComponent.paymentTerm].forEach((control: AbstractControl) => this.setError(control));
+
         let valid: boolean = true;
         if (!this.formCreateComponent.formGroup.valid || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)) {
             valid = false;

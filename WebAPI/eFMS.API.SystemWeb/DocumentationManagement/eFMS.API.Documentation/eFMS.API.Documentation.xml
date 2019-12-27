@@ -132,7 +132,13 @@
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.PreviewArrivalNotice(eFMS.API.Documentation.DL.Models.Criteria.PreviewArrivalNoticeCriteria)">
             <summary>
-            return data source of arrival notice report
+            return data source of arrival notice report (Sea)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.PreviewArrivalNoticeAir(eFMS.API.Documentation.DL.Models.Criteria.PreviewArrivalNoticeCriteria)">
+            <summary>
+            return data source of arrival notice report (Air)
             </summary>
             <returns></returns>
         </member>
@@ -461,6 +467,13 @@
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.ReviewProofOfDelivery(System.Guid)">
             <summary>
             preview proof
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.ReviewAirProofOfDelivery(System.Guid)">
+            <summary>
+            preview air proof
             </summary>
             <param name="id"></param>
             <returns></returns>

@@ -259,7 +259,13 @@ export class AirExportManifestComponent extends AppList {
                         }
                     });
                     this.housebills = res;
-                    console.log(this.housebills);
+                    const hasHbl = this.housebills.some(element => element.isRemoved === false);
+                    if (!hasHbl) {
+                        this.housebills.forEach(element => {
+                            element.isRemoved = false;
+                        });
+                    }
+                    console.log(hasHbl);
                     this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
                 },
             );

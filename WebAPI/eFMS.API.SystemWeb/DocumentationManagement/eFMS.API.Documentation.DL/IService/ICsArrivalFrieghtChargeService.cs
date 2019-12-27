@@ -23,5 +23,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState SetDeliveryOrderHeaderFooterDefault(CsDeliveryOrderDefaultModel model);
         Crystal PreviewDeliveryOrder(Guid hblid);
         Crystal PreviewArrivalNoticeSIF(PreviewArrivalNoticeCriteria criteria);
+        Crystal PreviewArrivalNoticeAir(PreviewArrivalNoticeCriteria criteria);
     }
 }

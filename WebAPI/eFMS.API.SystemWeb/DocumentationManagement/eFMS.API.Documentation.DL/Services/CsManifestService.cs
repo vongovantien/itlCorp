@@ -179,7 +179,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Shipper = item.ShipperDescription ?? string.Empty,
                         Consignee = item.ConsigneeDescription ?? string.Empty,
                         Descriptions = item.DesOfGoods ?? string.Empty,
-                        FreightCharge = item.FreightPayment ?? string.Empty,
+                        FreightCharge = item.FreightPayment != null? "Frieght: " + item.FreightPayment: string.Empty,
                         Notify = item.NotifyParty ?? string.Empty,
                         OnboardNote = item.OnBoardStatus ?? string.Empty,
                         MaskNos = string.Empty,
@@ -226,8 +226,6 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     foreach (var container in shipmentContainers)
                     {
-                        //totalPackages = totalPackages + container.Quantity + "X" + container.ContainerTypeName + "\n"
-                        //    + container.ContainerNo + container.SealNo + ";\n";
                         container.ContainerTypeName = units.Where(x => x.Id == container.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn;
                         var containerTemp = new SeaImportCargoManifestContainer
                         {

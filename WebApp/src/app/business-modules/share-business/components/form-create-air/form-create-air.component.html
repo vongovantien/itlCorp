@@ -24,10 +24,10 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !typeOfService.valid}">
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !mbltype.valid}">
                                     <label required>HAWB Type </label>
                                     <ng-select #hawb [items]="billTypes" placeholder="Please select" [allowClear]="true"
-                                        (opened)="closeOtherSelects(hawb)" formControlName="typeOfService">
+                                        (opened)="closeOtherSelects(hawb)" formControlName="mbltype">
                                     </ng-select>
                                 </div>
                             </div>
@@ -137,7 +137,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>FLight No</label>
+                                    <label>Flight No</label>
                                     <input type="text" class="form-control" formControlName="flightVesselName">
                                 </div>
                             </div>
@@ -161,7 +161,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label required>Personal In Charge</label>
+                            <label required>Person In Charge</label>
                             <input type="text" class="form-control" formControlName="personIncharge">
                         </div>
                     </div>
