@@ -722,6 +722,67 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
+        public Crystal PreviewAirProofOfDelivery(Guid Id)
+        {
+            var data = GetById(Id);
+            var listProof = new List<AirProofOfDeliveryReport>();
+            Crystal result = null;
+            var _currentUser = currentUser.UserID;
+            if (data != null)
+            {
+                var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
+                var dataPOL = catPlaceRepo.First(x => x.Id == data.Pol);
+                var dataATTN = catPartnerRepo.First(x => x.Id == data.AlsoNotifyPartyId);
+                var dataConsignee = catPartnerRepo.First(x => x.Id == data.ConsigneeId);
+                var dataShipper = catPartnerRepo.First(x => x.Id == data.ShipperId);
+
+
+                var proofOfDelivery = new AirProofOfDeliveryReport();
+                proofOfDelivery.MAWB = data.Mawb;
+                proofOfDelivery.HWBNO = data.Hwbno;
+                proofOfDelivery.LastDestination = dataPOD?.NameEn;
+                proofOfDelivery.DepartureAirport = dataPOL?.NameEn;
+                proofOfDelivery.ShippingMarkImport = data.ShippingMark;
+                proofOfDelivery.Consignee = dataConsignee.PartnerNameEn;
+                proofOfDelivery.ATTN = dataATTN?.PartnerNameEn;
+                proofOfDelivery.TotalValue = 0;
+                proofOfDelivery.Shipper = dataShipper.PartnerNameEn;
+                var csMawbcontainers = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
+                foreach (var item in csMawbcontainers)
+                {
+                    proofOfDelivery.Description += item.Description + string.Join(",", data.Commodity);
+                }
+                if (csMawbcontainers.Count() > 0)
+                {
+                    proofOfDelivery.NoPieces = csMawbcontainers.Sum(x => x.Quantity) ?? 0;
+                    proofOfDelivery.GW = csMawbcontainers.Sum(x => x.Gw) ?? 0;
+                    proofOfDelivery.NW = csMawbcontainers.Sum(x => x.Nw) ?? 0;
+                }
+                listProof.Add(proofOfDelivery);
+            }
+
+            var parameter = new ProofOfDeliveryReportParams();
+            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyDescription = string.Empty;
+            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
+            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.Contact = _currentUser;//Get user login
+            parameter.DecimalNo = 0; // set 0  temporary
+            parameter.CurrDecimalNo = 0; //set 0 temporary
+            result = new Crystal
+            {
+                ReportName = "AirImpProofofDelivery.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listProof);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+
+        }
+
         public Crystal PreviewSeaHBLofLading(Guid hblId, string reportType)
         {
             Crystal result = null;

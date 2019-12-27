@@ -203,6 +203,18 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.PreviewProofOfDelivery(id);
             return Ok(result);
         }
+        /// <summary>
+        /// preview air proof
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("PreviewAirProofOfDelivery")]
+        public IActionResult ReviewAirProofOfDelivery(Guid id)
+        {
+            var result = csTransactionDetailService.PreviewAirProofOfDelivery(id);
+            return Ok(result);
+        }
 
         /// <summary>
         /// preview sea house bill of lading
