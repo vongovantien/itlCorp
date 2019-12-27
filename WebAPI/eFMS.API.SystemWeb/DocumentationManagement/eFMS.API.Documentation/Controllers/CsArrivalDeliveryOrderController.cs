@@ -202,13 +202,24 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// return data source of arrival notice report
+        /// return data source of arrival notice report (Sea)
         /// </summary>
         /// <returns></returns>
         [HttpPost("PreviewArrivalNotice")]
         public IActionResult PreviewArrivalNotice(PreviewArrivalNoticeCriteria criteria)
         {
             var data = arrivalFreightChargeServices.PreviewArrivalNoticeSIF(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// return data source of arrival notice report (Air)
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("PreviewArrivalNoticeAir")]
+        public IActionResult PreviewArrivalNoticeAir(PreviewArrivalNoticeCriteria criteria)
+        {
+            var data = arrivalFreightChargeServices.PreviewArrivalNoticeAir(criteria);
             return Ok(data);
         }
     }
