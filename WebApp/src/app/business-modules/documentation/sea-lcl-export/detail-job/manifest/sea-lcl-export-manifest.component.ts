@@ -293,7 +293,7 @@ export class SeaLclExportManifestComponent extends AppList {
             manifestIssuer: this.formManifest.agent.value,
             csTransactionDetails: this.housebills.filter(x => x.isRemoved === false)
         };
-        this._documentationRepo.previewFCLExportManifest(body)
+        this._documentationRepo.PreviewSeaExportManifest(body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
