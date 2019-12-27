@@ -96,14 +96,10 @@
                             </div>
                         </div>
                         <div class="form-group row" *ngIf="commodity.id">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Active
-                            </label>
+                            <label class="col-lg-4 col-form-label form-control-label"> Active </label>
                             <div class="col-lg-8">
-                                <label class="m-checkbox">
-                                    <input [checked]="commodity.active" formControlName="commodityActive"
-                                        (change)="commodity.active=!commodity.active" type="checkbox"><span></span>
-                                </label>
+                                <app-switch [(toggle)]="commodityActive.value" (toggleChange)="commodityActive.setValue($event)">
+                                </app-switch>
                             </div>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 import { AppForm } from "src/app/app.form";
-import { Component, Output, EventEmitter, Input, ViewChildren, QueryList } from "@angular/core";
+import { Component, Output, EventEmitter, Input } from "@angular/core";
 import { formatDate } from "@angular/common";
 import { CommonEnum } from "src/app/shared/enums/common.enum";
 import { CatalogueRepo, SystemRepo } from "src/app/shared/repositories";
@@ -60,9 +60,9 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     ngOnInit(): void {
         this.initFormSearch();
 
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        this.suppliers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
-        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
+        this.customers = this._catalogueRepo.getListPartner(null,null,{ partnerGroup: CommonEnum.PartnerGroupEnum.CUSTOMER });
+        this.suppliers = this._catalogueRepo.getListPartner(null,null,{ partnerGroup: CommonEnum.PartnerGroupEnum.CARRIER });
+        this.agents = this._catalogueRepo.getListPartner(null,null,{ partnerGroup: CommonEnum.PartnerGroupEnum.AGENT });
         this.salemans = this._systemRepo.getSystemUsers({ active: true });
         this.creators = this._systemRepo.getSystemUsers({ active: true });
 
