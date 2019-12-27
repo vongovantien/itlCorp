@@ -1,0 +1,11 @@
+Billype	String	255	
+HWBNO	String	255	
+Pieces	String	150	
+GrossWeight	Number		
+ShipperName	String	255	
+Consignees	String	255	
+Description	Memo		
+FirstDest	String	255	
+SecondDest	String	255	
+ThirdDest	String	50	
+Notify	String	255	
