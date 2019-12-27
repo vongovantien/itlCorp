@@ -31,6 +31,8 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewProofOfDelivery(Guid Id);
         Crystal PreviewAirProofOfDelivery(Guid Id);
 
+        Crystal PreviewAirDocumentRelease(Guid Id);
+
         Crystal PreviewSeaHBLofLading(Guid hblId, string reportType);
 
         Crystal PreviewHouseAirwayBillLastest(Guid hblId, string reportType);

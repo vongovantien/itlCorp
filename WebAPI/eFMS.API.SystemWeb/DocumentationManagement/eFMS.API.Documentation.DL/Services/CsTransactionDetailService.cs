@@ -728,6 +728,8 @@ namespace eFMS.API.Documentation.DL.Services
             var listProof = new List<AirProofOfDeliveryReport>();
             Crystal result = null;
             var _currentUser = currentUser.UserID;
+            //var _currentUser = string.Empty;
+ 
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
@@ -780,7 +782,55 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
             return result;
+        }
 
+        public Crystal PreviewAirDocumentRelease(Guid Id)
+        {
+            var data = GetById(Id);
+            var listDocument = new List<AirDocumentReleaseReport>();
+            Crystal result = null;
+            //var _currentUser = currentUser.UserID;
+            var _currentUser = string.Empty;
+            if (data != null)
+            {
+                var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
+                var dataPOL = catPlaceRepo.First(x => x.Id == data.Pol);
+                var dataATTN = catPartnerRepo.First(x => x.Id == data.AlsoNotifyPartyId);
+                var dataConsignee = catPartnerRepo.First(x => x.Id == data.ConsigneeId);
+                var dataShipper = catPartnerRepo.First(x => x.Id == data.ShipperId);
+
+                var documentRelease = new AirDocumentReleaseReport();
+                documentRelease.Consignee = dataConsignee.PartnerNameEn;
+                documentRelease.HWBNO = data.Hwbno;
+                documentRelease.FlightNo = data.FlightNo;
+                documentRelease.CussignedDate = data.FlightDate; 
+                documentRelease.DepartureAirport = dataPOL?.NameEn;
+                documentRelease.LastDestination = dataPOD?.NameEn;
+                documentRelease.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : "" ;
+                documentRelease.WChargeable = data.ChargeWeight ?? 0;
+                listDocument.Add(documentRelease);
+            }
+
+            var parameter = new AirDocumentReleaseReportParams();
+            parameter.MAWB = data?.Mawb;
+            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyDescription = string.Empty;
+            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
+            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.Contact = _currentUser;//Get user login
+            parameter.DecimalNo = 0; // set 0  temporary
+
+            result = new Crystal
+            {
+                ReportName = "AirImpDocumentRelease.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listDocument);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
         }
 
         public Crystal PreviewSeaHBLofLading(Guid hblId, string reportType)

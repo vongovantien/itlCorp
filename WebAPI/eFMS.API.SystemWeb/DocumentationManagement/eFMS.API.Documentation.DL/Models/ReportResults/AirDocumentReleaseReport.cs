@@ -13,7 +13,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string FlightNo { get; set; }
         public DateTime FlightDate { get; set; }
         public string DepartureAirport { get; set; }
-        public DateTime CussignedDate { get; set; }
+        public DateTime? CussignedDate { get; set; }
         public string LastDestination { get; set; }
         public string ShippingMarkImport { get; set; }
         public DateTime DatePackage { get; set; }
