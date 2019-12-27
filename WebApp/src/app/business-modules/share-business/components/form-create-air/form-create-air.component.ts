@@ -70,13 +70,14 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
     dimensionDetails: DIM[] = [];
 
+    shipmentDetail: CsTransaction = new CsTransaction();
+
     isUpdate: boolean = false;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _fb: FormBuilder,
         private _store: Store<fromStore.IShareBussinessState>,
-        private _spinner: NgxSpinnerService,
     ) {
         super();
     }
@@ -113,6 +114,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             .subscribe(
                 (res: CsTransaction) => {
                     if (!!res) {
+                        this.shipmentDetail = new CsTransaction(res);
                         try {
                             const formData: any = {
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
@@ -139,7 +141,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                                 chargeWeight: res.chargeWeight,
                                 packageQty: res.packageQty,
                                 // commodity: 
-
                             };
                             this.formGroup.patchValue(formData);
 
@@ -256,6 +257,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             pol: [],
             pod: [],
             coloaderId: [],
+
         }, { validator: FormValidators.comparePort });
 
         this.mawb = this.formGroup.controls["mawb"];

@@ -2,7 +2,7 @@
     <app-sub-header>
         <div class="c-button-actions">
             <app-default-button [buttonSetting]="importButtonSetting"></app-default-button>
-            <app-default-button [buttonSetting]="saveButtonSetting"></app-default-button>
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="confirmSave.show()"></app-default-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>
     </app-sub-header>
@@ -19,3 +19,9 @@
         </tabset>
     </div>
 </div>
+
+<confirm-popup #confirmSave body="You are about to create a new HAWB.
+Are you sure all entered details are correct?" (onSubmit)="saveHBL()"></confirm-popup>
+
+<info-popup body="Opps, It looks like your missed something, Please recheck the highlighted field below.'"
+    [title]="'Cannot Update HB'"></info-popup>

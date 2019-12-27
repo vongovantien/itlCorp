@@ -38,7 +38,7 @@
                                     (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                                     [selectedDisplayFields]="['partnerNameEn']" [dataSources]="customers | async"
                                     [displayFields]="displayFieldsCustomer" [height]="150"
-                                    [placeholder]="'Select Customer'">
+                                    placeholder="Select Customer">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -81,8 +81,7 @@
                                     [currentActiveItemId]="{ field: 'id', value: saleman.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'saleman')"
                                     [selectedDisplayFields]="['employeeNameVn']" [dataSources]="salemans | async"
-                                    [displayFields]="displayFieldsSaleMan" [height]="150"
-                                    [placeholder]="'Select Salesman'">
+                                    [displayFields]="displayFieldsSaleMan" [height]="150" placeholder="Select Salesman">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
