@@ -46,7 +46,7 @@
                         <div class="form-group">
                             <label>Airline/Co-Loader</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
-                                [currentActiveItemId]="{ field: 'id', value: coloaderId.value}"
+                                [currentActiveItemId]="{ field: 'id', value: coloaderId.value, hardValue: shipmentDetail.supplierName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                 [displayFields]="displayFieldsSupplier" [height]="200" placeholder="Select airline">
                             </app-combo-grid-virtual-scroll>
@@ -56,7 +56,7 @@
                         <div class="form-group">
                             <label>Agent</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
-                                [currentActiveItemId]="{ field: 'id', value: agentId.value}"
+                                [currentActiveItemId]="{ field: 'id', value: agentId.value,hardValue: shipmentDetail.agentName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                                 [displayFields]="displayFieldsSupplier" [height]="200" placeholder="Select agent">
                             </app-combo-grid-virtual-scroll>
@@ -104,7 +104,7 @@
                         <div class="form-group">
                             <label>A.O.L - Departure </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
-                                [currentActiveItemId]="{ field: 'id', value: pol.value}"
+                                [currentActiveItemId]="{ field: 'id', value: pol.value, hardValue: shipmentDetail.polName}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort" [height]="200" placeholder="Select A.O.L">
                             </app-combo-grid-virtual-scroll>
@@ -115,7 +115,7 @@
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !pod.value || (formGroup.errors | equalError:'invalidPort')}">
                             <label required>A.O.D - Destination</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
-                                [currentActiveItemId]="{ field: 'id', value: pod.value}"
+                                [currentActiveItemId]="{ field: 'id', value: pod.value,hardValue: shipmentDetail.podName}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort" [height]="200" placeholder="Please select A.O.D">
                             </app-combo-grid-virtual-scroll>

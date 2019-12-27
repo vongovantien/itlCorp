@@ -32,7 +32,7 @@
                             <ng-container *ngIf="!!DataSources.length">
                                 <tr class="data-row pointer"
                                     *cdkVirtualFor="let item of DataSources; let i= index;trackBy: trackByFn"
-                                    data-id="{{(i+1)}}" (click)="emitSelected(item);indexSelected = i"
+                                    data-id="{{(i+1)}}" (click)="emitSelected(item,i)"
                                     [class.data-selected]="indexSelected !== -1 && i === indexSelected">
                                     <td *ngFor="let display of DisplayFields; trackBy: trackByFn">
                                         {{item[display.field]}}

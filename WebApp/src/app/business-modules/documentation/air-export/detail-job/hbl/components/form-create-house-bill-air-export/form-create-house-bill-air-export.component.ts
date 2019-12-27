@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, AbstractControl } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 
 import { Customer, User, PortIndex, Currency } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
@@ -8,7 +8,7 @@ import { CommonEnum } from '@enums';
 import { AppForm } from 'src/app/app.form';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 
-import { map } from 'rxjs/operators';
+import { map, filter, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -20,9 +20,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     formCreate: FormGroup;
     customerId: AbstractControl;
     saleManId: AbstractControl;
-    shippperId: AbstractControl;
+    shipperId: AbstractControl;
     consigneeId: AbstractControl;
-    forwardingAgentID: AbstractControl;
+    forwardingAgentId: AbstractControl;
     hbltype: AbstractControl;
     etd: AbstractControl;
     eta: AbstractControl;
@@ -33,9 +33,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     currencyId: AbstractControl;
     wTorVALPayment: AbstractControl;
     otherPayment: AbstractControl;
-
-
-
+    originBLNumber: AbstractControl;
+    issueHBLDate: AbstractControl;
+    shipperDescription: AbstractControl;
+    consigneeDescription: AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: Observable<User[]>;
@@ -70,7 +71,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        private _fb: FormBuilder
     ) {
         super();
     }
@@ -106,9 +108,120 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             map((currencies: Currency[]) => this.utility.prepareNg2SelectData(currencies, 'id', 'id')),
         );
 
+        this.initForm();
+
+    }
+
+    getCustomers() {
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+    }
+
+    initForm() {
+        this.formCreate = this._fb.group({
+            mawb: [],
+            hawb: [],
+            consigneeDescription: [],
+            shipperDescription: [],
+            forwardingAgentDescription: [],
+            pickupPlace: [],
+            firstCarrierBy: [],
+            firstCarrierTo: [],
+            transitPlaceTo1: [],
+            transitPlaceBy1: [],
+            transitPlaceTo2: [],
+            transitPlaceBy2: [],
+            flightNo: [],
+            issuranceAmount: [],
+            chgs: [],
+            dclrca: [],
+            dclrcus: [],
+            handingInformation: [],
+            notify: [],
+            issueHBLPlace: [],
+
+
+            // * Combogrid
+            customerId: [],
+            saleManId: [],
+            shipperId: [],
+            consigneeId: [],
+            forwardingAgentId: [],
+            pol: [],
+            pod: [],
+
+            // * Select
+            hbltype: [],
+            freightPayment: [],
+            currencyId: [],
+            originBLNumber: [],
+            wTorVALPayment: [],
+            otherPayment: [],
+
+            // * Date
+            etd: [],
+            eta: [],
+            flightDate: [],
+            issueHBLDate: [],
+
+        });
+
+        this.customerId = this.formCreate.controls["customerId"];
+        this.saleManId = this.formCreate.controls["saleManId"];
+        this.shipperId = this.formCreate.controls["shipperId"];
+        this.consigneeId = this.formCreate.controls["consigneeId"];
+        this.forwardingAgentId = this.formCreate.controls["forwardingAgentId"];
+        this.pol = this.formCreate.controls["pol"];
+        this.pod = this.formCreate.controls["pod"];
+        this.hbltype = this.formCreate.controls["hbltype"];
+        this.freightPayment = this.formCreate.controls["freightPayment"];
+        this.currencyId = this.formCreate.controls["currencyId"];
+        this.originBLNumber = this.formCreate.controls["originBLNumber"];
+        this.wTorVALPayment = this.formCreate.controls["wTorVALPayment"];
+        this.otherPayment = this.formCreate.controls["otherPayment"];
+        this.etd = this.formCreate.controls["etd"];
+        this.eta = this.formCreate.controls["eta"];
+        this.flightDate = this.formCreate.controls["flightDate"];
+        this.issueHBLDate = this.formCreate.controls["issueHBLDate"];
+        this.shipperDescription = this.formCreate.controls["shipperDescription"];
+        this.consigneeDescription = this.formCreate.controls["consigneeDescription"];
+
     }
 
     onSelectDataFormInfo(data: any, type: string) {
+        console.log(data);
+        switch (type) {
+            case 'customer':
+                console.log(data);
+                this.customerId.setValue(data.id);
 
+                this.saleMans = this.saleMans.pipe(
+                    tap((users: User[]) => {
+                        const user: User = users.find((u: User) => u.id === data.salePersonId);
+                        if (!!user) {
+                            this.saleManId.setValue(user.id);
+                        }
+                    })
+                );
+                if (!this.shipperId.value) {
+                    this.shipperId.setValue(data.id);
+                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                }
+                break;
+            case 'shipper':
+                this.shipperId.setValue(data.id);
+                this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                break;
+            case 'consignee':
+                this.consigneeId.setValue(data.id);
+                this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    getDescription(fullName: string, address: string, tel: string, fax: string) {
+        return `${fullName} \n ${address} \n Tel No: ${!!tel ? tel : ''} \n Fax No: ${!!fax ? fax : ''} \n`;
     }
 }

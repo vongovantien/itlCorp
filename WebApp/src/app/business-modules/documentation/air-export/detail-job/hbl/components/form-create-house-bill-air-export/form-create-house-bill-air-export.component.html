@@ -1,29 +1,32 @@
 <div class="m-portlet">
     <div class="m-portlet__body">
-        <form class="m-form m-form--state">
+        <form class="m-form m-form--state" [formGroup]="formCreate">
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
                         <label required>Master Air Waybill</label>
-                        <input type="text" class="form-control">
+                        <input type="text" class="form-control" formControlName="mawb">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label required>Customer (Payer)</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
-                            [currentActiveItemId]="{ field: 'id', value: null}" [selectedDisplayFields]="['shortName']"
-                            [dataSources]="customers | async" [displayFields]="displayFieldsCustomer" [height]="150">
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
+                            [currentActiveItemId]="{ field: 'id', value: customerId.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
+                            [displayFields]="displayFieldsCustomer" [height]="200">
                         </app-combo-grid-virtual-scroll>
+
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label required>Salesman In Charge</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'sale')"
-                            [currentActiveItemId]="{ field: 'id', value: null}" [selectedDisplayFields]="['username']"
-                            [dataSources]="saleMans" [displayFields]="[{field: 'username', label: 'User Name'}]"
-                            [height]="150">
+                            [currentActiveItemId]="{ field: 'id', value: saleManId.value}"
+                            [selectedDisplayFields]="['username']" [dataSources]="saleMans | async"
+                            [displayFields]="[{field: 'username', label: 'User Name'}]" [height]="200"
+                            [disabled]="!customerId.value">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -33,45 +36,51 @@
                     <div class="form-group">
                         <label required>Shipper</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
-                            [currentActiveItemId]="{ field: 'id', value: null}" [selectedDisplayFields]="['shortName']"
-                            [dataSources]="shipppers | async" [displayFields]="displayFieldsCustomer" [height]="150">
+                            [currentActiveItemId]="{ field: 'id', value: shipperId.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
+                            [displayFields]="displayFieldsCustomer" [height]="200">
                         </app-combo-grid-virtual-scroll>
-                        <textarea rows="7" class="form-control m-input m-input--square"></textarea>
+                        <textarea rows="7" class="form-control m-input m-input--square"
+                            formControlName="shipperDescription"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !null}">
                         <label required>Consignee</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consignee')"
-                            [currentActiveItemId]="{ field: 'id', value: null}" [selectedDisplayFields]="['shortName']"
-                            [dataSources]="consignees | async" [displayFields]="displayFieldsCustomer" [height]="150">
+                            [currentActiveItemId]="{ field: 'id', value: consigneeId.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
+                            [displayFields]="displayFieldsCustomer" [height]="200">
                         </app-combo-grid-virtual-scroll>
-                        <textarea rows="7" class="form-control m-input m-input--square"></textarea>
+                        <textarea rows="7" class="form-control m-input m-input--square"
+                            formControlName="consigneeDescription"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !null}">
                         <label required>Agent Handing</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
-                            [currentActiveItemId]="{ field: 'id', value: null}" [selectedDisplayFields]="['shortName']"
-                            [dataSources]="agents | async" [displayFields]="displayFieldsCustomer" [height]="150">
+                            [currentActiveItemId]="{ field: 'id', value: forwardingAgentId.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
+                            [displayFields]="displayFieldsCustomer" [height]="200">
                         </app-combo-grid-virtual-scroll>
-                        <textarea rows="7" class="form-control m-input m-input--square"></textarea>
+                        <textarea rows="7" class="form-control m-input m-input--square"
+                            formControlName="forwardingAgentDescription"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label required>House Air Waybill</label>
-                                <input type="text" class="form-control">
+                                <label required>HAWB No</label>
+                                <input type="text" class="form-control" formControlName="hawb">
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">
                             <div class="form-group">
                                 <label required>HAWB Type</label>
                                 <ng-select #hawb [items]="billTypes" placeholder="Please select" [allowClear]="true"
-                                    (opened)="closeOtherSelects(hawb)">
+                                    (opened)="closeOtherSelects(hawb)" formControlName="hbltype">
                                 </ng-select>
                             </div>
                         </div>
@@ -85,8 +94,8 @@
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                        [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETD"
-                                        readonly />
+                                        [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETD" readonly
+                                        formControlName="etd" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -101,8 +110,8 @@
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                        [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETA"
-                                        readonly />
+                                        [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETA" readonly
+                                        formControlName="eta" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -116,15 +125,16 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Place of Receipt</label>
-                        <input type="text" class="form-control">
+                        <input type="text" class="form-control" formControlName="pickupPlace">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Departure Airport</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
-                            [currentActiveItemId]="{ field: 'id', value: null}" [selectedDisplayFields]="['nameEn']"
-                            [dataSources]="ports | async" [displayFields]="displayFieldPort">
+                            [currentActiveItemId]="{ field: 'id', value: pol.value}"
+                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
+                            [displayFields]="displayFieldPort">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -133,13 +143,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>First Carrier</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="firstCarrierBy">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>To</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="firstCarrierTo">
                             </div>
                         </div>
                     </div>
@@ -149,25 +159,25 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>To</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="transitPlaceTo1">
                             </div>
                         </div>
                         <div class="col-md-3 pl-0">
                             <div class="form-group">
                                 <label>By</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="transitPlaceBy1">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>To</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="transitPlaceTo2">
                             </div>
                         </div>
                         <div class="col-md-3 pl-0">
                             <div class="form-group">
                                 <label>By</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="transitPlaceBy2">
                             </div>
                         </div>
                     </div>
@@ -176,8 +186,9 @@
                     <div class="form-group">
                         <label>Destination Airport</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
-                            [currentActiveItemId]="{ field: 'id', value: null}" [selectedDisplayFields]="['nameEn']"
-                            [dataSources]="ports | async" [displayFields]="displayFieldPort">
+                            [currentActiveItemId]="{ field: 'id', value: pod.value}"
+                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
+                            [displayFields]="displayFieldPort">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -186,7 +197,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Flight No</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="flightNo">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -195,7 +206,8 @@
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                        [alwaysShowCalendars]="true" name="daterange" readonly />
+                                        [alwaysShowCalendars]="true" name="daterange" readonly
+                                        formControlName="flightDate" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -212,14 +224,15 @@
                             <div class="form-group">
                                 <label>Air Freight</label>
                                 <ng-select #airFreight [items]="termTypes" placeholder="Please select"
-                                    [allowClear]="true" (opened)="closeOtherSelects(airFreight)">
+                                    [allowClear]="true" (opened)="closeOtherSelects(airFreight)"
+                                    formControlName="freightPayment">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Issurance Amount</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="issuranceAmount">
                             </div>
                         </div>
                     </div>
@@ -230,14 +243,14 @@
                             <div class="form-group">
                                 <label>Currency</label>
                                 <ng-select #currency [items]="currencies | async" [allowClear]="true"
-                                    (opened)="closeOtherSelects(currency)">
+                                    (opened)="closeOtherSelects(currency)" formControlName="currencyId">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>CHGS</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="chgs">
                             </div>
                         </div>
                     </div>
@@ -248,7 +261,7 @@
                             <div class="form-group">
                                 <label>WT/VAL</label>
                                 <ng-select #wtsVal [items]="wts" [allowClear]="true"
-                                    (opened)="closeOtherSelects(wtsVal)">
+                                    (opened)="closeOtherSelects(wtsVal)" formControlName="wTorVALPayment">
                                 </ng-select>
                             </div>
                         </div>
@@ -256,7 +269,7 @@
                             <div class="form-group">
                                 <label>Other</label>
                                 <ng-select #otherWts [items]="wts" [allowClear]="true"
-                                    (opened)="closeOtherSelects(otherWts)">
+                                    (opened)="closeOtherSelects(otherWts)" formControlName="otherPayment">
                                 </ng-select>
                             </div>
                         </div>
@@ -267,13 +280,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>DCLR-CA</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="dclrca">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>DCLR-CUS</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="dclrcus">
                             </div>
                         </div>
                     </div>
@@ -281,13 +294,14 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Handling Information</label>
-                        <textarea cols="30" rows="6" class="form-control"></textarea>
+                        <textarea cols="30" rows="6" class="form-control"
+                            formControlName="handingInformation"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Notify</label>
-                        <textarea cols="30" rows="6" class="form-control"></textarea>
+                        <textarea cols="30" rows="6" class="form-control" formControlName="notify"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -296,7 +310,7 @@
                             <div class="form-group">
                                 <label>Number of Origin B/L</label>
                                 <ng-select #obl [items]="numberOBLs" [allowClear]="true"
-                                    (opened)="closeOtherSelects(obl)">
+                                    (opened)="closeOtherSelects(obl)" formControlName="originBLNumber">
                                 </ng-select>
                             </div>
                         </div>
@@ -306,7 +320,8 @@
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                        [alwaysShowCalendars]="true" name="daterange" readonly />
+                                        [alwaysShowCalendars]="true" name="daterange" readonly
+                                        formControlName="issueHBLDate" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -318,7 +333,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Issued On</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="issueHBLPlace">
                             </div>
                         </div>
                     </div>
