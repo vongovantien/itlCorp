@@ -120,7 +120,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }       
 
-        public Crystal PreviewFCLExportManifest(ManifestReportModel model)
+        public Crystal PreviewSeaExportManifest(ManifestReportModel model)
         {
             if (model == null)
             {
@@ -205,7 +205,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public Crystal PreviewFCLImportManifest(ManifestReportModel model)
+        public Crystal PreviewSeaImportManifest(ManifestReportModel model)
         {
             if (model == null)
             {
@@ -295,6 +295,65 @@ namespace eFMS.API.Documentation.DL.Services
             };
             result.AddDataSource(manifests);
             result.AddSubReport("ContainerDetail", containers);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
+
+        public Crystal PreviewAirExportManifest(ManifestReportModel model)
+        {
+            if (model == null)
+            {
+                return null;
+            }
+            Crystal result = new Crystal();
+            var transaction = csTransactionService.GetById(model.JobId);
+            var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
+            model.PolName = model.Pol != null ? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn : null;
+            model.PodName = model.Pol != null ? ports.Where(x => x.Id == model.Pod)?.FirstOrDefault()?.NameEn : null;
+            var manifests = new List<AirCargoManifestReport>();
+            if (model.CsTransactionDetails.Count > 0)
+            {
+                foreach(var item in model.CsTransactionDetails)
+                {
+                    var manifest = new AirCargoManifestReport {
+                        Billype = string.Empty,
+                        HWBNO = item.Hwbno,
+                        Pieces = item.PackageQty?.ToString(),
+                        GrossWeight = item.GrossWeight,
+                        ShipperName = item.ShipperDescription,
+                        Consignees = item.ConsigneeDescription,
+                        Description = item.DesOfGoods,
+                        FirstDest = item.FirstCarrierBy,
+                        SecondDest = item.TransitPlaceTo1,
+                        ThirdDest = item.TransitPlaceTo2,
+                        Notify = item.NotifyPartyDescription
+                    };
+                    manifests.Add(manifest);
+                }
+            }
+            if (manifests.Count == 0)
+                return result;
+
+            var parameter = new AirCargoManifestReportParameter
+            {
+                AWB = transaction.Mawb,
+                Marks = model.MasksOfRegistration,
+                Flight = transaction.FlightVesselName,
+                PortLading = model.PolName,
+                PortUnlading = model.PodName,
+                FlightDate = transaction.FlightDate.ToString(),
+                Shipper = Constants.COMPANY_NAME + "\n" + Constants.COMPANY_ADDRESS1,
+                Consignee = transaction.AgentName,
+                Contact = currentUser.UserName
+            };
+            result = new Crystal
+            {
+                ReportName = "Aircargomanifest.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
             return result;
