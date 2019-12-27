@@ -360,5 +360,12 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
+
+        [HttpPost("GetMultiplePartnerGroup")]
+        public IActionResult GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
+        {
+            var data = catPartnerService.GetMultiplePartnerGroup(criteria);
+            return Ok(data);
+        }
     }
 }

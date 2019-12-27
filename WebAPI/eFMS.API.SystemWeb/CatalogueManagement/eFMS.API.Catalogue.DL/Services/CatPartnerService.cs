@@ -495,5 +495,39 @@ namespace eFMS.API.Catalogue.DL.Services
             IQueryable<CatPartnerModel> data = Get().Where(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             return data;
         }
+
+        public IQueryable<CatPartnerModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
+        {
+            IQueryable<CatPartnerModel> data = Get();
+            if (criteria == null) return data;
+            List<string> grpCodes = new List<string>();
+            if (criteria.PartnerGroups != null)
+            {
+                foreach (var grp in criteria.PartnerGroups)
+                {
+                    string group = PlaceTypeEx.GetPartnerGroup(grp);
+                    grpCodes.Add(group);
+                }
+                Expression<Func<CatPartnerModel, bool>> query = null;
+                foreach (var group in grpCodes)
+                {
+                    if (query == null)
+                    {
+                        query = x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0;
+                    }
+                    else
+                    {
+                        query = query.Or(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+                    }
+                }
+                query = criteria.Active != null ? query.And(x => x.Active == criteria.Active) : query;
+                data = query != null ? data.Where(query) : data;
+            }
+            else
+            {
+                data = data.Where(x => x.Active == criteria.Active || criteria.Active == null);
+            }           
+            return data;
+        }
     }
 }
