@@ -439,9 +439,10 @@ namespace eFMS.API.Documentation.DL.Services
                           PackageQty = detail.PackageQty,
                           PackageType = detail.PackageType, 
                           CW = detail.ChargeWeight,
+                          DatetimeCreated = detail.DatetimeCreated
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            results = res.OrderBy(o => o.Hwbno).ToList();
+            results = res.OrderByDescending(o => o.DatetimeCreated).ToList();
             //results.ForEach(fe => {
             //    fe.Containers = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
             //                                                            .Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));

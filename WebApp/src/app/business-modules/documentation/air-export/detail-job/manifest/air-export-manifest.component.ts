@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -51,7 +51,8 @@ export class AirExportManifestComponent extends AppList {
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
-        protected _router: Router
+        protected _router: Router,
+        private cdRef: ChangeDetectorRef
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -74,6 +75,7 @@ export class AirExportManifestComponent extends AppList {
 
     ngAfterViewInit() {
         this.formManifest.isAir = true;
+        this.cdRef.detectChanges();
         this._store.select(getParamsRouterState)
             .subscribe((param: Params) => {
                 if (param.jobId) {
