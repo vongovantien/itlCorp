@@ -485,6 +485,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.ReviewAirDocumentRelease(System.Guid)">
+            <summary>
+            preview air document release
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.PreviewSeaHBLofLading(System.Guid,System.String)">
             <summary>
             preview sea house bill of lading

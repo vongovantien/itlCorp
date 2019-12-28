@@ -35,8 +35,8 @@ const routing: Routes = [
         path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/air-export-hbl.module').then(m => m.AirExportHBLModule),
     },
     {
-        path: ':id/manifest', component: AirExportManifestComponent,
-        data: { name: "Manifest", path: ":id", level: 4 },
+        path: ':jobId/manifest', component: AirExportManifestComponent,
+        data: { name: "Manifest", path: ":jobId", level: 4 },
     },
     // {
     //     path: ':jobId/si', component: AirExportShippingInstructionComponent, data: {

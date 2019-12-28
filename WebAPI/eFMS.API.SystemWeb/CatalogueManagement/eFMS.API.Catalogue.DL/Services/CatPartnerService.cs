@@ -221,11 +221,10 @@ namespace eFMS.API.Catalogue.DL.Services
             var sysUsers = sysUserRepository.Get();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var query = (from partner in partners
-                         join user in sysUsers on partner.UserCreated equals user.Id into userGroups
-                         from u in userGroups.DefaultIfEmpty()
+                         join user in sysUsers on partner.UserCreated equals user.Id
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { user = u, partner, saleman = x }
+                         select new { user, partner, saleman = x }
                           );
             if (criteria.All == null)
             {
@@ -493,6 +492,40 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string group = PlaceTypeEx.GetPartnerGroup(partnerGroup);
             IQueryable<CatPartnerModel> data = Get().Where(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            return data;
+        }
+
+        public IQueryable<CatPartnerModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
+        {
+            IQueryable<CatPartnerModel> data = Get();
+            if (criteria == null) return data;
+            List<string> grpCodes = new List<string>();
+            if (criteria.PartnerGroups != null)
+            {
+                foreach (var grp in criteria.PartnerGroups)
+                {
+                    string group = PlaceTypeEx.GetPartnerGroup(grp);
+                    grpCodes.Add(group);
+                }
+                Expression<Func<CatPartnerModel, bool>> query = null;
+                foreach (var group in grpCodes.Distinct())
+                {
+                    if (query == null)
+                    {
+                        query = x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0;
+                    }
+                    else
+                    {
+                        query = query.Or(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+                    }
+                }
+                query = criteria.Active != null ? query.And(x => x.Active == criteria.Active) : query;
+                data =  data.Where(query);
+            }
+            else
+            {
+                data = data.Where(x => x.Active == criteria.Active || criteria.Active == null);
+            }           
             return data;
         }
     }
