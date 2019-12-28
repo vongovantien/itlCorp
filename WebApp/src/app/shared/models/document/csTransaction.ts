@@ -56,6 +56,7 @@ export class CsTransaction {
     subColoader: string = null;
     hwbNo: string = null;
     customerId: string = null;
+    customerName: string = null;
     notifyPartyId: string = null;
     saleManId: string = null;
     creatorName: string = null;

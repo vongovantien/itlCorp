@@ -18,13 +18,7 @@ import { SystemConstants } from 'src/constants/system.const';
 @Component({
     selector: 'air-export-hbl-form-create',
     templateUrl: './form-create-house-bill-air-export.component.html',
-    styles: [
-        `
-         .eta-date-picker .daterange-rtl .md-drppicker {
-            left: -105px !important;
-        }
-        `
-    ]
+    styleUrls: ['./form-create-house-bill-air-export.component.scss']
 })
 export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
@@ -111,17 +105,23 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             { id: '3', text: 'Three (3)' }
         ];
 
+        this.initForm();
+
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
         this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
+
         this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
         this.saleMans = this._systemRepo.getListSystemUser();
+
         this.currencies = this._catalogueRepo.getCurrencyBy({ active: true }).pipe(
             map((currencies: Currency[]) => this.utility.prepareNg2SelectData(currencies, 'id', 'id')),
+            tap((currencies: CommonInterface.INg2Select[]) => {
+                this.currencyId.setValue([currencies.find(currency => currency.id === 'USD')])
+            })
         );
 
-        this.initForm();
 
         // * get detail shipment from store.
         this._store.select(getTransactionDetailCsTransactionState)
@@ -220,7 +220,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     onSelectDataFormInfo(data: any, type: string) {
-        console.log(data);
         switch (type) {
             case 'customer':
                 this.customerId.setValue(data.id);

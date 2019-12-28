@@ -1,0 +1,12 @@
+:host ::ng-deep {
+    .eta-date-picker .daterange-rtl .md-drppicker {
+        left: -105px !important;
+    }
+    .table-prepaid-collect {
+        .form-control {
+            background: inherit;
+            padding: 4px 8px;
+            border: 0;
+        }
+    }
+}
