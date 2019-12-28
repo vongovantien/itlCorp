@@ -509,7 +509,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     grpCodes.Add(group);
                 }
                 Expression<Func<CatPartnerModel, bool>> query = null;
-                foreach (var group in grpCodes)
+                foreach (var group in grpCodes.Distinct())
                 {
                     if (query == null)
                     {
@@ -521,7 +521,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
                 query = criteria.Active != null ? query.And(x => x.Active == criteria.Active) : query;
-                data = query != null ? data.Where(query) : data;
+                data =  data.Where(query);
             }
             else
             {
