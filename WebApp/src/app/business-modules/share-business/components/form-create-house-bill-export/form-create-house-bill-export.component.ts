@@ -85,7 +85,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         { field: 'countryNameEN', label: 'Country' },
     ];
 
-    shipmmentDetail: CsTransaction = new CsTransaction();;
+    shipmmentDetail: CsTransaction = new CsTransaction();
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
