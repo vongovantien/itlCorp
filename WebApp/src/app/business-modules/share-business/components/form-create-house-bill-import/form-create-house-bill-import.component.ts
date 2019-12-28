@@ -112,6 +112,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     }
 
     ngOnInit() {
+        // this.getPort();
         this.getListSaleman();
         this.getCommonData();
         this.headersSaleman = [
@@ -150,7 +151,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             ],
         }, { selectedDisplayFields: ['name_EN'], });
         this.initForm();
-        this.getPort();
+
         this._store.select(fromShare.getDetailHBlState)
             .subscribe(
                 (res: any) => {
@@ -193,23 +194,24 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
     }
 
-    async getPort() {
-        this._spinner.show();
-        try {
-            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
-                this.configPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
-            } else {
-                const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }).toPromise();
-                this.configPort = ports || [];
-                this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
-            }
-        } catch (error) {
+    // async getPort() {
+    //     this._spinner.show();
+    //     try {
+    //         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
+    //             this.configPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
+    //         } else {
+    //             const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }).toPromise();
+    //             this.configPort = ports || [];
+    //             this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
+    //             this.configPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
+    //         }
+    //     } catch (error) {
 
-        }
-        finally {
-            this._spinner.hide();
-        }
-    }
+    //     }
+    //     finally {
+    //         this._spinner.hide();
+    //     }
+    // }
     refreshValue(value: any) {
         this.object.items = [value];
     }
@@ -231,7 +233,15 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 this.hbOfladingTypesString = this.hbOfladingTypes.map(x => x.displayName);
                 this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
             }
+            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
+                this.configPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
+            } else {
+                const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }).toPromise();
+                this.configPort.dataSource = ports || [];
+                this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
+                this.configPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
 
+            }
         } catch (error) {
         }
         finally {

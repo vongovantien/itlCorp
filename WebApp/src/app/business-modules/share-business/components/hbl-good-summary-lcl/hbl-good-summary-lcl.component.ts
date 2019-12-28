@@ -131,7 +131,11 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
         if (!!containers.length && !this.selectedPackage || containers.length === 1 && !this.selectedPackage) {
             if (!!containers[0].packageTypeId) {
-                this.selectedPackage = this.packages.find((unit: Unit) => unit.id === containers[0].packageTypeId).id;
+                const data: any = this.packages.find((unit: Unit) => unit.id === containers[0].packageTypeId);
+                console.log(data);
+                if (!!data) {
+                    this.selectedPackage = data.id;
+                }
             }
         }
         // * Container

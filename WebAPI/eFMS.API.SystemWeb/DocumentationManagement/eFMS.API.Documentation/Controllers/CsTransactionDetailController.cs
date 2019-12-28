@@ -217,6 +217,19 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// preview air document release
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("PreviewAirDocumentRelease")]
+        public IActionResult ReviewAirDocumentRelease(Guid id)
+        {
+            var result = csTransactionDetailService.PreviewAirDocumentRelease(id);
+            return Ok(result);
+        }
+
+        /// <summary>
         /// preview sea house bill of lading
         /// </summary>
         /// <param name="hblId">Id of Housebill</param>
