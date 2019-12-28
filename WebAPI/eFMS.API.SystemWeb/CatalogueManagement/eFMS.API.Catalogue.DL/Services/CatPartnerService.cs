@@ -221,11 +221,10 @@ namespace eFMS.API.Catalogue.DL.Services
             var sysUsers = sysUserRepository.Get();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var query = (from partner in partners
-                         join user in sysUsers on partner.UserCreated equals user.Id into userGroups
-                         from u in userGroups.DefaultIfEmpty()
+                         join user in sysUsers on partner.UserCreated equals user.Id
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { user = u, partner, saleman = x }
+                         select new { user, partner, saleman = x }
                           );
             if (criteria.All == null)
             {
