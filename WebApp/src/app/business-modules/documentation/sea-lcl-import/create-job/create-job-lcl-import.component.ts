@@ -35,13 +35,16 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
         super();
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+    }
 
     gotoList() {
         this._router.navigate(["home/documentation/sea-lcl-import"]);
     }
 
     showImportPopup() {
+        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.SeaLCLImport;
+        this.formImportJobDetailPopup.getShippments();
         this.formImportJobDetailPopup.show();
     }
 

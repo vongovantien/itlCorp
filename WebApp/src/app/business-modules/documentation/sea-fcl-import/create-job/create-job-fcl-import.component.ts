@@ -196,6 +196,9 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
     }
 
     showImportPopup() {
+
+        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
+        this.formImportJobDetailPopup.getShippments();
         this.formImportJobDetailPopup.show();
     }
 }

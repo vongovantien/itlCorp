@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { Store } from '@ngrx/store';
 
 import { CatalogueRepo } from '@repositories';

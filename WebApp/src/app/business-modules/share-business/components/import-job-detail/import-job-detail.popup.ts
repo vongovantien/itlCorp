@@ -24,6 +24,8 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
     selectedShipment: any = {};
     isCheckShipment: boolean = false;
     pageChecked: number = 0;
+    transactionType: number;
+
     constructor(
         private _documentRepo: DocumentationRepo,
         private _sortService: SortService,
@@ -46,7 +48,7 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
             { title: 'Supplier(Shipping Line)', field: 'supplierName', sortable: true },
             { title: 'Shipment Date', field: 'etd', sortable: true }
         ];
-        this.getShippments(this.dataSearch);
+        // this.getShippments(this.dataSearch);
     }
 
     onCancel() {
@@ -70,7 +72,7 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
         } else {
             data = this.dataSearch;
         }
-        data.transactionType = 7;
+        data.transactionType = this.transactionType;
         this._documentRepo.getListShipmentDocumentation(this.page, this.pageSize, data).pipe(
             catchError(this.catchError),
             finalize(() => { this.isLoading = false; }),

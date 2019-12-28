@@ -125,10 +125,14 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
 
     onImport(selectedData: any) {
         this.selectedJob = selectedData;
+        console.log(this.selectedJob);
         this.isImport = true;
+        this._store.dispatch(new fromShareBusiness.GetDimensionAction(this.selectedJob.id));
     }
 
     showImportPopup() {
+        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirExport;
+        this.formImportJobDetailPopup.getShippments();
         this.formImportJobDetailPopup.show();
     }
 
