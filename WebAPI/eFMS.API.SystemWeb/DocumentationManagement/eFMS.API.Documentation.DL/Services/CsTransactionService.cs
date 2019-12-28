@@ -1324,7 +1324,7 @@ namespace eFMS.API.Documentation.DL.Services
             var _shipmentType = GetShipmentTypeForPreviewPL(shipment.TransactionType) + shipment.TypeOfService;
             if (listHousebill.Count > 0)
             {
-                _hblNoList = String.Join("; ", listHousebill.Select(x => x.Hwbno));
+                _hblNoList = String.Join(";", listHousebill.Select(x => x.Hwbno));
 
                 var housebillFirst = listHousebill.First();
                 var userSaleman = sysUserRepo.Get(x => x.Id == housebillFirst.SaleManId).FirstOrDefault();
@@ -1527,7 +1527,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
             parameter.CurrDecimalNo = 2;
             parameter.DecimalNo = 2;
