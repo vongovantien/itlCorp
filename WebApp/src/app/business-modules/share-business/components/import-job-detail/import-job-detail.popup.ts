@@ -115,14 +115,16 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
                         this.containers = res;
                         // updae seal, cont.
                         console.log(this.containers);
-                        this.containers.forEach(item => {
-                            item.sealNo = null;
-                            item.containerNo = null;
-                            item.markNo = null;
-                        });
-                        this.selectedShipment.containers = this.containers;
+                        if (this.containers.length > 0) {
+                            this.containers.forEach(item => {
+                                item.sealNo = null;
+                                item.containerNo = null;
+                                item.markNo = null;
+                            });
+                            this.selectedShipment.containers = this.containers;
 
-                        this._store.dispatch(new fromShareBussiness.GetContainerSuccessAction(this.containers));
+                            this._store.dispatch(new fromShareBussiness.GetContainerSuccessAction(this.containers));
+                        }
 
                     }
                 }
