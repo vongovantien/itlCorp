@@ -109,9 +109,9 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             jobId: this.jobId,
             sailingDate: !!form.sailingDate && !!form.sailingDate.startDate ? formatDate(form.sailingDate.startDate, 'yyyy-MM-dd', 'en') : null,
             closingDate: !!form.closingDate && !!form.closingDate.startDate ? formatDate(form.closingDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            issueHbldate: !!form.issueHbldate && !!form.issueHbldate.startDate ? formatDate(form.issueHbldate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             mawb: form.mawb,
-
             shipperDescription: form.shipperDescription,
             consigneeDescription: form.consigneeDescription,
             notifyPartyDescription: form.notifyPartyDescription,
@@ -123,9 +123,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             deliveryPlace: form.placeDelivery,
             finalDestinationPlace: form.finalDestinationPlace,
             placeFreightPay: form.placeFreightPay,
-            issueHblplaceAndDate: form.issueHblplaceAndDate,
-            issueHbldate: new Date(),
-            issueHblplace: form.issueHblplaceAndDate,
+            issueHblplace: form.issueHblplace,
             referenceNo: form.referenceNo,
             exportReferenceNo: form.exportReferenceNo,
             goodsDeliveryDescription: form.goodsDeliveryDescription,
@@ -135,11 +133,11 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             inWord: form.inWord,
             onBoardStatus: form.onBoardStatus,
 
-            serviceType: !!form.serviceType ? form.serviceType[0].id : null,
-            originBlnumber: !!form.originBlnumber ? form.originBlnumber[0].id : null,
-            moveType: !!form.moveType ? form.moveType[0].id : null,
-            freightPayment: !!form.freightPayment ? form.freightPayment[0].id : null,
-            hbltype: !!form.hbltype ? form.hbltype[0].id : null,
+            serviceType: !!form.serviceType && !!form.serviceType.length ? form.serviceType[0].id : null,
+            originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? form.originBlnumber[0].id : null,
+            moveType: !!form.moveType && !!form.moveType.length ? form.moveType[0].id : null,
+            freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
+            hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
 
             customerId: form.customer,
             saleManId: form.saleMan,

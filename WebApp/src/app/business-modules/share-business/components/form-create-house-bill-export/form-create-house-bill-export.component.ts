@@ -6,14 +6,13 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { User, CsTransactionDetail } from 'src/app/shared/models';
+import { User, CsTransactionDetail, CsTransaction } from 'src/app/shared/models';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { AppForm } from 'src/app/app.form';
 import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from 'src/app/shared/validators';
 import { DataService } from 'src/app/shared/services';
-
 
 import { Observable } from 'rxjs';
 import { catchError, takeUntil, skip, finalize } from 'rxjs/operators';
@@ -37,17 +36,10 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     consigneeDescription: AbstractControl;
     notifyPartyDescription: AbstractControl;
     hbltype: AbstractControl;
-    bookingNo: AbstractControl;
-    localVoyNo: AbstractControl;
     oceanVoyNo: AbstractControl;
-    localVessel: AbstractControl;
-    oceanVessel: AbstractControl;
     country: AbstractControl;
-    placeReceipt: AbstractControl;
-    finalDestinationPlace: AbstractControl;
     pol: AbstractControl;
     pod: AbstractControl;
-    placeDelivery: AbstractControl;
     freightCharge: AbstractControl;
     goodsDelivery: AbstractControl;
     goodsDeliveryDescription: AbstractControl;
@@ -59,14 +51,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     freightPayment: AbstractControl;
     placeFreightPay: AbstractControl;
     originBlnumber: AbstractControl;
-    issueHblplaceAndDate: AbstractControl;
-    referenceNo: AbstractControl;
-    exportReferenceNo: AbstractControl;
     moveType: AbstractControl;
-    purchaseOrderNo: AbstractControl;
-    shippingMark: AbstractControl;
-    inWord: AbstractControl;
-    onBoardStatus: AbstractControl;
+    issueHbldate: AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: User[];
@@ -99,6 +85,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         { field: 'countryNameEN', label: 'Country' },
     ];
 
+    shipmmentDetail: CsTransaction = new CsTransaction();;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -118,7 +105,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.getDropdownData();
 
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        this.shipppers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.SHIPPER);
+        this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.consignees = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CONSIGNEE);
         this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
         this.countries = this._catalogueRepo.getCountry();
@@ -132,14 +119,13 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                 (shipment: CsTransactionDetail) => {
                     // * set default value for controls from shipment detail.
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
-                        console.log("detail job from store", shipment);
+                        this.shipmmentDetail = new CsTransaction(shipment);
                         this.formCreate.patchValue({
-                            bookingNo: shipment.bookingNo,
-                            mawb: shipment.mawb,
-                            oceanVoyNo: shipment.flightVesselName + ' - ' + shipment.voyNo,
-                            pod: shipment.pod,
-                            pol: shipment.pol,
-                            purchaseOrderNo: shipment.purchaseOrderNo
+                            bookingNo: this.shipmmentDetail.bookingNo,
+                            mawb: this.shipmmentDetail.mawb,
+                            oceanVoyNo: !!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '' + ' - ' + !!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : '',
+                            pod: this.shipmmentDetail.pod,
+                            pol: this.shipmmentDetail.pol,
                         });
                     }
 
@@ -181,6 +167,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             // * date
             sailingDate: [null, Validators.required],
             closingDate: [],
+            issueHbldate: [],
 
             // * Input
             mawb: [null, Validators.required],
@@ -196,7 +183,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             forwardingAgentDescription: [],
             placeFreightPay: [null, Validators.required],
             originBlnumber: [],
-            issueHblplaceAndDate: [],
+            issueHblplace: [],
             referenceNo: [],
             exportReferenceNo: [],
             moveType: [],
@@ -221,15 +208,10 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.consigneeDescription = this.formCreate.controls["consigneeDescription"];
         this.notifyPartyDescription = this.formCreate.controls["notifyPartyDescription"];
         this.hbltype = this.formCreate.controls["hbltype"];
-        this.bookingNo = this.formCreate.controls["bookingNo"];
-        this.localVoyNo = this.formCreate.controls["localVoyNo"];
         this.oceanVoyNo = this.formCreate.controls["oceanVoyNo"];
-        this.finalDestinationPlace = this.formCreate.controls["finalDestinationPlace"];
         this.country = this.formCreate.controls["country"];
         this.pol = this.formCreate.controls["pol"];
         this.pod = this.formCreate.controls["pod"];
-        this.placeReceipt = this.formCreate.controls["placeReceipt"];
-        this.placeDelivery = this.formCreate.controls["placeDelivery"];
         this.forwardingAgent = this.formCreate.controls["forwardingAgent"];
         this.forwardingAgentDescription = this.formCreate.controls["forwardingAgentDescription"];
         this.goodsDeliveryDescription = this.formCreate.controls["goodsDeliveryDescription"];
@@ -240,23 +222,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.freightPayment = this.formCreate.controls["freightPayment"];
         this.placeFreightPay = this.formCreate.controls["placeFreightPay"];
         this.originBlnumber = this.formCreate.controls["originBlnumber"];
-        this.issueHblplaceAndDate = this.formCreate.controls["issueHblplaceAndDate"];
-        this.referenceNo = this.formCreate.controls["referenceNo"];
-        this.exportReferenceNo = this.formCreate.controls["exportReferenceNo"];
         this.moveType = this.formCreate.controls["moveType"];
-        this.purchaseOrderNo = this.formCreate.controls["purchaseOrderNo"];
-        this.shippingMark = this.formCreate.controls["shippingMark"];
-        this.onBoardStatus = this.formCreate.controls["onBoardStatus"];
-        this.inWord = this.formCreate.controls["inWord"];
-
-        // this.formCreate.valueChanges
-        //     .pipe(
-        //         distinctUntilChanged((prev, curr) => prev === curr),
-        //         takeUntil(this.ngUnsubscribe)
-        //     )
-        //     .subscribe((value) => {
-        //         console.log(this.formCreate.status);
-        //     });
+        this.issueHbldate = this.formCreate.controls["issueHbldate"];
     }
 
     updateFormValue(data: CsTransactionDetail) {
@@ -284,6 +251,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             freightPayment: !!data.freightPayment ? [(this.termTypes || []).find(type => type.id === data.freightPayment)] : null,
             closingDate: !!data.closingDate ? { startDate: new Date(data.closingDate), endDate: new Date(data.closingDate) } : null,
             sailingDate: !!data.sailingDate ? { startDate: new Date(data.sailingDate), endDate: new Date(data.sailingDate) } : null,
+            issueHbldate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
+
             placeFreightPay: data.placeFreightPay,
             forwardingAgent: data.forwardingAgentId,
             goodsDelivery: data.goodsDeliveryId,
@@ -292,7 +261,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             originBlnumber: !!data.originBlnumber ? [(this.originNumbers || []).find(type => type.id === data.originBlnumber)] : null,
             referenceNo: data.referenceNo,
             exportReferenceNo: data.exportReferenceNo,
-            issueHblplaceAndDate: data.issueHblplace,
+            issueHblplace: data.issueHblplace,
             moveType: !!data.moveType ? [(this.typeOfMoves || []).find(type => type.id === data.moveType)] : null,
             serviceType: !!data.serviceType ? [(this.serviceTypes || []).find(s => s.id === data.serviceType)] : null,
             purchaseOrderNo: data.purchaseOrderNo,
@@ -300,7 +269,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             inWord: data.inWord,
             onBoardStatus: data.onBoardStatus
         });
-        console.log(this.formCreate.value);
     }
 
     getSaleMans() {
@@ -335,7 +303,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                         this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
                         this.typeOfMoves = this.utility.prepareNg2SelectData(commonData.typeOfMoves, 'value', 'displayName');
 
-                        console.log(this.serviceTypes);
                         this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
 
                     }
@@ -381,7 +348,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
-                console.log(data);
                 this.customer.setValue(data.id);
                 this.saleMans.forEach((item: User) => {
                     if (item.id === data.salePersonId) {

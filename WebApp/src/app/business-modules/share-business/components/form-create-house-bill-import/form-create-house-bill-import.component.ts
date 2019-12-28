@@ -200,7 +200,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 this.configPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
             } else {
                 const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }).toPromise();
-                this.configPort = ports || [];
+                this.configPort.dataSource = ports || [];
                 this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
             }
         } catch (error) {
@@ -428,6 +428,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             serviceType: [<CommonInterface.INg2Select>{ id: res.serviceType, text: res.serviceType }],
             hbOfladingType: [<CommonInterface.INg2Select>{ id: res.hbltype, text: res.hbltype }],
         });
+
         this.mindateEta = !!this.mindateEta ? this.createMoment(res.etd) : null;
         this.mindateEtaWareHouse = !!res.eta ? this.createMoment(res.eta) : null;
     }

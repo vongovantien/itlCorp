@@ -98,6 +98,20 @@ export class HouseBill extends BaseModel {
     warehouseNotice: string = null;
     packageQty: number = null;
 
+    // * AIR 
+    flightNo: string = null;
+    issuranceAmount: string = null;
+    chgs: string = null;
+    dclrca: string = null;
+    dclrcus: string = null;
+    handingInformation: string = null;
+    notify: string = null;
+    currencyId: string = null;
+    wTorVALPayment: string = null;
+    otherPayment: string = null;
+    flightDate: string = null;
+
+
     constructor(object?: any) {
         super();
         const self = this;

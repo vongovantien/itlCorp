@@ -107,7 +107,7 @@
                                             <select class="form-control border" [(ngModel)]="charge.quantityType"
                                                 (ngModelChange)="onChangeQuantityHint($event, charge)"
                                                 [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">
-                                                <option value="null" disabled></option>
+                                                <option value="null">-</option>
                                                 <option *ngFor="let hint of quantityHints" [ngValue]="hint.value">
                                                     {{hint.displayName}}</option>
                                             </select>
