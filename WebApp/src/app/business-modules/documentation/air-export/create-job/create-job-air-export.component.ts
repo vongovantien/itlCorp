@@ -18,7 +18,7 @@ import {
 import * as fromShareBusiness from './../../../share-business/store';
 
 import { catchError } from 'rxjs/operators';
-
+import _merge from 'lodash/merge';
 @Component({
     selector: 'app-create-job-air-export',
     templateUrl: './create-job-air-export.component.html'
@@ -67,7 +67,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
             coloaderId: form.coloaderId,
         };
 
-        const fclExportAddModel: CsTransaction = new CsTransaction(Object.assign({}, form, formData));
+        const fclExportAddModel: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
         fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.AirExport;
 
         return fclExportAddModel;

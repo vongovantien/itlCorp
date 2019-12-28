@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !null}">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !consigneeId.value}">
                         <label required>Consignee</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consignee')"
                             [currentActiveItemId]="{ field: 'id', value: consigneeId.value}"
@@ -57,7 +57,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !null}">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':isSubmitted && !forwardingAgentId.value}">
                         <label required>Agent Handing</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                             [currentActiveItemId]="{ field: 'id', value: forwardingAgentId.value}"
@@ -79,8 +80,9 @@
                         <div class="col-md-6 pl-0">
                             <div class="form-group">
                                 <label required>HAWB Type</label>
-                                <ng-select #hawb [items]="billTypes" placeholder="Please select" [allowClear]="true"
-                                    (opened)="closeOtherSelects(hawb)" formControlName="hbltype">
+                                <ng-select #hawbType [items]="billTypes" placeholder="Please select" [allowClear]="true"
+                                    (opened)="closeOtherSelects(hawbType)" formControlName="hbltype"
+                                    (selected)="onSelectDataFormInfo($event,'hawb-type')">
                                 </ng-select>
                             </div>
                         </div>
@@ -148,7 +150,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>To</label>
+                                <label> To </label>
                                 <input type="text" class="form-control" formControlName="firstCarrierTo">
                             </div>
                         </div>
@@ -158,13 +160,20 @@
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label>To</label>
+                                <label>
+                                    To
+                                </label>
                                 <input type="text" class="form-control" formControlName="transitPlaceTo1">
                             </div>
                         </div>
                         <div class="col-md-3 pl-0">
                             <div class="form-group">
-                                <label>By</label>
+                                <div>
+                                    <label>By</label>
+                                    <div class="float-right">
+                                        <i class="fa fa-plane fa-lg text-primary"></i>
+                                    </div>
+                                </div>
                                 <input type="text" class="form-control" formControlName="transitPlaceBy1">
                             </div>
                         </div>
@@ -176,7 +185,12 @@
                         </div>
                         <div class="col-md-3 pl-0">
                             <div class="form-group">
-                                <label>By</label>
+                                <div>
+                                    <label>By</label>
+                                    <div class="float-right">
+                                        <i class="fa fa-plane fa-lg text-primary"></i>
+                                    </div>
+                                </div>
                                 <input type="text" class="form-control" formControlName="transitPlaceBy2">
                             </div>
                         </div>
@@ -223,9 +237,8 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Air Freight</label>
-                                <ng-select #airFreight [items]="termTypes" placeholder="Please select"
-                                    [allowClear]="true" (opened)="closeOtherSelects(airFreight)"
-                                    formControlName="freightPayment">
+                                <ng-select #airFreight [items]="termTypes" [allowClear]="true"
+                                    (opened)="closeOtherSelects(airFreight)" formControlName="freightPayment">
                                 </ng-select>
                             </div>
                         </div>
@@ -294,14 +307,14 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Handling Information</label>
-                        <textarea cols="30" rows="6" class="form-control"
+                        <textarea cols="30" rows="5" class="form-control"
                             formControlName="handingInformation"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Notify</label>
-                        <textarea cols="30" rows="6" class="form-control" formControlName="notify"></textarea>
+                        <textarea cols="30" rows="5" class="form-control" formControlName="notify"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -310,18 +323,18 @@
                             <div class="form-group">
                                 <label>Number of Origin B/L</label>
                                 <ng-select #obl [items]="numberOBLs" [allowClear]="true"
-                                    (opened)="closeOtherSelects(obl)" formControlName="originBLNumber">
+                                    (opened)="closeOtherSelects(obl)" formControlName="originBlnumber">
                                 </ng-select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 eta-date-picker">
                             <div class="form-group">
                                 <label>Issued Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
-                                        formControlName="issueHBLDate" />
+                                        formControlName="issueHbldate" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -330,10 +343,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-12 ">
                             <div class="form-group">
                                 <label>Issued On</label>
-                                <input type="text" class="form-control" formControlName="issueHBLPlace">
+                                <input type="text" class="form-control" formControlName="issueHblplace">
                             </div>
                         </div>
                     </div>

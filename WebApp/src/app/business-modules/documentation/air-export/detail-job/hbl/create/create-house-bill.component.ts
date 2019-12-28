@@ -13,7 +13,9 @@ import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { catchError, finalize } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
+import { HouseBill } from '@models';
 
+import _merge from 'lodash/merge';
 @Component({
     selector: 'app-create-hbl-air-export',
     templateUrl: './create-house-bill.component.html',
@@ -55,23 +57,17 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
         console.log(form);
         const formData = {
-            id: SystemConstants.EMPTY_GUID,
-            jobId: this.jobId,
-            mawb: form.mawb,
-            shipperDescription: form.shipperDescription,
-            consigneeDescription: form.consigneeDescription,
-            hwbno: form.hwbno,
-            pickupPlace: form.placeReceipt,
-            deliveryPlace: form.placeDelivery,
-            placeFreightPay: form.placeFreightPay,
-            issueHblplaceAndDate: form.issueHblplaceAndDate,
-            issueHbldate: new Date(),
-            issueHblplace: form.issueHblplaceAndDate,
-            forwardingAgentDescription: form.forwardingAgentDescription,
+            eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
+            etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
+            issueHBLDate: !!form.issueHBLDate ? formatDate(form.issueHBLDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            originBlnumber: !!form.originBlnumber ? form.originBlnumber[0].id : null,
-            freightPayment: !!form.freightPayment ? form.freightPayment[0].id : null,
-            hbltype: !!form.hbltype ? form.hbltype[0].id : null,
+            originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? form.originBlnumber[0].id : null,
+            freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
+            hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
+            currencyId: !!form.currencyId && !!form.currencyId.length ? form.currencyId[0].id : null,
+            wTorVALPayment: !!form.wTorVALPayment && !!form.wTorVALPayment.length ? form.wTorVALPayment[0].id : null,
+            otherPayment: !!form.otherPayment && !!form.otherPayment.length ? form.otherPayment[0].id : null,
 
             customerId: form.customer,
             saleManId: form.saleMan,
@@ -82,11 +78,10 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             forwardingAgentId: form.forwardingAgent,
         };
 
-        return formData;
+        const houseBill = new HouseBill(_merge(form, formData));
+        console.log(houseBill);
+        return houseBill;
     }
-
-
-
 
     saveHBL() {
         this.confirmPopup.hide();
@@ -97,7 +92,9 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         //     return;
         // }
 
-        const modelAdd = this.getDataForm();
+        const houseBill: HouseBill = this.getDataForm();
+        houseBill.jobId = this.jobId;
+
         // this.createHbl(modelAdd);
 
     }
@@ -107,7 +104,11 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
         this.setError(this.formCreateHBLComponent.hbltype);
         this.setError(this.formCreateHBLComponent.otherPayment);
-        this.setError(this.formCreateHBLComponent.originBLNumber);
+        this.setError(this.formCreateHBLComponent.originBlnumber);
+        this.setError(this.formCreateHBLComponent.currencyId);
+        this.setError(this.formCreateHBLComponent.freightPayment);
+        this.setError(this.formCreateHBLComponent.wTorVALPayment);
+
 
         if (!this.formCreateHBLComponent.formCreate.valid) {
             valid = false;
@@ -115,9 +116,9 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         return valid;
     }
 
-    createHbl(body: any) {
+    createHbl(houseBill: HouseBill) {
         this._progressRef.start();
-        this._documentationRepo.createHousebill(body)
+        this._documentationRepo.createHousebill(houseBill)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())

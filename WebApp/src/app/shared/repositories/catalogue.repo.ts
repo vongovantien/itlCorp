@@ -153,6 +153,15 @@ export class CatalogueRepo {
             })
         );
     }
+
+    getPartnerByGroups(groups: number[], active: boolean = true) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`, { partnerGroups: groups, active: active }).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
     getPartnerGroup() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerGroup`).pipe(
             map((res: any) => {

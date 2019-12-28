@@ -12,7 +12,7 @@
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !customer.value}">
                         <label required>Customer (Payer)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
-                            [currentActiveItemId]="{ field: 'id', value: customer.value}"
+                            [currentActiveItemId]="{ field: 'id', value: customer.value,hardValue: shipmmentDetail.customerName}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                             [displayFields]="displayFieldsCustomer" [height]="150">
                         </app-combo-grid-virtual-scroll>
@@ -37,7 +37,7 @@
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !shipper.value}">
                         <label required>Shipper</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
-                            [currentActiveItemId]="{ field: 'id', value: shipper.value}"
+                            [currentActiveItemId]="{ field: 'id', value: shipper.value,hardValue: shipmmentDetail.supp}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
                             [displayFields]="displayFieldsCustomer" [height]="150">
                         </app-combo-grid-virtual-scroll>
@@ -231,8 +231,24 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Place and Date of Issue HBL</label>
-                                <input type="text" class="form-control" formControlName="issueHblplaceAndDate">
+                                <label>Place Of Issued</label>
+                                <input type="text" class="form-control" formControlName="issueHblplace">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Date Of Issued</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                        [alwaysShowCalendars]="true" name="daterange" readonly
+                                        formControlName="issueHbldate" />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">

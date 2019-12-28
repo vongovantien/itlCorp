@@ -438,6 +438,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             serviceType: [<CommonInterface.INg2Select>{ id: res.serviceType, text: res.serviceType }],
             hbOfladingType: [<CommonInterface.INg2Select>{ id: res.hbltype, text: res.hbltype }],
         });
+
         this.mindateEta = !!this.mindateEta ? this.createMoment(res.etd) : null;
         this.mindateEtaWareHouse = !!res.eta ? this.createMoment(res.eta) : null;
     }

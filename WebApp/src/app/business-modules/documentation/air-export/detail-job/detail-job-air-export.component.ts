@@ -144,7 +144,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.jobId = res.data.id;
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
@@ -244,7 +243,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
     duplicateConfirm() {
         this.action = { action: 'copy' };
-        this._router.navigate([`home/documentation/air/${this.jobId}`], {
+        this._router.navigate([`home/documentation/air-export/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
         this.confirmDuplicatePopup.hide();
