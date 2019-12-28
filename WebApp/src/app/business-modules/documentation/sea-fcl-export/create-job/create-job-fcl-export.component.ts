@@ -174,6 +174,8 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     showImportPopup() {
+        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLExport;
+        this.formImportJobDetailPopup.getShippments();
         this.formImportJobDetailPopup.show();
     }
 
