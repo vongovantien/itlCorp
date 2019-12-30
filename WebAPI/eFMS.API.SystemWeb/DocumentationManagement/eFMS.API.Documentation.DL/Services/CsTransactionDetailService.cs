@@ -1013,11 +1013,11 @@ namespace eFMS.API.Documentation.DL.Services
                 var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
 
                 var housebill = new HouseAirwayBillLastestReport();
-                housebill.MAWB = string.Empty; //NOT USE
+                housebill.MAWB = data.Mawb; //NOT USE
                 housebill.HWBNO = data.Hwbno; //Housebill No
                 housebill.ATTN = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription); //ShipperName & Address
                 housebill.ISSUED = string.Empty; //NOT USE
-                housebill.ConsigneeID = string.Empty; //NOT USE
+                housebill.ConsigneeID = data.ConsigneeId; //NOT USE
                 housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription); //Consignee & Address
                 housebill.ICASNC = string.Empty; //NOT USE
                 housebill.AccountingInfo = "FREIGHT " + data.FreightPayment; //'FREIGHT ' + Air Freight
@@ -1068,8 +1068,8 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
                 housebill.Ttal = data.Total != null ? data.Total.ToString() : string.Empty;
                 housebill.Description = data.DesOfGoods; //Natural and Quality Goods
-                housebill.WghtPP = string.Empty; //Chưa biết
-                housebill.WghtCC = string.Empty; //Chưa biết
+                housebill.WghtPP = string.Empty; //Chưa biết (chưa sửa) - WT (prepaid)
+                housebill.WghtCC = string.Empty; //Chưa biết (chưa sửa) - WT (Collect
                 housebill.ValChPP = string.Empty; //NOT USE
                 housebill.ValChCC = string.Empty; //NOT USE
                 housebill.TxPP = string.Empty; //NOT USE

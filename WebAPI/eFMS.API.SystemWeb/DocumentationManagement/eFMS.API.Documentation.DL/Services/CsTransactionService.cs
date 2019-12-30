@@ -433,24 +433,24 @@ namespace eFMS.API.Documentation.DL.Services
                         BranchId = masterBill.BranchId,
                         JobNo = masterBill.JobNo,
                         Mawb = masterBill.Mawb,
-                        TypeOfService = masterBill.TypeOfService,
+                        //TypeOfService = masterBill.TypeOfService,
                         Etd = masterBill.Etd,
                         Eta = masterBill.Eta,
                         ServiceDate = masterBill.ServiceDate,
-                        Mbltype = masterBill.Mbltype,
+                        //Mbltype = masterBill.Mbltype,
                         ColoaderId = masterBill.ColoaderId,
                         SubColoader = masterBill.SubColoader,
-                        BookingNo = masterBill.BookingNo,
+                        //BookingNo = masterBill.BookingNo,
                         AgentId = masterBill.AgentId,
                         Pol = masterBill.Pol,
                         Pod = masterBill.Pod,
                         DeliveryPlace = masterBill.DeliveryPlace,
-                        PaymentTerm = masterBill.PaymentTerm,
-                        FlightVesselName = masterBill.FlightVesselName,
-                        VoyNo = masterBill.VoyNo,
-                        ShipmentType = masterBill.ShipmentType,
-                        Commodity = masterBill.Commodity,
-                        DesOfGoods = masterBill.DesOfGoods,
+                        //PaymentTerm = masterBill.PaymentTerm,
+                        //FlightVesselName = masterBill.FlightVesselName,
+                        //VoyNo = masterBill.VoyNo,
+                        //ShipmentType = masterBill.ShipmentType,
+                        //Commodity = masterBill.Commodity,
+                        //DesOfGoods = masterBill.DesOfGoods,
                         PackageContainer = masterBill.PackageContainer,
                         Pono = masterBill.Pono,
                         PersonIncharge = masterBill.PersonIncharge,
@@ -458,16 +458,16 @@ namespace eFMS.API.Documentation.DL.Services
                         GrossWeight = masterBill.GrossWeight,
                         ChargeWeight = masterBill.ChargeWeight,
                         Cbm = masterBill.Cbm,
-                        Notes = masterBill.Notes,
+                        //Notes = masterBill.Notes,
                         TransactionType = masterBill.TransactionType,
                         UserCreated = masterBill.UserCreated,
-                        IsLocked = masterBill.IsLocked,
-                        LockedDate = masterBill.LockedDate,
+                        //IsLocked = masterBill.IsLocked,
+                        //LockedDate = masterBill.LockedDate,
                         DatetimeCreated = masterBill.DatetimeCreated,
                         UserModified = masterBill.UserModified,
                         DatetimeModified = masterBill.DatetimeModified,
-                        Active = masterBill.Active,
-                        InactiveOn = masterBill.InactiveOn,
+                        //Active = masterBill.Active,
+                        //InactiveOn = masterBill.InactiveOn,
                         SupplierName = coloader.ShortName,
                         AgentName = agent.ShortName,
                         HWBNo = houseBill.Hwbno,
@@ -478,7 +478,11 @@ namespace eFMS.API.Documentation.DL.Services
                         POLName = pol.NameEn,
                         CreatorName = creator.Username,
                         HblId = houseBill.Id == Guid.Empty || false ? Guid.Empty : houseBill.Id,
-                        PackageQty = masterBill.PackageQty
+                        PackageQty = masterBill.PackageQty,
+                        //PackageType = masterBill.PackageType,
+                        //FlightDate = masterBill.FlightDate,
+                        //Hw = masterBill.Hw,
+                        //Hwconstant = masterBill.Hwconstant
                     };
 
             return query;
@@ -574,11 +578,11 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QueryAE(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            var containers = csMawbcontainerRepo.Get();
+            //var containers = csMawbcontainerRepo.Get();
             var surcharges = csShipmentSurchargeRepo.Get();
             var query = (from transaction in listSearch
-                         join container in containers on transaction.Id equals container.Mblid into containerTrans
-                         from cont in containerTrans.DefaultIfEmpty()
+                         //join container in containers on transaction.Id equals container.Mblid into containerTrans
+                         //from cont in containerTrans.DefaultIfEmpty()
                          join surcharge in surcharges on transaction.HblId equals surcharge.Hblid into surchargeTrans
                          from sur in surchargeTrans.DefaultIfEmpty()
                          select new
@@ -652,11 +656,11 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QueryAI(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            var containers = csMawbcontainerRepo.Get();
+            //var containers = csMawbcontainerRepo.Get();
             var surcharges = csShipmentSurchargeRepo.Get();
             var query = (from transaction in listSearch
-                         join container in containers on transaction.Id equals container.Mblid into containerTrans
-                         from cont in containerTrans.DefaultIfEmpty()
+                         //join container in containers on transaction.Id equals container.Mblid into containerTrans
+                         //from cont in containerTrans.DefaultIfEmpty()
                          join surcharge in surcharges on transaction.HblId equals surcharge.Hblid into surchargeTrans
                          from sur in surchargeTrans.DefaultIfEmpty()
                          select new
