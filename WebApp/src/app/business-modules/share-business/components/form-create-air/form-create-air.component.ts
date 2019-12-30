@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { Store } from '@ngrx/store';
 
 import { CatalogueRepo } from '@repositories';
@@ -15,6 +14,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import * as fromStore from './../../store/index';
 import { distinctUntilChanged, takeUntil, skip, mergeMap, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { ActivatedRoute, Params } from '@angular/router';
 @Component({
     selector: 'form-create-air',
     templateUrl: './form-create-air.component.html',
@@ -78,6 +78,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         private _catalogueRepo: CatalogueRepo,
         private _fb: FormBuilder,
         private _store: Store<fromStore.IShareBussinessState>,
+        private _route: ActivatedRoute
     ) {
         super();
     }
@@ -115,6 +116,14 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 (res: CsTransaction) => {
                     if (!!res) {
                         this.shipmentDetail = new CsTransaction(res);
+                        this._route.queryParams.subscribe((param: Params) => {
+                            if (param.action === 'copy') {
+                                res.jobNo = null;
+                                res.etd = null;
+                                res.mawb = null;
+                                res.eta = null;
+                            }
+                        });
                         try {
                             const formData: any = {
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,

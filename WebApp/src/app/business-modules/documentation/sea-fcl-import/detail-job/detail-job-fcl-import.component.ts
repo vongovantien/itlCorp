@@ -163,6 +163,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
+                        this.formCreateComponent.formCreate.controls['jobId'].setValue(this.jobId);
                     } else {
                         this._toastService.error(res.message);
                     }

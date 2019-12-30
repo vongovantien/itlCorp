@@ -17,7 +17,7 @@ import {
 
 import * as fromShareBusiness from './../../../share-business/store';
 
-import { catchError } from 'rxjs/operators';
+import { catchError, skip, takeUntil } from 'rxjs/operators';
 import _merge from 'lodash/merge';
 @Component({
     selector: 'app-create-job-air-export',
@@ -126,9 +126,16 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     onImport(selectedData: any) {
         this.selectedJob = selectedData;
         this.isImport = true;
+        this.formCreateComponent.isUpdate = true;
+        this.formCreateComponent.formGroup.controls['jobNo'].setValue(null);
+        this._store.dispatch(new fromShareBusiness.GetDimensionAction(selectedData.id));
     }
 
     showImportPopup() {
+        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirExport;
+        this.formImportJobDetailPopup.getShippments();
+        this.formImportJobDetailPopup.selected = -1;
+        this.formImportJobDetailPopup.selectedShipment = null;
         this.formImportJobDetailPopup.show();
     }
 

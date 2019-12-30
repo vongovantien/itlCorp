@@ -852,10 +852,10 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.OSI = string.Empty; //Để trống
                 housebill.CheckNullAttach = string.Empty; //Để trống
                 housebill.ReferrenceNo = data.ReferenceNo; //ReferenceNo
-                housebill.Shipper = data.ShipperDescription;//dataShipper?.PartnerNameEn; //Shipper name
+                housebill.Shipper = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription);//dataShipper?.PartnerNameEn; //Shipper name
                 housebill.ConsigneeID = data.ConsigneeId; //NOT USE
-                housebill.Consignee = data.ConsigneeDescription;//dataConsignee?.PartnerNameEn;
-                housebill.Notify = data.NotifyPartyDescription;
+                housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription);//dataConsignee?.PartnerNameEn;
+                housebill.Notify = ReportUltity.ReplaceNullAddressDescription(data.NotifyPartyDescription);
                 housebill.PlaceAtReceipt = data.PickupPlace;// Place of receipt
                 housebill.PlaceDelivery = data.DeliveryPlace;// Place of Delivery
                 housebill.LocalVessel = data.LocalVoyNo;
@@ -979,7 +979,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var parameter = new SeaHBillofLadingReportParams1()
                 {
-                    Packages = string.Empty, //Tạm thời để trống (sao này sẽ thay thế bằng field Package)
+                    Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
                     GrossWeight = data?.GrossWeight.ToString(),
                     Measurement = data?.Cbm.ToString(),
                 };
@@ -992,7 +992,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {
-                    Packages = string.Empty, //Tạm thời để trống (sao này sẽ thay thế bằng field Package)
+                    Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
                     GrossWeight = data?.GrossWeight.ToString(),
                     Measurement = data?.Cbm.ToString(),
                     DocumentNo = string.Empty //Tạm thời để trống
@@ -1015,10 +1015,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var housebill = new HouseAirwayBillLastestReport();
                 housebill.MAWB = string.Empty; //NOT USE
                 housebill.HWBNO = data.Hwbno; //Housebill No
-                housebill.ATTN = data.ShipperDescription; //ShipperName & Address
+                housebill.ATTN = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription); //ShipperName & Address
                 housebill.ISSUED = string.Empty; //NOT USE
                 housebill.ConsigneeID = string.Empty; //NOT USE
-                housebill.Consignee = data.ConsigneeDescription; //Consignee & Address
+                housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription); //Consignee & Address
                 housebill.ICASNC = string.Empty; //NOT USE
                 housebill.AccountingInfo = "FREIGHT " + data.FreightPayment; //'FREIGHT ' + Air Freight
                 housebill.AgentIATACode = string.Empty; //Gán rỗng
@@ -1062,7 +1062,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.GrwDecimal = 2; //NOT USE
                 housebill.Wlbs = data.KgIb; //KgIb
                 housebill.RateClass = string.Empty; //NOT USE
-                housebill.ItemNo = string.Empty; //ComItemNo (chưa sửa) - Commodity Item no
+                housebill.ItemNo = data.ComItemNo; //ComItemNo - Commodity Item no
                 housebill.WChargeable = data.ChargeWeight; //CW
                 housebill.ChWDecimal = 2; //NOT USE
                 housebill.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
@@ -1086,10 +1086,12 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.CCChgDes = string.Empty; //NOT USE
                 housebill.SpecialNote = data.ShippingMark; //Shipping Mark
                 housebill.ShipperCertf = string.Empty; //NOT USE
-                housebill.ExecutedOn = data.IssueHblplace; //Issue On
+                housebill.ExecutedOn = data.IssueHblplace; //Issued On
                 housebill.ExecutedAt = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy") : string.Empty; //Issue At
                 housebill.Signature = string.Empty; //NOT USE
-                housebill.Dimensions = string.Empty; //Chưa biết (chưa sửa) - Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
+                var dimHbl = dimensionDetailService.Get(x => x.Hblid == hblId);
+                string _dimensions = string.Join("\r\n", dimHbl.Select(s => s.Length + "*" + s.Width + "*" + s.Height + "*" + s.Package)); 
+                housebill.Dimensions = _dimensions; //Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
                 housebill.ShipPicture = null; //NOT USE
                 housebill.PicMarks = string.Empty; //Gán rỗng
                 housebill.GoodsDelivery = string.Empty; //Chưa biết

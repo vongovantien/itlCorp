@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { AirExportCreateJobComponent } from '../create-job/create-job-air-export.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { DIM, CsTransaction } from '@models';
 
@@ -28,6 +28,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
+    @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
@@ -96,10 +97,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.formCreateComponent.isUpdate = true;
                         // * reset field duplicate
                         if (this.ACTION === "COPY") {
-                            this.resetFormControl(this.formCreateComponent.etd);
-                            this.resetFormControl(this.formCreateComponent.mawb);
-                            this.resetFormControl(this.formCreateComponent.eta);
                             this.formCreateComponent.getUserLogged();
+                            this.headerComponent.resetBreadcrumb("Create Job");
                         }
                     }
                 },
@@ -147,6 +146,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
+                        this.formCreateComponent.formGroup.controls['jobId'].setValue(this.jobId);
                     } else {
                         this._toastService.error(res.message);
                     }

@@ -232,6 +232,13 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("ImportMulti")]
+        public IActionResult ImportMulti()
+        {
+            var s = csTransactionService.ImportMulti();
+            return Ok();
+        }
+
         /// <summary>
         /// Preview PLsheet of Sea FCL Import
         /// </summary>
