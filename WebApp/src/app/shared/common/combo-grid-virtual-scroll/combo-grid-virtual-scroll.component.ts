@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -18,6 +18,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Input() isTooltip: boolean = false;
     @Input() placeholder: string = '';
     @Output() itemSelected = new EventEmitter<any>();
+    @ViewChild('inputSearch',{static: true}) inputSearch: ElementRef;
 
     currentItemSelected: any = null;
     CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = null;
@@ -189,5 +190,11 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
 
     getValue(item: any, field: string) {
         return item[field] || null;
+    }
+    
+    clickSearch(){
+        if(this.inputSearch){
+            setTimeout(() => this.inputSearch.nativeElement.focus(), 0);
+        }
     }
 }
