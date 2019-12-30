@@ -12,10 +12,11 @@ import { AirExportHBLFormCreateComponent } from '../components/form-create-house
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { catchError, finalize } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
-import { SystemConstants } from 'src/constants/system.const';
 import { HouseBill } from '@models';
 
 import _merge from 'lodash/merge';
+import { AbstractControl } from '@angular/forms';
+import { AirExportHBLAttachListComponent } from '../components/attach-list/attach-list-house-bill-air-export.component';
 @Component({
     selector: 'app-create-hbl-air-export',
     templateUrl: './create-house-bill.component.html',
@@ -24,6 +25,8 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(AirExportHBLFormCreateComponent, { static: false }) formCreateHBLComponent: AirExportHBLFormCreateComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(AirExportHBLAttachListComponent, { static: false }) attachListComponent: AirExportHBLAttachListComponent;
+
     jobId: string;
 
     constructor(
@@ -55,11 +58,10 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
-        console.log(form);
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
-            issueHBLDate: !!form.issueHBLDate ? formatDate(form.issueHBLDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            issueHbldate: !!form.issueHbldate ? formatDate(form.issueHbldate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? form.originBlnumber[0].id : null,
@@ -76,10 +78,13 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             pol: form.pol,
             pod: form.pod,
             forwardingAgentId: form.forwardingAgent,
+
+            cbm: this.formCreateHBLComponent.totalCBM,
+            hw: this.formCreateHBLComponent.totalHeightWeight,
+            attachList: this.attachListComponent.attachList,
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
-        console.log(houseBill);
         return houseBill;
     }
 
@@ -87,30 +92,30 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
 
-        // if (!this.checkValidateForm()) {
-        //     this.infoPopup.show();
-        //     return;
-        // }
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
 
         const houseBill: HouseBill = this.getDataForm();
         houseBill.jobId = this.jobId;
 
-        // this.createHbl(modelAdd);
-
+        this.createHbl(houseBill);
     }
 
     checkValidateForm() {
         let valid: boolean = true;
 
-        this.setError(this.formCreateHBLComponent.hbltype);
-        this.setError(this.formCreateHBLComponent.otherPayment);
-        this.setError(this.formCreateHBLComponent.originBlnumber);
-        this.setError(this.formCreateHBLComponent.currencyId);
-        this.setError(this.formCreateHBLComponent.freightPayment);
-        this.setError(this.formCreateHBLComponent.wTorVALPayment);
+        [this.formCreateHBLComponent.hbltype,
+        this.formCreateHBLComponent.otherPayment,
+        this.formCreateHBLComponent.originBlnumber,
+        this.formCreateHBLComponent.currencyId,
+        this.formCreateHBLComponent.freightPayment,
+        this.formCreateHBLComponent.wTorVALPayment].forEach((control: AbstractControl) => this.setError(control));;
 
-
-        if (!this.formCreateHBLComponent.formCreate.valid) {
+        if (!this.formCreateHBLComponent.formCreate.valid
+            || (!!this.formCreateHBLComponent.etd.value && !this.formCreateHBLComponent.etd.value.startDate)
+        ) {
             valid = false;
         }
         return valid;

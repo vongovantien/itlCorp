@@ -1,4 +1,5 @@
 import { BaseModel } from "../base.model";
+import { DIM } from "./dimension";
 
 export class HouseBill extends BaseModel {
     id: string = '00000000-0000-0000-0000-000000000000';
@@ -110,14 +111,38 @@ export class HouseBill extends BaseModel {
     wTorVALPayment: string = null;
     otherPayment: string = null;
     flightDate: string = null;
-
+    otherCharge: string = null;
+    wtpp: string = null;
+    valpp: string = null;
+    taxpp: string = null;
+    dueAgentPp: string = null;
+    dueCarrierPp: string = null;
+    totalPp: string = null;
+    wtcll: string = null;
+    valcll: string = null;
+    taxcll: string = null;
+    dueAgentCll: string = null;
+    dueCarrierCll: string = null;
+    totalCll: string = null;
+    issuedBy: string = null;
+    sci: string = null;
+    currConvertRate: string = null;
+    ccchargeInDrc: string = null;
+    attachList: string = null;
+    dimensionDetails: DIM[] = [];
+    hw: number = null;
 
     constructor(object?: any) {
         super();
         const self = this;
+        // tslint:disable-next-line: forin
         for (const key in object) {
             if (self.hasOwnProperty(key.toString())) {
                 self[key] = object[key];
+            }
+
+            if (!!self.dimensionDetails.length) {
+                self.dimensionDetails = object.dimensionDetails.map((i: DIM) => new DIM(i));
             }
         }
     }
