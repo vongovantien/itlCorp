@@ -9,4 +9,10 @@
             border: 0;
         }
     }
+
+    .table-dims-wrapper {
+        width: 100%;
+        max-height: 170px;
+        overflow-y: scroll;
+    }
 }

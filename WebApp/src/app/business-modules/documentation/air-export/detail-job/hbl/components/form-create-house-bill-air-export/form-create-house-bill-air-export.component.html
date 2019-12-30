@@ -3,13 +3,13 @@
         <form class="m-form m-form--state" [formGroup]="formCreate">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mawb.value}">
                         <label required>Master Air Waybill</label>
                         <input type="text" class="form-control" formControlName="mawb">
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !customerId.value}">
                         <label required>Customer (Payer)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [currentActiveItemId]="{ field: 'id', value: customerId.value}"
@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !saleManId.value}">
                         <label required>Salesman In Charge</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'sale')"
                             [currentActiveItemId]="{ field: 'id', value: saleManId.value}"
@@ -33,7 +33,7 @@
             </div>
             <div class="row div-inside bg-secondary">
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !shipperId.value}">
                         <label required>Shipper</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
                             [currentActiveItemId]="{ field: 'id', value: shipperId.value}"
@@ -72,13 +72,15 @@
                 <div class="col-md-4">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':isSubmitted && !hwbno.value}">
                                 <label required>HAWB No</label>
-                                <input type="text" class="form-control" formControlName="hawb">
+                                <input type="text" class="form-control" formControlName="hwbno">
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':isSubmitted && !hbltype.value}">
                                 <label required>HAWB Type</label>
                                 <ng-select #hawbType [items]="billTypes" placeholder="Please select" [allowClear]="true"
                                     (opened)="closeOtherSelects(hawbType)" formControlName="hbltype"
@@ -91,7 +93,8 @@
                 <div class="col-md-4">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted && !etd.value) || (isSubmitted && !etd.value.startDate)}">
                                 <label required>ETD</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -404,7 +407,6 @@
                             <div class="form-group">
                                 <label>Rate Charge</label>
                                 <input type="number" class="form-control">
-
                             </div>
                         </div>
                     </div>
@@ -434,30 +436,103 @@
                     </div>
 
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-8">
                     <div class="row">
                         <div class="col">Volume</div>
-                        <div class="text-primary">123123</div>
-                        <div class="text-primary">123123</div>
+                        <div class="col text-center">
+                            HW: &nbsp;
+                            <span class="text-primary">{{totalHeightWeight}}</span>
+                        </div>
+                        <div class="col text-right">
+                            CBM:&nbsp;
+                            <span class="text-primary">{{totalCBM}}</span>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="tabel-wrapper table-fixed w-100">
+                            <div class="table-head-fixed">
+                                <div class="table-header">
+                                    <table class="table table-bordered bg-white">
+                                        <thead class="table-borderless text-center">
+                                            <tr>
+                                                <th>L</th>
+                                                <th>W</th>
+                                                <th>H</th>
+                                                <th>PCS</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-dims-wrapper" (clickOutside)="selectedIndexDIM = -1">
+                            <table class="table table-bordered bg-white table-prepaid-collect">
+                                <tbody>
+                                    <ng-container formArrayName="dimensionDetails"
+                                        *ngFor="let item of formCreate?.get('dimensionDetails')['controls']; let j = index;">
+                                        <ng-container [formGroupName]="j">
+                                            <tr (click)="selectDIM(j)" [class.selected-row]="selectedIndexDIM === j">
+                                                <td>
+                                                    <input type="number" class="form-control" formControlName="length">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control" formControlName="width">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control" formControlName="height">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control" formControlName="package">
+                                                </td>
+                                                <td>
+                                                    <a class="btn m-btn--icon m-btn--icon-only m--font-danger"
+                                                        title="Delete" (click)="deleteDIM(j)">
+                                                        <i class="fa fa-times fa-lg"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+                                    </ng-container>
+                                    <tr app-table-none-record
+                                        *ngIf="!formCreate?.get('dimensionDetails')['controls'].length"></tr>
+                                    <tr>
+                                        <td colspan=1>
+                                            <a class="btn m-btn--icon m-btn--icon-only m--font-success" title="Add"
+                                                (click)="addDIM()">
+                                                <i class="fa fa-plus-circle fa-2x"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
+                <!-- * /DIM -->
+
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label>Nature and Quality of Goods</label>
-                        <textarea cols="30" rows="10" class="form-control"
-                            formControlName="handingInformation"></textarea>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>Nature and Quality of Goods</label>
+                                <textarea cols="30" rows="4" class="form-control"
+                                    formControlName="desOfGoods"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>Other Charge</label>
+                                <textarea cols="30" rows="5" class="form-control"
+                                    formControlName="otherCharge"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label>Other Charge</label>
-                        <textarea cols="30" rows="10" class="form-control"
-                            formControlName="handingInformation"></textarea>
-                    </div>
-                </div>
+
                 <div class="col-md-12 mt-3 mb-3">
                     <table class="table table-bordered bg-white table-prepaid-collect">
-                        <thead class="table-borderless">
+                        <thead class="table-borderless text-center">
                             <tr>
                                 <th></th>
                                 <th>WT</th>
@@ -469,56 +544,59 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr (click)="selectedPrepaid = true" [class.selected-row]="selectedPrepaid"
+                                (clickOutside)="selectedPrepaid = false;">
                                 <td class="font-weight-normal">Prepaid</td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="wtpp">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="valpp">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="taxpp">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="dueAgentPp">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="dueCarrierPp">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="totalPp">
                                 </td>
                             </tr>
-                            <tr>
+                            <tr (click)="selectedCollect = true" [class.selected-row]="selectedCollect"
+                                (clickOutside)="selectedCollect = false;">
                                 <td>Collect</td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="wtcll">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="valcll">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="taxcll">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="dueAgentCll">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="dueCarrierCll">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="totalCll">
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                <!--* /Prepaid-Collecy -->
+
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Shipping Mark</label>
-                        <textarea cols="30" rows="5" class="form-control"
-                            formControlName="handingInformation"></textarea>
+                        <textarea cols="30" rows="5" class="form-control" formControlName="shippingMark"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -526,13 +604,13 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Issue By</label>
-                                <input type="text" class="form-control" formControlName="issueHblplace">
+                                <input type="text" class="form-control" formControlName="issuedBy">
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>SCI</label>
-                                <input type="text" class="form-control" formControlName="issueHblplace">
+                                <input type="text" class="form-control" formControlName="sci">
                             </div>
                         </div>
                     </div>
@@ -542,13 +620,13 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Curr Convert Rate</label>
-                                <input type="text" class="form-control" formControlName="issueHblplace">
+                                <input type="text" class="form-control" formControlName="currConvertRate">
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>CC Charge in Drc</label>
-                                <input type="text" class="form-control" formControlName="issueHblplace">
+                                <input type="text" class="form-control" formControlName="ccchargeInDrc">
                             </div>
                         </div>
                     </div>

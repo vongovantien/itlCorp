@@ -13,6 +13,9 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { AirExportHBLComponent } from './air-export-hbl.component';
 import { AirExportCreateHBLComponent } from './create/create-house-bill.component';
 import { AirExportHBLFormCreateComponent } from './components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { AirExportHBLAttachListComponent } from './components/attach-list/attach-list-house-bill-air-export.component';
+import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 
 
 const routing: Routes = [
@@ -35,7 +38,10 @@ const LIB = [
     ModalModule.forRoot(),
     TabsModule.forRoot(),
     SelectModule,
-    NgxDaterangepickerMd.forRoot()
+    NgxDaterangepickerMd.forRoot(),
+    PerfectScrollbarModule,
+    FroalaEditorModule.forRoot(),
+
 
 ];
 @NgModule({
@@ -46,6 +52,7 @@ const LIB = [
         FormsModule,
         RouterModule.forChild(routing),
         ReactiveFormsModule,
+
         ...LIB
 
     ],
@@ -53,7 +60,8 @@ const LIB = [
     declarations: [
         AirExportHBLComponent,
         AirExportCreateHBLComponent,
-        AirExportHBLFormCreateComponent
+        AirExportHBLFormCreateComponent,
+        AirExportHBLAttachListComponent
     ],
     providers: [],
 })

@@ -65,7 +65,6 @@ export class CsTransaction {
     hblId: string = "00000000-0000-0000-0000-000000000000";
     packageQty: number = null;
     packageType: string = null;
-    customerName: string = null;
     supp: string = null;
 
     // * AIR
