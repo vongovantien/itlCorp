@@ -13,7 +13,7 @@
         </div>
     </app-sub-header>
     <div class="m-content">
-        <form-search-sea [transaction] = "transactionService" (onSearch)="onSearchMasterBills($event)"></form-search-sea>
+        <form-search-sea [transaction]="transactionService" (onSearch)="onSearchMasterBills($event)"></form-search-sea>
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="table-wrapper table-scrollable" id="masterbill-list-table">
@@ -162,7 +162,7 @@
                         <div class="col-sm-6" *ngIf="totalItems > pageSize">
                             <div class="float-right">
                                 <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
-                                    (pageChanged)="pageChanged($event)" [(ngModel)]="page" [maxSize]="5">
+                                    (pageChanged)="pageChanged($event)" [(ngModel)]="page" [maxSize]=10>
                                 </pagination>
                             </div>
                         </div>
