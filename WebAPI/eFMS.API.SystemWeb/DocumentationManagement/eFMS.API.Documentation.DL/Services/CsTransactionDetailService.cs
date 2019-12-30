@@ -70,7 +70,7 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- INSERT & UPDATE HOUSEBILLS --
         public HandleState AddTransactionDetail(CsTransactionDetailModel model)
         {
-            if (model.CsMawbcontainers.Count > 0)
+            if (model.CsMawbcontainers?.Count > 0)
             {
                 var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, model.Id);
                 if (checkDuplicateCont.Success == false)
@@ -85,7 +85,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.DatetimeModified = model.DatetimeCreated = DateTime.Now;
             model.Active = true;
             string contSealNo = string.Empty;
-            
+
             model.ContSealNo = contSealNo;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -94,7 +94,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var hs = Add(model);
                     if (hs.Success)
                     {
-                        if(model.CsMawbcontainers != null)
+                        if (model.CsMawbcontainers != null)
                         {
                             model.CsMawbcontainers.ForEach(x =>
                             {
@@ -174,7 +174,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Hblid == hb.Id);
                         }
-                        if(model.CsDimensionDetailModels != null)
+                        if (model.CsDimensionDetailModels != null)
                         {
                             var hsDimension = dimensionDetailService.UpdateHouseBill(model.CsDimensionDetailModels, model.Id);
                         }
@@ -437,7 +437,7 @@ namespace eFMS.API.Documentation.DL.Services
                           GW = detail.GrossWeight,
                           PackageContainer = detail.PackageContainer,
                           PackageQty = detail.PackageQty,
-                          PackageType = detail.PackageType, 
+                          PackageType = detail.PackageType,
                           CW = detail.ChargeWeight,
                           DatetimeCreated = detail.DatetimeCreated
                       };
@@ -730,7 +730,7 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = null;
             var _currentUser = currentUser.UserID;
             //var _currentUser = string.Empty;
- 
+
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
@@ -804,10 +804,10 @@ namespace eFMS.API.Documentation.DL.Services
                 documentRelease.Consignee = dataConsignee.PartnerNameEn;
                 documentRelease.HWBNO = data.Hwbno;
                 documentRelease.FlightNo = data.FlightNo;
-                documentRelease.CussignedDate = data.FlightDate; 
+                documentRelease.CussignedDate = data.FlightDate;
                 documentRelease.DepartureAirport = dataPOL?.NameEn;
                 documentRelease.LastDestination = dataPOD?.NameEn;
-                documentRelease.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : "" ;
+                documentRelease.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : "";
                 documentRelease.WChargeable = data.ChargeWeight ?? 0;
                 listDocument.Add(documentRelease);
             }
@@ -1007,7 +1007,7 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = null;
             var data = GetById(hblId);
             var housebills = new List<HouseAirwayBillLastestReport>();
-            if(data != null)
+            if (data != null)
             {
                 var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
                 var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
@@ -1050,7 +1050,7 @@ namespace eFMS.API.Documentation.DL.Services
                     housebill.LastDestination = dataPOL?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
                 }
                 housebill.FlightNo = data.FlightNo; //Flight No
-                housebill.FlightDate =data.FlightDate; //Flight Date
+                housebill.FlightDate = data.FlightDate; //Flight Date
                 housebill.ConnectingFlight = string.Empty; //Để rỗng
                 housebill.ConnectingFlightDate = null; //Gán null
                 housebill.insurAmount = data.IssuranceAmount; //Issurance Amount
@@ -1090,7 +1090,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ExecutedAt = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy") : string.Empty; //Issue At
                 housebill.Signature = string.Empty; //NOT USE
                 var dimHbl = dimensionDetailService.Get(x => x.Hblid == hblId);
-                string _dimensions = string.Join("\r\n", dimHbl.Select(s => s.Length + "*" + s.Width + "*" + s.Height + "*" + s.Package)); 
+                string _dimensions = string.Join("\r\n", dimHbl.Select(s => s.Length + "*" + s.Width + "*" + s.Height + "*" + s.Package));
                 housebill.Dimensions = _dimensions; //Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
                 housebill.ShipPicture = null; //NOT USE
                 housebill.PicMarks = string.Empty; //Gán rỗng
