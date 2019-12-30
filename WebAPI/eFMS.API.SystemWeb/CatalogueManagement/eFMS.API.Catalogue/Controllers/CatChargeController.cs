@@ -15,6 +15,7 @@ using eFMS.API.Common.Helpers;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -35,7 +36,8 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatChargeService catChargeService;
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
-        
+        private readonly IHostingEnvironment _hostingEnvironment;
+
         /// <summary>
         /// constructor
         /// </summary>
@@ -43,12 +45,17 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="service"></param>
         /// <param name="catChargeDefaultAccount"></param>
         /// <param name="imapper"></param>
-        public CatChargeController(IStringLocalizer<LanguageSub> localizer, ICatChargeService service, ICatChargeDefaultAccountService catChargeDefaultAccount, IMapper imapper)
+        public CatChargeController(IStringLocalizer<LanguageSub> localizer, 
+            ICatChargeService service, 
+            ICatChargeDefaultAccountService catChargeDefaultAccount, 
+            IMapper imapper,
+            IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catChargeService = service;
             catChargeDefaultAccountService = catChargeDefaultAccount;
             mapper = imapper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -339,8 +346,9 @@ namespace eFMS.API.Catalogue.Controllers
 
             try
             {
-                string templateName = Templates.CatCharge.ExelImportFileName + Templates.ExelImportEx;
-                var result = await new FileHelper().ExportExcel(templateName);
+                string fileName = Templates.CatCharge.ExelImportFileName + Templates.ExelImportEx;
+                string templateName = _hostingEnvironment.ContentRootPath;
+                var result = await new FileHelper().ExportExcel(templateName, fileName);
                 if (result != null)
                 {
                     return result;

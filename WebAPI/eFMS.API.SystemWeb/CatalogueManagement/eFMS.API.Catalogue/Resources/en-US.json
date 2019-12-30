@@ -76,6 +76,7 @@
   "MSG_CHARGE_CURRENCY_NOT_FOUND": "Currency not found, maybe wrong CurrencyId !|wrong",
   "MSG_CHARGE_TYPE_EMPTY": "Type is not allow to empty!|wrong",
   "MSG_CHARGE_SERVICE_TYPE_EMPTY": "Service type is not allow to empty!|wrong",
+  "MSG_CHARGE_SERVICE_TYPE_NOT_FOUND": "Service type '{0}' is not found!|wrong",
   "MSG_CHARGE_CODE_EMPTY": "Type is not allow to empty!|wrong",
   "MSG_CHARGE_CODE_EXISTED": "Code {0} has been existed!|wrong",
   "MSG_CHARGE_CODE_DUPLICATED": "Code {0} has been duplicated!|wrong",
