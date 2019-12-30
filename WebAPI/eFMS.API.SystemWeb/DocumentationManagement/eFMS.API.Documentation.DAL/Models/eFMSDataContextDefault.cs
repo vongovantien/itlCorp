@@ -2573,6 +2573,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("CBM")
                     .HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.CcchargeInDrc)
+                    .HasColumnName("CCChargeInDrc")
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ChargeWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Chgs)
@@ -2717,6 +2721,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("HBLType")
                     .HasMaxLength(20)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Hw)
+                    .HasColumnName("HW")
+                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Hwbno)
                     .HasColumnName("HWBNo")
