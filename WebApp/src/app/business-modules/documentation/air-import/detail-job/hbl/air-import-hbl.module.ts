@@ -1,0 +1,53 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
+import { PaginationModule, TabsModule, ModalModule } from 'ngx-bootstrap';
+import { SelectModule } from 'ng2-select';
+
+import { SharedModule } from 'src/app/shared/shared.module';
+import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
+import { ChargeConstants } from 'src/constants/charge.const';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { AirImportHBLComponent } from './air-import-hbl.component';
+
+
+
+const routing: Routes = [
+    {
+        path: '', component: AirImportHBLComponent,
+        data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.AI_CODE }
+    }
+    // {
+    //     path: ':hblId', component: SeaFCLExportDetailHBLComponent,
+    //     data: { name: 'House Bill Detail', path: ':id', level: 5 }
+    // }
+];
+
+const LIB = [
+    PaginationModule.forRoot(),
+    ModalModule.forRoot(),
+    TabsModule.forRoot(),
+    SelectModule,
+    NgxDaterangepickerMd.forRoot()
+
+];
+@NgModule({
+    imports: [
+        CommonModule,
+        SharedModule,
+        ShareBussinessModule,
+        FormsModule,
+        RouterModule.forChild(routing),
+        ReactiveFormsModule,
+        ...LIB
+
+    ],
+    exports: [],
+    declarations: [
+        AirImportHBLComponent
+    ],
+    providers: [],
+})
+export class AirImportHBLModule { }
