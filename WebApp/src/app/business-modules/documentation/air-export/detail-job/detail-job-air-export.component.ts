@@ -146,6 +146,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
+                        this.formCreateComponent.formGroup.controls['jobId'].setValue(this.jobId);
                     } else {
                         this._toastService.error(res.message);
                     }

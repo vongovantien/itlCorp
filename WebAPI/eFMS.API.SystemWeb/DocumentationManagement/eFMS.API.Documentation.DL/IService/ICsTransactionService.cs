@@ -13,6 +13,7 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICsTransactionService : IRepositoryBase<CsTransaction, CsTransactionModel>
     {
+        ResultHandle ImportMulti();
         IQueryable<CsTransactionModel> Query(CsTransactionCriteria criteria);
         List<CsTransactionModel> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount);
         CsTransactionModel GetById(Guid id);

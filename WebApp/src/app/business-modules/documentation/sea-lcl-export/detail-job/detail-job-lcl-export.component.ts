@@ -141,6 +141,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
+                        this.formCreateComponent.formGroup.controls['jobId'].setValue(this.jobId);
                     } else {
                         this._toastService.error(res.message);
                     }
