@@ -763,7 +763,7 @@ namespace eFMS.API.Accounting.DL.Services
             var chargeShipmentList = GetChargesShipmentByCriteria(criteria);
             var result = new ChargeShipmentResult
             {
-                ChargeShipments = chargeShipmentList.ToList(),
+                ChargeShipments = chargeShipmentList.Take(50).ToList(),
                 TotalShipment = chargeShipmentList.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count(),
                 TotalCharge = chargeShipmentList.Count(),
                 AmountDebitLocal = chargeShipmentList.Sum(x => x.AmountDebitLocal),
@@ -988,14 +988,14 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.StrCodes))
             {
                 //Chỉ lấy ra những charge có SOANo (Để hạn chế việc join & get data không cần thiết)
-                var charge = GetChargeShipmentDocAndOperation().Where(x => !string.IsNullOrEmpty(x.SOANo));
+                //var charge = GetChargeShipmentDocAndOperation().Where(x => !string.IsNullOrEmpty(x.SOANo));
                 var listCode = criteria.StrCodes.Split(',').Where(x => x.ToString() != string.Empty).ToList();
                 List<string> refNo = new List<string>();
                 refNo = (from s in soa
-                         join chg in charge on s.Soano equals chg.SOANo into chg2
+                         join chg in csShipmentSurchargeRepo.Get() on s.Soano equals (chg.PaySoano ?? chg.Soano) into chg2
                          from chg in chg2.DefaultIfEmpty()
                          where
-                             listCode.Contains(s.Soano) || listCode.Contains(chg.JobId) || listCode.Contains(chg.MBL) || listCode.Contains(chg.HBL)
+                             listCode.Contains(s.Soano) || listCode.Contains(chg.JobNo) || listCode.Contains(chg.Mblno) || listCode.Contains(chg.Hblno)
                          select s.Soano).ToList();
                 soa = soa.Where(x => refNo.Contains(x.Soano));
             }
