@@ -10,6 +10,7 @@ import { SOASearchCharge } from 'src/app/shared/models';
 import _includes from 'lodash/includes';
 import _uniq from 'lodash/uniq';
 import { StatementOfAccountFormCreateComponent } from '../components/form-create-soa/form-create-soa.component';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'app-statement-of-account-new',
@@ -40,9 +41,11 @@ export class StatementOfAccountAddnewComponent extends AppList {
         private _accountRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
+        private _progressService: NgProgress,
     ) {
         super();
         this.requestSort = this.sortLocal;
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -116,8 +119,12 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 creatorShipment: this.dataSearch.strCreators,
                 commodityGroupId: this.dataSearch.commodityGroupId
             };
+            this._progressRef.start();
             this._accountRepo.createSOA(body)
-                .pipe(catchError(this.catchError))
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { this._progressRef.complete(); })
+                )
                 .subscribe(
                     (res: any) => {
                         if (res.status) {
