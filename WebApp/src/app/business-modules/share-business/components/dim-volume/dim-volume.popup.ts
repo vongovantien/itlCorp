@@ -21,7 +21,7 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
 
     dims: DIM[] = [];
 
-    hwContstant: number = SystemConstants.HW_AIR_CONSTANT; // ? 6000
+    hwConstant: number = SystemConstants.HW_AIR_CONSTANT; // ? 6000
     cbmConstant: number = SystemConstants.CBM_AIR_CONSTANT; // ? 166.67
 
     totalHW: number = null;
@@ -83,8 +83,10 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
     }
 
     updateHeightWeight(dimItem: DIM) {
-        dimItem.hw = +((dimItem.length * dimItem.height * dimItem.width / this.hwContstant) * dimItem.package).toFixed(3);
-        dimItem.cbm = +((dimItem.length * dimItem.height * dimItem.width / this.hwContstant / this.cbmConstant) * dimItem.package).toFixed(3);
+        // dimItem.hw = +((dimItem.length * dimItem.height * dimItem.width / this.hwContstant) * dimItem.package).toFixed(3);
+        // dimItem.cbm = +((dimItem.length * dimItem.height * dimItem.width / this.hwContstant / this.cbmConstant) * dimItem.package).toFixed(3);
+        dimItem.hw = this.utility.calculateHeightWeight(dimItem.width, dimItem.height, dimItem.length, dimItem.package, this.hwConstant);
+        dimItem.cbm = this.utility.calculateCBM(dimItem.width, dimItem.height, dimItem.length, dimItem.package, this.hwConstant);
 
         this.updateTotalHeightWeight();
         this.updateCBM();
@@ -103,7 +105,7 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
     }
 
     updateCBM() {
-        this.totalCBM = this.dims.reduce((acc: number, curr: DIM) => acc += curr.cbm, 0);
+        this.totalCBM = +this.dims.reduce((acc: number, curr: DIM) => acc += curr.cbm, 0).toFixed(3);
     }
 
     checkValidate() {

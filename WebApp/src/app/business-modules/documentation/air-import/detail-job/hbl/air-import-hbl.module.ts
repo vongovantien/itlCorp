@@ -10,21 +10,19 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { AirExportHBLComponent } from './air-export-hbl.component';
-import { AirExportCreateHBLComponent } from './create/create-house-bill.component';
-import { AirExportHBLFormCreateComponent } from './components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
-import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
-import { AirExportHBLAttachListComponent } from './components/attach-list/attach-list-house-bill-air-export.component';
-import { FroalaEditorModule } from 'angular-froala-wysiwyg';
+import { AirImportHBLComponent } from './air-import-hbl.component';
+import { AirImportHBLFormCreateComponent } from './components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
+import { AirImportCreateHBLComponent } from './create/create-house-bill.component';
+
 
 
 const routing: Routes = [
     {
-        path: '', component: AirExportHBLComponent,
-        data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.SFE_CODE }
+        path: '', component: AirImportHBLComponent,
+        data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.AI_CODE }
     },
     {
-        path: 'new', component: AirExportCreateHBLComponent,
+        path: 'new', component: AirImportCreateHBLComponent,
         data: { name: 'New House Bill Detail', path: ':id', level: 5 }
     },
     // {
@@ -38,10 +36,7 @@ const LIB = [
     ModalModule.forRoot(),
     TabsModule.forRoot(),
     SelectModule,
-    NgxDaterangepickerMd.forRoot(),
-    PerfectScrollbarModule,
-    FroalaEditorModule.forRoot(),
-
+    NgxDaterangepickerMd.forRoot()
 
 ];
 @NgModule({
@@ -52,17 +47,15 @@ const LIB = [
         FormsModule,
         RouterModule.forChild(routing),
         ReactiveFormsModule,
-
         ...LIB
 
     ],
     exports: [],
     declarations: [
-        AirExportHBLComponent,
-        AirExportCreateHBLComponent,
-        AirExportHBLFormCreateComponent,
-        AirExportHBLAttachListComponent
+        AirImportHBLComponent,
+        AirImportHBLFormCreateComponent,
+        AirImportCreateHBLComponent
     ],
     providers: [],
 })
-export class AirExportHBLModule { }
+export class AirImportHBLModule { }

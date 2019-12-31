@@ -1,3 +1,5 @@
+import { SystemConstants } from "src/constants/system.const";
+
 export class UtilityHelper {
     prepareNg2SelectData(dataSource: any[], id: any, text: any): CommonInterface.INg2Select[] {
         return dataSource.map((item: any) => {
@@ -34,5 +36,13 @@ export class UtilityHelper {
         });
 
         return seenDuplicate;
+    }
+
+    calculateHeightWeight(width: number, height: number, length: number, packg: number, hwConstant: number) {
+        return +((width * height * length / hwConstant) * packg).toFixed(3);
+    }
+
+    calculateCBM(width: number, height: number, length: number, packg: number, hwConstant: number) {
+        return +((width * height * length / hwConstant / SystemConstants.CBM_AIR_CONSTANT) * packg).toFixed(3);
     }
 }

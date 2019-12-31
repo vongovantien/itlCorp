@@ -11,24 +11,26 @@ import { ShareBussinessModule } from '../../share-business/share-bussines.module
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { AirImportComponent } from './air-import.component';
 import { AirImportLazyLoadModule } from './air-import-lazy-load.module';
+import { AirImportCreateJobComponent } from './create-job/create-job-air-import.component';
+import { AirImportDetailJobComponent } from './detail-job/detail-job-air-import.component';
 
 const routing: Routes = [
     {
         path: '', pathMatch: 'full', component: AirImportComponent, data: {
-            name: "Air Import", path: "air-export", level: 2
+            name: "Air Import", path: "air-import", level: 2
         },
     },
-    // {
-    //     path: 'new', component: AirImportCreateJobComponent,
-    //     data: { name: "Create New Job", path: "new", level: 3 }
-    // },
-    // {
-    //     path: ':jobId', component: AirImportDetailJobComponent,
-    //     data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.AirImport },
-    // },
-    // {
-    //     path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/Air-import-hbl.module').then(m => m.AirImportHBLModule),
-    // },
+    {
+        path: 'new', component: AirImportCreateJobComponent,
+        data: { name: "Create New Job", path: "new", level: 3 }
+    },
+    {
+        path: ':jobId', component: AirImportDetailJobComponent,
+        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.AirImport },
+    },
+    {
+        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/Air-import-hbl.module').then(m => m.AirImportHBLModule),
+    },
     // {
     //     path: ':id/manifest', component: AirImportManifestComponent,
     //     data: { name: "Manifest", path: ":id", level: 4 },
@@ -62,7 +64,9 @@ const LIB = [
     ],
     exports: [],
     declarations: [
-        AirImportComponent
+        AirImportComponent,
+        AirImportCreateJobComponent,
+        AirImportDetailJobComponent
     ],
     providers: [],
 })

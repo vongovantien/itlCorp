@@ -65,6 +65,7 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? ChargeWeight { get; set; }
         public decimal? Cbm { get; set; }
         public int? PackageQty { get; set; }
+        public decimal? Hw { get; set; }
         public short? PackageType { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
@@ -113,6 +114,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string Sci { get; set; }
         public string OtherCharge { get; set; }
         public string CurrConvertRate { get; set; }
+        public string CcchargeInDrc { get; set; }
         public string Wtpp { get; set; }
         public string Valpp { get; set; }
         public string Taxpp { get; set; }

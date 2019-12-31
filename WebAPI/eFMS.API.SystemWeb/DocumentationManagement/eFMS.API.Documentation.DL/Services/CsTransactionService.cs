@@ -1225,7 +1225,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 Guid jobId = new Guid("3c4fdc20-85b7-4d66-9b5c-adb0a08aeb20");
                 var transaction = DataContext.Get(x => x.Id == jobId).FirstOrDefault();
-                for (int i = 0; i < 5000; i++)
+                for (int i = 0; i < 90000; i++)
                 {
                     transaction.Id = Guid.NewGuid();
                     transaction.JobNo = CreateJobNoByTransactionType(TransactionTypeEnum.SeaFCLImport, transaction.TransactionType);

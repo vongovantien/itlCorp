@@ -8,26 +8,27 @@ import { ToastrService } from 'ngx-toastr';
 
 
 import * as fromShareBussiness from './../../../../../share-business/store';
-import { AirExportHBLFormCreateComponent } from '../components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
-import { HouseBill } from '@models';
+import { HouseBill, DeliveryOrder } from '@models';
 
 import _merge from 'lodash/merge';
-import { AbstractControl } from '@angular/forms';
-import { AirExportHBLAttachListComponent } from '../components/attach-list/attach-list-house-bill-air-export.component';
+import { AirImportHBLFormCreateComponent } from '../components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from '@share-bussiness';
+import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 @Component({
-    selector: 'app-create-hbl-air-export',
+    selector: 'app-create-hbl-air-import',
     templateUrl: './create-house-bill.component.html',
 })
-export class AirExportCreateHBLComponent extends AppForm implements OnInit {
-    @ViewChild(AirExportHBLFormCreateComponent, { static: false }) formCreateHBLComponent: AirExportHBLFormCreateComponent;
+export class AirImportCreateHBLComponent extends AppForm implements OnInit {
+    @ViewChild(AirImportHBLFormCreateComponent, { static: false }) formCreateHBLComponent: AirImportHBLFormCreateComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(AirExportHBLAttachListComponent, { static: false }) attachListComponent: AirExportHBLAttachListComponent;
-
+    @ViewChild(ShareBusinessArrivalNoteComponent, { static: true, }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
+    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     jobId: string;
+    hblDetail: any = {};
 
     constructor(
         protected _progressService: NgProgress,
@@ -51,25 +52,53 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                 if (param.jobId) {
                     this.jobId = param.jobId;
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                    this.getDetailShipment();
                 }
             });
 
     }
 
+    getDetailShipment() {
+        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+                skip(1),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!!res) {
+                        this.hblDetail = res;
+
+                        const objArrival = {
+                            arrivalNo: this.hblDetail.jobNo + "-A01",
+                            arrivalFirstNotice: new Date()
+                        };
+                        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(objArrival);
+
+                        const objDelivery = {
+                            deliveryOrderNo: this.hblDetail.jobNo + "-D01",
+                            deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() }
+                        };
+                        this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
+                    }
+                },
+            );
+    }
+
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
+        console.log(form);
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
-            issueHbldate: !!form.issueHbldate ? formatDate(form.issueHbldate.startDate, 'yyyy-MM-dd', 'en') : null,
+            issueHBLDate: !!form.issueHBLDate ? formatDate(form.issueHBLDate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? form.originBlnumber[0].id : null,
             freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
             hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
-            currencyId: !!form.currencyId && !!form.currencyId.length ? form.currencyId[0].id : null,
-            wTorVALPayment: !!form.wTorVALPayment && !!form.wTorVALPayment.length ? form.wTorVALPayment[0].id : null,
-            otherPayment: !!form.otherPayment && !!form.otherPayment.length ? form.otherPayment[0].id : null,
 
             customerId: form.customer,
             saleManId: form.saleMan,
@@ -78,13 +107,10 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             pol: form.pol,
             pod: form.pod,
             forwardingAgentId: form.forwardingAgent,
-
-            cbm: this.formCreateHBLComponent.totalCBM,
-            hw: this.formCreateHBLComponent.totalHeightWeight,
-            attachList: this.attachListComponent.attachList,
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
+        console.log(houseBill);
         return houseBill;
     }
 
@@ -92,30 +118,27 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
 
-        if (!this.checkValidateForm()) {
-            this.infoPopup.show();
-            return;
-        }
+        // if (!this.checkValidateForm()) {
+        //     this.infoPopup.show();
+        //     return;
+        // }
 
         const houseBill: HouseBill = this.getDataForm();
         houseBill.jobId = this.jobId;
 
-        this.createHbl(houseBill);
+        // this.createHbl(modelAdd);
+
     }
 
     checkValidateForm() {
         let valid: boolean = true;
 
-        [this.formCreateHBLComponent.hbltype,
-        this.formCreateHBLComponent.otherPayment,
-        this.formCreateHBLComponent.originBlnumber,
-        this.formCreateHBLComponent.currencyId,
-        this.formCreateHBLComponent.freightPayment,
-        this.formCreateHBLComponent.wTorVALPayment].forEach((control: AbstractControl) => this.setError(control));;
+        this.setError(this.formCreateHBLComponent.hbltype);
+        this.setError(this.formCreateHBLComponent.originBlnumber);
+        this.setError(this.formCreateHBLComponent.freightPayment);
 
-        if (!this.formCreateHBLComponent.formCreate.valid
-            || (!!this.formCreateHBLComponent.etd.value && !this.formCreateHBLComponent.etd.value.startDate)
-        ) {
+
+        if (!this.formCreateHBLComponent.formCreate.valid) {
             valid = false;
         }
         return valid;
@@ -142,7 +165,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     gotoList() {
-        this._router.navigate([`home/documentation/air-export/${this.jobId}/hbl`]);
+        this._router.navigate([`home/documentation/air-import/${this.jobId}/hbl`]);
     }
 
 }

@@ -17,6 +17,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using AutoMapper.QueryableExtensions;
 using ITL.NetCore.Connection.Caching;
 using System.Linq.Expressions;
+using eFMS.API.Common.Globals;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -263,6 +264,14 @@ namespace eFMS.API.Catalogue.DL.Services
             var currencies = currencyService.Get();
             list.ForEach(item =>
             {
+                if(item.Status == null || item.Status?.ToLower().Trim() == "active")
+                {
+                    item.Active = true;
+                }
+                else
+                {
+                    item.Active = false;
+                }
                 if (string.IsNullOrEmpty(item.ChargeNameEn))
                 {
                     item.ChargeNameEn = stringLocalizer[LanguageSub.MSG_CHARGE_NAME_EN_EMPTY];
@@ -319,6 +328,27 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     item.ServiceTypeId = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_EMPTY];
                     item.IsValid = false;
+                }
+                else
+                {
+                    var services = item.ServiceTypeId.Split(";").Where(x => !string.IsNullOrEmpty(x));
+                    string serviceToAdd = string.Empty;
+                    foreach(var service in services)
+                    {
+                        var dataService = CustomData.Services.FirstOrDefault(x => x.DisplayName.ToLower() == service.ToLower().Trim());
+                        if (dataService == null)
+                        {
+                            item.ServiceTypeId = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_NOT_FOUND, service];
+                            item.IsValid = false;
+                            break;
+                        }
+                        serviceToAdd = serviceToAdd + dataService.Value + ";";
+                    }
+                    if (serviceToAdd.Length > 0)
+                    {
+                        serviceToAdd = serviceToAdd.Substring(0, serviceToAdd.Length - 1);
+                        item.ServiceTypeId = serviceToAdd;
+                    }
                 }
                 if (string.IsNullOrEmpty(item.Code))
                 {

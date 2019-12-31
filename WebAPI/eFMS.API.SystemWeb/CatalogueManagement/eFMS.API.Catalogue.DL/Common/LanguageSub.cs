@@ -93,6 +93,7 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string MSG_CHARGE_CURRENCY_NOT_FOUND = "MSG_CHARGE_CURRENCY_NOT_FOUND";
         public static readonly string MSG_CHARGE_TYPE_EMPTY = "MSG_CHARGE_TYPE_EMPTY";
         public static readonly string MSG_CHARGE_SERVICE_TYPE_EMPTY = "MSG_CHARGE_SERVICE_TYPE_EMPTY";
+        public static readonly string MSG_CHARGE_SERVICE_TYPE_NOT_FOUND = "MSG_CHARGE_SERVICE_TYPE_NOT_FOUND";
         public static readonly string MSG_CHARGE_CODE_EMPTY = "MSG_CHARGE_CODE_EMPTY";
         public static readonly string MSG_CHARGE_CODE_EXISTED = "MSG_CHARGE_CODE_EXISTED";
         public static readonly string MSG_CHARGE_CODE_DUPLICATED= "MSG_CHARGE_CODE_DUPLICATED";

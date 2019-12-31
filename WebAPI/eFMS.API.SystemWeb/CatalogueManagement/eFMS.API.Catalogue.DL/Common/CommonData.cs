@@ -7,9 +7,4 @@ namespace eFMS.API.Catalogue.DL.Common
         public string Value { get; set; }
         public string DisplayName { get; set; }
     }
-
-    public static class CustomData
-    {
-        
-    }
 }
