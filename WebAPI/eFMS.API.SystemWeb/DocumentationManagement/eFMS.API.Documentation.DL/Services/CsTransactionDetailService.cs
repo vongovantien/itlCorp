@@ -1013,11 +1013,11 @@ namespace eFMS.API.Documentation.DL.Services
                 var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
 
                 var housebill = new HouseAirwayBillLastestReport();
-                housebill.MAWB = string.Empty; //NOT USE
+                housebill.MAWB = data.Mawb; //NOT USE
                 housebill.HWBNO = data.Hwbno; //Housebill No
                 housebill.ATTN = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription); //ShipperName & Address
                 housebill.ISSUED = string.Empty; //NOT USE
-                housebill.ConsigneeID = string.Empty; //NOT USE
+                housebill.ConsigneeID = data.ConsigneeId; //NOT USE
                 housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription); //Consignee & Address
                 housebill.ICASNC = string.Empty; //NOT USE
                 housebill.AccountingInfo = "FREIGHT " + data.FreightPayment; //'FREIGHT ' + Air Freight
@@ -1068,20 +1068,20 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
                 housebill.Ttal = data.Total != null ? data.Total.ToString() : string.Empty;
                 housebill.Description = data.DesOfGoods; //Natural and Quality Goods
-                housebill.WghtPP = string.Empty; //Chưa biết
-                housebill.WghtCC = string.Empty; //Chưa biết
+                housebill.WghtPP = data.Wtpp; //WT (prepaid)
+                housebill.WghtCC = data.Wtcll; //WT (Collect)
                 housebill.ValChPP = string.Empty; //NOT USE
                 housebill.ValChCC = string.Empty; //NOT USE
                 housebill.TxPP = string.Empty; //NOT USE
                 housebill.TxCC = string.Empty; //NOT USE
                 housebill.OrchW = data.OtherCharge; //Other Charge
                 housebill.OChrVal = string.Empty; //NOT USE
-                housebill.TTChgAgntPP = string.Empty; //Chưa biết (chưa sửa) - Due to agent (prepaid)
-                housebill.TTChgAgntCC = string.Empty; //Chưa biết (chưa sửa) - Due to agent (Collect)
+                housebill.TTChgAgntPP = data.DueAgentPp; //Due to agent (prepaid)
+                housebill.TTChgAgntCC = data.DueAgentCll; //Due to agent (Collect)
                 housebill.TTCarrPP = string.Empty; //NOT USE
                 housebill.TTCarrCC = string.Empty; //NOT USE
-                housebill.TtalPP = string.Empty; //Chưa biết (chưa sửa) - Total (prepaid)
-                housebill.TtalCC = string.Empty; //Chưa biết (chưa sửa) - Total (Collect)
+                housebill.TtalPP = data.TotalPp; //Total (prepaid)
+                housebill.TtalCC = data.TotalCll; //Total (Collect)
                 housebill.CurConvRate = string.Empty; //NOT USE
                 housebill.CCChgDes = string.Empty; //NOT USE
                 housebill.SpecialNote = data.ShippingMark; //Shipping Mark

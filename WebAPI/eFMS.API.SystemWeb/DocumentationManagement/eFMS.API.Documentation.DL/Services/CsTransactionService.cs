@@ -58,7 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCountry> catCountry,
             ICsMawbcontainerService contService,
             ICsShipmentSurchargeService surService,
-            ICsTransactionDetailService tranDetailService, 
+            ICsTransactionDetailService tranDetailService,
             ICsArrivalFrieghtChargeService arrivalFrieghtChargeService,
             ICsDimensionDetailService dimensionService,
             IContextBase<CsDimensionDetail> dimensionDetailRepo) : base(repository, mapper)
@@ -175,9 +175,10 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsTrans = DataContext.Add(transaction);
                     if (hsTrans.Success)
                     {
-                        if(model.CsMawbcontainers != null)
+                        if (model.CsMawbcontainers != null)
                         {
-                            model.CsMawbcontainers.ForEach(x => {
+                            model.CsMawbcontainers.ForEach(x =>
+                            {
                                 x.Id = Guid.NewGuid();
                                 x.Mblid = transaction.Id;
                                 x.UserModified = transaction.UserCreated;
@@ -185,7 +186,7 @@ namespace eFMS.API.Documentation.DL.Services
                             });
                             var t = containerService.Add(model.CsMawbcontainers);
                         }
-                        if(model.DimensionDetails != null)
+                        if (model.DimensionDetails != null)
                         {
                             model.DimensionDetails.ForEach(x =>
                             {
@@ -406,17 +407,14 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled);
 
-            var coloaders = catPartnerRepo.Get();
-            var agents = catPartnerRepo.Get();
-            var pols = catPlaceRepo.Get();
-            var pods = catPlaceRepo.Get();
+            var coloaders = catPartnerRepo.Get(x => x.PartnerGroup.Contains("CARRIER"));
+            var agents = catPartnerRepo.Get(x => x.PartnerGroup.Contains("AGENT"));
+            var pols = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
+            var pods = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
             var creators = sysUserRepo.Get();
-            var houseBills = csTransactionDetailRepo.Get();
             IQueryable<CsTransactionModel> query = null;
 
             query = from masterBill in masterBills
-                    join houseBill in houseBills on masterBill.Id equals houseBill.JobId into houseBill2
-                    from houseBill in houseBill2.DefaultIfEmpty()
                     join coloader in coloaders on masterBill.ColoaderId equals coloader.Id into coloader2
                     from coloader in coloader2.DefaultIfEmpty()
                     join agent in agents on masterBill.AgentId equals agent.Id into agent2
@@ -430,55 +428,54 @@ namespace eFMS.API.Documentation.DL.Services
                     select new CsTransactionModel
                     {
                         Id = masterBill.Id,
-                        BranchId = masterBill.BranchId,
+                        //BranchId = masterBill.BranchId,
                         JobNo = masterBill.JobNo,
                         Mawb = masterBill.Mawb,
-                        TypeOfService = masterBill.TypeOfService,
+                        //TypeOfService = masterBill.TypeOfService,
                         Etd = masterBill.Etd,
                         Eta = masterBill.Eta,
                         ServiceDate = masterBill.ServiceDate,
-                        Mbltype = masterBill.Mbltype,
+                        //Mbltype = masterBill.Mbltype,
                         ColoaderId = masterBill.ColoaderId,
-                        SubColoader = masterBill.SubColoader,
-                        BookingNo = masterBill.BookingNo,
+                        //SubColoader = masterBill.SubColoader,
+                        //BookingNo = masterBill.BookingNo,
                         AgentId = masterBill.AgentId,
                         Pol = masterBill.Pol,
                         Pod = masterBill.Pod,
-                        DeliveryPlace = masterBill.DeliveryPlace,
-                        PaymentTerm = masterBill.PaymentTerm,
-                        FlightVesselName = masterBill.FlightVesselName,
-                        VoyNo = masterBill.VoyNo,
-                        ShipmentType = masterBill.ShipmentType,
-                        Commodity = masterBill.Commodity,
-                        DesOfGoods = masterBill.DesOfGoods,
+                        //DeliveryPlace = masterBill.DeliveryPlace,
+                        //PaymentTerm = masterBill.PaymentTerm,
+                        //FlightVesselName = masterBill.FlightVesselName,
+                        //VoyNo = masterBill.VoyNo,
+                        //ShipmentType = masterBill.ShipmentType,
+                        //Commodity = masterBill.Commodity,
+                        //DesOfGoods = masterBill.DesOfGoods,
                         PackageContainer = masterBill.PackageContainer,
-                        Pono = masterBill.Pono,
-                        PersonIncharge = masterBill.PersonIncharge,
+                        //Pono = masterBill.Pono,
+                        //PersonIncharge = masterBill.PersonIncharge,
                         NetWeight = masterBill.NetWeight,
                         GrossWeight = masterBill.GrossWeight,
                         ChargeWeight = masterBill.ChargeWeight,
                         Cbm = masterBill.Cbm,
-                        Notes = masterBill.Notes,
+                        //Notes = masterBill.Notes,
                         TransactionType = masterBill.TransactionType,
                         UserCreated = masterBill.UserCreated,
-                        IsLocked = masterBill.IsLocked,
-                        LockedDate = masterBill.LockedDate,
+                        //IsLocked = masterBill.IsLocked,
+                        //LockedDate = masterBill.LockedDate,
                         DatetimeCreated = masterBill.DatetimeCreated,
                         UserModified = masterBill.UserModified,
                         DatetimeModified = masterBill.DatetimeModified,
-                        Active = masterBill.Active,
-                        InactiveOn = masterBill.InactiveOn,
+                        //Active = masterBill.Active,
+                        //InactiveOn = masterBill.InactiveOn,
                         SupplierName = coloader.ShortName,
                         AgentName = agent.ShortName,
-                        HWBNo = houseBill.Hwbno,
-                        CustomerId = houseBill.CustomerId,
-                        NotifyPartyId = houseBill.NotifyPartyId,
-                        SaleManId = houseBill.SaleManId,
                         PODName = pod.NameEn,
                         POLName = pol.NameEn,
                         CreatorName = creator.Username,
-                        HblId = houseBill.Id == Guid.Empty || false ? Guid.Empty : houseBill.Id,
-                        PackageQty = masterBill.PackageQty
+                        PackageQty = masterBill.PackageQty,
+                        //PackageType = masterBill.PackageType,
+                        //FlightDate = masterBill.FlightDate,
+                        //Hw = masterBill.Hw,
+                        //Hwconstant = masterBill.Hwconstant
                     };
 
             return query;
@@ -494,7 +491,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return results;
             }
             var tempList = list;
-            rowsCount = tempList.Count();
+            rowsCount = tempList.Select(s => s.Id).Count();
             if (size > 0)
             {
                 if (page < 1)
@@ -574,73 +571,8 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QueryAE(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            var containers = csMawbcontainerRepo.Get();
-            var surcharges = csShipmentSurchargeRepo.Get();
-            var query = (from transaction in listSearch
-                         join container in containers on transaction.Id equals container.Mblid into containerTrans
-                         from cont in containerTrans.DefaultIfEmpty()
-                         join surcharge in surcharges on transaction.HblId equals surcharge.Hblid into surchargeTrans
-                         from sur in surchargeTrans.DefaultIfEmpty()
-                         select new
-                         {
-                             transaction,
-                             sur.CreditNo,
-                             sur.DebitNo,
-                             sur.Soano,
-                             sur.PaySoano
-                         });
-            if (criteria.All == null)
-            {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    &&
-                    (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    &&
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    && ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    && ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    && ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    && ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    && ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    &&
-                    (
-                           (((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null)))
-                        || (criteria.FromDate == null && criteria.ToDate == null)
-                    )
-                );
-            }
-            else
-            {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    ||
-                    (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    ||
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    || ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    || ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    || ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    || ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    || ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    ||
-                    (
-                           (((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null)))
-                        || (criteria.FromDate == null && criteria.ToDate == null)
-                    )
-                );
-            }
-            var result = query.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault()).OrderByDescending(o => o.DatetimeModified);
+            //Sử dụng lại của service Air Import
+            var result = QueryAI(criteria, listSearch);
             return result;
         }
 
@@ -652,73 +584,117 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QueryAI(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            var containers = csMawbcontainerRepo.Get();
-            var surcharges = csShipmentSurchargeRepo.Get();
-            var query = (from transaction in listSearch
-                         join container in containers on transaction.Id equals container.Mblid into containerTrans
-                         from cont in containerTrans.DefaultIfEmpty()
-                         join surcharge in surcharges on transaction.HblId equals surcharge.Hblid into surchargeTrans
-                         from sur in surchargeTrans.DefaultIfEmpty()
-                         select new
-                         {
-                             transaction,
-                             sur.CreditNo,
-                             sur.DebitNo,
-                             sur.Soano,
-                             sur.PaySoano
-                         });
+            var queryTrans = listSearch;
             if (criteria.All == null)
             {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                queryTrans = queryTrans.Where(x =>
+                       (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    && (x.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    && ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
+                    && ((x.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
+                    && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    &&
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    && ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    && ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    && ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    && ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    && ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    &&
-                    (
-                           (((x.transaction.Eta ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Eta ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
             }
             else
             {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                queryTrans = queryTrans.Where(x =>
+                       (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    || (x.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    || ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
+                    || ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
+                    || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     ||
                     (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    ||
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    || ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    || ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    || ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    || ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    || ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    ||
-                    (
-                           (((x.transaction.Eta ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Eta ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
             }
-            var result = query.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault()).OrderByDescending(o => o.DatetimeModified);
+            
+            //Search with HouseBill & Surcharge
+            IQueryable<CsTransactionModel> dataQuerySur = null;
+            if (!string.IsNullOrEmpty(criteria.HWBNo)
+                || !string.IsNullOrEmpty(criteria.CustomerId)
+                || !string.IsNullOrEmpty(criteria.SaleManId)
+                || !string.IsNullOrEmpty(criteria.NotifyPartyId)
+                || !string.IsNullOrEmpty(criteria.CreditDebitNo)
+                || !string.IsNullOrEmpty(criteria.SoaNo))
+            {
+                var surcharges = csShipmentSurchargeRepo.Get();
+                var houseBills = csTransactionDetailRepo.Get();
+                var querySur = from transaction in queryTrans
+                               join houseBill in houseBills on transaction.Id equals houseBill.JobId into houseBill2
+                               from houseBill in houseBill2.DefaultIfEmpty()
+                               join surcharge in surcharges on houseBill.Id equals surcharge.Hblid into surchargeTrans
+                               from sur in surchargeTrans.DefaultIfEmpty()
+                               select new
+                               {
+                                   transaction,
+                                   HWBNo = houseBill.Hwbno,
+                                   houseBill.CustomerId,
+                                   houseBill.NotifyPartyId,
+                                   houseBill.SaleManId,
+                                   sur.CreditNo,
+                                   sur.DebitNo,
+                                   sur.Soano,
+                                   sur.PaySoano
+                               };
+                if (criteria.All == null)
+                {
+                    querySur = querySur.Where(x =>
+                            (x.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        &&
+                            ((x.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                        &&
+                            ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
+                        &&
+                        (
+                            (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        )
+                        &&
+                        (
+                            (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        )
+                    );
+                    queryTrans = querySur.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
+                }
+                else
+                {
+                    querySur = querySur.Where(x =>
+                            (x.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        ||
+                            ((x.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                        ||
+                            ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
+                        ||
+                        (
+                            (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        )
+                        ||
+                        (
+                            (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        )
+                    );
+                    dataQuerySur = querySur.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
+                }
+            }
+
+            IQueryable<CsTransactionModel> result = queryTrans;
+            if (dataQuerySur != null)
+            {
+                if (criteria.All != null)
+                {
+                    result = result.Union(dataQuerySur);
+                    result = result.GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
+                }
+            }
+            //Sort Array sẽ nhanh hơn
+            result = result.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
             return result;
         }
 
@@ -752,82 +728,8 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QuerySEF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            var containers = csMawbcontainerRepo.Get();
-            var surcharges = csShipmentSurchargeRepo.Get();
-            var query = (from transaction in listSearch
-                         join container in containers on transaction.Id equals container.Mblid into containerTrans
-                         from cont in containerTrans.DefaultIfEmpty()
-                         join surcharge in surcharges on transaction.HblId equals surcharge.Hblid into surchargeTrans
-                         from sur in surchargeTrans.DefaultIfEmpty()
-                         select new
-                         {
-                             transaction,
-                             cont.ContainerNo,
-                             cont.SealNo,
-                             cont.MarkNo,
-                             sur.CreditNo,
-                             sur.DebitNo,
-                             sur.Soano,
-                             sur.PaySoano
-                         });
-            if (criteria.All == null)
-            {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    &&
-                    (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    &&
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    && ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    && ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    && ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    && ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    && ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    &&
-                    (
-                           (((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null)))
-                        || (criteria.FromDate == null && criteria.ToDate == null)
-                    )
-                );
-            }
-            else
-            {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    ||
-                    (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    ||
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    || ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    || ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    || ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    || ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    || ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    ||
-                    (
-                           (((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null)))
-                        || (criteria.FromDate == null && criteria.ToDate == null)
-                    )
-                );
-            }
-            var result = query.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault()).OrderByDescending(o => o.DatetimeModified);
+            //Sử dụng lại của service Sea FCL Import
+            var result = QuerySIF(criteria, listSearch);
             return result;
         }
 
@@ -838,83 +740,161 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="list"></param>
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QuerySIF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
-        {
-            var containers = csMawbcontainerRepo.Get();
-            var surcharges = csShipmentSurchargeRepo.Get();
-            var query = (from transaction in listSearch
-                         join container in containers on transaction.Id equals container.Mblid into containerTrans
-                         from cont in containerTrans.DefaultIfEmpty()
-                         join surcharge in surcharges on transaction.HblId equals surcharge.Hblid into surchargeTrans
-                         from sur in surchargeTrans.DefaultIfEmpty()
-                         select new
-                         {
-                             transaction,
-                             cont.ContainerNo,
-                             cont.SealNo,
-                             cont.MarkNo,
-                             sur.CreditNo,
-                             sur.DebitNo,
-                             sur.Soano,
-                             sur.PaySoano
-                         });
+        {            
+            var queryTrans = listSearch;
             if (criteria.All == null)
             {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                queryTrans = queryTrans.Where(x =>
+                       (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    && (x.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    && ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
+                    && ((x.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
+                    && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    &&
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    && ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    && ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    && ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    && ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    && ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    &&
-                    (
-                           (((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
             }
             else
             {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                queryTrans = queryTrans.Where(x =>
+                       (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    || (x.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    || ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
+                    || ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
+                    || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     ||
                     (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    ||
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    || ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    || ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    || ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    || ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    || ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    ||
-                    (
-                           (((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
             }
-            var result = query.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault()).OrderByDescending(o => o.DatetimeModified);
+
+            //Search with Container Of Shipment
+            IQueryable<CsTransactionModel> dataQueryCont = null;
+            if (   !string.IsNullOrEmpty(criteria.ContainerNo) 
+                || !string.IsNullOrEmpty(criteria.SealNo) 
+                || !string.IsNullOrEmpty(criteria.MarkNo))
+            {
+                var containers = csMawbcontainerRepo.Get();
+                var queryCont = from transaction in queryTrans
+                                join container in containers on transaction.Id equals container.Mblid into containerTrans
+                                from cont in containerTrans.DefaultIfEmpty()
+                                select new
+                                {
+                                    transaction,
+                                    cont.ContainerNo,
+                                    cont.SealNo,
+                                    cont.MarkNo
+                                };
+                if (criteria.All == null)
+                {
+                    queryCont = queryCont.Where(x =>
+                           (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        && (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        && (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+                    queryTrans = queryCont.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
+                }
+                else
+                {
+                    queryCont = queryCont.Where(x =>
+                           (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        || (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        || (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+                    dataQueryCont = queryCont.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
+                }                
+            }
+
+            //Search with HouseBill & Surcharge
+            IQueryable<CsTransactionModel> dataQuerySur = null;
+            if (   !string.IsNullOrEmpty(criteria.HWBNo) 
+                || !string.IsNullOrEmpty(criteria.CustomerId) 
+                || !string.IsNullOrEmpty(criteria.SaleManId)
+                || !string.IsNullOrEmpty(criteria.NotifyPartyId)
+                || !string.IsNullOrEmpty(criteria.CreditDebitNo) 
+                || !string.IsNullOrEmpty(criteria.SoaNo))
+            {
+                var surcharges = csShipmentSurchargeRepo.Get();
+                var houseBills = csTransactionDetailRepo.Get();
+                var querySur = from transaction in queryTrans
+                               join houseBill in houseBills on transaction.Id equals houseBill.JobId into houseBill2
+                               from houseBill in houseBill2.DefaultIfEmpty()
+                               join surcharge in surcharges on houseBill.Id equals surcharge.Hblid into surchargeTrans
+                               from sur in surchargeTrans.DefaultIfEmpty()
+                               select new
+                               {
+                                   transaction,
+                                   HWBNo = houseBill.Hwbno,
+                                   houseBill.CustomerId,
+                                   houseBill.NotifyPartyId,
+                                   houseBill.SaleManId,
+                                   sur.CreditNo,
+                                   sur.DebitNo,
+                                   sur.Soano,
+                                   sur.PaySoano
+                               };
+                if (criteria.All == null)
+                {
+                    querySur = querySur.Where(x =>
+                            (x.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        && 
+                            ((x.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                        &&
+                            ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
+                        &&
+                        (
+                            (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        )
+                        &&
+                        (
+                            (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        )
+                    );
+                    queryTrans = querySur.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
+                }
+                else
+                {
+                    querySur = querySur.Where(x =>
+                            (x.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        ||
+                            ((x.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                        ||
+                            ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
+                        ||
+                        (
+                            (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        )
+                        ||
+                        (
+                            (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        )
+                    );
+                    dataQuerySur = querySur.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
+                }                
+            }
+            
+            IQueryable<CsTransactionModel> result = queryTrans;
+            if (dataQueryCont != null)
+            {
+                if (criteria.All != null)
+                {
+                    result = result.Union(dataQueryCont);
+                    result = result.GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
+                }
+            }
+            if (dataQuerySur != null)
+            {
+                if (criteria.All != null)
+                {
+                    result = result.Union(dataQuerySur);
+                    result = result.GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
+                }
+            }
+            //Sort Array sẽ nhanh hơn
+            result = result.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
             return result;
         }
 
@@ -926,82 +906,8 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QuerySEL(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            var containers = csMawbcontainerRepo.Get();
-            var surcharges = csShipmentSurchargeRepo.Get();
-            var query = (from transaction in listSearch
-                         join container in containers on transaction.Id equals container.Mblid into containerTrans
-                         from cont in containerTrans.DefaultIfEmpty()
-                         join surcharge in surcharges on transaction.HblId equals surcharge.Hblid into surchargeTrans
-                         from sur in surchargeTrans.DefaultIfEmpty()
-                         select new
-                         {
-                             transaction,
-                             cont.ContainerNo,
-                             cont.SealNo,
-                             cont.MarkNo,
-                             sur.CreditNo,
-                             sur.DebitNo,
-                             sur.Soano,
-                             sur.PaySoano
-                         });
-            if (criteria.All == null)
-            {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    &&
-                    (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    &&
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    && ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    && ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    && ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    && ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    && ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    &&
-                    (
-                           (((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null)))
-                        || (criteria.FromDate == null && criteria.ToDate == null)
-                    )
-                );
-            }
-            else
-            {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    ||
-                    (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    ||
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    || ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    || ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    || ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    || ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    || ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    ||
-                    (
-                           (((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null)))
-                        || (criteria.FromDate == null && criteria.ToDate == null)
-                    )
-                );
-            }
-            var result = query.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault()).OrderByDescending(o => o.DatetimeModified);
+            //Sử dụng lại của service Sea FCL Import
+            var result = QuerySIF(criteria, listSearch);
             return result;
         }
 
@@ -1013,82 +919,8 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QuerySIL(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            var containers = csMawbcontainerRepo.Get();
-            var surcharges = csShipmentSurchargeRepo.Get();
-            var query = (from transaction in listSearch
-                         join container in containers on transaction.Id equals container.Mblid into containerTrans
-                         from cont in containerTrans.DefaultIfEmpty()
-                         join surcharge in surcharges on transaction.HblId equals surcharge.Hblid into surchargeTrans
-                         from sur in surchargeTrans.DefaultIfEmpty()
-                         select new
-                         {
-                             transaction,
-                             cont.ContainerNo,
-                             cont.SealNo,
-                             cont.MarkNo,
-                             sur.CreditNo,
-                             sur.DebitNo,
-                             sur.Soano,
-                             sur.PaySoano
-                         });
-            if (criteria.All == null)
-            {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    && (x.transaction.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    &&
-                    (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    &&
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    && ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    && ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    && ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    && ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    && ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    &&
-                    (
-                           (((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null)))
-                        || (criteria.FromDate == null && criteria.ToDate == null)
-                    )
-                );
-            }
-            else
-            {
-                query = query.Where(x => (x.transaction.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.Mawb ?? "").IndexOf(criteria.MAWB ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.transaction.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.ContainerNo ?? "").IndexOf(criteria.ContainerNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    || (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    ||
-                    (
-                        (x.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    ||
-                    (
-                        (x.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                    )
-                    || ((x.transaction.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                    || ((x.transaction.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                    || ((x.transaction.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                    || ((x.transaction.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
-                    || ((x.transaction.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
-                    ||
-                    (
-                           (((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null)))
-                        || (criteria.FromDate == null && criteria.ToDate == null)
-                    )
-                );
-            }
-            var result = query.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault()).OrderByDescending(o => o.DatetimeModified);
+            //Sử dụng lại của service Sea FCL Import
+            var result = QuerySIF(criteria, listSearch);
             return result;
         }
 
@@ -1165,7 +997,8 @@ namespace eFMS.API.Documentation.DL.Services
                     var containers = csMawbcontainerRepo.Get(x => x.Mblid == jobId).ToList();
                     if (containers != null)
                     {
-                        containers.ForEach(x => {
+                        containers.ForEach(x =>
+                        {
                             x.Id = Guid.NewGuid();
                             x.Mblid = transaction.Id;
                             x.UserModified = transaction.UserCreated;
@@ -1297,7 +1130,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var hsTrans = transactionRepository.Add(transaction, false);
                 if (model.CsMawbcontainers != null)
                 {
-                    model.CsMawbcontainers.ForEach(x => {
+                    model.CsMawbcontainers.ForEach(x =>
+                    {
                         x.Id = Guid.NewGuid();
                         x.Mblid = transaction.Id;
                         x.UserModified = transaction.UserCreated;
@@ -1305,7 +1139,7 @@ namespace eFMS.API.Documentation.DL.Services
                     });
                     var hsCont = containerService.Add(model.CsMawbcontainers, false);
                 }
-                if(model.DimensionDetails != null)
+                if (model.DimensionDetails != null)
                 {
                     model.DimensionDetails.ForEach(x =>
                     {
@@ -1356,9 +1190,9 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         var houseDimensions = dimensionDetailRepository.Get(x => x.Hblid == item.Id);
-                        if(houseDimensions != null)
+                        if (houseDimensions != null)
                         {
-                            foreach(var x in houseDimensions)
+                            foreach (var x in houseDimensions)
                             {
                                 x.Id = Guid.NewGuid();
                                 x.Hblid = item.Id;
