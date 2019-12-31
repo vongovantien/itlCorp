@@ -324,21 +324,21 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.Type = stringLocalizer[LanguageSub.MSG_CHARGE_TYPE_EMPTY];
                     item.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.ServiceTypeId))
+                if (string.IsNullOrEmpty(item.ServiceName))
                 {
-                    item.ServiceTypeId = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_EMPTY];
+                    item.ServiceName = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_EMPTY];
                     item.IsValid = false;
                 }
                 else
                 {
-                    var services = item.ServiceTypeId.Split(";").Where(x => !string.IsNullOrEmpty(x));
+                    var services = item.ServiceName.Split(";").Where(x => !string.IsNullOrEmpty(x));
                     string serviceToAdd = string.Empty;
                     foreach(var service in services)
                     {
                         var dataService = CustomData.Services.FirstOrDefault(x => x.DisplayName.ToLower() == service.ToLower().Trim());
                         if (dataService == null)
                         {
-                            item.ServiceTypeId = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_NOT_FOUND, service];
+                            item.ServiceName = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_NOT_FOUND, service];
                             item.IsValid = false;
                             break;
                         }

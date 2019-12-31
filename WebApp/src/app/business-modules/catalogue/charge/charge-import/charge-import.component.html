@@ -132,8 +132,8 @@
                                 <span>Type </span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceTypeId'), 'sorting_desc': (!isDesc && sortKey == 'serviceTypeId') }"
-                                (click)="sort('serviceTypeId')">
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceName'), 'sorting_desc': (!isDesc && sortKey == 'serviceName') }"
+                                (click)="sort('serviceName')">
                                 <span>Sevice </span>
                             </th>
                             <th class="sorting"
@@ -192,10 +192,9 @@
                                         item.type.split('|')[0] }}</span>
                                 </td>
                                 <td class="">
-                                    <span
-                                        *ngIf="item.serviceTypeId.split('|').length == 1">{{ item.serviceTypeId }}</span>
-                                    <span class="m--font-danger" *ngIf="item.serviceTypeId.split('|').length > 1">{{
-                                        item.serviceTypeId.split('|')[0] }}</span>
+                                    <span *ngIf="item.serviceName.split('|').length == 1">{{ item.serviceName }}</span>
+                                    <span class="m--font-danger" *ngIf="item.serviceName.split('|').length > 1">{{
+                                        item.serviceName.split('|')[0] }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.status }}</span>

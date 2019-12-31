@@ -302,7 +302,7 @@ namespace eFMS.API.Catalogue.Controllers
                         CurrencyId = worksheet.Cells[row,6].Value?.ToString().Trim(),
                         Vatrate = worksheet.Cells[row,7].Value == null ? -1 : Convert.ToDecimal(worksheet.Cells[row, 7].Value),
                         Type = worksheet.Cells[row, 8].Value?.ToString().Trim(),
-                        ServiceTypeId = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        ServiceName = worksheet.Cells[row, 9].Value?.ToString().Trim(),
                         Status = worksheet.Cells[row, 10].Value?.ToString().Trim(),
                     };
                     list.Add(charge);
@@ -325,14 +325,15 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CatChargeImportModel> data)
         {
-            var result = catChargeService.Import(data);
-            if (result.Success)
+            var hs = catChargeService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully!!!" };
+            if (hs.Success)
             {
                 return Ok(result);
             }
             else
             {
-                return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Exception.Message });
             }
         }
         
