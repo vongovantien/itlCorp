@@ -1,0 +1,23 @@
+HWBNO	String	50	
+DONo	String	50	
+Consignee	String	250	
+ReferrenceNo	String	50	
+FlightNo	String	50	
+FlightDate	Date		
+DepartureAirport	String	150	
+CussignedDate	Date		
+LastDestination	String	50	
+ShippingMarkImport	Memo		
+DatePackage	Date		
+ReceivedCountry	String	50	
+PlaceAtReceipt	String	150	
+NoPieces	String	150	
+Description	Memo		
+WChargeable	Number		
+DeliveryOrderNote	Memo		
+FirstDestination	String	255	
+SecondDestination	String	255	
+CBM	Number		
+KilosUnit	String	50	
+AgentName	String	250	
+Notify	String	255	
