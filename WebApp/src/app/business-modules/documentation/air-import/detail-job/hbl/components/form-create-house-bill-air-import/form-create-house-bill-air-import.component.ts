@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { Customer, User, PortIndex, Currency, CsTransaction, Unit } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
@@ -57,6 +57,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     shipperDescription: AbstractControl;
     consigneeDescription: AbstractControl;
     notifyDescription: AbstractControl;
+    mawb: AbstractControl;
+    hawb: AbstractControl;
+    flightDateOrigin: AbstractControl;
 
     route: AbstractControl;
     unit: AbstractControl;
@@ -177,14 +180,13 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
     initForm() {
         this.formCreate = this._fb.group({
-            mawb: [],
-            hawb: [],
+            mawb: [null, Validators.required],
+            hawb: [null, Validators.required],
             consigneeDescription: [],
             notifyDescription: [],
             shipperDescription: [],
             flightNo: [],
             flightNoOrigin: [],
-            flightDateOrigin: [],
             issuranceAmount: [],
             chgs: [],
             dclrca: ['NVD'],
@@ -199,7 +201,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
 
             // * Combogrid
-            customerId: [],
+            customerId: [null, Validators.required],
             saleManId: [],
             shipperId: [],
             consigneeId: [],
@@ -215,7 +217,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
 
             // * Select
-            hbltype: [],
+            hbltype: [null, Validators.required],
             freightPayment: [],
             currencyId: [],
             originBlnumber: [],
@@ -227,24 +229,27 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             da: [],
             eta: [],
             flightDate: [],
-            issueDate: [],
-            issueHbldate: [{ startDate: new Date(), endDate: new Date() }],
+            issueDate: [{ startDate: new Date(), endDate: new Date() }],
+            flightDateOrigin: []
 
         });
+
+        this.mawb = this.formCreate.controls["mawb"];
+        this.hawb = this.formCreate.controls["hawb"];
 
         this.customerId = this.formCreate.controls["customerId"];
         this.saleManId = this.formCreate.controls["saleManId"];
         this.shipperId = this.formCreate.controls["shipperId"];
         this.consigneeId = this.formCreate.controls["consigneeId"];
         this.notifyId = this.formCreate.controls["notifyId"];
-        this.warehouse = this.formCreate.controls["warehouse"];
-        this.route = this.formCreate.controls['route'];
         this.forwardingAgentId = this.formCreate.controls["forwardingAgentId"];
         this.pol = this.formCreate.controls["pol"];
         this.pod = this.formCreate.controls["pod"];
         this.finalDestinaltion = this.formCreate.controls['finalDestinaltion'];
         this.hbltype = this.formCreate.controls["hbltype"];
         this.freightPayment = this.formCreate.controls["freightPayment"];
+        this.unit = this.formCreate.controls["unit"];
+
         this.da = this.formCreate.controls["da"];
         this.eta = this.formCreate.controls["eta"];
 
@@ -252,14 +257,10 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.issueHbldate = this.formCreate.controls["issueHbldate"];
         this.shipperDescription = this.formCreate.controls["shipperDescription"];
         this.consigneeDescription = this.formCreate.controls["consigneeDescription"];
-        this.quantity = this.formCreate.controls['quantity'];
-        this.unit = this.formCreate.controls['unit'];
-        this.gw = this.formCreate.controls['gw'];
-        this.cw = this.formCreate.controls['cw'];
-        this.po = this.formCreate.controls['po'];
         this.issueDate = this.formCreate.controls['issueDate'];
         this.descriptionOfGood = this.formCreate.controls['descriptionOfGood'];
         this.notifyDescription = this.formCreate.controls['notifyDescription'];
+        this.flightDateOrigin = this.formCreate.controls['flightDateOrigin'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -311,7 +312,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                 this.pod.setValue(data.id);
                 break;
             case 'final':
-                this.pod.setValue(data.finalDestinaltion);
+                this.finalDestinaltion.setValue(data.id);
                 break;
             default:
                 break;
