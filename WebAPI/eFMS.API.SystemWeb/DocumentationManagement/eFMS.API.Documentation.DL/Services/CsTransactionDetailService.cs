@@ -114,14 +114,14 @@ namespace eFMS.API.Documentation.DL.Services
 
                             var t = containerService.Add(model.CsMawbcontainers);
                         }
-                        if (model.CsDimensionDetailModels != null)
+                        if (model.DimensionDetails != null)
                         {
-                            model.CsDimensionDetailModels.ForEach(x =>
+                            model.DimensionDetails.ForEach(x =>
                             {
                                 x.Id = Guid.NewGuid();
                                 x.Mblid = model.Id;
                             });
-                            var d = dimensionDetailService.Add(model.CsDimensionDetailModels);
+                            var d = dimensionDetailService.Add(model.DimensionDetails);
                         }
                     }
                     DataContext.SubmitChanges();
@@ -174,9 +174,9 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Hblid == hb.Id);
                         }
-                        if (model.CsDimensionDetailModels != null)
+                        if (model.DimensionDetails != null)
                         {
-                            var hsDimension = dimensionDetailService.UpdateHouseBill(model.CsDimensionDetailModels, model.Id);
+                            var hsDimension = dimensionDetailService.UpdateHouseBill(model.DimensionDetails, model.Id);
                         }
                         else
                         {

@@ -6,6 +6,7 @@ export class DeliveryOrder {
     doheader1: string = null;
     doheader2: string = null;
     dofooter: string = null;
+    subAbbr: string = null;
     deliveryOrderPrintedDate: any = null;
 
     constructor(object: any = {}) {

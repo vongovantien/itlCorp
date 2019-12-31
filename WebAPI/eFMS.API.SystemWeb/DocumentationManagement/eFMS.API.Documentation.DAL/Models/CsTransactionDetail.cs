@@ -10,6 +10,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string Mawb { get; set; }
         public string Hwbno { get; set; }
         public string Hbltype { get; set; }
+        public decimal? HwConstant { get; set; }
         public string CustomerId { get; set; }
         public string SaleManId { get; set; }
         public string ShipperDescription { get; set; }
@@ -128,5 +129,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string DueCarrierCll { get; set; }
         public string TotalCll { get; set; }
         public string AttachList { get; set; }
+
+        public virtual CsTransaction Job { get; set; }
     }
 }

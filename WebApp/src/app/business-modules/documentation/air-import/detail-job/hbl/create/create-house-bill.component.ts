@@ -52,9 +52,13 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 if (param.jobId) {
                     this.jobId = param.jobId;
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                    this.deliveryComponent.isAir = true;
                     this.getDetailShipment();
                 }
             });
+    }
+
+    ngAfterViewInit() {
 
     }
 
@@ -91,22 +95,29 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
         console.log(form);
         const formData = {
+            mawb: form.mawb,
+            customerId: form.customer,
+            saleManId: form.saleManId,
+            shipperId: form.shipperId,
+            consigneeId: form.consigneeId,
+            notifyPartyID: form.notifyId,
+            hwbNo: form.hawb,
+            hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
+            forwardingAgentId: form.forwardingAgentId,
+            pol: form.pol,
+            pod: form.pod,
+            wareHouseNotice: form.warehouse,
+
             issueHBLDate: !!form.issueHBLDate ? formatDate(form.issueHBLDate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? form.originBlnumber[0].id : null,
             freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
-            hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
 
-            customerId: form.customer,
-            saleManId: form.saleMan,
-            shipperId: form.shipper,
-            consigneeId: form.consignee,
-            pol: form.pol,
-            pod: form.pod,
-            forwardingAgentId: form.forwardingAgent,
+
+
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
