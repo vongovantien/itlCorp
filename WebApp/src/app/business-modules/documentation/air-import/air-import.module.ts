@@ -29,7 +29,7 @@ const routing: Routes = [
         data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.AirImport },
     },
     {
-        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/Air-import-hbl.module').then(m => m.AirImportHBLModule),
+        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/air-import-hbl.module').then(m => m.AirImportHBLModule),
     },
     // {
     //     path: ':id/manifest', component: AirImportManifestComponent,

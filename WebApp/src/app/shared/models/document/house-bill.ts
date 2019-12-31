@@ -57,7 +57,6 @@ export class HouseBill extends BaseModel {
     inWord: string = null;
     inactiveOn: string = null;
     issueHbldate: string = null;
-    issueHblplace: string = null;
     jobId: string = null;
     localVessel: string = null;
     localVoyNo: string = null;
@@ -108,7 +107,7 @@ export class HouseBill extends BaseModel {
     handingInformation: string = null;
     notify: string = null;
     currencyId: string = null;
-    wTorVALPayment: string = null;
+    wtorValpayment: string = null;
     otherPayment: string = null;
     flightDate: string = null;
     otherCharge: string = null;
@@ -131,7 +130,20 @@ export class HouseBill extends BaseModel {
     attachList: string = null;
     dimensionDetails: DIM[] = [];
     hw: number = null;
-
+    firstCarrierBy: string = null;
+    firstCarrierTo: string = null;
+    transitPlaceTo1: string = null;
+    transitPlaceTo2: string = null;
+    transitPlaceBy1: string = null;
+    transitPlaceBy2: string = null;
+    issueHblplace: string = null;
+    hwConstant: number = null;
+    total: number = null;
+    seaAir: number = null;
+    rateCharge: number = null;
+    kgIb: number = null;
+    rclass: number = null;
+    comItemNo: number = null;
     constructor(object?: any) {
         super();
         const self = this;
