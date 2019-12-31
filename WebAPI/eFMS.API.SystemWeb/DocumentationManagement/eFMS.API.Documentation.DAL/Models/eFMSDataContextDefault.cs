@@ -2693,7 +2693,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.FlightDate).HasColumnType("datetime");
 
+                entity.Property(e => e.FlightDateOrigin).HasColumnType("datetime");
+
                 entity.Property(e => e.FlightNo).HasMaxLength(250);
+
+                entity.Property(e => e.FlightNoOrigin).HasMaxLength(250);
 
                 entity.Property(e => e.ForwardingAgentDescription).HasMaxLength(500);
 
@@ -2803,6 +2807,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Pod).HasColumnName("POD");
 
+                entity.Property(e => e.PoinvoiceNo)
+                    .HasColumnName("POInvoiceNo")
+                    .HasMaxLength(250);
+
                 entity.Property(e => e.Pol).HasColumnName("POL");
 
                 entity.Property(e => e.PurchaseOrderNo)
@@ -2820,6 +2828,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Remark).HasMaxLength(500);
+
+                entity.Property(e => e.Route).HasMaxLength(250);
 
                 entity.Property(e => e.SailingDate).HasColumnType("datetime");
 
@@ -2844,6 +2854,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ShippingMark).HasMaxLength(4000);
+
+                entity.Property(e => e.SubAbbr).HasMaxLength(250);
 
                 entity.Property(e => e.Taxcll)
                     .HasColumnName("TAXCLL")

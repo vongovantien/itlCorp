@@ -87,6 +87,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string DosentTo1 { get; set; }
         public string DosentTo2 { get; set; }
         public string Dofooter { get; set; }
+        public string SubAbbr { get; set; }
         public string FirstCarrierBy { get; set; }
         public string FirstCarrierTo { get; set; }
         public string TransitPlaceTo1 { get; set; }
@@ -95,6 +96,8 @@ namespace eFMS.API.Documentation.Service.Models
         public string TransitPlaceBy2 { get; set; }
         public string FlightNo { get; set; }
         public DateTime? FlightDate { get; set; }
+        public string FlightNoOrigin { get; set; }
+        public DateTime? FlightDateOrigin { get; set; }
         public string IssuranceAmount { get; set; }
         public string CurrencyId { get; set; }
         public string Chgs { get; set; }
@@ -129,6 +132,8 @@ namespace eFMS.API.Documentation.Service.Models
         public string DueCarrierCll { get; set; }
         public string TotalCll { get; set; }
         public string AttachList { get; set; }
+        public string Route { get; set; }
+        public string PoinvoiceNo { get; set; }
 
         public virtual CsTransaction Job { get; set; }
     }

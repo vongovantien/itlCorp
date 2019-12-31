@@ -9,7 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, skip, takeUntil, mergeMap } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
 import { HouseBill, DeliveryOrder } from '@models';
 
@@ -17,6 +17,7 @@ import _merge from 'lodash/merge';
 import { AirImportHBLFormCreateComponent } from '../components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
 import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from '@share-bussiness';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
+import { forkJoin } from 'rxjs';
 @Component({
     selector: 'app-create-hbl-air-import',
     templateUrl: './create-house-bill.component.html',
@@ -100,8 +101,9 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             saleManId: form.saleManId,
             shipperId: form.shipperId,
             consigneeId: form.consigneeId,
-            notifyPartyID: form.notifyId,
-            hwbNo: form.hawb,
+            notifyPartyId: form.notifyId,
+            notifyPartyDescription: form.notifyDescription,
+            hwbno: form.hawb,
             hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -109,15 +111,14 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             pol: form.pol,
             pod: form.pod,
             wareHouseNotice: form.warehouse,
-
-            issueHBLDate: !!form.issueHBLDate ? formatDate(form.issueHBLDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            route: form.route,
+            flightNo: form.flightNo,
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
-
-            originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? form.originBlnumber[0].id : null,
+            flightNoOrigin: form.flightNoOrigin,
+            flightDateOrigin: !!form.flightDateOrigin ? formatDate(form.flightDateOrigin.startDate, 'yyyy-MM-dd', 'en') : null,
+            issueHBLDate: !!form.issueDate ? formatDate(form.issueDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            packageType: !!form.unit && !!form.unit.length ? form.units[0].id : null,
             freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
-
-
-
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
@@ -128,25 +129,23 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     saveHBL() {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
-
-        // if (!this.checkValidateForm()) {
-        //     this.infoPopup.show();
-        //     return;
-        // }
-
-        const houseBill: HouseBill = this.getDataForm();
-        houseBill.jobId = this.jobId;
-
-        // this.createHbl(modelAdd);
-
+        if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
+            this.arrivalNoteComponent.isSubmitted = true;
+            this.deliveryComponent.isSubmitted = true;
+            this.infoPopup.show();
+        } else {
+            const houseBill: HouseBill = this.getDataForm();
+            houseBill.jobId = this.jobId;
+            this.createHbl(houseBill);
+        }
     }
 
     checkValidateForm() {
         let valid: boolean = true;
 
         this.setError(this.formCreateHBLComponent.hbltype);
-        this.setError(this.formCreateHBLComponent.originBlnumber);
         this.setError(this.formCreateHBLComponent.freightPayment);
+        this.setError(this.formCreateHBLComponent.unit);
 
 
         if (!this.formCreateHBLComponent.formCreate.valid) {
@@ -156,24 +155,34 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     createHbl(houseBill: HouseBill) {
-        this._progressRef.start();
-        this._documentationRepo.createHousebill(houseBill)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message, '');
-                        this.gotoList();
-                    } else {
-
-                    }
+        if (this.formCreateHBLComponent.formCreate.valid) {
+            this._progressRef.start();
+            this._documentationRepo.createHousebill(houseBill)
+                .pipe(
+                    mergeMap((res: any) => {
+                        const dateNotice = {
+                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                            arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
+                        const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
+                        const printedDate = {
+                            deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        this.deliveryComponent.deliveryOrder.hblid = res.data;
+                        const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+                        return forkJoin([arrival, delivery]);
+                    }),
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
+                ).subscribe(result => {
+                    this._toastService.success(result[0].message, '');
+                    this.gotoList();
                 }
-            );
-
+                );
+        }
     }
+
 
     gotoList() {
         this._router.navigate([`home/documentation/air-import/${this.jobId}/hbl`]);
