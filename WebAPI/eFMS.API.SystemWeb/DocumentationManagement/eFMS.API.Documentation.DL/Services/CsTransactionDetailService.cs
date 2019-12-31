@@ -153,7 +153,7 @@ namespace eFMS.API.Documentation.DL.Services
                         return new HandleState("Housebill not found !");
                     }
 
-                    if (model.CsMawbcontainers.Count > 0)
+                    if (model.CsMawbcontainers?.Count > 0)
                     {
                         var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, model.Id);
                         if (checkDuplicateCont.Success == false)
