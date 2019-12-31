@@ -16,6 +16,7 @@ namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatPlaceService : IRepositoryBaseCache<CatPlace, CatPlaceModel>
     {
+        IQueryable<sp_GetCatPlace> Get(CatPlaceCriteria criteria);
         IQueryable<CatPlaceModel> GetByModeOfTran();
         IQueryable<CatPlaceModel> GetCatPlaces();
         IQueryable<sp_GetCatPlace> Query(CatPlaceCriteria criteria);

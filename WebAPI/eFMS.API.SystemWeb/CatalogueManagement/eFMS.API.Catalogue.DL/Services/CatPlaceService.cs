@@ -139,6 +139,38 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
+        public IQueryable<sp_GetCatPlace> Get(CatPlaceCriteria criteria)
+        {
+            string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
+            var places = DataContext.Get(x => (x.PlaceTypeId == placetype || string.IsNullOrEmpty(placetype)
+                                           && (x.Active == criteria.Active || criteria.Active == null)))
+                                    .Select(x => new sp_GetCatPlace {
+                                        ID = x.Id,
+                                        Code = x.Code,
+                                        NameVn = x.NameVn,
+                                        NameEn = x.NameEn,
+                                        DisplayName = x.DisplayName,
+                                        Address = x.Address,
+                                        DistrictID = x.DistrictId,
+                                        DistrictNameEN = string.Empty,
+                                        DistrictNameVN = string.Empty,
+                                        ProvinceID = x.ProvinceId,
+                                        ProvinceNameEN = string.Empty,
+                                        ProvinceNameVN = string.Empty,
+                                        CountryID = x.CountryId,
+                                        AreaID = x.AreaId,
+                                        LocalAreaID = x.LocalAreaId,
+                                        ModeOfTransport = x.ModeOfTransport,
+                                        PlaceTypeID = x.PlaceTypeId,
+                                        Note = x.Note,
+                                        UserCreated = x.UserCreated,
+                                        DatetimeCreated = x.DatetimeCreated,
+                                        UserModified = x.UserModified,
+                                        DatetimeModified = x.DatetimeModified,
+                                        Active = x.Active
+                        });
+            return places;
+        }
         public IQueryable<sp_GetCatPlace> Query(CatPlaceCriteria criteria)
         {
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);

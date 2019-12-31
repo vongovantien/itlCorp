@@ -60,12 +60,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.Type = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY];
                     item.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.DebitAccountNo.ToString()))
+                if (string.IsNullOrEmpty(item.DebitAccountNo))
                 {
                     item.DebitAccountNo = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
                     item.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.CreditAccountNo.ToString()))
+                if (string.IsNullOrEmpty(item.CreditAccountNo))
                 {
                     item.CreditAccountNo = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_CREDIT_EMPTY];
                     item.IsValid = false;
