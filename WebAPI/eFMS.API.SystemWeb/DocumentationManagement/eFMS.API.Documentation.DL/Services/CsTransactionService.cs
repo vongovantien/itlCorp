@@ -693,7 +693,8 @@ namespace eFMS.API.Documentation.DL.Services
                     result = result.GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
                 }
             }
-            result = result.OrderByDescending(o => o.DatetimeModified);
+            //Sort Array sẽ nhanh hơn
+            result = result.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
             return result;
         }
 
@@ -892,7 +893,8 @@ namespace eFMS.API.Documentation.DL.Services
                     result = result.GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
                 }
             }
-            result = result.OrderByDescending(o => o.DatetimeModified);
+            //Sort Array sẽ nhanh hơn
+            result = result.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
             return result;
         }
 
