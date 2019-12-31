@@ -9,5 +9,6 @@ namespace eFMS.API.Catalogue.DL.Models
         public string UnitCode { get; set; }
         public bool IsValid { get; set; }
         public string Status { get; set; }
+        public string ServiceName { get; set; }
     }
 }
