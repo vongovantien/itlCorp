@@ -1,22 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { Store } from '@ngrx/store';
+import { ActivatedRoute, Params } from '@angular/router';
 
 import { AppForm } from 'src/app/app.form';
-import { SystemConstants } from 'src/constants/system.const';
-import { DataService } from 'src/app/shared/services';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { User, CsTransactionDetail } from 'src/app/shared/models';
 
-import { takeUntil, skip, finalize, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntil, skip, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../share-business/store';
-import { ActivatedRoute, Params } from '@angular/router';
 
 @Component({
     selector: 'form-create-sea-export',
@@ -24,8 +21,6 @@ import { ActivatedRoute, Params } from '@angular/router';
 })
 
 export class ShareBussinessFormCreateSeaExportComponent extends AppForm implements OnInit {
-
-
     formGroup: FormGroup;
     etd: AbstractControl;
     eta: AbstractControl;
@@ -57,16 +52,26 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         { field: 'countryNameEN', label: 'Country' },
     ];
 
-    serviceTypes: CommonInterface.INg2Select[];
-    ladingTypes: CommonInterface.INg2Select[];
-    shipmentTypes: CommonInterface.INg2Select[];
-    termTypes: CommonInterface.INg2Select[];
+    serviceTypes: CommonInterface.INg2Select[] = [];
+
+    ladingTypes: CommonInterface.INg2Select[] = [
+        { id: 'Copy', text: 'Copy' },
+        { id: 'Original', text: 'Original' },
+        { id: 'Sea Waybill', text: 'Sea Waybill' },
+        { id: 'Surrendered', text: 'Surrendered' },
+    ];
+    shipmentTypes: CommonInterface.INg2Select[] = [
+        { id: 'Freehand', text: 'Freehand' },
+        { id: 'Nominated', text: 'Nominated' }
+    ];
+    termTypes: CommonInterface.INg2Select[] = [
+        { id: "Collect", text: "Collect" },
+        { id: "Prepaid", text: "Prepaid" }
+    ];
 
     userLogged: User;
 
     constructor(
-        private _spinner: NgxSpinnerService,
-        private _dataService: DataService,
         private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
         private _fb: FormBuilder,
@@ -77,15 +82,15 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         super();
     }
 
-    async ngOnInit() {
+    ngOnInit() {
         this.initForm();
 
         this.carries = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
         this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
         this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
 
-        await this.getCommonData();
         this.getUserLogged();
+        this.getServices();
 
         // * Subscribe state to update form.
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
@@ -109,7 +114,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
 
                                 mbltype: !!res.mbltype ? [this.ladingTypes.find(type => type.id === res.mbltype)] : null,
-                                typeOfService: !!res.typeOfService ? [this.serviceTypes.find(type => type.id === res.typeOfService)] : null,
+                                typeOfService: !!res.typeOfService ? [{ id: res.typeOfService, text: res.typeOfService }] : null,
                                 term: !!res.shipmentType ? [this.termTypes.find(type => type.id === res.paymentTerm)] : null,
                                 shipmentType: !!res.shipmentType ? [this.shipmentTypes.find(type => type.id === res.shipmentType)] : null,
 
@@ -193,36 +198,12 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.personalIncharge.disable();
     }
 
-    async getCommonData() {
-        this._spinner.show();
-        try {
-            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
-                const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-
+    getServices() {
+        this._documentRepo.getShipmentDataCommon().subscribe(
+            (commonData: any) => {
                 this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
-                this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
-                this.shipmentTypes = this.utility.prepareNg2SelectData(commonData.shipmentTypes, 'value', 'displayName');
-                this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-
-                this.formGroup.controls["shipmentType"].setValue([this.shipmentTypes[0]]);
-
-            } else {
-                const commonData: { [key: string]: CommonInterface.IValueDisplay[] } = await this._documentRepo.getShipmentDataCommon().toPromise();
-
-                this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
-                this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
-                this.shipmentTypes = this.utility.prepareNg2SelectData(commonData.shipmentTypes, 'value', 'displayName');
-                this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-
-                this.formGroup.controls["shipmentType"].setValue([this.shipmentTypes[0]]);
-
-                this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
             }
-
-        } catch (error) { }
-        finally {
-            this._spinner.hide();
-        }
+        );
     }
 
     onSelectDataFormInfo(data: any, type: string) {

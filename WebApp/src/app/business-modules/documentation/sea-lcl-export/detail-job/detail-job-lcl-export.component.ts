@@ -12,6 +12,7 @@ import { combineLatest, of } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, take, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
+import { NgProgress } from '@ngx-progressbar/core';
 
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
@@ -44,10 +45,14 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         protected _actionStoreSubject: ActionsSubject,
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
-        private _documentRepo: DocumentationRepo
+        private _documentRepo: DocumentationRepo,
+        private _ngProgressService: NgProgress
+
 
     ) {
         super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
+        this._progressRef = this._ngProgressService.ref();
+
     }
 
     ngAfterViewInit() {

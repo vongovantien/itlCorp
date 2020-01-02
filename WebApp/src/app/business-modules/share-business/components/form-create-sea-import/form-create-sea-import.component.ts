@@ -1,6 +1,5 @@
 import { Component, ViewEncapsulation, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 
 import { AppForm } from 'src/app/app.form';
@@ -8,8 +7,7 @@ import { DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { User } from 'src/app/shared/models';
-import { BaseService, DataService } from 'src/app/shared/services';
-import { SystemConstants } from 'src/constants/system.const';
+import { BaseService } from 'src/app/shared/services';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
@@ -75,8 +73,6 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         protected _catalogueRepo: CatalogueRepo,
         protected _fb: FormBuilder,
         protected _baseService: BaseService,
-        private _dataService: DataService,
-        private _spinner: NgxSpinnerService,
         private _store: Store<fromShare.ITransactionState>,
         private _route: ActivatedRoute
 
@@ -84,7 +80,18 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         super();
     }
 
-    async ngOnInit() {
+    ngOnInit() {
+        this.ladingTypes = [
+            { id: 'Copy', text: 'Copy' },
+            { id: 'Original', text: 'Original' },
+            { id: 'Sea Waybill', text: 'Sea Waybill' },
+            { id: 'Surrendered', text: 'Surrendered' },
+        ];
+
+        this.shipmentTypes = [
+            { id: 'Freehand', text: 'Freehand' },
+            { id: 'Nominated', text: 'Nominated' }
+        ];
 
         this.carries = this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER);
         this.agents = this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT);
@@ -92,7 +99,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
 
         this.initForm();
         this.getUserLogged();
-        await this.getCommonData();
+        this.getServices();
 
         // * Subscribe state to update form.
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
@@ -125,7 +132,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
 
                                 mbltype: !!this.fclImportDetail.mbltype ? [(this.ladingTypes || []).find(type => type.id === this.fclImportDetail.mbltype)] : null,
                                 shipmentType: !!this.fclImportDetail.shipmentType ? [(this.shipmentTypes || []).find(type => type.id === this.fclImportDetail.shipmentType)] : null,
-                                typeOfService: !!this.fclImportDetail.typeOfService ? [(this.serviceTypes || []).find(type => type.id === this.fclImportDetail.typeOfService)] : null,
+                                typeOfService: !!this.fclImportDetail.typeOfService ? [{ id: this.fclImportDetail.typeOfService, text: this.fclImportDetail.typeOfService }] : null,
                                 personIncharge: this.fclImportDetail.personIncharge || this.userLogged.id,
 
                                 pod: this.fclImportDetail.pod,
@@ -190,8 +197,10 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         this.coloader = this.formCreate.controls["coloader"];
         this.deliveryPlace = this.formCreate.controls["deliveryPlace"];
 
-        // * Handle etd, eta change.
 
+        this.shipmentType.setValue([this.shipmentTypes[0]]);
+
+        // * Handle etd, eta change.
         this.formCreate.controls['etd'].valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
@@ -228,33 +237,12 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         this.personIncharge.disable();
     }
 
-    async getCommonData() {
-        this._spinner.show();
-        try {
-            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
-                this.commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-
-                this.serviceTypes = this.utility.prepareNg2SelectData(this.commonData.serviceTypes, 'value', 'displayName');
-                this.ladingTypes = this.utility.prepareNg2SelectData(this.commonData.billOfLadings, 'value', 'displayName');
-                this.shipmentTypes = this.utility.prepareNg2SelectData(this.commonData.shipmentTypes, 'value', 'displayName');
-
-                this.shipmentType.setValue([this.shipmentTypes[0]]);
-            } else {
-                this.commonData = await this._documentRepo.getShipmentDataCommon().toPromise();
-                this.serviceTypes = this.utility.prepareNg2SelectData(this.commonData.serviceTypes, 'value', 'displayName');
-                this.ladingTypes = this.utility.prepareNg2SelectData(this.commonData.billOfLadings, 'value', 'displayName');
-                this.shipmentTypes = this.utility.prepareNg2SelectData(this.commonData.shipmentTypes, 'value', 'displayName');
-
-                this.shipmentType.setValue([this.shipmentTypes[0]]);
-
-                this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, this.commonData);
+    getServices() {
+        this._documentRepo.getShipmentDataCommon().subscribe(
+            (commonData: any) => {
+                this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
             }
-        } catch (error) {
-        }
-        finally {
-            this._spinner.hide();
-        }
-
+        );
     }
 
     onSelectDataFormInfo(data: any, key: string | any) {
@@ -279,3 +267,4 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         }
     }
 }
+

@@ -199,7 +199,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             )
             .subscribe(
                 (res: CsTransaction) => {
-                    console.log(res);
                     if (res.id !== SystemConstants.EMPTY_GUID && !!res.commodity) {
                         // * Update commodity
                         const commodities: CommonInterface.INg2Select[] =
