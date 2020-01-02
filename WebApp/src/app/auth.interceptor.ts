@@ -1,18 +1,27 @@
-import { Injectable } from '@angular/core';
+import { Injectable, InjectionToken, Inject } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, timeout } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
+
+export const DEFAULT_TIMEOUT = new InjectionToken<number>('defaultTimeout');
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthInterceptor implements HttpInterceptor {
-    constructor(private _toastService: ToastrService) { }
+    constructor(
+        private _toastService: ToastrService,
+        @Inject(DEFAULT_TIMEOUT) protected defaultTimeout: number,
+    ) {
+    }
 
     authReq: HttpRequest<any> = null;
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
+        const timeoutValue = req.headers.get('timeout') || this.defaultTimeout;
+
         const authHeader = `Bearer ${localStorage.getItem('access_token')}`;
         this.authReq = req.clone(req);
         if (environment.local) {
@@ -25,6 +34,7 @@ export class AuthInterceptor implements HttpInterceptor {
             this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
         }
         return next.handle(this.authReq).pipe(
+            timeout(+timeoutValue),
             catchError((error: HttpErrorResponse) => {
                 switch (error.status) {
                     case 401:

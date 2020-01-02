@@ -29,7 +29,7 @@ import { NgProgressModule } from "@ngx-progressbar/core";
 import { ToastrModule } from "ngx-toastr";
 
 import { GlobalState } from "./global-state";
-import { AuthInterceptor } from "./auth.interceptor";
+import { AuthInterceptor, DEFAULT_TIMEOUT } from "./auth.interceptor";
 import { AppRoutingModule } from "./app-routing.module";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { environment } from "src/environments/environment";
@@ -90,7 +90,8 @@ import { reducers, CustomSerializer } from "./store";
         },
         {
             provide: RouterStateSerializer, useClass: CustomSerializer
-        }
+        },
+        { provide: DEFAULT_TIMEOUT, useValue: 30000 }
     ],
 
     bootstrap: [AppComponent],
