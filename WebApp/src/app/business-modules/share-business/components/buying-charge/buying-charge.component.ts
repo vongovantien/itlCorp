@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, CsTransactionDetail } from 'src/app/shared/models';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, CsTransactionDetail, HouseBill, CsTransaction } from 'src/app/shared/models';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
@@ -33,8 +33,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     serviceTypeId: string;
     containers: Container[] = [];
-    shipment: any;
-    hbl: CsTransactionDetail;
+    shipment: CsTransaction;
+    hbl: HouseBill;
 
     headers: CommonInterface.IHeaderTable[] = [];
     headerPartner: CommonInterface.IHeaderTable[] = [];
@@ -262,6 +262,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.voucherIdre = null;
         newSurCharge.voucherIdredate = null;
         newSurCharge.isFromShipment = true;
+        newSurCharge.hblno = this.hbl.hwbno || null;
+        newSurCharge.mblno = this.shipment.mawb || null;
 
         this.addSurcharges(type, newSurCharge);
     }
@@ -281,6 +283,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.voucherIdre = null;
         newSurCharge.voucherIdredate = null;
         newSurCharge.isFromShipment = true;
+        newSurCharge.invoiceDate = null;
 
         this.addSurcharges(type, newSurCharge);
     }

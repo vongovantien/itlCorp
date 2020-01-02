@@ -147,6 +147,9 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
                     container.commodityName = this.getCommodityName(container.commodityId);
                     container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
                     container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
+                    if (!!container.containerNo || !!container.markNo || !!container.sealNo) {
+                        container.quantity = 1;
+                    }
                 }
                 this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
 

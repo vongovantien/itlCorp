@@ -48,7 +48,8 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [currentActiveItemId]="{ field: 'id', value: coloaderId.value, hardValue: shipmentDetail.supplierName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
-                                [displayFields]="displayFieldsSupplier" [height]="200" placeholder="Select airline">
+                                [displayFields]="displayFieldsSupplier" [height]="200" placeholder="Select airline"
+                                [loading]="isLoading">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -58,7 +59,8 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                                 [currentActiveItemId]="{ field: 'id', value: agentId.value,hardValue: shipmentDetail.agentName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                                [displayFields]="displayFieldsSupplier" [height]="200" placeholder="Select agent">
+                                [displayFields]="displayFieldsSupplier" [height]="200" placeholder="Select agent"
+                                [loading]="isLoading">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -69,10 +71,14 @@
                                     [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) || (isSubmitted && !etd.value) || (isSubmitted && !etd.value.startDate)}">
                                     <label required>ETD</label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
+                                        <input type="text" class="form-control m-input m-input--square po-rel"
                                             ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
                                             placeholder="Select ETD" readonly formControlName="etd" />
+                                        <span class="m-input-icon_clear" (click)="resetFormControl(etd)"
+                                            *ngIf="!!etd.value && !!etd.value.startDate">
+                                            <i class="la la-times"></i>
+                                        </span>
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
@@ -90,6 +96,10 @@
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
                                             placeholder="Select ETA" readonly formControlName="eta"
                                             [minDate]="minDateETA" />
+                                        <span class="m-input-icon_clear" (click)="resetFormControl(eta)"
+                                            *ngIf="!!eta.value && !!eta.value.startDate">
+                                            <i class="la la-times"></i>
+                                        </span>
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
@@ -106,7 +116,8 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                                 [currentActiveItemId]="{ field: 'id', value: pol.value, hardValue: shipmentDetail.polName}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                                [displayFields]="displayFieldPort" [height]="200" placeholder="Select A.O.L">
+                                [displayFields]="displayFieldPort" [height]="200" placeholder="Select A.O.L"
+                                [loading]="isLoading">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -117,7 +128,8 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                                 [currentActiveItemId]="{ field: 'id', value: pod.value,hardValue: shipmentDetail.podName}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                                [displayFields]="displayFieldPort" [height]="200" placeholder="Please select A.O.D">
+                                [displayFields]="displayFieldPort" [height]="200" placeholder="Please select A.O.D"
+                                [loading]="isLoading">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmitted && formGroup.errors | equalError:'invalidPort'">Port of
@@ -149,6 +161,10 @@
                                             ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
                                             readonly formControlName="flightDate" />
+                                        <span class="m-input-icon_clear" (click)="resetFormControl(flightDate)"
+                                            *ngIf="!!flightDate.value && !!flightDate.value.startDate">
+                                            <i class="la la-times"></i>
+                                        </span>
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
@@ -173,6 +189,10 @@
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                     [alwaysShowCalendars]="true" name="daterange" readonly
                                     formControlName="serviceDate" />
+                                <span class="m-input-icon_clear" (click)="resetFormControl(serviceDate)"
+                                    *ngIf="!!serviceDate.value && !!serviceDate.value.startDate">
+                                    <i class="la la-times"></i>
+                                </span>
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>

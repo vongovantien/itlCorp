@@ -106,7 +106,7 @@ export abstract class AppForm extends AppPage {
         if (this.comboGrids) {
             const arrayCombo = this.comboGrids.toArray();
             if (arrayCombo.length > 0) {
-                arrayCombo.forEach((c: ComboGridVirtualScrollComponent) => { c.keyword = ''; c.Search(c.keyword); });
+                arrayCombo.forEach((c: ComboGridVirtualScrollComponent) => { c.keyword = ''; });
             }
         }
     }

@@ -101,6 +101,10 @@
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETD" readonly
                                         formControlName="etd" />
+                                    <span class="m-input-icon_clear" (click)="resetFormControl(etd)"
+                                        *ngIf="!!etd.value && !!etd.value.startDate">
+                                        <i class="la la-times"></i>
+                                    </span>
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -117,6 +121,10 @@
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETA" readonly
                                         formControlName="eta" />
+                                    <span class="m-input-icon_clear" (click)="resetFormControl(eta)"
+                                        *ngIf="!!eta.value && !!eta.value.startDate">
+                                        <i class="la la-times"></i>
+                                    </span>
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -225,6 +233,10 @@
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
                                         formControlName="flightDate" />
+                                    <span class="m-input-icon_clear" (click)="resetFormControl(flightDate)"
+                                        *ngIf="!!flightDate.value && !!flightDate.value.startDate">
+                                        <i class="la la-times"></i>
+                                    </span>
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -338,6 +350,10 @@
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
                                         formControlName="issueHbldate" />
+                                    <span class="m-input-icon_clear" (click)="resetFormControl(issueHbldate)"
+                                        *ngIf="!!issueHbldate.value && !!issueHbldate.value.startDate">
+                                        <i class="la la-times"></i>
+                                    </span>
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>

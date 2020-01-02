@@ -998,6 +998,19 @@ table.dataTable {
         left: auto !important;
         margin-top: 0;
     }
+    .m-input-icon_clear {
+        position: absolute;
+        top: 9px;
+        right: 30px;
+        i {
+            font-size: 0.8rem;
+            color: #6f727d;
+            font-weight: bold;
+            &:hover {
+                color: red;
+            }
+        }
+    }
 }
 
 .up {
