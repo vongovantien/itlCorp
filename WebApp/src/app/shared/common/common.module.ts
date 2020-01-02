@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SubHeaderComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent } from '.';
-import { ModalModule, CollapseModule, TooltipModule, PaginationModule } from 'ngx-bootstrap';
+import { ModalModule, CollapseModule, TooltipModule, PaginationModule, BsDropdownModule } from 'ngx-bootstrap';
 import { ConfirmPopupComponent, InfoPopupComponent } from './popup';
 import { UploadAlertComponent } from './popup/upload-alert/upload-alert.component';
 import { SelectModule } from 'ng2-select';
@@ -57,7 +57,8 @@ const COMPONENTS = [
         FormsModule,
         DirectiveModule,
         PipeModule,
-        TooltipModule.forRoot()
+        TooltipModule.forRoot(),
+        BsDropdownModule.forRoot()
     ],
     exports: [
         ...COMPONENTS

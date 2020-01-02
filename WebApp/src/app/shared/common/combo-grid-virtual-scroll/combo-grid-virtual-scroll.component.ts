@@ -16,6 +16,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Input() disabled: boolean;
     @Input() height: number = 200;
     @Input() isTooltip: boolean = false;
+    @Input() loading: boolean = false;
     @Input() placeholder: string = '';
     @Output() itemSelected = new EventEmitter<any>();
     @ViewChild('inputSearch', { static: true }) inputSearch: ElementRef;
@@ -134,6 +135,9 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
             this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
         }
+
+        // * Reset keyword search.
+        this.keyword = '';
     }
 
     setCurrentActiveItem(item: any) {

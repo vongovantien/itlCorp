@@ -12,7 +12,7 @@ import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.p
 import { SystemConstants } from 'src/constants/system.const';
 
 import * as fromStore from './../../store/index';
-import { distinctUntilChanged, takeUntil, skip, mergeMap, tap } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip, mergeMap, tap, finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { ActivatedRoute, Params } from '@angular/router';
 @Component({
@@ -103,10 +103,10 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.getUserLogged();
         this.initForm();
 
-        this.carries = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
-        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
-        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
-
+        this.getCarriers();
+        this.getAgents();
+        this.getPorts();
+        this.getAgents();
         this.getUnits();
         this.getCommodity();
 
@@ -312,6 +312,37 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
     }
+
+    getCarriers() {
+        this.isLoading = true;
+        this.carries = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER)
+            .pipe(
+                finalize(() => {
+                    this.isLoading = false;
+                })
+            );
+    }
+
+    getPorts() {
+        this.isLoading = true;
+        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }).pipe(
+            finalize(() => {
+                this.isLoading = false;
+            })
+        );
+    }
+
+    getAgents() {
+        this.isLoading = true;
+        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT)
+            .pipe(
+                finalize(() => {
+                    this.isLoading = false;
+                })
+            );
+    }
+
+
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
