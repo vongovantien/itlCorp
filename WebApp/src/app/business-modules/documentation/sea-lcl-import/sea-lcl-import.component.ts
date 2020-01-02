@@ -34,6 +34,9 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
     selectedMasterBill: CsTransaction = null;
     deleteMessage: string = '';
     transactionService: number = CommonEnum.TransactionTypeEnum.SeaLCLImport;
+
+    _fromDate: Date = this.createMoment().startOf('month').toDate();
+    _toDate: Date = this.createMoment().endOf('month').toDate();
     constructor(
         private _router: Router,
         private _documentationRepo: DocumentationRepo,
@@ -82,8 +85,8 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
         ];
         this.dataSearch = {
             transactionType: this.transactionService,
-            //fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-            //toDate: new Date(),
+            fromDate: this._fromDate,
+            toDate: this._toDate,
         };
 
         this.requestSearchShipment();
@@ -137,6 +140,14 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
         data.transactionType = this.transactionService;
 
         this.dataSearch = data;
+        this.requestSearchShipment();
+    }
+
+    onResetMasterBills($event: any) {
+        $event.transactionType = this.transactionService;
+        $event.fromDate = this._fromDate;
+        $event.toDate = this._toDate;
+        this.dataSearch = $event;
         this.requestSearchShipment();
     }
 

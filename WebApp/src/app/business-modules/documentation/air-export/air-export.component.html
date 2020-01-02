@@ -14,7 +14,7 @@
 
 <div class="m-content">
 
-    <form-search-sea [transaction]="transactionService" (onSearch)="onSearchShipment($event)"></form-search-sea>
+    <form-search-sea [transaction]="transactionService" (onSearch)="onSearchShipment($event)" (onReset)="onResetShipment($event)"></form-search-sea>
 
     <div class="m-portlet">
         <div class="m-portlet__body">

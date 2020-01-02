@@ -1029,7 +1029,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (data != null)
             {
                 _hbllist = string.Join("\r\n", data.ListSurcharges.Select(s => s.Hwbno));
-                int i = 0;
+                int i = 1;
                 foreach (var item in data.ListSurcharges)
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
@@ -1103,6 +1103,8 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.DigitSymbol = ",";
                     charge.DecimalNo = 0; //NOT USE
                     charge.CurrDecimalNo = 0; //NOT USE
+
+                    listCharge.Add(charge);
                 }
             }
             var parameter = new AirShipperDebitNewReportParams();
@@ -1180,7 +1182,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             parameter.Currency = criteria.Currency;
             parameter.HBLList = _hbllist;
-
+            parameter.DecimalNo = 2;
             //Exchange Rate USD to VND
             var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == Constants.CURRENCY_USD && x.CurrencyToId == Constants.CURRENCY_LOCAL && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
             parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;

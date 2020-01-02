@@ -459,7 +459,7 @@ namespace eFMS.API.Documentation.DL.Services
                         //Notes = masterBill.Notes,
                         TransactionType = masterBill.TransactionType,
                         UserCreated = masterBill.UserCreated,
-                        //IsLocked = masterBill.IsLocked,
+                        IsLocked = masterBill.IsLocked,
                         //LockedDate = masterBill.LockedDate,
                         DatetimeCreated = masterBill.DatetimeCreated,
                         UserModified = masterBill.UserModified,
