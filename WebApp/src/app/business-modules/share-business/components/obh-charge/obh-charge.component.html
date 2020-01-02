@@ -110,7 +110,8 @@
                                         [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
                                         [dataSources]="listCharges | async"
                                         [displayFields]="configComboGridCharge.displayFields" [height]="150"
-                                        [disabled]="!!charge.debitNo || !!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
+                                        [disabled]="!!charge.debitNo || !!charge.debitNo || !charge.isFromShipment ? 'disabled': null"
+                                        placeholder="Select charge">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </td>

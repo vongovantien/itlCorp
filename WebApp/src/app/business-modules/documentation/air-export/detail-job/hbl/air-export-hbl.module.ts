@@ -8,6 +8,7 @@ import { SelectModule } from 'ng2-select';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { NgxCurrencyModule } from 'ngx-currency';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
@@ -17,13 +18,12 @@ import { AirExportCreateHBLComponent } from './create/create-house-bill.componen
 import { AirExportHBLFormCreateComponent } from './components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
 import { AirExportHBLAttachListComponent } from './components/attach-list/attach-list-house-bill-air-export.component';
 import { AirExportDetailHBLComponent } from './detail/detail-house-bill.component';
-import { NgxCurrencyModule } from 'ngx-currency';
 
 
 const routing: Routes = [
     {
         path: '', component: AirExportHBLComponent,
-        data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.SFE_CODE }
+        data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.AE_CODE }
     },
     {
         path: 'new', component: AirExportCreateHBLComponent,

@@ -1,17 +1,17 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
-import { CsTransactionDetail } from '@models';
-import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 
-import * as fromShareBussiness from './../../../../../share-business/store';
+import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
+import { CsTransactionDetail, Crystal } from '@models';
 import { ReportPreviewComponent } from '@common';
-import { AirExportHBLFormCreateComponent } from '../components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
+import * as fromShareBussiness from '@share-bussiness';
+
+
+import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -54,12 +54,10 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             if (param.hblId) {
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
+
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-                this._store.dispatch(new fromShareBussiness.GetDimensionAction(this.jobId));
-
-
-                this.getDetailHbl();
+                this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
 
             } else {
                 // TODO handle error. 
@@ -68,23 +66,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
     }
-
-    getDetailHbl() {
-        this._store.select(fromShareBussiness.getDetailHBlState)
-            .pipe(
-                skip(1),
-                catchError(this.catchError),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: CsTransactionDetail) => {
-                    if (!!res) {
-                        this.hblDetail = res;
-                    }
-                },
-            );
-    }
-
 
     saveHBL() {
         this.confirmPopup.hide();

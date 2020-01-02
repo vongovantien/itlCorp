@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, FormArray, Validators, FormControl } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { Store } from '@ngrx/store';
 
 import { Customer, User, PortIndex, Currency, CsTransaction, DIM, HouseBill } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
@@ -7,16 +8,14 @@ import { CommonEnum } from '@enums';
 
 import { AppForm } from 'src/app/app.form';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
-
-import { map, tap, takeUntil, catchError, skip, mergeMap, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
-
 import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState, getDimensionVolumesState } from 'src/app/business-modules/share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
-import _isEqual from 'lodash/isEqual';
+
+import { map, tap, takeUntil, catchError, skip, mergeMap, debounceTime, distinctUntilChanged, switchMap, debounce } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
-import cloneDeep from 'lodash/cloneDeep';
+import _cloneDeep from 'lodash/cloneDeep';
+
 @Component({
     selector: 'air-export-hbl-form-create',
     templateUrl: './form-create-house-bill-air-export.component.html',
@@ -153,7 +152,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                         }
                     ),
                     mergeMap(
-                        () => this._store.select(getDetailHBlState)
+                        () => this._store.select(getDetailHBlState).pipe(takeUntil(this.ngUnsubscribe))
                     )
                 )
                 .subscribe(
@@ -164,6 +163,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
                             this.hwconstant = hbl.hwConstant;
+                            console.log(this.hwconstant);
+
                             this.updateFormValue(hbl);
                         }
 
@@ -180,7 +181,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                             this.shipmentDetail = new CsTransaction(shipment);
                             this.jobId = this.shipmentDetail.id;
                             this.hwconstant = this.shipmentDetail.hwConstant;
-
+                            console.log(this.hwconstant);
                             this.formCreate.patchValue({
                                 mawb: shipment.mawb,
                                 pod: shipment.pod,
@@ -271,7 +272,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             issueHbldate: [{ startDate: new Date(), endDate: new Date() }],
 
             // * Array
-            // dimensionDetails: this._fb.array([])
+            dimensionDetails: this._fb.array([])
 
         });
 
@@ -297,12 +298,17 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.shipperDescription = this.formCreate.controls["shipperDescription"];
         this.consigneeDescription = this.formCreate.controls["consigneeDescription"];
         this.forwardingAgentDescription = this.formCreate.controls["forwardingAgentDescription"];
-        // this.dimensionDetails = this.formCreate.controls["dimensionDetails"] as FormArray;
+        this.dimensionDetails = <FormArray>this.formCreate.controls["dimensionDetails"];
 
-        // this.dimensionDetails.valueChanges
-        //     .subscribe((dims: DIM[]) => {
-        //         this.calculateHWDimension(dims);
-        //     });
+        this.formCreate.get('dimensionDetails')
+            .valueChanges
+            .pipe(
+                debounceTime(500),
+                distinctUntilChanged(),
+            )
+            .subscribe(changes => {
+                this.updateHeightWeight(changes);
+            });
 
         this.onWTVALChange();
         this.otherPaymentChange();
@@ -323,11 +329,31 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             wtorValpayment: !!data.wtorValpayment ? [(this.wts || []).find(type => type.id === data.wtorValpayment)] : null,
             otherPayment: !!data.otherPayment ? [(this.wts || []).find(type => type.id === data.otherPayment)] : null,
             currencyId: !!data.currencyId ? [{ id: data.currencyId, text: data.currencyId }] : null,
-            // dimensionDetails: this.dims
+            dimensionDetails: []
 
         };
-        this.formCreate.patchValue(_merge(cloneDeep(data), formValue));
-        // this.formCreate.setControl('dimensionDetails', this._fb.array(this.dims || []));
+        this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
+
+        // * Update dimension Form Array.
+        this.formCreate.setControl('dimensionDetails', this.setDimensionDetails(this.dims));
+
+        this.formCreate.get('dimensionDetails')
+            .valueChanges
+            .pipe(
+                debounceTime(500),
+                distinctUntilChanged(),
+            )
+            .subscribe(changes => {
+                this.updateHeightWeight(changes);
+            });
+    }
+
+    setDimensionDetails(dims: DIM[]): FormArray {
+        const formArray: FormArray = new FormArray([]);
+        dims.forEach((d: DIM) => {
+            formArray.push(this._fb.group(d));
+        });
+        return formArray;
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -391,47 +417,49 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     addDIM() {
         this.selectedIndexDIM = -1;
-        // (this.formCreate.controls.dimensionDetails as FormArray).push(this.createDIMItem());
-        this.dims.push(new DIM({
-            mblId: this.jobId,
-            hblId: this.hblId
-        }));
+        (this.formCreate.controls.dimensionDetails as FormArray).push(this.createDIMItem());
+        // this.dims.push(new DIM({
+        //     mblId: this.jobId,
+        //     hblId: this.hblId
+        // }));
     }
 
     deleteDIM(index: number) {
-        // (this.formCreate.get('dimensionDetails') as FormArray).removeAt(index);
-        this.dims.splice(index, 1);
-        this.calculateHWDimension();
+        (this.formCreate.get('dimensionDetails') as FormArray).removeAt(index);
+        // this.dims.splice(index, 1);
+        this.calculateHWDimension(this.formCreate.get('dimensionDetails').value || []);
     }
 
     selectDIM(index: number) {
         this.selectedIndexDIM = index;
     }
 
-    updateHeightWeight(dimItem: DIM) {
-        dimItem.hw = this.utility.calculateHeightWeight(dimItem.width, dimItem.height, dimItem.length, dimItem.package, this.hwconstant);
-        dimItem.cbm = this.utility.calculateCBM(dimItem.width, dimItem.height, dimItem.length, dimItem.package, this.hwconstant);
+    updateHeightWeight(dims: DIM[] = []) {
+        dims.forEach(dimItem => {
+            dimItem.hw = this.utility.calculateHeightWeight(dimItem.width, dimItem.height, dimItem.length, dimItem.package, this.hwconstant);
+            dimItem.cbm = this.utility.calculateCBM(dimItem.width, dimItem.height, dimItem.length, dimItem.package, this.hwconstant);
+        });
 
-        this.totalHeightWeight = this.updateTotalHeightWeight();
-        this.totalCBM = this.updateCBM();
+        this.totalHeightWeight = this.updateTotalHeightWeight(dims);
+        this.totalCBM = this.updateCBM(dims);
     }
 
-    calculateHWDimension() {
-        if (!!this.dims.length) {
-            for (const item of this.dims) {
-                this.updateHeightWeight(item);
+    calculateHWDimension(dims: DIM[]) {
+        if (!!dims.length) {
+            for (const item of dims) {
+                this.updateHeightWeight(dims);
             }
         } else {
             this.totalCBM = this.totalHeightWeight = 0;
         }
     }
 
-    updateTotalHeightWeight() {
-        return +this.dims.reduce((acc: number, curr: DIM) => acc += curr.hw, 0).toFixed(3);
+    updateTotalHeightWeight(dims: DIM[]) {
+        return +dims.reduce((acc: number, curr: DIM) => acc += curr.hw, 0).toFixed(3);
     }
 
-    updateCBM() {
-        return +this.dims.reduce((acc: number, curr: DIM) => acc += curr.cbm, 0).toFixed(3);
+    updateCBM(dims: DIM[]) {
+        return +dims.reduce((acc: number, curr: DIM) => acc += curr.cbm, 0).toFixed(3);
     }
 
     onWTVALChange() {

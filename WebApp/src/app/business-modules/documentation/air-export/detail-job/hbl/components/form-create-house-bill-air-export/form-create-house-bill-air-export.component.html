@@ -468,28 +468,21 @@
                         <div class="table-dims-wrapper" (clickOutside)="selectedIndexDIM = -1">
                             <table class="table table-bordered bg-white table-prepaid-collect">
                                 <tbody>
-                                    <ng-container *ngIf="!!dims.length">
-                                        <ng-container *ngFor="let item of dims; let j = index">
+                                    <ng-container formArrayName="dimensionDetails"
+                                        *ngFor="let item of formCreate?.get('dimensionDetails')['controls']; let j = index;">
+                                        <ng-container [formGroupName]="j">
                                             <tr (click)="selectDIM(j)" [class.selected-row]="selectedIndexDIM === j">
                                                 <td>
-                                                    <input type="number" class="form-control" [(ngModel)]="item.length"
-                                                        [ngModelOptions]="{standalone: true}"
-                                                        (ngModelChange)="updateHeightWeight(item)">
+                                                    <input type="number" class="form-control" formControlName="length">
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control" [(ngModel)]="item.width"
-                                                        [ngModelOptions]="{standalone: true}"
-                                                        (ngModelChange)="updateHeightWeight(item)">
+                                                    <input type="number" class="form-control" formControlName="width">
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control" [(ngModel)]="item.height"
-                                                        [ngModelOptions]="{standalone: true}"
-                                                        (ngModelChange)="updateHeightWeight(item)">
+                                                    <input type="number" class="form-control" formControlName="height">
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control" [(ngModel)]="item.package"
-                                                        [ngModelOptions]="{standalone: true}"
-                                                        (ngModelChange)="updateHeightWeight(item)">
+                                                    <input type="number" class="form-control" formControlName="package">
                                                 </td>
                                                 <td>
                                                     <a class="btn m-btn--icon m-btn--icon-only m--font-danger"
@@ -500,7 +493,8 @@
                                             </tr>
                                         </ng-container>
                                     </ng-container>
-                                    <tr app-table-none-record *ngIf="!dims.length">
+                                    <tr app-table-none-record
+                                        *ngIf="!formCreate?.get('dimensionDetails')['controls'].length">
                                     </tr>
                                     <tr>
                                         <td colspan=1>
