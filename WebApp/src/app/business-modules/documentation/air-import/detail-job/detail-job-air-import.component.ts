@@ -13,6 +13,7 @@ import { tap, map, switchMap, catchError, takeUntil, skip, take, finalize } from
 
 import * as fromShareBussiness from '../../../share-business/store';
 import { AirImportCreateJobComponent } from '../create-job/create-job-air-import.component';
+import { NgProgress } from '@ngx-progressbar/core';
 
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
@@ -47,10 +48,14 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         protected _router: Router,
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
-        private _documentRepo: DocumentationRepo
+        private _documentRepo: DocumentationRepo,
+        private _ngProgressService: NgProgress
+
 
     ) {
         super(_toastService, _documenRepo, _router, _store);
+        this._progressRef = this._ngProgressService.ref();
+
     }
 
     ngAfterViewInit() {

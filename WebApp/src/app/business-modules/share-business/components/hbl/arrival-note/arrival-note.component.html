@@ -91,7 +91,8 @@
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.chargeId}">
                                                     <input type="text" class="form-control"
                                                         [(ngModel)]="charge.description"
-                                                        (click)="charge.isShowCharge = true">
+                                                        (click)="charge.isShowCharge = true"
+                                                        placeholder="Select charge">
                                                     <ng-container *ngIf="charge.isShowCharge">
                                                         <app-combo-grid [headers]="headerCharge" [data]="listCharges"
                                                             [fields]="['chargeNameEn']" [active]="charge.chargeId"
@@ -112,6 +113,7 @@
                                                             <select class="form-control border"
                                                                 [(ngModel)]="charge.quantityType"
                                                                 (ngModelChange)="onChangeQuantityType($event, charge)">
+                                                                <option [ngValue]="null">-</option>
                                                                 <option *ngFor="let type of quantityTypes"
                                                                     [ngValue]="type.value">
                                                                     {{type.displayName}}</option>

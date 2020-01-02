@@ -74,6 +74,10 @@ export class CsShipmentSurcharge {
     quantityType: any = null;
     creditNo: string = null;
     debitNo: string = null;
+    jobNo: string = null;
+    mblno: string = null;
+    hblno: string = null;
+    advanceNo: string = null;
 
     constructor(object?: any) {
         const self = this;
