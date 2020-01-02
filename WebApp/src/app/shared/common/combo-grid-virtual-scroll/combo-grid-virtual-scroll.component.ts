@@ -18,7 +18,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Input() isTooltip: boolean = false;
     @Input() placeholder: string = '';
     @Output() itemSelected = new EventEmitter<any>();
-    @ViewChild('inputSearch',{static: true}) inputSearch: ElementRef;
+    @ViewChild('inputSearch', { static: true }) inputSearch: ElementRef;
 
     currentItemSelected: any = null;
     CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = null;
@@ -30,6 +30,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     SearchFields: string[] = [];
     SelectedDisplayFields: string[] = [];
     Disabled: boolean = false;
+    searchKeys: string[] = [];
 
     constructor(
         private cdr: ChangeDetectorRef,
@@ -90,6 +91,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     setDisplayFields(data: { field: string, label: string }[]) {
         if (!!data && data.length > 0) {
             this.DisplayFields = data;
+            this.searchKeys = this.DisplayFields.map(d => d.field);
         }
     }
 
@@ -149,51 +151,51 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         }
     }
 
-    Search(key: string) {
-        key = key.toLowerCase().trim();
-        const constData = this.ConstDataSources;
-        const displayFields = this.DisplayFields;
-        const context = this;
+    // Search(key: string) {
+    //     key = key.toLowerCase().trim();
+    //     const constData = this.ConstDataSources;
+    //     const displayFields = this.DisplayFields;
+    //     const context = this;
 
-        const data = constData.filter(o => {
-            let matched: boolean = false;
-            for (const i of displayFields) {
-                const field: string = i.field;
-                const value: string = context.getValue(o, field) == null ? "" : context.getValue(o, field);
-                const valueType: string = typeof value;
+    //     const data = constData.filter(o => {
+    //         let matched: boolean = false;
+    //         for (const i of displayFields) {
+    //             const field: string = i.field;
+    //             const value: string = context.getValue(o, field) == null ? "" : context.getValue(o, field);
+    //             const valueType: string = typeof value;
 
-                if (valueType === 'boolean' && value === key) {
-                    matched = true;
-                }
+    //             if (valueType === 'boolean' && value === key) {
+    //                 matched = true;
+    //             }
 
-                if (valueType === 'string' && value.toLowerCase().includes(key)) {
-                    matched = true;
-                }
+    //             if (valueType === 'string' && value.toLowerCase().includes(key)) {
+    //                 matched = true;
+    //             }
 
-                if (valueType === 'number' && +value === +key) {
-                    matched = true;
-                }
-            }
-            return matched;
-        });
-        if (!!data.length) {
-            this.DataSources = data;
-        } else {
-            this.DataSources = constData;
-        }
+    //             if (valueType === 'number' && +value === +key) {
+    //                 matched = true;
+    //             }
+    //         }
+    //         return matched;
+    //     });
+    //     if (!!data.length) {
+    //         this.DataSources = data;
+    //     } else {
+    //         this.DataSources = constData;
+    //     }
 
-        if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
-            const _CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = this.CurrentActiveItemIdObj;
-            this.indexSelected = this.DataSources.findIndex(o => o[_CurrentActiveItemIdObj.field] === _CurrentActiveItemIdObj.value);
-        }
-    }
+    //     if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
+    //         const _CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = this.CurrentActiveItemIdObj;
+    //         this.indexSelected = this.DataSources.findIndex(o => o[_CurrentActiveItemIdObj.field] === _CurrentActiveItemIdObj.value);
+    //     }
+    // }
 
     getValue(item: any, field: string) {
         return item[field] || null;
     }
-    
-    clickSearch(){
-        if(this.inputSearch){
+
+    clickSearch() {
+        if (this.inputSearch) {
             setTimeout(() => this.inputSearch.nativeElement.focus(), 0);
         }
     }

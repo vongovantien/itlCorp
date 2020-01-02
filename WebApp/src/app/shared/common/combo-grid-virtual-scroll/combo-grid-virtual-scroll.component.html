@@ -1,6 +1,6 @@
 <div class="dropdown e--combogrid">
-    <input (click)="clickSearch()" class="form-control m-input m-input--square dropdown-toggle" [disabled]="Disabled" type="text" readonly
-        data-toggle="dropdown" placeholder="Please select"
+    <input (click)="clickSearch()" class="form-control m-input m-input--square dropdown-toggle" [disabled]="Disabled"
+        type="text" readonly data-toggle="dropdown" placeholder="Please select"
         [value]="displaySelectedStr == '' ? null : displaySelectedStr"
         [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''" [placeholder]="placeholder">
 
@@ -9,8 +9,7 @@
             <div class="table-head-fixed">
                 <div class="table-filter-block">
                     <div class="search-field">
-                        <input #inputSearch (ngModelChange)="Search(keyword)"
-                            class="form-control m-input m-input--square cbgr-input-search" type="text"
+                        <input #inputSearch class="form-control m-input m-input--square cbgr-input-search" type="text"
                             placeholder="Search..." autofocus [(ngModel)]="keyword">
                         <i class="icon-search"></i>
                     </div>
@@ -31,7 +30,7 @@
                         <tbody>
                             <ng-container *ngIf="!!DataSources.length">
                                 <tr class="data-row pointer"
-                                    *cdkVirtualFor="let item of DataSources; let i= index;trackBy: trackByFn"
+                                    *cdkVirtualFor="let item of DataSources | filter :keyword: searchKeys; let i= index;trackBy: trackByFn"
                                     data-id="{{(i+1)}}" (click)="emitSelected(item,i)"
                                     [class.data-selected]="indexSelected !== -1 && i === indexSelected">
                                     <td *ngFor="let display of DisplayFields; trackBy: trackByFn">
