@@ -54,6 +54,8 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
     {
         public string DBTitle { get; set; }
         public string DebitNo { get; set; }
+        public string TotalDebit { get; set; }
+        public string TotalCredit { get; set; }
         public string CompanyName { get; set; }
         public string CompanyDescription { get; set; }
         public string CompanyAddress1 { get; set; }
@@ -65,18 +67,17 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string AccsUSD { get; set; }
         public string AccsVND { get; set; }
         public string BankAddress { get; set; }
+        public decimal DecimalNo { get; set; }
         public string IssueInv { get; set; }
         public string InvoiceInfo { get; set; }
         public string Contact { get; set; }
         public string ReviseNotice { get; set; }
         public string IssuedDate { get; set; }
+        public string HBLList { get; set; }
         public string OtherRef { get; set; }
         public string InwordVND { get; set; }
-        public string Currency { get; set; }
-        public string TotalDebit { get; set; }
-        public string TotalCredit { get; set; }
-        public string BalanceAmount { get; set; }
-        public string HBLList { get; set; }
+        public string Currency { get; set; }              
         public decimal RateUSDToVND { get; set; }
+        public string BalanceAmount { get; set; }
     }
 }

@@ -16,6 +16,7 @@ import { TransactionTypeEnum } from "@enums";
 })
 export class ShareBusinessFormSearchSeaComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
+    @Output() onReset: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
     @Input() transaction: number = 1;
     filterTypes: CommonInterface.ICommonTitleValue[];
 
@@ -178,7 +179,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
         this.resetFormControl(this.saleman);
         this.resetFormControl(this.creator);
         this.filterType.setValue(this.filterTypes[0]);
-        this.onSearch.emit(<any>{ transactionType: null });
+        this.onReset.emit(<any>{ transactionType: null });
     }
 
     collapsed() {

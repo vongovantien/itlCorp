@@ -28,6 +28,11 @@ export class AirExportComponent extends AppList {
   itemToDelete: any = null;
 
   transactionService: number = CommonEnum.TransactionTypeEnum.AirExport;
+  tmpHouseBills: CsTransactionDetail[] = [];
+  tmpIndex: number = -1;
+
+  _fromDate: Date = this.createMoment().startOf('month').toDate();
+  _toDate: Date = this.createMoment().endOf('month').toDate();
 
   constructor(
     private _router: Router,
@@ -43,8 +48,8 @@ export class AirExportComponent extends AppList {
     this.isLoading = <any>this._store.select(fromShare.getTransationLoading);
     this.dataSearch = {
       transactionType: this.transactionService,
-      //fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-      //toDate: new Date(),
+      fromDate: this._fromDate,
+      toDate: this._toDate,
     };
   }
 
@@ -101,8 +106,8 @@ export class AirExportComponent extends AppList {
   }
 
   getListHouseBill(jobId: any, index: number) {
-    if (!!this.shipments[index].houseBillList && !!this.shipments[index].houseBillList.length) {
-      this.houseBills = this.shipments[index].houseBillList || [];
+    if (this.tmpIndex === index) {
+      this.houseBills = this.tmpHouseBills;
     } else {
       this._progressRef.start();
       this._documentRepo.getListHouseBillOfJob({ jobId: jobId })
@@ -110,9 +115,8 @@ export class AirExportComponent extends AppList {
         .subscribe(
           (res: any) => {
             this.houseBills = res || [];
-            console.log(this.houseBills);
-
-            this.shipments[index].houseBillList = res;
+            this.tmpHouseBills = this.houseBills;
+            this.tmpIndex = index;
           }
         );
     }
@@ -120,6 +124,14 @@ export class AirExportComponent extends AppList {
 
   onSearchShipment($event: any) {
     $event.transactionType = this.transactionService;
+    this.dataSearch = $event;
+    this.requestSearchShipment();
+  }
+
+  onResetShipment($event: any) {
+    $event.transactionType = this.transactionService;
+    $event.fromDate = this._fromDate;
+    $event.toDate = this._toDate;
     this.dataSearch = $event;
     this.requestSearchShipment();
   }
