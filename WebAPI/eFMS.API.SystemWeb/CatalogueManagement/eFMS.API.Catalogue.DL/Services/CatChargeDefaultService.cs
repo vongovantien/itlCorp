@@ -22,63 +22,73 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
         private readonly ICatChargeService chargeService;
+        private readonly IContextBase<CatCharge> chargeRepository;
 
         public CatChargeDefaultService(IContextBase<CatChargeDefaultAccount> repository, 
             ICacheServiceBase<CatChargeDefaultAccount> cacheService, 
             IMapper mapper,
             ICatChargeService charge,
             IStringLocalizer<LanguageSub> localizer,
-            ICurrentUser user) : base(repository, cacheService, mapper)
+            ICurrentUser user,
+            IContextBase<CatCharge> chargeRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
             chargeService = charge;
+            chargeRepository = chargeRepo;
         }
 
         public List<CatChargeDefaultAccountImportModel> CheckValidImport(List<CatChargeDefaultAccountImportModel> list)
         {
             var defaultAccount = Get();
-            var chargeDefaults = chargeService.Get();
+            var charges = chargeRepository.Get();
             list.ForEach(item =>
             {
+                if (string.IsNullOrEmpty(item.Type))
+                {
+                    item.TypeError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY];
+                    item.IsValid = false;
+                }
                 if (string.IsNullOrEmpty(item.ChargeCode))
                 {
-                    item.ChargeCode = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_EMPTY];
+                    item.ChargeCodeError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
                 {
-                    var charge = chargeDefaults.FirstOrDefault(x => x.Code == item.ChargeCode);
+                    var charge = charges.FirstOrDefault(x => x.Code.ToLower() == item.ChargeCode.ToLower());
                     if (charge == null)
                     {
-                        item.ChargeCode = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_NOT_FOUND], item.ChargeCode);
+                        item.ChargeCodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_NOT_FOUND], item.ChargeCode);
                         item.IsValid = false;
                     }
                 }
-
-                if (string.IsNullOrEmpty(item.Type)){
-                    item.Type = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY];
+                if (string.IsNullOrEmpty(item.DebitAccountNo) 
+                    && string.IsNullOrEmpty(item.CreditAccountNo)
+                    && item.DebitVat == null
+                    && item.CreditVat == null)
+                {
+                    item.DebitAccountNoError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
+                    item.CreditAccountNoError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
+                    item.CreditVatError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
+                    item.DebitVatError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
                     item.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.DebitAccountNo))
+                if (item.DebitVat != null)
                 {
-                    item.DebitAccountNo = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
-                    item.IsValid = false;
+                    if(item.DebitVat> 99)
+                    {
+                        item.DebitVatError = "Must be lower 100";
+                        item.IsValid = false;
+                    }
                 }
-                if (string.IsNullOrEmpty(item.CreditAccountNo))
+                if(item.CreditVat != null)
                 {
-                    item.CreditAccountNo = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_CREDIT_EMPTY];
-                    item.IsValid = false;
-                }
-                if (item.DebitVat == null)
-                {
-                    item.DebitVat = -1;
-                    item.IsValid = false;
-                }
-                if(item.CreditVat == null)
-                {
-                    item.CreditVat = -1;
-                    item.IsValid = false;
+                    if(item.CreditVat > 99)
+                    {
+                        item.CreditVatError = "Must be lower 100";
+                        item.IsValid = false;
+                    }
                 }
             });
             return list;

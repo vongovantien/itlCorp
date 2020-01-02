@@ -206,13 +206,13 @@ namespace eFMS.API.Catalogue.Controllers
                     var defaultAccount = new CatChargeDefaultAccountImportModel
                     {
                         IsValid = true,
-                        ChargeCode = worksheet.Cells[row, 1].Value?.ToString(),
-                        Type = worksheet.Cells[row, 2].Value?.ToString(),
-                        DebitAccountNo = worksheet.Cells[row, 3].Value?.ToString(),
-                        CreditAccountNo = worksheet.Cells[row, 4].Value?.ToString(),
-                        DebitVat = worksheet.Cells[row, 5].Value == null ? -1 : Convert.ToDecimal(worksheet.Cells[row, 5].Value),
-                        CreditVat = worksheet.Cells[row, 6].Value == null ? -1 : Convert.ToDecimal(worksheet.Cells[row, 6].Value),
-                        Status = worksheet.Cells[row, 7].Value?.ToString(),
+                        ChargeCode = worksheet.Cells[row, 1].Value == null ? string.Empty : worksheet.Cells[row, 1].Value.ToString().Trim(),
+                        Type = worksheet.Cells[row, 2].Value == null ? string.Empty : worksheet.Cells[row, 2].Value.ToString().Trim(),
+                        DebitAccountNo = worksheet.Cells[row, 3].Value == null ? string.Empty : worksheet.Cells[row, 3].Value.ToString().Trim(),
+                        CreditAccountNo = worksheet.Cells[row, 4].Value == null ? string.Empty : worksheet.Cells[row, 4].Value.ToString(),
+                        DebitVat = worksheet.Cells[row, 5].Value != null ? (decimal?)null:Convert.ToDecimal(worksheet.Cells[row, 5].Value),
+                        CreditVat = worksheet.Cells[row, 6].Value == null ? (decimal?)null: Convert.ToDecimal(worksheet.Cells[row, 6].Value),
+                        Status = worksheet.Cells[row, 7].Value == null? string.Empty: worksheet.Cells[row, 7].Value.ToString(),
                     };
                     list.Add(defaultAccount);
                 }

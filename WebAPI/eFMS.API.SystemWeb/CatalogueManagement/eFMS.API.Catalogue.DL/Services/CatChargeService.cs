@@ -264,6 +264,32 @@ namespace eFMS.API.Catalogue.DL.Services
             var currencies = currencyService.Get();
             list.ForEach(item =>
             {
+                if (string.IsNullOrEmpty(item.ServiceName))
+                {
+                    item.ServiceNameError = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_EMPTY];
+                    item.IsValid = false;
+                }
+                else
+                {
+                    var services = item.ServiceName.Split(";").Where(x => !string.IsNullOrEmpty(x));
+                    string serviceToAdd = string.Empty;
+                    foreach (var service in services)
+                    {
+                        var dataService = CustomData.Services.FirstOrDefault(x => x.DisplayName.ToLower() == service.ToLower().Trim());
+                        if (dataService == null)
+                        {
+                            item.ServiceNameError = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_NOT_FOUND, service];
+                            item.IsValid = false;
+                            break;
+                        }
+                        serviceToAdd = serviceToAdd + dataService.Value + ";";
+                    }
+                    if (serviceToAdd.Length > 0)
+                    {
+                        serviceToAdd = serviceToAdd.Substring(0, serviceToAdd.Length - 1);
+                        item.ServiceTypeId = serviceToAdd;
+                    }
+                }
                 if (string.IsNullOrEmpty(item.ChargeNameEn))
                 {
                     item.ChargeNameEnError = stringLocalizer[LanguageSub.MSG_CHARGE_NAME_EN_EMPTY];

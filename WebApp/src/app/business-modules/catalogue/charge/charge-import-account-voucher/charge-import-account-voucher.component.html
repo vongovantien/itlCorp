@@ -134,38 +134,34 @@
                                     <span>{{ (i + this.pager.startIndex + 1) }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.chargeCode.split('|').length == 1">{{ item.chargeCode }}</span>
-                                    <span class="m--font-danger" *ngIf="item.chargeCode.split('|').length > 1">{{
-                                        item.chargeCode.split('|')[0] }}</span>
+                                    <span *ngIf="item.chargeCodeError === null">{{ item.chargeCode }}</span>
+                                    <span class="m--font-danger" *ngIf="item.chargeCodeError !== null">{{
+                                        item.chargeCodeError }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.type.split('|').length == 1">{{ item.type }}</span>
-                                    <span class="m--font-danger" *ngIf="item.type.split('|').length > 1">{{
-                                        item.type.split('|')[0] }}</span>
+                                    <span *ngIf="item.typeError === null">{{ item.type }}</span>
+                                    <span class="m--font-danger" *ngIf="item.typeError !== null">{{
+                                        item.typeError }}</span>
                                 </td>
                                 <td class="">
-                                    <span
-                                        *ngIf="item.debitAccountNo.split('|').length == 1">{{ item.debitAccountNo }}</span>
-                                    <span class="m--font-danger" *ngIf="item.debitAccountNo.split('|').length > 1">{{
-                                        item.debitAccountNo.split('|')[0] }}</span>
+                                    <span *ngIf="item.debitAccountNoError === null">{{ item.debitAccountNo }}</span>
+                                    <span class="m--font-danger" *ngIf="item.debitAccountNoError !== null">{{
+                                        item.debitAccountNoError }}</span>
                                 </td>
                                 <td class="">
-                                    <span
-                                        *ngIf="item.creditAccountNo.split('|').length == 1">{{ item.creditAccountNo }}</span>
-                                    <span class="m--font-danger" *ngIf="item.creditAccountNo.split('|').length > 1">{{
-                                        item.creditAccountNo.split('|')[0] }}</span>
+                                    <span *ngIf="item.creditAccountNoError === null">{{ item.creditAccountNo }}</span>
+                                    <span class="m--font-danger" *ngIf="item.creditAccountNoError !== null">{{
+                                        item.creditAccountNoError }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.debitVat != -1">{{ item.debitVat }}</span>
-                                    <span class="m--font-danger" *ngIf="item.debitVat== -1">Debit account VAT is not
-                                        allow to null and
-                                        must be number </span>
+                                    <span *ngIf="item.debitVatError === null">{{ item.debitVat }}</span>
+                                    <span class="m--font-danger" *ngIf="item.debitVatError !== null">{{ item.debitVatError
+                                    }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.creditVat != -1">{{ item.creditVat }}</span>
-                                    <span class="m--font-danger" *ngIf="item.creditVat== -1">Credit account VAT is not
-                                        allow to null and
-                                        must be number </span>
+                                    <span *ngIf="item.creditVatError === null">{{ item.creditVat }}</span>
+                                    <span class="m--font-danger" *ngIf="item.creditVatError !== null">{{ item.creditVatError
+                                    }}</span>
                                 </td>
                                 <td class="">
                                     <span>{{ item.status }}</span>

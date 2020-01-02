@@ -428,7 +428,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    string countryBilling = item.CountryBilling.ToLower().Trim();
+                    string countryBilling = item.CountryBilling.ToLower();
                     if(countryBilling.Length == 0)
                     {
                         item.CountryBillingError = stringLocalizer[LanguageSub.MSG_PARTNER_COUNTRY_BILLING_EMPTY];
@@ -483,7 +483,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     else
                     {
-                        countShipping = item.CountryBilling.ToLower().Trim();
                         if(countShipping.Length == 0)
                         {
                             item.CountryShippingError = stringLocalizer[LanguageSub.MSG_PARTNER_COUNTRY_SHIPPING_EMPTY];
