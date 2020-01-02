@@ -401,8 +401,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
             var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && (x.Type == Constants.TYPE_CHARGE_BUY || x.Type == Constants.TYPE_CHARGE_SELL));
-            var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
-            var csTrans = csTransactionRepo.Get();
+            var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
+            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
             var creditNote = acctCdnoteRepo.Get();
             var debitNote = acctCdnoteRepo.Get();
@@ -459,8 +459,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
             var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == Constants.TYPE_CHARGE_OBH);
-            var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
-            var csTrans = csTransactionRepo.Get();
+            var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
+            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
             var debitNote = acctCdnoteRepo.Get();
             //OBH Receiver (SELL - Credit)
@@ -513,8 +513,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
             var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == Constants.TYPE_CHARGE_OBH);
-            var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
-            var csTrans = csTransactionRepo.Get();
+            var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
+            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
             var custom = customsDeclarationRepo.Get();
             var creditNote = acctCdnoteRepo.Get();
@@ -631,8 +631,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 Service = data.Service,
                                 CustomNo = GetTopClearanceNoByJobNo(data.JobId)
                             };
-
-            return queryData.OrderBy(x => x.Service);
+            queryData = queryData.ToArray().OrderBy(x => x.Service).AsQueryable();
+            return queryData;
         }
         #endregion -- Get Data Charge Master --
 
@@ -753,7 +753,8 @@ namespace eFMS.API.Accounting.DL.Services
                 SOANo = chg.SOANo,
                 DatetimeModifiedSurcharge = chg.DatetimeModified
             });
-            query = query.OrderByDescending(x => x.DatetimeModifiedSurcharge);
+            //Sort Array sẽ nhanh hơn
+            query = query.ToArray().OrderByDescending(x => x.DatetimeModifiedSurcharge).AsQueryable();
             return query;
         }
 
@@ -762,7 +763,7 @@ namespace eFMS.API.Accounting.DL.Services
             var chargeShipmentList = GetChargesShipmentByCriteria(criteria);
             var result = new ChargeShipmentResult
             {
-                ChargeShipments = chargeShipmentList.ToList(),
+                ChargeShipments = chargeShipmentList.Take(50).ToList(),
                 TotalShipment = chargeShipmentList.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count(),
                 TotalCharge = chargeShipmentList.Count(),
                 AmountDebitLocal = chargeShipmentList.Sum(x => x.AmountDebitLocal),
@@ -901,7 +902,8 @@ namespace eFMS.API.Accounting.DL.Services
                 SOANo = chg.SOANo,
                 DatetimeModifiedSurcharge = chg.DatetimeModified
             });
-            query = query.OrderByDescending(x => x.DatetimeModifiedSurcharge);
+            //Sort Array sẽ nhanh hơn
+            query = query.ToArray().OrderByDescending(x => x.DatetimeModifiedSurcharge).AsQueryable();
             return query;
         }
 
@@ -952,7 +954,7 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion -- Get List More Charges & Add More Charge Shipment By Criteria --
 
         #region -- Get List & Paging SOA By Criteria --
-        private IQueryable<AcctSOAResult> QueryDataListSOA(IQueryable<ChargeSOAResult> charge, IQueryable<AcctSoa> soa)
+        private IQueryable<AcctSOAResult> QueryDataListSOA(IQueryable<AcctSoa> soa)
         {
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var partner = catPartnerRepo.Get();
@@ -975,24 +977,25 @@ namespace eFMS.API.Accounting.DL.Services
                                  DatetimeModified = s.DatetimeModified,
                                  UserModified = s.UserModified,
                              };
-            return resultData.OrderByDescending(x => x.DatetimeModified);
+            //Sort Array sẽ nhanh hơn
+            resultData = resultData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
+            return resultData;
         }
 
         public IQueryable<AcctSOAResult> GetListSOA(AcctSOACriteria criteria)
         {
-            //Chỉ lấy ra những charge có SOANo (Để hạn chế việc join & get data không cần thiết)
-            var charge = GetChargeShipmentDocAndOperation().Where(x => !string.IsNullOrEmpty(x.SOANo));
             var soa = DataContext.Get();
-
             if (!string.IsNullOrEmpty(criteria.StrCodes))
             {
+                //Chỉ lấy ra những charge có SOANo (Để hạn chế việc join & get data không cần thiết)
+                //var charge = GetChargeShipmentDocAndOperation().Where(x => !string.IsNullOrEmpty(x.SOANo));
                 var listCode = criteria.StrCodes.Split(',').Where(x => x.ToString() != string.Empty).ToList();
                 List<string> refNo = new List<string>();
                 refNo = (from s in soa
-                         join chg in charge on s.Soano equals chg.SOANo into chg2
+                         join chg in csShipmentSurchargeRepo.Get() on s.Soano equals (chg.PaySoano ?? chg.Soano) into chg2
                          from chg in chg2.DefaultIfEmpty()
                          where
-                             listCode.Contains(s.Soano) || listCode.Contains(chg.JobId) || listCode.Contains(chg.MBL) || listCode.Contains(chg.HBL)
+                             listCode.Contains(s.Soano) || listCode.Contains(chg.JobNo) || listCode.Contains(chg.Mblno) || listCode.Contains(chg.Hblno)
                          select s.Soano).ToList();
                 soa = soa.Where(x => refNo.Contains(x.Soano));
             }
@@ -1024,14 +1027,15 @@ namespace eFMS.API.Accounting.DL.Services
                 soa = soa.Where(x => x.UserCreated == criteria.SoaUserCreate);
             }
 
-            var dataResult = QueryDataListSOA(charge, soa);
+            var dataResult = QueryDataListSOA(soa);
             return dataResult;
         }
 
         public IQueryable<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount)
         {
             var data = GetListSOA(criteria);
-            rowsCount = (data.Count() > 0) ? data.Count() : 0;
+            var _totalItem = data.Select(s => s.Id).Count();
+            rowsCount = (_totalItem > 0) ? _totalItem : 0;
             if (size > 0)
             {
                 if (page < 1)
@@ -1164,14 +1168,12 @@ namespace eFMS.API.Accounting.DL.Services
                 //Xóa các serviceTypeId trùng
                 string[] arrayGrpServiceTypeId = arrayStrServiceTypeId.Distinct<string>().ToArray();
 
-                var serviceId = string.Empty;
                 foreach (var item in arrayGrpServiceTypeId)
                 {
                     //Lấy ra DisplayName của serviceTypeId
                     serviceName += CustomData.Services.Where(x => x.Value == item).FirstOrDefault() != null ?
                                 CustomData.Services.Where(x => x.Value == item).FirstOrDefault().DisplayName.Trim() + ";"
                                 : string.Empty;
-                    serviceId += item + ";";
                 }
                 serviceName = (serviceName + ")").Replace(";)", string.Empty);
             }

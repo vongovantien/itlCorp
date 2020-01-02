@@ -85,7 +85,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("Query")]
         public IActionResult Get(CatPlaceCriteria criteria)
         {
-            var results = catPlaceService.Query(criteria);
+            var results = catPlaceService.Get(criteria);
             return Ok(results);
         }
 

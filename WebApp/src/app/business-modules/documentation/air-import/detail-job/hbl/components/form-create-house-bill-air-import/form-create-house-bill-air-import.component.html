@@ -3,13 +3,13 @@
         <form class="m-form m-form--state" [formGroup]="formCreate">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mawb.value}">
                         <label required>MAWB</label>
                         <input type="text" class="form-control" formControlName="mawb">
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !customerId.value}">
                         <label required>Customer (Payer)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [currentActiveItemId]="{ field: 'id', value: customerId.value}"
@@ -33,7 +33,7 @@
             </div>
             <div class="row div-inside bg-secondary">
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !shipperId.value}">
                         <label required>Shipper</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
                             [currentActiveItemId]="{ field: 'id', value: shipperId.value}"
@@ -57,8 +57,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !notifyId.value}">
-                        <label required>Notify Party</label>
+                    <div class="form-group">
+                        <label>Notify Party</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consignee')"
                             [currentActiveItemId]="{ field: 'id', value: notifyId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="notifies | async"
@@ -71,13 +71,14 @@
                 <div class="col-md-4">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !hawb.value}">
                                 <label required>HAWB</label>
                                 <input type="text" class="form-control" formControlName="hawb">
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':isSubmitted && !hbltype.value}">
                                 <label required>HAWB Type</label>
                                 <ng-select #hawbType [items]="billTypes" placeholder="Please select" [allowClear]="true"
                                     (opened)="closeOtherSelects(hawbType)" formControlName="hbltype"

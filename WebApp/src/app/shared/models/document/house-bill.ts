@@ -95,6 +95,7 @@ export class HouseBill extends BaseModel {
     shipperId: string = null;
     shipperName: string = null;
     shippingMark: string = null;
+    subbAbbr: string = null;
     warehouseNotice: string = null;
     packageQty: number = null;
 
@@ -152,10 +153,14 @@ export class HouseBill extends BaseModel {
             if (self.hasOwnProperty(key.toString())) {
                 self[key] = object[key];
             }
-
-            if (!!self.dimensionDetails.length) {
-                self.dimensionDetails = object.dimensionDetails.map((i: DIM) => new DIM(i));
+            if (self.dimensionDetails !== null) {
+                if (!!self.dimensionDetails.length) {
+                    self.dimensionDetails = object.dimensionDetails.map((i: DIM) => new DIM(i));
+                }
             }
+
+
+
         }
     }
 }

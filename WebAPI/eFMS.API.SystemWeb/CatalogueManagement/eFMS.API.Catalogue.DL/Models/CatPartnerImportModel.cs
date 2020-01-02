@@ -17,5 +17,22 @@ namespace eFMS.API.Catalogue.DL.Models
         public string Status { get; set; }
         public string ACReference { get; set; }
         public string Profile { get; set; }
+        public string PartnerNameEnError { get; set; }
+        public string PartnerNameVnError { get; set; }
+        public string ShortNameError { get; set; }
+        public string TaxCodeError { get; set; }
+        public string PartnerGroupError { get; set; }
+        public string ContactPersonError { get; set; }
+        public string TelError { get; set; }
+        public string AddressEnError { get; set; }
+        public string AddressVnError { get; set; }
+        public string CityBillingError { get; set; }
+        public string CountryBillingError { get; set; }
+        public string AddressShippingEnError { get; set; }
+        public string AddressShippingVnError { get; set; }
+        public string CityShippingError { get; set; }
+        public string CountryShippingError { get; set; }
+        public string SaleManNameError { get; set; }
+        public string ProfileError { get; set; }
     }
 }

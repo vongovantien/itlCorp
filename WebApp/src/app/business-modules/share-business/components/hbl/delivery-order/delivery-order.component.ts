@@ -29,6 +29,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
     userLogged: User;
     hblid: string;
     hblDetail: any = {};
+    isAir: boolean = false;
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -82,6 +83,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
             doheader1: this.deliveryOrder.doheader1,
             doheader2: this.deliveryOrder.doheader2,
             dofooter: this.deliveryOrder.dofooter,
+            subAbbr: this.deliveryOrder.subAbbr
         };
 
         this._progressRef.start();
@@ -130,5 +132,6 @@ interface IDefaultHeaderFooter {
     doheader1: string;
     doheader2: string;
     dofooter: string;
+    subAbbr: string;
 }
 

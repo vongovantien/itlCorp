@@ -14,6 +14,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string Doheader1 { get; set; }
         public string Doheader2 { get; set; }
         public string Dofooter { get; set; }
+        public string SubAbbr { get; set; }
         public DateTime? DeliveryOrderPrintedDate { get; set; }
     }
 }

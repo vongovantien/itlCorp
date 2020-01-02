@@ -25,9 +25,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public DateTime? ExchangeDate { get; set; }
         public string Notes { get; set; }
         public string SettlementCode { get; set; }
-        public string Csidsettlement { get; set; }
-        public string CsstatusSettlement { get; set; }
-        public DateTime? CsdateSettlement { get; set; }
         public string InvoiceNo { get; set; }
         public DateTime? InvoiceDate { get; set; }
         public string SeriesNo { get; set; }
@@ -35,24 +32,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string ClearanceNo { get; set; }
         public string ContNo { get; set; }
         public string PaymentRefNo { get; set; }
-        public string AccountantId { get; set; }
-        public DateTime? AccountantDate { get; set; }
-        public string AccountantStatus { get; set; }
-        public string AccountantNote { get; set; }
-        public string ChiefAccountantId { get; set; }
-        public DateTime? ChiefAccountantDate { get; set; }
-        public string ChiefAccountantStatus { get; set; }
-        public string ChiefAccountantNote { get; set; }
         public string Status { get; set; }
-        public string SoaadjustmentRequestor { get; set; }
-        public DateTime? SoaadjustmentRequestedDate { get; set; }
-        public string SoaadjustmentReason { get; set; }
-        public string UnlockedSoasaleMan { get; set; }
-        public string UnlockedSoasaleManStatus { get; set; }
-        public DateTime? UnlockedSoasaleManDate { get; set; }
-        public string UnlockedSoadirector { get; set; }
-        public string UnlockedSoadirectorStatus { get; set; }
-        public DateTime? UnlockedSoadirectorDate { get; set; }
         public bool? Soaclosed { get; set; }
         public bool? Cdclosed { get; set; }
         public string CreditNo { get; set; }

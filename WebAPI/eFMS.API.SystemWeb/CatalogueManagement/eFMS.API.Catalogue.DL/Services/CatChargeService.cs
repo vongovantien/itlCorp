@@ -264,27 +264,19 @@ namespace eFMS.API.Catalogue.DL.Services
             var currencies = currencyService.Get();
             list.ForEach(item =>
             {
-                if(item.Status == null || item.Status?.ToLower().Trim() == "active")
-                {
-                    item.Active = true;
-                }
-                else
-                {
-                    item.Active = false;
-                }
                 if (string.IsNullOrEmpty(item.ChargeNameEn))
                 {
-                    item.ChargeNameEn = stringLocalizer[LanguageSub.MSG_CHARGE_NAME_EN_EMPTY];
+                    item.ChargeNameEnError = stringLocalizer[LanguageSub.MSG_CHARGE_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.ChargeNameVn))
                 {
-                    item.ChargeNameVn = stringLocalizer[LanguageSub.MSG_CHARGE_NAME_LOCAL_EMPTY];
+                    item.ChargeNameVnError = stringLocalizer[LanguageSub.MSG_CHARGE_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.UnitCode))
                 {
-                    item.UnitCode = stringLocalizer[LanguageSub.MSG_CHARGE_UNIT_EMPTY];
+                    item.UnitError = stringLocalizer[LanguageSub.MSG_CHARGE_UNIT_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -292,7 +284,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var unit = units.FirstOrDefault(x => x.Code.ToLower() == item.UnitCode.ToLower());
                     if(unit == null)
                     {
-                        item.UnitCode = stringLocalizer[LanguageSub.MSG_CHARGE_UNIT_NOT_FOUND];
+                        item.UnitError = stringLocalizer[LanguageSub.MSG_CHARGE_UNIT_NOT_FOUND];
                         item.IsValid = false;
                     }
                     else
@@ -302,57 +294,30 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (item.UnitPrice < 0)
                 {
-                    item.UnitPrice = -1;
                     item.IsValid = false;
+                    item.UnitPriceError = "Price is not allow empty and must be a decimal number";
                 }
-                if (string.IsNullOrEmpty(item.CurrencyId))
-                {
-                    item.CurrencyId = stringLocalizer[LanguageSub.MSG_CHARGE_CURRENCY_EMPTY];
+                if(item.Vatrate > 99) {
                     item.IsValid = false;
+                    item.VatrateError = "VAT is must be lower than 100";
                 }
                 if (!string.IsNullOrEmpty(item.CurrencyId))
                 {
                     var currency = currencies.FirstOrDefault(x => x.Id == item.CurrencyId);
                     if (currency == null)
                     {
-                        item.CurrencyId = stringLocalizer[LanguageSub.MSG_CHARGE_CURRENCY_NOT_FOUND];
+                        item.CurrencyError = stringLocalizer[LanguageSub.MSG_CHARGE_CURRENCY_NOT_FOUND];
                         item.IsValid = false;
                     }
                 }
-                if (string.IsNullOrEmpty(item.Type))
-                {
-                    item.Type = stringLocalizer[LanguageSub.MSG_CHARGE_TYPE_EMPTY];
-                    item.IsValid = false;
-                }
-                if (string.IsNullOrEmpty(item.ServiceTypeId))
-                {
-                    item.ServiceTypeId = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_EMPTY];
-                    item.IsValid = false;
-                }
                 else
                 {
-                    var services = item.ServiceTypeId.Split(";").Where(x => !string.IsNullOrEmpty(x));
-                    string serviceToAdd = string.Empty;
-                    foreach(var service in services)
-                    {
-                        var dataService = CustomData.Services.FirstOrDefault(x => x.DisplayName.ToLower() == service.ToLower().Trim());
-                        if (dataService == null)
-                        {
-                            item.ServiceTypeId = stringLocalizer[LanguageSub.MSG_CHARGE_SERVICE_TYPE_NOT_FOUND, service];
-                            item.IsValid = false;
-                            break;
-                        }
-                        serviceToAdd = serviceToAdd + dataService.Value + ";";
-                    }
-                    if (serviceToAdd.Length > 0)
-                    {
-                        serviceToAdd = serviceToAdd.Substring(0, serviceToAdd.Length - 1);
-                        item.ServiceTypeId = serviceToAdd;
-                    }
+                    item.CurrencyError = stringLocalizer[LanguageSub.MSG_CHARGE_CURRENCY_EMPTY];
+                    item.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.Code))
+                if (string.IsNullOrEmpty(item.Type))
                 {
-                    item.Code = stringLocalizer[LanguageSub.MSG_CHARGE_CODE_EMPTY];
+                    item.TypeError = stringLocalizer[LanguageSub.MSG_CHARGE_TYPE_EMPTY];
                     item.IsValid = false;
                 }
                 if(!string.IsNullOrEmpty(item.Code))
@@ -360,14 +325,19 @@ namespace eFMS.API.Catalogue.DL.Services
                     var charge = charges.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
                     if (charge != null)
                     {
-                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_CODE_EXISTED], item.Code);
+                        item.CodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_CODE_EXISTED], item.Code);
                         item.IsValid = false;
                     }
                     if (list.Count(x => x.Code?.ToLower() == item.Code?.ToLower()) > 1)
                     {
-                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_CODE_DUPLICATED], item.Code);
+                        item.CodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_CODE_DUPLICATED], item.Code);
                         item.IsValid = false;
                     }
+                }
+                else
+                {
+                    item.CodeError = stringLocalizer[LanguageSub.MSG_CHARGE_CODE_EMPTY];
+                    item.IsValid = false;
                 }
 
             });
