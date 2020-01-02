@@ -277,7 +277,7 @@
                             <div class="form-group">
                                 <label>WT/VAL</label>
                                 <ng-select #wtsVal [items]="wts" [allowClear]="true"
-                                    (opened)="closeOtherSelects(wtsVal)" formControlName="wTorVALPayment">
+                                    (opened)="closeOtherSelects(wtsVal)" formControlName="wtorValpayment">
                                 </ng-select>
                             </div>
                         </div>
@@ -361,28 +361,28 @@
                         <div class="col">
                             <div class="form-group">
                                 <label>Pieces</label>
-                                <input type="number" class="form-control">
+                                <input type="number" class="form-control" formControlName="packageQty">
 
                             </div>
                         </div>
                         <div class="col pl-0">
                             <div class="form-group">
                                 <label>GW</label>
-                                <input type="number" class="form-control">
+                                <input type="number" class="form-control" formControlName="grossWeight">
 
                             </div>
                         </div>
                         <div class="col pl-0">
                             <div class="form-group">
                                 <label>Kg Ib</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="kgIb">
 
                             </div>
                         </div>
                         <div class="col pl-0">
                             <div class="form-group">
                                 <label>R.Class</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="rclass">
                             </div>
                         </div>
                     </div>
@@ -392,21 +392,21 @@
                         <div class="col">
                             <div class="form-group">
                                 <label>Com Item. No</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="comItemNo">
 
                             </div>
                         </div>
                         <div class="col pl-0">
                             <div class="form-group">
                                 <label>C.W</label>
-                                <input type="number" class="form-control">
+                                <input type="number" class="form-control" formControlName="chargeWeight">
 
                             </div>
                         </div>
                         <div class="col pl-0">
                             <div class="form-group">
                                 <label>Rate Charge</label>
-                                <input type="number" class="form-control">
+                                <input type="number" class="form-control" formControlName="rateCharge">
                             </div>
                         </div>
                     </div>
@@ -416,7 +416,7 @@
                         <div class="col d-flex align-items-end" style="max-width: 80px">
                             <div class="form-group">
                                 <label class="m-checkbox m-checkbox--bold">
-                                    <input type="checkbox"> Min
+                                    <input type="checkbox" (change)="onChangeMin($event)"> Min
                                     <span></span>
                                 </label>
                             </div>
@@ -424,28 +424,27 @@
                         <div class="col pl-0">
                             <div class="form-group">
                                 <label>Total</label>
-                                <input type="number" class="form-control">
+                                <input currencyMask type="text" class="form-control" formControlName="total">
                             </div>
                         </div>
                         <div class="col pl-0">
                             <div class="form-group">
                                 <label>Sea-Air</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="seaAir">
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="col-md-8">
                     <div class="row">
                         <div class="col">Volume</div>
                         <div class="col text-center">
                             HW: &nbsp;
-                            <span class="text-primary">{{totalHeightWeight}}</span>
+                            <span class="text-primary">{{totalHeightWeight | number: '.0-3'}}</span>
                         </div>
                         <div class="col text-right">
                             CBM:&nbsp;
-                            <span class="text-primary">{{totalCBM}}</span>
+                            <span class="text-primary">{{totalCBM | number: '.0-3'}}</span>
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -469,21 +468,28 @@
                         <div class="table-dims-wrapper" (clickOutside)="selectedIndexDIM = -1">
                             <table class="table table-bordered bg-white table-prepaid-collect">
                                 <tbody>
-                                    <ng-container formArrayName="dimensionDetails"
-                                        *ngFor="let item of formCreate?.get('dimensionDetails')['controls']; let j = index;">
-                                        <ng-container [formGroupName]="j">
+                                    <ng-container *ngIf="!!dims.length">
+                                        <ng-container *ngFor="let item of dims; let j = index">
                                             <tr (click)="selectDIM(j)" [class.selected-row]="selectedIndexDIM === j">
                                                 <td>
-                                                    <input type="number" class="form-control" formControlName="length">
+                                                    <input type="number" class="form-control" [(ngModel)]="item.length"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        (ngModelChange)="updateHeightWeight(item)">
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control" formControlName="width">
+                                                    <input type="number" class="form-control" [(ngModel)]="item.width"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        (ngModelChange)="updateHeightWeight(item)">
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control" formControlName="height">
+                                                    <input type="number" class="form-control" [(ngModel)]="item.height"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        (ngModelChange)="updateHeightWeight(item)">
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control" formControlName="package">
+                                                    <input type="number" class="form-control" [(ngModel)]="item.package"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        (ngModelChange)="updateHeightWeight(item)">
                                                 </td>
                                                 <td>
                                                     <a class="btn m-btn--icon m-btn--icon-only m--font-danger"
@@ -494,8 +500,8 @@
                                             </tr>
                                         </ng-container>
                                     </ng-container>
-                                    <tr app-table-none-record
-                                        *ngIf="!formCreate?.get('dimensionDetails')['controls'].length"></tr>
+                                    <tr app-table-none-record *ngIf="!dims.length">
+                                    </tr>
                                     <tr>
                                         <td colspan=1>
                                             <a class="btn m-btn--icon m-btn--icon-only m--font-success" title="Add"
