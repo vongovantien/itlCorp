@@ -96,7 +96,7 @@
                                                 </th>
                                             </thead>
                                             <tbody class="tbody-group">
-                                                <ng-container *ngIf="!isLoading && !!houseBills.length">
+                                                <ng-container *ngIf="!(isLoading | async) && !!houseBills.length">
                                                     <tr (click)="selectHBL(house)" class="pointer"
                                                         title="Select House Bill"
                                                         [class.selected-row]="selectedHbl.id === house.id"
@@ -144,10 +144,10 @@
                                                         <td>{{totalCBM}}</td>
                                                     </tr>
                                                 </ng-container>
-                                                <tr *ngIf="!isLoading && !houseBills.length" app-table-none-record
-                                                    [colspan]="headers.length + 1">
+                                                <tr *ngIf="!(isLoading | async) && !houseBills.length"
+                                                    app-table-none-record [colspan]="headers.length + 1">
                                                 </tr>
-                                                <tr *ngIf="isLoading" app-table-row-loading></tr>
+                                                <tr *ngIf="isLoading | async" app-table-row-loading></tr>
                                             </tbody>
                                         </table>
                                     </div>

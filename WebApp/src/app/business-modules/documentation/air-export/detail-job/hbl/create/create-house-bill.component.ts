@@ -83,8 +83,9 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             cbm: this.formCreateHBLComponent.totalCBM,
             hw: this.formCreateHBLComponent.totalHeightWeight,
             attachList: this.attachListComponent.attachList,
-            dimensionDetails: this.formCreateHBLComponent.dims,
-            hwConstant: 2323
+            dimensionDetails: form.dimensionDetails,
+            hwConstant: this.formCreateHBLComponent.hwconstant
+
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
@@ -114,7 +115,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         this.formCreateHBLComponent.originBlnumber,
         this.formCreateHBLComponent.currencyId,
         this.formCreateHBLComponent.freightPayment,
-        this.formCreateHBLComponent.wtorValpayment].forEach((control: AbstractControl) => this.setError(control));;
+        this.formCreateHBLComponent.wtorValpayment].forEach((control: AbstractControl) => this.setError(control));
 
         if (!this.formCreateHBLComponent.formCreate.valid
             || (!!this.formCreateHBLComponent.etd.value && !this.formCreateHBLComponent.etd.value.startDate)
