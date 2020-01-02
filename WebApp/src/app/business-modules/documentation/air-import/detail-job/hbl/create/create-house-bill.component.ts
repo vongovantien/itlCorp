@@ -106,19 +106,26 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             hwbno: form.hawb,
             hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
-            etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
+            arrivalDate: !!form.arrivaldate && !!form.arrivaldate.startDate ? formatDate(form.arrivaldate.startDate, 'yyyy-MM-dd', 'en') : null,
             forwardingAgentId: form.forwardingAgentId,
             pol: form.pol,
             pod: form.pod,
-            wareHouseNotice: form.warehouse,
+            warehouseNotice: form.warehouseNotice,
             route: form.route,
             flightNo: form.flightNo,
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightNoOrigin: form.flightNoOrigin,
             flightDateOrigin: !!form.flightDateOrigin ? formatDate(form.flightDateOrigin.startDate, 'yyyy-MM-dd', 'en') : null,
-            issueHBLDate: !!form.issueDate ? formatDate(form.issueDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            packageType: !!form.unit && !!form.unit.length ? form.units[0].id : null,
+            issueHBLDate: !!form.issueHBLDate ? formatDate(form.issueHBLDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            packageType: !!form.unit && !!form.unit.length ? form.unit[0].id : null,
             freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
+            packageQty: form.packageQty,
+            grossWeight: form.gw,
+            chargeWeight: form.cw,
+            poInvoiceNo: form.po,
+            goodsDeliveryDescription: form.descriptionOfGood,
+            finalPOD: form.finalPOD,
+            desOfGoods: form.descriptionOfGood
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
@@ -142,12 +149,9 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
     checkValidateForm() {
         let valid: boolean = true;
-
-        this.setError(this.formCreateHBLComponent.hbltype);
+        // this.setError(this.formCreateHBLComponent.hbltype);
         this.setError(this.formCreateHBLComponent.freightPayment);
-        this.setError(this.formCreateHBLComponent.unit);
-
-
+        this.setError(this.formCreateHBLComponent.packageType);
         if (!this.formCreateHBLComponent.formCreate.valid) {
             valid = false;
         }

@@ -59,21 +59,22 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Notify Party</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consignee')"
-                            [currentActiveItemId]="{ field: 'id', value: notifyId.value}"
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'notify')"
+                            [currentActiveItemId]="{ field: 'id', value: notifyPartyId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="notifies | async"
                             [displayFields]="displayFieldsCustomer" [height]="200">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
-                            formControlName="notifyDescription"></textarea>
+                            formControlName="notifyPartyDescription"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !hawb.value}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':isSubmitted && !hwbno.value}">
                                 <label required>HAWB</label>
-                                <input type="text" class="form-control" formControlName="hawb">
+                                <input type="text" class="form-control" formControlName="hwbno">
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">
@@ -114,7 +115,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="Select Date Arrival"
-                                        readonly formControlName="da" />
+                                        readonly formControlName="arrivalDate" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -162,7 +163,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Warehouse</label>
-                                <input type="text" class="form-control" formControlName="warehouse">
+                                <input type="text" class="form-control" formControlName="warehouseNotice">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -229,7 +230,7 @@
                     <div class="form-group">
                         <label>Final Destination</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'final')"
-                            [currentActiveItemId]="{ field: 'id', value: finalDestinaltion.value}"
+                            [currentActiveItemId]="{ field: 'id', value: finalPod.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                             [displayFields]="displayFieldPort">
                         </app-combo-grid-virtual-scroll>
@@ -240,21 +241,21 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Quantity</label>
-                                <input type="number" class="form-control" formControlName="quantity">
+                                <input type="number" class="form-control" formControlName="packageQty">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Unit</label>
                                 <ng-select #unit [items]="units | async" [allowClear]="true"
-                                    (opened)="closeOtherSelects(unit)" formControlName="unit">
+                                    (opened)="closeOtherSelects(unit)" formControlName="packageType">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>G.W</label>
-                                <input type="number" class="form-control" formControlName="gw">
+                                <input type="number" class="form-control" formControlName="grossWeight">
                             </div>
                         </div>
                     </div>
@@ -292,7 +293,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
-                                        formControlName="issueDate" />
+                                        formControlName="issueHBLDate" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -307,7 +308,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label>Description of Goods</label>
-                        <textarea rows="7" formControlName="descriptionOfGood" class="form-control">
+                        <textarea rows="7" formControlName="desOfGoods" class="form-control">
 
                         </textarea>
                     </div>
