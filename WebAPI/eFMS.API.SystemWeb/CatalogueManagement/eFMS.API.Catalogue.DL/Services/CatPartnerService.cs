@@ -303,7 +303,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var partners = Get().ToList();
             var users = sysUserRepository.Get().ToList();
             var countries = countryService.Get().ToList();
-            //var places = placeService.Get();
             var provinces = placeService.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
             var branchs = placeService.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch)).ToList();
             var salemans = sysUserRepository.Get().ToList();
@@ -429,33 +428,41 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    string countryBilling = item.CountryBilling.ToLower();
-                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == countryBilling);
-                    if (country == null)
+                    string countryBilling = item.CountryBilling.ToLower().Trim();
+                    if(countryBilling.Length == 0)
                     {
-                        item.CountryBillingError = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND], item.CountryBilling);
+                        item.CountryBillingError = stringLocalizer[LanguageSub.MSG_PARTNER_COUNTRY_BILLING_EMPTY];
                         item.IsValid = false;
                     }
                     else
                     {
-                        item.CountryId = country.Id;
-                        if (item.CityBilling.Length == 0)
+                        var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == countryBilling);
+                        if (country == null)
                         {
-                            item.CityBillingError = stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_BILLING_EMPTY];
+                            item.CountryBillingError = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND], item.CountryBilling);
                             item.IsValid = false;
                         }
                         else
                         {
-                            string cityBilling = item.CityBilling.ToLower();
-                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == cityBilling && i.CountryId == country.Id);
-                            if (province == null)
+                            item.CountryId = country.Id;
+                            if (item.CityBilling.Length == 0)
                             {
-                                item.CityBillingError = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_BILLING_NOT_FOUND], item.CityBilling);
+                                item.CityBillingError = stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_BILLING_EMPTY];
                                 item.IsValid = false;
                             }
                             else
                             {
-                                item.ProvinceId = province.Id;
+                                string cityBilling = item.CityBilling.ToLower();
+                                var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == cityBilling && i.CountryId == country.Id);
+                                if (province == null)
+                                {
+                                    item.CityBillingError = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_BILLING_NOT_FOUND], item.CityBilling);
+                                    item.IsValid = false;
+                                }
+                                else
+                                {
+                                    item.ProvinceId = province.Id;
+                                }
                             }
                         }
                     }
@@ -476,24 +483,33 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     else
                     {
-                        item.CountryShippingId = countryShipping.Id;
-
-                        if (item.CityShipping.Length == 0)
+                        countShipping = item.CountryBilling.ToLower().Trim();
+                        if(countShipping.Length == 0)
                         {
-                            item.CityShippingError = stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_EMPTY];
+                            item.CountryShippingError = stringLocalizer[LanguageSub.MSG_PARTNER_COUNTRY_SHIPPING_EMPTY];
                             item.IsValid = false;
                         }
                         else
                         {
-                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == item.CountryId);
-                            if (province == null)
+                            item.CountryShippingId = countryShipping.Id;
+
+                            if (item.CityShipping.Length == 0)
                             {
-                                item.CityShippingError = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND], item.CityShipping);
+                                item.CityShippingError = stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_EMPTY];
                                 item.IsValid = false;
                             }
                             else
                             {
-                                item.ProvinceShippingId = province.Id;
+                                var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == item.CountryId);
+                                if (province == null)
+                                {
+                                    item.CityShippingError = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND], item.CityShipping);
+                                    item.IsValid = false;
+                                }
+                                else
+                                {
+                                    item.ProvinceShippingId = province.Id;
+                                }
                             }
                         }
                     }
