@@ -215,12 +215,12 @@
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'saleManName'), 'sorting_desc': (!isDesc && sortKey == 'saleManName') }"
                                 (click)="sort('saleManName')">
-                                <span>Saleman</span>
+                                <span>Salesman</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'profile'), 'sorting_desc': (!isDesc && sortKey == 'profile') }"
                                 (click)="sort('profile')">
-                                <span>Localtion (Workplace)</span>
+                                <span>Location (Workplace)</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'bankAccountNo'), 'sorting_desc': (!isDesc && sortKey == 'bankAccountNo') }"
@@ -256,142 +256,115 @@
                                     <span>{{ (i + this.pager.startIndex + 1) }}</span>
                                 </td>
                                 <td>
-                                    <span
-                                        *ngIf="item.partnerNameEn.split('|').length == 1">{{ item.partnerNameEn }}</span>
+                                    <span *ngIf="item.partnerNameEnError === null">{{ item.partnerNameEn }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.partnerNameEn.split('|').length > 1">{{ item.partnerNameEn.split('|')[0] }}</span>
+                                        *ngIf="item.partnerNameEnError !== null">{{ item.partnerNameEnError === null }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.partnerNameVnError === null">{{ item.partnerNameVn }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.partnerNameVnError !== null">{{ item.partnerNameVnError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.shortNameError === null">{{ item.shortName }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.shortNameError !== null">{{ item.shortNameError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.taxCodeError === null">{{ item.taxCode }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.taxCodeError !== null">{{ item.taxCodeError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.PartnerGroupError === null">{{ item.partnerGroup }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.PartnerGroupError !== null">{{ item.PartnerGroupError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.contactPersonError === null">{{ item.contactPerson }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.contactPersonError !== null">{{ item.contactPersonError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.telError === null">{{ item.tel }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.telError !== null">{{ item.telError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.addressEnError === null">{{ item.addressEn }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.addressEnError !== null">{{ item.addressEnError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.addressVnError === null">{{ item.addressVn }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.addressVnError !== null">{{ item.addressVnError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.cityBillingError === null">{{ item.cityBilling }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.cityBillingError !== null">{{ item.cityBillingError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.countryBillingError === null">{{ item.countryBilling }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.countryBillingError !== null">{{ item.countryBillingError }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.zipCode }}</span>
                                 </td>
                                 <td>
                                     <span
-                                        *ngIf="item.partnerNameVn.split('|').length == 1">{{ item.partnerNameVn }}</span>
+                                        *ngIf="item.addressShippingEnError === null">{{ item.addressShippingEn }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.partnerNameVn.split('|').length > 1">{{ item.partnerNameVn.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.shortName.split('|').length == 1">{{ item.shortName }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.shortName.split('|').length > 1">{{ item.shortName.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.taxCode.split('|').length == 1">{{ item.taxCode }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.taxCode.split('|').length > 1">{{ item.taxCode.split('|')[0] }}</span>
+                                        *ngIf="item.addressShippingEnError !== null">{{ item.addressShippingEnError }}</span>
                                 </td>
                                 <td>
                                     <span
-                                        *ngIf="item.partnerGroup.split('|').length == 1">{{ item.partnerGroup }}</span>
+                                        *ngIf="item.addressShippingVnError === null">{{ item.addressShippingVn }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.partnerGroup.split('|').length > 1">{{ item.partnerGroup.split('|')[0] }}</span>
+                                        *ngIf="item.addressShippingVnError !== null">{{ item.addressShippingVnError }}</span>
                                 </td>
                                 <td>
-                                    <span
-                                        *ngIf="item.contactPerson.split('|').length == 1">{{ item.contactPerson }}</span>
+                                    <span *ngIf="item.cityShippingError === null">{{ item.cityShipping }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.contactPerson.split('|').length > 1">{{ item.contactPerson.split('|')[0] }}</span>
+                                        *ngIf="item.cityShippingError !== null">{{ item.cityShippingError }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.tel.split('|').length == 1">{{ item.tel }}</span>
+                                    <span *ngIf="item.countryShippingError === null">{{ item.countryShipping }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.tel.split('|').length > 1">{{ item.tel.split('|')[0] }}</span>
+                                        *ngIf="item.countryShippingError !== null">{{ item.countryShippingError }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.addressEn.split('|').length == 1">{{ item.addressEn }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.addressEn.split('|').length > 1">{{ item.addressEn.split('|')[0] }}</span>
+                                    <span>{{ item.zipCodeShipping }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.addressVn.split('|').length == 1">{{ item.addressVn }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.addressVn.split('|').length > 1">{{ item.addressVn.split('|')[0] }}</span>
+                                    <span>{{ item.email }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.cityBilling.split('|').length == 1">{{ item.cityBilling }}</span>
+                                    <span *ngIf="item.saleManNameError === null">{{ item.saleManName }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.cityBilling.split('|').length > 1">{{ item.cityBilling.split('|')[0] }}</span>
+                                        *ngIf="item.saleManNameError !== null">{{ item.saleManNameError }}</span>
                                 </td>
                                 <td>
-                                    <span
-                                        *ngIf="item.countryBilling.split('|').length == 1">{{ item.countryBilling }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.countryBilling.split('|').length > 1">{{ item.countryBilling.split('|')[0] }}</span>
+                                    <span *ngIf="item.profileError === null">{{ item.profile }}</span> <span
+                                        class="m--font-danger"
+                                        *ngIf="item.profileError !== null">{{ item.profileError }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.zipCode.split('|').length == 1">{{ item.zipCode }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.zipCode.split('|').length > 1">{{ item.zipCode.split('|')[0] }}</span>
+                                    <span>{{ item.bankAccountNo }}</span>
                                 </td>
                                 <td>
-                                    <span
-                                        *ngIf="item.addressShippingEn.split('|').length == 1">{{ item.addressShippingEn }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.addressShippingEn.split('|').length > 1">{{ item.addressShippingEn.split('|')[0] }}</span>
+                                    <span>{{ item.bankAccountName }}</span>
                                 </td>
                                 <td>
-                                    <span
-                                        *ngIf="item.addressShippingVn.split('|').length == 1">{{ item.addressShippingVn }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.addressShippingVn.split('|').length > 1">{{ item.addressShippingVn.split('|')[0] }}</span>
+                                    <span>{{ item.swiftCode }}</span>
                                 </td>
                                 <td>
-                                    <span
-                                        *ngIf="item.cityShipping.split('|').length == 1">{{ item.cityShipping }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.cityShipping.split('|').length > 1">{{ item.cityShipping.split('|')[0] }}</span>
+                                    <span>{{ item.bankAccountAddress }}</span>
                                 </td>
                                 <td>
-                                    <span
-                                        *ngIf="item.countryShipping.split('|').length == 1">{{ item.countryShipping }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.countryShipping.split('|').length > 1">{{ item.countryShipping.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span
-                                        *ngIf="item.zipCodeShipping.split('|').length == 1">{{ item.zipCodeShipping }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.zipCodeShipping.split('|').length > 1">{{ item.zipCodeShipping.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.email.split('|').length == 1">{{ item.email }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.email.split('|').length > 1">{{ item.email.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.saleManName.split('|').length == 1">{{ item.saleManName }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.saleManName.split('|').length > 1">{{ item.saleManName.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.profile.split('|').length == 1">{{ item.profile }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.profile.split('|').length > 1">{{ item.profile.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span
-                                        *ngIf="item.bankAccountNo.split('|').length == 1">{{ item.bankAccountNo }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.bankAccountNo.split('|').length > 1">{{ item.bankAccountNo.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span
-                                        *ngIf="item.bankAccountName.split('|').length == 1">{{ item.bankAccountName }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.bankAccountName.split('|').length > 1">{{ item.bankAccountName.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.swiftCode.split('|').length == 1">{{ item.swiftCode }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.swiftCode.split('|').length > 1">{{ item.swiftCode.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span
-                                        *ngIf="item.bankAccountAddress.split('|').length == 1">{{ item.bankAccountAddress }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.bankAccountAddress.split('|').length > 1">{{ item.bankAccountAddress.split('|')[0] }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.note.split('|').length == 1">{{ item.note }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.note.split('|').length > 1">{{ item.note.split('|')[0] }}</span>
+                                    <span>{{ item.note }}</span>
                                 </td>
                             </tr>
                         </ng-container>

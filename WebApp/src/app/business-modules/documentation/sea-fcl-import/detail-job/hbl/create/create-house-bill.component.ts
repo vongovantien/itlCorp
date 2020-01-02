@@ -97,6 +97,7 @@ export class CreateHouseBillComponent extends AppForm {
 
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
         this._cd.detectChanges();
+
     }
 
     getDetailShipment() {

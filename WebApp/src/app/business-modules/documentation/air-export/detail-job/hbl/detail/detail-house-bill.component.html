@@ -12,16 +12,10 @@
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
             <tab heading="HAWB Detail">
-                <air-import-hbl-form-create></air-import-hbl-form-create>
+                <air-export-hbl-form-create [isUpdate]="true"></air-export-hbl-form-create>
             </tab>
-            <tab heading="Arrival Notice">
-                <hbl-arrival-note></hbl-arrival-note>
-            </tab>
-            <tab heading="Authorzie Letter">
-                <ng-container>
-                    <hbl-delivery-order>
-                    </hbl-delivery-order>
-                </ng-container>
+            <tab heading="Attach List">
+                <air-export-hbl-attach-list></air-export-hbl-attach-list>
             </tab>
         </tabset>
     </div>
@@ -32,3 +26,7 @@ Are you sure all entered details are correct?" (onSubmit)="saveHBL()"></confirm-
 
 <info-popup body="Opps, It looks like your missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Update HB'"></info-popup>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>

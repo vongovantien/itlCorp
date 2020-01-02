@@ -245,7 +245,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
-                int colCount = worksheet.Dimension.Columns;
+                // int colCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest();
                 if (worksheet.Cells[1, 1].Value?.ToString() != "Code")
                 {
@@ -287,9 +287,23 @@ namespace eFMS.API.Catalogue.Controllers
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 10 must have header is 'Status' " });
                 }
+                
                 List<CatChargeImportModel> list = new List<CatChargeImportModel>();
                 for(int row = 2; row <= rowCount; row++)
                 {
+                    bool active = true;
+                    string status = worksheet.Cells[row, 10].Value?.ToString().Trim();
+                    if(status.ToLower() != "active")
+                    {
+                        active = false;
+                    }
+                    decimal unitPrice = -1;
+                    var price = worksheet.Cells[row, 5].Value;
+                    if(price != null) { unitPrice = Convert.ToDecimal(price); }
+                    decimal vatRate = -1;
+                    var vat = worksheet.Cells[row, 7].Value;
+                    if(vat != null) { vatRate = Convert.ToDecimal(vat); }
+
                     var charge = new CatChargeImportModel
                     {
                         IsValid = true,
@@ -297,13 +311,13 @@ namespace eFMS.API.Catalogue.Controllers
                         ChargeNameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         ChargeNameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                         UnitCode = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                        // UnitId = worksheet.Cells[row, 4].Value == null ? (short)(-1) : Convert.ToInt16(worksheet.Cells[row, 4].Value),
-                        UnitPrice = worksheet.Cells[row,5].Value == null? -1: Convert.ToDecimal(worksheet.Cells[row, 5].Value),
+                        UnitPrice = unitPrice,
                         CurrencyId = worksheet.Cells[row,6].Value?.ToString().Trim(),
-                        Vatrate = worksheet.Cells[row,7].Value == null ? -1 : Convert.ToDecimal(worksheet.Cells[row, 7].Value),
+                        Vatrate = vatRate,
                         Type = worksheet.Cells[row, 8].Value?.ToString().Trim(),
-                        ServiceTypeId = worksheet.Cells[row, 9].Value?.ToString().Trim(),
-                        Status = worksheet.Cells[row, 10].Value?.ToString().Trim(),
+                        ServiceName = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        Status = status,
+                        Active = active
                     };
                     list.Add(charge);
                 }
@@ -325,14 +339,15 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CatChargeImportModel> data)
         {
-            var result = catChargeService.Import(data);
-            if (result.Success)
+            var hs = catChargeService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully!!!" };
+            if (hs.Success)
             {
                 return Ok(result);
             }
             else
             {
-                return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Exception.Message });
             }
         }
         

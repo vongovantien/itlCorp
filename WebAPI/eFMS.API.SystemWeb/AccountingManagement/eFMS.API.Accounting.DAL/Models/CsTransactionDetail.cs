@@ -10,6 +10,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string Mawb { get; set; }
         public string Hwbno { get; set; }
         public string Hbltype { get; set; }
+        public decimal? HwConstant { get; set; }
         public string CustomerId { get; set; }
         public string SaleManId { get; set; }
         public string ShipperDescription { get; set; }
@@ -65,6 +66,7 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? ChargeWeight { get; set; }
         public decimal? Cbm { get; set; }
         public int? PackageQty { get; set; }
+        public decimal? Hw { get; set; }
         public short? PackageType { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
@@ -85,6 +87,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string DosentTo1 { get; set; }
         public string DosentTo2 { get; set; }
         public string Dofooter { get; set; }
+        public string SubAbbr { get; set; }
         public string FirstCarrierBy { get; set; }
         public string FirstCarrierTo { get; set; }
         public string TransitPlaceTo1 { get; set; }
@@ -93,6 +96,8 @@ namespace eFMS.API.Accounting.Service.Models
         public string TransitPlaceBy2 { get; set; }
         public string FlightNo { get; set; }
         public DateTime? FlightDate { get; set; }
+        public string FlightNoOrigin { get; set; }
+        public DateTime? FlightDateOrigin { get; set; }
         public string IssuranceAmount { get; set; }
         public string CurrencyId { get; set; }
         public string Chgs { get; set; }
@@ -103,6 +108,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string HandingInformation { get; set; }
         public string Notify { get; set; }
         public string Rclass { get; set; }
+        public string ComItemNo { get; set; }
         public string KgIb { get; set; }
         public decimal? RateCharge { get; set; }
         public bool? Min { get; set; }
@@ -112,13 +118,22 @@ namespace eFMS.API.Accounting.Service.Models
         public string Sci { get; set; }
         public string OtherCharge { get; set; }
         public string CurrConvertRate { get; set; }
-        public string Wt { get; set; }
-        public string Val { get; set; }
-        public string Tax { get; set; }
-        public string DueAgent { get; set; }
-        public string DueCarrier { get; set; }
+        public string CcchargeInDrc { get; set; }
+        public string Wtpp { get; set; }
+        public string Valpp { get; set; }
+        public string Taxpp { get; set; }
+        public string DueAgentPp { get; set; }
+        public string DueCarrierPp { get; set; }
         public string TotalPp { get; set; }
+        public string Wtcll { get; set; }
+        public string Valcll { get; set; }
+        public string Taxcll { get; set; }
+        public string DueAgentCll { get; set; }
+        public string DueCarrierCll { get; set; }
+        public string TotalCll { get; set; }
         public string AttachList { get; set; }
+        public string Route { get; set; }
+        public string PoinvoiceNo { get; set; }
 
         public virtual CsTransaction Job { get; set; }
     }

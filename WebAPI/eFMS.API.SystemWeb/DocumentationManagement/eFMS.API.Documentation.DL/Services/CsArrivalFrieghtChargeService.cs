@@ -638,6 +638,7 @@ namespace eFMS.API.Documentation.DL.Services
             detailTransaction.Dofooter = model.Dofooter;
             detailTransaction.DeliveryOrderNo = model.DeliveryOrderNo;
             detailTransaction.DeliveryOrderPrintedDate = model.DeliveryOrderPrintedDate;
+            detailTransaction.SubAbbr = model.SubAbbr;
             var result = detailTransactionRepository.Update(detailTransaction, x => x.Id == model.HBLID);
             return result;
         }

@@ -127,6 +127,7 @@ export class AirImportHBLComponent extends AppList implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
+                        this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
                         this.getHouseBills(this.jobId);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');

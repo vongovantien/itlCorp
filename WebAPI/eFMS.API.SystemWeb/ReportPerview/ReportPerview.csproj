@@ -335,6 +335,8 @@
     <Content Include="Reports\SeaImpProoofDelivery.ttx" />
     <Content Include="Reports\SeaOnboardContainerList.rpt" />
     <Content Include="Reports\SeaOnboardContainerList.ttx" />
+    <Content Include="Reports\AirImptAuthorisedLetter.rpt" />
+    <Content Include="Reports\AirImptAuthorisedLetter_Consign.rpt" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -97,7 +97,8 @@ namespace eFMS.API.Accounting.DL.Services
             var data = QueryData(criteria);
 
             //Phân trang
-            rowsCount = (data.Count() > 0) ? data.Count() : 0;
+            var _totalItem = data.Select(s => s.Id).Count();
+            rowsCount = (_totalItem > 0) ? _totalItem : 0;
             if (size > 0)
             {
                 if (page < 1)
@@ -116,8 +117,8 @@ namespace eFMS.API.Accounting.DL.Services
             var approveSettle = acctApproveSettlementRepo.Get(x => x.IsDeputy == false);
             var user = sysUserRepo.Get();
             var surcharge = csShipmentSurchargeRepo.Get();
-            var opst = opsTransactionRepo.Get();
-            var csTrans = csTransactionRepo.Get();
+            var opst = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
+            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
             var custom = customsDeclarationRepo.Get();
             var advRequest = acctAdvanceRequestRepo.Get();
@@ -255,8 +256,9 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Note = s.Key.Note,
                 DatetimeModified = s.Key.DatetimeModified
-            }
-            ).OrderByDescending(orb => orb.DatetimeModified);
+            });
+            //Sort Array sẽ nhanh hơn
+            data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             return data;
         }
 

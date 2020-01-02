@@ -77,7 +77,8 @@ namespace eFMS.API.Accounting.DL.Services
             var data = QueryData(criteria);
 
             //Phân trang
-            rowsCount = (data.Count() > 0) ? data.Count() : 0;
+            var _totalItem = data.Select(s => s.Id).Count();
+            rowsCount = (_totalItem > 0) ? _totalItem : 0;
             if (size > 0)
             {
                 if (page < 1)
@@ -243,8 +244,9 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentMethodName = CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
                 StatusApprovalName = CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
-            }
-            ).OrderByDescending(orb => orb.DatetimeModified);
+            });
+            //Sort Array sẽ nhanh hơn
+            data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             return data;
         }
 

@@ -24,6 +24,10 @@ export function DimensionReducer(state = initialDimensionState, action: Dimensio
             return { ...state, isLoaded: false, isLoading: true };
         }
 
+        case DimensionActionTypes.GET_DIMENSION_HBL: {
+            return { ...state, isLoaded: false, isLoading: true };
+        }
+
         case DimensionActionTypes.GET_DIMENSION_SUCESS: {
             return { ...state, dims: action.payload, isLoaded: false, isLoading: true };
         }

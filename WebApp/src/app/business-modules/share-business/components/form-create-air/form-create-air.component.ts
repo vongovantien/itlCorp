@@ -111,7 +111,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.getCommodity();
 
         this._store.select(fromStore.getTransactionDetailCsTransactionState)
-            .pipe(skip(1))
+            .pipe(skip(1), takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: CsTransaction) => {
                     if (!!res) {
@@ -173,10 +173,11 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 tap((units: Unit[]) => {
                     this.units = this.utility.prepareNg2SelectData(units, 'id', 'code');
                 }),
-                mergeMap(() => this._store.select(fromStore.getTransactionDetailCsTransactionState))
+                mergeMap(() => this._store.select(fromStore.getTransactionDetailCsTransactionState).pipe(takeUntil(this.ngUnsubscribe)))
             )
             .subscribe(
                 (res: CsTransaction) => {
+                    console.log(res);
                     if (res.id !== SystemConstants.EMPTY_GUID) {
 
                         // * Update Form
@@ -194,7 +195,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 tap((units: Unit[]) => {
                     this.commodities = this.utility.prepareNg2SelectData(units, 'code', 'commodityNameEn');
                 }),
-                mergeMap(() => this._store.select(fromStore.getTransactionDetailCsTransactionState))
+                mergeMap(() => this._store.select(fromStore.getTransactionDetailCsTransactionState).pipe(takeUntil(this.ngUnsubscribe)))
             )
             .subscribe(
                 (res: CsTransaction) => {

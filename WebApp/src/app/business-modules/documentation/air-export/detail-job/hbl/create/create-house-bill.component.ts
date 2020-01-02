@@ -22,6 +22,7 @@ import { AirExportHBLAttachListComponent } from '../components/attach-list/attac
     templateUrl: './create-house-bill.component.html',
 })
 export class AirExportCreateHBLComponent extends AppForm implements OnInit {
+
     @ViewChild(AirExportHBLFormCreateComponent, { static: false }) formCreateHBLComponent: AirExportHBLFormCreateComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
@@ -53,11 +54,11 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                 }
             });
-
     }
 
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
+        console.log(form);
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -68,7 +69,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
             hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
             currencyId: !!form.currencyId && !!form.currencyId.length ? form.currencyId[0].id : null,
-            wTorVALPayment: !!form.wTorVALPayment && !!form.wTorVALPayment.length ? form.wTorVALPayment[0].id : null,
+            wtorValpayment: !!form.wtorValpayment && !!form.wtorValpayment.length ? form.wtorValpayment[0].id : null,
             otherPayment: !!form.otherPayment && !!form.otherPayment.length ? form.otherPayment[0].id : null,
 
             customerId: form.customer,
@@ -82,6 +83,9 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             cbm: this.formCreateHBLComponent.totalCBM,
             hw: this.formCreateHBLComponent.totalHeightWeight,
             attachList: this.attachListComponent.attachList,
+            dimensionDetails: form.dimensionDetails,
+            hwConstant: this.formCreateHBLComponent.hwconstant
+
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
@@ -111,7 +115,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         this.formCreateHBLComponent.originBlnumber,
         this.formCreateHBLComponent.currencyId,
         this.formCreateHBLComponent.freightPayment,
-        this.formCreateHBLComponent.wTorVALPayment].forEach((control: AbstractControl) => this.setError(control));;
+        this.formCreateHBLComponent.wtorValpayment].forEach((control: AbstractControl) => this.setError(control));
 
         if (!this.formCreateHBLComponent.formCreate.valid
             || (!!this.formCreateHBLComponent.etd.value && !this.formCreateHBLComponent.etd.value.startDate)
