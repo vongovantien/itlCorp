@@ -145,12 +145,25 @@ export class ShareBussinessEffects {
         );
 
     @Effect()
-    getListDimension$: Observable<Action> = this.actions$
+    getListDimensionShipment$: Observable<Action> = this.actions$
         .pipe(
             ofType<HBLActions>(DimensionActionTypes.GET_DIMENSION),
             map((payload: any) => payload.payload), // jobId
             mergeMap(
                 (jobId: string) => this._documentRepo.getShipmentDemensionDetail(jobId)
+                    .pipe(
+                        map((data: any) => new GetDimensionSuccessAction(data)),
+                        catchError(err => of(new GetDimensionFailAction(err)))
+                    ))
+        );
+
+    @Effect()
+    getListDimensionHBL$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<HBLActions>(DimensionActionTypes.GET_DIMENSION_HBL),
+            map((payload: any) => payload.payload), // hblId
+            mergeMap(
+                (hblId: string) => this._documentRepo.getHBLDemensionDetail(hblId)
                     .pipe(
                         map((data: any) => new GetDimensionSuccessAction(data)),
                         catchError(err => of(new GetDimensionFailAction(err)))

@@ -6,10 +6,11 @@ import { Action } from '@ngrx/store';
  */
 export enum DimensionActionTypes {
     INIT_DIMENSION = '[DIMENSION] INIT',
-    GET_DIMENSION = '[DIMENSION] Get',
-    GET_DIMENSION_SUCESS = '[DIMENSION] Get Success',
-    GET_DIMENSION_FAIL = '[DIMENSION] Get Fail',
-};
+    GET_DIMENSION = '[DIMENSION] GET',
+    GET_DIMENSION_HBL = '[DIMENSION] GET HBL',
+    GET_DIMENSION_SUCESS = '[DIMENSION] GET SUCCESS',
+    GET_DIMENSION_FAIL = '[DIMENSION] GET FAIL',
+}
 
 /**
  * Every action is comprised of at least a type and an optional
@@ -23,6 +24,12 @@ export class InitDimensionAction implements Action {
 }
 export class GetDimensionAction implements Action {
     readonly type = DimensionActionTypes.GET_DIMENSION;
+
+    constructor(public payload: any) { }
+}
+
+export class GetDimensionHBLAction implements Action {
+    readonly type = DimensionActionTypes.GET_DIMENSION_HBL;
 
     constructor(public payload: any) { }
 }
@@ -47,4 +54,5 @@ export type DimensionActions
     = GetDimensionAction
     | InitDimensionAction
     | GetDimensionSuccessAction
+    | GetDimensionHBLAction
     | GetDimensionFailAction;

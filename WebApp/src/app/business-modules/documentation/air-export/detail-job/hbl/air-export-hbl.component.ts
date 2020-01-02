@@ -79,6 +79,7 @@ export class AirExportHBLComponent extends AppList implements OnInit {
         ];
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+        this.isLoading = this._store.select(fromShareBussiness.getHBLLoadingState);
     }
 
     getHouseBills(id: string) {
