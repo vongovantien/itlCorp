@@ -115,7 +115,7 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
             this.housebills = this.tmpHouseBills;
         } else {
             this._progressRef.start();
-            this._documentationRepo.getListHouseBillOfJob({ jobId: jobId })
+            this._documentationRepo.getListHouseBillAscHBLOfJob({ jobId: jobId })
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => {
