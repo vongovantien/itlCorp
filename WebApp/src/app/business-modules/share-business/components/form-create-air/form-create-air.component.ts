@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -25,6 +25,7 @@ import { Observable } from 'rxjs';
 
 export class ShareBusinessFormCreateAirComponent extends AppForm implements OnInit {
 
+    @Input() type: string = 'import';
     @ViewChild(ShareBusinessDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareBusinessDIMVolumePopupComponent;
 
     formGroup: FormGroup;
@@ -254,8 +255,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             ])],
 
             // * Date
-            etd: [null, Validators.required],
-            eta: [],
+            etd: [null, this.type !== 'import' ? Validators.required : null],
+            eta: [null, this.type === 'import' ? Validators.required : null],
             serviceDate: [],
             flightDate: [],
 
