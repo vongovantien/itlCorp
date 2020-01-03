@@ -10,13 +10,16 @@ import { ToastrService } from 'ngx-toastr';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirExportHBLFormCreateComponent } from '../components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, map, tap, mergeMap } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
-import { HouseBill } from '@models';
+import { HouseBill, DIM } from '@models';
 
 import _merge from 'lodash/merge';
 import { AbstractControl } from '@angular/forms';
 import { AirExportHBLAttachListComponent } from '../components/attach-list/attach-list-house-bill-air-export.component';
+import { ShareBusinessImportHouseBillDetailComponent } from '@share-bussiness';
+import { getDimensionVolumesState, getDetailHBlState } from './../../../../../share-business/store';
+import { SystemConstants } from 'src/constants/system.const';
 @Component({
     selector: 'app-create-hbl-air-export',
     templateUrl: './create-house-bill.component.html',
@@ -27,9 +30,9 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(AirExportHBLAttachListComponent, { static: false }) attachListComponent: AirExportHBLAttachListComponent;
-
+    @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     jobId: string;
-
+    selectedHbl: any = {}; // TODO model.
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -143,6 +146,48 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             );
 
     }
+
+    showImportPopup() {
+        const dataSearch = { jobId: this.jobId };
+        dataSearch.jobId = this.jobId;
+        this.importHouseBillPopup.typeFCL = 'Export';
+        this.importHouseBillPopup.selected = - 1;
+        this.importHouseBillPopup.getHourseBill(dataSearch);
+        this.importHouseBillPopup.show();
+    }
+
+    onImport(selectedData: any) {
+        this.selectedHbl = selectedData;
+        if (!!this.selectedHbl) {
+            this._store.select(getDimensionVolumesState)
+                .pipe(
+                    takeUntil(this.ngUnsubscribe),
+                    map((dims: DIM[]) => dims.map(d => new DIM(d))),
+                    tap(
+                        (dims: DIM[]) => {
+                            this.formCreateHBLComponent.dims = dims;
+                        }
+                    ),
+                    mergeMap(
+                        () => this._store.select(getDetailHBlState)
+                    )
+                )
+                .subscribe(
+                    (hbl: HouseBill) => {
+                        if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
+                            this.formCreateHBLComponent.totalCBM = hbl.cbm;
+                            this.formCreateHBLComponent.totalHeightWeight = hbl.hw;
+                            this.formCreateHBLComponent.jobId = hbl.jobId;
+                            this.formCreateHBLComponent.hblId = hbl.id;
+                            this.formCreateHBLComponent.hwconstant = hbl.hwConstant;
+                            this.formCreateHBLComponent.updateFormValue(hbl);
+                        }
+
+                    }
+                );
+        }
+    }
+
 
     gotoList() {
         this._router.navigate([`home/documentation/air-export/${this.jobId}/hbl`]);

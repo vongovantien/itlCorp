@@ -93,16 +93,18 @@ namespace eFMS.API.Documentation.DL.Services
         {
             string manifestNo = string.Empty;
             var shipment = transactionRepository.Get(x => x.Id == jobId).FirstOrDefault();
-            var prefixJob = shipment.JobNo.Substring(0, 3);
+            //var prefixJob = shipment.JobNo.Substring(0, 3);
             int length = shipment.JobNo.Length - 1;
-            var suffixJob = shipment.JobNo.Substring(3);
-            switch (prefixJob)
+            switch (shipment.TransactionType)
             {
                 case "SIF":
-                    manifestNo = "MSI" + suffixJob;
+                    manifestNo = "MSI" + shipment.JobNo.Substring(3, length);
                     break;
                 case "SEF":
-                    manifestNo = "MSE" + suffixJob;
+                    manifestNo = "MSE" + shipment.JobNo.Substring(3, length);
+                    break;
+                case "AE":
+                    manifestNo = "MAE" + shipment.JobNo.Substring(2, length - 1);
                     break;
             }
             return manifestNo;
@@ -320,7 +322,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Billype = "H",
                         HWBNO = item.Hwbno,
                         Pieces = item.PackageQty?.ToString(),
-                        GrossWeight = item.GrossWeight,
+                        GrossWeight = item.GrossWeight ?? 0,
                         ShipperName = item.ShipperDescription,
                         Consignees = item.ConsigneeDescription,
                         Description = item.DesOfGoods,
@@ -337,14 +339,14 @@ namespace eFMS.API.Documentation.DL.Services
 
             var parameter = new AirCargoManifestReportParameter
             {
-                AWB = transaction.Mawb,
-                Marks = model.MasksOfRegistration,
-                Flight = transaction.FlightVesselName,
-                PortLading = model.PolName,
-                PortUnlading = model.PodName,
-                FlightDate = transaction.FlightDate.ToString(),
+                AWB = transaction.Mawb ?? string.Empty,
+                Marks = model.MasksOfRegistration?? string.Empty,
+                Flight = transaction.FlightVesselName?? string.Empty,
+                PortLading = model.PolName?? string.Empty,
+                PortUnlading = model.PodName?? string.Empty,
+                FlightDate = transaction.FlightDate == null?string.Empty: transaction.FlightDate.Value.ToString("MMM dd, yyyy"),
                 Shipper = Constants.COMPANY_NAME + "\n" + Constants.COMPANY_ADDRESS1,
-                Consignee = transaction.AgentName,
+                Consignee = transaction.AgentName?? string.Empty,
                 Contact = currentUser.UserName
             };
             result = new Crystal

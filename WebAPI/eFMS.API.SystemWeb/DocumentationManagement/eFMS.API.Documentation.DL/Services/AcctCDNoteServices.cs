@@ -508,6 +508,7 @@ namespace eFMS.API.Documentation.DL.Services
             var sealsNo = string.Empty;
             decimal? volum = 0;
             decimal? hbGw = 0;
+            decimal? hbCw = 0; //House Bill Charge Weight
             var hbShippers = string.Empty;
             var hbConsignees = string.Empty;
             foreach (var item in HBList)
@@ -527,8 +528,18 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     sealsNo += !string.IsNullOrEmpty(cont.SealNo) ? cont.SealNo + ", " : "";
                 }
-                volum += conts.Sum(s => s.Cbm);
-                hbGw += conts.Sum(s => s.Gw);
+                if (conts.Count() > 0)
+                {
+                    volum += conts.Sum(s => s.Cbm);
+                    hbGw += conts.Sum(s => s.Gw);
+                    hbCw += conts.Sum(s => s.ChargeAbleWeight);
+                }
+                else
+                {
+                    volum += item.Cbm;
+                    hbGw += item.GrossWeight;
+                    hbCw += item.ChargeWeight;
+                }
             }
             hbConstainers += ".";
             hbConstainers = hbConstainers != "." ? hbConstainers.Replace(", .", "") : string.Empty;
@@ -577,7 +588,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.HbGrossweight = hbGw;
             soaDetails.HbShippers = hbShippers; //Shipper
             soaDetails.HbConsignees = hbConsignees; //Consignee
-            soaDetails.CW = transaction != null ? transaction.ChargeWeight : opsTransaction.SumChargeWeight;
+            soaDetails.HbChargeWeight = hbCw;
             return soaDetails;
         }
 
@@ -1028,7 +1039,7 @@ namespace eFMS.API.Documentation.DL.Services
             string _hbllist = string.Empty;
             if (data != null)
             {
-                _hbllist = string.Join("\r\n", data.ListSurcharges.Select(s => s.Hwbno));
+                _hbllist = string.Join("\r\n", data.ListSurcharges.Select(s => s.Hwbno).Distinct());
                 int i = 1;
                 foreach (var item in data.ListSurcharges)
                 {
@@ -1075,8 +1086,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
                     charge.GrossWeight = data.HbGrossweight;//Total GW of HBL
                     charge.HWBNO = data.HbLadingNo; //HBLNOs
-                    charge.GrossWeight = data.GW; //Gross Weight
-                    charge.WChargeable = data.CW; //Charge Weigh
+                    charge.WChargeable = data.HbChargeWeight; //Total Charge Weight of HBL
 
                     //Thông tin list charge
                     charge.Subject = "FREIGHT CHARGES";

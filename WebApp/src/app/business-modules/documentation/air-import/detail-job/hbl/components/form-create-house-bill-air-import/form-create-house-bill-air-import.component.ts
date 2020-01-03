@@ -1,20 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
-import { Customer, User, PortIndex, Currency, CsTransaction, Unit } from '@models';
+import { Customer, User, PortIndex, Currency, CsTransaction, Unit, HouseBill } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 
 import { AppForm } from 'src/app/app.form';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 
-import { map, filter, tap, takeUntil, catchError, skip } from 'rxjs/operators';
+import { map, filter, tap, takeUntil, catchError, skip, finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import { IShareBussinessState, getTransactionDetailCsTransactionState } from 'src/app/business-modules/share-business/store';
+import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState } from 'src/app/business-modules/share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
-
+import _merge from 'lodash/merge';
+import { cloneDeep } from 'lodash';
+import * as fromShareBussiness from './../../../../../../share-business/store';
+import { prepareNg2SelectData } from 'src/helper/data.helper';
 @Component({
     selector: 'air-import-hbl-form-create',
     templateUrl: './form-create-house-bill-air-import.component.html',
@@ -27,25 +30,25 @@ import { SystemConstants } from 'src/constants/system.const';
     ]
 })
 export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
-
+    @Input() isUpdate: boolean = false;
     formCreate: FormGroup;
     customerId: AbstractControl;
     saleManId: AbstractControl;
     shipperId: AbstractControl;
     consigneeId: AbstractControl;
-    notifyId: AbstractControl;
-    warehouse: AbstractControl;
+    notifyPartyId: AbstractControl;
+    warehouseNotice: AbstractControl;
     forwardingAgentId: AbstractControl;
     hbltype: AbstractControl;
-    da: AbstractControl;
+    arrivaldate: AbstractControl;
     eta: AbstractControl;
     pol: AbstractControl;
     pod: AbstractControl;
     flightDate: AbstractControl;
     flightNo: AbstractControl;
     flightNoOrigin: AbstractControl;
-    finalDestinaltion: AbstractControl;
-    quantity: AbstractControl;
+    finalPod: AbstractControl;
+    packageQty: AbstractControl;
 
     freightPayment: AbstractControl;
 
@@ -56,19 +59,15 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     issueHbldate: AbstractControl;
     shipperDescription: AbstractControl;
     consigneeDescription: AbstractControl;
-    notifyDescription: AbstractControl;
+    notifyPartyDescription: AbstractControl;
     mawb: AbstractControl;
-    hawb: AbstractControl;
+    hwbno: AbstractControl;
     flightDateOrigin: AbstractControl;
 
     route: AbstractControl;
-    unit: AbstractControl;
-    gw: AbstractControl;
-    cw: AbstractControl;
-    po: AbstractControl;
-    issueDate: AbstractControl;
-    descriptionOfGood: AbstractControl;
-
+    packageType: AbstractControl;
+    issueHBLDate: AbstractControl;
+    desOfGoods: AbstractControl;
 
     // forwardingAgentDescription: AbstractControl;
 
@@ -81,7 +80,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
     currencies: Observable<any[]>;
-    units: Observable<any[]>;
+    units: any[] = [];
+    ngDataUnit: any = [];
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameEn', label: 'Name ABBR' },
@@ -104,6 +104,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     termTypes: CommonInterface.INg2Select[];
     wts: CommonInterface.INg2Select[];
     numberOBLs: CommonInterface.INg2Select[];
+    jobId: string = SystemConstants.EMPTY_GUID;
+    hblId: string = SystemConstants.EMPTY_GUID;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -115,6 +117,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
+
         this.billTypes = [
             { id: 'Copy', text: 'Copy' },
             { id: 'Original', text: 'Original' },
@@ -141,49 +144,74 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.notifies = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE]);
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
         this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
-        this.units = this._catalogueRepo.getUnit({ active: true }).pipe(
-            map((unit: Unit[]) =>
-                this.utility.prepareNg2SelectData(unit, 'id', 'unitNameEn')
-            ),
-        );
 
         this.saleMans = this._systemRepo.getListSystemUser();
-
-
+        this.getUnit();
         this.initForm();
 
-        // * get detail shipment from store.
-        this._store.select(getTransactionDetailCsTransactionState)
-            .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
-            .subscribe(
-                (shipment: CsTransaction) => {
-                    // * set default value for controls from shipment detail.
-                    if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
-                        this.formCreate.patchValue({
-                            mawb: shipment.mawb,
-                            pod: shipment.pod,
-                            pol: shipment.pol,
-                            da: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
-                            eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
-                            flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
-                            flightNo: shipment.flightVesselName,
-                            forwardingAgentId: shipment.agentId
-                        });
+        if (!this.isUpdate) {
+            // * get detail shipment from store.
+            this._store.select(getTransactionDetailCsTransactionState)
+                .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
+                .subscribe(
+                    (shipment: CsTransaction) => {
+                        // * set default value for controls from shipment detail.
+                        if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
+                            this.formCreate.patchValue({
+                                mawb: shipment.mawb,
+                                pod: shipment.pod,
+                                pol: shipment.pol,
+                                arrivaldate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                                eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                                flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
+                                flightNo: shipment.flightVesselName,
+                                forwardingAgentId: shipment.agentId
+                            });
+                        }
                     }
-                }
-            );
+                );
+        } else {
+            this._store.select(getDetailHBlState)
+                .pipe(
+                    takeUntil(this.ngUnsubscribe)
+                )
+                .subscribe(
+                    (hbl: HouseBill) => {
+                        if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID && hbl.id !== undefined) {
+                            this.jobId = hbl.jobId;
+                            this.hblId = hbl.id;
+                            console.log(hbl);
+                            this.updateFormValue(hbl);
+                        }
+
+                    }
+                );
+        }
+
     }
 
     getCustomers() {
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
     }
 
+
+    getUnit() {
+        this._catalogueRepo.getUnit({ active: true }).subscribe((res: any) => {
+            if (!!res) {
+                const units = res;
+                this.ngDataUnit = units.map(x => ({ text: x.unitNameEn, id: x.id }));
+                console.log(this.ngDataUnit);
+            }
+
+        });
+    }
+
     initForm() {
         this.formCreate = this._fb.group({
             mawb: [null, Validators.required],
-            hawb: [null, Validators.required],
+            hwbno: [null, Validators.required],
             consigneeDescription: [],
-            notifyDescription: [],
+            notifyPartyDescription: [],
             shipperDescription: [],
             flightNo: [],
             flightNoOrigin: [],
@@ -194,27 +222,24 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             handingInformation: [],
 
             issueHblplace: [],
-            warehouse: [],
+            warehouseNotice: [],
             route: [],
-            quantity: [],
-            descriptionOfGood: [],
-
+            packageQty: [],
+            desOfGoods: [],
+            poinvoiceNo: [],
 
             // * Combogrid
             customerId: [null, Validators.required],
             saleManId: [],
             shipperId: [],
             consigneeId: [],
-            notifyId: [],
+            notifyPartyId: [],
             forwardingAgentId: [],
             pol: [],
             pod: [],
-            finalDestinaltion: [],
-            gw: [],
-            cw: [],
-            po: [],
-
-
+            finalPod: [],
+            grossWeight: [],
+            chargeWeight: [],
 
             // * Select
             hbltype: [null, Validators.required],
@@ -223,43 +248,42 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             originBlnumber: [],
             wTorVALPayment: [],
             otherPayment: [],
-            unit: [],
+            packageType: [],
 
             // * Date
-            da: [],
-            eta: [],
+            arrivalDate: [],
             flightDate: [],
-            issueDate: [{ startDate: new Date(), endDate: new Date() }],
-            flightDateOrigin: []
+            issueHBLDate: [{ startDate: new Date(), endDate: new Date() }],
+            flightDateOrigin: [],
+            eta: [],
 
         });
 
         this.mawb = this.formCreate.controls["mawb"];
-        this.hawb = this.formCreate.controls["hawb"];
+        this.hwbno = this.formCreate.controls["hwbno"];
 
         this.customerId = this.formCreate.controls["customerId"];
         this.saleManId = this.formCreate.controls["saleManId"];
         this.shipperId = this.formCreate.controls["shipperId"];
         this.consigneeId = this.formCreate.controls["consigneeId"];
-        this.notifyId = this.formCreate.controls["notifyId"];
+        this.notifyPartyId = this.formCreate.controls["notifyPartyId"];
         this.forwardingAgentId = this.formCreate.controls["forwardingAgentId"];
         this.pol = this.formCreate.controls["pol"];
         this.pod = this.formCreate.controls["pod"];
-        this.finalDestinaltion = this.formCreate.controls['finalDestinaltion'];
+        this.finalPod = this.formCreate.controls['finalPod'];
         this.hbltype = this.formCreate.controls["hbltype"];
         this.freightPayment = this.formCreate.controls["freightPayment"];
-        this.unit = this.formCreate.controls["unit"];
+        this.packageType = this.formCreate.controls["packageType"];
 
-        this.da = this.formCreate.controls["da"];
+        this.arrivaldate = this.formCreate.controls["arrivaldate"];
         this.eta = this.formCreate.controls["eta"];
 
         this.flightDate = this.formCreate.controls["flightDate"];
-        this.issueHbldate = this.formCreate.controls["issueHbldate"];
         this.shipperDescription = this.formCreate.controls["shipperDescription"];
         this.consigneeDescription = this.formCreate.controls["consigneeDescription"];
-        this.issueDate = this.formCreate.controls['issueDate'];
-        this.descriptionOfGood = this.formCreate.controls['descriptionOfGood'];
-        this.notifyDescription = this.formCreate.controls['notifyDescription'];
+        this.issueHBLDate = this.formCreate.controls['issueHBLDate'];
+        this.desOfGoods = this.formCreate.controls['desOfGoods'];
+        this.notifyPartyDescription = this.formCreate.controls['notifyPartyDescription'];
         this.flightDateOrigin = this.formCreate.controls['flightDateOrigin'];
     }
 
@@ -285,15 +309,20 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                     this.consigneeId.setValue(data.id);
                     this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-                if (!this.notifyId.value) {
-                    this.notifyId.setValue(data.id);
-                    this.notifyDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                if (!this.notifyPartyId.value) {
+                    this.notifyPartyId.setValue(data.id);
+                    this.notifyPartyDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
                 break;
             case 'shipper':
                 this.shipperId.setValue(data.id);
                 this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 break;
+            case 'notify':
+                this.notifyPartyId.setValue(data.id);
+                this.notifyPartyDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                break;
+
             case 'consignee':
                 this.consigneeId.setValue(data.id);
                 this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
@@ -312,7 +341,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                 this.pod.setValue(data.id);
                 break;
             case 'final':
-                this.finalDestinaltion.setValue(data.id);
+                this.finalPod.setValue(data.id);
                 break;
             default:
                 break;
@@ -322,4 +351,24 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     getDescription(fullName: string, address: string, tel: string, fax: string) {
         return `${fullName} \n ${address} \n Tel No: ${!!tel ? tel : ''} \n Fax No: ${!!fax ? fax : ''} \n`;
     }
+
+
+    updateFormValue(data: HouseBill) {
+        setTimeout(() => {
+            const formValue = {
+                issueHBLDate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
+                eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
+                flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : null,
+                hbltype: !!data.hbltype ? [(this.billTypes || []).find(type => type.id === data.hbltype)] : null,
+                freightPayment: !!data.freightPayment ? [(this.termTypes || []).find(type => type.id === data.freightPayment)] : null,
+                arrivalDate: !!data.arrivalDate ? { startDate: new Date(data.arrivalDate), endDate: new Date(data.arrivalDate) } : null,
+                packageType: !!data.packageType ? [(this.ngDataUnit || []).find(type => type.id === data.packageType)] : null
+            };
+
+            this.formCreate.patchValue(_merge(cloneDeep(data), formValue));
+        }, 500);
+
+
+    }
+
 }

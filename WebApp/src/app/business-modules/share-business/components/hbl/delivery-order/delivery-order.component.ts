@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
@@ -20,6 +20,7 @@ import * as fromShare from './../../../store';
 })
 
 export class ShareBusinessDeliveryOrderComponent extends AppForm {
+    @Input() isAir: boolean = false;
 
     deliveryOrder: DeliveryOrder = new DeliveryOrder();
 
@@ -29,7 +30,6 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
     userLogged: User;
     hblid: string;
     hblDetail: any = {};
-    isAir: boolean = false;
 
     constructor(
         private _documentRepo: DocumentationRepo,

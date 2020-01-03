@@ -13,6 +13,7 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { AirImportHBLComponent } from './air-import-hbl.component';
 import { AirImportHBLFormCreateComponent } from './components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
 import { AirImportCreateHBLComponent } from './create/create-house-bill.component';
+import { AirImportDetailHBLComponent } from './detail/detail-house-bill.component';
 
 
 
@@ -25,10 +26,10 @@ const routing: Routes = [
         path: 'new', component: AirImportCreateHBLComponent,
         data: { name: 'New House Bill Detail', path: ':id', level: 5 }
     },
-    // {
-    //     path: ':hblId', component: SeaFCLExportDetailHBLComponent,
-    //     data: { name: 'House Bill Detail', path: ':id', level: 5 }
-    // }
+    {
+        path: ':hblId', component: AirImportDetailHBLComponent,
+        data: { name: 'House Bill Detail', path: ':id', level: 5 }
+    }
 ];
 
 const LIB = [
@@ -54,7 +55,8 @@ const LIB = [
     declarations: [
         AirImportHBLComponent,
         AirImportHBLFormCreateComponent,
-        AirImportCreateHBLComponent
+        AirImportCreateHBLComponent,
+        AirImportDetailHBLComponent
     ],
     providers: [],
 })

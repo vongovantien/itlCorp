@@ -571,6 +571,7 @@ namespace eFMS.API.Documentation.DL.Services
                 result.Dofooter = data.Dofooter;
                 result.DeliveryOrderNo = data.DeliveryOrderNo;
                 result.DeliveryOrderPrintedDate = data.DeliveryOrderPrintedDate;
+                result.SubAbbr = data.SubAbbr;
             }
             else
             {
