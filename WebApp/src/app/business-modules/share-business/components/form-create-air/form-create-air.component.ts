@@ -1,12 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { ActivatedRoute, Params } from '@angular/router';
 
 import { CatalogueRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { User, Unit, Customer, PortIndex, DIM, CsTransaction } from '@models';
 import { FormValidators } from '@validators';
 import { AppForm } from 'src/app/app.form';
+import { getCataloguePortState, getCataloguePortLoadingState } from '@store';
 
 import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.popup';
 import { SystemConstants } from 'src/constants/system.const';
@@ -14,7 +16,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import * as fromStore from './../../store/index';
 import { distinctUntilChanged, takeUntil, skip, mergeMap, tap, finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { ActivatedRoute, Params } from '@angular/router';
+
 @Component({
     selector: 'form-create-air',
     templateUrl: './form-create-air.component.html',
@@ -73,6 +75,10 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     shipmentDetail: CsTransaction = new CsTransaction();
 
     isUpdate: boolean = false;
+    isLoadingAgent: boolean = false;
+    isLoadingAirline: boolean = false;
+
+    isLoadingPort: Observable<boolean>;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -177,7 +183,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             )
             .subscribe(
                 (res: CsTransaction) => {
-                    console.log(res);
                     if (res.id !== SystemConstants.EMPTY_GUID) {
 
                         // * Update Form
@@ -314,30 +319,31 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     getCarriers() {
-        this.isLoading = true;
+        this.isLoadingAirline = true;
         this.carries = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER)
             .pipe(
                 finalize(() => {
-                    this.isLoading = false;
+                    this.isLoadingAirline = false;
                 })
             );
     }
 
     getPorts() {
-        this.isLoading = true;
-        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }).pipe(
-            finalize(() => {
-                this.isLoading = false;
-            })
+        this.ports = this._store.select(getCataloguePortState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        );
+
+        this.isLoadingPort = this._store.select(getCataloguePortLoadingState).pipe(
+            takeUntil(this.ngUnsubscribe)
         );
     }
 
     getAgents() {
-        this.isLoading = true;
+        this.isLoadingAgent = true;
         this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT)
             .pipe(
                 finalize(() => {
-                    this.isLoading = false;
+                    this.isLoadingAgent = false;
                 })
             );
     }

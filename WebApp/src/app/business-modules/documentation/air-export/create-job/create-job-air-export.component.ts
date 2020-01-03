@@ -19,6 +19,7 @@ import * as fromShareBusiness from './../../../share-business/store';
 
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+import { GetCataloguePortAction } from '@store';
 @Component({
     selector: 'app-create-job-air-export',
     templateUrl: './create-job-air-export.component.html'
@@ -43,6 +44,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     ngOnInit() {
+        this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
         this._store.dispatch(new fromShareBusiness.TransactionGetDetailSuccessAction({}));
     }
 
@@ -51,8 +53,8 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
-            serviceDate: !!form.serviceDate && !!form.etd.serviceDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            flightDate: !!form.flightDate && !!form.etd.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDate: !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            flightDate: !!form.flightDate && !!form.flightDate.startDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
             mbltype: !!form.mbltype && !!form.mbltype.length ? form.mbltype[0].id : null,
@@ -65,7 +67,6 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
             pod: form.pod,
             coloaderId: form.coloaderId,
         };
-
         const fclExportAddModel: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
         fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.AirExport;
 
