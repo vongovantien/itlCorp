@@ -5,6 +5,7 @@ import { CatalogueRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { SortService } from '@services';
 import { Partner } from '@models';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
 
 @Component({
@@ -17,6 +18,10 @@ export class PartnerListComponent extends AppList implements OnInit {
     @Output() deleteConfirm = new EventEmitter<Partner>();
     @Output() detail = new EventEmitter<Partner>();
     partners: any[] = [];
+    headerSalemans: CommonInterface.IHeaderTable[];
+    isCustomer = false;
+    saleMans: any[] = [];
+    services: any[] = [];
 
     constructor(private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
@@ -30,6 +35,15 @@ export class PartnerListComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
+        this.getService();
+        this.headerSalemans = [
+            { title: 'No', field: '', sortable: true },
+            { title: 'Service', field: 'service', sortable: true },
+            { title: 'Office', field: 'office', sortable: true },
+            { title: 'Company', field: 'company', sortable: true },
+            { title: 'Status', field: 'status', sortable: true },
+            { title: 'CreateDate', field: 'createDate', sortable: true }
+        ];
         this.headers = [
             { title: 'Partner ID', field: 'id', sortable: true },
             { title: 'Name ABBR', field: 'shortName', sortable: true },
@@ -42,10 +56,66 @@ export class PartnerListComponent extends AppList implements OnInit {
             { title: 'Status', field: 'active', sortable: true },
         ];
         this.dataSearch = this.criteria;
+        if (this.criteria.partnerGroup === PartnerGroupEnum.CUSTOMER) {
+            this.isCustomer = true;
+        } else {
+            this.isCustomer = false;
+        }
         console.log(this.dataSearch);
         this.getPartners();
     }
-
+    replaceService() {
+        for (const item of this.saleMans) {
+            this.services.forEach(itemservice => {
+                if (item.service === itemservice.id) {
+                    item.service = itemservice.text;
+                }
+            });
+        }
+    }
+    getService() {
+        this._catalogueRepo.getListService()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
+                    }
+                },
+            );
+    }
+    showSaleman(partnerId: string) {
+        this._catalogueRepo.getListSaleman(partnerId)
+            .pipe(catchError(this.catchError), finalize(() => {
+            })).subscribe(
+                (res: any) => {
+                    this.saleMans = res;
+                    this.replaceService();
+                }
+            );
+        // if (!!this.customers[indexs].saleManRequests.length) {
+        //     this.saleMans = this.customers[indexs].saleManRequests;
+        //     this.replaceService();
+        // } else {
+        //     this._progressRef.start();
+        //     this._catalogueRepo.getListSaleman(partnerId)
+        //         .pipe(
+        //             catchError(this.catchError),
+        //             finalize(() => this._progressRef.complete())
+        //         ).subscribe(
+        //             (res: Saleman[]) => {
+        //                 this.saleMans = res || [];
+        //                 this.customers[indexs].saleManRequests = this.saleMans;
+        //                 this.replaceService();
+        //             }
+        //         );
+        // }
+    }
+    sortBySaleman(sortData: CommonInterface.ISortData): void {
+        if (!!sortData.sortField) {
+            this.saleMans = this._sortService.sort(this.saleMans, sortData.sortField, sortData.order);
+        }
+    }
     searchPartner(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
         this.dataSearch[event.field] = event.searchString;
