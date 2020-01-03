@@ -8,7 +8,7 @@ import { CommonEnum } from '@enums';
 import { AppForm } from 'src/app/app.form';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 
-import { map, filter, tap, takeUntil, catchError, skip } from 'rxjs/operators';
+import { map, filter, tap, takeUntil, catchError, skip, finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
@@ -17,6 +17,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import _merge from 'lodash/merge';
 import { cloneDeep } from 'lodash';
 import * as fromShareBussiness from './../../../../../../share-business/store';
+import { prepareNg2SelectData } from 'src/helper/data.helper';
 @Component({
     selector: 'air-import-hbl-form-create',
     templateUrl: './form-create-house-bill-air-import.component.html',
@@ -65,9 +66,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
     route: AbstractControl;
     packageType: AbstractControl;
-    grossWeight: AbstractControl;
-    cw: AbstractControl;
-    po: AbstractControl;
     issueHBLDate: AbstractControl;
     desOfGoods: AbstractControl;
 
@@ -82,8 +80,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
     currencies: Observable<any[]>;
-    units: Observable<any[]>;
-    unitArr: any = [];
+    units: any[] = [];
+    ngDataUnit: any = [];
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameEn', label: 'Name ABBR' },
@@ -119,6 +117,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
+
         this.billTypes = [
             { id: 'Copy', text: 'Copy' },
             { id: 'Original', text: 'Original' },
@@ -145,17 +144,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.notifies = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE]);
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
         this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
-        this.units = this._catalogueRepo.getUnit({ active: true }).pipe(
-            map((unit: Unit[]) =>
-                this.utility.prepareNg2SelectData(unit, 'id', 'unitNameEn')
-            ),
-        );
-
-
 
         this.saleMans = this._systemRepo.getListSystemUser();
-
-        this.unitArr = this.units;
+        this.getUnit();
         this.initForm();
 
         if (!this.isUpdate) {
@@ -186,13 +177,11 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                 )
                 .subscribe(
                     (hbl: HouseBill) => {
-                        if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
+                        if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID && hbl.id !== undefined) {
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
-
+                            console.log(hbl);
                             this.updateFormValue(hbl);
-
-
                         }
 
                     }
@@ -203,6 +192,18 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
     getCustomers() {
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+    }
+
+
+    getUnit() {
+        this._catalogueRepo.getUnit({ active: true }).subscribe((res: any) => {
+            if (!!res) {
+                const units = res;
+                this.ngDataUnit = units.map(x => ({ text: x.unitNameEn, id: x.id }));
+                console.log(this.ngDataUnit);
+            }
+
+        });
     }
 
     initForm() {
@@ -225,7 +226,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             route: [],
             packageQty: [],
             desOfGoods: [],
-
+            poinvoiceNo: [],
 
             // * Combogrid
             customerId: [null, Validators.required],
@@ -238,10 +239,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             pod: [],
             finalPod: [],
             grossWeight: [],
-            cw: [],
-            po: [],
-
-
+            chargeWeight: [],
 
             // * Select
             hbltype: [null, Validators.required],
@@ -251,9 +249,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             wTorVALPayment: [],
             otherPayment: [],
             packageType: [],
-
-
-
 
             // * Date
             arrivalDate: [],
@@ -359,18 +354,20 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
 
     updateFormValue(data: HouseBill) {
+        setTimeout(() => {
+            const formValue = {
+                issueHBLDate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
+                eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
+                flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : null,
+                hbltype: !!data.hbltype ? [(this.billTypes || []).find(type => type.id === data.hbltype)] : null,
+                freightPayment: !!data.freightPayment ? [(this.termTypes || []).find(type => type.id === data.freightPayment)] : null,
+                arrivalDate: !!data.arrivalDate ? { startDate: new Date(data.arrivalDate), endDate: new Date(data.arrivalDate) } : null,
+                packageType: !!data.packageType ? [(this.ngDataUnit || []).find(type => type.id === data.packageType)] : null
+            };
 
-        const formValue = {
-            issueHBLDate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
-            eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
-            flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : null,
-            hbltype: !!data.hbltype ? [(this.billTypes || []).find(type => type.id === data.hbltype)] : null,
-            freightPayment: !!data.freightPayment ? [(this.termTypes || []).find(type => type.id === data.freightPayment)] : null,
-            arrivalDate: !!data.arrivalDate ? { startDate: new Date(data.arrivalDate), endDate: new Date(data.arrivalDate) } : null,
-            packageType: !!data.packageType ? [{ id: data.packageType, text: data.packageType }] : null,
-        };
+            this.formCreate.patchValue(_merge(cloneDeep(data), formValue));
+        }, 500);
 
-        this.formCreate.patchValue(_merge(cloneDeep(data), formValue));
 
     }
 

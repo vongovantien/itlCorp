@@ -26,7 +26,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(AirImportHBLFormCreateComponent, { static: false }) formCreateHBLComponent: AirImportHBLFormCreateComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBusinessArrivalNoteComponent, { static: true, }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
+    @ViewChild(ShareBusinessArrivalNoteComponent, { static: true }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     jobId: string;
     hblDetail: any = {};
@@ -53,14 +53,14 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 if (param.jobId) {
                     this.jobId = param.jobId;
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-                    this.deliveryComponent.isAir = true;
                     this.getDetailShipment();
                 }
             });
     }
 
     ngAfterViewInit() {
-
+        this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
+        this._cd.detectChanges();
     }
 
     getDetailShipment() {
@@ -75,18 +75,20 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (!!res) {
                         this.hblDetail = res;
+                        setTimeout(() => {
+                            const objArrival = {
+                                arrivalNo: this.hblDetail.jobNo + "-A01",
+                                arrivalFirstNotice: new Date()
+                            };
+                            this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(objArrival);
 
-                        const objArrival = {
-                            arrivalNo: this.hblDetail.jobNo + "-A01",
-                            arrivalFirstNotice: new Date()
-                        };
-                        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(objArrival);
+                            const objDelivery = {
+                                deliveryOrderNo: this.hblDetail.jobNo + "-A01",
+                                deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() }
+                            };
+                            this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
+                        }, 500);
 
-                        const objDelivery = {
-                            deliveryOrderNo: this.hblDetail.jobNo + "-D01",
-                            deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() }
-                        };
-                        this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                     }
                 },
             );
@@ -106,7 +108,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             hwbno: form.hawb,
             hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
-            arrivalDate: !!form.arrivaldate && !!form.arrivaldate.startDate ? formatDate(form.arrivaldate.startDate, 'yyyy-MM-dd', 'en') : null,
+            arrivalDate: !!form.arrivalDate && !!form.arrivalDate.startDate ? formatDate(form.arrivalDate.startDate, 'yyyy-MM-dd', 'en') : null,
             forwardingAgentId: form.forwardingAgentId,
             pol: form.pol,
             pod: form.pod,
@@ -115,16 +117,16 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             flightNo: form.flightNo,
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightNoOrigin: form.flightNoOrigin,
-            flightDateOrigin: !!form.flightDateOrigin ? formatDate(form.flightDateOrigin.startDate, 'yyyy-MM-dd', 'en') : null,
+            flightDateOrigin: !!form.flightDateOrigin && form.flightDateOrigin.startDate !== undefined ? formatDate(form.flightDateOrigin.startDate, 'yyyy-MM-dd', 'en') : null,
             issueHBLDate: !!form.issueHBLDate ? formatDate(form.issueHBLDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            packageType: !!form.unit && !!form.unit.length ? form.unit[0].id : null,
+            packageType: !!form.packageType && !!form.packageType.length ? form.packageType[0].id : null,
             freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
             packageQty: form.packageQty,
             grossWeight: form.gw,
-            chargeWeight: form.cw,
-            poInvoiceNo: form.po,
-            goodsDeliveryDescription: form.descriptionOfGood,
-            finalPOD: form.finalPOD,
+            chargeWeight: form.chargeWeight,
+            poInvoiceNo: form.poinvoiceNo,
+            goodsDeliveryDescription: form.desOfGoods,
+            finalPOD: form.finalPod,
             desOfGoods: form.descriptionOfGood
         };
 

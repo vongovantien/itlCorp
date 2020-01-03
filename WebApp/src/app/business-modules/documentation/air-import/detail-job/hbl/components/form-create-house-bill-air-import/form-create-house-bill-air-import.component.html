@@ -247,7 +247,7 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Unit</label>
-                                <ng-select #unit [items]="units | async" [allowClear]="true"
+                                <ng-select #unit [items]="ngDataUnit" [allowClear]="true"
                                     (opened)="closeOtherSelects(unit)" formControlName="packageType">
                                 </ng-select>
                             </div>
@@ -265,7 +265,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>C.W</label>
-                                <input type="number" class="form-control" formControlName="cw">
+                                <input type="number" class="form-control" formControlName="chargeWeight">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -283,7 +283,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>PO/Invoice No</label>
-                                <input type="text" class="form-control" formControlName="po">
+                                <input type="text" class="form-control" formControlName="poinvoiceNo">
                             </div>
                         </div>
                         <div class="col-md-6">

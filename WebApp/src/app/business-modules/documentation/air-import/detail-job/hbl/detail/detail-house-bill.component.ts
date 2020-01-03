@@ -11,6 +11,7 @@ import { skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { ReportPreviewComponent } from '@common';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from '@share-bussiness';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -23,10 +24,11 @@ enum HBL_TAB {
 })
 export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent implements OnInit {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
-
+    @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
+    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     hblId: string;
 
-    hblDetail: CsTransactionDetail;
+    hblDetail: any;
 
     dataReport: Crystal;
 
@@ -73,7 +75,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
     }
 
-
     getDetailHbl() {
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
@@ -90,6 +91,41 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             );
     }
 
+    onSaveHBLDetail() {
+        switch (this.selectedTab) {
+            case HBL_TAB.DETAIL:
+                this.saveHBL();
+                break;
+
+            // * Update Arrival Note.    
+            case HBL_TAB.ARRIVAL: {
+                this.confirmPopup.hide();
+                this.arrivalNoteComponent.isSubmitted = true;
+                if (!this.arrivalNoteComponent.checkValidate()) {
+                    return;
+                } else if (!!this.arrivalNoteComponent.hblArrivalNote.arrivalNo) {
+                    this.arrivalNoteComponent.saveArrivalNote();
+                } else {
+                    return;
+                }
+                break;
+            }
+            // * Update Delivery Order.
+            case HBL_TAB.AUTHORIZE: {
+                this.confirmPopup.hide();
+                this.deliveryComponent.isSubmitted = true;
+                if (!!this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
+                    this.deliveryComponent.saveDeliveryOrder();
+                } else {
+                    return;
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
 
     saveHBL() {
         this.confirmPopup.hide();
@@ -104,10 +140,19 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
 
-        for (const dim of modelUpdate.dimensionDetails) {
-            dim.hblId = this.hblId;
-            dim.mblId = this.jobId;
-        }
+        modelUpdate.arrivalFirstNotice = this.hblDetail.arrivalFirstNotice;
+        modelUpdate.arrivalFooter = this.hblDetail.arrivalFooter;
+        modelUpdate.arrivalHeader = this.hblDetail.arrivalHeader;
+        modelUpdate.arrivalNo = this.hblDetail.arrivalNo;
+        modelUpdate.arrivalSecondNotice = this.hblDetail.arrivalSecondNotice;
+        modelUpdate.deliveryOrderNo = this.hblDetail.deliveryOrderNo;
+        modelUpdate.deliveryOrderPrintedDate = this.hblDetail.deliveryOrderPrintedDate;
+        modelUpdate.dofooter = this.hblDetail.dofooter;
+        modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
+        modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
+        modelUpdate.subAbbr = this.hblDetail.subAbbr;
+
+
         this.updateHbl(modelUpdate);
     }
 
@@ -122,7 +167,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl`]);
+                        this._router.navigate([`/home/documentation/air-import/${this.jobId}/hbl`]);
                     } else {
                         this._toastService.error(res.message);
                     }
