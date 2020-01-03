@@ -1,7 +1,6 @@
 
 import { NgModule } from "@angular/core";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
-import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
@@ -35,7 +34,7 @@ import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { environment } from "src/environments/environment";
 
 import { StoreRouterConnectingModule, RouterStateSerializer } from '@ngrx/router-store';
-import { reducers, CustomSerializer } from "./store";
+import { reducers, CustomSerializer, effects } from "./store";
 
 
 @NgModule({
@@ -50,7 +49,6 @@ import { reducers, CustomSerializer } from "./store";
         DashboardComponent
     ],
     imports: [
-        CommonModule,
         BrowserModule,
         AppRoutingModule,
         FormsModule,
@@ -72,6 +70,7 @@ import { reducers, CustomSerializer } from "./store";
         NgProgressModule,
 
         StoreModule.forRoot(reducers),
+        EffectsModule.forFeature(effects),
         EffectsModule.forRoot([]),
         StoreDevtoolsModule.instrument({
             maxAge: 25, // Retains last 25 states
@@ -91,7 +90,7 @@ import { reducers, CustomSerializer } from "./store";
         {
             provide: RouterStateSerializer, useClass: CustomSerializer
         },
-        { provide: DEFAULT_TIMEOUT, useValue: 30000 }
+        { provide: DEFAULT_TIMEOUT, useValue: 30000 },
     ],
 
     bootstrap: [AppComponent],

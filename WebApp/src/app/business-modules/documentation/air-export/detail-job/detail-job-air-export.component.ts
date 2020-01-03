@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
 
 import { AirExportCreateJobComponent } from '../create-job/create-job-air-export.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
@@ -10,11 +11,9 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { DIM, CsTransaction } from '@models';
 
 import { combineLatest, of } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, skip, take, finalize } from 'rxjs/operators';
+import { tap, map, switchMap, catchError, takeUntil, skip, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
-import { NgProgress } from '@ngx-progressbar/core';
-
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -159,9 +158,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     saveJob(body: any) {
+        this._progressRef.start();
         this._documenRepo.updateCSTransaction(body)
             .pipe(
-                catchError(this.catchError)
+                catchError(this.catchError),
+                finalize(() => this.isLoading = false)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {

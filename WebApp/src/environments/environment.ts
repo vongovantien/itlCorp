@@ -19,6 +19,5 @@ export const environment = {
         EXPORT: "test.api-efms.itlvn.com/Export",
         INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver",
         // INDENTITY_SERVER_URL: "https://localhost:44369",
-
     },
 };
