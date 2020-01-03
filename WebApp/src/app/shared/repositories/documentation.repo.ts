@@ -451,12 +451,12 @@ export class DocumentationRepo {
         );
     }
 
-    PreviewSeaImportManifest(body: any) {
+    previewSeaImportManifest(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewSeaImportManifest`, body).pipe(
             map((data: any) => data)
         );
     }
-    PreviewSeaExportManifest(body: any) {
+    previewSeaExportManifest(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewSeaExportManifest`, body).pipe(
             map((data: any) => data)
         );
