@@ -1,7 +1,7 @@
 <div class="sea-fcl-create-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <app-default-button [buttonSetting]="importButtonSetting"></app-default-button>
+            <app-default-button [buttonSetting]="importButtonSetting" (click)="showImportPopup()"></app-default-button>
             <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="confirmSave.show()"></app-default-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>
@@ -26,7 +26,7 @@
         </tabset>
     </div>
 </div>
-
+<import-house-bill-detail (onImport)="onImport($event)"> </import-house-bill-detail>
 <confirm-popup #confirmSave body="You are about to create a new HAWB.
 Are you sure all entered details are correct?" (onSubmit)="saveHBL()"></confirm-popup>
 
