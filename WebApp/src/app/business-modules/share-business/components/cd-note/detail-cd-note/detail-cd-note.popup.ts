@@ -11,6 +11,7 @@ import { API_MENU } from "src/constants/api-menu.const";
 import { ModalDirective } from "ngx-bootstrap";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -155,13 +156,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             this.totalDebit += this.formatNumberCurrency(_debit) + ' ' + currency + ' | ';
             this.balanceAmount += (_balance > 0 ? this.formatNumberCurrency(_balance) : '(' + this.formatNumberCurrency(Math.abs(_balance)) + ')') + ' ' + currency + ' | ';
         }
-        // this.totalCredit += "]";
-        // this.totalDebit += "]";
-        // this.balanceAmount += "]";
-        // this.totalCredit = this.totalCredit.replace("| ]", "").replace("]", "");
-        // this.totalDebit = this.totalDebit.replace("| ]", "").replace("]", "");
-        // this.balanceAmount = this.balanceAmount.replace("| ]", "").replace("]", "");
-
+        
         this.totalCredit = this.totalCredit === ' | ' ? '' : this.totalCredit.replace("| ", "");
         this.totalDebit = this.totalDebit === ' | ' ? '' : this.totalDebit.replace("| ", "");
         this.balanceAmount = this.balanceAmount === ' | ' ? '' : this.balanceAmount.replace("| ", "");
@@ -286,8 +281,9 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     get scr() {
-        return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
+        //return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
         //return this.sanitizer.bypassSecurityTrustResourceUrl("http://localhost:53717");
+        return this.sanitizer.bypassSecurityTrustResourceUrl('http://' + `${environment.HOST.REPORT}`);
     }
 
     ngAfterViewInit() {
