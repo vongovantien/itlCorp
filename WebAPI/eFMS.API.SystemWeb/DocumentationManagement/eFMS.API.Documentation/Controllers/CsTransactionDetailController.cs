@@ -266,5 +266,19 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.PreviewAirAttachList(hblId);
             return Ok(result);
         }
+        
+        [HttpGet("PreviewAirImptAuthorisedLetter")]
+        public IActionResult PreviewAirImptAuthorisedLetter(Guid housbillId)
+        {
+            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetter(housbillId);
+            return Ok(result);
+        }
+
+        [HttpGet("AirImptAuthorisedLetter_Consign")]
+        public IActionResult PreviewAirImptAuthorisedLetterConsign(Guid housbillId)
+        {
+            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetterConsign(housbillId);
+            return Ok(result);
+        }
     }
 }
