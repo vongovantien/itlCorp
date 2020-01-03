@@ -1140,5 +1140,96 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             return result;
         }
+
+        public Crystal PreviewAirImptAuthorisedLetter(Guid housbillId)
+        {
+            Crystal result = null;
+            var data = GetById(housbillId);
+            var authorizeLetters = new List<AirImptAuthorisedLetterReport>();
+            if(data != null)
+            {
+                var authorizeLetter = new AirImptAuthorisedLetterReport {
+                    HWBNO = data.Hwbno,
+                    DONo = "DONo",
+                    Consignee = data.ConsigneeDescription,
+                    FlightNo = data.FlightNo,
+                    FlightDate = data.FlightDate,
+                    DepartureAirport = data.PODName,
+                    NoPieces = data.PackageQty?.ToString(),
+                    Description = data.DesOfGoods,
+                    WChargeable = data.ChargeWeight,
+                    DeliveryOrderNote = data.DeliveryOrderNo,
+                    FirstDestination = data.FirstCarrierTo,
+                    SecondDestination = data.TransitPlaceTo1,
+                    Notify = data.NotifyPartyDescription
+                };
+                authorizeLetters.Add(authorizeLetter);
+            }
+            var parameter = new AirImptAuthorisedLetterReportParameter
+            {
+                MAWB = data.Mawb,
+                CompanyName = Constants.COMPANY_NAME,
+                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
+                Website = Constants.COMPANY_WEBSITE,
+                DecimalNo = 2
+            };
+            result = new Crystal
+            {
+                ReportName = "AirImptAuthorisedLetter.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(authorizeLetters);
+            result.SetParameter(parameter);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            return result;
+        }
+
+        public Crystal PreviewAirImptAuthorisedLetterConsign(Guid housbillId)
+        {
+
+            Crystal result = null;
+            var data = GetById(housbillId);
+            var authorizeLetters = new List<AirImptAuthorisedLetterReport>();
+            if (data != null)
+            {
+                var authorizeLetter = new AirImptAuthorisedLetterReport
+                {
+                    HWBNO = data.Hwbno,
+                    DONo = "DONo",
+                    Consignee = data.ConsigneeDescription,
+                    FlightNo = data.FlightNo,
+                    FlightDate = data.FlightDate,
+                    NoPieces = data.PackageQty?.ToString(),
+                    Description = data.DesOfGoods,
+                    WChargeable = data.ChargeWeight,
+                    DeliveryOrderNote = data.DeliveryOrderNo,
+                    FirstDestination = data.FirstCarrierTo,
+                    SecondDestination = data.TransitPlaceTo1,
+                    CBM = data.Cbm,
+                    Notify = data.NotifyPartyDescription
+                };
+                authorizeLetters.Add(authorizeLetter);
+            }
+            var parameter = new AirImptAuthorisedLetterReportParameter
+            {
+                MAWB = data.Mawb,
+                CompanyName = Constants.COMPANY_NAME,
+                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                Website = Constants.COMPANY_WEBSITE,
+                DecimalNo = 2
+            };
+            result = new Crystal
+            {
+                ReportName = "AirImptAuthorisedLetter_Consign.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(authorizeLetters);
+            result.SetParameter(parameter);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            return result;
+        }
     }
 }

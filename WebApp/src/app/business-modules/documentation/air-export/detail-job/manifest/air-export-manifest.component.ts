@@ -172,6 +172,8 @@ export class AirExportManifestComponent extends AppList {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message, '');
+                            this.getManifest(this.jobId);
+                            this.getHblList(this.jobId);
                         } else {
                             this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                         }

@@ -12,7 +12,12 @@ namespace eFMS.API.Documentation.DL.Common
             var currentDate = DateTime.Now;
             return servicePrefix + currentDate.Year.ToString().Substring(2,2) + String.Format("{0:00}", currentDate.Month) + "/" + String.Format("{0:00000}", number);
         }
-
+        public static string GenerateManifest(string prefix, int number)
+        {
+            number = number + 1;
+            var currentDate = DateTime.Now;
+            return prefix + currentDate.Year.ToString().Substring(2) + String.Format("{0:00}", currentDate.Month) + "/" + String.Format("{0:00000}", number);
+        }
         public static string GeneratePrefixHousbillNo()
         {
             Random rnd = new Random();

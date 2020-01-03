@@ -25,9 +25,18 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string DeliveryOrderNote { get; set; }
         public string FirstDestination { get; set; }
         public string SecondDestination { get; set; }
-        public decimal CBM { get; set; }
+        public decimal? CBM { get; set; }
         public string KilosUnit { get; set; }
         public string AgentName { get; set; }
         public string Notify { get; set; }
+    }
+    public class AirImptAuthorisedLetterReportParameter
+    {
+        public string MAWB { get; set; }
+        public string CompanyName { get; set; }
+        public string CompanyAddress1 { get; set; }
+        public string CompanyAddress2 { get; set; }
+        public string Website { get; set; }
+        public int DecimalNo { get; set; }
     }
 }

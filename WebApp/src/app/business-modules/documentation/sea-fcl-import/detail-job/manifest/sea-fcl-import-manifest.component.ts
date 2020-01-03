@@ -295,7 +295,7 @@ export class SeaFclImportManifestComponent extends AppList {
             manifestIssuer: this.formManifest.agent.value,
             csTransactionDetails: this.housebills.filter(x => x.isRemoved === false)
         };
-        this._documentationRepo.PreviewSeaImportManifest(body)
+        this._documentationRepo.previewSeaImportManifest(body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
