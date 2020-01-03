@@ -50,6 +50,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string HbShippers { get; set; }
         public string HbConsignees { get; set; }
         public DateTime? VesselDate { get; set; }
-        public decimal? CW { get; set; }
+        public decimal? HbChargeWeight { get; set; }
     }
 }
