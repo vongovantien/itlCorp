@@ -65,6 +65,9 @@
   "MSG_CHARGE_DEFAULT_CODE_EMPTY": "Charge code is not allow to empty!|wrong",
   "MSG_CHARGE_DEFAULT_CODE_NOT_FOUND": "The charge with code {0} not found !|wrong",
   "MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY": "Voucher type is not allow to empty!|wrong",
+  "MSG_CHARGE_DEFAULT_DUPLICATE": "Voucher default {0} is duplicated",
+  "MSG_CHARGE_DEFAULT_EXISTED": "Voucher efault {0} is existed",
+  "MSG_CHARGE_DEFAULT_NOT_VALID": "Voucher type must be three value appropriate type",
   "MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY": "Account debit no. & Account Credit No & Account Debit No (VAT) & Account Credit No (VAT) is not allow to empty!|wrong",
   "MSG_CHARGE_DEFAULT_ACCOUNT_CREDIT_EMPTY": "Account credit no. is not allow to empty!|wrong",
   //------------end  : ChargeDefault

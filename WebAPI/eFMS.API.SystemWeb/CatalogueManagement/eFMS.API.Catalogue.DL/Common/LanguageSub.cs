@@ -81,9 +81,12 @@ namespace eFMS.API.Catalogue.DL.Common
         #region ChargeDefault
         public static readonly string MSG_CHARGE_DEFAULT_CODE_EMPTY = "MSG_CHARGE_DEFAULT_CODE_EMPTY";
         public static readonly string MSG_CHARGE_DEFAULT_CODE_NOT_FOUND = "MSG_CHARGE_DEFAULT_CODE_NOT_FOUND";
+        public static readonly string MSG_CHARGE_DEFAULT_DUPLICATED = "MSG_CHARGE_DEFAULT_DUPLICATE";
+        public static readonly string MSG_CHARGE_DEFAULT_EXISTED = "MSG_CHARGE_DEFAULT_EXISTED";
         public static readonly string MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY = "MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY";
         public static readonly string MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY = "MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY";
         public static readonly string MSG_CHARGE_DEFAULT_ACCOUNT_CREDIT_EMPTY = "MSG_CHARGE_DEFAULT_ACCOUNT_CREDIT_EMPTY";
+        public static readonly string MSG_CHARGE_DEFAULT_NOT_VALID= "MSG_CHARGE_DEFAULT_NOT_VALID";
         #endregion
 
         #region Charge
