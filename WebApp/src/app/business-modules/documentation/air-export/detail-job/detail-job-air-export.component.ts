@@ -158,9 +158,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     saveJob(body: any) {
+        this._progressRef.start();
         this._documenRepo.updateCSTransaction(body)
             .pipe(
-                catchError(this.catchError)
+                catchError(this.catchError),
+                finalize(() => this.isLoading = false)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {

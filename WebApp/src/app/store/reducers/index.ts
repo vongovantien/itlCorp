@@ -3,7 +3,7 @@ import { Params, RouterStateSnapshot, Data } from '@angular/router';
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 import { spinnerReducer, ISpinnerState } from './spinner.reducer';
 import { catalogueReducer, ICatalogueState } from './catalogue.reducer';
-import { create } from 'domain';
+
 
 export interface IRouterStateUrl {
     url: string;

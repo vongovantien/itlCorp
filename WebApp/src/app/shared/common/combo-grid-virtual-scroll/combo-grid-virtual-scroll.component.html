@@ -1,15 +1,26 @@
 <div class="dropdown e--combogrid" (clickOutside)="keyword = ''">
     <input (click)="clickSearch()" class="form-control m-input m-input--square dropdown-toggle pos-rel"
-        [disabled]="Disabled" type="text" readonly data-toggle="dropdown"
+        [disabled]="loading ? true : Disabled" type="text" readonly data-toggle="dropdown"
         [value]="displaySelectedStr == '' ? null : displaySelectedStr"
         [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''"
         [placeholder]="loading ? '' : placeholder">
-    <ng-container *ngIf="!!loading">
+    <ng-container>
+        <div class="e--combogrid_icon">
+            <span class="e--combogrid_icon__dropdown">
+                <i class="fa fa-angle-down" aria-hidden="true"></i>
+            </span>
+            <span class="e--combogrid_icon__clear" (click)="removeCurrenActiveItem()" *ngIf="!!displaySelectedStr">
+                <i class="la la-times" aria-hidden="true"></i>
+            </span>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="!!loading && !displaySelectedStr">
         <div class="on-loading text-center">
             <div class="m-loader m-loader--brand">
             </div><span>Loading</span>
         </div>
     </ng-container>
+
     <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
         <div class="tabel-wrapper table-fixed">
             <div class="table-head-fixed">

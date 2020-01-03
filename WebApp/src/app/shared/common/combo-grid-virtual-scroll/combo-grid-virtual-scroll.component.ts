@@ -19,6 +19,8 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Input() loading: boolean = false;
     @Input() placeholder: string = '';
     @Output() itemSelected = new EventEmitter<any>();
+    @Output() remove = new EventEmitter<any>();
+
     @ViewChild('inputSearch', { static: true }) inputSearch: ElementRef;
 
     currentItemSelected: any = null;
@@ -124,6 +126,13 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             this.indexSelected = -1;
             this.displaySelectedStr = null;
         }
+    }
+
+    removeCurrenActiveItem() {
+        // this.indexSelected = -1;
+        // this.displaySelectedStr = null;
+
+        this.remove.emit();
     }
 
     emitSelected(item: any, index: number) {
