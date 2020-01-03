@@ -105,7 +105,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
             .subscribe(
                 (res: HBLArrivalNote) => {
                     if (!!res) {
-                        if (!!res.hblid) {
+                        if (!!res.hblid && res.arrivalNo !== null) {
                             this.hblArrivalNote = res;
                             this.hblArrivalNote.arrivalFirstNotice = !!res.arrivalFirstNotice ? { startDate: new Date(res.arrivalFirstNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
                             this.hblArrivalNote.arrivalSecondNotice = !!res.arrivalSecondNotice ? { startDate: new Date(res.arrivalSecondNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
