@@ -95,7 +95,7 @@ export class HouseBill extends BaseModel {
     shipperId: string = null;
     shipperName: string = null;
     shippingMark: string = null;
-    subbAbbr: string = null;
+    subAbbr: string = null;
     warehouseNotice: string = null;
     packageQty: number = null;
 
@@ -145,6 +145,14 @@ export class HouseBill extends BaseModel {
     kgIb: number = null;
     rclass: number = null;
     comItemNo: number = null;
+    arrivalDate: string = null;
+    route: string = null;
+    flightNoOrigin: string = null;
+    flightDateOrigin: string = null;
+    finalPOD: string = null;
+    poInvoiceNo: string = null;
+    issueHBLDate: string = null;
+
     constructor(object?: any) {
         super();
         const self = this;

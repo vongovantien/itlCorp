@@ -63,18 +63,22 @@ export class ShareBusinessFormSearchHouseBillComponent extends AppForm {
     }
 
     resetSearch() {
+        const date = new Date();
+        const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
         const body: ISearchDataHbl = {
             all: null,
             mawb: null,
             hwbno: null,
             customerName: null,
             salemanName: null,
-            fromDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            toDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null
+            fromDate: formatDate(startDate, 'yyyy-MM-dd', 'en'),
+            toDate: formatDate(new Date(), 'yyyy-MM-dd', 'en')
         };
         // this.formSearch.reset();
         this.searchText.reset();
+        this.serviceDate.setValue({ startDate: startDate, endDate: new Date() });
         this.filterType.setValue(this.filterTypes[0]);
+
         this.onSearch.emit(body);
     }
 
