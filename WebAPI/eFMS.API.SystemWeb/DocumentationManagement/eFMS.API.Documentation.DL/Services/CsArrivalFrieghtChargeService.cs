@@ -435,6 +435,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var _podName = placeRepository.Get(x => x.Id == houseBill.Pod).FirstOrDefault()?.NameEn;
                 var _shipperName = partnerRepositoty.Get(x => x.Id == houseBill.ShipperId).FirstOrDefault()?.PartnerNameEn;
                 var _consigneeName = partnerRepositoty.Get(x => x.Id == houseBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
+                var _agentName = partnerRepositoty.Get(x => x.Id == houseBill.ForwardingAgentId).FirstOrDefault()?.PartnerNameEn;
 
                 var _arrivalHeader = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
                 var _arrivalFooter = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalFooter);
@@ -454,14 +455,14 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.LastDestination = _podName; //Destination Air Port (POD)
                         charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader
                         charge.DatePackage = DateTime.Now; //Current Date
-                        charge.NoPieces = string.Empty; //Quantity + Unit Qty
+                        charge.NoPieces = houseBill.PackageQty + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty
                         charge.Description = houseBill.DesOfGoods; //Description of Goods
-                        charge.WChargeable = houseBill.GrossWeight; //G.W (GrossWeight)
+                        charge.WChargeable = houseBill.GrossWeight != null ? houseBill.GrossWeight : 0; //G.W (GrossWeight)
                         charge.blnShow = frieght.IsShow != null ? frieght.IsShow.Value : false; //isShow of charge arrival
                         charge.blnStick = frieght.IsTick != null ? frieght.IsTick.Value : false;//isStick of charge arrival
                         charge.blnRoot = frieght.IsFull != null ? frieght.IsFull.Value : false; //isRoot of charge arrival
                         charge.FreightCharge = chargeRepository.Get(x => x.Id == frieght.ChargeId).FirstOrDefault()?.ChargeNameEn;//Charge name of charge arrival
-                        charge.Qty = frieght.Quantity;//Quantity of charge
+                        charge.Qty = frieght.Quantity != null ? frieght.Quantity : 0;//Quantity of charge
                         charge.Unit = frieght.UnitName;//Unit name of charge arrival
                         charge.TotalValue = frieght.UnitPrice;//Unit price of charge arrival
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
@@ -469,12 +470,12 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Notes = frieght.Notes;//Note of charge arrival
                         charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer
                         charge.Shipper = _shipperName; //Shipper Name
-                        charge.CBM = houseBill.ChargeWeight; //C.W (ChargeWeight)
+                        charge.CBM = houseBill.ChargeWeight != null ? houseBill.ChargeWeight : 0; //C.W (ChargeWeight)
                         charge.AOL = string.Empty; //NOT USE
                         charge.KilosUnit = string.Empty; //NOT USE
                         charge.DOPickup = DateTime.Now; //NOT USE
                         charge.ExVND = frieght.ExchangeRate != null ? frieght.ExchangeRate.Value : 0;
-                        charge.AgentName = string.Empty; //Tạm thời để trống vì chưa có field
+                        charge.AgentName = _agentName; //Agent
                         charge.Notify = houseBill.NotifyParty; //Notify Party
                         charge.DecimalSymbol = string.Empty;
                         charge.DigitSymbol = string.Empty;
@@ -497,9 +498,9 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.LastDestination = _podName; //Destination Air Port (POD)
                     charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader
                     charge.DatePackage = DateTime.Now; //Current Date
-                    charge.NoPieces = string.Empty; //Quantity + Unit Qty (Tạm thời để trống vì chưa có field)
+                    charge.NoPieces = houseBill.PackageQty + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty; //Quantity + Unit Qty
                     charge.Description = houseBill.DesOfGoods; //Description of Goods
-                    charge.WChargeable = houseBill.GrossWeight; //G.W (GrossWeight)
+                    charge.WChargeable = houseBill.GrossWeight != null ? houseBill.GrossWeight : 0; //G.W (GrossWeight)
                     charge.blnShow = false; //isShow of charge arrival
                     charge.blnStick = false;//isStick of charge arrival
                     charge.blnRoot = false; //isRoot of charge arrival
@@ -512,12 +513,12 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Notes = string.Empty;//Note of charge
                     charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer
                     charge.Shipper = _shipperName; //Shipper
-                    charge.CBM = houseBill.ChargeWeight; //C.W (ChargeWeight)
+                    charge.CBM = houseBill.ChargeWeight != null ? houseBill.ChargeWeight : 0; //C.W (ChargeWeight)
                     charge.AOL = string.Empty; //NOT USE
                     charge.KilosUnit = string.Empty; //NOT USE
                     charge.DOPickup = DateTime.Now; //NOT USE
                     charge.ExVND = 0;
-                    charge.AgentName = string.Empty; //Tạm thời để trống vì chưa có field
+                    charge.AgentName = _agentName; //Agent
                     charge.Notify = houseBill.NotifyParty;
                     charge.DecimalSymbol = string.Empty;
                     charge.DigitSymbol = string.Empty;
@@ -539,8 +540,8 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.Website = Constants.COMPANY_WEBSITE;
             parameter.AccountInfo = string.Empty;
             parameter.Contact = _currentUser;
-            parameter.DecimalNo = 2;
-            parameter.CurrDecimalNo = 2;
+            parameter.DecimalNo = 0;
+            parameter.CurrDecimalNo = 0;
 
             result = new Crystal
             {
