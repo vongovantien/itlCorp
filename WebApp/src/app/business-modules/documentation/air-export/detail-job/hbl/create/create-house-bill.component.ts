@@ -61,8 +61,8 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
-            issueHbldate: !!form.issueHbldate && !!form.eta.issueHbldate ? formatDate(form.issueHbldate.startDate, 'yyyy-MM-dd', 'en') : null,
-            flightDate: !!form.flightDate && !!form.eta.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            issueHbldate: !!form.issueHbldate && !!form.issueHbldate.startDate ? formatDate(form.issueHbldate.startDate, 'yyyy-MM-dd', 'en') : null,
+            flightDate: !!form.flightDate && !!form.flightDate.startDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? form.originBlnumber[0].id : null,
             freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
