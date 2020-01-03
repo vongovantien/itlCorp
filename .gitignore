@@ -359,3 +359,4 @@ WebAPI/ITL.NetCore.Connection.dll
 WebAPI/ITL.NetCore.Connection.pdb
 /backup
 /WebAPI/eFMS.API.SystemWeb/ReportPerview/aspnet_client/system_web/4_7_3535
+/WebApp/src/environments/environment.ts
