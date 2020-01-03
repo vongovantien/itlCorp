@@ -20,6 +20,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState DeleteTransactionDetail(Guid hbId);
         //CsTransactionDetailReport GetReportBy(Guid jobId);
         List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria);
+        IQueryable<CsTransactionDetailModel> GetListHouseBillAscHBL(CsTransactionDetailCriteria criteria);
         List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount);
         object GetGoodSummaryOfAllHBLByJobId(Guid jobId);
         object ImportCSTransactionDetail(CsTransactionDetailModel model);

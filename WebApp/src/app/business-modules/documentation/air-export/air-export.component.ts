@@ -110,7 +110,7 @@ export class AirExportComponent extends AppList {
       this.houseBills = this.tmpHouseBills;
     } else {
       this._progressRef.start();
-      this._documentRepo.getListHouseBillOfJob({ jobId: jobId })
+      this._documentRepo.getListHouseBillAscHBLOfJob({ jobId: jobId })
         .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
         .subscribe(
           (res: any) => {

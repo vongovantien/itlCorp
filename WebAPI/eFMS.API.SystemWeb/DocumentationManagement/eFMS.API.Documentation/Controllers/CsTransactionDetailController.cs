@@ -168,6 +168,13 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        [HttpPost("GetListHouseBillAscHBL")]
+        public IActionResult GetListHouseBillAscHBL(CsTransactionDetailCriteria criteria)
+        {
+            var data = csTransactionDetailService.GetListHouseBillAscHBL(criteria);
+            return Ok(data);
+        }
+
         [HttpPost]
         [Route("Paging")]
         public IActionResult Paging(CsTransactionDetailCriteria criteria, int page, int size)
