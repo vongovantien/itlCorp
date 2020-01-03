@@ -44,6 +44,10 @@ export function TransactionReducer(state = initState, action: TransactionActions
             return { ...state, cstransactions: action.payload, isLoading: false, isLoaded: true };
         }
 
+        case TransactionActionTypes.LOAD_LIST_FAIL: {
+            return { ...state, isLoading: false, isLoaded: false };
+        }
+
         case TransactionActionTypes.GET_PROFIT: {
             return { ...state, isLoaded: false, isLoading: true };
         }
