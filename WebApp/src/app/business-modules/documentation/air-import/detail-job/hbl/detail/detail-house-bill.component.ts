@@ -33,6 +33,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     dataReport: Crystal;
 
     selectedTab: string = HBL_TAB.DETAIL;
+    isClickSubMenu: boolean = false;
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -198,5 +199,35 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
+    }
+
+    previewArrivalNotice(_currency: string) {
+        this._documentationRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: _currency })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    onPreview(type: string) {
+        this.isClickSubMenu = false;
+        // Preview Arrival Notice
+        if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
+            const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
+            this.previewArrivalNotice(_currency);
+        }
     }
 }
