@@ -242,6 +242,15 @@ export class DocumentationRepo {
         );
     }
 
+    getListHouseBillAscHBLOfJob(data: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetListHouseBillAscHBL`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
     createHousebill(body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/addNew`, body);
     }
@@ -533,6 +542,12 @@ export class DocumentationRepo {
 
     previewAirAttachList(hblId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirAttachList`, { hblId: hblId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    previewArrivalNoticeAir(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/PreviewArrivalNoticeAir`, body).pipe(
             map((data: any) => data)
         );
     }

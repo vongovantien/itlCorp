@@ -19,6 +19,7 @@ import * as fromShareBusiness from '../../../share-business/store';
 
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+import { GetCataloguePortAction } from '@store';
 @Component({
     selector: 'app-create-job-air-import',
     templateUrl: './create-job-air-import.component.html'
@@ -43,6 +44,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
     }
 
     ngOnInit() {
+        this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
         this._store.dispatch(new fromShareBusiness.TransactionGetDetailSuccessAction({}));
     }
 
@@ -78,7 +80,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         this.formCreateComponent.paymentTerm].forEach((control: AbstractControl) => this.setError(control));
 
         let valid: boolean = true;
-        if (!this.formCreateComponent.formGroup.valid || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)) {
+        if (!this.formCreateComponent.formGroup.valid || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)) {
             valid = false;
         }
         return valid;

@@ -21,27 +21,24 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
-        private readonly ICatChargeService chargeService;
         private readonly IContextBase<CatCharge> chargeRepository;
 
         public CatChargeDefaultService(IContextBase<CatChargeDefaultAccount> repository, 
             ICacheServiceBase<CatChargeDefaultAccount> cacheService, 
             IMapper mapper,
-            ICatChargeService charge,
             IStringLocalizer<LanguageSub> localizer,
             ICurrentUser user,
             IContextBase<CatCharge> chargeRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
-            chargeService = charge;
             chargeRepository = chargeRepo;
         }
 
         public List<CatChargeDefaultAccountImportModel> CheckValidImport(List<CatChargeDefaultAccountImportModel> list)
         {
-            var defaultAccount = Get();
-            var charges = chargeRepository.Get();
+            var defaultAccount = DataContext.Get().ToList();
+            var charges = chargeRepository.Get().ToList();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.Type))
@@ -61,6 +58,26 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         item.ChargeCodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_NOT_FOUND], item.ChargeCode);
                         item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.ChargeId = charge.Id;
+                        if(defaultAccount.Where(x => x.ChargeId == item.ChargeId && x.Type == item.Type).GroupBy(x => x.ChargeId == item.ChargeId && x.Type == item.Type)
+                            .Any(x => x.Count() > 0))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_EXISTED], item.ChargeCode);
+                            item.IsValid = false;
+                        }
+                        if (list.Where(x => x.ChargeId == item.ChargeId && x.Type == item.Type).GroupBy(x => x.ChargeId == item.ChargeId && x.Type == item.Type)
+                           .Any(x => x.Count() > 1))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_DUPLICATED], item.ChargeCode);
+                            item.IsValid = false;
+                        }
+                        if(list.Where(x => x.ChargeId == item.ChargeId).GroupBy(x => x.ChargeId).Any(x => x.Count() > 3)){
+                            item.ChargeCodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_NOT_VALID], item.ChargeCode);
+                            item.IsValid = false;
+                        }
                     }
                 }
                 if (string.IsNullOrEmpty(item.DebitAccountNo) 
@@ -98,36 +115,26 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                var charges = chargeService.Get();
-                var chargeDefaults = Get();
-                foreach(var item in data)                {
-                    var charge = charges.FirstOrDefault(x => x.Code == item.ChargeCode);
-                    var listChargeDefaultAcc = chargeDefaults.Where(x => x.ChargeId == charge.Id).ToList();
-                    bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
-                    DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
+                var listCharge = new List<CatChargeDefaultAccount>();
+                foreach(var item in data){
                     var defaultAccount = new CatChargeDefaultAccount
                     {
-                        ChargeId = charge.Id,
-                        Active = active,
-                        InactiveOn = inactiveDate,
+                        ChargeId = item.ChargeId,
+                        DebitAccountNo = item.DebitAccountNo,
+                        DebitVat = item.DebitVat,
+                        CreditAccountNo = item.CreditAccountNo,
+                        CreditVat = item.CreditVat,
+                        Type = item.Type,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
-                        DatetimeCreated = DateTime.Now,                        
-                        Type = item.Type,
-                        DebitAccountNo = item.DebitAccountNo,
-                        CreditAccountNo = item.CreditAccountNo,
-                        DebitVat = item.DebitVat,
-                        CreditVat = item.CreditVat                        
+                        DatetimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
+                        Active = item.Active,
+                        InactiveOn = item.InactiveOn
                     };
-                    foreach(var acc in listChargeDefaultAcc)
-                    {
-                        if (acc.Type != defaultAccount.Type)
-                        {
-                            DataContext.Add(defaultAccount, false);
-                        }
-                    }
+                    listCharge.Add(defaultAccount);
                 }
-                DataContext.SubmitChanges();
+                DataContext.Add(listCharge);
                 ClearCache();
                 Get();
                 

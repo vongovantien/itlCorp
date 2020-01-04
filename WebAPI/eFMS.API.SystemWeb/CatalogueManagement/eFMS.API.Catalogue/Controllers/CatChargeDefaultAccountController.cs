@@ -203,6 +203,14 @@ namespace eFMS.API.Catalogue.Controllers
                 List<CatChargeDefaultAccountImportModel> list = new List<CatChargeDefaultAccountImportModel>();
                 for(int row = 2; row <= rowCount; row++)
                 {
+                    var status = worksheet.Cells[row, 7].Value;
+                    bool active = false;
+                    DateTime? inactiveDate = null;
+                    if (status != null)
+                    {
+                        active = status.ToString().ToLower() == "active";
+                        inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
+                    }
                     var defaultAccount = new CatChargeDefaultAccountImportModel
                     {
                         IsValid = true,
@@ -213,6 +221,8 @@ namespace eFMS.API.Catalogue.Controllers
                         DebitVat = worksheet.Cells[row, 5].Value != null ? (decimal?)null:Convert.ToDecimal(worksheet.Cells[row, 5].Value),
                         CreditVat = worksheet.Cells[row, 6].Value == null ? (decimal?)null: Convert.ToDecimal(worksheet.Cells[row, 6].Value),
                         Status = worksheet.Cells[row, 7].Value == null? string.Empty: worksheet.Cells[row, 7].Value.ToString(),
+                        Active = active,
+                        InactiveOn = inactiveDate
                     };
                     list.Add(defaultAccount);
                 }
@@ -231,18 +241,16 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("import")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Import([FromBody] List<CatChargeDefaultAccountImportModel> data)
         {
-            var result = catChargeDefaultAccountService.Import(data);
-            if (result.Success)
+            var hs = catChargeDefaultAccountService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully!!!" };
+            if (hs.Success)
             {
                 return Ok(result);
             }
-            else
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
-            }
+            return BadRequest(new ResultHandle { Status = false, Message = hs.Exception.Message });
         }
 
         /// <summary>

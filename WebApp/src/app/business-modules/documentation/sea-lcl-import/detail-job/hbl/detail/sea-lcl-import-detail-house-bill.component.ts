@@ -271,7 +271,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                             this.reportPopup.show();
                         }, 1000);
                     } else {
-                        this._toastService.warning('There is no data to display preview');
+                        this._toastService.warning('There is no data charge to display preview');
                     }
                 },
             );

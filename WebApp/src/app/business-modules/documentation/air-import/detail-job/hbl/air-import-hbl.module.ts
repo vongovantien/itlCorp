@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { PaginationModule, TabsModule, ModalModule } from 'ngx-bootstrap';
+import { PaginationModule, TabsModule, ModalModule, BsDropdownModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -37,7 +37,8 @@ const LIB = [
     ModalModule.forRoot(),
     TabsModule.forRoot(),
     SelectModule,
-    NgxDaterangepickerMd.forRoot()
+    NgxDaterangepickerMd.forRoot(),
+    BsDropdownModule.forRoot()
 
 ];
 @NgModule({

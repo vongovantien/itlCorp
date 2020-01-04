@@ -442,7 +442,7 @@ namespace eFMS.API.Documentation.DL.Services
                           DatetimeCreated = detail.DatetimeCreated
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            results = res.OrderByDescending(o => o.DatetimeCreated).ToList();
+            results = res.OrderByDescending(o => o.DatetimeModified).ToList();
             //results.ForEach(fe => {
             //    fe.Containers = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
             //                                                            .Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));
@@ -451,6 +451,90 @@ namespace eFMS.API.Documentation.DL.Services
             //    fe.GW = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Sum(s => s.Gw);
             //    fe.CBM = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Sum(s => s.Cbm);
             //});
+            return results;
+        }
+
+        public IQueryable<CsTransactionDetailModel> GetListHouseBillAscHBL(CsTransactionDetailCriteria criteria)
+        {
+            var res = from detail in DataContext.Get()
+                      join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
+                      join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
+                      from cus in customers.DefaultIfEmpty()
+                      join shipper in catPartnerRepo.Get() on detail.ShipperId equals shipper.Id into shippers
+                      from shipper in shippers.DefaultIfEmpty()
+                      join consignee in catPartnerRepo.Get() on detail.ConsigneeId equals consignee.Id into consignees
+                      from consignee in consignees.DefaultIfEmpty()
+                      join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id into salemans
+                      from sale in salemans.DefaultIfEmpty()
+                      join notify in catPartnerRepo.Get() on detail.NotifyPartyId equals notify.Id into notifys
+                      from notify in notifys.DefaultIfEmpty()
+                      join port in catPlaceRepo.Get() on detail.Pod equals port.Id into portDetail
+                      from pod in portDetail.DefaultIfEmpty()
+                      where detail.JobId == criteria.JobId
+                      select new CsTransactionDetailModel
+                      {
+                          Id = detail.Id,
+                          JobId = detail.JobId,
+                          Hwbno = detail.Hwbno,
+                          Mawb = detail.Mawb,
+                          SaleManId = detail.SaleManId,
+                          SaleManName = sale.Username,
+                          CustomerId = detail.CustomerId,
+                          CustomerName = cus.ShortName,
+                          NotifyPartyId = detail.NotifyPartyId,
+                          NotifyParty = notify.ShortName,
+                          FinalDestinationPlace = detail.FinalDestinationPlace,
+                          Eta = detail.Eta,
+                          Etd = detail.Etd,
+                          ConsigneeId = detail.ConsigneeId,
+                          ConsigneeDescription = detail.ConsigneeDescription,
+                          ShipperDescription = detail.ShipperDescription,
+                          ShipperId = detail.ShipperId,
+                          NotifyPartyDescription = detail.NotifyPartyDescription,
+                          Pod = detail.Pod,
+                          Pol = detail.Pol,
+                          AlsoNotifyPartyId = detail.AlsoNotifyPartyId,
+                          AlsoNotifyPartyDescription = detail.AlsoNotifyPartyDescription,
+                          Hbltype = detail.Hbltype,
+                          ReferenceNo = detail.ReferenceNo,
+                          ColoaderId = detail.ColoaderId,
+                          LocalVoyNo = detail.LocalVoyNo,
+                          LocalVessel = detail.LocalVessel,
+                          OceanVessel = detail.OceanVessel,
+                          OceanVoyNo = detail.OceanVoyNo,
+                          OriginBlnumber = detail.OriginBlnumber,
+                          ShipperName = shipper.ShortName,
+                          ConsigneeName = consignee.ShortName,
+                          DesOfGoods = detail.DesOfGoods,
+                          PODName = pod.NameEn,
+                          ManifestRefNo = detail.ManifestRefNo,
+                          ServiceType = detail.ServiceType,
+                          ContSealNo = detail.ContSealNo,
+                          SailingDate = detail.SailingDate,
+                          FreightPayment = detail.FreightPayment,
+                          PickupPlace = detail.PickupPlace,
+                          DeliveryPlace = detail.DeliveryPlace,
+                          GoodsDeliveryDescription = detail.GoodsDeliveryDescription,
+                          GoodsDeliveryId = detail.GoodsDeliveryId,
+                          ForwardingAgentDescription = detail.ForwardingAgentDescription,
+                          ForwardingAgentId = detail.ForwardingAgentId,
+                          MoveType = detail.MoveType,
+                          ShippingMark = detail.ShippingMark,
+                          InWord = detail.InWord,
+                          OnBoardStatus = detail.OnBoardStatus,
+                          Remark = detail.Remark,
+                          PurchaseOrderNo = detail.PurchaseOrderNo,
+                          OriginCountryId = detail.OriginCountryId,
+                          CBM = detail.Cbm,
+                          GW = detail.GrossWeight,
+                          PackageContainer = detail.PackageContainer,
+                          PackageQty = detail.PackageQty,
+                          PackageType = detail.PackageType,
+                          CW = detail.ChargeWeight,
+                          DatetimeCreated = detail.DatetimeCreated
+                      };
+            //Order tăng dần theo số House
+            var results = res.ToArray().OrderBy(o => o.Hwbno).AsQueryable();
             return results;
         }
 
@@ -1150,7 +1234,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var authorizeLetter = new AirImptAuthorisedLetterReport {
                     HWBNO = data.Hwbno,
-                    DONo = "DONo",
+                    DONo = data.DeliveryOrderNo,
                     Consignee = data.ConsigneeDescription,
                     FlightNo = data.FlightNo,
                     FlightDate = data.FlightDate,

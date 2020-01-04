@@ -8,6 +8,7 @@ export enum DimensionActionTypes {
     INIT_DIMENSION = '[DIMENSION] INIT',
     GET_DIMENSION = '[DIMENSION] GET',
     GET_DIMENSION_HBL = '[DIMENSION] GET HBL',
+    GET_DIMENSION_HBL_SUCCESS = '[DIMENSION] GET HBL SUCESS',
     GET_DIMENSION_SUCESS = '[DIMENSION] GET SUCCESS',
     GET_DIMENSION_FAIL = '[DIMENSION] GET FAIL',
 }
@@ -34,6 +35,12 @@ export class GetDimensionHBLAction implements Action {
     constructor(public payload: any) { }
 }
 
+export class GetDimensionHBLSuccessAction implements Action {
+    readonly type = DimensionActionTypes.GET_DIMENSION_HBL_SUCCESS;
+
+    constructor(public payload: any) { }
+}
+
 export class GetDimensionSuccessAction implements Action {
     readonly type = DimensionActionTypes.GET_DIMENSION_SUCESS;
 
@@ -55,4 +62,5 @@ export type DimensionActions
     | InitDimensionAction
     | GetDimensionSuccessAction
     | GetDimensionHBLAction
+    | GetDimensionHBLSuccessAction
     | GetDimensionFailAction;

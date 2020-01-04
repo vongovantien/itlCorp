@@ -62,7 +62,7 @@
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
             <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')">
-                <form-create-air>
+                <form-create-air type="export">
                     <div class="row m--margin-top-20" *ngIf="!!shipmentDetail">
                         <div class="col-md-4">
                             <span>Created: {{shipmentDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
@@ -76,7 +76,7 @@
                 </form-create-air>
                 <grant-total-profit></grant-total-profit>
             </tab>
-            <tab heading="House Bills List" (selectTab)="onSelectTab('hbl')" [active]="selectedTab === 'HBL'"
+            <tab heading="HAWB List" (selectTab)="onSelectTab('hbl')" [active]="selectedTab === 'HBL'"
                 [disabled]="ACTION === 'COPY'">
                 <ng-container *ngIf="selectedTab === 'HBL'">
                 </ng-container>

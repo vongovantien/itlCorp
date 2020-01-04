@@ -5,7 +5,7 @@ import { throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class CatalogueRepo {
 
     private VERSION: string = 'v1';

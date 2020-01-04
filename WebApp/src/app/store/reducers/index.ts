@@ -2,6 +2,8 @@ import * as fromRouter from '@ngrx/router-store';
 import { Params, RouterStateSnapshot, Data } from '@angular/router';
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 import { spinnerReducer, ISpinnerState } from './spinner.reducer';
+import { catalogueReducer, ICatalogueState } from './catalogue.reducer';
+
 
 export interface IRouterStateUrl {
     url: string;
@@ -13,11 +15,13 @@ export interface IRouterStateUrl {
 export interface IAppState {
     routerReducer: fromRouter.RouterReducerState<IRouterStateUrl>;
     spinnerReducer: ISpinnerState;
+    catalogueReducer: ICatalogueState;
 }
 
 export const reducers: ActionReducerMap<IAppState> = {
     routerReducer: fromRouter.routerReducer,
-    spinnerReducer: spinnerReducer
+    spinnerReducer: spinnerReducer,
+    catalogueReducer: catalogueReducer
 };
 
 // * Custom Serializer
@@ -41,11 +45,16 @@ export class CustomSerializer implements fromRouter.RouterStateSerializer<IRoute
 // * Selector
 
 export const routerState = createFeatureSelector<fromRouter.RouterReducerState<IRouterStateUrl>>('routerReducer');
+export const catalogueState = createFeatureSelector<any>('catalogueReducer');
+
 
 export const getRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state);
 export const getQueryParamsRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.queryParams);
 export const getParamsRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.params);
 export const getUrlRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.url);
 export const getDataRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.data);
+
+export const getCataloguePortState = createSelector(catalogueState, (state: ICatalogueState) => state && state.ports);
+export const getCataloguePortLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
 export const isSpinnerShowing = createSelector(spinnerReducer, (state: ISpinnerState) => state.show);

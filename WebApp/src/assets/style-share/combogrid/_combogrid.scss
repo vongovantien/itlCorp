@@ -1,5 +1,31 @@
 //combogrid
 .e--combogrid {
+    .e--combogrid_icon {
+        position: absolute;
+        right: 1rem;
+        top: 25%;
+        i {
+            color: #6f727d;
+        }
+        .e--combogrid_icon__clear {
+            position: absolute;
+            right: 20px;
+            i {
+                font-size: 0.8rem;
+                font-weight: bold;
+
+                &:hover {
+                    color: red;
+                    cursor: pointer;
+                }
+            }
+        }
+        .e--combogrid_icon__dropdown {
+            i {
+                font-size: 1.3rem;
+            }
+        }
+    }
     .on-loading {
         position: absolute;
         top: 60%;

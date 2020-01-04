@@ -6,7 +6,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { AddChargeComponent } from '../add-charge/add-charge.component';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, timeout } from 'rxjs/operators';
 @Component({
     selector: 'detail-charge',
     templateUrl: './detail-charge.component.html',
@@ -70,7 +70,9 @@ export class DetailChargeComponent extends AddChargeComponent {
 
     }
     ngAfterViewInit() {
-        this.getChargeDetail();
+        setTimeout(() => {
+            this.getChargeDetail();
+        }, 30);
     }
 
     getChargeDetail() {
