@@ -68,7 +68,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     packageType: AbstractControl;
     issueHBLDate: AbstractControl;
     desOfGoods: AbstractControl;
-
+    isLoading: boolean = false;
     // forwardingAgentDescription: AbstractControl;
 
     customers: Observable<Customer[]>;
@@ -137,8 +137,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             { id: '2', text: 'Two (2)' },
             { id: '3', text: 'Three (3)' }
         ];
-
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+        this.getCustomers();
         this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.notifies = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE]);
@@ -191,7 +190,12 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     getCustomers() {
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+        this.isLoading = true;
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER).pipe(
+            finalize(() => {
+                this.isLoading = false;
+            })
+        );
     }
 
 

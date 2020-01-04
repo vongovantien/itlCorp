@@ -14,7 +14,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [currentActiveItemId]="{ field: 'id', value: customerId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200">
+                            placeholder="Select Customer" [loading]="isLoading" [displayFields]="displayFieldsCustomer"
+                            (remove)="resetFormControl(customerId)" [height]="200">
                         </app-combo-grid-virtual-scroll>
 
                     </div>
