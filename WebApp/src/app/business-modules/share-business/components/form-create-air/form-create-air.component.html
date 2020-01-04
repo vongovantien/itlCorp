@@ -49,7 +49,7 @@
                                 [currentActiveItemId]="{ field: 'id', value: coloaderId.value, hardValue: shipmentDetail.supplierName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                 [displayFields]="displayFieldsSupplier" [height]="200" placeholder="Select airline"
-                                [loading]="isLoadingAirline" (remove)="resetFormControl(coloaderId)">
+                                [loading]="isLoadingAirline | async" (remove)="resetFormControl(coloaderId)">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                                 [currentActiveItemId]="{ field: 'id', value: agentId.value,hardValue: shipmentDetail.agentName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                                 [displayFields]="displayFieldsSupplier" [height]="200" placeholder="Select agent"
-                                [loading]="isLoadingAgent" (remove)="resetFormControl(agentId)">
+                                [loading]="isLoadingAgent | async" (remove)="resetFormControl(agentId)">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>

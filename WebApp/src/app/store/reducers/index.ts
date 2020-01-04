@@ -54,7 +54,15 @@ export const getParamsRouterState = createSelector(routerState, (state: fromRout
 export const getUrlRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.url);
 export const getDataRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.data);
 
+// * CATALOGUE 
+
 export const getCataloguePortState = createSelector(catalogueState, (state: ICatalogueState) => state && state.ports);
 export const getCataloguePortLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
+
+export const getCatalogueCarrierState = createSelector(catalogueState, (state: ICatalogueState) => state && state.carriers);
+export const getCatalogueCarrierLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
+
+export const getCatalogueAgentState = createSelector(catalogueState, (state: ICatalogueState) => state && state.agents);
+export const getCatalogueAgentLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
 export const isSpinnerShowing = createSelector(spinnerReducer, (state: ISpinnerState) => state.show);

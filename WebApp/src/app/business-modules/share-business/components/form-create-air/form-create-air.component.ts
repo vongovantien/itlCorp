@@ -8,7 +8,7 @@ import { CommonEnum } from '@enums';
 import { User, Unit, Customer, PortIndex, DIM, CsTransaction } from '@models';
 import { FormValidators } from '@validators';
 import { AppForm } from 'src/app/app.form';
-import { getCataloguePortState, getCataloguePortLoadingState } from '@store';
+import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueCarrierLoadingState, GetCatalogueCarrierAction, getCatalogueAgentState, getCatalogueAgentLoadingState, GetCatalogueAgentAction } from '@store';
 
 import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.popup';
 import { SystemConstants } from 'src/constants/system.const';
@@ -45,9 +45,19 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     commodity: AbstractControl;
     packageType: AbstractControl;
 
-    shipmentTypes: CommonInterface.INg2Select[];
-    billTypes: CommonInterface.INg2Select[];
-    termTypes: CommonInterface.INg2Select[];
+    shipmentTypes: CommonInterface.INg2Select[] = [
+        { id: 'Freehand', text: 'Freehand' },
+        { id: 'Nominated', text: 'Nominated' }
+    ];
+    billTypes: CommonInterface.INg2Select[] = [
+        { id: 'Copy', text: 'Copy' },
+        { id: 'Original', text: 'Original' },
+        { id: 'Surrendered', text: 'Surrendered' },
+    ];
+    termTypes: CommonInterface.INg2Select[] = [
+        { id: 'Prepaid', text: 'Prepaid' },
+        { id: 'Collect', text: 'Collect' }
+    ];
 
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
@@ -76,9 +86,9 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     shipmentDetail: CsTransaction = new CsTransaction();
 
     isUpdate: boolean = false;
-    isLoadingAgent: boolean = false;
-    isLoadingAirline: boolean = false;
 
+    isLoadingAgent: Observable<boolean>;
+    isLoadingAirline: Observable<boolean>;
     isLoadingPort: Observable<boolean>;
 
     constructor(
@@ -91,29 +101,15 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     ngOnInit() {
-        this.billTypes = [
-            { id: 'Copy', text: 'Copy' },
-            { id: 'Original', text: 'Original' },
-            { id: 'Surrendered', text: 'Surrendered' },
-        ];
-
-        this.shipmentTypes = [
-            { id: 'Freehand', text: 'Freehand' },
-            { id: 'Nominated', text: 'Nominated' }
-        ];
-
-        this.termTypes = [
-            { id: 'Prepaid', text: 'Prepaid' },
-            { id: 'Collect', text: 'Collect' }
-        ];
+        this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
+        this._store.dispatch(new GetCatalogueCarrierAction(CommonEnum.PartnerGroupEnum.CARRIER));
+        this._store.dispatch(new GetCatalogueAgentAction(CommonEnum.PartnerGroupEnum.AGENT));
 
         this.getUserLogged();
         this.initForm();
-
         this.getCarriers();
         this.getAgents();
         this.getPorts();
-        this.getAgents();
         this.getUnits();
         this.getCommodity();
 
@@ -320,13 +316,13 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     getCarriers() {
-        this.isLoadingAirline = true;
-        this.carries = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER)
-            .pipe(
-                finalize(() => {
-                    this.isLoadingAirline = false;
-                })
-            );
+        this.carries = this._store.select(getCatalogueCarrierState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        );
+
+        this.isLoadingAirline = this._store.select(getCatalogueCarrierLoadingState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        );
     }
 
     getPorts() {
@@ -340,16 +336,14 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     getAgents() {
-        this.isLoadingAgent = true;
-        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT)
-            .pipe(
-                finalize(() => {
-                    this.isLoadingAgent = false;
-                })
-            );
+        this.agents = this._store.select(getCatalogueAgentState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        );
+
+        this.isLoadingAgent = this._store.select(getCatalogueAgentLoadingState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        );
     }
-
-
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {

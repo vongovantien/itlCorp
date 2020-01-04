@@ -4,8 +4,8 @@ import { Action, Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { map, catchError, withLatestFrom, switchMap } from 'rxjs/operators';
 import { CatalogueRepo } from '@repositories';
-import { CatalogueActions, CatalogueActionTypes, GetCataloguePortSuccessAction, GetCataloguePortFailAction } from '../actions';
-import { getCataloguePortState } from '../reducers';
+import { CatalogueActions, CatalogueActionTypes, GetCataloguePortSuccessAction, GetCataloguePortFailAction, GetCatalogueCarrierSuccessAction, GetCatalogueCarrierFailAction, GetCatalogueAgentSuccessAction, GetCatalogueAgentFailAction } from '../actions';
+import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState } from '../reducers';
 
 @Injectable()
 export class CatalogueEffect {
@@ -14,7 +14,9 @@ export class CatalogueEffect {
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<any>
     ) { }
-    @Effect() getPorts$: Observable<Action> = this.actions$
+
+    @Effect()
+    getPorts$: Observable<Action> = this.actions$
         .pipe(
             ofType<CatalogueActions>(CatalogueActionTypes.GET_PORT),
             withLatestFrom(
@@ -33,4 +35,44 @@ export class CatalogueEffect {
             })
         );
 
+    @Effect()
+    getCarriers$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<CatalogueActions>(CatalogueActionTypes.GET_CARRIER),
+            withLatestFrom(
+                this._store.select(getCatalogueCarrierState),
+                (action: CatalogueActions, carriers: any[]) => ({ data: carriers, action: action })),
+
+            switchMap((data: { data: any[], action: CatalogueActions }) => {
+                // * Check carriers in redux store.
+                if (!!data && data.data && data.data.length) {
+                    return of(new GetCatalogueCarrierSuccessAction(data.data));
+                }
+                return this._catalogueRepo.getPartnersByType(data.action.payload).pipe(
+                    map((response: any) => new GetCatalogueCarrierSuccessAction(response)),
+                    catchError(err => of(new GetCatalogueCarrierFailAction(err)))
+                );
+            })
+        );
+
+
+    @Effect()
+    getAgents$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<CatalogueActions>(CatalogueActionTypes.GET_AGENT),
+            withLatestFrom(
+                this._store.select(getCatalogueAgentState),
+                (action: CatalogueActions, agents: any[]) => ({ data: agents, action: action })),
+
+            switchMap((data: { data: any[], action: CatalogueActions }) => {
+                // * Check carriers in redux store.
+                if (!!data && data.data && data.data.length) {
+                    return of(new GetCatalogueAgentSuccessAction(data.data));
+                }
+                return this._catalogueRepo.getPartnersByType(data.action.payload).pipe(
+                    map((response: any) => new GetCatalogueAgentSuccessAction(response)),
+                    catchError(err => of(new GetCatalogueAgentFailAction(err)))
+                );
+            })
+        );
 }
