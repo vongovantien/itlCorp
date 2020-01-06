@@ -827,11 +827,11 @@ namespace eFMS.API.Documentation.DL.Services
                 proofOfDelivery.ATTN = dataATTN?.PartnerNameEn;
                 proofOfDelivery.TotalValue = 0;
                 proofOfDelivery.Shipper = dataShipper.PartnerNameEn;
-                proofOfDelivery.WChargeable = data.ChargeWeight;
+                proofOfDelivery.WChargeable = data.ChargeWeight ?? 0;
                 proofOfDelivery.Description = data.DesOfGoods;
-                proofOfDelivery.NoPieces = data.PackageQty;
-                proofOfDelivery.GW = data.GrossWeight;
-                proofOfDelivery.NW = data.NetWeight;
+                proofOfDelivery.NoPieces = data.PackageQty ?? 0;
+                proofOfDelivery.GW = data.GrossWeight ?? 0;
+                proofOfDelivery.NW = data.NetWeight ?? 0;
                 listProof.Add(proofOfDelivery);
             }
 

@@ -31,7 +31,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string PlaceDelivery { get; set; }
         public string ArrivalNote { get; set; }
         public string Description { get; set; }
-        public int? NoPieces { get; set; }
+        public int NoPieces { get; set; }
         public decimal GrossWeight { get; set; }
         public decimal Cbm { get; set; }
         public string Unit { get; set; }
@@ -66,10 +66,10 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string PlaceOfReceipt { get; set; }
         public decimal NoofPieces{ get; set; }
         public string UnitPieaces { get; set; }
-        public decimal? GW { get; set; }
-        public decimal? NW { get; set; }
+        public decimal GW { get; set; }
+        public decimal NW { get; set; }
         public string SeaCBM { get; set; }
-        public decimal? WChargeable { get; set; }
+        public decimal WChargeable { get; set; }
 
     }
     public class AirProofOfDeliveryReportParams
