@@ -19,6 +19,7 @@ import * as fromShareBusiness from '../../../share-business/store';
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+import { ClassGetter } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-create-job-air-import',
     templateUrl: './create-job-air-import.component.html'
@@ -93,6 +94,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         }
 
         const modelAdd = this.onSubmitData();
+        console.log(this.formCreateComponent.dimensionDetails);
         modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
         if (this.isImport === true) {
