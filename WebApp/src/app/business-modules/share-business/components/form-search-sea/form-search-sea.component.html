@@ -1,7 +1,7 @@
 <div class="m-portlet">
     <div class="m-portlet__body">
         <!--begin::Form-->
-        <form class="m-form m-form--state" [formGroup]="formSearch">
+        <form class="m-form m-form--state" [formGroup]="formSearch" (ngSubmit)="searchShipment()">
             <div class="row">
                 <div class="col-lg-8">
                     <div class="form-group">
@@ -128,8 +128,7 @@
                         </a>
                     </div>
                     <div class="col-lg-6 m--align-right">
-                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="searchShipment()">
+                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                             <span>
                                 <i class="la la-search"></i>
                                 <span>

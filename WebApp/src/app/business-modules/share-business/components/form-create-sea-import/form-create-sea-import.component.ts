@@ -16,6 +16,7 @@ import * as fromShare from '../../store';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { ActivatedRoute, Params } from '@angular/router';
+import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueAgentState, getCataloguePortState } from '@store';
 
 @Component({
     selector: 'form-create-sea-import',
@@ -24,8 +25,16 @@ import { ActivatedRoute, Params } from '@angular/router';
 })
 export class ShareBussinessFormCreateSeaImportComponent extends AppForm implements OnInit {
 
-    ladingTypes: CommonInterface.INg2Select[];
-    shipmentTypes: CommonInterface.INg2Select[];
+    ladingTypes: CommonInterface.INg2Select[] = [
+        { id: 'Copy', text: 'Copy' },
+        { id: 'Original', text: 'Original' },
+        { id: 'Sea Waybill', text: 'Sea Waybill' },
+        { id: 'Surrendered', text: 'Surrendered' },
+    ];
+    shipmentTypes: CommonInterface.INg2Select[] = [
+        { id: 'Freehand', text: 'Freehand' },
+        { id: 'Nominated', text: 'Nominated' }
+    ];
     serviceTypes: CommonInterface.INg2Select[];
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
@@ -81,21 +90,14 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
     }
 
     ngOnInit() {
-        this.ladingTypes = [
-            { id: 'Copy', text: 'Copy' },
-            { id: 'Original', text: 'Original' },
-            { id: 'Sea Waybill', text: 'Sea Waybill' },
-            { id: 'Surrendered', text: 'Surrendered' },
-        ];
 
-        this.shipmentTypes = [
-            { id: 'Freehand', text: 'Freehand' },
-            { id: 'Nominated', text: 'Nominated' }
-        ];
+        this._store.dispatch(new GetCatalogueAgentAction(CommonEnum.PartnerGroupEnum.AGENT));
+        this._store.dispatch(new GetCatalogueCarrierAction(CommonEnum.PartnerGroupEnum.CARRIER));
+        this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
 
-        this.carries = this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER);
-        this.agents = this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT);
-        this.ports = this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
+        this.carries = this._store.select(getCatalogueCarrierState);
+        this.agents = this._store.select(getCatalogueAgentState);
+        this.ports = this._store.select(getCataloguePortState);
 
         this.initForm();
         this.getUserLogged();
