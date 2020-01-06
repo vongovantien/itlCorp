@@ -439,7 +439,8 @@ namespace eFMS.API.Documentation.DL.Services
                           PackageQty = detail.PackageQty,
                           PackageType = detail.PackageType,
                           CW = detail.ChargeWeight,
-                          DatetimeCreated = detail.DatetimeCreated
+                          DatetimeCreated = detail.DatetimeCreated,
+                          DatetimeModified = detail.DatetimeModified
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.OrderByDescending(o => o.DatetimeModified).ToList();
@@ -826,11 +827,11 @@ namespace eFMS.API.Documentation.DL.Services
                 proofOfDelivery.ATTN = dataATTN?.PartnerNameEn;
                 proofOfDelivery.TotalValue = 0;
                 proofOfDelivery.Shipper = dataShipper.PartnerNameEn;
-                proofOfDelivery.WChargeable = data.ChargeWeight;
+                proofOfDelivery.WChargeable = data.ChargeWeight ?? 0;
                 proofOfDelivery.Description = data.DesOfGoods;
-                proofOfDelivery.NoPieces = data.PackageQty;
-                proofOfDelivery.GW = data.GrossWeight;
-                proofOfDelivery.NW = data.NetWeight;
+                proofOfDelivery.NoPieces = data.PackageQty ?? 0;
+                proofOfDelivery.GW = data.GrossWeight ?? 0;
+                proofOfDelivery.NW = data.NetWeight ?? 0;
                 listProof.Add(proofOfDelivery);
             }
 
