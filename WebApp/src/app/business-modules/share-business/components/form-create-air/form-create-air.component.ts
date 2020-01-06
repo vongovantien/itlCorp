@@ -5,16 +5,17 @@ import { ActivatedRoute, Params } from '@angular/router';
 
 import { CatalogueRepo } from '@repositories';
 import { CommonEnum } from '@enums';
-import { User, Unit, Customer, PortIndex, DIM, CsTransaction } from '@models';
+import { User, Unit, Customer, PortIndex, DIM, CsTransaction, Commodity } from '@models';
 import { FormValidators } from '@validators';
 import { AppForm } from 'src/app/app.form';
-import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueCarrierLoadingState, GetCatalogueCarrierAction, getCatalogueAgentState, getCatalogueAgentLoadingState, GetCatalogueAgentAction } from '@store';
+import {
+    getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueCarrierLoadingState, GetCatalogueCarrierAction, getCatalogueAgentState, getCatalogueAgentLoadingState, GetCatalogueAgentAction, GetCatalogueUnitAction, getCatalogueUnitState, GetCatalogueCommodityAction, getCatalogueCommodityState
+} from '@store';
 
 import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.popup';
-import { SystemConstants } from 'src/constants/system.const';
 
 import * as fromStore from './../../store/index';
-import { distinctUntilChanged, takeUntil, skip, mergeMap, tap, finalize } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -65,7 +66,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     units: CommonInterface.INg2Select[];
     commodities: CommonInterface.INg2Select[];
 
-
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name Abbr' },
         { field: 'partnerNameEn', label: 'Name EN' },
@@ -105,13 +105,16 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this._store.dispatch(new GetCatalogueCarrierAction(CommonEnum.PartnerGroupEnum.CARRIER));
         this._store.dispatch(new GetCatalogueAgentAction(CommonEnum.PartnerGroupEnum.AGENT));
 
+        this._store.dispatch(new GetCatalogueUnitAction({ active: true }));
+        this._store.dispatch(new GetCatalogueCommodityAction({ active: true }));
+
         this.getUserLogged();
         this.initForm();
         this.getCarriers();
         this.getAgents();
         this.getPorts();
         this.getUnits();
-        this.getCommodity();
+        this.getCommodities();
 
         this._store.select(fromStore.getTransactionDetailCsTransactionState)
             .pipe(skip(1), takeUntil(this.ngUnsubscribe))
@@ -156,10 +159,30 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                             };
                             this.formGroup.patchValue(formData);
 
+                            if (!!res.packageType) {
+                                this.formGroup.patchValue({ packageType: [this.units.find(u => u.id === +res.packageType)] });
+                            }
                             // * Update minDate ETA
                             if (!!this.formGroup.value.etd) {
                                 this.minDateETA = this.createMoment(new Date(res.etd));
                             }
+
+                            // * Update commodity
+                            const commodities: CommonInterface.INg2Select[] =
+                                (res.commodity || '').split(',').map((i: string) => <CommonInterface.INg2Select>({
+                                    id: i,
+                                    text: i,
+                                }));
+
+                            const commoditiesTemp = [];
+                            commodities.forEach((commodity: CommonInterface.INg2Select) => {
+                                const dataTempInPackages = (this.commodities || []).find((t: CommonInterface.INg2Select) => t.id === commodity.id);
+                                if (!!dataTempInPackages) {
+                                    commoditiesTemp.push(dataTempInPackages);
+                                }
+                            });
+                            // * Update Form
+                            this.formGroup.patchValue({ commodity: commoditiesTemp });
 
                         } catch (error) {
                             console.log(error + '');
@@ -171,55 +194,19 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     getUnits() {
-        this._catalogueRepo.getUnit({ active: true })
-            .pipe(
-                tap((units: Unit[]) => {
-                    this.units = this.utility.prepareNg2SelectData(units, 'id', 'code');
-                }),
-                mergeMap(() => this._store.select(fromStore.getTransactionDetailCsTransactionState).pipe(takeUntil(this.ngUnsubscribe)))
-            )
-            .subscribe(
-                (res: CsTransaction) => {
-                    if (res.id !== SystemConstants.EMPTY_GUID) {
-
-                        // * Update Form
-                        if (!!res.packageType) {
-                            this.formGroup.patchValue({ packageType: [this.units.find(u => u.id === +res.packageType)] });
-                        }
-                    }
-                }
-            );
+        this._store.select(getCatalogueUnitState).subscribe(
+            ((units: Unit[]) => {
+                this.units = this.utility.prepareNg2SelectData(units, 'id', 'code');
+            }),
+        );
     }
 
-    getCommodity() {
-        this._catalogueRepo.getCommondity({ active: true })
-            .pipe(
-                tap((units: Unit[]) => {
-                    this.commodities = this.utility.prepareNg2SelectData(units, 'code', 'commodityNameEn');
-                }),
-                mergeMap(() => this._store.select(fromStore.getTransactionDetailCsTransactionState).pipe(takeUntil(this.ngUnsubscribe)))
-            )
+    getCommodities() {
+        this._store.select(getCatalogueCommodityState)
             .subscribe(
-                (res: CsTransaction) => {
-                    if (res.id !== SystemConstants.EMPTY_GUID && !!res.commodity) {
-                        // * Update commodity
-                        const commodities: CommonInterface.INg2Select[] =
-                            (res.commodity || '').split(',').map((i: string) => <CommonInterface.INg2Select>({
-                                id: i,
-                                text: i,
-                            }));
-
-                        const commoditiesTemp = [];
-                        commodities.forEach((commodity: CommonInterface.INg2Select) => {
-                            const dataTempInPackages = (this.commodities || []).find((t: CommonInterface.INg2Select) => t.id === commodity.id);
-                            if (!!dataTempInPackages) {
-                                commoditiesTemp.push(dataTempInPackages);
-                            }
-                        });
-                        // * Update Form
-                        this.formGroup.patchValue({ commodity: commoditiesTemp });
-                    }
-                }
+                (commodities: Commodity[]) => {
+                    this.commodities = this.utility.prepareNg2SelectData(commodities, 'code', 'commodityNameEn');
+                },
             );
     }
 
