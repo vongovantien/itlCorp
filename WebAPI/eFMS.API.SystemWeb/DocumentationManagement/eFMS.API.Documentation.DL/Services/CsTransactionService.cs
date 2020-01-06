@@ -520,7 +520,7 @@ namespace eFMS.API.Documentation.DL.Services
             switch (criteria.TransactionType)
             {
                 case TransactionTypeEnum.InlandTrucking:
-                    //results = QueryIT(criteria, listSearch);
+                    results = QueryIT(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.AirExport:
                     results = QueryAE(criteria, listSearch);
@@ -529,10 +529,10 @@ namespace eFMS.API.Documentation.DL.Services
                     results = QueryAI(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.SeaConsolExport:
-                    //results = QuerySEC(criteria, listSearch);
+                    results = QuerySEC(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.SeaConsolImport:
-                    //results = QuerySIC(criteria, listSearch);
+                    results = QuerySIC(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.SeaFCLExport:
                     results = QuerySEF(criteria, listSearch);
@@ -1397,7 +1397,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.InputData = string.Empty; //Gán rỗng
                         charge.SalesProfit = saleProfit;
                         charge.Quantity = surcharge.Quantity;
-                        charge.UnitPrice = surcharge.UnitPrice != null ? surcharge.UnitPrice.Value : 0;
+                        charge.UnitPrice = surcharge.UnitPrice ?? 0;
                         charge.Unit = unitCode;
                         charge.LastRevised = _dateNow;
                         charge.OBH = isOBH;

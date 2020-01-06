@@ -302,20 +302,20 @@ namespace eFMS.API.Documentation.DL.Services
                         
                         charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
                         charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
-                        charge.NoPieces = houserBill.PackageQty.ToString();
-                        charge.GrossWeight = houserBill.GrossWeight != null ? houserBill.GrossWeight.Value : 0; //GrossWeight of container
-                        charge.CBM = houserBill.Cbm != null ? houserBill.Cbm.Value : 0; //CBM of container
+                        charge.NoPieces = houserBill.PackageQty != null ? houserBill.PackageQty.ToString() : string.Empty;//Package Qty
+                        charge.GrossWeight = houserBill.GrossWeight ?? 0; //GrossWeight of container
+                        charge.CBM = houserBill.Cbm ?? 0; //CBM of container
                         charge.Unit = "KGS"; //Đang gán cứng
 
-                        charge.blnShow = frieght.IsShow != null ? frieght.IsShow.Value : false; //isShow of charge arrival
-                        charge.blnStick = frieght.IsTick != null ? frieght.IsTick.Value : false;//isStick of charge arrival
-                        charge.blnRoot = frieght.IsFull != null ? frieght.IsFull.Value : false; //isRoot of charge arrival
+                        charge.blnShow = frieght.IsShow ?? false; //isShow of charge arrival
+                        charge.blnStick = frieght.IsTick ?? false;//isStick of charge arrival
+                        charge.blnRoot = frieght.IsFull ?? false; //isRoot of charge arrival
                         charge.FreightCharges = chargeRepository.Get(x => x.Id == frieght.ChargeId).FirstOrDefault()?.ChargeNameEn;//Charge name of charge arrival
-                        charge.Qty = frieght.Quantity != null ? frieght.Quantity.Value : 0;//Quantity of charge arrival
+                        charge.Qty = frieght.Quantity ?? 0;//Quantity of charge arrival
                         charge.QUnit = frieght.UnitName;//Unit name of charge arrival
-                        charge.TotalValue = frieght.UnitPrice != null ? frieght.UnitPrice.Value : 0;//Unit price of charge arrival
+                        charge.TotalValue = frieght.UnitPrice ?? 0;//Unit price of charge arrival
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
-                        charge.VAT = frieght.Vatrate != null ? frieght.Vatrate.Value : 0; //VAT of charge arrival
+                        charge.VAT = frieght.Vatrate ?? 0; //VAT of charge arrival
                         charge.Notes = frieght.Notes;//Note of charge arrival
                         charge.ArrivalFooterNoitice = _arrivalFooter;//Footer of arrival
                         charge.SeaFCL = true; //Đang gán cứng lấy hàng nguyên công
@@ -324,7 +324,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.insurAmount = "insurAmount";
                         charge.BillType = houserBill.Hbltype; // House Bill of Lading Type
                         charge.DOPickup = DateTime.Now;
-                        charge.ExVND = frieght.ExchangeRate != null ? frieght.ExchangeRate.Value : 0;
+                        charge.ExVND = frieght.ExchangeRate ?? 0;
                         charge.DecimalSymbol = ",";//Dấu phân cách phần ngàn
                         charge.DigitSymbol = ".";//Dấu phân cách phần thập phân
                         charge.DecimalNo = 2;
@@ -365,9 +365,9 @@ namespace eFMS.API.Documentation.DL.Services
 
                     charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
                     charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
-                    charge.NoPieces = houserBill.PackageQty.ToString();
-                    charge.GrossWeight = houserBill.GrossWeight != null ? houserBill.GrossWeight.Value : 0; //GrossWeight of container
-                    charge.CBM = houserBill.Cbm != null ? houserBill.Cbm.Value : 0; //CBM of container
+                    charge.NoPieces = houserBill.PackageQty != null ? houserBill.PackageQty.ToString() : string.Empty;//Package Qty
+                    charge.GrossWeight = houserBill.GrossWeight ?? 0; //GrossWeight of container
+                    charge.CBM = houserBill.Cbm ?? 0; //CBM of container
                     charge.Unit = "KGS"; //Đang gán cứng
 
                     charge.blnShow = false; //isShow of charge arrival
@@ -455,26 +455,26 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.LastDestination = _podName; //Destination Air Port (POD)
                         charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader
                         charge.DatePackage = DateTime.Now; //Current Date
-                        charge.NoPieces = houseBill.PackageQty + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty
+                        charge.NoPieces = (houseBill.PackageQty != null ? houseBill.PackageQty.ToString() : string.Empty) + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty
                         charge.Description = houseBill.DesOfGoods; //Description of Goods
-                        charge.WChargeable = houseBill.GrossWeight != null ? houseBill.GrossWeight : 0; //G.W (GrossWeight)
-                        charge.blnShow = frieght.IsShow != null ? frieght.IsShow.Value : false; //isShow of charge arrival
-                        charge.blnStick = frieght.IsTick != null ? frieght.IsTick.Value : false;//isStick of charge arrival
-                        charge.blnRoot = frieght.IsFull != null ? frieght.IsFull.Value : false; //isRoot of charge arrival
+                        charge.WChargeable = houseBill.GrossWeight ?? 0; //G.W (GrossWeight)
+                        charge.blnShow = frieght.IsShow ?? false; //isShow of charge arrival
+                        charge.blnStick = frieght.IsTick ?? false;//isStick of charge arrival
+                        charge.blnRoot = frieght.IsFull ?? false; //isRoot of charge arrival
                         charge.FreightCharge = chargeRepository.Get(x => x.Id == frieght.ChargeId).FirstOrDefault()?.ChargeNameEn;//Charge name of charge arrival
-                        charge.Qty = frieght.Quantity != null ? frieght.Quantity : 0;//Quantity of charge
+                        charge.Qty = frieght.Quantity ?? 0;//Quantity of charge
                         charge.Unit = frieght.UnitName;//Unit name of charge arrival
-                        charge.TotalValue = frieght.UnitPrice;//Unit price of charge arrival
+                        charge.TotalValue = frieght.UnitPrice ?? 0;//Unit price of charge arrival
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
-                        charge.VAT = frieght.Vatrate; //VAT of charge arrival
+                        charge.VAT = frieght.Vatrate ?? 0; //VAT of charge arrival
                         charge.Notes = frieght.Notes;//Note of charge arrival
                         charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer
                         charge.Shipper = _shipperName; //Shipper Name
-                        charge.CBM = houseBill.ChargeWeight != null ? houseBill.ChargeWeight : 0; //C.W (ChargeWeight)
+                        charge.CBM = houseBill.ChargeWeight ?? 0; //C.W (ChargeWeight)
                         charge.AOL = string.Empty; //NOT USE
                         charge.KilosUnit = string.Empty; //NOT USE
                         charge.DOPickup = DateTime.Now; //NOT USE
-                        charge.ExVND = frieght.ExchangeRate != null ? frieght.ExchangeRate.Value : 0;
+                        charge.ExVND = frieght.ExchangeRate ?? 0;
                         charge.AgentName = _agentName; //Agent
                         charge.Notify = houseBill.NotifyParty; //Notify Party
                         charge.DecimalSymbol = string.Empty;
@@ -498,9 +498,9 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.LastDestination = _podName; //Destination Air Port (POD)
                     charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader
                     charge.DatePackage = DateTime.Now; //Current Date
-                    charge.NoPieces = houseBill.PackageQty + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty; //Quantity + Unit Qty
+                    charge.NoPieces = (houseBill.PackageQty != null ? houseBill.PackageQty.ToString() : string.Empty) + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty; //Quantity + Unit Qty
                     charge.Description = houseBill.DesOfGoods; //Description of Goods
-                    charge.WChargeable = houseBill.GrossWeight != null ? houseBill.GrossWeight : 0; //G.W (GrossWeight)
+                    charge.WChargeable = houseBill.GrossWeight ?? 0; //G.W (GrossWeight)
                     charge.blnShow = false; //isShow of charge arrival
                     charge.blnStick = false;//isStick of charge arrival
                     charge.blnRoot = false; //isRoot of charge arrival
@@ -513,7 +513,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Notes = string.Empty;//Note of charge
                     charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer
                     charge.Shipper = _shipperName; //Shipper
-                    charge.CBM = houseBill.ChargeWeight != null ? houseBill.ChargeWeight : 0; //C.W (ChargeWeight)
+                    charge.CBM = houseBill.ChargeWeight ?? 0; //C.W (ChargeWeight)
                     charge.AOL = string.Empty; //NOT USE
                     charge.KilosUnit = string.Empty; //NOT USE
                     charge.DOPickup = DateTime.Now; //NOT USE
