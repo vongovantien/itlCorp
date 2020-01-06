@@ -44,7 +44,6 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
     }
 
     ngOnInit() {
-        this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
         this._store.dispatch(new fromShareBusiness.TransactionGetDetailSuccessAction({}));
     }
 
