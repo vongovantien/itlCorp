@@ -14,7 +14,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [currentActiveItemId]="{ field: 'id', value: customer.value,hardValue: shipmmentDetail.customerName}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
-                            [displayFields]="displayFieldsCustomer" [height]="150">
+                            [displayFields]="displayFieldsCustomer" [height]="200"
+                            (remove)="resetFormControl(customer)">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -24,14 +25,12 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'sale')"
                             [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
                             [selectedDisplayFields]="['username']" [dataSources]="saleMans"
-                            [displayFields]="[{field: 'username', label: 'User Name'}]" [height]="150"
-                            [disabled]="!customer.value">
+                            [displayFields]="[{field: 'username', label: 'User Name'}]" [height]="200"
+                            [disabled]="!customer.value" (remove)="resetFormControl(saleMan)">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
-
             </div>
-
             <div class="row div-inside bg-secondary">
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !shipper.value}">
@@ -39,7 +38,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
                             [currentActiveItemId]="{ field: 'id', value: shipper.value,hardValue: shipmmentDetail.supp}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
-                            [displayFields]="displayFieldsCustomer" [height]="150">
+                            [displayFields]="displayFieldsCustomer" [height]="200" (remove)="resetFormControl(shipper)">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="shipperDescription"></textarea>
@@ -51,7 +50,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consignee')"
                             [currentActiveItemId]="{ field: 'id', value: consignee.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
-                            [displayFields]="displayFieldsCustomer" [height]="150">
+                            [displayFields]="displayFieldsCustomer" [height]="200"
+                            (remove)="resetFormControl(consignee)">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="consigneeDescription"></textarea>
@@ -63,7 +63,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'notify')"
                             [currentActiveItemId]="{ field: 'id', value: notifyParty.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
-                            [displayFields]="displayFieldsCustomer" [height]="150">
+                            [displayFields]="displayFieldsCustomer" [height]="200"
+                            (remove)="resetFormControl(notifyParty)">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="notifyPartyDescription"></textarea>
@@ -79,7 +80,7 @@
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !hbltype.value}">
                         <label required>House Bill of Lading Type</label>
                         <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
-                            formControlName="hbltype" (opened)="closeOtherSelects(selectMBL)">
+                            formControlName="hbltype" (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
                         </ng-select>
                     </div>
                 </div>
@@ -107,7 +108,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'country')"
                             [currentActiveItemId]="{ field: 'id', value: country.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="countries | async"
-                            [displayFields]="displayFieldsCountry" [height]="150">
+                            [displayFields]="displayFieldsCountry" [height]="200" (remove)="resetFormControl(country)">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -123,7 +124,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                             [currentActiveItemId]="{ field: 'id', value: pol.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort">
+                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pol)">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -134,7 +135,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                             [currentActiveItemId]="{ field: 'id', value: pod.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort">
+                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pod)">
                         </app-combo-grid-virtual-scroll>
                         <div class="form-control-feedback"
                             *ngIf="isSubmitted && formCreate.errors | equalError:'invalidPort'">Port of
@@ -160,7 +161,7 @@
                         <label required>Freight Payment </label>
                         <ng-select #selectTerm [items]="termTypes" placeholder="Please Select"
                             formControlName="freightPayment" (opened)="closeOtherSelects(selectTerm)"
-                            (data)="onSelectDataFormInfo($event, 'freightPayment')">
+                            (data)="onSelectDataFormInfo($event, 'freightPayment')" [allowClear]="true">
                         </ng-select>
                     </div>
                 </div>
@@ -172,6 +173,10 @@
                                 [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                 [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
                                 formControlName="closingDate" />
+                            <span class="m-input-icon_clear" (click)="resetFormControl(closingDate)"
+                                *ngIf="!!closingDate.value && !!closingDate.value.startDate">
+                                <i class="la la-times"></i>
+                            </span>
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-calendar"></i>
@@ -189,6 +194,10 @@
                                 [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                 [alwaysShowCalendars]="sailingDate" name="daterange" placeholder="Select" readonly
                                 formControlName="sailingDate" />
+                            <span class="m-input-icon_clear" (click)="resetFormControl(sailingDate)"
+                                *ngIf="!!sailingDate.value && !!sailingDate.value.startDate">
+                                <i class="la la-times"></i>
+                            </span>
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-calendar"></i>
@@ -205,7 +214,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="row div-inside bg-secondary">
                 <div class="col-md-4">
                     <div class="form-group">
@@ -213,7 +221,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'forwarding')"
                             [currentActiveItemId]="{ field: 'id', value: forwardingAgent.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                            [displayFields]="displayFieldsCustomer">
+                            [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(forwardingAgent)">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="forwardingAgentDescription"></textarea>
@@ -225,65 +233,8 @@
                             <div class="form-group">
                                 <label>Number of Origin B/L</label>
                                 <ng-select #blNumber [items]="originNumbers" placeholder="Please Select"
-                                    formControlName="originBlnumber" (opened)="closeOtherSelects(blNumber)">
-                                </ng-select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Place Of Issued</label>
-                                <input type="text" class="form-control" formControlName="issueHblplace">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Date Of Issued</label>
-                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                        [alwaysShowCalendars]="true" name="daterange" readonly
-                                        formControlName="issueHbldate" />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Reference No</label>
-                                <input type="text" class="form-control" formControlName="referenceNo">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Export Reference No</label>
-                                <input type="text" class="form-control" formControlName="exportReferenceNo">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label>Delivery of Good</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'deliveryGood')"
-                            [currentActiveItemId]="{ field: 'id', value: goodsDelivery.value}"
-                            [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                            [displayFields]="displayFieldsCustomer">
-                        </app-combo-grid-virtual-scroll>
-                        <textarea rows="7" class="form-control m-input m-input--square"
-                            formControlName="goodsDeliveryDescription"></textarea>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Type of Move</label>
-                                <ng-select #moveType [items]="typeOfMoves" placeholder="Please Select"
-                                    formControlName="moveType" (opened)="closeOtherSelects(moveType)">
+                                    formControlName="originBlnumber" (opened)="closeOtherSelects(blNumber)"
+                                    [allowClear]="true">
                                 </ng-select>
                             </div>
                         </div>
@@ -295,16 +246,75 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label>Place Of Issued HBL</label>
+                                <input type="text" class="form-control" formControlName="issueHblplace">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Date Of Issued</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                        [alwaysShowCalendars]="true" name="daterange" readonly
+                                        formControlName="issueHbldate" />
+                                    <span class="m-input-icon_clear" (click)="resetFormControl(issueHbldate)"
+                                        *ngIf="!!issueHbldate.value && !!issueHbldate.value.startDate">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Delivery of Good</label>
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'deliveryGood')"
+                            [currentActiveItemId]="{ field: 'id', value: goodsDelivery.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
+                            [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(goodsDelivery)">
+                        </app-combo-grid-virtual-scroll>
+                        <textarea rows="7" class="form-control m-input m-input--square"
+                            formControlName="goodsDeliveryDescription"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Reference No</label>
+                                <input type="text" class="form-control" formControlName="referenceNo">
+                            </div>
+                            <div class="form-group">
+                                <label>Type of Move</label>
+                                <ng-select #moveType [items]="typeOfMoves" placeholder="Please Select"
+                                    formControlName="moveType" (opened)="closeOtherSelects(moveType)"
+                                    [allowClear]="true">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Export Reference No</label>
+                                <input type="text" class="form-control" formControlName="exportReferenceNo">
+                            </div>
+                            <div class="form-group">
                                 <label>Type of Service</label>
                                 <ng-select #serviceType [items]="serviceTypes" placeholder="Please Select"
-                                    formControlName="serviceType" (opened)="closeOtherSelects(serviceType)">
+                                    formControlName="serviceType" (opened)="closeOtherSelects(serviceType)"
+                                    [allowClear]="true">
                                 </ng-select>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div class="row div-inside bg-secondary">
                 <div class="col-md-4">
                     <div class="form-group">

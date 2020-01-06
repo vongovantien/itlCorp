@@ -107,9 +107,9 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
             jobId: this.jobId,
             sailingDate: !!form.sailingDate && !!form.sailingDate.startDate ? formatDate(form.sailingDate.startDate, 'yyyy-MM-dd', 'en') : null,
             closingDate: !!form.closingDate && !!form.closingDate.startDate ? formatDate(form.closingDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            issueHbldate: !!form.issueHbldate && !!form.issueHbldate.startDate ? formatDate(form.issueHbldate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             mawb: form.mawb,
-
             shipperDescription: form.shipperDescription,
             consigneeDescription: form.consigneeDescription,
             notifyPartyDescription: form.notifyPartyDescription,
@@ -122,8 +122,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
             finalDestinationPlace: form.finalDestinationPlace,
             placeFreightPay: form.placeFreightPay,
             issueHblplaceAndDate: form.issueHblplaceAndDate,
-            issueHbldate: new Date(),
-            issueHblplace: form.issueHblplaceAndDate,
+            issueHblplace: form.issueHblplace,
             referenceNo: form.referenceNo,
             exportReferenceNo: form.exportReferenceNo,
             goodsDeliveryDescription: form.goodsDeliveryDescription,
