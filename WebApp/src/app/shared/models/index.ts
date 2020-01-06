@@ -12,6 +12,9 @@ export * from './catalogue/catUnit.model';
 export * from './catalogue/port-index.model';
 export * from './catalogue/customer.model';
 export { SaleManRequest } from './catalogue/customer.model';
+export * from './catalogue/commodity.model';
+export * from './catalogue/commonity-group.model';
+
 
 export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
