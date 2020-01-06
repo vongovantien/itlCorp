@@ -141,34 +141,44 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<sp_GetCatPlace> Get(CatPlaceCriteria criteria)
         {
+            var countries = countryService.Get();
+
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
-            var places = DataContext.Get(x => (x.PlaceTypeId == placetype || string.IsNullOrEmpty(placetype)
-                                           && (x.Active == criteria.Active || criteria.Active == null)))
-                                    .Select(x => new sp_GetCatPlace {
-                                        ID = x.Id,
-                                        Code = x.Code,
-                                        NameVn = x.NameVn,
-                                        NameEn = x.NameEn,
-                                        DisplayName = x.DisplayName,
-                                        Address = x.Address,
-                                        DistrictID = x.DistrictId,
-                                        DistrictNameEN = string.Empty,
-                                        DistrictNameVN = string.Empty,
-                                        ProvinceID = x.ProvinceId,
-                                        ProvinceNameEN = string.Empty,
-                                        ProvinceNameVN = string.Empty,
-                                        CountryID = x.CountryId,
-                                        AreaID = x.AreaId,
-                                        LocalAreaID = x.LocalAreaId,
-                                        ModeOfTransport = x.ModeOfTransport,
-                                        PlaceTypeID = x.PlaceTypeId,
-                                        Note = x.Note,
-                                        UserCreated = x.UserCreated,
-                                        DatetimeCreated = x.DatetimeCreated,
-                                        UserModified = x.UserModified,
-                                        DatetimeModified = x.DatetimeModified,
-                                        Active = x.Active
-                        });
+
+            // Join left với country.
+            var places = from x in DataContext.Get(x => (x.PlaceTypeId == placetype || string.IsNullOrEmpty(placetype)
+                                            && (x.Active == criteria.Active || criteria.Active == null)))
+                         join coun in countries on x.CountryId equals coun.Id into coun2
+                         from coun in coun2.DefaultIfEmpty()
+                         select new sp_GetCatPlace
+                         {
+                             ID = x.Id,
+                             Code = x.Code,
+                             NameVn = x.NameVn,
+                             NameEn = x.NameEn,
+                             DisplayName = x.DisplayName,
+                             Address = x.Address,
+                             DistrictID = x.DistrictId,
+                             DistrictNameEN = string.Empty,
+                             DistrictNameVN = string.Empty,
+                             ProvinceID = x.ProvinceId,
+                             ProvinceNameEN = string.Empty,
+                             ProvinceNameVN = string.Empty,
+                             CountryNameEN = coun.NameEn,
+                             CountryNameVN = coun.NameVn,
+                             CountryID = x.CountryId,
+                             AreaID = x.AreaId,
+                             LocalAreaID = x.LocalAreaId,
+                             ModeOfTransport = x.ModeOfTransport,
+                             PlaceTypeID = x.PlaceTypeId,
+                             Note = x.Note,
+                             UserCreated = x.UserCreated,
+                             DatetimeCreated = x.DatetimeCreated,
+                             UserModified = x.UserModified,
+                             DatetimeModified = x.DatetimeModified,
+                             Active = x.Active
+                         };
+        
             return places;
         }
         public IQueryable<sp_GetCatPlace> Query(CatPlaceCriteria criteria)
