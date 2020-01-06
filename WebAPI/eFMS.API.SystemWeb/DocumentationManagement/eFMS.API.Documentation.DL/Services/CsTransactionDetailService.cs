@@ -1294,6 +1294,7 @@ namespace eFMS.API.Documentation.DL.Services
                 MAWB = data.Mawb,
                 CompanyName = Constants.COMPANY_NAME,
                 CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
                 Website = Constants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };

@@ -469,6 +469,24 @@ export class DocumentationRepo {
         );
     }
 
+    previewAirImportAuthorizeLetter1(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    previewAirImportAuthorizeLetter2(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/AirImptAuthorisedLetter_Consign`, { housbillId: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
 
     previewSIFPLsheet(jobId: string, currency: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/PreviewSIFPLsheet`, { jobId: jobId, currency: currency }).pipe(

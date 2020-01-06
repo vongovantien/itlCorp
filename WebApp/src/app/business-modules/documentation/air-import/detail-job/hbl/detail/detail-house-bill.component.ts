@@ -235,6 +235,46 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         if (type === 'DOCUMENT_RELEASE_FORM') {
             this.previewAirDocumentRelease();
         }
+        if (type === 'AUTHORIZE_LETTER1') {
+            this.previewAuthorizeLetter1();
+        }
+        if (type === 'AUTHORIZE_LETTER2') {
+            this.previewAuthorizeLetter2();
+        }
+    }
+    previewAuthorizeLetter2() {
+        this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.reportPopup.frm.nativeElement.submit();
+                        this.reportPopup.show();
+                    }, 1000);
+
+                },
+            );
+    }
+    previewAuthorizeLetter1() {
+        this._documentationRepo.previewAirImportAuthorizeLetter2(this.hblId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.reportPopup.frm.nativeElement.submit();
+                        this.reportPopup.show();
+                    }, 1000);
+
+                },
+            );
     }
 
     previewProofOfDelivery() {

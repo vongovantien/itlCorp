@@ -20,6 +20,18 @@
                                     (click)="onPreview('ARRIVAL_VND')">VND</a></li>
                         </ul>
                     </li>
+                    <li role="menuitem" dropdown triggers="mouseover" placement="right" container="body">
+                        <a dropdownToggle class="dropdown-item dropdown-toggle pointer"
+                            (click)="isClickSubMenu = true">Authorize Letter
+                            <span class="caret"></span>
+                        </a>
+                        <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">
+                            <li role="menuitem"><a class="dropdown-item pointer"
+                                    (click)="onPreview('AUTHORIZE_LETTER1')">Authorize Letter( Form 1)</a></li>
+                            <li role="menuitem"><a class="dropdown-item pointer"
+                                    (click)="onPreview('AUTHORIZE_LETTER2')">Authorize Letter( Form 2)</a></li>
+                        </ul>
+                    </li>
                     <li role="menuitem"><a class="dropdown-item pointer" (click)="onPreview('PROOF_OF_DELIVERY')">Proof
                             of Delivery</a></li>
                     <li role="menuitem"><a class="dropdown-item pointer"
