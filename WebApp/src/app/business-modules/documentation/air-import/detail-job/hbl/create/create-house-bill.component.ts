@@ -15,9 +15,10 @@ import { HouseBill, DeliveryOrder } from '@models';
 
 import _merge from 'lodash/merge';
 import { AirImportHBLFormCreateComponent } from '../components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from '@share-bussiness';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, getDetailHBlState } from '@share-bussiness';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { forkJoin } from 'rxjs';
+import { SystemConstants } from 'src/constants/system.const';
 @Component({
     selector: 'app-create-hbl-air-import',
     templateUrl: './create-house-bill.component.html',
@@ -28,9 +29,10 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: true }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
+    @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     jobId: string;
     hblDetail: any = {};
-
+    selectedHbl: any = {};
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -59,7 +61,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     ngAfterViewInit() {
-        this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
+        // this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
         this._cd.detectChanges();
     }
 
@@ -92,6 +94,39 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     }
                 },
             );
+    }
+
+    onImport(selectedData: any) {
+        this.selectedHbl = selectedData;
+        this.formCreateHBLComponent.updateFormValue(this.selectedHbl);
+        // if (!!this.selectedHbl) {
+        //     this._store.select(getDetailHBlState)
+        //         .pipe(
+        //             takeUntil(this.ngUnsubscribe),
+
+        //         )
+        //         .subscribe(
+        //             (hbl: HouseBill) => {
+        //                 if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
+
+        //                     this.formCreateHBLComponent.jobId = hbl.jobId;
+        //                     this.formCreateHBLComponent.hblId = hbl.id;
+
+        //                 }
+
+        //             }
+        //         );
+        // }
+    }
+
+
+    showImportPopup() {
+        const dataSearch = { jobId: this.jobId };
+        dataSearch.jobId = this.jobId;
+        this.importHouseBillPopup.typeFCL = 'Import';
+        this.importHouseBillPopup.selected = - 1;
+        this.importHouseBillPopup.getHourseBill(dataSearch);
+        this.importHouseBillPopup.show();
     }
 
     getDataForm() {
@@ -154,6 +189,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         // this.setError(this.formCreateHBLComponent.hbltype);
         this.setError(this.formCreateHBLComponent.freightPayment);
         this.setError(this.formCreateHBLComponent.packageType);
+
         if (!this.formCreateHBLComponent.formCreate.valid) {
             valid = false;
         }
