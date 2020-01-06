@@ -30,8 +30,9 @@ namespace eFMS.API.Accounting.Service.Models
         public string PickupPlace { get; set; }
         public DateTime? Etd { get; set; }
         public DateTime? Eta { get; set; }
-        public Guid Pol { get; set; }
-        public Guid Pod { get; set; }
+        public Guid? Pol { get; set; }
+        public Guid? Pod { get; set; }
+        public Guid? FinalPod { get; set; }
         public string DeliveryPlace { get; set; }
         public string FinalDestinationPlace { get; set; }
         public string ColoaderId { get; set; }
@@ -82,6 +83,7 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? ArrivalSecondNotice { get; set; }
         public string ArrivalHeader { get; set; }
         public string ArrivalFooter { get; set; }
+        public DateTime? ArrivalDate { get; set; }
         public string DeliveryOrderNo { get; set; }
         public DateTime? DeliveryOrderPrintedDate { get; set; }
         public string DosentTo1 { get; set; }

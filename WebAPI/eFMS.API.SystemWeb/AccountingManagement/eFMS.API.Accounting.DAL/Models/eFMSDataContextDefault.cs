@@ -1429,6 +1429,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ArrivalDate).HasColumnType("datetime");
+
                 entity.Property(e => e.ArrivalFirstNotice).HasColumnType("datetime");
 
                 entity.Property(e => e.ArrivalNo).HasMaxLength(100);
@@ -1552,6 +1554,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.FinalDestinationPlace).HasMaxLength(500);
+
+                entity.Property(e => e.FinalPod).HasColumnName("FinalPOD");
 
                 entity.Property(e => e.FirstCarrierBy).HasMaxLength(250);
 

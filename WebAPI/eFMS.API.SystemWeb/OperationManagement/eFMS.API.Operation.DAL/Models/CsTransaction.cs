@@ -48,6 +48,7 @@ namespace eFMS.API.Operation.Service.Models
         public DateTime? LockedDate { get; set; }
         public bool? IsLocked { get; set; }
         public DateTime? FlightDate { get; set; }
+        public decimal? Hwconstant { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
