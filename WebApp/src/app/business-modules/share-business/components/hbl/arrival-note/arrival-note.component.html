@@ -125,6 +125,7 @@
                                             <td>
                                                 <div class="form-group">
                                                     <select [(ngModel)]="charge.unitId" class="form-control">
+                                                        <option [ngValue]="null">-</option>
                                                         <option *ngFor="let unit of (listUnits | async)"
                                                             [ngValue]="unit.id">
                                                             {{unit.code}}</option>
@@ -143,6 +144,7 @@
                                                 <div class="form-group">
                                                     <select [(ngModel)]="charge.currencyId" class="form-control"
                                                         (ngModelChange)="onChangeCurrency($event, charge)">
+                                                        <option [ngValue]="null">-</option>
                                                         <option *ngFor="let currency of (listCurrency | async)"
                                                             [ngValue]="currency.id">{{currency.id}}</option>
                                                     </select>

@@ -159,13 +159,13 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 )
                 .subscribe(
                     (hbl: HouseBill) => {
-                        if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
+                        if (!!hbl && hbl.id && hbl.id !== SystemConstants.EMPTY_GUID) {
                             this.totalCBM = hbl.cbm;
                             this.totalHeightWeight = hbl.hw;
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
                             this.hwconstant = hbl.hwConstant;
-                            console.log(this.hwconstant);
+                            console.log(hbl);
 
                             this.updateFormValue(hbl);
                         }
@@ -437,12 +437,14 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     updateHeightWeight(dims: DIM[] = []) {
-        dims.forEach(dimItem => {
-            dimItem.hw = this.utility.calculateHeightWeight(dimItem.width || 0, dimItem.height || 0, dimItem.length || 0, dimItem.package || 0, this.hwconstant || 0);
-            dimItem.cbm = this.utility.calculateCBM(dimItem.width || 0, dimItem.height || 0, dimItem.length || 0, dimItem.package || 0, this.hwconstant || 0);
-        });
-        this.totalHeightWeight = this.updateTotalHeightWeight(dims);
-        this.totalCBM = this.updateCBM(dims);
+        if (!!dims.length) {
+            dims.forEach(dimItem => {
+                dimItem.hw = this.utility.calculateHeightWeight(dimItem.width || 0, dimItem.height || 0, dimItem.length || 0, dimItem.package || 0, this.hwconstant || 6000);
+                dimItem.cbm = this.utility.calculateCBM(dimItem.width || 0, dimItem.height || 0, dimItem.length || 0, dimItem.package || 0, this.hwconstant || 6000);
+            });
+            this.totalHeightWeight = this.updateTotalHeightWeight(dims);
+            this.totalCBM = this.updateCBM(dims);
+        }
     }
 
     calculateHWDimension(dims: DIM[]) {

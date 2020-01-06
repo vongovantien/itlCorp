@@ -14,13 +14,13 @@ export interface IRouterStateUrl {
 
 export interface IAppState {
     routerReducer: fromRouter.RouterReducerState<IRouterStateUrl>;
-    spinnerReducer: ISpinnerState;
+    // spinnerReducer: ISpinnerState;
     catalogueReducer: ICatalogueState;
 }
 
 export const reducers: ActionReducerMap<IAppState> = {
     routerReducer: fromRouter.routerReducer,
-    spinnerReducer: spinnerReducer,
+    // spinnerReducer: spinnerReducer,
     catalogueReducer: catalogueReducer
 };
 
