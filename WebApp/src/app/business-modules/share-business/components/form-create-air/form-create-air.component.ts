@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
+import { Store, ActionsSubject } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
 
 import { CatalogueRepo } from '@repositories';
@@ -17,6 +17,7 @@ import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.p
 import * as fromStore from './../../store/index';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { DimensionActionTypes } from './../../store/index';
 
 @Component({
     selector: 'form-create-air',
@@ -95,9 +96,23 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         private _catalogueRepo: CatalogueRepo,
         private _fb: FormBuilder,
         private _store: Store<fromStore.IShareBussinessState>,
-        private _route: ActivatedRoute
+        private _route: ActivatedRoute,
+        private _actionSubject: ActionsSubject
+
     ) {
         super();
+
+        this._actionSubject
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (action: fromStore.DimensionActions) => {
+                    if (action.type === fromStore.DimensionActionTypes.GET_DIMENSION_SUCESS) {
+                        this.dimensionDetails = action.payload;
+                    }
+                }
+            );
     }
 
     ngOnInit() {

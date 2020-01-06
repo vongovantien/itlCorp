@@ -90,7 +90,6 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
             },
         );
     }
-
     onImportShippment() {
         if (this.selected === -1) {
             this.isCheckShipment = false;
@@ -100,37 +99,40 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
                 return;
             }
             console.log(this.selectedShipment);
-            const objShipment = Object.assign({}, this.selectedShipment);
-            objShipment.etd = null;
-            objShipment.mawb = null;
-            objShipment.eta = null;
-            objShipment.personIncharge = localStorage.getItem('currently_userName') || 'Admin';
-            this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(objShipment));
-            this.isCheckShipment = true;
-            // TODO get container list.
-            this._documentRepo.getListContainersOfJob({ mblid: this.selectedShipment.id }).pipe(
-            ).subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.containers = res;
-                        // updae seal, cont.
-                        console.log(this.containers);
-                        if (this.containers.length > 0) {
-                            this.containers.forEach(item => {
-                                item.sealNo = null;
-                                item.containerNo = null;
-                                item.markNo = null;
-                            });
-                            this.selectedShipment.containers = this.containers;
+            this._documentRepo.getDetailTransaction(this.selectedShipment.id).pipe()
+                .subscribe((resdetail: any) => {
+                    const objShipment = resdetail;
+                    objShipment.etd = null;
+                    objShipment.mawb = null;
+                    objShipment.eta = null;
+                    objShipment.personIncharge = localStorage.getItem('currently_userName') || 'Admin';
+                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(objShipment));
+                    this.isCheckShipment = true;
+                    // TODO get container list.
+                    this._documentRepo.getListContainersOfJob({ mblid: this.selectedShipment.id }).pipe(
+                    ).subscribe(
+                        (res: any) => {
+                            if (!!res) {
+                                this.containers = res;
+                                // updae seal, cont.
+                                console.log(this.containers);
+                                if (this.containers.length > 0) {
+                                    this.containers.forEach(item => {
+                                        item.sealNo = null;
+                                        item.containerNo = null;
+                                        item.markNo = null;
+                                    });
+                                    this.selectedShipment.containers = this.containers;
 
-                            this._store.dispatch(new fromShareBussiness.GetContainerSuccessAction(this.containers));
+                                    this._store.dispatch(new fromShareBussiness.GetContainerSuccessAction(this.containers));
+                                }
+
+                            }
                         }
-
-                    }
-                }
-            );
-            this.onImport.emit(this.selectedShipment);
-            this.hide();
+                    );
+                    this.onImport.emit(this.selectedShipment);
+                    this.hide();
+                });
         }
     }
 

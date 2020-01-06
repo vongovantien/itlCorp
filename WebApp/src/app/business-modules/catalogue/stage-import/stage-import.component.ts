@@ -50,20 +50,6 @@ export class StageImportComponent extends AppPage implements OnInit {
   }
 
   chooseFile(file: Event) {
-    // if (file.target['files'] == null) { return; }
-    // this.progressBar.start();
-    // this.baseService.uploadfile(this.menu_api.Catalogue.Stage_Management.uploadExel, file.target['files'], "uploadedFile")
-    //   .subscribe(res => {
-    //     this.data = res['data'];
-    //     this.pager.totalItems = this.data.length;
-    //     this.totalValidRows = res['totalValidRows'];
-    //     this.totalRows = this.data.length;
-    //     this.pagingData(this.data);
-    //     this.progressBar.complete();
-    //   }, err => {
-    //     this.progressBar.complete();
-    //     this.baseService.handleError(err);
-    //   })
     this.pager.totalItems = 0;
     if (file.target['files'] == null) { return; }
     this._progressRef.start();
@@ -125,18 +111,6 @@ export class StageImportComponent extends AppPage implements OnInit {
 
 
   async import(element) {
-    // if (this.data == null) { return; }
-    // if (this.totalRows - this.totalValidRows > 0) {
-    //   this.invaliDataAlert.show();
-    // } else {
-    //   const validItems = this.data.filter(x => x.isValid);
-    //   const response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems, true, true);
-    //   if (response) {
-    //     this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
-    //     this.pager.totalItems = 0;
-    //     this.reset();
-    //   }
-    // }
     if (this.data == null) { return; }
     if (this.totalRows - this.totalValidRows > 0) {
       this.importAlert.show();
@@ -164,7 +138,6 @@ export class StageImportComponent extends AppPage implements OnInit {
   }
 
   async downloadSample() {
-    //await this.baseService.downloadfile(this.menu_api.Catalogue.Stage_Management.downloadExcel, 'ImportStageTemplate.xlsx');
     this.catalogueRepo.downloadStageExcel()
       .pipe(catchError(this.catchError))
       .subscribe(

@@ -84,7 +84,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatCountryModel> GetCountries(CatCountryCriteria criteria, int page, int size, out int rowsCount)
         {
             Expression<Func<CatCountryModel, bool>> query = null;
-            if (criteria.condition == SearchCondition.AND)
+            if (criteria.All == null)
             {
                 query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -93,9 +93,9 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             else
             {
-                query = x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                                                || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "null", StringComparison.OrdinalIgnoreCase) > -1
-                                                                || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null", StringComparison.OrdinalIgnoreCase) > -1)
+                query = x => ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                                                || (x.NameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                                                || (x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                                                 && (x.Active == criteria.Active || criteria.Active == null);
             }
             var data = Paging(query, page, size, x => x.DatetimeModified, false, out rowsCount);
@@ -183,7 +183,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private IQueryable<CatCountryModel> GetBy(CatCountryCriteria criteria)
         {
             Expression<Func<CatCountryModel, bool>> query = null;
-            if (criteria.condition == SearchCondition.AND)
+            if (criteria.All == null)
             {
                 query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -192,9 +192,9 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             else
             {
-                query = x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                            || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                            || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                query = x => ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.NameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                             && (x.Active == criteria.Active || criteria.Active == null);
             }
             var data = Get(query);

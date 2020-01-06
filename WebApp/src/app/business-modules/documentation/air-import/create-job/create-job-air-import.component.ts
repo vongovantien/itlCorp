@@ -17,9 +17,9 @@ import {
 
 import * as fromShareBusiness from '../../../share-business/store';
 
-import { catchError, skip, takeUntil } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
-import { GetCataloguePortAction } from '@store';
+import { ClassGetter } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-create-job-air-import',
     templateUrl: './create-job-air-import.component.html'
@@ -94,6 +94,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         }
 
         const modelAdd = this.onSubmitData();
+        console.log(this.formCreateComponent.dimensionDetails);
         modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
         if (this.isImport === true) {
@@ -126,11 +127,14 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         this.isImport = true;
         this.formCreateComponent.isUpdate = true;
         this.formCreateComponent.formGroup.controls['jobNo'].setValue(null);
+        console.log('selected job:');
+        console.log(this.selectedJob);
+        // this.formCreateComponent.formGroup.controls['flightVesselName'].setValue(null);
         this._store.dispatch(new fromShareBusiness.GetDimensionAction(selectedData.id));
     }
 
     showImportPopup() {
-        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirExport;
+        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirImport;
         this.formImportJobDetailPopup.getShippments();
         this.formImportJobDetailPopup.selected = -1;
         this.formImportJobDetailPopup.selectedShipment = null;

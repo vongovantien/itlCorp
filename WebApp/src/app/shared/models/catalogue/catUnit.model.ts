@@ -1,5 +1,5 @@
 export class Unit {
-     id: any = null;
+     id: number = 0;
      code: string = '';
      unitNameVn: string = '';
      unitNameEn: string = '';
