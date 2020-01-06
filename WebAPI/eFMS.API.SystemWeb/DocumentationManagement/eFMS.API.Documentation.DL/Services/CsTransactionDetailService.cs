@@ -806,8 +806,7 @@ namespace eFMS.API.Documentation.DL.Services
             var data = GetById(Id);
             var listProof = new List<AirProofOfDeliveryReport>();
             Crystal result = null;
-            //var _currentUser = currentUser.UserID;
-            var _currentUser = string.Empty;
+            var _currentUser = currentUser.UserID;
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
