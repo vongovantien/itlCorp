@@ -1274,7 +1274,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var authorizeLetter = new AirImptAuthorisedLetterReport
                 {
                     HWBNO = data.Hwbno,
-                    DONo = "DONo",
+                    DONo = data.DeliveryOrderNo,
                     Consignee = data.ConsigneeDescription,
                     FlightNo = data.FlightNo,
                     FlightDate = data.FlightDate,
