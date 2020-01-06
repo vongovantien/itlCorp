@@ -439,7 +439,8 @@ namespace eFMS.API.Documentation.DL.Services
                           PackageQty = detail.PackageQty,
                           PackageType = detail.PackageType,
                           CW = detail.ChargeWeight,
-                          DatetimeCreated = detail.DatetimeCreated
+                          DatetimeCreated = detail.DatetimeCreated,
+                          DatetimeModified = detail.DatetimeModified
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.OrderByDescending(o => o.DatetimeModified).ToList();
