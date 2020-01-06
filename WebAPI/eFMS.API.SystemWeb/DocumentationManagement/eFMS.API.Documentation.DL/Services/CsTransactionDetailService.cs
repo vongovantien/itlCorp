@@ -805,9 +805,8 @@ namespace eFMS.API.Documentation.DL.Services
             var data = GetById(Id);
             var listProof = new List<AirProofOfDeliveryReport>();
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
-            //var _currentUser = string.Empty;
-
+            //var _currentUser = currentUser.UserID;
+            var _currentUser = string.Empty;
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
@@ -827,17 +826,11 @@ namespace eFMS.API.Documentation.DL.Services
                 proofOfDelivery.ATTN = dataATTN?.PartnerNameEn;
                 proofOfDelivery.TotalValue = 0;
                 proofOfDelivery.Shipper = dataShipper.PartnerNameEn;
-                var csMawbcontainers = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
-                foreach (var item in csMawbcontainers)
-                {
-                    proofOfDelivery.Description += item.Description + string.Join(",", data.Commodity);
-                }
-                if (csMawbcontainers.Count() > 0)
-                {
-                    proofOfDelivery.NoPieces = csMawbcontainers.Sum(x => x.Quantity) ?? 0;
-                    proofOfDelivery.GW = csMawbcontainers.Sum(x => x.Gw) ?? 0;
-                    proofOfDelivery.NW = csMawbcontainers.Sum(x => x.Nw) ?? 0;
-                }
+                proofOfDelivery.WChargeable = data.ChargeWeight;
+                proofOfDelivery.Description = data.DesOfGoods;
+                proofOfDelivery.NoPieces = data.PackageQty;
+                proofOfDelivery.GW = data.GrossWeight;
+                proofOfDelivery.NW = data.NetWeight;
                 listProof.Add(proofOfDelivery);
             }
 
@@ -867,8 +860,8 @@ namespace eFMS.API.Documentation.DL.Services
             var data = GetById(Id);
             var listDocument = new List<AirDocumentReleaseReport>();
             Crystal result = null;
-            //var _currentUser = currentUser.UserID;
-            var _currentUser = string.Empty;
+            var _currentUser = currentUser.UserID;
+           // var _currentUser = string.Empty;
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);

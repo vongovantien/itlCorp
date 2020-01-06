@@ -162,7 +162,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         this._documenRepo.updateCSTransaction(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this.isLoading = false)
+                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {

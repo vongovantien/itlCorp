@@ -65,4 +65,13 @@ export const getCatalogueCarrierLoadingState = createSelector(catalogueState, (s
 export const getCatalogueAgentState = createSelector(catalogueState, (state: ICatalogueState) => state && state.agents);
 export const getCatalogueAgentLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
+export const getCatalogueUnitState = createSelector(catalogueState, (state: ICatalogueState) => state && state.units);
+export const getCatalogueUnitLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
+
+export const getCatalogueCommodityState = createSelector(catalogueState, (state: ICatalogueState) => state && state.commodities);
+export const getCatalogueCommodityLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
+
+export const getCatalogueCustomerState = createSelector(catalogueState, (state: ICatalogueState) => state && state.customers);
+export const getCatalogueCustomerLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
+
 export const isSpinnerShowing = createSelector(spinnerReducer, (state: ISpinnerState) => state.show);

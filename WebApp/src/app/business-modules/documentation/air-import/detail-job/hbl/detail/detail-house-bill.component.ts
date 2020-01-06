@@ -229,5 +229,47 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
             this.previewArrivalNotice(_currency);
         }
+        if (type === 'PROOF_OF_DELIVERY') {
+            this.previewProofOfDelivery();
+        }
+        if (type === 'DOCUMENT_RELEASE_FORM') {
+            this.previewAirDocumentRelease();
+        }
+    }
+
+    previewProofOfDelivery() {
+        this._documentationRepo.previewAirProofofDelivery(this.hblId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.reportPopup.frm.nativeElement.submit();
+                        this.reportPopup.show();
+                    }, 1000);
+
+                },
+            );
+    }
+
+    previewAirDocumentRelease() {
+        this._documentationRepo.previewAirDocumentRelease(this.hblId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.reportPopup.frm.nativeElement.submit();
+                        this.reportPopup.show();
+                    }, 1000);
+
+                },
+            );
     }
 }

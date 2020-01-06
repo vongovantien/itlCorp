@@ -14,6 +14,7 @@ import { takeUntil, skip, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../share-business/store';
+import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState } from '@store';
 
 @Component({
     selector: 'form-create-sea-export',
@@ -85,9 +86,14 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     ngOnInit() {
         this.initForm();
 
-        this.carries = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
-        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
-        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
+        this._store.dispatch(new GetCatalogueAgentAction(CommonEnum.PartnerGroupEnum.AGENT));
+        this._store.dispatch(new GetCatalogueCarrierAction(CommonEnum.PartnerGroupEnum.CARRIER));
+        this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
+
+        this.carries = this._store.select(getCatalogueCarrierState);
+        this.agents = this._store.select(getCatalogueAgentState);
+        this.ports = this._store.select(getCataloguePortState);
+
 
         this.getUserLogged();
         this.getServices();

@@ -9,7 +9,8 @@
                 <ul id="dropdown-nested" *dropdownMenu class="dropdown-menu" role="menu"
                     aria-labelledby="button-nested">
                     <li role="menuitem" dropdown triggers="mouseover" placement="right" container="body">
-                        <a dropdownToggle class="dropdown-item dropdown-toggle pointer" (click)="isClickSubMenu = true">Arrival Notice
+                        <a dropdownToggle class="dropdown-item dropdown-toggle pointer"
+                            (click)="isClickSubMenu = true">Arrival Notice
                             <span class="caret"></span>
                         </a>
                         <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">
@@ -19,6 +20,10 @@
                                     (click)="onPreview('ARRIVAL_VND')">VND</a></li>
                         </ul>
                     </li>
+                    <li role="menuitem"><a class="dropdown-item pointer" (click)="onPreview('PROOF_OF_DELIVERY')">Proof
+                            of Delivery</a></li>
+                    <li role="menuitem"><a class="dropdown-item pointer"
+                            (click)="onPreview('DOCUMENT_RELEASE_FORM')">Document Release Form</a></li>
                 </ul>
             </div>
             <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="confirmSave.show()"></app-default-button>
