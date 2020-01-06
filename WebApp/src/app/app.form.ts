@@ -3,7 +3,7 @@ import { AbstractControl, FormControl, FormGroup, ValidatorFn, ValidationErrors 
 import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.model';
 import { ButtonType } from './shared/enums/type-button.enum';
 import { SelectComponent } from 'ng2-select';
-import { ViewChildren, QueryList } from '@angular/core';
+import { ViewChildren, QueryList, HostListener } from '@angular/core';
 import { ComboGridVirtualScrollComponent } from './shared/common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
 
 export abstract class AppForm extends AppPage {
@@ -32,6 +32,9 @@ export abstract class AppForm extends AppPage {
         typeButton: ButtonType.save,
     };
 
+    @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+        this.reset();
+    }
     constructor() {
         super();
     }
@@ -85,7 +88,7 @@ export abstract class AppForm extends AppPage {
         control.setErrors(err);
     }
 
-    search($event?: any) {
+    onSearchRequest($event?: any) {
         this.requestSearch($event);
     }
 

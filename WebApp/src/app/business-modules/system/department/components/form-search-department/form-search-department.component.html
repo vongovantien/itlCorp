@@ -21,14 +21,15 @@
                         <input type="text" class="form-control" formControlName="searchKey"
                             aria-label="Text input with dropdown button">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button" title="Search" (click)="search()">
+                            <button class="btn btn-primary" type="button" title="Search" (click)="onSearchRequest()">
                                 <i class="la la-search"></i>
                             </button>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-auto">
-                    <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="reset()">
+                    <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="reset()">
                         <span>
                             <i class="la la-refresh"></i>
                             <span>

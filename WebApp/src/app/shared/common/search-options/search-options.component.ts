@@ -1,15 +1,16 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ButtonModalSetting } from '../../models/layout/button-modal-setting.model';
 import { ButtonType } from '../../enums/type-button.enum';
-// declare var $: any;
+import { AppForm } from 'src/app/app.form';
 @Component({
     selector: 'app-search-options',
     templateUrl: './search-options.component.html'
 })
-export class SearchOptionsComponent implements OnInit {
+export class SearchOptionsComponent extends AppForm implements OnInit {
     @Input() configSearch: any;
     @Output() search = new EventEmitter<any>();
     @Output() reset_search = new EventEmitter<any>();
+
     defaultSetting: any = { fieldName: 'All', displayName: 'All' };
     settingFields: any[] = [this.defaultSetting];
     searchObject: any = {
@@ -20,13 +21,18 @@ export class SearchOptionsComponent implements OnInit {
 
     resetButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.reset
-    }
+    };
 
-    constructor() { }
+    constructor() {
+        super();
+
+        this.requestReset = this.resetSearch;
+    }
 
     ngOnInit() {
         this.getSettings(this.configSearch);
     }
+
     getSettings(configSearch: any): any {
         if (this.configSearch.settingFields) {
             this.configSearch.settingFields.forEach((element: any) => {
@@ -46,17 +52,6 @@ export class SearchOptionsComponent implements OnInit {
             this.searchObject.displayName = field.displayName;
         }
         this.searchObject.field = field.fieldName;
-        // this.setActiveStyle(event);
-    }
-
-    setActiveStyle(event: any): any {
-        var id_element = document.getElementById(event.target.id);
-        if ($(id_element).hasClass("active") == false) {
-            $(id_element).siblings().removeClass('active');
-            if (id_element != null) {
-                id_element.classList.add("active");
-            }
-        }
     }
 
     searchClick() {
