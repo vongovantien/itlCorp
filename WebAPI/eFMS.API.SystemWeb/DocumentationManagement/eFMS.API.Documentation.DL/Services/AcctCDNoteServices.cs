@@ -922,8 +922,8 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.MAWB = data.MbLadingNo; //MBLNO
                     charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
                     charge.ContainerSize = data.HbPackages; //Quantity Cont
-                    charge.GrossWeight = data.HbGrossweight != null ? data.HbGrossweight.Value : 0;//Total GW of HBL
-                    charge.CBM = data.Volum != null ? data.Volum.Value : 0; //Total CBM of HBL
+                    charge.GrossWeight = data.HbGrossweight ?? 0;//Total GW of HBL
+                    charge.CBM = data.Volum ?? 0; //Total CBM of HBL
                     charge.SealNo = data.HbSealNo; //Cont/Seal No
                     charge.HWBNO = data.HbLadingNo; //HBLNOs
 
@@ -1008,12 +1008,12 @@ namespace eFMS.API.Documentation.DL.Services
                 _accsVnd = officeOfUser.BankAccountVnd;
             }
             //Thông tin Bank
-            parameter.AccountName = _accountName != null ? _accountName : string.Empty;
-            parameter.BankName = _bankName != null ? _bankName : string.Empty;
-            parameter.BankAddress = _bankAddress != null ? _bankAddress : string.Empty;
-            parameter.SwiftAccs = _swiftAccs != null ? _swiftAccs : string.Empty;
-            parameter.AccsUSD = _accsUsd != null ? _accsUsd : string.Empty;
-            parameter.AccsVND = _accsVnd != null ? _accsVnd : string.Empty;
+            parameter.AccountName = _accountName ?? string.Empty;
+            parameter.BankName = _bankName ?? string.Empty;
+            parameter.BankAddress = _bankAddress ?? string.Empty;
+            parameter.SwiftAccs = _swiftAccs ?? string.Empty;
+            parameter.AccsUSD = _accsUsd ?? string.Empty;
+            parameter.AccsVND = _accsVnd ?? string.Empty;
 
             parameter.Currency = criteria.Currency;
 
@@ -1183,12 +1183,12 @@ namespace eFMS.API.Documentation.DL.Services
                 _accsVnd = officeOfUser.BankAccountVnd;
             }
             //Thông tin Bank
-            parameter.AccountName = _accountName != null ? _accountName : string.Empty;
+            parameter.AccountName = _accountName ?? string.Empty;
             parameter.BankName = _bankName != null ? _bankName : string.Empty;
-            parameter.BankAddress = _bankAddress != null ? _bankAddress : string.Empty;
-            parameter.SwiftAccs = _swiftAccs != null ? _swiftAccs : string.Empty;
-            parameter.AccsUSD = _accsUsd != null ? _accsUsd : string.Empty;
-            parameter.AccsVND = _accsVnd != null ? _accsVnd : string.Empty;
+            parameter.BankAddress = _bankAddress ?? string.Empty;
+            parameter.SwiftAccs = _swiftAccs ?? string.Empty;
+            parameter.AccsUSD = _accsUsd ?? string.Empty;
+            parameter.AccsVND = _accsVnd ?? string.Empty;
 
             parameter.Currency = criteria.Currency;
             parameter.HBLList = _hbllist;
@@ -1215,7 +1215,7 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
             if (!string.IsNullOrEmpty(employeeId))
             {
-                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault().WorkPlaceId;
+                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.WorkPlaceId;
                 if (branchOfUser != null)
                 {
                     result = sysOfficeRepo.Get(x => x.Id == branchOfUser).FirstOrDefault();

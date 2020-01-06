@@ -92,7 +92,7 @@ export class CatalogueRepo {
         }
     }
 
-    deleteUnit(id: string) {
+    deleteUnit(id: number) {
         return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatUnit/Delete/${id}`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)

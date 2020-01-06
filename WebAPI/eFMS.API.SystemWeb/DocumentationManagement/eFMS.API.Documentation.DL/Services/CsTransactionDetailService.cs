@@ -969,7 +969,7 @@ namespace eFMS.API.Documentation.DL.Services
                     housebill.MaskNos = string.Join("\r\n", conts.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "-" + x.SealNo : string.Empty));
                 }
                 housebill.Description = data.DesOfGoods;//Description of goods
-                housebill.GrossWeight = data.GrossWeight != null ? data.GrossWeight.Value : 0;
+                housebill.GrossWeight = data.GrossWeight ?? 0;
                 housebill.GrwDecimal = 2;
                 housebill.Unit = "PKS"; //Đang gán cứng
                 housebill.CBM = data.Cbm != null ? data.Cbm.Value : 0;
@@ -1135,12 +1135,12 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.Notify = data.Notify; //Notify
                 housebill.SCI = string.Empty; //NOT USE
                 housebill.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
-                housebill.GrossWeight = data.GrossWeight; //GrossWeight
+                housebill.GrossWeight = data.GrossWeight ?? 0; //GrossWeight
                 housebill.GrwDecimal = 2; //NOT USE
                 housebill.Wlbs = data.KgIb; //KgIb
                 housebill.RateClass = string.Empty; //NOT USE
                 housebill.ItemNo = data.ComItemNo; //ComItemNo - Commodity Item no
-                housebill.WChargeable = data.ChargeWeight; //CW
+                housebill.WChargeable = data.ChargeWeight ?? 0; //CW
                 housebill.ChWDecimal = 2; //NOT USE
                 housebill.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
                 housebill.Ttal = data.Total != null ? data.Total.ToString() : string.Empty;
@@ -1211,7 +1211,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var housebill = new AirAttachedListReport();
                 housebill.HBLNo = data.Hwbno;
                 housebill.IssuedDate = data.Etd;//ETD of Housebill
-                housebill.AttachedList = data.AttachList;
+                housebill.AttachedList = ReportUltity.ReplaceHtmlBaseForPreviewReport(data.AttachList);
                 housebills.Add(housebill);
             }
             result = new Crystal
