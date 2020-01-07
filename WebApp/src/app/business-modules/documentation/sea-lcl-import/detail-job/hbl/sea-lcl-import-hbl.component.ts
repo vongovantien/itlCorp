@@ -102,26 +102,28 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
     }
 
     selectHBL(hbl: HouseBill) {
-        this.selectedHbl = new HouseBill(hbl);
+        if (!this.selectedHbl || !!this.selectedHbl && this.selectedHbl.id !== hbl.id) {
+            this.selectedHbl = new HouseBill(hbl);
 
-        // * Get container, Job detail, Surcharge with hbl id, JobId.
-        this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
-        this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
-        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(hbl.jobId));
-        this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
+            // * Get container, Job detail, Surcharge with hbl id, JobId.
+            this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
+            this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
+            this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(hbl.jobId));
+            this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
-        switch (this.selectedTabSurcharge) {
-            case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
-                this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE, hblId: this.selectedHbl.id }));
-                break;
-            case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
-                this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE, hblId: this.selectedHbl.id }));
-                break;
-            case CommonEnum.SurchargeTypeEnum.OBH:
-                this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.OBH, hblId: this.selectedHbl.id }));
-                break;
-            default:
-                break;
+            switch (this.selectedTabSurcharge) {
+                case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
+                    this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE, hblId: this.selectedHbl.id }));
+                    break;
+                case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
+                    this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE, hblId: this.selectedHbl.id }));
+                    break;
+                case CommonEnum.SurchargeTypeEnum.OBH:
+                    this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.OBH, hblId: this.selectedHbl.id }));
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

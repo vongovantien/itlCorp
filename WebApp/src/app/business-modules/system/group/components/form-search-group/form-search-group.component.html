@@ -1,7 +1,8 @@
 <div class="m-portlet form-search-group-wrapper">
   <div class="m-portlet__body">
     <div class="m-form">
-      <app-search-options [configSearch]="configSearch" (search)="search($event)" (reset_search)="onReset($event)">
+      <app-search-options [configSearch]="configSearch" (search)="onSearchRequest($event)"
+        (reset_search)="onReset($event)">
       </app-search-options>
     </div>
   </div>

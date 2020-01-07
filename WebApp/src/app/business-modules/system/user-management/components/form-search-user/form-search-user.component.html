@@ -22,7 +22,7 @@
                     </app-default-button>
                 </div>
             </div> -->
-            <app-search-options [configSearch]="configSearch" (search)="search($event)"
+            <app-search-options [configSearch]="configSearch" (search)="onSearchRequest($event)"
                 (reset_search)="onReset($event)"></app-search-options>
         </div>
     </div>

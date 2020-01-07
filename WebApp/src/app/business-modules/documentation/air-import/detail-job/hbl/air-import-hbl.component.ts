@@ -170,26 +170,28 @@ export class AirImportHBLComponent extends AppList implements OnInit {
     }
 
     selectHBL(hbl: HouseBill) {
-        this.selectedHbl = new CsTransactionDetail(hbl);
+        if (!this.selectedHbl || !!this.selectedHbl && this.selectedHbl.id !== hbl.id) {
+            this.selectedHbl = new CsTransactionDetail(hbl);
 
-        // * Get container, Job detail, Surcharge with hbl id, JobId.
-        this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
-        this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
-        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(hbl.jobId));
-        this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
+            // * Get container, Job detail, Surcharge with hbl id, JobId.
+            this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
+            this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
+            this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(hbl.jobId));
+            this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
-        switch (this.selectedTabSurcharge) {
-            case 'BUY':
-                this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
-                break;
-            case 'SELL':
-                this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
-                break;
-            case 'OBH':
-                this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: 'OBH', hblId: this.selectedHbl.id }));
-                break;
-            default:
-                break;
+            switch (this.selectedTabSurcharge) {
+                case 'BUY':
+                    this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
+                    break;
+                case 'SELL':
+                    this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
+                    break;
+                case 'OBH':
+                    this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: 'OBH', hblId: this.selectedHbl.id }));
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

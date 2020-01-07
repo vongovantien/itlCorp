@@ -15,6 +15,7 @@ import { map, tap, takeUntil, catchError, skip, mergeMap, debounceTime, distinct
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
+import { GetCataloguePortAction, getCataloguePortState } from '@store';
 
 @Component({
     selector: 'air-export-hbl-form-create',
@@ -123,6 +124,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
+        this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
         this.initForm();
 
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
@@ -130,7 +132,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
 
-        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
+        this.ports = this._store.select(getCataloguePortState);
         this.saleMans = this._systemRepo.getListSystemUser();
 
         this.currencies = this._catalogueRepo.getCurrencyBy({ active: true }).pipe(
@@ -157,13 +159,13 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 )
                 .subscribe(
                     (hbl: HouseBill) => {
-                        if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
+                        if (!!hbl && hbl.id && hbl.id !== SystemConstants.EMPTY_GUID) {
                             this.totalCBM = hbl.cbm;
                             this.totalHeightWeight = hbl.hw;
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
                             this.hwconstant = hbl.hwConstant;
-                            console.log(this.hwconstant);
+                            console.log(hbl);
 
                             this.updateFormValue(hbl);
                         }
@@ -411,7 +413,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             width: [null, Validators.min(0)],
             length: [null, Validators.min(0)],
             package: [null, Validators.min(0)],
-            hblId: [this.hblId]
+            hblId: [this.hblId],
         }));
     }
 
@@ -435,13 +437,14 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     updateHeightWeight(dims: DIM[] = []) {
-        dims.forEach(dimItem => {
-            dimItem.hw = this.utility.calculateHeightWeight(dimItem.width, dimItem.height, dimItem.length, dimItem.package, this.hwconstant);
-            dimItem.cbm = this.utility.calculateCBM(dimItem.width, dimItem.height, dimItem.length, dimItem.package, this.hwconstant);
-        });
-
-        this.totalHeightWeight = this.updateTotalHeightWeight(dims);
-        this.totalCBM = this.updateCBM(dims);
+        if (!!dims.length) {
+            dims.forEach(dimItem => {
+                dimItem.hw = this.utility.calculateHeightWeight(dimItem.width || 0, dimItem.height || 0, dimItem.length || 0, dimItem.package || 0, this.hwconstant || 6000);
+                dimItem.cbm = this.utility.calculateCBM(dimItem.width || 0, dimItem.height || 0, dimItem.length || 0, dimItem.package || 0, this.hwconstant || 6000);
+            });
+            this.totalHeightWeight = this.updateTotalHeightWeight(dims);
+            this.totalCBM = this.updateCBM(dims);
+        }
     }
 
     calculateHWDimension(dims: DIM[]) {
