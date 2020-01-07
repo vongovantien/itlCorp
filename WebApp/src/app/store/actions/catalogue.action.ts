@@ -1,4 +1,5 @@
 import { Action } from '@ngrx/store';
+import { CommonEnum } from '@enums';
 
 
 export enum CatalogueActionTypes {
@@ -29,6 +30,9 @@ export enum CatalogueActionTypes {
     GET_CUSTOMER_SUCCESS = '[Catalogue] Get Customer Success',
     GET_CUSTOMER_FAIL = '[Catalogue] Get Customer Fail',
 
+    GET_COUNTRY = '[Catalogue] Get Country',
+    GET_COUNTRY_SUCCESS = '[Catalogue] Get Country Success',
+    GET_COUNTRY_FAIL = '[Catalogue] Get Country Fail',
 }
 
 export class GetCataloguePartnerAction implements Action {
@@ -39,7 +43,7 @@ export class GetCataloguePartnerAction implements Action {
 //#region Port
 export class GetCataloguePortAction implements Action {
     readonly type = CatalogueActionTypes.GET_PORT;
-    constructor(public payload: any) { }
+    constructor(public payload: any = { placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }) { }
 }
 export class GetCataloguePortSuccessAction implements Action {
     readonly type = CatalogueActionTypes.GET_PORT_SUCCESS;
@@ -72,7 +76,7 @@ export class GetCatalogueCarrierFailAction implements Action {
 //#region Agent
 export class GetCatalogueAgentAction implements Action {
     readonly type = CatalogueActionTypes.GET_AGENT;
-    constructor(public payload: any) { }
+    constructor(public payload: any = CommonEnum.PartnerGroupEnum.CONSIGNEE) { }
 }
 export class GetCatalogueAgentSuccessAction implements Action {
     readonly type = CatalogueActionTypes.GET_AGENT_SUCCESS;
@@ -129,6 +133,21 @@ export class GetCatalogueCustomerFailAction implements Action {
 }
 //#endregion
 
+//#region Cuntry
+export class GetCatalogueCountryAction implements Action {
+    readonly type = CatalogueActionTypes.GET_COUNTRY;
+    constructor(public payload?: any) { }
+}
+export class GetCatalogueCountrySuccessAction implements Action {
+    readonly type = CatalogueActionTypes.GET_COUNTRY_SUCCESS;
+    constructor(public payload: any) { }
+}
+export class GetCatalogueCountryFailAction implements Action {
+    readonly type = CatalogueActionTypes.GET_COUNTRY_FAIL;
+    constructor(public payload: any) { }
+}
+//#endregion
+
 export type CatalogueActions = GetCataloguePartnerAction
     | GetCataloguePortAction
     | GetCataloguePortSuccessAction
@@ -148,4 +167,7 @@ export type CatalogueActions = GetCataloguePartnerAction
     | GetCatalogueCustomerAction
     | GetCatalogueCustomerSuccessAction
     | GetCatalogueCustomerFailAction
+    | GetCatalogueCountryAction
+    | GetCatalogueCountrySuccessAction
+    | GetCatalogueCountryFailAction
     ;

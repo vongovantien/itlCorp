@@ -1,5 +1,5 @@
 import { CatalogueActionTypes, CatalogueActions } from "../actions/catalogue.action";
-import { PortIndex, Customer, Unit, Commodity } from "@models";
+import { PortIndex, Customer, Unit, Commodity, CountryModel } from "@models";
 
 
 export interface ICatalogueState {
@@ -8,6 +8,7 @@ export interface ICatalogueState {
     agents: Customer[];
     units: Unit[];
     customers: Customer[];
+    countries: CountryModel[];
     commodities: Commodity[];
     isLoading: boolean;
 
@@ -20,6 +21,7 @@ const initialState: ICatalogueState = {
     units: [],
     customers: [],
     commodities: [],
+    countries: [],
     isLoading: false
 };
 
@@ -86,6 +88,16 @@ export function catalogueReducer(state = initialState, action: CatalogueActions)
             return { ...state, isLoading: false, customers: action.payload };
         }
         case CatalogueActionTypes.GET_CUSTOMER_FAIL: {
+            return { ...state, isLoading: false, };
+        }
+
+        case CatalogueActionTypes.GET_COUNTRY: {
+            return { ...state, isLoading: true };
+        }
+        case CatalogueActionTypes.GET_COUNTRY_SUCCESS: {
+            return { ...state, isLoading: false, countries: action.payload };
+        }
+        case CatalogueActionTypes.GET_COUNTRY_FAIL: {
             return { ...state, isLoading: false, };
         }
 
