@@ -7,6 +7,7 @@ namespace eFMS.API.Documentation.Service.Models
     {
         public Guid Id { get; set; }
         public Guid JobId { get; set; }
+        public Guid? ParentId { get; set; }
         public string Mawb { get; set; }
         public string Hwbno { get; set; }
         public string Hbltype { get; set; }
@@ -30,8 +31,8 @@ namespace eFMS.API.Documentation.Service.Models
         public string PickupPlace { get; set; }
         public DateTime? Etd { get; set; }
         public DateTime? Eta { get; set; }
-        public Guid Pol { get; set; }
-        public Guid Pod { get; set; }
+        public Guid? Pol { get; set; }
+        public Guid? Pod { get; set; }
         public Guid? FinalPod { get; set; }
         public string DeliveryPlace { get; set; }
         public string FinalDestinationPlace { get; set; }

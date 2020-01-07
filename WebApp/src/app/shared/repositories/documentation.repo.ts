@@ -570,4 +570,10 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    syncHBL(jobId: string, body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/SyncHBLByShipment/${jobId}`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }

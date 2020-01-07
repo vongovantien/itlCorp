@@ -17,9 +17,8 @@ import {
 
 import * as fromShareBusiness from './../../../share-business/store';
 
-import { catchError, skip, takeUntil, finalize } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import _merge from 'lodash/merge';
-import { GetCataloguePortAction } from '@store';
 @Component({
     selector: 'app-create-job-air-export',
     templateUrl: './create-job-air-export.component.html'

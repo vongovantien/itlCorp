@@ -615,7 +615,7 @@ namespace eFMS.API.Documentation.DL.Services
                     )
                 );
             }
-            
+
             //Search with HouseBill & Surcharge
             IQueryable<CsTransactionModel> dataQuerySur = null;
             if (!string.IsNullOrEmpty(criteria.HWBNo)
@@ -740,7 +740,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="list"></param>
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QuerySIF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
-        {            
+        {
             var queryTrans = listSearch;
             if (criteria.All == null)
             {
@@ -775,8 +775,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Search with Container Of Shipment
             IQueryable<CsTransactionModel> dataQueryCont = null;
-            if (   !string.IsNullOrEmpty(criteria.ContainerNo) 
-                || !string.IsNullOrEmpty(criteria.SealNo) 
+            if (!string.IsNullOrEmpty(criteria.ContainerNo)
+                || !string.IsNullOrEmpty(criteria.SealNo)
                 || !string.IsNullOrEmpty(criteria.MarkNo))
             {
                 var containers = csMawbcontainerRepo.Get();
@@ -805,16 +805,16 @@ namespace eFMS.API.Documentation.DL.Services
                         || (x.SealNo ?? "").IndexOf(criteria.SealNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                         || (x.MarkNo ?? "").IndexOf(criteria.MarkNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
                     dataQueryCont = queryCont.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
-                }                
+                }
             }
 
             //Search with HouseBill & Surcharge
             IQueryable<CsTransactionModel> dataQuerySur = null;
-            if (   !string.IsNullOrEmpty(criteria.HWBNo) 
-                || !string.IsNullOrEmpty(criteria.CustomerId) 
+            if (!string.IsNullOrEmpty(criteria.HWBNo)
+                || !string.IsNullOrEmpty(criteria.CustomerId)
                 || !string.IsNullOrEmpty(criteria.SaleManId)
                 || !string.IsNullOrEmpty(criteria.NotifyPartyId)
-                || !string.IsNullOrEmpty(criteria.CreditDebitNo) 
+                || !string.IsNullOrEmpty(criteria.CreditDebitNo)
                 || !string.IsNullOrEmpty(criteria.SoaNo))
             {
                 var surcharges = csShipmentSurchargeRepo.Get();
@@ -840,7 +840,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     querySur = querySur.Where(x =>
                             (x.HWBNo ?? "").IndexOf(criteria.HWBNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                        && 
+                        &&
                             ((x.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
                         &&
                             ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
@@ -873,9 +873,9 @@ namespace eFMS.API.Documentation.DL.Services
                         )
                     );
                     dataQuerySur = querySur.Select(s => s.transaction).GroupBy(g => g.JobNo).Select(s => s.FirstOrDefault());
-                }                
+                }
             }
-            
+
             IQueryable<CsTransactionModel> result = queryTrans;
             if (dataQueryCont != null)
             {
@@ -1560,9 +1560,55 @@ namespace eFMS.API.Documentation.DL.Services
             return shipmentType;
         }
         #endregion -- PREVIEW --
+
+        public ResultHandle SyncHouseBills(Guid JobId, CsTransactionSyncHBLCriteria model)
+        {
+            try
+            {
+                var shipment = DataContext.Get(x => x.Id == JobId).FirstOrDefault();
+                if (shipment == null) return null;
+
+                if (shipment.TransactionType != Constants.AE_SHIPMENT && shipment.TransactionType != Constants.AI_SHIPMENT )
+                    return null;
+                // Lấy ds HBL
+                var housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();
+
+                if (housebills.Count() == 0)
+                {
+                    return new ResultHandle { Status = false, Message = "Not found housebill", Data = null };
+                }
+                else
+                {
+                    foreach (var hbl in housebills)
+                    {
+                        hbl.FlightNo = model.FlightVesselName;
+                        hbl.UserModified = "admin";
+                        hbl.Eta = model.Eta;
+                        hbl.Etd = model.Etd;
+                        hbl.Pod = model.Pod;
+                        hbl.Pol = model.Pol;
+                        hbl.IssuedBy = model.IssuedBy;
+                        hbl.FlightDate = model.FlightDate;
+                        hbl.ForwardingAgentId = model.AgentId;
+
+                        string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
+                        hbl.ForwardingAgentDescription = agentDescription;
+
+                        csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id);
+                    }
+
+                    return new ResultHandle { Status = true, Message ="Sync House Bill " + String.Join(", ",housebills.Select(s => s.Hwbno).Distinct()) + " SuccessFul", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                }
+            }
+            catch (Exception ex)
+            {
+                var result = new HandleState(ex.Message);
+                return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
+            }
+        }
     }
 
-
+   
 }
 
 

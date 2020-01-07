@@ -251,6 +251,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             hw: [null, Validators.compose([
                 Validators.min(0)
             ])],
+            issuedBy: [],
 
             // * Date
             etd: [null, this.type !== 'import' ? Validators.required : null],

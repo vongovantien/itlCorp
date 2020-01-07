@@ -253,6 +253,19 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Sync HBL with id
+        /// </summary>
+        [HttpPost]
+        //[Authorize]
+        [Route("SyncHBLByShipment/{id}")]
+        public IActionResult SyncHBL(Guid id,CsTransactionSyncHBLCriteria model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var result = csTransactionService.SyncHouseBills(id,model);
+            return Ok(result);
+        }
+
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {

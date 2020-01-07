@@ -100,7 +100,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
             {
@@ -1482,6 +1482,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.EffectDate).HasColumnType("datetime");
 
+                entity.Property(e => e.FreightPayment)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Office).HasMaxLength(500);
@@ -2416,6 +2420,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.IsLocked).HasDefaultValueSql("((0))");
 
+                entity.Property(e => e.IssuedBy).HasMaxLength(50);
+
                 entity.Property(e => e.JobNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2737,6 +2743,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.PackageContainer).HasMaxLength(1600);
+
+                entity.Property(e => e.ParentId).HasColumnName("ParentID");
 
                 entity.Property(e => e.PickupPlace).HasMaxLength(500);
 
