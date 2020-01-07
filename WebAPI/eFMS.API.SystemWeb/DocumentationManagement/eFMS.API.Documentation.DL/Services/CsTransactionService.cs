@@ -1150,7 +1150,15 @@ namespace eFMS.API.Documentation.DL.Services
                     });
                     dimensionDetailService.Add(model.DimensionDetails, false);
                 }
-                var detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
+                IQueryable<CsTransactionDetail> detailTrans = null;
+                if (model.TransactionType == "AI" || model.TransactionType == "AE")
+                {
+                    detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id && x.ParentId != null);
+                }
+                else
+                {
+                    detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
+                }
                 if (detailTrans != null)
                 {
                     int countDetail = csTransactionDetailRepo.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
