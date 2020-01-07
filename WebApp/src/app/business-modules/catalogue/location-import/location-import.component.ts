@@ -57,6 +57,7 @@ export class LocationImportComponent extends AppList implements OnInit {
         this.route.queryParams.subscribe(prams => {
             if (prams.type !== undefined) {
                 this.type = prams.type;
+                console.log(this.type);
             }
         });
     }

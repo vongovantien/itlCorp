@@ -105,6 +105,7 @@ export class AppCountryComponent extends AppList implements OnInit {
         if (this.selectedCountry.id) {
             this.formCountry.isUpdate = true;
             this.formCountry.isSubmitted = false;
+            this.formCountry.id = country.id;
 
             this.formCountry.formAddCountry.patchValue(this.selectedCountry);
             this.formCountry.show();
