@@ -80,14 +80,7 @@ namespace eFMS.API.Catalogue.DL.Services
             partner.DatetimeModified = DateTime.Now;
             partner.UserCreated = partner.UserModified = currentUser.UserID;
             partner.Active = true;
-            if(!String.IsNullOrEmpty(partner.InternalReferenceNo))
-            {
-                partner.Id = partner.AccountNo = partner.TaxCode + "." + partner.InternalReferenceNo;
-            }
-            else
-            {
-                partner.Id = partner.TaxCode;
-            }
+           
             var hs = DataContext.Add(partner);
             if (hs.Success)
             {
@@ -102,7 +95,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     });
                     partner.SalePersonId = salemans.FirstOrDefault().Id.ToString();
                     DataContext.Update(partner, x => x.Id == partner.Id);
-                    salemanRepository.Add(salemans);
+                   salemanRepository.Add(salemans);
                 }
                 DataContext.SubmitChanges();
                 salemanRepository.SubmitChanges();

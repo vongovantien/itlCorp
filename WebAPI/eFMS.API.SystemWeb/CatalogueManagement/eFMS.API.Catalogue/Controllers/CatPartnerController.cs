@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -141,10 +142,12 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost("CheckTaxCode")]
         public IActionResult CheckTaxCode(CatPartnerEditModel model)
         {
-            if(model.Id == null)
+            if(string.IsNullOrEmpty(model.Id))
             {
                 var result = catPartnerService.Get(x => x.TaxCode.Trim() == model.TaxCode.Trim().ToLower()
-                                                    && ((x.InternalReferenceNo == null? "": x.InternalReferenceNo.Trim()) == model.InternalReferenceNo.Trim().ToLower() || string.IsNullOrEmpty(model.InternalReferenceNo))
+                                                    && (((string.IsNullOrEmpty( x.InternalReferenceNo)? "": x.InternalReferenceNo.Trim()) == model.InternalReferenceNo.Trim().ToLower()) 
+                                                    || string.IsNullOrEmpty(model.InternalReferenceNo)
+                                                    )
                             )?.FirstOrDefault();
                 return Ok(result);
             }
@@ -169,7 +172,15 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatPartnerEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-
+            if (!String.IsNullOrEmpty(model.InternalReferenceNo))
+            {
+               model.AccountNo = model.TaxCode + "." + model.InternalReferenceNo;
+            }
+            else
+            {
+                model.AccountNo = model.TaxCode;
+            }
+            model.Id = Guid.NewGuid().ToString();
             var checkExistMessage = CheckExist(string.Empty, model);
             if (checkExistMessage.Length > 0)
             {

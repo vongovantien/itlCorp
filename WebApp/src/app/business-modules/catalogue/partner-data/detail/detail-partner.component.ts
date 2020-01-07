@@ -141,11 +141,6 @@ export class PartnerDetailComponent extends AppList {
                     this.saleMandetail = (res.data || []).map((item: Saleman) => new Saleman(item));
                     if (this.saleMandetail.length > 0) {
                         for (const it of this.saleMandetail) {
-                            if (it.status === true) {
-                                it.statusString = "Active";
-                            } else {
-                                it.statusString = "InActive";
-                            }
                             const index = this.services.findIndex(x => x.id === it.service);
                             if (index > -1) {
                                 it.serviceName = this.services[index].text;
@@ -371,7 +366,7 @@ export class PartnerDetailComponent extends AppList {
                 for (const it of this.saleMandetail) {
                     this.services.forEach(item => {
                         if (it.service === item.text) {
-                            it.service = item.id;
+                            it.serviceName = item.id;
                         }
                     });
                 }
@@ -497,10 +492,10 @@ export class PartnerDetailComponent extends AppList {
             effectDate: saleman.effectDate,
             status: saleman.status === true ? 'Active' : 'Inactive',
             partnerId: null,
-            saleman_ID: saleman.saleman_ID,
+            saleManId: saleman.saleManId,
             service: saleman.service,
-            createDate: saleman.createDate
-
+            createDate: saleman.createDate,
+            freightPayment: saleman.freightPayment
         };
         this.poupSaleman.showSaleman(saleMane);
         this.poupSaleman.show();

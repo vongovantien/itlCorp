@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { catchError } from "rxjs/operators";
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { PopupBase } from 'src/app/popup.base';
@@ -14,7 +14,7 @@ import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/fo
 })
 
 export class SalemanPopupComponent extends PopupBase {
-    @Output() onCreate = new EventEmitter();
+    @Output() onCreateToForm = new EventEmitter();
     @Output() onDelete = new EventEmitter();
     saleMans: Saleman[] = [];
     headerSaleman: CommonInterface.IHeaderTable[];
@@ -43,12 +43,15 @@ export class SalemanPopupComponent extends PopupBase {
     status: AbstractControl;
     effectiveDate: AbstractControl;
     description: AbstractControl;
+    freightPayment: AbstractControl;
+    termTypes: CommonInterface.INg2Select[];
 
     @Input() popupData: Saleman;
     constructor(
         private baseService: BaseService,
         private api_menu: API_MENU,
         private _catalogueRepo: CatalogueRepo,
+        private _systemRepo: SystemRepo,
         private _fb: FormBuilder
     ) {
 
@@ -56,6 +59,11 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+        this.termTypes = [
+            { id: 'All', text: 'All' },
+            { id: 'Prepaid', text: 'Prepaid' },
+            { id: 'Collect', text: 'Collect' },
+        ];
         this.getComboboxData();
         this.currrently_user = localStorage.getItem('currently_userName');
         this.form = this._fb.group({
@@ -65,27 +73,32 @@ export class SalemanPopupComponent extends PopupBase {
             effectiveDate: [],
             description: [],
             service: [this.services[0]],
+            freightPayment: [this.termTypes[0]]
 
         });
+
         this.saleman = this.form.controls["saleman"];
         this.service = this.form.controls["service"];
         this.office = this.form.controls["office"];
         this.status = this.form.controls["status"];
         this.effectiveDate = this.form.controls["effectiveDate"];
         this.description = this.form.controls["description"];
+        this.freightPayment = this.form.controls["freightPayment"];
+        this.freightPayment.setValue([<CommonInterface.INg2Select>{ id: "All", text: "All" }]);
     }
 
     showSaleman(sm: Saleman) {
         this.form.reset();
-        console.log(sm);
         this.form.setValue({
             office: sm.office,
             effectiveDate: !!sm.effectDate ? { startDate: new Date(sm.effectDate), endDate: new Date(sm.effectDate) } : null,
             service: this.services.filter(i => i.id === sm.service)[0],
             status: this.statuss.filter(i => i.title === sm.status)[0],
-            saleman: sm.saleman_ID,
-            description: sm.description
+            saleman: sm.saleManId,
+            description: sm.description,
+            freightPayment: this.termTypes.filter(i => i.id === sm.freightPayment)
         });
+        this.saleman.setValue(sm.saleManId);
     }
 
     onDeleteSaleman() {
@@ -98,7 +111,7 @@ export class SalemanPopupComponent extends PopupBase {
         this.strSalemanCurrent = {};
         this.strOfficeCurrent = {};
         this.saleManToAdd = new Saleman();
-        this.saleManToAdd.saleman_ID = {};
+        this.saleManToAdd.saleManId = {};
         this.saleManToAdd.office = {};
     }
     closePoup() {
@@ -112,7 +125,6 @@ export class SalemanPopupComponent extends PopupBase {
         this.getService();
         this.getOffice();
         this.statuss = this.getStatus();
-        // this.selectedStatus = this.statuss[1];
 
     }
 
@@ -129,9 +141,9 @@ export class SalemanPopupComponent extends PopupBase {
             );
     }
 
-    ApplyToList() {
+    applyToList() {
         this.isSave = true;
-        this.OnCreate();
+        this.onCreate();
     }
 
     getOffice() {
@@ -154,16 +166,22 @@ export class SalemanPopupComponent extends PopupBase {
         ];
     }
 
-    async getSalemans() {
-        const responses = await this.baseService.getAsync(this.api_menu.System.User_Management.getAll);
-        if (responses != null) {
-            this.users = responses;
-        }
+    getSalemans() {
+        this._systemRepo.getListSystemUser({})
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.users = res;
+                    }
+                },
+            );
     }
 
     onSelectSaleMan(saleMan: any) {
         this.saleman.setValue(saleMan.id);
         this.selectedDataSaleMan = saleMan;
+        console.log(this.selectedDataSaleMan);
     }
 
     onSelectOffice(office: any) {
@@ -171,8 +189,9 @@ export class SalemanPopupComponent extends PopupBase {
         this.selectedDataOffice = office;
     }
 
-    OnCreate() {
+    onCreate() {
         this.isSave = true;
+        this.setError(this.freightPayment);
         if (this.form.valid) {
             const saleMane: any = {
                 company: this.office.value,
@@ -180,12 +199,14 @@ export class SalemanPopupComponent extends PopupBase {
                 effectDate: !!this.effectiveDate.value && this.effectiveDate.value.startDate != null ? formatDate(this.effectiveDate.value.startDate !== undefined ? this.effectiveDate.value.startDate : this.effectiveDate.value, 'yyyy-MM-dd', 'en') : null,
                 status: this.status.value.value,
                 partnerId: null,
-                saleman_ID: this.saleman.value,
+                saleManId: this.saleman.value,
                 service: this.service.value.id,
-                createDate: new Date()
+                createDate: new Date(),
+                username: this.selectedDataSaleMan.username,
+                freightPayment: this.freightPayment.value.id
             };
             this.saleManToAdd = new Saleman(saleMane);
-            this.onCreate.emit(this.saleManToAdd);
+            this.onCreateToForm.emit(this.saleManToAdd);
         }
     }
 }

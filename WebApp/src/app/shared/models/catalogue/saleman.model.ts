@@ -1,6 +1,6 @@
 export class Saleman {
     id: string = '';
-    saleman_ID: any = '';
+    saleManId: any = '';
     office: any = '';
     company: string = '';
     service: string = '';
@@ -12,6 +12,8 @@ export class Saleman {
     statusString: string = '';
     userCreated: string = '';
     serviveName: string = '';
+    username: string = '';
+    freightPayment: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

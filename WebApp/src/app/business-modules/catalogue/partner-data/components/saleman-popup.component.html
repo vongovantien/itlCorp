@@ -86,6 +86,16 @@
                                     </span>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label>Payment Term</label>
+                                    <select [attr.disabled]="isDetail ? '' : null" name="term" class="form-control"
+                                        formControlName="freightPayment">
+                                        <option *ngFor="let term of termTypes" [ngValue]="term">{{term.text}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': isDup}">
                                 <div class="form-control-feedback" *ngIf="isDup">
                                     Sale Man with service is duplicate
@@ -104,7 +114,7 @@
                 </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="" *ngIf="!isDetail" (click)="ApplyToList()"
+                <button type="" *ngIf="!isDetail" (click)="applyToList()"
                     class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-save"></i>

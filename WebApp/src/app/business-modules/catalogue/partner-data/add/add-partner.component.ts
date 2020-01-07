@@ -130,18 +130,18 @@ export class AddPartnerDataComponent extends AppList {
                                 this.saleMandetail.push(this.salemanToAdd);
                                 console.log(this.saleMandetail[0]);
                                 /// get detail employee --- to be continue
-                                this.getEmployee(this.saleMandetail[0].saleman_ID);
+                                this.getEmployee(this.saleMandetail[0].saleManId);
                                 this.poupSaleman.hide();
                                 for (const it of this.saleMandetail) {
 
                                     this.services.forEach(item => {
                                         if (it.service === item.id) {
-                                            it.service = item.text;
+                                            it.serviceName = item.text;
                                         }
                                     });
                                 }
                                 this.saleMandetail.forEach(element => {
-                                    element.status = element.status.value;
+                                    element.status = element.status;
                                 });
 
                             }
@@ -161,6 +161,7 @@ export class AddPartnerDataComponent extends AppList {
     showPopupSaleman() {
         this.poupSaleman.isSave = false;
         this.poupSaleman.isDetail = false;
+        this.poupSaleman.form.reset();
         this.poupSaleman.show();
     }
 
@@ -323,7 +324,6 @@ export class AddPartnerDataComponent extends AppList {
         this.formPartnerComponent.partnerWorkPlace.setErrors(null);
         this.formPartnerComponent.partnerAccountRef.setErrors(null);
         if (this.formPartnerComponent.partnerForm.valid) {
-            this.partner.accountNo = this.partner.id;
             if (this.saleMandetail.length === 0) {
                 if (this.isShowSaleMan) {
                     this.toastr.error('Please add saleman and service for customer!');
@@ -354,7 +354,11 @@ export class AddPartnerDataComponent extends AppList {
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
-        this.partner.accountNo = formBody.internalReferenceNo + "." + formBody.taxCode;
+        // if (formBody.internalReferenceNo != null) {
+        //     this.partner.accountNo = formBody.internalReferenceNo + "." + formBody.taxCode;
+        // } else {
+        //     this.partner.accountNo = formBody.taxCode;
+        // }
         this.partner.partnerGroup = formBody.partnerGroup[0].id;
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
@@ -375,13 +379,17 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.addressShippingVn = formBody.shippingAddressVN;
         this.partner.addressShippingEn = formBody.shippingAddressEN;
         this.partner.shortName = formBody.shortName;
-        if (formBody.billingCountry.length > 0) {
-            this.partner.countryId = formBody.billingCountry[0].id;
+        if (formBody.billingCountry !== null) {
+            if (formBody.billingCountry.length > 0) {
+                this.partner.countryId = formBody.billingCountry[0].id;
+            }
         }
-        if (formBody.shippingCountry.length > 0) {
-            this.partner.countryShippingId = formBody.shippingCountry[0].id;
+        if (formBody.shippingCountry !== null) {
+            if (formBody.shippingCountry.length > 0) {
+                this.partner.countryShippingId = formBody.shippingCountry[0].id;
+            }
         }
-        this.partner.accountNo = formBody.partnerAccountNo;
+
         this.partner.tel = formBody.partnerContactNumber;
         this.partner.fax = formBody.partnerContactFaxNo;
         this.partner.taxCode = formBody.taxCode;
@@ -452,6 +460,7 @@ export class AddPartnerDataComponent extends AppList {
             this.saleMandetail = this._sortService.sort(this.saleMandetail, sortData.sortField, sortData.order);
         }
     }
+
     showDetailSaleMan(saleman: Saleman, index: any) {
         this.poupSaleman.index = index;
         this.poupSaleman.isDetail = true;
@@ -461,9 +470,10 @@ export class AddPartnerDataComponent extends AppList {
             effectDate: saleman.effectDate,
             status: saleman.status === true ? 'Active' : 'Inactive',
             partnerId: null,
-            saleman_ID: saleman.saleman_ID,
+            saleManId: saleman.saleManId,
             service: saleman.service,
-            createDate: saleman.createDate
+            createDate: saleman.createDate,
+            freightPayment: saleman.freightPayment
 
         };
         this.poupSaleman.showSaleman(saleMane);
