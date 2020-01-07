@@ -53,6 +53,7 @@ import {
 
 import { reducers, effects } from './store';
 import { ShareGoodsImportComponent } from './components/goods-import/goods-import.component';
+import { ValidatorModule } from 'src/app/shared/validators/validator.module';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -119,6 +120,7 @@ const customCurrencyMaskConfig = {
         DirectiveModule,
         PipeModule,
         SelectModule,
+        ValidatorModule,
         PaginationModule.forRoot(),
         BsDropdownModule.forRoot(),
         TooltipModule.forRoot(),

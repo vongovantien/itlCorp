@@ -14,12 +14,11 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { forkJoin, Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, take, filter, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { catchError, takeUntil, finalize } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
-import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 
 @Component({
     selector: 'buying-charge',
@@ -264,6 +263,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.isFromShipment = true;
         newSurCharge.hblno = this.hbl.hwbno || null;
         newSurCharge.mblno = this.shipment.mawb || null;
+        newSurCharge.jobNo = this.shipment.jobNo || null;
+
 
         this.addSurcharges(type, newSurCharge);
     }

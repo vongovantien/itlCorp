@@ -7,8 +7,6 @@ import { RepositoryModule } from "./repositories/repository.module";
 import { CommonComponentModule } from "./common/common.module";
 import { DirectiveModule } from "./directives/directive.module";
 import { PipeModule } from "./pipes/pipe.module";
-import { FormValidators } from "./validators";
-
 
 const APP_MODULES = [
   DirectiveModule,
@@ -29,7 +27,7 @@ const APP_MODULES = [
     ...APP_MODULES
   ],
   providers: [
-    FormValidators
+
   ]
 })
 export class SharedModule { }
