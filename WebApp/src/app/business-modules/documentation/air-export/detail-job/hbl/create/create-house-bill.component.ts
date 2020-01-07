@@ -20,6 +20,7 @@ import { AirExportHBLAttachListComponent } from '../components/attach-list/attac
 import { ShareBusinessImportHouseBillDetailComponent } from '@share-bussiness';
 import { getDimensionVolumesState, getDetailHBlState } from './../../../../../share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 @Component({
     selector: 'app-create-hbl-air-export',
     templateUrl: './create-house-bill.component.html',
@@ -54,9 +55,22 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
+                    this.generateHblNo(CommonEnum.TransactionTypeEnum.AirExport);
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                 }
             });
+    }
+
+    generateHblNo(transactionType: number){
+        this._documentationRepo.generateHBLNo(transactionType)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: any) => {
+                    this.formCreateHBLComponent.hwbno.setValue(res.hblNo);
+                }
+            );
     }
 
     getDataForm() {
