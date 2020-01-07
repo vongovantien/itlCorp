@@ -46,6 +46,8 @@ export class ShareBusinessFormManifestComponent extends AppList {
     jobId: string = '';
     isAir: boolean = false;
     isImport: boolean = false;
+    defaultMarksOfNationality: string = '';
+    defaultVoyNo: string = '';
 
     constructor(
         private _fb: FormBuilder,
@@ -112,7 +114,7 @@ export class ShareBusinessFormManifestComponent extends AppList {
                         this.pod.setValue(this.shipmentDetail.pod);
                     }
                     if (this.marksOfNationality.value === null) {
-                        this.marksOfNationality.setValue('VN');
+                        this.marksOfNationality.setValue(this.defaultMarksOfNationality);
                     }
                     if (this.freightCharge.value === null) {
                         if (this.shipmentDetail.paymentTerm !== null) {
@@ -120,7 +122,7 @@ export class ShareBusinessFormManifestComponent extends AppList {
                         }
                     }
                     if (this.vesselNo.value === null) {
-                        this.vesselNo.setValue(this.shipmentDetail.voyNo);
+                        this.vesselNo.setValue(this.defaultVoyNo);
                     }
                     if (!this.isImport) {
                         this.date.setValue({ startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) });

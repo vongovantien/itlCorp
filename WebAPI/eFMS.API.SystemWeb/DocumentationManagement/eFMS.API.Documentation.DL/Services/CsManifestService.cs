@@ -50,13 +50,13 @@ namespace eFMS.API.Documentation.DL.Services
                 var manifest = mapper.Map<CsManifest>(model);
                 manifest.CreatedDate = DateTime.Now;
                 var hs = new HandleState();
+                manifest.RefNo = GetManifestNo(model.JobId);
                 if (DataContext.Any(x => x.JobId == model.JobId))
                 {
                     hs = DataContext.Update(manifest, x => x.JobId == model.JobId);
                 }
                 else
                 {
-                    manifest.RefNo = GetManifestNo(model.JobId);
                     hs = DataContext.Add(manifest);
                 }
                 if (hs.Success)
@@ -97,14 +97,14 @@ namespace eFMS.API.Documentation.DL.Services
             int length = shipment.JobNo.Length - 1;
             switch (shipment.TransactionType)
             {
-                case "SIF":
-                    manifestNo = "MSI" + shipment.JobNo.Substring(3, length);
+                case "SFI":
+                    manifestNo = "MSI" + shipment.JobNo.Substring(3);
                     break;
-                case "SEF":
-                    manifestNo = "MSE" + shipment.JobNo.Substring(3, length);
+                case "SFE":
+                    manifestNo = "MSE" + shipment.JobNo.Substring(3);
                     break;
                 case "AE":
-                    manifestNo = "MAE" + shipment.JobNo.Substring(2, length - 1);
+                    manifestNo = "MAE" + shipment.JobNo.Substring(2);
                     break;
             }
             return manifestNo;
