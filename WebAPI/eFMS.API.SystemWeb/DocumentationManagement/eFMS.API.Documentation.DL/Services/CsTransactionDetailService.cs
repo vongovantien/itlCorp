@@ -197,6 +197,35 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
         }
+
+        public string GenerateHBLNo(TransactionTypeEnum transactionTypeEnum)
+        {
+            string hblNo = string.Empty;
+            var transactionType = DataTypeEx.GetType(transactionTypeEnum);
+            if (transactionType == TermData.AirImport || transactionType == TermData.AirExport)
+            {
+                var shipments = Get(x => x.Hwbno.Contains(Constants.CODE_ITL))
+                    .ToArray().OrderByDescending(o => o.Hwbno)
+                    .OrderByDescending(o => o.DatetimeCreated).Select(s => s.Hwbno);
+                int count = 0;
+                if (shipments != null && shipments.Count() > 0)
+                {
+                    foreach(var shipment in shipments)
+                    {
+                        string hblNoFirst = shipment;
+                        hblNoFirst = hblNoFirst.Substring(Constants.CODE_ITL.Length, hblNoFirst.Length - Constants.CODE_ITL.Length);
+                        Int32.TryParse(hblNoFirst, out count);
+                        if(count > 0)
+                        {
+                            break;
+                        }
+                    }
+                }
+                hblNo = GenerateID.GenerateHBLNo(count);
+            }                       
+            return hblNo;
+        }
+
         #endregion -- INSERT & UPDATE HOUSEBILLS --
 
         public List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria)
@@ -712,7 +741,8 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
 
         }
-
+        
+        #region --- PREVIEW ---
         public Crystal Preview(CsTransactionDetailModel model)
         {
             if (model == null)
@@ -1309,5 +1339,6 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             return result;
         }
+        #endregion --- PREVIEW ---
     }
 }
