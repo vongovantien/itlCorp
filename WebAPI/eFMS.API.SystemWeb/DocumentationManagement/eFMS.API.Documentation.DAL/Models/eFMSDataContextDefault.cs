@@ -100,7 +100,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
             {
@@ -2738,6 +2738,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.PackageContainer).HasMaxLength(1600);
 
+                entity.Property(e => e.ParentId).HasColumnName("ParentID");
+
                 entity.Property(e => e.PickupPlace).HasMaxLength(500);
 
                 entity.Property(e => e.PlaceFreightPay).HasMaxLength(4000);
@@ -2850,12 +2852,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Wtpp)
                     .HasColumnName("WTPP")
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Job)
-                    .WithMany(p => p.CsTransactionDetail)
-                    .HasForeignKey(d => d.JobId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>

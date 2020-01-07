@@ -7,6 +7,7 @@ namespace eFMS.API.Documentation.Service.Models
     {
         public Guid Id { get; set; }
         public Guid JobId { get; set; }
+        public Guid? ParentId { get; set; }
         public string Mawb { get; set; }
         public string Hwbno { get; set; }
         public string Hbltype { get; set; }
@@ -136,7 +137,5 @@ namespace eFMS.API.Documentation.Service.Models
         public string AttachList { get; set; }
         public string Route { get; set; }
         public string PoinvoiceNo { get; set; }
-
-        public virtual CsTransaction Job { get; set; }
     }
 }
