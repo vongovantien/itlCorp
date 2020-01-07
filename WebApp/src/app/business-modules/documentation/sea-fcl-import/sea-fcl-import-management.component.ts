@@ -145,6 +145,7 @@ export class SeaFCLImportManagementComponent extends AppList {
     }
 
     onResetMasterBills($event: any) {
+        this.page = 1;
         $event.transactionType = this.transactionService;
         $event.fromDate = this._fromDate;
         $event.toDate = this._toDate;

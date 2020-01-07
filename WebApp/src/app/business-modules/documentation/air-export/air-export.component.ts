@@ -129,6 +129,7 @@ export class AirExportComponent extends AppList {
   }
 
   onResetShipment($event: any) {
+    this.page = 1;
     $event.transactionType = this.transactionService;
     $event.fromDate = this._fromDate;
     $event.toDate = this._toDate;
