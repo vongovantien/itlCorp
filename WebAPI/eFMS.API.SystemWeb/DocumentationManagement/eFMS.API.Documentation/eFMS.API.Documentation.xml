@@ -142,6 +142,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsDimensionDetailController.GetDIMFromHouseBillsByJob(System.Guid)">
+            <summary>
+            get dimension from all house bills by a job
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsManifestController">
             <summary>
             
