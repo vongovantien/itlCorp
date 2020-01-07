@@ -204,8 +204,6 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
                     this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
                     break;
                 case 'SELL':
-                    this.sellingChargeComponent.isShowSyncFreightCharge = false;
-
                     this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
                     break;
                 case 'OBH':

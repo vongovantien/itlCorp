@@ -51,7 +51,7 @@ export class HouseBill extends BaseModel {
     goodsDeliveryDescription: string = null;
     goodsDeliveryId: string = null;
     grossWeight: number = null;
-    gw: number = null;
+    gw: number = null; // Can be deleted.
     hbltype: string = null;
     hwbno: string = null;
     inWord: string = null;

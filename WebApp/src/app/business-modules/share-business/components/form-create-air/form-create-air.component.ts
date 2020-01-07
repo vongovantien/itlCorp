@@ -232,7 +232,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
-                Validators.maxLength(11),
+                Validators.maxLength(15),
                 Validators.minLength(11),
             ])],
             flightVesselName: [],

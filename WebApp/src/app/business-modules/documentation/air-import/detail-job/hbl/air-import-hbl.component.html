@@ -162,12 +162,12 @@
                                     <tabset class="custom-class-tab">
                                         <tab heading="Buying" (selectTab)="onSelectTabSurcharge('BUY')">
                                             <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
-                                                <buying-charge></buying-charge>
+                                                <buying-charge service="air"></buying-charge>
                                             </ng-container>
                                         </tab>
                                         <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
                                             <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
-                                                <selling-charge></selling-charge>
+                                                <selling-charge [showSyncFreight]="false"></selling-charge>
                                             </ng-container>
 
                                         </tab>

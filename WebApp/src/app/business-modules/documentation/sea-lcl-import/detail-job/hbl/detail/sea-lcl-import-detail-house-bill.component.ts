@@ -188,21 +188,15 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                     this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
-                        console.log(this.hblDetail);
-                        // this.hblGoodsSummaryComponent.containerDetail = this.hblDetail.packageContainer;
-                        // this.hblGoodsSummaryComponent.commodities = this.hblDetail.commodity;
-                        // this.hblGoodsSummaryComponent.description = this.hblDetail.desOfGoods;
-                        // this.hblGoodsSummaryComponent.grossWeight = this.hblDetail.grossWeight;
-                        // this.hblGoodsSummaryComponent.netWeight = this.hblDetail.netWeight;
                         this.formHouseBill.updateDataToForm(this.hblDetail);
+
+                        // * Dispatch to save containers.
+                        this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
+
+                        // * Get container to update model
+                        this.getListContainer();
+
                     }
-
-                    // * Dispatch to save containers.
-                    this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
-
-                    // * Get container to update model
-                    this.getListContainer();
-
                 },
             );
     }

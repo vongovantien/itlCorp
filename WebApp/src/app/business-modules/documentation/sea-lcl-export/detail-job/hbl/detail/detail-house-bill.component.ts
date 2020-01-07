@@ -84,13 +84,12 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
                 (res: CsTransactionDetail) => {
                     if (!!res) {
                         this.hblDetail = res;
+                        // * Dispatch to save containers.
+                        this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
+
+                        // * Get container to update model
+                        this.getListContainer();
                     }
-
-                    // * Dispatch to save containers.
-                    this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
-
-                    // * Get container to update model
-                    this.getListContainer();
                 },
             );
     }
@@ -103,6 +102,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
             .subscribe(
                 (containers: any) => {
                     this.containers = containers || [];
+                    console.log("list container", this.containers);
                 }
             );
     }

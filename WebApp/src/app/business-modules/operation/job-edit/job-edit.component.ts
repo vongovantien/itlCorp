@@ -468,7 +468,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                     this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.opsTransaction.hblid }));
                 }
                 if (type === 'SELL') {
-                    this.sellingChargeComponent.isShowSyncFreightCharge = false;
                     this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.opsTransaction.hblid }));
                 }
                 if (type === 'OBH') {
