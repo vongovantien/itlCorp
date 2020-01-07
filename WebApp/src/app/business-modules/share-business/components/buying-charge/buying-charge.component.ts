@@ -1,11 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, CsTransactionDetail, HouseBill, CsTransaction } from 'src/app/shared/models';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction } from 'src/app/shared/models';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
@@ -29,6 +29,7 @@ import * as fromRoot from 'src/app/store';
 export class ShareBussinessBuyingChargeComponent extends AppList {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @Input() service: string = 'sea';
 
     serviceTypeId: string;
     containers: Container[] = [];
@@ -212,6 +213,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (hbl: any) => {
                     this.hbl = hbl;
+                    console.log("detail hbl", hbl);
                 }
             );
     }
@@ -407,26 +409,45 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     onChangeQuantityHint(hintType: string, chargeItem: CsShipmentSurcharge) {
         switch (hintType) {
             case CommonEnum.QUANTITY_TYPE.GW:
-                chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW);
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
+                    chargeItem.quantity = this.hbl.grossWeight || 0;
+                } else {
+                    chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW);
+                }
                 break;
             case CommonEnum.QUANTITY_TYPE.NW:
-                chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
+                    chargeItem.quantity = this.hbl.netWeight || 0;
+                } else {
+                    chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
+                }
                 break;
             case CommonEnum.QUANTITY_TYPE.CBM:
-                chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
+                    chargeItem.quantity = this.hbl.cbm || 0;
+                } else {
+                    chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
+                }
                 break;
             case CommonEnum.QUANTITY_TYPE.CONT:
                 chargeItem.quantity = this.calculateContainer(this.containers, 'quantity');
                 break;
             case CommonEnum.QUANTITY_TYPE.CW:
-                chargeItem.quantity = this.calculateContainer(this.containers, 'chargeAbleWeight');
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
+                    chargeItem.quantity = this.hbl.chargeWeight || 0;
+                } else {
+                    chargeItem.quantity = this.calculateContainer(this.containers, 'chargeAbleWeight');
+                }
                 break;
             case CommonEnum.QUANTITY_TYPE.PACKAGE:
-                chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
+                    chargeItem.quantity = this.hbl.packageQty || 0;
+                } else {
+                    chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
+                }
                 break;
             default:
                 break;
-
         }
 
         // * Update quantityType, total.

@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-8">
                 <div class="m--align-right" *ngIf="!(isLocked | async)">
-                    <ng-container *ngIf="isShowSyncFreightCharge && !!charges && !charges.length">
+                    <ng-container *ngIf="showSyncFreight && !!charges && !charges.length">
                         <button type="button"
                             class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
                             (click)="syncFreightCharge()">
