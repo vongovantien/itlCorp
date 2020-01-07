@@ -153,6 +153,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
+            { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
             { title: 'KB', field: 'kickBack', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
             { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
@@ -161,7 +162,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
             { title: 'Voucher IDRE', field: 'voucherIdre', sortable: true },
             { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
-            { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
         ];
     }
 
