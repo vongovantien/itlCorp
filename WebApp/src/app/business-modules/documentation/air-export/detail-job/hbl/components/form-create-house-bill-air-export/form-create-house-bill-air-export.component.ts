@@ -408,7 +408,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     createDIMItem(): FormGroup {
         return this._fb.group(new DIM({
-            mblId: [this.jobId],
             height: [null, Validators.min(0)],
             width: [null, Validators.min(0)],
             length: [null, Validators.min(0)],

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -23,7 +23,8 @@ import * as fromStore from './../../store';
 
 export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingChargeComponent {
 
-    isShowSyncFreightCharge: boolean = true;
+    @Input() showSyncFreight: boolean = true;
+
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,

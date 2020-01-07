@@ -1,5 +1,4 @@
-
-
+import { environment } from "src/environments/environment";
 
 export const language = {
   /**
@@ -135,6 +134,7 @@ export const language = {
       icon: "icon-format_paint",
       route_parent: "/home/designs-zone/",
       display_child: false,
+      "display": !environment.production,
       childs: [
         { name: "Form", route_child: "form", display: true },
         { name: "Table", route_child: "table", display: true }

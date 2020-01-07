@@ -194,14 +194,13 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                         this.formHouseBill.getListSaleman();
                         this.formHouseBill.updateDataToForm(this.hblDetail);
+
+                        // * Dispatch to save containers.
+                        this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
+
+                        // * Get container to update model
+                        this.getListContainer();
                     }
-
-                    // * Dispatch to save containers.
-                    this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
-
-                    // * Get container to update model
-                    this.getListContainer();
-
                 },
             );
     }

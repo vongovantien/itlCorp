@@ -1,5 +1,6 @@
 import { WAREHOUSEENCOLUMNSETTING } from "../app/business-modules/catalogue/warehouse/warehouse.columns";
 import { WAREHOUSEIMPORTENCOLUMNSETTING } from "src/app/business-modules/catalogue/warehouse/warehouse-import/warehouse-import.columns";
+import { environment } from "src/environments/environment";
 
 export const language = {
     /**
@@ -43,7 +44,7 @@ export const language = {
         },
 
         {
-            "parent_name": "Operation",
+            "parent_name": "Logistics",
             "icon": "icon-cogs",
             "route_parent": "/home/operation/",
             "display_child": false,
@@ -56,7 +57,7 @@ export const language = {
         },
 
         {
-            "parent_name": "Documentation",
+            "parent_name": "Services",
             "icon": "icon-file-text2",
             "route_parent": "/home/documentation/",
             "display_child": false,
@@ -138,6 +139,7 @@ export const language = {
             "icon": "icon-format_paint",
             "route_parent": "/home/designs-zone/",
             "display_child": false,
+            "display": !environment.production,
             "childs": [
                 { name: "Form", route_child: "form", display: true },
                 { name: "Table", route_child: "table", display: true }

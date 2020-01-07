@@ -74,7 +74,7 @@ export class CsTransaction {
     netweight: number = null;
 
     dimensionDetails: DIM[] = [];
-
+    issuedBy: string = null;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
