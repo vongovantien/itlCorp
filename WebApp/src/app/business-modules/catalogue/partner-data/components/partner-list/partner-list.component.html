@@ -34,7 +34,7 @@
                         <td>{{partner.tel}}</td>
                         <td>{{partner.fax}}</td>
                         <td>{{partner.userCreatedName}}</td>
-                        <td>{{partner.datetimeModified}}</td>
+                        <td>{{partner.datetimeModified | date:'dd/MM/yyyy' }}</td>
                         <td [ngClass]="partner.active ? 'text-success' : 'text-danger'">
                             {{partner.active ? 'Active' : 'Inactive'}}</td>
                     </tr>
