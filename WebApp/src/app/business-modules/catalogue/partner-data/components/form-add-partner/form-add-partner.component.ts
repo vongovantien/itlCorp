@@ -219,7 +219,8 @@ export class FormAddPartnerComponent extends AppForm {
             partnerSwiftCode: [null],
             partnerWorkPlace: [null],
             active: [true],
-            note: [null]
+            note: [null],
+            coLoaderCode: [null]
         });
 
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
@@ -321,7 +322,8 @@ export class FormAddPartnerComponent extends AppForm {
             partnerWorkPlace: workPlaceActive,
             active: partner.active === null ? false : partner.active,
             // public: partner.public === null ? false : partner.public,
-            note: partner.note
+            note: partner.note,
+            coLoaderCode: partner.coLoaderCode
         });
     }
     getPartnerGroupActives(arg0: string[]): any {

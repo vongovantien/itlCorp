@@ -209,7 +209,14 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            model.AccountNo = model.TaxCode + "." + model.InternalReferenceNo;
+            if (!String.IsNullOrEmpty(model.InternalReferenceNo))
+            {
+                model.AccountNo = model.TaxCode + "." + model.InternalReferenceNo;
+            }
+            else
+            {
+                model.AccountNo = model.TaxCode;
+            }
             var checkExistMessage = CheckExist(id, model);
             if (checkExistMessage.Length > 0)
             {

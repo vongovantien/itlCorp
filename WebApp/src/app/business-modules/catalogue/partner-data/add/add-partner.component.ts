@@ -419,6 +419,7 @@ export class AddPartnerDataComponent extends AppList {
             this.partner.workPlaceId = formBody.partnerWorkPlace.length > 0 ? formBody.partnerWorkPlace[0].id : null;
         }
         this.partner.internalReferenceNo = formBody.internalReferenceNo;
+        this.partner.coLoaderCode = formBody.coLoaderCode;
     }
 
     onCreatePartner() {
