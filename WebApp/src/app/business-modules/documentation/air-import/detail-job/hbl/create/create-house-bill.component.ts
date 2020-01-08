@@ -19,6 +19,7 @@ import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent,
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { forkJoin } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 @Component({
     selector: 'app-create-hbl-air-import',
     templateUrl: './create-house-bill.component.html',
@@ -54,6 +55,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
+                    this.generateHblNo(CommonEnum.TransactionTypeEnum.AirImport);
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     this.getDetailShipment();
                 }
@@ -63,6 +65,18 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     ngAfterViewInit() {
         // this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
         this._cd.detectChanges();
+    }
+
+    generateHblNo(transactionType: number){
+        this._documentationRepo.generateHBLNo(transactionType)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: any) => {
+                    this.formCreateHBLComponent.hwbno.setValue(res.hblNo);
+                }
+            );
     }
 
     getDetailShipment() {

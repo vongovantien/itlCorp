@@ -19,6 +19,7 @@ import { cloneDeep } from 'lodash';
 import * as fromShareBussiness from './../../../../../../share-business/store';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
+import { FormValidators } from 'src/app/shared/validators';
 @Component({
     selector: 'air-import-hbl-form-create',
     templateUrl: './form-create-house-bill-air-import.component.html',
@@ -304,7 +305,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             chargeWeight: [],
 
             // * Select
-            hbltype: [null, Validators.required],
+            hbltype: [],
             freightPayment: [],
             currencyId: [],
             originBlnumber: [],
@@ -319,7 +320,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             flightDateOrigin: [],
             eta: [],
 
-        });
+        },
+            { validator: FormValidators.compareGW_CW }
+        );
 
         this.mawb = this.formCreate.controls["mawb"];
         this.hwbno = this.formCreate.controls["hwbno"];

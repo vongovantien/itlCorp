@@ -48,6 +48,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string DigitSymbol { get; set; }
         public decimal DecimalNo { get; set; }
         public decimal CurrDecimalNo { get; set; }
+        public string FlexID { get; set; }
     }
 
     public class AirShipperDebitNewReportParams

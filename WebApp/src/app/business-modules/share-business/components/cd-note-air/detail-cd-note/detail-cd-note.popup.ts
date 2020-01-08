@@ -1,7 +1,7 @@
 import { Component, ViewChild, Output, EventEmitter, ElementRef } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
 import { DocumentationRepo } from "src/app/shared/repositories";
-import { ShareBussinessCdNoteAddPopupComponent } from "../add-cd-note/add-cd-note.popup";
+import { ShareBussinessCdNoteAddAirPopupComponent } from "../add-cd-note/add-cd-note.popup";
 import { catchError, finalize } from "rxjs/operators";
 import { SortService } from "src/app/shared/services";
 import { ToastrService } from "ngx-toastr";
@@ -14,13 +14,13 @@ import { TransactionTypeEnum } from "src/app/shared/enums";
 import { environment } from 'src/environments/environment';
 
 @Component({
-    selector: 'cd-note-detail-popup',
+    selector: 'cd-note-detail-air-popup',
     templateUrl: './detail-cd-note.popup.html'
 })
-export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
+export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(ShareBussinessCdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: ShareBussinessCdNoteAddPopupComponent;
+    @ViewChild(ShareBussinessCdNoteAddAirPopupComponent, { static: false }) cdNoteEditPopupComponent: ShareBussinessCdNoteAddAirPopupComponent;
     @ViewChild('formPreviewCdNote', { static: false }) formPreviewCdNote: ElementRef;
     @ViewChild("popupReport", { static: false }) popupReport: ModalDirective;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
@@ -62,14 +62,14 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             address: 'Address',
             tel: 'Tel',
             taxCode: 'Taxcode',
-            hbl: 'House Bill of Lading',
+            hbl: 'HAWB/ HBL',
             jobId: 'JOB ID',
-            mbl: 'Master Bill of Lading',
-            pol: 'Port of loading',
-            pod: 'Port of destination',
-            etd: 'Estimated Time of Departure',
-            eta: 'Estimated Time of Arrival',
-            vessel: 'Vessel',
+            mbl: 'MAWB/ MBL No',
+            pol: 'A.O.L',
+            pod: 'P.O.L',
+            etd: 'ETD',
+            eta: 'ETA',
+            vessel: 'Flight',
             volume: 'Volume',
             packageQty: 'Package Quantity',
             soa: 'SOA',
@@ -77,7 +77,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         };
 
         this.headers = [
-            { title: 'HBL No', field: 'hwbno', sortable: true },
+            { title: 'HAWB No', field: 'hwbno', sortable: true },
             { title: 'Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'nameEn', sortable: true },
             { title: 'Quantity', field: 'quantity', sortable: true },
@@ -189,6 +189,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         this.cdNoteEditPopupComponent.selectedNoteType = this.CdNoteDetail.cdNote.type;
         this.cdNoteEditPopupComponent.CDNote = this.CdNoteDetail.cdNote;
         this.cdNoteEditPopupComponent.currentMBLId = this.CdNoteDetail.jobId;
+        this.cdNoteEditPopupComponent.flexId.setValue(this.CdNoteDetail.cdNote.flexId);
         this.cdNoteEditPopupComponent.setHeader();
         this.cdNoteEditPopupComponent.getListCharges(this.CdNoteDetail.jobId, this.CdNoteDetail.partnerId, this.isHouseBillID, this.CdNoteDetail.cdNote.code);
         this.cdNoteEditPopupComponent.show();
