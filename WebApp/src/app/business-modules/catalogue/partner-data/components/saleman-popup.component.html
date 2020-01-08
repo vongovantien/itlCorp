@@ -16,7 +16,8 @@
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger':  isSave &&  !saleman.value }">
                                 <label>Sale Man <span class="m--font-danger">(*)</span></label>
-                                <app-combo-grid-virtual-scroll [selectedDisplayFields]="['username']"
+                                <app-combo-grid-virtual-scroll [disabled]="isDetail ? true : false"
+                                    [selectedDisplayFields]="['username']"
                                     [currentActiveItemId]="{ field: 'id', value: saleman.value}"
                                     (itemSelected)="onSelectSaleMan($event)" [dataSources]="users"
                                     [displayFields]="[{'field':'username','label':'Username'},{'field':'employeeNameEn','label':'Name EN'}]">

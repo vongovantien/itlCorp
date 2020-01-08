@@ -27,6 +27,7 @@ using StackExchange.Redis;
 using ITL.NetCore.Connection.Caching;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Catalogue.DL.Common;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -150,6 +151,9 @@ namespace eFMS.API.Catalogue.Infrastructure
                 options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
                 options.ApiName = configuration["Authentication:ApiName"];
                 options.ApiSecret = configuration["Authentication:ApiSecret"];
+            });
+            services.Configure<WebUrl>(option => {
+                option.Url = configuration.GetSection("WebUrl").Value;
             });
             return services;
         }

@@ -17,10 +17,12 @@ using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using eFMS.API.Common;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -32,6 +34,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatSaleman> salemanRepository;
         private readonly ICatPlaceService placeService;
         private readonly ICatCountryService countryService;
+        private readonly IOptions<WebUrl> webUrl;
 
         public CatPartnerService(IContextBase<CatPartner> repository, 
             ICacheServiceBase<CatPartner> cacheService, 
@@ -41,7 +44,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysUser> sysUserRepo,
             ICatPlaceService place,
             ICatCountryService country,
-            IContextBase<CatSaleman> salemanRepo) : base(repository, cacheService, mapper)
+            IContextBase<CatSaleman> salemanRepo, IOptions<WebUrl> url) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -49,6 +52,7 @@ namespace eFMS.API.Catalogue.DL.Services
             salemanRepository = salemanRepo;
             sysUserRepository = sysUserRepo;
             countryService = country;
+            webUrl = url;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -101,6 +105,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 salemanRepository.SubmitChanges();
                 ClearCache();
                 Get();
+                SendMail.Send("Confirm Add Partner", webUrl.Value.Url.ToString() + "/en/#/home/catalogue/partner-data/detail/" + entity.Id, "samuel.an@logtechub.com", null, null);
             }
             return hs;
         }
