@@ -22,6 +22,10 @@ export enum CatalogueActionTypes {
     GET_UNIT_SUCCESS = '[Catalogue] Get Unit Success',
     GET_UNIT_FAIL = '[Catalogue] Get Unit Fail',
 
+    GET_CURRENCY = '[Catalogue] Get Currency',
+    GET_CURRENCY_SUCCESS = '[Catalogue] Get Currency Success',
+    GET_CURRENCY_FAIL = '[Catalogue] Get Currency Fail',
+
     GET_COMMODITY = '[Catalogue] Get Commodity',
     GET_COMMODITY_SUCCESS = '[Catalogue] Get Commodity Success',
     GET_COMMODITY_FAIL = '[Catalogue] Get Commodity Fail',
@@ -91,7 +95,7 @@ export class GetCatalogueAgentFailAction implements Action {
 //#region Unit
 export class GetCatalogueUnitAction implements Action {
     readonly type = CatalogueActionTypes.GET_UNIT;
-    constructor(public payload: any) { }
+    constructor(public payload: any = { active: true }) { }
 }
 export class GetCatalogueUnitSuccessAction implements Action {
     readonly type = CatalogueActionTypes.GET_UNIT_SUCCESS;
@@ -148,6 +152,20 @@ export class GetCatalogueCountryFailAction implements Action {
 }
 //#endregion
 
+//#region Currency
+export class GetCatalogueCurrencyAction implements Action {
+    readonly type = CatalogueActionTypes.GET_CURRENCY;
+    constructor(public payload: any = { active: true }) { }
+}
+export class GetCatalogueCurrencySuccessAction implements Action {
+    readonly type = CatalogueActionTypes.GET_CURRENCY_SUCCESS;
+    constructor(public payload: any) { }
+}
+export class GetCatalogueCurrencyFailAction implements Action {
+    readonly type = CatalogueActionTypes.GET_CURRENCY_FAIL;
+    constructor(public payload: any) { }
+}
+//#endregion
 export type CatalogueActions = GetCataloguePartnerAction
     | GetCataloguePortAction
     | GetCataloguePortSuccessAction
@@ -170,4 +188,7 @@ export type CatalogueActions = GetCataloguePartnerAction
     | GetCatalogueCountryAction
     | GetCatalogueCountrySuccessAction
     | GetCatalogueCountryFailAction
+    | GetCatalogueCurrencyAction
+    | GetCatalogueCurrencySuccessAction
+    | GetCatalogueCurrencyFailAction
     ;
