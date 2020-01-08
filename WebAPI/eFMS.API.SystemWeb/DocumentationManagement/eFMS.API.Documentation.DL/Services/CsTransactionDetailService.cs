@@ -204,22 +204,28 @@ namespace eFMS.API.Documentation.DL.Services
             var transactionType = DataTypeEx.GetType(transactionTypeEnum);
             if (transactionType == TermData.AirImport || transactionType == TermData.AirExport)
             {
-                var shipments = Get(x => x.Hwbno.Contains(Constants.CODE_ITL))
-                    .ToArray().OrderByDescending(o => o.Hwbno)
-                    .OrderByDescending(o => o.DatetimeCreated).Select(s => s.Hwbno);
+                var hblNos = Get(x => x.Hwbno.Contains(Constants.CODE_ITL)).ToArray()
+                    .OrderByDescending(o => o.DatetimeCreated)
+                    .ThenByDescending(o => o.Hwbno)
+                    .Select(s => s.Hwbno);
                 int count = 0;
-                if (shipments != null && shipments.Count() > 0)
+                if (hblNos != null && hblNos.Count() > 0)
                 {
-                    foreach(var shipment in shipments)
+                    foreach(var hbl in hblNos)
                     {
-                        string hblNoFirst = shipment;
-                        hblNoFirst = hblNoFirst.Substring(Constants.CODE_ITL.Length, hblNoFirst.Length - Constants.CODE_ITL.Length);
-                        Int32.TryParse(hblNoFirst, out count);
+                        string _hbl = hbl;
+                        _hbl = _hbl.Substring(Constants.CODE_ITL.Length, _hbl.Length - Constants.CODE_ITL.Length);
+                        Int32.TryParse(_hbl, out count);
                         if(count > 0)
                         {
                             break;
                         }
                     }
+                }
+                //Reset về 0
+                if(count == 9999)
+                {
+                    count = 0;
                 }
                 hblNo = GenerateID.GenerateHBLNo(count);
             }                       

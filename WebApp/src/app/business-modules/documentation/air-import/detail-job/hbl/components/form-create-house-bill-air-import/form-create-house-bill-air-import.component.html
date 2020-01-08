@@ -84,9 +84,8 @@
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':isSubmitted && !hbltype.value}">
-                                <label required>HAWB Type</label>
+                            <div class="form-group">
+                                <label>HAWB Type</label>
                                 <ng-select #hawbType [items]="billTypes" placeholder="Please select" [allowClear]="true"
                                     (opened)="closeOtherSelects(hawbType)" formControlName="hbltype"
                                     (selected)="onSelectDataFormInfo($event,'hawb-type')">
@@ -263,9 +262,14 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
+                            <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && (formCreate.errors | equalError:'invalidGW') }">
                                 <label>G.W</label>
                                 <input type="number" class="form-control" formControlName="grossWeight">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && (formCreate.errors | equalError:'invalidGW')">
+                                    GW must be less than or equal CW
+                                </div>
                             </div>
                         </div>
                     </div>

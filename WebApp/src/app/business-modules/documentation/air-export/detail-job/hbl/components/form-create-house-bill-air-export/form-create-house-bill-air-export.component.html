@@ -390,7 +390,7 @@
                                 <input type="number" class="form-control" formControlName="grossWeight">
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && (formCreate.errors | equalError:'invalidGW')">
-                                    GW must be less than CW
+                                    GW must be less than or equal CW
                                 </div>
                             </div>
                         </div>
