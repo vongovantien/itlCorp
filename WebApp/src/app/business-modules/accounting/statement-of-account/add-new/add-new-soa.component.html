@@ -59,7 +59,7 @@
             </div>
             <perfect-scrollbar style="max-height: 900px">
                 <div class="table-wrapper" [ngClass]="listCharges.length > 20 ? 'table-30-row' : ''">
-                    <table class="table table-striped table-brand dataTable">
+                    <table class="table table-brand dataTable table-bordered">
                         <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
                             <th class="first">
                                 <label class="m-checkbox">
@@ -113,6 +113,9 @@
                                 </td>
                                 <td>
                                     <span>{{charge.invoiceNo}}</span>
+                                </td>
+                                <td [ngClass]="charge.cdNote ? '' : 'bg-red'">
+                                    <span>{{charge.cdNote}}</span>
                                 </td>
                                 <td>
                                     <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') : ''}}</span>
