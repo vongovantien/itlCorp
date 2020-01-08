@@ -3,7 +3,7 @@ export class Saleman {
     saleManId: any = '';
     office: any = '';
     company: string = '';
-    service: string = '';
+    service: any = '';
     partnerId: string = '';
     createDate: string = '';
     status?: boolean = false;
@@ -11,9 +11,9 @@ export class Saleman {
     effectDate: any = '';
     statusString: string = '';
     userCreated: string = '';
-    serviveName: string = '';
+    serviceName: string = '';
     username: string = '';
-    freightPayment: string = '';
+    freightPayment: any = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

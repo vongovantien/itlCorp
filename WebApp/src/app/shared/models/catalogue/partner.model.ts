@@ -79,6 +79,6 @@ export class SaleManRequest {
     effectDate: any = '';
     description: string = '';
     status: boolean = false;
-    createDate: string = '';
+    createDate: any = '';
     userModified: string = '';
 }

@@ -20,6 +20,7 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public DateTime? ModifiedDate { get; set; }
         public string UserModified { get; set; }
         public string Username { get; set; }
+        public string FreightPayment { get; set; }
 
     }
 }

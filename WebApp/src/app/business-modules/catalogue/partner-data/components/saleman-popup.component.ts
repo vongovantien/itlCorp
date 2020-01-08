@@ -69,10 +69,10 @@ export class SalemanPopupComponent extends PopupBase {
         this.form = this._fb.group({
             saleman: [null, Validators.required],
             office: [null, Validators.required],
-            status: [this.statuss[1]],
+            status: [false],
             effectiveDate: [],
             description: [],
-            service: [this.services[0]],
+            service: [this.services[0], Validators.required],
             freightPayment: [this.termTypes[0]]
 
         });
@@ -88,17 +88,15 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     showSaleman(sm: Saleman) {
-        this.form.reset();
         this.form.setValue({
             office: sm.office,
             effectiveDate: !!sm.effectDate ? { startDate: new Date(sm.effectDate), endDate: new Date(sm.effectDate) } : null,
-            service: this.services.filter(i => i.id === sm.service)[0],
-            status: this.statuss.filter(i => i.title === sm.status)[0],
+            service: [<CommonInterface.INg2Select>{ id: sm.service, text: sm.serviceName }],
+            status: sm.status,
             saleman: sm.saleManId,
             description: sm.description,
-            freightPayment: this.termTypes.filter(i => i.id === sm.freightPayment)
+            freightPayment: [<CommonInterface.INg2Select>{ id: sm.freightPayment, text: sm.freightPayment }]
         });
-        this.saleman.setValue(sm.saleManId);
     }
 
     onDeleteSaleman() {
@@ -108,11 +106,14 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     resetForm() {
-        this.strSalemanCurrent = {};
-        this.strOfficeCurrent = {};
-        this.saleManToAdd = new Saleman();
-        this.saleManToAdd.saleManId = {};
-        this.saleManToAdd.office = {};
+        this.saleman.setValue(null);
+        this.office.setValue(null);
+        this.freightPayment.setValue([<CommonInterface.INg2Select>{ id: "All", text: "All" }]);
+        this.service.setValue(null);
+        this.effectiveDate.setValue(null);
+        this.description.setValue(null);
+        this.status.setValue(false);
+
     }
     closePoup() {
         this.isDetail = false;
@@ -135,7 +136,7 @@ export class SalemanPopupComponent extends PopupBase {
                 (res: any) => {
                     if (!!res) {
                         this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
-                        this.service.setValue(this.services.filter(i => i.value === res.value)[1]);
+                        // this.service.setValue(this.services.filter(i => i.value === res.value)[1]);
                     }
                 },
             );
@@ -193,19 +194,21 @@ export class SalemanPopupComponent extends PopupBase {
         this.isSave = true;
         this.setError(this.freightPayment);
         if (this.form.valid) {
-            const saleMane: any = {
+            const salemans: any = {
                 company: this.office.value,
                 office: this.office.value,
-                effectDate: !!this.effectiveDate.value && this.effectiveDate.value.startDate != null ? formatDate(this.effectiveDate.value.startDate !== undefined ? this.effectiveDate.value.startDate : this.effectiveDate.value, 'yyyy-MM-dd', 'en') : null,
-                status: this.status.value.value,
+                effectDate: !!this.effectiveDate.value && this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate !== undefined ? this.effectiveDate.value.startDate : this.effectiveDate.value, 'yyyy-MM-dd', 'en') : null,
+                status: this.status.value,
                 partnerId: null,
                 saleManId: this.saleman.value,
-                service: this.service.value.id,
+                service: this.service.value[0].id,
                 createDate: new Date(),
                 username: this.selectedDataSaleMan.username,
-                freightPayment: this.freightPayment.value.id
+                freightPayment: this.freightPayment.value[0].id,
+                description: this.description.value,
+                serviceName: this.service.value[0].text,
             };
-            this.saleManToAdd = new Saleman(saleMane);
+            this.saleManToAdd = new Saleman(salemans);
             this.onCreateToForm.emit(this.saleManToAdd);
         }
     }

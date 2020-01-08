@@ -56,6 +56,9 @@
                                         <td>
                                             <span>{{sale.company}}</span>
                                         </td>
+                                        <td>
+                                            <span>{{sale.username}}</span>
+                                        </td>
                                         <td [ngClass]="sale.status ? 'text-success' : 'text-danger'">
                                             {{sale.status ? 'Active' : 'Inactive'}}</td>
                                         <td>

@@ -17,5 +17,9 @@ namespace eFMS.API.Catalogue.Models
         public DateTime? EffectDate { get; set; }
         public string Description { get; set; }
         public string UserCreated { get; set; }
+        public string FreightPayment { get; set; }
+        public string ServiceName { get; set; }
+        public DateTime? CreateDate { get; set; }
+
     }
 }

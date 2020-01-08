@@ -3,7 +3,7 @@ export class SalemanAdd {
     saleManId: string = '';
     office: string = '';
     company: string = '';
-    service: string = '';
+    service: any = '';
     partnerId: string = '';
     createDate: string = '';
     status?: boolean = false;

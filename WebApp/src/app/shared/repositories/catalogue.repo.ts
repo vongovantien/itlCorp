@@ -424,20 +424,30 @@ export class CatalogueRepo {
         );
     }
 
-    getListSaleManDetail(page?: number, size?: number, body: any = {}) {
-        if (!!page && !!size) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/paging`, body, {
-                page: '' + page,
-                size: '' + size
-            }).pipe(
-                catchError((error) => throwError(error)),
-                map((data: any) => data)
-            );
-        } else {
-            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
-                map((data: any) => data)
-            );
-        }
+    // getListSaleManDetail(page?: number, size?: number, body: any = {}) {
+    //     if (!!page && !!size) {
+    //         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/paging`, body, {
+    //             page: '' + page,
+    //             size: '' + size
+    //         }).pipe(
+    //             catchError((error) => throwError(error)),
+    //             map((data: any) => data)
+    //         );
+    //     } else {
+    //         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
+    //             map((data: any) => data)
+    //         );
+    //     }
+    // }
+
+
+    getListSaleManDetail(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/Query`, body).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+
     }
 
     getStage(body?: any) {

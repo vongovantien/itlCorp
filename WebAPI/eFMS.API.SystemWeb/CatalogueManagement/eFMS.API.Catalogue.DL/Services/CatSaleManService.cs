@@ -39,11 +39,25 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatSaleManModel> GetBy(string partnerId)
         {
-            List<CatSaleManModel> results = null;
+            //List<CatSaleManModel> results = null;
             //var data = DataContext.Get(x => x.JobNo == jobNo);
             var data = GetSaleMan().Where(x => x.PartnerId.Trim() == partnerId);
-            if (data.Count() == 0) return results;
-            results = mapper.Map<List<CatSaleManModel>>(data);
+            var sysUser = sysUserRepository.Get();
+            var query = from sale in data
+                        join user in sysUser on sale.SaleManId equals user.Id
+                        select new { sale, user };
+
+
+            List<CatSaleManModel> results = new List<CatSaleManModel>();
+            if (data.Count() == 0) return null;
+
+            foreach (var item in query)
+            {
+
+                var saleman = mapper.Map<CatSaleManModel>(item.sale);
+                saleman.Username = item.user.Username;
+                results.Add(saleman);
+            }
             return results;
         }
 
