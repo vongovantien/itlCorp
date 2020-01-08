@@ -47,7 +47,11 @@ import {
     ShareBussinessFormCreateSeaExportComponent,
     ShareBusinessFormCreateHouseBillExportComponent,
     ShareBusinessFormCreateAirComponent,
-    ShareBusinessDIMVolumePopupComponent
+    ShareBusinessDIMVolumePopupComponent,
+    ShareBussinessCdNoteListAirComponent,
+    ShareBussinessCdNoteAddAirPopupComponent,
+    ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
+    ShareBussinessCdNoteDetailAirPopupComponent,
 } from './components';
 
 
@@ -90,7 +94,11 @@ const COMPONENTS = [
     ShareBussinessFormCreateSeaExportComponent,
     ShareBusinessFormCreateHouseBillExportComponent,
     ShareBusinessFormCreateAirComponent,
-    ShareBusinessDIMVolumePopupComponent
+    ShareBusinessDIMVolumePopupComponent,
+    ShareBussinessCdNoteListAirComponent,
+    ShareBussinessCdNoteAddAirPopupComponent,
+    ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
+    ShareBussinessCdNoteDetailAirPopupComponent,
 ];
 
 

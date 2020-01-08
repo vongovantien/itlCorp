@@ -51,5 +51,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string HbConsignees { get; set; }
         public DateTime? VesselDate { get; set; }
         public decimal? HbChargeWeight { get; set; }
+        public string FlexId { get; set; }
     }
 }
