@@ -31,6 +31,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     typeOfService: AbstractControl;
     personalIncharge: AbstractControl;
     term: AbstractControl;
+    serviceDate: AbstractControl;
 
     coloader: AbstractControl; // Supplier/Vendor(Coloader).
     pol: AbstractControl;
@@ -118,6 +119,8 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                                 jobID: res.jobNo,
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
                                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
+                                serviceDate: !!res.serviceDate ? { startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) } : null,
+
 
                                 mbltype: !!res.mbltype ? [this.ladingTypes.find(type => type.id === res.mbltype)] : null,
                                 typeOfService: !!res.typeOfService ? [{ id: res.typeOfService, text: res.typeOfService }] : null,
@@ -151,23 +154,28 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     initForm() {
         this.formGroup = this._fb.group({
             jobID: [{ value: null, disabled: true }], // * disabled
+
             etd: [null, Validators.required], // * Date
             eta: [], // * Date
+            serviceDate: [],
+
             mawb: [null, Validators.required],
-            mbltype: [], // * select
-            shipmentType: [], // * select
-            flightVesselName: [],
             voyNo: [],
-            typeOfService: [], // * select
-            personalIncharge: [],  // * select
+            flightVesselName: [],
+            pono: [],
             notes: [],
             term: [],
             bookingNo: [],
+
             coloader: [],
             pol: [null, Validators.required],
             pod: [],
             agent: [],
-            pono: []
+
+            mbltype: [], // * select
+            shipmentType: [], // * select
+            typeOfService: [], // * select
+            personalIncharge: [],  // * select
         });
 
         this.etd = this.formGroup.controls["etd"];
@@ -178,6 +186,8 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.typeOfService = this.formGroup.controls["typeOfService"];
         this.term = this.formGroup.controls["term"];
         this.personalIncharge = this.formGroup.controls["personalIncharge"];
+        this.serviceDate = this.formGroup.controls["serviceDate"];
+
 
         this.coloader = this.formGroup.controls["coloader"];
         this.pol = this.formGroup.controls["pol"];
@@ -190,10 +200,19 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
-                this.minDateETA = value.startDate; // * Update min date
+                if (!!value.startDate) {
+                    this.minDateETA = value.startDate; // * Update min date
 
-                this.isSubmitted = false;
-                this.resetFormControl(this.formGroup.controls["eta"]);
+                    this.isSubmitted = false;
+                    this.resetFormControl(this.formGroup.controls["eta"]);
+                    // * serviceDate hadn't value
+
+                    if (!this.formGroup.controls["serviceDate"].value || !this.formGroup.controls["serviceDate"].value.startDate) {
+                        this.formGroup.controls["serviceDate"].setValue(value);
+                    }
+                } else {
+                    this.formGroup.controls["serviceDate"].setValue(null);
+                }
             });
     }
 
