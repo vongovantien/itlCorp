@@ -62,15 +62,14 @@ export class SeaLCLExportComponent extends AppList {
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'MBL No.', field: 'mawb', sortable: true },
             { title: 'ETD', field: 'etd', sortable: true },
-            { title: 'ETA', field: 'eta', sortable: true },
             { title: 'Shipping Line', field: 'supplierName', sortable: true },
             { title: 'Agent', field: 'agentName', sortable: true },
             { title: 'POL', field: 'polName', sortable: true },
             { title: 'POD', field: 'podName', sortable: true },
             { title: 'Total Pkgs', field: 'packageQty', sortable: true },
+            { title: 'G.W', field: 'grossWeight', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
             { title: 'Creator', field: 'userCreated', sortable: true },
-            { title: 'Created Date', field: 'datetimeCreated', sortable: true },
             { title: 'Modified Date', field: 'datetimeModified', sortable: true },
         ];
         this.headersHBL = [
@@ -79,8 +78,8 @@ export class SeaLCLExportComponent extends AppList {
             { title: 'Salesman', field: 'saleManName', sortable: true },
             { title: 'Notify Party', field: 'notifyParty', sortable: true },
             { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
-            { title: 'Containers', field: 'containers', sortable: true },
             { title: 'Packages', field: 'packages', sortable: true },
+            { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
 
