@@ -15,9 +15,9 @@
             </div>
             <div class="modal-body">
                 <div class="m-form m-form--state">
-                    <div class="div-inside bg-secondary m--margin-bottom-15">
+                    <form class="div-inside bg-secondary m--margin-bottom-15" [formGroup]="formCreate">
                         <div class="row">
-                            <div class="col-lg-9">
+                            <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
                                         Subject to Partner
@@ -31,6 +31,14 @@
                                     </app-combo-grid-virtual-scroll>
 
                                 </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                <label class="form-control-label">
+                                    Flex ID:
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" formControlName="flexId">
+                            </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group m-form__group">
@@ -61,7 +69,7 @@
                             </div>
 
                         </div>
-                    </div>
+                    </form>
 
                     <div class="m-form m-form--label-align-right">
                         <div class="row align-items-center">
@@ -124,7 +132,7 @@
                                                     <input type="checkbox" (change)="onChangeCheckBoxGrpCharge(charges)"
                                                         value="{{charges}}" [(ngModel)]="charges.isSelected"
                                                         name="{{charges.hwbno}}">
-                                                        HBL No: {{charges.hwbno}}
+                                                        HAWB No: {{charges.hwbno}}
                                                     <span></span>
                                                 </label>
                                             </td>
@@ -243,7 +251,7 @@
     [title]="'Alert'">
 </info-popup>
 
-<add-remaining-charge-popup (onAddCharge)="onAddMoreCharge($event)"></add-remaining-charge-popup>
+<add-remaining-charge-air-popup (onAddCharge)="onAddMoreCharge($event)"></add-remaining-charge-air-popup>
 
 <confirm-popup #confirmCloseAddPopup (onSubmit)="onSubmitConfirmCloseAdd()" [title]="'Alert'"
     (onCancel)="onCancelConfirmCloseAdd()"
