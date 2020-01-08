@@ -90,5 +90,35 @@ namespace eFMS.API.Common.Helpers
                 Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\" + folderName));
             }
         }
+        public static void CreateDirectoryFile(string folderName, string objectId)
+        {
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\")))
+            {
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\"));
+            }
+
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName)))
+            {
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName));
+            }
+
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName + "\\files\\")))
+            {
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName + "\\files\\"));
+            }
+            if(!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName + "\\files\\" + objectId)))
+            {
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName + "\\files\\" + objectId));
+            }
+        }
+        public static async Task SaveFile(string fileName, string folderName, string objectId, IFormFile file)
+        {
+            var physicPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName + "\\files\\" + objectId + "\\", fileName); // lưu vào folder
+
+            using (var bits = new FileStream(physicPath, FileMode.Create))
+            {
+                await file.CopyToAsync(bits);
+            }
+        }
     }
 }

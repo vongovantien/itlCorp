@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -10,6 +11,7 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -165,6 +167,13 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpPut("UploadMultiFiles/{jobId}")]
+        public IActionResult UploadMultiFiles([FromBody]List<IFormFile> files, [Required]Guid jobId)
+        {
+            string folderName = Request.Headers["Module"];
+            return Ok();
         }
         #endregion -- INSERT & UPDATE
 
