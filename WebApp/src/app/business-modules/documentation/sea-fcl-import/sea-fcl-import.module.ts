@@ -10,7 +10,6 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { SeaFCLImportManagementComponent } from './sea-fcl-import-management.component';
 import { SeaFCLImportCreateJobComponent } from './create-job/create-job-fcl-import.component';
 import { SeaFCLImportDetailJobComponent } from './detail-job/detail-job-fcl-import.component';
-import { SeaFCLImportManagementFormSearchComponent } from './components/form-search/form-search-fcl-import.component';
 import { SeaFCLImportLazyLoadModule } from './sea-fcl-import-lazy-load.module';
 import { SeaFclImportManifestComponent } from './detail-job/manifest/sea-fcl-import-manifest.component';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
@@ -41,9 +40,6 @@ const routing: Routes = [
 
 ];
 
-const COMPONENTS = [
-    SeaFCLImportManagementFormSearchComponent,
-];
 
 const LIB = [
     CollapseModule.forRoot(),
@@ -57,7 +53,6 @@ const LIB = [
 
 @NgModule({
     declarations: [
-        ...COMPONENTS,
         SeaFCLImportManagementComponent,
         SeaFCLImportCreateJobComponent,
         SeaFCLImportDetailJobComponent,
