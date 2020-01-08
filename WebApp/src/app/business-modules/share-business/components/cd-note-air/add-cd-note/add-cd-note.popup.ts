@@ -3,24 +3,27 @@ import { Component, ViewChild, EventEmitter, Output } from "@angular/core";
 import { DocumentationRepo } from "src/app/shared/repositories";
 import { catchError, map } from "rxjs/operators";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
-import { ShareBussinessCdNoteAddRemainingChargePopupComponent } from "../add-remaining-charge/add-remaining-charge.popup";
+import { ShareBussinessCdNoteAddRemainingChargeAirPopupComponent } from "../add-remaining-charge/add-remaining-charge.popup";
 import { SortService } from "src/app/shared/services";
 import { ChargeCdNote } from "src/app/shared/models/document/chargeCdNote.model";
 import { ToastrService } from "ngx-toastr";
 import { AcctCDNote } from "src/app/shared/models/document/acctCDNote.model";
 import { TransactionTypeEnum } from "src/app/shared/enums/transaction-type.enum";
+import { AbstractControl, FormGroup, FormBuilder } from "@angular/forms";
 @Component({
-    selector: 'cd-note-add-popup',
+    selector: 'cd-note-add-air-popup',
     templateUrl: './add-cd-note.popup.html'
 })
-export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
+export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild('changePartnerPopup', { static: false }) changePartnerPopup: ConfirmPopupComponent;
     @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
-    @ViewChild(ShareBussinessCdNoteAddRemainingChargePopupComponent, { static: false }) addRemainChargePopup: ShareBussinessCdNoteAddRemainingChargePopupComponent;
+    @ViewChild(ShareBussinessCdNoteAddRemainingChargeAirPopupComponent, { static: false }) addRemainChargePopup: ShareBussinessCdNoteAddRemainingChargeAirPopupComponent;
     @ViewChild('confirmCloseAddPopup', { static: false }) confirmCloseAddPopup: ConfirmPopupComponent;
 
+    formCreate: FormGroup;
+    
     headers: CommonInterface.IHeaderTable[];
 
     noteTypes = [
@@ -46,6 +49,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     partnerCurrent: any = {};
     isHouseBillID: boolean = false;
 
+    flexId: AbstractControl;
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -64,6 +68,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
+        private _fb: FormBuilder,
     ) {
         super();
         this.selectedNoteType = "DEBIT";
@@ -71,11 +76,15 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+        this.formCreate = this._fb.group({
+            flexId: []
+        });
+        this.flexId = this.formCreate.controls["flexId"];
     }
 
     setHeader() {
         this.headers = [
-            { title: 'HBL No', field: 'hwbno', sortable: true },
+            { title: 'HAWB No', field: 'hwbno', sortable: true },
             { title: 'Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'nameEn', sortable: true },
             { title: 'Quantity', field: 'quantity', sortable: true },
@@ -99,6 +108,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.initGroup = [];
         this.isChangeCharge = false;
         this.isCheckAllCharge = false;
+        this.formCreate.reset();
     }
 
     getListSubjectPartner(mblId: any) {
@@ -236,7 +246,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     saveCDNote() {
         //Lấy danh sách group charge chưa delete
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner)
-
+        console.log(this.flexId.value);
         //Không được phép create khi chưa có charge
         if (this.listChargePartner.length === 0) {
             this.notExistsChargePopup.show();
@@ -245,6 +255,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
             this.CDNote.currencyId = "VND" // in the future , this id must be local currency of each country
+            this.CDNote.flexId = this.flexId.value;
             this.CDNote.transactionTypeEnum = this.transactionType;
             var arrayCharges = [];
             for (const charges of this.listChargePartner) {

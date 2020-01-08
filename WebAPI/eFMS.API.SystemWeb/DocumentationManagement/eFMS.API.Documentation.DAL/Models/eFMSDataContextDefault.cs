@@ -100,7 +100,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
             {
@@ -381,6 +381,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.ExportedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FlexId).HasColumnName("FlexID");
 
                 entity.Property(e => e.FreightPrice).HasColumnType("decimal(18, 4)");
 
@@ -1496,7 +1498,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SaleManId)
-                    .HasColumnName("SaleMan_ID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -2787,8 +2788,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("SCI")
                     .HasMaxLength(250);
 
-                entity.Property(e => e.SeaAir).HasMaxLength(250);
-
                 entity.Property(e => e.ServiceType).HasMaxLength(160);
 
                 entity.Property(e => e.ShipperDescription).HasMaxLength(500);
@@ -3757,6 +3756,11 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
                 entity.Property(e => e.Folder).HasMaxLength(50);
+
+                entity.Property(e => e.ObjectId)
+                    .HasColumnName("ObjectID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 

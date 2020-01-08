@@ -5,10 +5,10 @@ import { SortService } from "src/app/shared/services";
 import { TransactionTypeEnum } from "@enums";
 
 @Component({
-    selector: 'add-remaining-charge-popup',
+    selector: 'add-remaining-charge-air-popup',
     templateUrl: './add-remaining-charge.popup.html'
 })
-export class ShareBussinessCdNoteAddRemainingChargePopupComponent extends PopupBase {
+export class ShareBussinessCdNoteAddRemainingChargeAirPopupComponent extends PopupBase {
     @Output() onAddCharge: EventEmitter<any> = new EventEmitter<any>();
 
     headers: CommonInterface.IHeaderTable[];
@@ -28,7 +28,7 @@ export class ShareBussinessCdNoteAddRemainingChargePopupComponent extends PopupB
 
     setHeader() {
         this.headers = [
-            { title: 'HBL No', field: 'hwbno', sortable: true },
+            { title: 'HAWB No', field: 'hwbno', sortable: true },
             { title: 'Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'nameEn', sortable: true },
             { title: 'Quantity', field: 'quantity', sortable: true },

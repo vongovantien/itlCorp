@@ -589,6 +589,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.HbShippers = hbShippers; //Shipper
             soaDetails.HbConsignees = hbConsignees; //Consignee
             soaDetails.HbChargeWeight = hbCw;
+            soaDetails.FlexId = cdNote.FlexId;
             return soaDetails;
         }
 
@@ -1113,7 +1114,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.DigitSymbol = ",";
                     charge.DecimalNo = 0; //NOT USE
                     charge.CurrDecimalNo = 0; //NOT USE
-
+                    charge.FlexID = data.FlexId;
                     listCharge.Add(charge);
                 }
             }
