@@ -63,7 +63,7 @@ export class GetCataloguePortFailAction implements Action {
 export class GetCatalogueCarrierAction implements Action {
     readonly type = CatalogueActionTypes.GET_CARRIER;
 
-    constructor(public payload: any) { }
+    constructor(public payload: any = CommonEnum.PartnerGroupEnum.CARRIER) { }
 }
 
 export class GetCatalogueCarrierSuccessAction implements Action {
@@ -80,7 +80,7 @@ export class GetCatalogueCarrierFailAction implements Action {
 //#region Agent
 export class GetCatalogueAgentAction implements Action {
     readonly type = CatalogueActionTypes.GET_AGENT;
-    constructor(public payload: any = CommonEnum.PartnerGroupEnum.CONSIGNEE) { }
+    constructor(public payload: any = { type: CommonEnum.PartnerGroupEnum.AGENT, active: true }) { }
 }
 export class GetCatalogueAgentSuccessAction implements Action {
     readonly type = CatalogueActionTypes.GET_AGENT_SUCCESS;

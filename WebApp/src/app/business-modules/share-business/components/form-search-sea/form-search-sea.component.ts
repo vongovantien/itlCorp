@@ -1,5 +1,5 @@
 import { AppForm } from "src/app/app.form";
-import { Component, Output, EventEmitter, Input, HostListener } from "@angular/core";
+import { Component, Output, EventEmitter, Input } from "@angular/core";
 import { formatDate } from "@angular/common";
 import { CommonEnum } from "src/app/shared/enums/common.enum";
 import { CatalogueRepo, SystemRepo } from "src/app/shared/repositories";
@@ -8,8 +8,6 @@ import { Observable } from "rxjs";
 import { Customer } from "src/app/shared/models/catalogue/customer.model";
 import { User } from "src/app/shared/models";
 import { TransactionTypeEnum } from "@enums";
-import { Store } from "@ngrx/store";
-import { IAppState, GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueAgentState, getCatalogueCarrierState } from "@store";
 
 @Component({
     selector: 'form-search-sea',
@@ -57,25 +55,18 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private _store: Store<IAppState>,
         private _systemRepo: SystemRepo) {
         super();
 
         this.requestReset = this.resetSearch;
     }
 
-
-
     ngOnInit(): void {
         this.initFormSearch();
 
-        this._store.dispatch(new GetCatalogueAgentAction(CommonEnum.PartnerGroupEnum.AGENT));
-        this._store.dispatch(new GetCatalogueCarrierAction(CommonEnum.PartnerGroupEnum.CARRIER));
-
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
-
-        this.agents = this._store.select(getCatalogueAgentState);
-        this.suppliers = this._store.select(getCatalogueCarrierState);
+        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
+        this.suppliers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
 
         this.salemans = this._systemRepo.getSystemUsers({ active: true });
         this.creators = this._systemRepo.getSystemUsers({ active: true });

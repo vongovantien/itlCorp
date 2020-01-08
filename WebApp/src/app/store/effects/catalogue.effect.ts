@@ -9,6 +9,7 @@ import {
 } from '../actions';
 import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, getCatalogueUnitState, getCatalogueCommodityState, getCatalogueCustomerState, getCatalogueCountryState, getCatalogueCurrencyState } from '../reducers';
 import { Commodity, Unit, Customer, PortIndex, CountryModel, Currency } from '@models';
+import { CommonEnum } from '@enums';
 
 @Injectable()
 export class CatalogueEffect {
@@ -72,7 +73,7 @@ export class CatalogueEffect {
                 if (!!data && data.data && data.data.length) {
                     return of(new GetCatalogueAgentSuccessAction(data.data));
                 }
-                return this._catalogueRepo.getPartnersByType(data.action.payload).pipe(
+                return this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, data.action.payload.active).pipe(
                     map((response: Customer[]) => new GetCatalogueAgentSuccessAction(response)),
                     catchError(err => of(new GetCatalogueAgentFailAction(err)))
                 );

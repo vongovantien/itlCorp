@@ -6,7 +6,7 @@ namespace eFMS.API.Catalogue.Service.Models
     public partial class CatSaleman
     {
         public Guid Id { get; set; }
-        public string SaleMan_ID { get; set; }
+        public string SaleManId { get; set; }
         public string Office { get; set; }
         public string Company { get; set; }
         public string Service { get; set; }
@@ -18,5 +18,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UserModified { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string UserCreated { get; set; }
+        public string FreightPayment { get; set; }
     }
 }

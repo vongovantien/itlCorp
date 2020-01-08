@@ -86,7 +86,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     ngOnInit() {
         this.initForm();
 
-        this._store.dispatch(new GetCatalogueAgentAction(CommonEnum.PartnerGroupEnum.AGENT));
+        this._store.dispatch(new GetCatalogueAgentAction());
         this._store.dispatch(new GetCatalogueCarrierAction(CommonEnum.PartnerGroupEnum.CARRIER));
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
 
