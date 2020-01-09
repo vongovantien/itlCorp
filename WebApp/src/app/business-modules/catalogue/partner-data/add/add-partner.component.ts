@@ -85,17 +85,20 @@ export class AddPartnerDataComponent extends AppList {
     initHeaderSalemanTable() {
         this.headerSaleman = [
             { title: '', field: '', sortable: false },
-            { title: 'Saleman', field: 'saleman_ID', sortable: true },
-            { title: 'Service', field: 'service', sortable: true },
+            { title: 'Saleman', field: 'username', sortable: true },
+            { title: 'Service', field: 'serviceName', sortable: true },
             { title: 'Office', field: 'office', sortable: true },
             { title: 'Company', field: 'company', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'CreatedDate', field: 'createDate', sortable: true }
         ];
     }
+
     closepp(param: SalemanAdd) {
         this.salemanToAdd = param;
+        this.poupSaleman.hide();
         this.poupSaleman.isDetail = false;
+
         if (this.saleMandetail.length > 0) {
             for (const it of this.saleMandetail) {
                 this.services.forEach(item => {
@@ -117,7 +120,6 @@ export class AddPartnerDataComponent extends AppList {
             }
         }
 
-
         if (this.salemanToAdd.service !== null && this.salemanToAdd.office !== null) {
             this._catalogueRepo.checkExistedSaleman(this.salemanToAdd.service[0].id, this.salemanToAdd.office)
                 .pipe(catchError(this.catchError))
@@ -129,18 +131,18 @@ export class AddPartnerDataComponent extends AppList {
                                 this.toastr.error('Duplicate service, office with sale man!');
                             } else {
                                 this.saleMandetail.push(this.salemanToAdd);
+                                console.log(this.saleMandetail);
+
                                 /// get detail employee --- to be continue
                                 this.getEmployee(this.saleMandetail[0].saleManId);
-                                this.poupSaleman.hide();
-                                for (const it of this.saleMandetail) {
 
+                                for (const it of this.saleMandetail) {
                                     this.services.forEach(item => {
                                         if (it.service === item.id) {
                                             it.serviceName = item.text;
                                         }
                                     });
                                 }
-
                             }
                         }
 
@@ -465,19 +467,17 @@ export class AddPartnerDataComponent extends AppList {
 
     showDetailSaleMan(saleman: Saleman, id: any) {
         this.poupSaleman.isDetail = true;
-        const obj = this.saleMandetail.find(x => x.id === id);
         const saleMane: any = {
-            description: obj.description,
-            office: obj.office,
-            effectDate: obj.effectDate,
-            status: obj.status,
+            description: saleman.description,
+            office: saleman.office,
+            effectDate: saleman.effectDate,
+            status: saleman.status,
             partnerId: null,
-            saleManId: obj.saleManId,
-            service: obj.service,
-            createDate: obj.createDate,
-            freightPayment: obj.freightPayment,
-            serviceName: obj.serviceName
-
+            saleManId: saleman.saleManId,
+            service: saleman.service,
+            createDate: saleman.createDate,
+            freightPayment: saleman.freightPayment,
+            serviceName: saleman.serviceName
         };
         this.poupSaleman.showSaleman(saleMane);
         this.poupSaleman.show();

@@ -498,21 +498,21 @@ export class PartnerDetailComponent extends AppList {
             this.saleMandetail = this._sortService.sort(this.saleMandetail, sortData.sortField, sortData.order);
         }
     }
+
     showDetailSaleMan(saleman: Saleman, id: any) {
         this.poupSaleman.isDetail = true;
 
-        const obj = this.saleMandetail.find(x => x.id === id);
+        //const obj = this.saleMandetail.find(x => x.id === id);
         const saleMane: any = {
-            description: obj.description,
-            office: obj.office,
-            effectDate: obj.effectDate,
-            status: obj.status,
+            description: saleman.description,
+            office: saleman.office,
+            effectDate: saleman.effectDate,
+            status: saleman.status,
             partnerId: null,
-            saleManId: obj.saleManId,
-            service: obj.service,
-            createDate: obj.createDate,
-            freightPayment: obj.freightPayment,
-            serviceName: obj.serviceName
+            saleManId: saleman.saleManId,
+            service: saleman.service,
+            freightPayment: saleman.freightPayment,
+            serviceName: saleman.serviceName
         };
         this.poupSaleman.showSaleman(saleMane);
         this.poupSaleman.show();

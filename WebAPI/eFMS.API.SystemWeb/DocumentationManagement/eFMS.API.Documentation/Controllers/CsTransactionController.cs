@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
@@ -10,8 +12,10 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -31,6 +35,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICsTransactionService csTransactionService;
         private readonly ICurrentUser currentUser;
         private readonly ICsShipmentSurchargeService surchargeService;
+        private readonly ISysImageService sysImageService;
 
         /// <summary>
         /// constructor
@@ -39,13 +44,17 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="service">inject ICsTransactionService</param>
         /// <param name="user">inject ICurrentUser</param>
         /// <param name="serviceSurcharge">inject ICsShipmentSurchargeService</param>
-        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, ICsTransactionService service, ICurrentUser user,
-            ICsShipmentSurchargeService serviceSurcharge)
+        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, 
+            ICsTransactionService service, 
+            ICurrentUser user,
+            ICsShipmentSurchargeService serviceSurcharge,
+            ISysImageService imageService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
             currentUser = user;
             surchargeService = serviceSurcharge;
+            sysImageService = imageService;
         }
 
         /// <summary>
@@ -164,6 +173,54 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpPost("UploadFile")]
+        public IActionResult UploadFile([FromForm]IFormFile file)
+        {
+            var s = JsonConvert.SerializeObject(file);
+            return Ok(s);
+        }
+
+        /// <summary>
+        /// attach multi files to shipment
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpPut("UploadMultiFiles/{jobId}")]
+        [Authorize]
+        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId)
+        {
+            string folderName = Request.Headers["Module"];
+            DocumentFileUploadModel model = new DocumentFileUploadModel
+            {
+                Files = files,
+                FolderName = folderName,
+                JobId = jobId
+            };
+            var result = await sysImageService.UploadDocumentationFiles(model);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get all attached files in a shipment
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet("GetFileAttachs")]
+        public IActionResult GetAttachedFiles([Required]Guid jobId)
+        {
+            string id = jobId.ToString();
+            var results = sysImageService.Get(x => x.ObjectId == id);
+            return Ok(results);
+        }
+
+        [HttpDelete("DeleteAttachedFile/{id}")]
+        public IActionResult DeleteAttachedFile([Required]Guid id)
+        {
+            var result = sysImageService.DeleteFile(id);
             return Ok(result);
         }
         #endregion -- INSERT & UPDATE
