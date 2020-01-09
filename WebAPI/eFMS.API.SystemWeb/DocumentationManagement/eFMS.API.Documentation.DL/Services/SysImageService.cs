@@ -62,12 +62,12 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var file in model.Files)
                 {
                     fileName = file.FileName;
-                    //await ImageHelper.SaveFile(fileName, model.FolderName, model.JobId.ToString(), file);
-                    var s = Path.Combine(path, "wwwroot", model.FolderName, "files", model.JobId.ToString(), fileName);
-                    using (var fileStream = new FileStream(s, FileMode.Create))
-                    {
-                        await file.CopyToAsync(fileStream);
-                    }
+                    await ImageHelper.SaveFile(fileName, model.FolderName, model.JobId.ToString(), file);
+                    //var s = Path.Combine(path, "wwwroot", model.FolderName, "files", model.JobId.ToString(), fileName);
+                    //using (var fileStream = new FileStream(s, FileMode.Create))
+                    //{
+                    //    await file.CopyToAsync(fileStream);
+                    //}
 
                     string urlFile = path + "/" + model.FolderName + "/files/" + model.JobId.ToString() + "/" + fileName;
                     var result = new { link = urlFile };
