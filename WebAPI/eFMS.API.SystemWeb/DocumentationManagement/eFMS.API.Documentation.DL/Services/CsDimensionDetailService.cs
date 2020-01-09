@@ -37,6 +37,9 @@ namespace eFMS.API.Documentation.DL.Services
                     var dimensions = Get(x => x.Hblid == item.Id);
                     foreach(var dimension in dimensions)
                     {
+                        dimension.Id = Guid.Empty;
+                        dimension.Hblid = null;
+                        dimension.Mblid = id;
                         results.Add(dimension);
                     }
                 }
