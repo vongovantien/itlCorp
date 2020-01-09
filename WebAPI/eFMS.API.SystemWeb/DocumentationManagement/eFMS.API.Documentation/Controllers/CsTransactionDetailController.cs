@@ -166,22 +166,25 @@ namespace eFMS.API.Documentation.Controllers
         private string CheckExist(CsTransactionDetailModel model)
         {
             string message = string.Empty;
-            var shipmentTransactionType = csTransactionService.Get(x => x.Id == model.JobId).FirstOrDefault()?.TransactionType;
-            //Chỉ check trùng HBLNo đối với các service khác hàng Air(Import & Export)
-            if (!string.IsNullOrEmpty(shipmentTransactionType) && shipmentTransactionType != TermData.AirImport && shipmentTransactionType != TermData.AirExport)
+            if (model.ParentId == null)
             {
-                if (model.Id == Guid.Empty)
+                var shipmentTransactionType = csTransactionService.Get(x => x.Id == model.JobId).FirstOrDefault()?.TransactionType;
+                //Chỉ check trùng HBLNo đối với các service khác hàng Air(Import & Export)
+                if (!string.IsNullOrEmpty(shipmentTransactionType) && shipmentTransactionType != TermData.AirImport && shipmentTransactionType != TermData.AirExport)
                 {
-                    if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
+                    if (model.Id == Guid.Empty)
                     {
-                        message = "Housebill of Lading No is existed !";
+                        if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
+                        {
+                            message = "Housebill of Lading No is existed !";
+                        }
                     }
-                }
-                else
-                {
-                    if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.Id != model.Id))
+                    else
                     {
-                        message = "Housebill of Lading No is existed !";
+                        if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.Id != model.Id))
+                        {
+                            message = "Housebill of Lading No is existed !";
+                        }
                     }
                 }
             }

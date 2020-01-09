@@ -507,10 +507,15 @@ namespace eFMS.API.Documentation.DL.Services
                           PackageType = detail.PackageType,
                           CW = detail.ChargeWeight,
                           DatetimeCreated = detail.DatetimeCreated,
-                          DatetimeModified = detail.DatetimeModified
+                          DatetimeModified = detail.DatetimeModified,
+                          ParentId = detail.ParentId
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            results = res.OrderByDescending(o => o.DatetimeModified).ToList();
+            if(res.Count() > 0)
+            {
+                results = res.Where(x=>x.ParentId == null).OrderByDescending(o => o.DatetimeModified).ToList();
+            }
+
             //results.ForEach(fe => {
             //    fe.Containers = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
             //                                                            .Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));

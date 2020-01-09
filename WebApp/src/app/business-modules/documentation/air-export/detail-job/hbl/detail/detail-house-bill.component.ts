@@ -12,6 +12,7 @@ import * as fromShareBussiness from '@share-bussiness';
 
 
 import { catchError, finalize } from 'rxjs/operators';
+import { SeparateHouseBillComponent } from '../components/form-separate-house-bill/form-separate-house-bill.component';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -22,7 +23,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     hblId: string;
 
-    hblDetail: CsTransactionDetail;
+    // hblDetail: CsTransactionDetail;
 
     dataReport: Crystal;
 
@@ -127,7 +128,9 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             );
     }
 
-    previewAttachList(){
+
+
+    previewAttachList() {
         this._documentationRepo.previewAirAttachList(this.hblId)
             .pipe(
                 catchError(this.catchError),
@@ -147,4 +150,9 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 },
             );
     }
+
+    gotoSeparate() {
+        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}/separate`]);
+    }
+
 }
