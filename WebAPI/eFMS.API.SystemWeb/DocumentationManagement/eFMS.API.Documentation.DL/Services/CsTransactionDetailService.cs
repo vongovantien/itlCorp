@@ -328,7 +328,39 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
-                var queryDetail = csTransactionDetailRepo.Get(x => x.Id == Id).FirstOrDefault();
+                var queryDetail = csTransactionDetailRepo.Get(x => x.Id == Id && x.ParentId == null ).FirstOrDefault();
+                var detail = mapper.Map<CsTransactionDetailModel>(queryDetail);
+                if (detail != null)
+                {
+                    var resultPartner = catPartnerRepo.Get(x => x.Id == detail.CustomerId).FirstOrDefault();
+                    var resultNoti = catPartnerRepo.Get(x => x.Id == detail.NotifyPartyId).FirstOrDefault();
+                    var resultSaleman = sysUserRepo.Get(x => x.Id == detail.SaleManId).FirstOrDefault();
+                    var pol = catPlaceRepo.Get(x => x.Id == detail.Pol).FirstOrDefault();
+                    var pod = catPlaceRepo.Get(x => x.Id == detail.Pod).FirstOrDefault();
+                    var shipment = csTransactionRepo.Get(x => x.Id == queryDetail.JobId).First();
+                    detail.CustomerName = resultPartner?.PartnerNameEn;
+                    detail.CustomerNameVn = resultPartner?.PartnerNameVn;
+                    detail.SaleManId = resultSaleman?.Id;
+                    detail.NotifyParty = resultNoti?.PartnerNameEn;
+                    detail.POLName = pol?.NameEn;
+                    detail.PODName = pod?.NameEn;
+                    detail.ShipmentEta = shipment.Eta;
+                    return detail;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+
+        }
+
+        public CsTransactionDetailModel GetSeparateByHblid(Guid hbId)
+        {
+            try
+            {
+                var queryDetail = csTransactionDetailRepo.Get(x => x.ParentId == hbId).FirstOrDefault();
                 var detail = mapper.Map<CsTransactionDetailModel>(queryDetail);
                 if (detail != null)
                 {

@@ -61,6 +61,20 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(hbl);
         }
 
+        [HttpGet]
+        [Route("GetSeparateByHblid")]
+        public IActionResult GetSeparateByHblid(Guid hbId)
+        {
+            CsMawbcontainerCriteria criteriaMaw = new CsMawbcontainerCriteria { Hblid = hbId };
+            var hbl = csTransactionDetailService.GetSeparateByHblid(hbId);
+            var resultMaw = containerService.Query(criteriaMaw).ToList();
+            if (resultMaw.Count() > 0)
+            {
+                hbl.CsMawbcontainers = resultMaw;
+            }
+            return Ok(hbl);
+        }
+
         //[HttpGet]
         //[Route("GetHbDetails")]
         //public CsTransactionDetailModel GetHbDetails(Guid JobId,Guid HbId)
