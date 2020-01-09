@@ -12,5 +12,6 @@ namespace eFMS.API.Documentation.DL.IService
     {
         HandleState UpdateMasterBill(List<CsDimensionDetailModel> dimensionDetails, Guid masterId);
         HandleState UpdateHouseBill(List<CsDimensionDetailModel> dimensionDetails, Guid housebillId);
+        List<CsDimensionDetailModel> GetDIMFromHouseByJob(Guid id);
     }
 }

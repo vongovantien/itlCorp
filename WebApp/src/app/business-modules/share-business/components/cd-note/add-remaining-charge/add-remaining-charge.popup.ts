@@ -18,7 +18,6 @@ export class ShareBussinessCdNoteAddRemainingChargePopupComponent extends PopupB
     partner: string = "";
     
     transactionType: TransactionTypeEnum = 0;
-    labelHblNo: string = 'HBL No';
     constructor(private _sortService: SortService) {
         super();
         this.requestSort = this.sortRemainingCharge;
@@ -28,13 +27,8 @@ export class ShareBussinessCdNoteAddRemainingChargePopupComponent extends PopupB
     }
 
     setHeader() {
-        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
-            this.labelHblNo = 'HAWB No';
-        } else {
-            this.labelHblNo = 'HBL No';
-        }
         this.headers = [
-            { title: this.labelHblNo, field: 'hwbno', sortable: true },
+            { title: 'HBL No', field: 'hwbno', sortable: true },
             { title: 'Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'nameEn', sortable: true },
             { title: 'Quantity', field: 'quantity', sortable: true },

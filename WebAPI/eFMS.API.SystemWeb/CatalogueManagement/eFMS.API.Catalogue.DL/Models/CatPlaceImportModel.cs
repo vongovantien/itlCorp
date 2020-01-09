@@ -29,5 +29,15 @@ namespace eFMS.API.Catalogue.DL.Models
         public DateTime? InActiveOn { get; set; }
         public bool IsValid { get; set; }
         public string Status { get; set; }
+        public string CountryNameError { get; set; }
+        public string CodeError { get; set; }
+        public string NameEnError { get; set; }
+        public string NameVnError { get; set; }
+        public string ProvinceNameError { get; set; }
+        public string DistrictNameError { get; set; }
+        public string DisplayNameError { get; set; }
+        public string AddressError { get; set; }
+        public string AreaNameError { get; set; }
+        public string ModeOfTransportError { get; set; }
     }
 }

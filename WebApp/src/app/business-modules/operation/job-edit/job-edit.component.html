@@ -625,7 +625,7 @@
                                     <tab heading="Selling" (selectTab)="getSurCharges('SELL')">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <selling-charge></selling-charge>
+                                            <selling-charge [showSyncFreight]="false"></selling-charge>
                                         </ng-container>
                                     </tab>
                                     <tab heading="OBH" (selectTab)="getSurCharges('OBH')">

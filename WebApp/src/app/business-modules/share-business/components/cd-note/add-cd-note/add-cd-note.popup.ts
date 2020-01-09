@@ -60,8 +60,6 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
 
     isChangeCharge: boolean = false;
 
-    labelHblNo: string = 'HBL No';
-
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
@@ -76,13 +74,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     }
 
     setHeader() {
-        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
-            this.labelHblNo = 'HAWB No';
-        } else {
-            this.labelHblNo = 'HBL No';
-        }
         this.headers = [
-            { title: this.labelHblNo, field: 'hwbno', sortable: true },
+            { title: 'HBL No', field: 'hwbno', sortable: true },
             { title: 'Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'nameEn', sortable: true },
             { title: 'Quantity', field: 'quantity', sortable: true },

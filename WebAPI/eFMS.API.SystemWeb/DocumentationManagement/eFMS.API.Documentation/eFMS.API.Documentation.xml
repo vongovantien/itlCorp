@@ -142,6 +142,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsDimensionDetailController.GetDIMFromHouseBillsByJob(System.Guid)">
+            <summary>
+            get dimension from all house bills by a job
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsManifestController">
             <summary>
             
@@ -470,6 +477,11 @@
             <param name="jobId"></param>
             <param name="currency"></param>
             <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.SyncHBL(System.Guid,eFMS.API.Documentation.DL.Models.Criteria.CsTransactionSyncHBLCriteria)">
+            <summary>
+            Sync HBL with id
+            </summary>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.ReviewProofOfDelivery(System.Guid)">
             <summary>

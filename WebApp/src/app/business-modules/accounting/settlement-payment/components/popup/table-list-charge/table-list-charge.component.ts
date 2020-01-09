@@ -1,19 +1,21 @@
-import { Component, OnInit, Attribute, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
-import { Charge, CustomDeclaration, Surcharge, Partner, Unit } from '@models';
+import { CustomDeclaration, Surcharge, Partner, Unit } from '@models';
 import { CatalogueRepo, DocumentationRepo, OperationRepo, AccountingRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 
 import { PopupBase } from 'src/app/popup.base';
 
-import { Observable, forkJoin, of, from } from 'rxjs';
-import { map, catchError, mergeMap, find, filter, tap, switchMap } from 'rxjs/operators';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
+import { Observable, forkJoin, of } from 'rxjs';
+import { map, catchError, switchMap } from 'rxjs/operators';
+import { FormGroup, AbstractControl, FormBuilder, FormControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { SystemConstants } from 'src/constants/system.const';
 import { ToastrService } from 'ngx-toastr';
 import cloneDeep from 'lodash/cloneDeep';
+import { Store } from '@ngrx/store';
+import { IAppState, GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
 
 
 @Component({
@@ -70,6 +72,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         private _accountingRepo: AccountingRepo,
         private _fb: FormBuilder,
         private _toastService: ToastrService,
+        private _store: Store<IAppState>
     ) {
         super();
     }
@@ -126,6 +129,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             { title: 'Name', field: 'partnerNameEn' },
             { title: 'Partner Code', field: 'taxCode' },
         ];
+
+        this._store.dispatch(new GetCatalogueUnitAction());
 
         this.getMasterCharges();
         this.getShipmentCommonData();
@@ -192,13 +197,13 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     }
 
     getUnits() {
-        this.listUnits = this._catalogueRepo.getUnit({ active: true });
+        this.listUnits = this._store.select(getCatalogueUnitState);
     }
 
-    getMasterCharges(serviceTypeId: string = ChargeConstants.CL_CODE) {
+    getMasterCharges(serviceTypeId: string = null) {
         forkJoin([
-            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT }),
-            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH, serviceTypeId: serviceTypeId }),
         ]).pipe(
             map(([chargeCredit, chargeOBH]) => {
                 return [...chargeCredit, ...chargeOBH];
@@ -249,6 +254,10 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 this.selectedAdvance = data;
 
                 this.advanceNo.setValue(data.advanceNo);
+
+                if (!!this.charges.length) {
+                    this.charges.forEach(c => c.advanceNo = this.selectedAdvance.advanceNo);
+                }
 
                 break;
             default:
@@ -370,7 +379,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             invoiceDate: null,
             clearanceNo: !!this.selectedCD ? this.selectedCD.clearanceNo : null,
             chargeId: null,
-            unitId: null
+            unitId: null,
+            advanceNo: !!this.selectedAdvance ? this.selectedAdvance.advanceNo : null,
+            jobNo: this.selectedShipment.jobId,
+            mblno: this.selectedShipment.mbl,
+            hblno: this.selectedShipment.hbl,
         }));
     }
 
@@ -385,6 +398,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         newCharge.jobId = this.selectedShipment.jobId;
         newCharge.mbl = this.selectedShipment.mbl;
         newCharge.hbl = this.selectedShipment.hbl;
+        newCharge.advanceNo = this.selectedAdvance.advanceNo;
         newCharge.settlementCode = this.settlementCode;
 
         this.charges.push(new Surcharge(newCharge));
@@ -427,12 +441,13 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             }
         }
 
-        console.log("lit charge to save", listChargesToSave);
-
         if (this.isUpdate) {
             this.onUpdate.emit(listChargesToSave);
+            console.log("lit charge to save", listChargesToSave);
         } else {
             this.onChange.emit(listChargesToSave);
+            console.log("lit charge to save", listChargesToSave);
+
         }
 
         this.hide();
@@ -487,6 +502,14 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             this.isDuplicateInvoice = false;
         }
         return valid;
+    }
+
+    resetFormControl(control: FormControl | AbstractControl) {
+        if (!!control && control instanceof FormControl) {
+            control.setValue(null);
+            control.markAsUntouched({ onlySelf: true });
+            control.markAsPristine({ onlySelf: true });
+        }
     }
 
 }

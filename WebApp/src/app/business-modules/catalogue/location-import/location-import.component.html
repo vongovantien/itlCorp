@@ -115,12 +115,12 @@
                                 (click)="sortData('countryName')">
                                 <span>Country</span>
                             </th>
-                            <th *ngIf="type != 'province' && type != 'country'" class="sorting"
+                            <th *ngIf="type != 'city' && type != 'country'" class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'provinceName'), 'sorting_desc': (!isDesc && sortKey == 'provinceName') }"
                                 (click)="sortData('provinceName')">
                                 <span>Province</span>
                             </th>
-                            <th *ngIf="type != 'province' && type != 'country' && type != 'district'" class="sorting"
+                            <th *ngIf="type != 'city' && type != 'country' && type != 'district'" class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'districtName'), 'sorting_desc': (!isDesc && sortKey == 'districtName') }"
                                 (click)="sortData('districtName')">
                                 <span>District</span>
@@ -136,36 +136,34 @@
                                 <td> {{ (i + this.pager.startIndex + 1) }}
                                 </td>
                                 <td>
-                                    <span *ngIf="item.code.split('|').length == 1">{{ item.code }}</span>
+                                    <span *ngIf="item.codeError === null">{{ item.code }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.code.split('|').length > 1">{{ item.code.split('|')[0] }}</span>
+                                        *ngIf="item.codeError !== null">{{ item.codeError }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.nameEn.split('|').length == 1">{{ item.nameEn }}</span>
+                                    <span *ngIf="item.nameEnError === null">{{ item.nameEn }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.nameEn.split('|').length > 1">{{ item.nameEn.split('|')[0] }}</span>
+                                        *ngIf="item.nameEnError !== null">{{ item.nameEnError }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.nameVn.split('|').length == 1">{{ item.nameVn }}</span>
+                                    <span *ngIf="item.nameVnError === null">{{ item.nameVn }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.nameVn.split('|').length > 1">{{ item.nameVn.split('|')[0] }}</span>
+                                        *ngIf="item.nameVnError !== null">{{ item.nameVnError }}</span>
                                 </td>
                                 <td *ngIf="type != 'country'">
-                                    <span *ngIf="item.countryName.split('|').length == 1">{{ item.countryName }}</span>
+                                    <span *ngIf="item.countryNameError === null">{{ item.countryName }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.countryName.split('|').length > 1">{{ item.countryName.split('|')[0] }}</span>
+                                        *ngIf="item.countryNameError !== null">{{ item.countryNameError }}</span>
                                 </td>
-                                <td *ngIf="type != 'province' && type != 'country'">
-                                    <span
-                                        *ngIf="item.provinceName.split('|').length == 1">{{ item.provinceName }}</span>
+                                <td *ngIf="type != 'city' && type != 'country'">
+                                    <span *ngIf="item.provinceNameError === null">{{ item.provinceName }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.provinceName.split('|').length > 1">{{ item.provinceName.split('|')[0] }}</span>
+                                        *ngIf="item.provinceNameError !== null">{{ item.provinceNameError }}</span>
                                 </td>
-                                <td *ngIf="type != 'province' && type != 'country' && type != 'district'">
-                                    <span
-                                        *ngIf="item.districtName.split('|').length == 1">{{ item.districtName }}</span>
+                                <td *ngIf="type != 'city' && type != 'country' && type != 'district'">
+                                    <span *ngIf="item.districtNameError === null">{{ item.districtName }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.districtName.split('|').length > 1">{{ item.districtName.split('|')[0] }}</span>
+                                        *ngIf="item.districtNameError !== null">{{ item.districtNameError }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.status }}</span>

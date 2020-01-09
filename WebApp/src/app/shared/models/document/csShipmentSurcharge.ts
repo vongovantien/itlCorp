@@ -79,6 +79,8 @@ export class CsShipmentSurcharge {
     hblno: string = null;
     advanceNo: string = null;
 
+    debitCharge: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

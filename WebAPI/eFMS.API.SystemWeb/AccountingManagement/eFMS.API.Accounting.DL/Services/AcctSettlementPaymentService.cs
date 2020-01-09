@@ -486,7 +486,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ContNo = sur.ContNo,
                            Notes = sur.Notes,
                            IsFromShipment = sur.IsFromShipment,
-                           TypeOfFee = sur.TypeOfFee
+                           TypeOfFee = sur.TypeOfFee,
+                           AdvanceNo = sur.AdvanceNo
                        };
 
             return data.ToList();

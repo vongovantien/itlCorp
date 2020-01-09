@@ -47,12 +47,17 @@ import {
     ShareBussinessFormCreateSeaExportComponent,
     ShareBusinessFormCreateHouseBillExportComponent,
     ShareBusinessFormCreateAirComponent,
-    ShareBusinessDIMVolumePopupComponent
+    ShareBusinessDIMVolumePopupComponent,
+    ShareBussinessCdNoteListAirComponent,
+    ShareBussinessCdNoteAddAirPopupComponent,
+    ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
+    ShareBussinessCdNoteDetailAirPopupComponent,
 } from './components';
 
 
 import { reducers, effects } from './store';
 import { ShareGoodsImportComponent } from './components/goods-import/goods-import.component';
+import { ValidatorModule } from 'src/app/shared/validators/validator.module';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -89,7 +94,11 @@ const COMPONENTS = [
     ShareBussinessFormCreateSeaExportComponent,
     ShareBusinessFormCreateHouseBillExportComponent,
     ShareBusinessFormCreateAirComponent,
-    ShareBusinessDIMVolumePopupComponent
+    ShareBusinessDIMVolumePopupComponent,
+    ShareBussinessCdNoteListAirComponent,
+    ShareBussinessCdNoteAddAirPopupComponent,
+    ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
+    ShareBussinessCdNoteDetailAirPopupComponent,
 ];
 
 
@@ -119,6 +128,7 @@ const customCurrencyMaskConfig = {
         DirectiveModule,
         PipeModule,
         SelectModule,
+        ValidatorModule,
         PaginationModule.forRoot(),
         BsDropdownModule.forRoot(),
         TooltipModule.forRoot(),

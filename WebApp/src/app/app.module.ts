@@ -90,7 +90,7 @@ import { reducers, CustomSerializer, effects } from "./store";
         {
             provide: RouterStateSerializer, useClass: CustomSerializer
         },
-        { provide: DEFAULT_TIMEOUT, useValue: 30000 },
+        { provide: DEFAULT_TIMEOUT, useValue: !environment.production ? 100000 : 30000 },
     ],
 
     bootstrap: [AppComponent],

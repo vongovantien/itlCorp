@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
@@ -17,6 +18,7 @@ namespace eFMS.API.Documentation.DL.IService
         List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria);
         HandleState AddTransactionDetail(CsTransactionDetailModel model);
         HandleState UpdateTransactionDetail(CsTransactionDetailModel model);
+        string GenerateHBLNo(TransactionTypeEnum transactionTypeEnum);
         HandleState DeleteTransactionDetail(Guid hbId);
         //CsTransactionDetailReport GetReportBy(Guid jobId);
         List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria);

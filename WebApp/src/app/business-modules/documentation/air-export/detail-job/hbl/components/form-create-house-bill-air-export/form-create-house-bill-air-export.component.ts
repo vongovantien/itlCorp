@@ -11,11 +11,12 @@ import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState, getDimensionVolumesState } from 'src/app/business-modules/share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { map, tap, takeUntil, catchError, skip, mergeMap, debounceTime, distinctUntilChanged, switchMap, debounce } from 'rxjs/operators';
+import { map, tap, takeUntil, catchError, skip, mergeMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
 import { GetCataloguePortAction, getCataloguePortState } from '@store';
+import { FormValidators } from 'src/app/shared/validators';
 
 @Component({
     selector: 'air-export-hbl-form-create',
@@ -260,7 +261,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             pod: [],
 
             // * Select
-            hbltype: [null, Validators.required],
+            hbltype: [],
             freightPayment: [],
             currencyId: [],
             originBlnumber: [],
@@ -276,7 +277,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             // * Array
             dimensionDetails: this._fb.array([])
 
-        });
+        },
+            { validator: FormValidators.compareGW_CW }
+        );
 
         this.hwbno = this.formCreate.controls["hwbno"];
         this.mawb = this.formCreate.controls["mawb"];
@@ -316,6 +319,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.otherPaymentChange();
         this.onRateChargeChange();
         this.onChargeWeightChange();
+        this.onSeaAirChange();
     }
 
     updateFormValue(data: HouseBill) {
@@ -408,7 +412,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     createDIMItem(): FormGroup {
         return this._fb.group(new DIM({
-            mblId: [this.jobId],
             height: [null, Validators.min(0)],
             width: [null, Validators.min(0)],
             length: [null, Validators.min(0)],
@@ -527,7 +530,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['chargeWeight'].value);
+                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['chargeWeight'].value - this.formCreate.controls['seaAir'].value);
                 }
             );
     }
@@ -537,14 +540,24 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['rateCharge'].value);
+                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
+                }
+            );
+    }
+
+    onSeaAirChange() {
+        this.formCreate.controls['seaAir'].valueChanges
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (value: number) => {
+                    this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
                 }
             );
     }
 
     onChangeMin(value: any) {
         if (value.target.checked) {
-            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value);
+            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
         }
     }
 

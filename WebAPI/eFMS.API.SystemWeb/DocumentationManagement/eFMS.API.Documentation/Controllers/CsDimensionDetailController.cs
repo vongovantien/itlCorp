@@ -37,5 +37,17 @@ namespace eFMS.API.Documentation.Controllers
             var results = dimensionDetailService.Get(x => x.Hblid == hblId);
             return Ok(results);
         }
+
+        /// <summary>
+        /// get dimension from all house bills by a job
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetDIMFromHouseBillsByJob")]
+        public IActionResult GetDIMFromHouseBillsByJob(Guid id)
+        {
+            var results = dimensionDetailService.GetDIMFromHouseByJob(id);
+            return Ok(results);
+        }
     }
 }

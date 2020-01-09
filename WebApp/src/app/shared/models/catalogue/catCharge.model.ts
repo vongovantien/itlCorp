@@ -15,6 +15,7 @@ export class Charge {
     datetimeModified: string = '';
     active: boolean = true;
     inactiveOn: string = '';
+    debitCharge: string = null;
 
     constructor(data?: any) {
         const self = this;

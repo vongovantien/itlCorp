@@ -42,5 +42,6 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? PaidBehalfPrice { get; set; }
         public string TrackingTransportBill { get; set; }
         public DateTime? TrackingTransportDate { get; set; }
+        public string FlexId { get; set; }
     }
 }

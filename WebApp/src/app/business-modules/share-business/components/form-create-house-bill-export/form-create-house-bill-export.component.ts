@@ -18,6 +18,7 @@ import { Observable } from 'rxjs';
 import { catchError, takeUntil, skip, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState } from '@store';
 @Component({
     selector: 'form-create-house-bill-export',
     templateUrl: './form-create-house-bill-export.component.html'
@@ -107,10 +108,14 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
         this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.consignees = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CONSIGNEE);
-        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
-        this.countries = this._catalogueRepo.getCountry();
-        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA });
 
+        this._store.dispatch(new GetCatalogueAgentAction());
+        this._store.dispatch(new GetCataloguePortAction());
+        this._store.dispatch(new GetCatalogueCountryAction());
+
+        this.agents = this._store.select(getCatalogueAgentState);
+        this.ports = this._store.select(getCataloguePortState);
+        this.countries = this._store.select(getCatalogueCountryState);
 
         // * get detail shipment from store.
         this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
@@ -238,7 +243,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             notifyParty: data.notifyPartyId,
             notifyPartyDescription: data.notifyPartyDescription,
             hwbno: data.hwbno,
-            hbltype: !!data.hbltype ? [(this.ladingTypes || []).find(type => type.id === data.hbltype)] : null,
+            hbltype: !!data.hbltype ? [{ id: data.hbltype, text: data.hbltype }] : null,
             bookingNo: data.customsBookingNo,
             localVoyNo: data.localVoyNo,
             oceanVoyNo: data.oceanVoyNo,
@@ -248,7 +253,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             pod: data.pod,
             placeDelivery: data.deliveryPlace,
             finalDestinationPlace: data.finalDestinationPlace,
-            freightPayment: !!data.freightPayment ? [(this.termTypes || []).find(type => type.id === data.freightPayment)] : null,
+            freightPayment: !!data.freightPayment ? [{ id: data.freightPayment, text: data.freightPayment }] : null,
             closingDate: !!data.closingDate ? { startDate: new Date(data.closingDate), endDate: new Date(data.closingDate) } : null,
             sailingDate: !!data.sailingDate ? { startDate: new Date(data.sailingDate), endDate: new Date(data.sailingDate) } : null,
             issueHbldate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
@@ -262,8 +267,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             referenceNo: data.referenceNo,
             exportReferenceNo: data.exportReferenceNo,
             issueHblplace: data.issueHblplace,
-            moveType: !!data.moveType ? [(this.typeOfMoves || []).find(type => type.id === data.moveType)] : null,
-            serviceType: !!data.serviceType ? [(this.serviceTypes || []).find(s => s.id === data.serviceType)] : null,
+            moveType: !!data.moveType ? [{ id: data.moveType, text: data.moveType }] : null,
+            serviceType: !!data.serviceType ? [{ id: data.serviceType, text: data.serviceType }] : null,
             purchaseOrderNo: data.purchaseOrderNo,
             shippingMark: data.shippingMark,
             inWord: data.inWord,

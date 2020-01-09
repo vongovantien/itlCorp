@@ -5,10 +5,11 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { map, catchError, withLatestFrom, switchMap } from 'rxjs/operators';
 import { CatalogueRepo } from '@repositories';
 import {
-    CatalogueActions, CatalogueActionTypes, GetCataloguePortSuccessAction, GetCataloguePortFailAction, GetCatalogueCarrierSuccessAction, GetCatalogueCarrierFailAction, GetCatalogueAgentSuccessAction, GetCatalogueAgentFailAction, GetCatalogueUnitSuccessAction, GetCatalogueUnitFailAction, GetCatalogueCommoditySuccessAction, GetCatalogueCommodityFailAction, GetCatalogueCustomerAction, GetCatalogueCustomerSuccessAction, GetCatalogueCustomerFailAction
+    CatalogueActions, CatalogueActionTypes, GetCataloguePortSuccessAction, GetCataloguePortFailAction, GetCatalogueCarrierSuccessAction, GetCatalogueCarrierFailAction, GetCatalogueAgentSuccessAction, GetCatalogueAgentFailAction, GetCatalogueUnitSuccessAction, GetCatalogueUnitFailAction, GetCatalogueCommoditySuccessAction, GetCatalogueCommodityFailAction, GetCatalogueCurrencyFailAction, GetCatalogueCustomerSuccessAction, GetCatalogueCustomerFailAction, GetCatalogueCountrySuccessAction, GetCatalogueCountryFailAction, GetCatalogueCurrencySuccessAction
 } from '../actions';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, getCatalogueUnitState, getCatalogueCommodityState, getCatalogueCustomerState } from '../reducers';
-import { Commodity, Unit, Customer, PortIndex } from '@models';
+import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, getCatalogueUnitState, getCatalogueCommodityState, getCatalogueCustomerState, getCatalogueCountryState, getCatalogueCurrencyState } from '../reducers';
+import { Commodity, Unit, Customer, PortIndex, CountryModel, Currency } from '@models';
+import { CommonEnum } from '@enums';
 
 @Injectable()
 export class CatalogueEffect {
@@ -46,13 +47,13 @@ export class CatalogueEffect {
                 this._store.select(getCatalogueCarrierState),
                 (action: CatalogueActions, carriers: Customer[]) => ({ data: carriers, action: action })),
 
-            switchMap((data: { data: any[], action: CatalogueActions }) => {
+            switchMap((data: { data: Customer[], action: CatalogueActions }) => {
                 // * Check carriers in redux store.
                 if (!!data && data.data && data.data.length) {
                     return of(new GetCatalogueCarrierSuccessAction(data.data));
                 }
                 return this._catalogueRepo.getPartnersByType(data.action.payload).pipe(
-                    map((response: any) => new GetCatalogueCarrierSuccessAction(response)),
+                    map((response: Customer[]) => new GetCatalogueCarrierSuccessAction(response)),
                     catchError(err => of(new GetCatalogueCarrierFailAction(err)))
                 );
             })
@@ -65,15 +66,15 @@ export class CatalogueEffect {
             ofType<CatalogueActions>(CatalogueActionTypes.GET_AGENT),
             withLatestFrom(
                 this._store.select(getCatalogueAgentState),
-                (action: CatalogueActions, agents: any[]) => ({ data: agents, action: action })),
+                (action: CatalogueActions, agents: Customer[]) => ({ data: agents, action: action })),
 
-            switchMap((data: { data: any[], action: CatalogueActions }) => {
+            switchMap((data: { data: Customer[], action: CatalogueActions }) => {
                 // * Check carriers in redux store.
                 if (!!data && data.data && data.data.length) {
                     return of(new GetCatalogueAgentSuccessAction(data.data));
                 }
-                return this._catalogueRepo.getPartnersByType(data.action.payload).pipe(
-                    map((response: any) => new GetCatalogueAgentSuccessAction(response)),
+                return this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, data.action.payload.active).pipe(
+                    map((response: Customer[]) => new GetCatalogueAgentSuccessAction(response)),
                     catchError(err => of(new GetCatalogueAgentFailAction(err)))
                 );
             })
@@ -87,13 +88,13 @@ export class CatalogueEffect {
                 this._store.select(getCatalogueUnitState),
                 (action: CatalogueActions, units: Unit[]) => ({ data: units, action: action })),
 
-            switchMap((data: { data: any[], action: CatalogueActions }) => {
+            switchMap((data: { data: Unit[], action: CatalogueActions }) => {
                 // * Check carriers in redux store.
                 if (!!data && data.data && data.data.length) {
                     return of(new GetCatalogueUnitSuccessAction(data.data));
                 }
                 return this._catalogueRepo.getUnit(data.action.payload).pipe(
-                    map((response: any) => new GetCatalogueUnitSuccessAction(response)),
+                    map((response: Unit[]) => new GetCatalogueUnitSuccessAction(response)),
                     catchError(err => of(new GetCatalogueUnitFailAction(err)))
                 );
             })
@@ -107,13 +108,13 @@ export class CatalogueEffect {
                 this._store.select(getCatalogueCommodityState),
                 (action: CatalogueActions, commodities: Commodity[]) => ({ data: commodities, action: action })),
 
-            switchMap((data: { data: any[], action: CatalogueActions }) => {
+            switchMap((data: { data: Commodity[], action: CatalogueActions }) => {
                 // * Check carriers in redux store.
                 if (!!data && data.data && data.data.length) {
                     return of(new GetCatalogueCommoditySuccessAction(data.data));
                 }
                 return this._catalogueRepo.getCommondity(data.action.payload).pipe(
-                    map((response: any) => new GetCatalogueCommoditySuccessAction(response)),
+                    map((response: Commodity[]) => new GetCatalogueCommoditySuccessAction(response)),
                     catchError(err => of(new GetCatalogueCommodityFailAction(err)))
                 );
             })
@@ -126,14 +127,52 @@ export class CatalogueEffect {
             withLatestFrom(
                 this._store.select(getCatalogueCustomerState),
                 (action: CatalogueActions, customers: Customer[]) => ({ data: customers, action: action })),
-            switchMap((data: { data: any[], action: CatalogueActions }) => {
+            switchMap((data: { data: Customer[], action: CatalogueActions }) => {
                 // * Check carriers in redux store.
                 if (!!data && data.data && data.data.length) {
                     return of(new GetCatalogueCustomerSuccessAction(data.data));
                 }
                 return this._catalogueRepo.getPartnersByType(data.action.payload).pipe(
-                    map((response: any) => new GetCatalogueCustomerSuccessAction(response)),
+                    map((response: Customer[]) => new GetCatalogueCustomerSuccessAction(response)),
                     catchError(err => of(new GetCatalogueCustomerFailAction(err)))
+                );
+            })
+        );
+
+    @Effect()
+    getCountries$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<CatalogueActions>(CatalogueActionTypes.GET_COUNTRY),
+            withLatestFrom(
+                this._store.select(getCatalogueCountryState),
+                (action: CatalogueActions, countries: CountryModel[]) => ({ data: countries, action: action })),
+            switchMap((data: { data: CountryModel[], action: CatalogueActions }) => {
+                // * Check carriers in redux store.
+                if (!!data && data.data && data.data.length) {
+                    return of(new GetCatalogueCountrySuccessAction(data.data));
+                }
+                return this._catalogueRepo.getCountry().pipe(
+                    map((response: CountryModel[]) => new GetCatalogueCountrySuccessAction(response)),
+                    catchError(err => of(new GetCatalogueCountryFailAction(err)))
+                );
+            })
+        );
+
+    @Effect()
+    getcurrencies$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<CatalogueActions>(CatalogueActionTypes.GET_CURRENCY),
+            withLatestFrom(
+                this._store.select(getCatalogueCurrencyState),
+                (action: CatalogueActions, currencies: Currency[]) => ({ data: currencies, action: action })),
+            switchMap((data: { data: Currency[], action: CatalogueActions }) => {
+                // * Check carriers in redux store.
+                if (!!data && data.data && data.data.length) {
+                    return of(new GetCatalogueCurrencySuccessAction(data.data));
+                }
+                return this._catalogueRepo.getListCurrency().pipe(
+                    map((response: Currency[]) => new GetCatalogueCurrencySuccessAction(response)),
+                    catchError(err => of(new GetCatalogueCurrencyFailAction(err)))
                 );
             })
         );

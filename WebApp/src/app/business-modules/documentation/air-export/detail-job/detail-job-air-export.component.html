@@ -72,6 +72,14 @@
                             <span>Modified: {{shipmentDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
                             </span> <span class="text-success">{{shipmentDetail.userModified}}</span>
                         </div>
+                        <div class="col-md-4 text-right">
+                            <button class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase" type="button"
+                                (click)="confirmSyncHBL.show()">
+                                <span><i class="la la-refresh"></i>
+                                    <span> Sync HBL </span>
+                                </span>
+                            </button>
+                        </div>
                     </div>
                 </form-create-air>
                 <grant-total-profit></grant-total-profit>
@@ -118,3 +126,9 @@
 
 <confirm-popup #confirmLockShipment (onSubmit)="onLockShipment()" [body]="'Do you want to lock this shipment ?'"
     [labelConfirm]="'Yes'"></confirm-popup>
+
+
+<confirm-popup #confirmSyncHBL (onSubmit)="confirmSyncHBL.hide(); onSyncHBL()"
+    body="Do you want to sync <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date to HAWB ?<span>"
+    [labelConfirm]="'Yes'">
+</confirm-popup>

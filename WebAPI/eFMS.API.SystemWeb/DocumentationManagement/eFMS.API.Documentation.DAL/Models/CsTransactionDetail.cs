@@ -116,7 +116,7 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? RateCharge { get; set; }
         public bool? Min { get; set; }
         public decimal? Total { get; set; }
-        public string SeaAir { get; set; }
+        public int? SeaAir { get; set; }
         public string IssuedBy { get; set; }
         public string Sci { get; set; }
         public string OtherCharge { get; set; }
@@ -137,5 +137,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string AttachList { get; set; }
         public string Route { get; set; }
         public string PoinvoiceNo { get; set; }
+
+        public virtual CsTransaction Job { get; set; }
     }
 }

@@ -40,3 +40,4 @@ DecimalSymbol	String	255
 DigitSymbol	String	255	
 DecimalNo	Number		
 CurrDecimalNo	Number		
+FlexID	String	255	

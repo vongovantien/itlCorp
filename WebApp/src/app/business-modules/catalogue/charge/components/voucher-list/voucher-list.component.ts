@@ -1,15 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
-import { findIndex } from 'lodash';
 import { CatChargeDefaultAccount } from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
+import findIndex from 'lodash/findIndex';
+
+
+
 
 @Component({
     selector: 'voucher-list',
     templateUrl: 'voucher-list.component.html'
 })
 
-export class VoucherListComponent extends AppList {
+export class VoucherListComponent extends AppList implements OnInit {
     constructor() {
         super();
     }

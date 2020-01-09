@@ -8,7 +8,7 @@ import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/commo
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { DIM, CsTransaction } from '@models';
 
-import { combineLatest, of } from 'rxjs';
+import { combineLatest, of, forkJoin } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, take, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
@@ -275,5 +275,60 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         modelAdd.isLocked = true;
 
         this.saveJob(modelAdd);
+    }
+
+    onSyncHBL() {
+        this.formCreateComponent.isSubmitted = true;
+
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
+        const modelAdd = this.onSubmitData();
+        modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
+
+        for (const item of modelAdd.dimensionDetails) {
+            item.mblId = this.shipmentDetail.id;
+        }
+
+        //  * Update field
+        modelAdd.id = this.jobId;
+        modelAdd.branchId = this.shipmentDetail.branchId;
+        modelAdd.transactionType = this.shipmentDetail.transactionType;
+        modelAdd.jobNo = this.shipmentDetail.jobNo;
+        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
+        modelAdd.userCreated = this.shipmentDetail.userCreated;
+
+        const bodySyncData = {
+            flightVesselName: modelAdd.flightVesselName,
+            flightDate: modelAdd.flightDate,
+            etd: modelAdd.etd,
+            eta: modelAdd.eta,
+            pol: modelAdd.pol,
+            pod: modelAdd.pod,
+            agentId: modelAdd.agentId,
+            issuedBy: modelAdd.issuedBy
+        };
+
+        this._progressRef.start();
+        forkJoin([
+            this._documenRepo.updateCSTransaction(modelAdd),
+            this._documentRepo.syncHBL(this.jobId, bodySyncData)
+        ]).pipe(
+            catchError(this.catchError),
+            finalize(() => {
+                this._progressRef.complete();
+            })
+        ).subscribe(
+            (respone: CommonInterface.IResult[] = []) => {
+                respone.forEach(r => {
+                    if (r[0].status) {
+                        this._toastService.success(r[0].message);
+                    } else {
+                        this._toastService.error(r[0].message);
+                    }
+                });
+            },
+        );
     }
 }

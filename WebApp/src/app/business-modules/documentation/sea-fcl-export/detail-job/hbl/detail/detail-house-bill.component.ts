@@ -83,20 +83,12 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 (res: CsTransactionDetail) => {
                     if (!!res) {
                         this.hblDetail = res;
-                        // this.goodSummaryComponent.containerDetail = this.hblDetail.packageContainer;
-                        // this.goodSummaryComponent.commodities = this.hblDetail.commodity;
-                        // this.goodSummaryComponent.description = this.hblDetail.desOfGoods;
-                        // this.goodSummaryComponent.grossWeight = this.hblDetail.grossWeight;
-                        // this.goodSummaryComponent.netWeight = this.hblDetail.netWeight;
-                        // this.goodSummaryComponent.totalChargeWeight = this.hblDetail.chargeWeight;
-                        // this.goodSummaryComponent.totalCBM = this.hblDetail.cbm;
+                        // * Dispatch to save containers.
+                        this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
+
+                        // * Get container to update model
+                        this.getListContainer();
                     }
-
-                    // * Dispatch to save containers.
-                    this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
-
-                    // * Get container to update model
-                    this.getListContainer();
                 },
             );
     }

@@ -30,12 +30,14 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICsTransactionDetailService csTransactionDetailService;
         private readonly ICurrentUser currentUser;
         ICsMawbcontainerService containerService;
-        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service, ICurrentUser user , ICsMawbcontainerService mawbcontainerService)
+        ICsTransactionService csTransactionService;
+        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service, ICurrentUser user , ICsMawbcontainerService mawbcontainerService, ICsTransactionService csTransaction)
         {
             stringLocalizer = localizer;
             csTransactionDetailService = service;
             currentUser = user;
             containerService = mawbcontainerService;
+            csTransactionService = csTransaction;
         }
 
         [HttpGet]
@@ -140,24 +142,35 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("GenerateHBLNo")]
+        public IActionResult GenerateHBLNo(TransactionTypeEnum transactionTypeEnum)
+        {
+            var data = csTransactionDetailService.GenerateHBLNo(transactionTypeEnum);
+            return Ok(new { hblNo = data });
+        }
+
         private string CheckExist(CsTransactionDetailModel model)
         {
             string message = string.Empty;
-            if(model.Id == Guid.Empty)
-            { 
-                if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
-                {
-                    message = "Housebill of Lading No is existed !";
-                }
-            }
-            else
+            var shipmentTransactionType = csTransactionService.Get(x => x.Id == model.JobId).FirstOrDefault()?.TransactionType;
+            //Chỉ check trùng HBLNo đối với các service khác hàng Air(Import & Export)
+            if (!string.IsNullOrEmpty(shipmentTransactionType) && shipmentTransactionType != TermData.AirImport && shipmentTransactionType != TermData.AirExport)
             {
-                if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.Id != model.Id))
+                if (model.Id == Guid.Empty)
                 {
-                    message = "Housebill of Lading No is existed !";
+                    if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
+                    {
+                        message = "Housebill of Lading No is existed !";
+                    }
+                }
+                else
+                {
+                    if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.Id != model.Id))
+                    {
+                        message = "Housebill of Lading No is existed !";
+                    }
                 }
             }
-            
             return message;
         }
 

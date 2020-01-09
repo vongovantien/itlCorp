@@ -40,8 +40,6 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
 
     dataReport: any = null;
 
-    labelHblNo: string = 'HBL No';
-
     labelDetail: any = {};
 
     constructor(
@@ -59,50 +57,27 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     setHeader() {
-        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
-            this.labelDetail = {
-                subjectTo: 'Subject To',
-                address: 'Address',
-                tel: 'Tel',
-                taxCode: 'Taxcode',
-                hbl: 'HAWB/ HBL',
-                jobId: 'JOB ID',
-                mbl: 'MAWB/ MBL No',
-                pol: 'A.O.L',
-                pod: 'P.O.L',
-                etd: 'ETD',
-                eta: 'ETA',
-                vessel: 'Flight',
-                volume: 'Volume',
-                packageQty: 'Package Quantity',
-                soa: 'SOA',
-                locked: 'Locked'
-            };
-            this.labelHblNo = 'HAWB No';
-        } else {
-            this.labelDetail = {
-                subjectTo: 'Subject To',
-                address: 'Address',
-                tel: 'Tel',
-                taxCode: 'Taxcode',
-                hbl: 'House Bill of Lading',
-                jobId: 'JOB ID',
-                mbl: 'Master Bill of Lading',
-                pol: 'Port of loading',
-                pod: 'Port of destination',
-                etd: 'Estimated Time of Departure',
-                eta: 'Estimated Time of Arrival',
-                vessel: 'Vessel',
-                volume: 'Volume',
-                packageQty: 'Package Quantity',
-                soa: 'SOA',
-                locked: 'Locked'
-            };
-            this.labelHblNo = 'HBL No';
-        }
+        this.labelDetail = {
+            subjectTo: 'Subject To',
+            address: 'Address',
+            tel: 'Tel',
+            taxCode: 'Taxcode',
+            hbl: 'House Bill of Lading',
+            jobId: 'JOB ID',
+            mbl: 'Master Bill of Lading',
+            pol: 'Port of loading',
+            pod: 'Port of destination',
+            etd: 'Estimated Time of Departure',
+            eta: 'Estimated Time of Arrival',
+            vessel: 'Vessel',
+            volume: 'Volume',
+            packageQty: 'Package Quantity',
+            soa: 'SOA',
+            locked: 'Locked'
+        };
 
         this.headers = [
-            { title: this.labelHblNo, field: 'hwbno', sortable: true },
+            { title: 'HBL No', field: 'hwbno', sortable: true },
             { title: 'Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'nameEn', sortable: true },
             { title: 'Quantity', field: 'quantity', sortable: true },
@@ -156,7 +131,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             this.totalDebit += this.formatNumberCurrency(_debit) + ' ' + currency + ' | ';
             this.balanceAmount += (_balance > 0 ? this.formatNumberCurrency(_balance) : '(' + this.formatNumberCurrency(Math.abs(_balance)) + ')') + ' ' + currency + ' | ';
         }
-        
+
         this.totalCredit = this.totalCredit === ' | ' ? '' : this.totalCredit.replace("| ", "");
         this.totalDebit = this.totalDebit === ' | ' ? '' : this.totalDebit.replace("| ", "");
         this.balanceAmount = this.balanceAmount === ' | ' ? '' : this.balanceAmount.replace("| ", "");
@@ -231,14 +206,14 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     previewCdNote(data: string) {
-        if(this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport){
+        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
             this.previewAirCdNote(data);
         } else {
             this.previewSeaCdNote(data);
         }
     }
 
-    previewSeaCdNote(data: string){
+    previewSeaCdNote(data: string) {
         this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -259,7 +234,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             );
     }
 
-    previewAirCdNote(data: string){
+    previewAirCdNote(data: string) {
         this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
             .pipe(catchError(this.catchError))
             .subscribe(

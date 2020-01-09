@@ -146,6 +146,10 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     }
 
     saveOBHSurCharge() {
+        if (!this.charges.length) {
+            this._toastService.warning("Please add charge");
+            return;
+        }
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;

@@ -18,6 +18,7 @@ import { AirExportCreateHBLComponent } from './create/create-house-bill.componen
 import { AirExportHBLFormCreateComponent } from './components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
 import { AirExportHBLAttachListComponent } from './components/attach-list/attach-list-house-bill-air-export.component';
 import { AirExportDetailHBLComponent } from './detail/detail-house-bill.component';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 
 const routing: Routes = [
@@ -27,7 +28,7 @@ const routing: Routes = [
     },
     {
         path: 'new', component: AirExportCreateHBLComponent,
-        data: { name: 'New House Bill Detail', path: ':id', level: 5 }
+        data: { name: 'New House Bill Detail', path: ':id', level: 5, transactionType: CommonEnum.TransactionTypeEnum.AirExport }
     },
     {
         path: ':hblId', component: AirExportDetailHBLComponent,
@@ -45,7 +46,7 @@ const LIB = [
     FroalaEditorModule.forRoot(),
     NgxCurrencyModule.forRoot({
         align: "right",
-        allowNegative: false,
+        allowNegative: true,
         allowZero: true,
         decimal: ".",
         precision: 3,

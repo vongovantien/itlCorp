@@ -21,7 +21,7 @@ export class FormCountryPopupComponent extends PopupBase implements OnInit {
     nameEn: AbstractControl;
     nameVn: AbstractControl;
     active: AbstractControl;
-    id: AbstractControl;
+    id: number = 0;
 
     isUpdate: boolean = false;
     isSubmitted = false;
@@ -51,15 +51,13 @@ export class FormCountryPopupComponent extends PopupBase implements OnInit {
             nameVn: ['', Validators.compose([
                 Validators.required
             ])],
-            active: [],
-            id: []
+            active: []
 
         });
         this.code = this.formAddCountry.controls['code'];
         this.nameEn = this.formAddCountry.controls['nameEn'];
         this.nameVn = this.formAddCountry.controls['nameVn'];
         this.active = this.formAddCountry.controls['active'];
-        this.id = this.formAddCountry.controls['id'];
     }
 
     cancelAdd() {
@@ -78,7 +76,7 @@ export class FormCountryPopupComponent extends PopupBase implements OnInit {
                 code: formData.code,
                 nameEn: formData.nameEn,
                 nameVn: formData.nameVn,
-                id: formData.id,
+                id: this.id,
                 active: !!this.isUpdate ? formData.active : true,
             };
             this._progressRef.start();

@@ -17,8 +17,8 @@
                                     [currentActiveItemId]="{field:'hblid', value:shipment.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
                                     [selectedDisplayFields]="['jobId','mbl','hbl']" [dataSources]="shipments"
-                                    [displayFields]="configShipmentDisplayFields" [height]="150"
-                                    [placeholder]="'Please Select Shipment'">
+                                    [displayFields]="configShipmentDisplayFields"
+                                    [placeholder]="'Please Select Shipment'" (remove)="resetFormControl(shipment)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -29,7 +29,7 @@
                                     [currentActiveItemId]="{field:'clearanceNo', value:customNo.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'cd')"
                                     [selectedDisplayFields]="['clearanceNo']" [dataSources]="cds | async"
-                                    [displayFields]="configCustomDisplayFields" [height]="150">
+                                    [displayFields]="configCustomDisplayFields" (remove)="resetFormControl(customNo)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -38,9 +38,10 @@
                                 <label> Advance No </label>
                                 <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{field:'advanceNo', value:advanceNo.value}"
-                                    (itemSelected)="onSelectDataFormInfo($event, 'adv')"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'advanceNo')"
                                     [selectedDisplayFields]="['advanceNo','amount','requestCurrency']"
-                                    [dataSources]="advs" [displayFields]="configAdvanceDisplayFields" [height]="150">
+                                    [dataSources]="advs" [displayFields]="configAdvanceDisplayFields"
+                                    (remove)="resetFormControl(advanceNo)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>

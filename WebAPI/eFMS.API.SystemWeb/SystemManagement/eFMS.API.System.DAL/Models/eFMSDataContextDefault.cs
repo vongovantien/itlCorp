@@ -369,7 +369,7 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Title).HasMaxLength(1600);
+                entity.Property(e => e.Title).HasMaxLength(250);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -489,6 +489,11 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
                 entity.Property(e => e.Folder).HasMaxLength(50);
+
+                entity.Property(e => e.ObjectId)
+                    .HasColumnName("ObjectID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 
@@ -895,9 +900,7 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Password).HasMaxLength(4000);
 
-                entity.Property(e => e.PasswordLdap)
-                    .HasColumnName("PasswordLDAP")
-                    .HasMaxLength(4000);
+                entity.Property(e => e.PasswordLdap).HasColumnName("PasswordLDAP");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

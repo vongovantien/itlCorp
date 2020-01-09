@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -13,6 +13,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
+import cloneDeep from 'lodash/cloneDeep';
 
 
 @Component({
@@ -23,7 +24,8 @@ import * as fromStore from './../../store';
 
 export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingChargeComponent {
 
-    isShowSyncFreightCharge: boolean = true;
+    @Input() showSyncFreight: boolean = true;
+
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,
@@ -76,6 +78,10 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     saveSellingSurCharge() {
+        if (!this.charges.length) {
+            this._toastService.warning("Please add charge");
+            return;
+        }
         // * Update data 
         this.isSubmitted = true;
         if (!this.checkValidate()) {
@@ -132,6 +138,29 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         }
 
                     }
+                }
+            );
+    }
+
+    syncBuyingCharge() {
+        this._store.select(fromStore.getBuyingSurChargeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (buyings: CsShipmentSurcharge[]) => {
+                    if (!buyings.length) {
+                        this._toastService.warning("Not found buying charge");
+                        return;
+                    }
+
+                    const buyingCharges: CsShipmentSurcharge[] = cloneDeep(buyings);
+                    // * update debit charge to chargeId
+                    buyingCharges.forEach(c => {
+                        c.chargeId = c.debitCharge;
+                        c.id = SystemConstants.EMPTY_GUID;
+                        c.type = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+                    });
+
+                    this.charges = [...this.charges, ...buyingCharges];
                 }
             );
     }

@@ -117,8 +117,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
     ngOnInit() {
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
-        this._store.dispatch(new GetCatalogueCarrierAction(CommonEnum.PartnerGroupEnum.CARRIER));
-        this._store.dispatch(new GetCatalogueAgentAction(CommonEnum.PartnerGroupEnum.AGENT));
+        this._store.dispatch(new GetCatalogueCarrierAction());
+        this._store.dispatch(new GetCatalogueAgentAction({ active: true }));
 
         this._store.dispatch(new GetCatalogueUnitAction({ active: true }));
         this._store.dispatch(new GetCatalogueCommodityAction({ active: true }));
@@ -232,7 +232,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
-                Validators.maxLength(11),
+                Validators.maxLength(15),
                 Validators.minLength(11),
             ])],
             flightVesselName: [],
@@ -251,6 +251,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             hw: [null, Validators.compose([
                 Validators.min(0)
             ])],
+            issuedBy: [],
 
             // * Date
             etd: [null, this.type !== 'import' ? Validators.required : null],

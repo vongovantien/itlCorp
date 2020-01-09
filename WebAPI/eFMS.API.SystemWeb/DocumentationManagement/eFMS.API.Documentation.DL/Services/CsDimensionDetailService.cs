@@ -16,10 +16,35 @@ namespace eFMS.API.Documentation.DL.Services
     public class CsDimensionDetailService : RepositoryBase<CsDimensionDetail, CsDimensionDetailModel>, ICsDimensionDetailService
     {
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<CsTransactionDetail> detailRepository;
         public CsDimensionDetailService(IContextBase<CsDimensionDetail> repository, IMapper mapper,
-            ICurrentUser currUser) : base(repository, mapper)
+            ICurrentUser currUser,
+            IContextBase<CsTransactionDetail> detailRepo) : base(repository, mapper)
         {
             currentUser = currUser;
+            detailRepository = detailRepo;
+        }
+
+        public List<CsDimensionDetailModel> GetDIMFromHouseByJob(Guid id)
+        {
+            var houseBills = detailRepository.Get(x => x.JobId == id);
+            List<CsDimensionDetailModel> results = null;
+            if (houseBills != null)
+            {
+                results = new List<CsDimensionDetailModel>();
+                foreach (var item in houseBills)
+                {
+                    var dimensions = Get(x => x.Hblid == item.Id);
+                    foreach(var dimension in dimensions)
+                    {
+                        dimension.Id = Guid.Empty;
+                        dimension.Hblid = null;
+                        dimension.Mblid = id;
+                        results.Add(dimension);
+                    }
+                }
+            }
+            return results;
         }
 
         public HandleState UpdateHouseBill(List<CsDimensionDetailModel> dimensionDetails, Guid housebillId)

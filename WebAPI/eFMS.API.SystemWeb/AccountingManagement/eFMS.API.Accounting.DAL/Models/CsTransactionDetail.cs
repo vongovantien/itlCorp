@@ -7,6 +7,7 @@ namespace eFMS.API.Accounting.Service.Models
     {
         public Guid Id { get; set; }
         public Guid JobId { get; set; }
+        public Guid? ParentId { get; set; }
         public string Mawb { get; set; }
         public string Hwbno { get; set; }
         public string Hbltype { get; set; }
@@ -115,7 +116,7 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? RateCharge { get; set; }
         public bool? Min { get; set; }
         public decimal? Total { get; set; }
-        public string SeaAir { get; set; }
+        public int? SeaAir { get; set; }
         public string IssuedBy { get; set; }
         public string Sci { get; set; }
         public string OtherCharge { get; set; }
