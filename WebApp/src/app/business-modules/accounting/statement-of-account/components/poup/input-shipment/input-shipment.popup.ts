@@ -12,6 +12,7 @@ export class InputShipmentPopupComponent extends PopupBase {
     @Output() onInputShipment: EventEmitter<any> = new EventEmitter<any>();
     shipmentTypes = [
         { text: 'JOB ID', id: 'JOBID' },
+        { text: 'MBL/MAWB', id: 'MBL' },
         { text: 'HAWB/HBL', id: 'HBL' }
     ];
     selectedShipmentType: string = '';

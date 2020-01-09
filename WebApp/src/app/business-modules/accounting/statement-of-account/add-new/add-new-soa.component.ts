@@ -60,6 +60,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
             { title: 'Credit', field: 'credit', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+            { title: 'C/D Note', field: 'cdNote', sortable: true },
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
         ];

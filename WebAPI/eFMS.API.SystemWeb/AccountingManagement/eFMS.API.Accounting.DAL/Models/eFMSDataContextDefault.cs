@@ -337,6 +337,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ExportedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.FlexId).HasColumnName("FlexID");
+
                 entity.Property(e => e.FreightPrice).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.InvoiceNo).HasMaxLength(100);
@@ -787,6 +789,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.BankAccountName).HasMaxLength(4000);
 
                 entity.Property(e => e.BankAccountNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CoLoaderCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -1349,6 +1355,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.IsLocked).HasDefaultValueSql("((0))");
 
+                entity.Property(e => e.IssuedBy).HasMaxLength(50);
+
                 entity.Property(e => e.JobNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1671,6 +1679,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.PackageContainer).HasMaxLength(1600);
 
+                entity.Property(e => e.ParentId).HasColumnName("ParentID");
+
                 entity.Property(e => e.PickupPlace).HasMaxLength(500);
 
                 entity.Property(e => e.PlaceFreightPay).HasMaxLength(4000);
@@ -1711,8 +1721,6 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Sci)
                     .HasColumnName("SCI")
                     .HasMaxLength(250);
-
-                entity.Property(e => e.SeaAir).HasMaxLength(250);
 
                 entity.Property(e => e.ServiceType).HasMaxLength(160);
 
