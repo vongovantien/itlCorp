@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
@@ -182,8 +183,15 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(s);
         }
 
+        /// <summary>
+        /// attach multi files to shipment
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
         [HttpPut("UploadMultiFiles/{jobId}")]
-        public IActionResult UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId)
+        [Authorize]
+        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId)
         {
             string folderName = Request.Headers["Module"];
             DocumentFileUploadModel model = new DocumentFileUploadModel
@@ -192,7 +200,27 @@ namespace eFMS.API.Documentation.Controllers
                 FolderName = folderName,
                 JobId = jobId
             };
-            var result = sysImageService.UploadDocumentationFiles(model);
+            var result = await sysImageService.UploadDocumentationFiles(model);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get all attached files in a shipment
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet("GetFileAttachs")]
+        public IActionResult GetAttachedFiles([Required]Guid jobId)
+        {
+            string id = jobId.ToString();
+            var results = sysImageService.Get(x => x.ObjectId == id);
+            return Ok(results);
+        }
+
+        [HttpDelete("DeleteAttachedFile/{id}")]
+        public IActionResult DeleteAttachedFile([Required]Guid id)
+        {
+            var result = sysImageService.DeleteFile(id);
             return Ok(result);
         }
         #endregion -- INSERT & UPDATE

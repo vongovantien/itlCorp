@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Documentation.DL.IService;
@@ -44,7 +45,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("GetDIMFromHouseBillsByJob")]
-        public IActionResult GetDIMFromHouseBillsByJob(Guid id)
+        public IActionResult GetDIMFromHouseBillsByJob([Required]Guid id)
         {
             var results = dimensionDetailService.GetDIMFromHouseByJob(id);
             return Ok(results);

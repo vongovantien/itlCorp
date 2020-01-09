@@ -449,6 +449,21 @@
             <param name="model">model to update</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.UploadMultiFiles(System.Collections.Generic.List{Microsoft.AspNetCore.Http.IFormFile},System.Guid)">
+            <summary>
+            attach multi files to shipment
+            </summary>
+            <param name="files"></param>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetAttachedFiles(System.Guid)">
+            <summary>
+            get all attached files in a shipment
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckAllowDelete(System.Guid)">
             <summary>
             check allow delete an existed item

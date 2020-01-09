@@ -23,6 +23,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsTransactionDetailAddManifest, CsTransactionDetail>();
             CreateMap<CsTransactionDetail, CsTransactionDetailAddManifest>();
             CreateMap<CsDimensionDetail, CsDimensionDetailModel>();
+            CreateMap<SysImage, SysImageModel>();
 
 
 

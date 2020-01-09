@@ -120,5 +120,19 @@ namespace eFMS.API.Common.Helpers
                 await file.CopyToAsync(bits);
             }
         }
+
+        public static async Task<bool> DeleteFile(string pathFile)
+        {
+            if (!System.IO.File.Exists(pathFile)) return false;
+            try
+            {
+                System.IO.File.Delete(pathFile);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
     }
 }
