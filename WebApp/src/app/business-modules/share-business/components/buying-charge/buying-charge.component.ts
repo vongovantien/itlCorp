@@ -20,6 +20,8 @@ import { catchError, takeUntil, finalize } from 'rxjs/operators';
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
 
+import { getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCatalogueUnitState, GetCatalogueUnitAction } from 'src/app/store';
+
 @Component({
     selector: 'buying-charge',
     templateUrl: './buying-charge.component.html',
@@ -59,6 +61,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     isDuplicateInvoice: boolean = false;
 
     selectedSurcharge: CsShipmentSurcharge;
+
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,
@@ -127,7 +130,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { displayName: 'Agent', value: CommonEnum.PartnerGroupEnum.AGENT, fieldName: 'AGENT' },
         ];
 
-        this.listCurrency = this._catalogueRepo.getCurrencyBy({ active: true });
+        this._store.dispatch(new GetCatalogueCurrencyAction());
+        this._store.dispatch(new GetCatalogueUnitAction());
+
+        this.listCurrency = this._store.select(getCatalogueCurrencyState);
 
         this.getUnits();
         this.getPartner();
@@ -167,7 +173,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     getUnits() {
         this._progressRef.start();
-        this._catalogueRepo.getUnit({ active: true })
+        this._store.select(getCatalogueUnitState)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (units: Unit[]) => {
@@ -376,10 +382,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             }
             charge.type = type;
         }
-
     }
 
     saveBuyingCharge(type: CommonEnum.SurchargeTypeEnum | string) {
+        if (!this.charges.length) {
+            this._toastService.warning("Please add charge");
+            return;
+        }
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;

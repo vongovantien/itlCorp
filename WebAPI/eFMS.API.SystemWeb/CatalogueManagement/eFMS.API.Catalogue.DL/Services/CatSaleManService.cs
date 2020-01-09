@@ -22,11 +22,14 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<SysUser> sysUserRepository;
 
-        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user) : base(repository, mapper)
+
+        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user, IContextBase<SysUser> sysUserRepo) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
+            sysUserRepository = sysUserRepo;
         }
 
         public IQueryable<CatSaleman> GetSaleMan()
@@ -36,11 +39,25 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatSaleManModel> GetBy(string partnerId)
         {
-            List<CatSaleManModel> results = null;
+            //List<CatSaleManModel> results = null;
             //var data = DataContext.Get(x => x.JobNo == jobNo);
             var data = GetSaleMan().Where(x => x.PartnerId.Trim() == partnerId);
-            if (data.Count() == 0) return results;
-            results = mapper.Map<List<CatSaleManModel>>(data);
+            var sysUser = sysUserRepository.Get();
+            var query = from sale in data
+                        join user in sysUser on sale.SaleManId equals user.Id
+                        select new { sale, user };
+
+
+            List<CatSaleManModel> results = new List<CatSaleManModel>();
+            if (data.Count() == 0) return null;
+
+            foreach (var item in query)
+            {
+
+                var saleman = mapper.Map<CatSaleManModel>(item.sale);
+                saleman.Username = item.user.Username;
+                results.Add(saleman);
+            }
             return results;
         }
 
@@ -73,8 +90,11 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatSaleManViewModel> Query(CatSalemanCriteria criteria)
         {
             var salesMan = GetSaleMan().Where(x => x.PartnerId == criteria.PartnerId);
+            var sysUser = sysUserRepository.Get();
+
             var query = from saleman in salesMan
-                        select new { saleman };
+                        join users in sysUser on saleman.SaleManId equals users.Id
+                        select new { saleman, users };
             if (criteria.All == null)
             {
                 query = query.Where(x => 
@@ -96,8 +116,10 @@ namespace eFMS.API.Catalogue.DL.Services
             List<CatSaleManViewModel> results = new List<CatSaleManViewModel>();
             foreach (var item in query)
             {
-                var saleMan = mapper.Map<CatSaleManViewModel>(item.saleman);
-                results.Add(saleMan);
+
+                var saleman = mapper.Map<CatSaleManViewModel>(item.saleman);
+                saleman.Username = item.users.Username;
+                results.Add(saleman);
             }
             return results;
         }

@@ -16,6 +16,7 @@ import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { NgProgress } from '@ngx-progressbar/core';
+import { formatDate } from '@angular/common';
 
 
 @Component({
@@ -75,11 +76,14 @@ export class PartnerDetailComponent extends AppList {
     ngOnInit() {
         this.getComboboxDataSaleman();
         this.initHeaderSalemanTable();
-        this.route.params.subscribe(async (prams: any) => {
+        this.route.params.subscribe((prams: any) => {
             if (!!prams.id) {
                 this.partner.id = prams.id;
                 this.dataSearchSaleman.partnerId = this.partner.id;
-                this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
+
+
+
+
             }
         });
         this.partner.departmentId = "Head Office";
@@ -132,27 +136,28 @@ export class PartnerDetailComponent extends AppList {
 
     getSalemanPagingByPartnerId(dataSearchSaleman?: any) {
         this.isLoading = true;
-        this._catalogueRepo.getListSaleManDetail(this.page, this.pageSize, Object.assign({}, dataSearchSaleman, { partnerId: this.partner.id }))
+        this._catalogueRepo.getListSaleManDetail(Object.assign({}, dataSearchSaleman, { partnerId: this.partner.id }))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; })
             ).subscribe(
                 (res: any) => {
-                    this.saleMandetail = (res.data || []).map((item: Saleman) => new Saleman(item));
-                    if (this.saleMandetail.length > 0) {
-                        for (const it of this.saleMandetail) {
-                            if (it.status === true) {
-                                it.statusString = "Active";
-                            } else {
-                                it.statusString = "InActive";
-                            }
-                            const index = this.services.findIndex(x => x.id === it.service);
-                            if (index > -1) {
-                                it.serviceName = this.services[index].text;
+                    if (!!res) {
+                        if (!!res) {
+                            console.log(res);
+                            this.saleMandetail = (res || []).map((item: Saleman) => new Saleman(item));
+                            if (this.saleMandetail.length > 0) {
+                                for (const it of this.saleMandetail) {
+                                    const index = this.services.findIndex(x => x.id === it.service);
+                                    if (index > -1) {
+                                        it.serviceName = this.services[index].text;
+                                    }
+                                }
                             }
                         }
+
                     }
-                    this.totalItems = res.totalItems || 0;
+
                 },
             );
     }
@@ -192,11 +197,8 @@ export class PartnerDetailComponent extends AppList {
                                 console.log("dup");
                                 this.toastr.error('Duplicate service, office with sale man!');
                             } else {
-                                console.log(this.saleMandetail);
-                                console.log(this.salemanToAdd);
+                                //this.saleMandetail.push(this.salemanToAdd);
                                 this.saleMandetail = [...this.saleMandetail, this.salemanToAdd];
-                                console.log(this.saleMandetail);
-                                console.log(this.saleMandetail[0]);
                                 this.getEmployee(this.saleMandetail[0].saleman_ID);
                                 this.poupSaleman.hide();
                                 for (const it of this.saleMandetail) {
@@ -225,7 +227,7 @@ export class PartnerDetailComponent extends AppList {
     showPopupSaleman() {
         this.poupSaleman.isSave = false;
         this.poupSaleman.isDetail = false;
-        this.poupSaleman.form.reset();
+        this.poupSaleman.resetForm();
         this.poupSaleman.show();
     }
 
@@ -239,7 +241,7 @@ export class PartnerDetailComponent extends AppList {
     }
     deleteSaleman(index: any) {
         this.index = index;
-        this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].saleman_ID}?`;
+        this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].username}?`;
         this.confirmDeleteSalemanPopup.show();
     }
     getDataCombobox() {
@@ -279,7 +281,7 @@ export class PartnerDetailComponent extends AppList {
                 (res: any) => {
                     if (!!res) {
                         this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
-                        this.selectedService = this.services[0];
+                        this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
                     }
                 },
             );
@@ -349,8 +351,13 @@ export class PartnerDetailComponent extends AppList {
     }
 
     onSubmit() {
+        this.partner.saleMans = this.saleMandetail;
         this.formPartnerComponent.isSubmitted = true;
         this.getFormPartnerData();
+        this.partner.saleMans.forEach(element => {
+            element.effectDate = element.effectDate !== null ? formatDate(element.effectDate.startDate !== undefined ? element.effectDate.startDate : element.effectDate, 'yyyy-MM-dd', 'en') : null;
+            element.createDate = element.createDate !== null ? formatDate(element.createDate.startDate !== undefined ? element.createDate.startDate : element.createDate, 'yyyy-MM-dd', 'en') : null;
+        });
         if (this.partner.countryId == null || this.partner.provinceId == null
             || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
             return;
@@ -370,8 +377,8 @@ export class PartnerDetailComponent extends AppList {
             if (this.saleMandetail.length > 0) {
                 for (const it of this.saleMandetail) {
                     this.services.forEach(item => {
-                        if (it.service === item.text) {
-                            it.service = item.id;
+                        if (it.service === item.id) {
+                            it.serviceName = item.text;
                         }
                     });
                 }
@@ -392,9 +399,6 @@ export class PartnerDetailComponent extends AppList {
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
-        if (formBody.internalReferenceNo != null) {
-            this.partner.accountNo = formBody.internalReferenceNo + "." + formBody.taxCode;
-        }
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
                 this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
@@ -414,12 +418,17 @@ export class PartnerDetailComponent extends AppList {
         this.partner.addressShippingVn = formBody.shippingAddressVN;
         this.partner.addressShippingEn = formBody.shippingAddressEN;
         this.partner.shortName = formBody.shortName;
-        if (formBody.billingCountry.length > 0) {
-            this.partner.countryId = formBody.billingCountry[0].id;
+        if (formBody.billingCountry !== null) {
+            if (formBody.billingCountry.length > 0) {
+                this.partner.countryId = formBody.billingCountry[0].id;
+            }
         }
-        if (formBody.shippingCountry.length > 0) {
-            this.partner.countryShippingId = formBody.shippingCountry[0].id;
+        if (formBody.shippingCountry !== null) {
+            if (formBody.shippingCountry.length > 0) {
+                this.partner.countryShippingId = formBody.shippingCountry[0].id;
+            }
         }
+
         this.partner.accountNo = formBody.partnerAccountNo;
         this.partner.tel = formBody.partnerContactNumber;
         this.partner.fax = formBody.partnerContactFaxNo;
@@ -449,6 +458,7 @@ export class PartnerDetailComponent extends AppList {
             this.partner.workPlaceId = formBody.partnerWorkPlace.length > 0 ? formBody.partnerWorkPlace[0].id : null;
         }
         this.partner.internalReferenceNo = formBody.internalReferenceNo;
+        this.partner.coLoaderCode = formBody.coLoaderCode;
     }
 
     updatePartner() {
@@ -488,19 +498,21 @@ export class PartnerDetailComponent extends AppList {
             this.saleMandetail = this._sortService.sort(this.saleMandetail, sortData.sortField, sortData.order);
         }
     }
-    showDetailSaleMan(saleman: Saleman, index: any) {
-        this.poupSaleman.index = index;
+
+    showDetailSaleMan(saleman: Saleman, id: any) {
         this.poupSaleman.isDetail = true;
+
+        //const obj = this.saleMandetail.find(x => x.id === id);
         const saleMane: any = {
             description: saleman.description,
             office: saleman.office,
             effectDate: saleman.effectDate,
-            status: saleman.status === true ? 'Active' : 'Inactive',
+            status: saleman.status,
             partnerId: null,
-            saleman_ID: saleman.saleman_ID,
+            saleManId: saleman.saleManId,
             service: saleman.service,
-            createDate: saleman.createDate
-
+            freightPayment: saleman.freightPayment,
+            serviceName: saleman.serviceName
         };
         this.poupSaleman.showSaleman(saleMane);
         this.poupSaleman.show();

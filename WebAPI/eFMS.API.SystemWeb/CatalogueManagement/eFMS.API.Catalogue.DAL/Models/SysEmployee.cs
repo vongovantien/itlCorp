@@ -11,6 +11,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string EmployeeNameVn { get; set; }
         public string EmployeeNameEn { get; set; }
         public string Position { get; set; }
+        public string Title { get; set; }
         public DateTime? Birthday { get; set; }
         public string ExtNo { get; set; }
         public string Tel { get; set; }
@@ -22,15 +23,16 @@ namespace eFMS.API.Catalogue.Service.Models
         public string EmpPhotoSize { get; set; }
         public decimal? SaleTarget { get; set; }
         public decimal? Bonus { get; set; }
+        public string StaffCode { get; set; }
         public string SaleResource { get; set; }
         public Guid? LdapObjectGuid { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public byte[] Signature { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-        public byte[] Signature { get; set; }
 
         public virtual CatSaleResource SaleResourceNavigation { get; set; }
     }

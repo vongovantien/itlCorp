@@ -75,7 +75,7 @@
                         <tbody>
                             <ng-container *ngIf="!!saleMandetail && !isLoading ;">
                                 <tr
-                                    *ngFor="let sale of saleMandetail | filter : keyword : ['company','saleman_ID','service','office']; let i = index; trackBy: trackByFn">
+                                    *ngFor="let sale of saleMandetail | filter : keyword : ['username','serviceName','office','company']; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 50px">
                                             <button type="button"
@@ -87,11 +87,11 @@
                                     </td>
                                     <td>
                                         <span><a style="cursor:pointer;"
-                                                (click)="showDetailSaleMan(sale,i)">{{sale.saleman_ID}}</a>
+                                                (click)="showDetailSaleMan(sale,sale.id)">{{sale.username}}</a>
                                         </span>
                                     </td>
                                     <td>
-                                        <span>{{sale.service}}</span>
+                                        <span>{{sale.serviceName}}</span>
                                     </td>
                                     <td>
                                         <span>{{sale.office}}</span>
@@ -141,7 +141,7 @@
     </div>
     <!--end::m-content of Partner-data-addnew-->
 </form>
-<app-saleman-popup [popupData]="saleMantoView" (onCreate)="closepp($event)"
+<app-saleman-popup [popupData]="saleMantoView" (onCreateToForm)="closepp($event)"
     (onDelete)="closeppAndDeleteSaleman($event)">
 </app-saleman-popup>
 <confirm-popup (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>

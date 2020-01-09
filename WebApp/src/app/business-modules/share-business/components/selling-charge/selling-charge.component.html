@@ -16,6 +16,18 @@
             </div>
             <div class="col-md-8">
                 <div class="m--align-right" *ngIf="!(isLocked | async)">
+                    <ng-container>
+                        <button type="button"
+                            class="btn btn-secondary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
+                            (click)="syncBuyingCharge()">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Sync Buying
+                                </span>
+                            </span>
+                        </button>
+                    </ng-container>
                     <ng-container *ngIf="showSyncFreight && !!charges && !charges.length">
                         <button type="button"
                             class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
@@ -37,7 +49,6 @@
                             </span>
                         </span>
                     </button>
-
                 </div>
             </div>
         </div>
@@ -271,6 +282,5 @@
         </div>
     </div>
 </div>
-
 <confirm-popup [body]="'Are you sure want to delete this Charge'" (onSubmit)="onDeleteShipmentSurcharge('SELL')">
 </confirm-popup>

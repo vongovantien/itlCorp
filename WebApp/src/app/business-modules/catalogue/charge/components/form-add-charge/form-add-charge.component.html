@@ -7,7 +7,7 @@
                         <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && !code.valid }">
-                                <label class="form-control-label" for="">
+                                <label class="form-control-label">
                                     Code <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" required formControlName="code" minlength="3" maxlength="10"
@@ -22,7 +22,7 @@
                         <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && !nameEn.valid }">
-                                <label class="form-control-label" for="">
+                                <label class="form-control-label">
                                     Name EN <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" required minlength="3" name="nameEn"
@@ -37,7 +37,7 @@
                         <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && !nameVn.valid }">
-                                <label class="form-control-label" for="">
+                                <label class="form-control-label">
                                     Name Local <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" required minlength="3" name="nameVn"
@@ -54,7 +54,7 @@
                         <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && !unit.valid}">
-                                <label class="form-control-label" for="">
+                                <label class="form-control-label">
                                     Unit <span class="m--font-danger">(*)</span>
                                 </label>
 
@@ -84,7 +84,7 @@
                         <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && !currency.valid}">
-                                <label class="form-control-label" for="">
+                                <label class="form-control-label">
                                     Currency <span class="m--font-danger">(*)</span>
                                 </label>
 
@@ -116,7 +116,7 @@
                         <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && !type.valid}">
-                                <label class="form-control-label" for="">
+                                <label class="form-control-label">
                                     Type <span class="m--font-danger">(*)</span>
                                 </label>
 
@@ -131,7 +131,7 @@
                         <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && !service.valid || requiredService}">
-                                <label class="form-control-label" for="">
+                                <label class="form-control-label">
                                     Service <span class="m--font-danger">(*)</span>
                                 </label>
 
@@ -144,10 +144,22 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-6" *ngIf="isShowMappingSelling">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Selling Mapping
+                                </label>
+                                <app-combo-grid-virtual-scroll (itemSelected)="debitCharge.setValue($event.id)"
+                                    [currentActiveItemId]="{ field: 'id', value: debitCharge.value}"
+                                    [selectedDisplayFields]="['chargeNameEn']" [dataSources]="debitCharges | async"
+                                    [displayFields]="[{ field: 'chargeNameEn', label: 'Name' }, { field: 'code', label: 'Code' }]"
+                                    placeholder="Select charge" (remove)="resetFormControl(debitCharge)">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </form>
-
 </div>

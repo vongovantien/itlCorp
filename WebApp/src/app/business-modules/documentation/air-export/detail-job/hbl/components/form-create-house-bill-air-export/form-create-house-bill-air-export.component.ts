@@ -304,7 +304,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.consigneeDescription = this.formCreate.controls["consigneeDescription"];
         this.forwardingAgentDescription = this.formCreate.controls["forwardingAgentDescription"];
         this.dimensionDetails = <FormArray>this.formCreate.controls["dimensionDetails"];
-        
+
         this.formCreate.get('dimensionDetails')
             .valueChanges
             .pipe(
@@ -319,6 +319,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.otherPaymentChange();
         this.onRateChargeChange();
         this.onChargeWeightChange();
+        this.onSeaAirChange();
     }
 
     updateFormValue(data: HouseBill) {
@@ -529,7 +530,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['chargeWeight'].value);
+                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['chargeWeight'].value - this.formCreate.controls['seaAir'].value);
                 }
             );
     }
@@ -539,14 +540,24 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['rateCharge'].value);
+                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
+                }
+            );
+    }
+
+    onSeaAirChange() {
+        this.formCreate.controls['seaAir'].valueChanges
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (value: number) => {
+                    this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
                 }
             );
     }
 
     onChangeMin(value: any) {
         if (value.target.checked) {
-            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value);
+            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
         }
     }
 

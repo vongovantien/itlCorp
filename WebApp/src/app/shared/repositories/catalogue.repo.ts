@@ -124,7 +124,7 @@ export class CatalogueRepo {
         );
     }
 
-    getListCurrency(page?: number, size?: number, body?: any) {
+    getListCurrency(page?: number, size?: number, body: any = { active: true }) {
         if (!!page && !!size && !!body) {
             return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrency/paging`, body, {
                 page: '' + page,
@@ -136,7 +136,7 @@ export class CatalogueRepo {
                 })
             );
         } else {
-            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrency/getAllByQuery`, body).pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => {
                     return data;
@@ -162,6 +162,11 @@ export class CatalogueRepo {
         );
     }
 
+    importPartner(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/Import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
     getPartnerGroup() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerGroup`).pipe(
             map((res: any) => {
@@ -424,20 +429,30 @@ export class CatalogueRepo {
         );
     }
 
-    getListSaleManDetail(page?: number, size?: number, body: any = {}) {
-        if (!!page && !!size) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/paging`, body, {
-                page: '' + page,
-                size: '' + size
-            }).pipe(
-                catchError((error) => throwError(error)),
-                map((data: any) => data)
-            );
-        } else {
-            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
-                map((data: any) => data)
-            );
-        }
+    // getListSaleManDetail(page?: number, size?: number, body: any = {}) {
+    //     if (!!page && !!size) {
+    //         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/paging`, body, {
+    //             page: '' + page,
+    //             size: '' + size
+    //         }).pipe(
+    //             catchError((error) => throwError(error)),
+    //             map((data: any) => data)
+    //         );
+    //     } else {
+    //         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
+    //             map((data: any) => data)
+    //         );
+    //     }
+    // }
+
+
+    getListSaleManDetail(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/Query`, body).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+
     }
 
     getStage(body?: any) {

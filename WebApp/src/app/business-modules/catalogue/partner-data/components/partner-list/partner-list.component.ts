@@ -41,6 +41,7 @@ export class PartnerListComponent extends AppList implements OnInit {
             { title: 'Service', field: 'service', sortable: true },
             { title: 'Office', field: 'office', sortable: true },
             { title: 'Company', field: 'company', sortable: true },
+            { title: 'Salesman', field: 'username', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'CreateDate', field: 'createDate', sortable: true }
         ];
@@ -90,6 +91,7 @@ export class PartnerListComponent extends AppList implements OnInit {
             })).subscribe(
                 (res: any) => {
                     this.saleMans = res;
+                    console.log(this.saleMans);
                     this.replaceService();
                 }
             );

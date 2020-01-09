@@ -77,4 +77,7 @@ export const getCatalogueCustomerLoadingState = createSelector(catalogueState, (
 export const getCatalogueCountryState = createSelector(catalogueState, (state: ICatalogueState) => state && state.countries);
 export const getCatalogueCountryLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
+export const getCatalogueCurrencyState = createSelector(catalogueState, (state: ICatalogueState) => state && state.currencies);
+export const getCatalogueCurrencyLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
+
 export const isSpinnerShowing = createSelector(spinnerReducer, (state: ISpinnerState) => state.show);

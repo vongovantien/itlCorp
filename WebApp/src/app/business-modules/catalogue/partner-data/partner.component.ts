@@ -146,7 +146,7 @@ export class PartnerComponent extends AppList implements OnInit {
         this.partner = event;
         this.router.navigate([`/home/catalogue/partner-data/detail/${this.partner.id}`]);
     }
-    async onDelete() {
+    onDelete() {
         this._catalogueRepo.deletePartner(this.partner.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
@@ -167,7 +167,8 @@ export class PartnerComponent extends AppList implements OnInit {
     addPartner() {
         this.router.navigate(["/home/catalogue/partner-data/add", { partnerType: this.criteria.partnerGroup }]);
     }
-    async export() {
+
+    export() {
         this._progressRef.start();
         this._exportRepo.exportPartner(this.criteria)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))

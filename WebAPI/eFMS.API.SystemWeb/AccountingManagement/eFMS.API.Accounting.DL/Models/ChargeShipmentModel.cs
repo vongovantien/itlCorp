@@ -33,5 +33,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string CreditDebitNo { get; set; }
 
         public DateTime? DatetimeModifiedSurcharge { get; set; }
+        public string CDNote { get; set; }
     }
 }

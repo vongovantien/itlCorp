@@ -125,7 +125,8 @@ export class StatementOfAccountEditComponent extends AppList {
                         commodityGroupId: this.soa.commodityGroupId,
                         strServices: this.soa.serviceTypeId.replace(new RegExp(";", 'g'), ","),
                         jobIds: [],
-                        hbls: []
+                        hbls: [],
+                        mbls:[]
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
                 },

@@ -29,6 +29,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<OpsTransaction> opsTransRepository;
         private readonly IContextBase<CatCurrencyExchange> currentExchangeRateRepository;
         private readonly IContextBase<CsTransaction> csTransactionRepository;
+        private readonly IContextBase<CatCharge> catChargeRepository;
         private readonly ICurrentUser currentUser;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
@@ -36,6 +37,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPartner> partnerRepo,
             IContextBase<OpsTransaction> opsTransRepo,
             IContextBase<CatCurrencyExchange> currentExchangeRateRepo,
+            IContextBase<CatCharge> catChargeRepo,
             IContextBase<CsTransaction> csTransactionRepo,
             ICurrentUser currUser) : base(repository, mapper)
         {
@@ -46,6 +48,7 @@ namespace eFMS.API.Documentation.DL.Services
             currentExchangeRateRepository = currentExchangeRateRepo;
             csTransactionRepository = csTransactionRepo;
             currentUser = currUser;
+            catChargeRepository = catChargeRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -246,6 +249,10 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.Unit = item.UnitNameEn;
                 charge.NameEn = item.ChargeNameEn;
                 charge.ExchangeRate = item.RateToLocal;
+                if(charge.Type == Constants.CHARGE_BUY_TYPE)
+                {
+                    charge.DebitCharge = catChargeRepository.Get(c => c.Id == charge.ChargeId).FirstOrDefault()?.DebitCharge;
+                }
                 listCharges.Add(charge);
             }
             return listCharges;

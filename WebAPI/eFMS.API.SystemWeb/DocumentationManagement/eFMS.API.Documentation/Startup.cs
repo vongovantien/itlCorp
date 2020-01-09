@@ -131,6 +131,7 @@ namespace eFMS.API.Shipment
             //app.UseCors("CorsPolicy");
             //ConfigureAuth(app);
             app.UseAuthentication();
+            app.UseStaticFiles();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseMvc();
             app.UseRequestLocalization();

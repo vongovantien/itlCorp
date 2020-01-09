@@ -18,7 +18,7 @@
                                 <label>Sale Man <span class="m--font-danger">(*)</span></label>
                                 <app-combo-grid-virtual-scroll [disabled]="isDetail ? true : false"
                                     [selectedDisplayFields]="['username']"
-                                    [currentActiveItemId]="{ field: 'username', value: saleman.value}"
+                                    [currentActiveItemId]="{ field: 'id', value: saleman.value}"
                                     (itemSelected)="onSelectSaleMan($event)" [dataSources]="users"
                                     [displayFields]="[{'field':'username','label':'Username'},{'field':'employeeNameEn','label':'Name EN'}]">
                                 </app-combo-grid-virtual-scroll>
@@ -28,14 +28,17 @@
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger':  isSave &&  !service.value }">
                                 <label>Service <span class="m--font-danger">(*)</span></label>
-                                <select [attr.disabled]="isDetail ? '' : null" name="service" class="form-control"
-                                    formControlName="service">
-                                    <option *ngFor="let sv of services" [ngValue]="sv">
-                                        {{sv.text}}
-                                    </option>
-                                </select>
+
+
+                                <ng-select [disabled]="isDetail ? true : false" [items]="services"
+                                    formControlName="service" [allowClear]="false">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="isSave && !service.value">
+                                    Service is required
+                                </div>
 
                             </div>
                         </div>
@@ -57,13 +60,13 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label>Status <span class="m--font-danger">(*)</span></label>
-                                <select [attr.disabled]="isDetail ? '' : null" name="status" class="form-control"
-                                    formControlName="status">
-                                    <option *ngFor="let status of statuss" [ngValue]="status">{{status.title}}
-                                    </option>
-                                </select>
+                                <label>Payment Term</label>
+
+                                <ng-select [disabled]="isDetail ? true : false" [items]="termTypes"
+                                    formControlName="freightPayment" [allowClear]="false">
+                                </ng-select>
                             </div>
+
                         </div>
                     </div>
                     <div class="row">
@@ -86,16 +89,25 @@
                                     </span>
                                 </div>
                             </div>
+
+                            <div class="form-group">
+                                <label class="form-control-label"> Status </label>
+                                <div class="">
+                                    <app-switch [toggle]="status.value" (toggleChange)="status.setValue($event)">
+                                    </app-switch>
+                                </div>
+                            </div>
+
                             <div class="form-group" [ngClass]="{ 'm-form__group has-danger': isDup}">
                                 <div class="form-control-feedback" *ngIf="isDup">
-                                    Sale Man with service is duplicate
+                                    Salemans with service is duplicate
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label>Description</label>
-                                <textarea [attr.disabled]="isDetail ? '' : null" name="description"
+                                <label class="form-control-label"> Description </label>
+                                <textarea rows="5" [attr.disabled]="isDetail ? '' : null" name="description"
                                     formControlName="description" class="form-control"></textarea>
                             </div>
                         </div>
@@ -104,7 +116,7 @@
                 </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="" *ngIf="!isDetail" (click)="ApplyToList()"
+                <button type="" *ngIf="!isDetail" (click)="applyToList()"
                     class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-save"></i>

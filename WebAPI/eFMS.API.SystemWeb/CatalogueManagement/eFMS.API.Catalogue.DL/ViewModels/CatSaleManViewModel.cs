@@ -7,7 +7,7 @@ namespace eFMS.API.Catalogue.DL.ViewModels
     public class CatSaleManViewModel
     {
         public string Id { get; set; }
-        public string Saleman_ID { get; set; }
+        public string SaleManId { get; set; }
         public string Office { get; set; }
         public string Company { get; set; }
         public bool? Status { get; set; }
@@ -19,6 +19,8 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string UserCreated { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string UserModified { get; set; }
+        public string Username { get; set; }
+        public string FreightPayment { get; set; }
 
     }
 }

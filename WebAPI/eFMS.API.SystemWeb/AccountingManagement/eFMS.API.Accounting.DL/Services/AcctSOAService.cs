@@ -449,7 +449,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    CreditDebitNo = sur.Type == Constants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
                                    DatetimeModified = sur.DatetimeModified,
                                    CommodityGroupID = ops.CommodityGroupId,
-                                   Service = ops.Hblid == sur.Hblid ? "CL" : cst.TransactionType
+                                   Service = ops.Hblid == sur.Hblid ? "CL" : cst.TransactionType,
+                                   CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
                                };
             queryBuySell = queryBuySell.Where(x => !string.IsNullOrEmpty(x.Service));
             return queryBuySell;
@@ -503,7 +504,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    CreditDebitNo = sur.DebitNo,
                                    DatetimeModified = sur.DatetimeModified,
                                    CommodityGroupID = ops.CommodityGroupId,
-                                   Service = ops.Hblid == sur.Hblid ? "CL" : cst.TransactionType
+                                   Service = ops.Hblid == sur.Hblid ? "CL" : cst.TransactionType,
+                                   CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
                                };
             queryObhSell = queryObhSell.Where(x => !string.IsNullOrEmpty(x.Service));
             return queryObhSell;
@@ -558,7 +560,8 @@ namespace eFMS.API.Accounting.DL.Services
                                   CreditDebitNo = sur.CreditNo,
                                   DatetimeModified = sur.DatetimeModified,
                                   CommodityGroupID = ops.CommodityGroupId,
-                                  Service = ops.Hblid == sur.Hblid ? "CL" : cst.TransactionType
+                                  Service = ops.Hblid == sur.Hblid ? "CL" : cst.TransactionType,
+                                  CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
                               };
             queryObhBuy = queryObhBuy.Where(x => !string.IsNullOrEmpty(x.Service));
             return queryObhBuy;
@@ -629,7 +632,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 DatetimeModified = data.DatetimeModified,
                                 CommodityGroupID = data.CommodityGroupID,
                                 Service = data.Service,
-                                CustomNo = GetTopClearanceNoByJobNo(data.JobId)
+                                CustomNo = GetTopClearanceNoByJobNo(data.JobId),
+                                CDNote = data.CDNote
                             };
             queryData = queryData.ToArray().OrderBy(x => x.Service).AsQueryable();
             return queryData;
@@ -708,6 +712,11 @@ namespace eFMS.API.Accounting.DL.Services
                 charge = charge.Where(chg => criteria.Hbls.Contains(chg.HBL));
             }
 
+            if (criteria.Mbls != null && criteria.Mbls.Count > 0)
+            {
+                charge = charge.Where(chg => criteria.Mbls.Contains(chg.MBL));
+            }
+
             var query = charge.Select(chg => new ChargeShipmentModel
             {
                 ID = chg.ID,
@@ -751,7 +760,8 @@ namespace eFMS.API.Accounting.DL.Services
                             :
                                 GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, Constants.CURRENCY_USD)) * (chg.Credit != null ? chg.Credit.Value : 0),
                 SOANo = chg.SOANo,
-                DatetimeModifiedSurcharge = chg.DatetimeModified
+                DatetimeModifiedSurcharge = chg.DatetimeModified,
+                CDNote = chg.CDNote
             });
             //Sort Array sẽ nhanh hơn
             query = query.ToArray().OrderByDescending(x => x.DatetimeModifiedSurcharge).AsQueryable();
@@ -763,7 +773,7 @@ namespace eFMS.API.Accounting.DL.Services
             var chargeShipmentList = GetChargesShipmentByCriteria(criteria);
             var result = new ChargeShipmentResult
             {
-                ChargeShipments = chargeShipmentList.Take(50).ToList(),
+                ChargeShipments = chargeShipmentList.Take(30).ToList(),
                 TotalShipment = chargeShipmentList.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count(),
                 TotalCharge = chargeShipmentList.Count(),
                 AmountDebitLocal = chargeShipmentList.Sum(x => x.AmountDebitLocal),

@@ -38,5 +38,6 @@ namespace eFMS.API.Accounting.DL.Models
         public DateTime? DatetimeModified { get; set; }
         public short? CommodityGroupID { get; set; }
         public string Service { get; set; }
+        public string CDNote { get; set; }
     }
 }

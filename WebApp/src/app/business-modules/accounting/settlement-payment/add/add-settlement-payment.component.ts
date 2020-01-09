@@ -42,7 +42,9 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     }
 
     onChangeCurrency(currency: Currency) {
-        this.requestSurchargeListComponent.changeCurrency(currency);
+        if (!!this.requestSurchargeListComponent) {
+            this.requestSurchargeListComponent.changeCurrency(currency);
+        }
     }
 
     saveSettlement() {
@@ -82,6 +84,10 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     }
 
     saveAndSendRequest() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
         this._progressRef.start();
         const body: IDataSettlement = {
             settlement: {

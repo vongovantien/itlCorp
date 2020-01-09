@@ -567,11 +567,20 @@ namespace eFMS.API.Documentation.DL.Services
                           PackageQty = detail.PackageQty,
                           PackageType = detail.PackageType,
                           CW = detail.ChargeWeight,
-                          DatetimeCreated = detail.DatetimeCreated
+                          DatetimeCreated = detail.DatetimeCreated,
                       };
             //Order tăng dần theo số House
-            var results = res.ToArray().OrderBy(o => o.Hwbno).AsQueryable();
-            return results;
+            var results = res.ToArray().OrderBy(o => o.Hwbno).ToList();
+            results.ForEach(fe =>
+            {
+                //Qty*Unit Cont of list Container HBL
+                fe.Containers = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
+                                                                        .Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));
+                //Qty*Unit Package of list Container HBL
+                fe.Packages = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
+                                                                        .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + "x" + GetUnitNameById(s.PackageTypeId)) : string.Empty));
+            });
+            return results.AsQueryable();
         }
 
         public List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount)
