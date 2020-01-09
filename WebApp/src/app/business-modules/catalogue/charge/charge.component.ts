@@ -1,17 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import _map from 'lodash/map';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { Router } from '@angular/router';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { ExcelService } from 'src/app/shared/services/excel.service';
-import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
-import { SystemConstants } from 'src/constants/system.const';
 import { AppList } from 'src/app/app.list';
 import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map, tap } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { Charge } from 'src/app/shared/models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
@@ -55,7 +49,7 @@ export class ChargeComponent extends AppList implements OnInit {
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Status', field: 'active', sortable: true }
         ];
-        this.searchCharge(this.dataSearch);
+        this.searchCharge();
     }
     sortCharge(sort: string): void {
         this.ListCharges = this.sortService.sort(this.ListCharges, sort, this.order);
@@ -80,13 +74,13 @@ export class ChargeComponent extends AppList implements OnInit {
                 this.dataSearch.type = dataSearch.keyword;
             }
         }
-        this.searchCharge(this.dataSearch);
+        this.searchCharge();
     }
 
-    searchCharge(dataSearch: any) {
+    searchCharge() {
         this.isLoading = true;
         this._progressRef.start();
-        this._catalogueRepo.getListCharge(this.page, this.pageSize, Object.assign({}, dataSearch))
+        this._catalogueRepo.getListCharge(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
@@ -121,7 +115,7 @@ export class ChargeComponent extends AppList implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.searchCharge(this.dataSearch);
+                        this.searchCharge();
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }
@@ -142,7 +136,7 @@ export class ChargeComponent extends AppList implements OnInit {
                 (response: ArrayBuffer) => {
                     this.downLoadFile(response, "application/ms-excel", 'Charge.xlsx');
                 },
-                (errors: any) => {
+                () => {
                 },
                 () => { }
             );

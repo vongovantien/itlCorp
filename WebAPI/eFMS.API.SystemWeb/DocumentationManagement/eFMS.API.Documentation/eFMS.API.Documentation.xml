@@ -389,7 +389,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsTransactionService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsTransactionService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.API.Documentation.DL.IService.ISysImageService)">
             <summary>
             constructor
             </summary>
@@ -447,6 +447,21 @@
             update an existed item
             </summary>
             <param name="model">model to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.UploadMultiFiles(System.Collections.Generic.List{Microsoft.AspNetCore.Http.IFormFile},System.Guid)">
+            <summary>
+            attach multi files to shipment
+            </summary>
+            <param name="files"></param>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetAttachedFiles(System.Guid)">
+            <summary>
+            get all attached files in a shipment
+            </summary>
+            <param name="jobId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckAllowDelete(System.Guid)">
