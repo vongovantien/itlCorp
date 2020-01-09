@@ -162,6 +162,11 @@ export class CatalogueRepo {
         );
     }
 
+    importPartner(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/Import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
     getPartnerGroup() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerGroup`).pipe(
             map((res: any) => {

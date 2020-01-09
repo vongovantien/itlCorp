@@ -275,12 +275,13 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CatPartnerImportModel> data)
         {
-            var result = catPartnerService.Import(data);
-            if (result.Success)
+            var hs = catPartnerService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
             {
-                return Ok(result);
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
             }
-            return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
+            return Ok(result);
         }
 
         /// <summary>
