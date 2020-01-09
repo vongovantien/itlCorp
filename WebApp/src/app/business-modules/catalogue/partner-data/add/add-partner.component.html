@@ -75,7 +75,7 @@
                         <tbody>
                             <ng-container *ngIf="!!saleMandetail && !isLoading ;">
                                 <tr
-                                    *ngFor="let sale of saleMandetail | filter : keyword : ['company','saleman_ID','service','office']; let i = index; trackBy: trackByFn">
+                                    *ngFor="let sale of saleMandetail | filter : keyword : ['username','serviceName','office','company']; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 50px">
                                             <button type="button"
