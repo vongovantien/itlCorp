@@ -56,6 +56,24 @@ export class ApiService {
         return this._http.post(this.setUrl(url), formData, options);
     }
 
+    putFile(url: string, files: any, name: string = null, params?: any) {
+        if (files.length === 0) {
+            return;
+        }
+        const formData = new FormData();
+        for (const file of files) {
+            formData.append(name || file.name, file);
+        }
+        const options = {
+            params: params,
+            reportProgress: true,
+            headers: new HttpHeaders({
+                'accept': 'application/json'
+            })
+        };
+        return this._http.put(this.setUrl(url), formData, options);
+    }
+
     put(url: string, data?: any, params?: any, headers?: any) {
         return this._http
             .put(this.setUrl(url), data, {
@@ -66,7 +84,6 @@ export class ApiService {
 
     downloadfile(url: string, data?: any, params?: any, headers?: any) {
         if (data !== null && data !== undefined) {
-            console.log(headers);
             return this._http.post(this.setUrl(url), data, {
                 params,
                 headers: Object.assign({}, this._headers, headers),

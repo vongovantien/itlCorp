@@ -1,4 +1,4 @@
-<div class="sea-fcl-import-hbl-page">
+<div class="sea-fcl-import-hbl-page m-animate-fade-in">
     <app-sub-header>
         <div class="c-button-actions">
             <span *ngIf="!!(isLocked | async)" class="m--margin-right-10 align-middle">
@@ -188,6 +188,8 @@
                 <tab heading=" Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')">
                 </tab>
                 <tab heading="Assignment" (selectTab)="onSelectTab('assignment')">
+                </tab>
+                <tab heading="Attach Files" (selectTab)="onSelectTab('files')">
                 </tab>
             </tabset>
         </div>

@@ -99,6 +99,11 @@
                 <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="AirExport_assignment">
                 </ng-container>
             </tab>
+            <tab heading="Attach Files" (selectTab)="onSelectTab('files')" [active]="selectedTab === 'FILES'"
+                [disabled]="ACTION === 'COPY'">
+                <ng-container *ngIf="selectedTab === 'FILES'" loadModule="AirExport_attachFile">
+                </ng-container>
+            </tab>
         </tabset>
     </div>
     <ul class="m-nav-sticky fms-shipment-sidebar" *ngIf="ACTION !== 'COPY'">

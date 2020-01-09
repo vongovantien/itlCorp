@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="NewFolder\" />
     <Folder Include="Resources\Files\" />
     <Folder Include="ViewModels\" />
     <Folder Include="wwwroot\" />
