@@ -3,6 +3,7 @@ using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -98,6 +99,17 @@ namespace eFMS.API.Documentation.Controllers
             }
             ResultHandle result = new ResultHandle { Status = _status, Message = _message };
             return Ok(result);
+        }
+        
+        [HttpPost("UnLockShipment")]
+        public IActionResult UnLockShipment(ShipmentCriteria criteria)
+        {
+            switch (criteria.ShipmentPropertySearch)
+            {
+                case ShipmentPropertySearch.JOBID:
+                    break;
+            }
+            return Ok();
         }
     }
 }
