@@ -197,7 +197,7 @@ export class SalemanPopupComponent extends PopupBase {
             const salemans: any = {
                 company: this.office.value,
                 office: this.office.value,
-                effectDate: !!this.effectiveDate.value && this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate !== undefined ? this.effectiveDate.value.startDate : this.effectiveDate.value, 'yyyy-MM-dd', 'en') : null,
+                effectDate: !!this.effectiveDate.value && !!this.effectiveDate.value.startDate ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
                 status: this.status.value,
                 partnerId: null,
                 saleManId: this.saleman.value,
@@ -208,8 +208,8 @@ export class SalemanPopupComponent extends PopupBase {
                 description: this.description.value,
                 serviceName: this.service.value[0].text,
             };
-            this.saleManToAdd = new Saleman(salemans);
-            this.onCreateToForm.emit(this.saleManToAdd);
+            console.log(salemans);
+            this.onCreateToForm.emit(new Saleman(salemans));
         }
     }
 }
