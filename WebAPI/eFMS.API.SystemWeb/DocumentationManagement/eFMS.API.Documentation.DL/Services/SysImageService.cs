@@ -62,29 +62,29 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var file in model.Files)
                 {
                     fileName = file.FileName;
-                    await ImageHelper.SaveFile(fileName, model.FolderName, model.JobId.ToString(), file);
-                    //var s = Path.Combine(path, "wwwroot", model.FolderName, "files", model.JobId.ToString(), fileName);
-                    //using (var fileStream = new FileStream(s, FileMode.Create))
-                    //{
-                    //    await file.CopyToAsync(fileStream);
-                    //}
-
-                    string urlFile = path + "/" + model.FolderName + "/files/" + model.JobId.ToString() + "/" + fileName;
-                    var result = new { link = urlFile };
+                    string objectId = model.JobId.ToString();
+                    await ImageHelper.SaveFile(fileName, model.FolderName, objectId, file);
+                    string urlFile = path + "/" + model.FolderName + "/files/" + objectId + "/" + fileName;
                     var sysImage = new SysImage
                     {
                         Id = Guid.NewGuid(),
                         Url = urlFile,
                         Name = fileName,
-                        Folder = model.FolderName ?? "Company",
+                        Folder = model.FolderName ?? "Shipment",
                         ObjectId = model.JobId.ToString(),
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
                         DateTimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now
                     };
-                    list.Add(sysImage);
-                    hs = await DataContext.AddAsync(sysImage);
+                    if(!DataContext.Any(x => x.ObjectId == objectId && x.Url == urlFile))
+                    {
+                        list.Add(sysImage);
+                    }
+                }
+                if(list.Count > 0)
+                {
+                    hs = await DataContext.AddAsync(list);
                 }
                 return new ResultHandle { Data = list, Status = hs.Success, Message = hs.Message?.ToString() };
 
