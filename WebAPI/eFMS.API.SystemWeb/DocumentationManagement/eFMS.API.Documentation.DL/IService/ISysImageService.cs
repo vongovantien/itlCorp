@@ -10,6 +10,6 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ISysImageService
     {
-        Task<ResultHandle> UploadDocumentationImages(DocumentFileUploadModel model);
+        Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model);
     }
 }

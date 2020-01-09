@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -33,6 +34,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICsTransactionService csTransactionService;
         private readonly ICurrentUser currentUser;
         private readonly ICsShipmentSurchargeService surchargeService;
+        private readonly ISysImageService sysImageService;
 
         /// <summary>
         /// constructor
@@ -41,13 +43,17 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="service">inject ICsTransactionService</param>
         /// <param name="user">inject ICurrentUser</param>
         /// <param name="serviceSurcharge">inject ICsShipmentSurchargeService</param>
-        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, ICsTransactionService service, ICurrentUser user,
-            ICsShipmentSurchargeService serviceSurcharge)
+        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, 
+            ICsTransactionService service, 
+            ICurrentUser user,
+            ICsShipmentSurchargeService serviceSurcharge,
+            ISysImageService imageService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
             currentUser = user;
             surchargeService = serviceSurcharge;
+            sysImageService = imageService;
         }
 
         /// <summary>
@@ -169,11 +175,25 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpPost("UploadFile")]
+        public IActionResult UploadFile([FromForm]IFormFile file)
+        {
+            var s = JsonConvert.SerializeObject(file);
+            return Ok(s);
+        }
+
         [HttpPut("UploadMultiFiles/{jobId}")]
-        public IActionResult UploadMultiFiles([FromBody]List<IFormFile> files, [Required]Guid jobId)
+        public IActionResult UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId)
         {
             string folderName = Request.Headers["Module"];
-            return Ok();
+            DocumentFileUploadModel model = new DocumentFileUploadModel
+            {
+                Files = files,
+                FolderName = folderName,
+                JobId = jobId
+            };
+            var result = sysImageService.UploadDocumentationFiles(model);
+            return Ok(result);
         }
         #endregion -- INSERT & UPDATE
 

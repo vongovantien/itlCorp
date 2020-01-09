@@ -366,32 +366,42 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = new HandleState();
             var surcharges = mapper.Map<List<CsShipmentSurcharge>>(list);
-            try
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                foreach (var item in surcharges)
+                try
                 {
-                    if (item.Id == Guid.Empty)
+                    foreach (var item in surcharges)
                     {
-                        item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
-                        item.UserCreated = currentUser.UserID;
-                        item.Id = Guid.NewGuid();
-                        item.ExchangeDate = DateTime.Now;
-                        DataContext.Add(item, false);
+                        if (item.Id == Guid.Empty)
+                        {
+                            item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                            item.UserCreated = currentUser.UserID;
+                            item.Id = Guid.NewGuid();
+                            item.ExchangeDate = DateTime.Now;
+                            var t = DataContext.Add(item, true);
+                        }
+                        else
+                        {
+                            item.DatetimeModified = DateTime.Now;
+                            item.UserModified = currentUser.UserID;
+                            var d = DataContext.Update(item, x => x.Id == item.Id, true);
+                        }
                     }
-                    else
-                    {
-                        item.DatetimeModified = DateTime.Now;
-                        item.UserModified = currentUser.UserID;
-                        DataContext.Update(item, x => x.Id == item.Id, false);
-                    }
+                    DataContext.SubmitChanges();
+                    trans.Commit();
                 }
-                DataContext.SubmitChanges();
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    result = new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+                return result;
             }
-            catch (Exception ex)
-            {
-                result = new HandleState(ex.Message);
-            }
-            return result;
         }
 
         public List<HousbillProfit> GetShipmentTotalProfit(Guid jobId)

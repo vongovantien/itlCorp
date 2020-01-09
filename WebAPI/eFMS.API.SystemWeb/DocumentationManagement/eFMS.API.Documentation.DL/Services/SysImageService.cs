@@ -4,6 +4,7 @@ using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Hosting;
@@ -24,7 +25,7 @@ namespace eFMS.API.Documentation.DL.Services
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public async Task<ResultHandle> UploadDocumentationImages(DocumentFileUploadModel model)
+        public async Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model)
         {
             return await WriteFile(model);
         }
@@ -36,29 +37,36 @@ namespace eFMS.API.Documentation.DL.Services
             string path = _hostingEnvironment.ContentRootPath;
             try
             {
+                var list = new List<SysImage>();
                 /* Kiểm tra các thư mục có tồn tại */
+                var hs = new HandleState();
                 ImageHelper.CreateDirectoryFile(model.FolderName, model.JobId.ToString());
                 foreach (var file in model.Files)
                 {
                     fileName = file.FileName;
                     await ImageHelper.SaveFile(fileName, model.FolderName, model.JobId.ToString(), file);
-                    string urlFile = path + "/" + model.FolderName + "/" + "files" + "/" + fileName;
+                    string urlFile = path + "/" + model.FolderName + "/" + "files" + model.JobId.ToString() + "/" + fileName;
                     var result = new { link = urlFile };
                     var sysImage = new SysImage
                     {
                         Id = Guid.NewGuid(),
                         Url = urlFile,
                         Name = fileName,
-                        Folder = model.FolderName ?? "Company"
+                        Folder = model.FolderName ?? "Company",
+                        ObjectId = model.JobId.ToString()
                     };
+                    list.Add(sysImage);
                 }
-                return new ResultHandle();
+                if(list.Count > 0)
+                {
+                    hs = await DataContext.AddAsync(list);
+                }
+                return new ResultHandle { Data = list, Status = hs.Success, Message = hs.Message?.ToString() };
 
             }
             catch (Exception ex)
             {
-                var hs = new ResultHandle { Data = null, Status = false, Message = ex.Message };
-                return hs;
+                return new ResultHandle { Data = null, Status = false, Message = ex.Message };
             }
         }
     }
