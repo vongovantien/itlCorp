@@ -595,8 +595,14 @@ export class DocumentationRepo {
         );
     }
 
-    generateHBLNo(transactionTypeEnum: number){
+    generateHBLNo(transactionTypeEnum: number) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GenerateHBLNo`, { transactionTypeEnum: transactionTypeEnum }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getHouseDIMByJob(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsDimensionDetail/GetDIMFromHouseBillsByJob`, { id: jobId }).pipe(
             map((data: any) => data)
         );
     }
