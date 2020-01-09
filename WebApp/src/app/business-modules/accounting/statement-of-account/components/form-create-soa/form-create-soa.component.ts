@@ -363,6 +363,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 strServices: this.selectedService[0].id === 'All' ? '' : this.selectedService.map(service => service.id).toString(),
                 jobIds: this.mapShipment("JOBID"),
                 hbls: this.mapShipment("HBL"),
+                mbls: this.mapShipment("MBL"),
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);
