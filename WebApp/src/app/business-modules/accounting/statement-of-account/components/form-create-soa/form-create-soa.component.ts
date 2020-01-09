@@ -10,7 +10,7 @@ import _uniq from 'lodash/uniq';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
-import { InputShipmentPopupComponent } from '../poup/input-shipment/input-shipment.popup';
+import { ShareAccountingInputShipmentPopupComponent } from '../../../components/input-shipment/input-shipment.popup';
 
 @Component({
     selector: 'soa-form-create',
@@ -20,7 +20,7 @@ import { InputShipmentPopupComponent } from '../poup/input-shipment/input-shipme
 export class StatementOfAccountFormCreateComponent extends AppPage {
     @Output() onApply: EventEmitter<any> = new EventEmitter<any>();
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild(InputShipmentPopupComponent, { static: false }) inputShipmentPopupComponent: InputShipmentPopupComponent;
+    @ViewChild(ShareAccountingInputShipmentPopupComponent, { static: false }) inputShipmentPopupComponent: ShareAccountingInputShipmentPopupComponent;
 
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -70,7 +70,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     commodityGroup: any[] = [];
     commodity: any = null;
 
-    shipmentInput: any = null;
+    shipmentInput: OperationInteface.IInputShipment;
 
     constructor(
         private _toastService: ToastrService,

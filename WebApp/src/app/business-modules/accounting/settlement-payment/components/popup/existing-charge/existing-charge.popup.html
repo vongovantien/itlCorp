@@ -9,18 +9,18 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-4">
+                    <div class="col-3">
                         <div class="form-group">
                             <label class="font-weight-bold">Partner</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
                                 (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                                 [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                 [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields"
-                                [height]="200">
+                                [height]="200" [loading]="isLoadingPartnerGrid">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <div class="form-group">
                             <label class="font-weight-bold">Service</label>
                             <app-multiple-select [source]="services" [active]="selectedServices"
@@ -34,14 +34,20 @@
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment" [height]="150"
                                 (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
                                 [dataSources]="configShipment.dataSource" [displayFields]="configShipment.displayFields"
-                                [selectedDisplayFields]="configShipment.selectedDisplayFields">
+                                [selectedDisplayFields]="configShipment.selectedDisplayFields" [loading]="isLoadingShipmentGrid">
                             </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-group">
+                            <label class="font-weight-bold">&nbsp;</label>
+                            <div><a class="pointer" style="text-decoration: underline;" (click)="openInputShipment()">Shipment List</a></div>
                         </div>
                     </div>
                     <div class="col-12 form-actions">
                         <div class="m--align-right">
                             <app-default-button [buttonSetting]="searchlButtonSetting" (onClick)="searchCharge()"
-                                [disabled]="!selectedShipmentData">
+                                [disabled]="!selectedShipmentData && !shipmentInput">
                             </app-default-button>
                             <app-default-button [buttonSetting]="resetButtonSetting" (onClick)="reset()"
                                 class="m--margin-left-10">
@@ -121,3 +127,4 @@
         </div>
     </div>
 </div>
+<input-shipment-popup (onInputShipment) = "onShipmentList($event)"></input-shipment-popup>

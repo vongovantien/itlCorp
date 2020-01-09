@@ -137,9 +137,9 @@ namespace eFMS.API.Accounting.DL.Services
                          from cstd in csd.DefaultIfEmpty()
                          join cst in csTrans on cstd.JobId equals cst.Id into cs
                          from cst in cs.DefaultIfEmpty()
-                         join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : ops.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno), MBL = (cstd.Mawb != null ? cstd.Mawb : ops.Mblno) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
+                         join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : ops.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno), MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
                          from cus in cus1.DefaultIfEmpty()
-                         join req in advRequest on new { JobNo = (cst.JobNo != null ? cst.JobNo : ops.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno), MBL = (cstd.Mawb != null ? cstd.Mawb : ops.Mblno) } equals new { JobNo = req.JobId, HBL = req.Hbl, MBL = req.Mbl } into req1
+                         join req in advRequest on new { JobNo = (cst.JobNo != null ? cst.JobNo : ops.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno), MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno) } equals new { JobNo = req.JobId, HBL = req.Hbl, MBL = req.Mbl } into req1
                          from req in req1.DefaultIfEmpty()
                          where
                          (
@@ -151,7 +151,7 @@ namespace eFMS.API.Accounting.DL.Services
                                       || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Mblno) : true)
                                       || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.JobNo) : true)
                                       || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Hwbno) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Mawb) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.Mawb) : true)
                                       || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.JobNo) : true)
                                       || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo) : true)
                                       || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(req.AdvanceNo) : true)
@@ -287,7 +287,7 @@ namespace eFMS.API.Accounting.DL.Services
                        {
                            JobId = (cst.JobNo != null ? cst.JobNo : ops.JobNo),
                            HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno),
-                           MBL = (cstd.Mawb != null ? cstd.Mawb : ops.Mblno),
+                           MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno),
                            Amount = sur.Total != null ? sur.Total : 0,
                            ChargeCurrency = sur.CurrencyId,
                            SettlementCurrency = set.SettlementCurrency
@@ -319,7 +319,7 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrenct = currentUser.UserID;
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
                 var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
                 if (settlement == null) return new HandleState("Not Found Settlement Payment");
@@ -327,28 +327,64 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     return new HandleState("Not allow delete. Settlements are awaiting approval.");
                 }
-                dc.AcctSettlementPayment.Remove(settlement);
 
-                //Phí chừng từ (chỉ cập nhật lại SettlementCode bằng null)
-                var surchargeShipment = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == true).ToList();
-                if (surchargeShipment != null && surchargeShipment.Count > 0)
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    surchargeShipment.ForEach(sur =>
+                    try
                     {
-                        sur.SettlementCode = null;
-                        sur.UserModified = userCurrenct;
-                        sur.DatetimeModified = DateTime.Now;
-                    });
-                    dc.CsShipmentSurcharge.UpdateRange(surchargeShipment);
+                        //Phí chừng từ (chỉ cập nhật lại SettlementCode bằng null)
+                        var surchargeShipment = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == true).ToList();
+                        if (surchargeShipment != null && surchargeShipment.Count > 0)
+                        {
+                            //surchargeShipment.ForEach(sur =>
+                            //{
+                            //    sur.SettlementCode = null;
+                            //    sur.UserModified = userCurrenct;
+                            //    sur.DatetimeModified = DateTime.Now;
+                            //});
+                            //dc.CsShipmentSurcharge.UpdateRange(surchargeShipment);
+                            foreach (var item in surchargeShipment)
+                            {
+                                item.SettlementCode = null;
+                                item.UserModified = userCurrenct;
+                                item.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                            }
+                        }
+                        //Phí hiện trường (Xóa khỏi surcharge)
+                        var surchargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == false).ToList();
+                        if (surchargeScene != null && surchargeScene.Count > 0)
+                        {
+                            //dc.CsShipmentSurcharge.RemoveRange(surchargeScene);
+                            foreach (var item in surchargeScene)
+                            {
+                                var hsRemoveSurchargeScene = csShipmentSurchargeRepo.Delete(x => x.Id == item.Id);
+                            }
+                        }
+                        //dc.SaveChanges();
+                        //return new HandleState();
+                        var hs = DataContext.Delete(x => x.Id == settlement.Id);
+                        if (hs.Success)
+                        {
+                            trans.Commit();
+                        }
+                        else
+                        {
+                            trans.Rollback();
+                        }
+                        return hs;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
                 }
-                //Phí hiện trường (Xóa khỏi surcharge)
-                var surchargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == false).ToList();
-                if (surchargeScene != null && surchargeScene.Count > 0)
-                {
-                    dc.CsShipmentSurcharge.RemoveRange(surchargeScene);
-                }
-                dc.SaveChanges();
-                return new HandleState();
             }
             catch (Exception ex)
             {
@@ -390,7 +426,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 SettlementNo = sur.SettlementCode,
                                 JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
                                 HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
-                                MBL = (opst.Mblno == null ? cstd.Mawb : opst.Mblno),
+                                MBL = (opst.Mblno == null ? cst.Mawb : opst.Mblno),
                                 CurrencyShipment = settle.SettlementCurrency,
                                 TotalAmount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
                             };
@@ -455,7 +491,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 sur.SettlementCode == settlementNo
                             && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
                             && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
-                            && (opst.Mblno == null ? cstd.Mawb : opst.Mblno) == MBL
+                            && (opst.Mblno == null ? cst.Mawb : opst.Mblno) == MBL
                        select new ShipmentChargeSettlement
                        {
                            Id = sur.Id,
@@ -525,7 +561,7 @@ namespace eFMS.API.Accounting.DL.Services
                        {
                            Id = sur.Id,
                            JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
-                           MBL = (opst.Mblno == null ? cstd.Mawb : opst.Mblno),
+                           MBL = (opst.Mblno == null ? cst.Mawb : opst.Mblno),
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
                            ChargeCode = cc.Code,
                            Hblid = sur.Hblid,
@@ -633,7 +669,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 settle.StatusApproval == Constants.STATUS_APPROVAL_DONE
                             && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
                             && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
-                            && (opst.Mblno == null ? cstd.Mawb : opst.Mblno) == MBL
+                            && (opst.Mblno == null ? cst.Mawb : opst.Mblno) == MBL
                        select new SettlementPaymentMngt
                        {
                            SettlementNo = settle.SettlementNo,
@@ -679,7 +715,7 @@ namespace eFMS.API.Accounting.DL.Services
                             sur.SettlementCode == item.SettlementNo
                         && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
                         && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
-                        && (opst.Mblno == null ? cstd.Mawb : opst.Mblno) == MBL
+                        && (opst.Mblno == null ? cst.Mawb : opst.Mblno) == MBL
                        select new ChargeSettlementPaymentMngt
                        {
                            SettlementNo = item.SettlementNo,
@@ -696,7 +732,7 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- PAYMENT MANAGEMENT ---
 
         #region -- GET EXISITS CHARGE --
-        public List<ShipmentChargeSettlement> GetExistsCharge(string JobId, string HBL, string MBL)
+        public List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria)
         {
             //Chỉ lấy ra những phí chứng từ (thuộc credit hoặc đối tượng obh credit)
             var surcharge = csShipmentSurchargeRepo
@@ -712,58 +748,105 @@ namespace eFMS.API.Accounting.DL.Services
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
 
-            var data = from sur in surcharge
-                       join cc in charge on sur.ChargeId equals cc.Id into cc2
-                       from cc in cc2.DefaultIfEmpty()
-                       join u in unit on sur.UnitId equals u.Id into u2
-                       from u in u2.DefaultIfEmpty()
-                       join par in payer on sur.PayerId equals par.Id into par2
-                       from par in par2.DefaultIfEmpty()
-                       join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
-                       from pae in pae2.DefaultIfEmpty()
-                       join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
-                       from opst in opst2.DefaultIfEmpty()
-                       join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
-                       from cstd in cstd2.DefaultIfEmpty()
-                       join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                       from cst in cst2.DefaultIfEmpty()
-                       where
-                                !string.IsNullOrEmpty(JobId) ? (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId : true
-                            &&
-                                !string.IsNullOrEmpty(HBL) ? (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL : true
-                            &&
-                                !string.IsNullOrEmpty(MBL) ? (opst.Mblno == null ? cstd.Mawb : opst.Mblno) == MBL : true
-                       select new ShipmentChargeSettlement
-                       {
-                           Id = sur.Id,
-                           JobId = JobId,
-                           MBL = MBL,
-                           HBL = HBL,
-                           Hblid = sur.Hblid,
-                           Type = sur.Type,
-                           SettlementCode = sur.SettlementCode,
-                           ChargeId = sur.ChargeId,
-                           ChargeName = cc.ChargeNameEn,
-                           Quantity = sur.Quantity,
-                           UnitId = sur.UnitId,
-                           UnitName = u.UnitNameEn,
-                           UnitPrice = sur.UnitPrice,
-                           CurrencyId = sur.CurrencyId,
-                           Vatrate = sur.Vatrate,
-                           Total = sur.Total != null ? sur.Total : 0,
-                           PayerId = sur.PayerId,
-                           Payer = par.ShortName,
-                           PaymentObjectId = sur.PaymentObjectId,
-                           OBHPartnerName = pae.ShortName,
-                           InvoiceNo = sur.InvoiceNo,
-                           SeriesNo = sur.SeriesNo,
-                           InvoiceDate = sur.InvoiceDate,
-                           ClearanceNo = sur.ClearanceNo,
-                           ContNo = sur.ContNo,
-                           Notes = sur.Notes,
-                           IsFromShipment = sur.IsFromShipment
-                       };
+            if (criteria.jobIds != null)
+            {
+                opsTrans = opsTrans.Where(x => criteria.jobIds.Contains(x.JobNo));
+                csTrans = csTrans.Where(x => criteria.jobIds.Contains(x.JobNo));
+            }
+            if (criteria.mbls != null)
+            {
+                opsTrans = opsTrans.Where(x => criteria.mbls.Contains(x.Mblno));
+                csTrans = csTrans.Where(x => criteria.mbls.Contains(x.Mawb));
+            }
+            if (criteria.hbls != null)
+            {
+                opsTrans = opsTrans.Where(x => criteria.hbls.Contains(x.Hwbno));
+                csTransD = csTransD.Where(x => criteria.hbls.Contains(x.Hwbno));
+            }
+            var dataOperation = from sur in surcharge
+                                join cc in charge on sur.ChargeId equals cc.Id into cc2
+                                from cc in cc2.DefaultIfEmpty()
+                                join u in unit on sur.UnitId equals u.Id into u2
+                                from u in u2.DefaultIfEmpty()
+                                join par in payer on sur.PayerId equals par.Id into par2
+                                from par in par2.DefaultIfEmpty()
+                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                                from pae in pae2.DefaultIfEmpty()
+                                join opst in opsTrans on sur.Hblid equals opst.Hblid
+                                select new ShipmentChargeSettlement
+                                {
+                                    Id = sur.Id,
+                                    JobId = opst.JobNo,
+                                    MBL = opst.Mblno,
+                                    HBL = opst.Hwbno,
+                                    Hblid = sur.Hblid,
+                                    Type = sur.Type,
+                                    SettlementCode = sur.SettlementCode,
+                                    ChargeId = sur.ChargeId,
+                                    ChargeName = cc.ChargeNameEn,
+                                    Quantity = sur.Quantity,
+                                    UnitId = sur.UnitId,
+                                    UnitName = u.UnitNameEn,
+                                    UnitPrice = sur.UnitPrice,
+                                    CurrencyId = sur.CurrencyId,
+                                    Vatrate = sur.Vatrate,
+                                    Total = sur.Total != null ? sur.Total : 0,
+                                    PayerId = sur.PayerId,
+                                    Payer = par.ShortName,
+                                    PaymentObjectId = sur.PaymentObjectId,
+                                    OBHPartnerName = pae.ShortName,
+                                    InvoiceNo = sur.InvoiceNo,
+                                    SeriesNo = sur.SeriesNo,
+                                    InvoiceDate = sur.InvoiceDate,
+                                    ClearanceNo = sur.ClearanceNo,
+                                    ContNo = sur.ContNo,
+                                    Notes = sur.Notes,
+                                    IsFromShipment = sur.IsFromShipment
+                                };
 
+            var dataDocument = from sur in surcharge
+                               join cc in charge on sur.ChargeId equals cc.Id into cc2
+                               from cc in cc2.DefaultIfEmpty()
+                               join u in unit on sur.UnitId equals u.Id into u2
+                               from u in u2.DefaultIfEmpty()
+                               join par in payer on sur.PayerId equals par.Id into par2
+                               from par in par2.DefaultIfEmpty()
+                               join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                               from pae in pae2.DefaultIfEmpty()
+                               join cstd in csTransD on sur.Hblid equals cstd.Id
+                               join cst in csTrans on cstd.JobId equals cst.Id
+                               select new ShipmentChargeSettlement
+                               {
+                                   Id = sur.Id,
+                                   JobId = cst.JobNo,
+                                   MBL = cst.Mawb,
+                                   HBL = cstd.Hwbno,
+                                   Hblid = sur.Hblid,
+                                   Type = sur.Type,
+                                   SettlementCode = sur.SettlementCode,
+                                   ChargeId = sur.ChargeId,
+                                   ChargeName = cc.ChargeNameEn,
+                                   Quantity = sur.Quantity,
+                                   UnitId = sur.UnitId,
+                                   UnitName = u.UnitNameEn,
+                                   UnitPrice = sur.UnitPrice,
+                                   CurrencyId = sur.CurrencyId,
+                                   Vatrate = sur.Vatrate,
+                                   Total = sur.Total != null ? sur.Total : 0,
+                                   PayerId = sur.PayerId,
+                                   Payer = par.ShortName,
+                                   PaymentObjectId = sur.PaymentObjectId,
+                                   OBHPartnerName = pae.ShortName,
+                                   InvoiceNo = sur.InvoiceNo,
+                                   SeriesNo = sur.SeriesNo,
+                                   InvoiceDate = sur.InvoiceDate,
+                                   ClearanceNo = sur.ClearanceNo,
+                                   ContNo = sur.ContNo,
+                                   Notes = sur.Notes,
+                                   IsFromShipment = sur.IsFromShipment
+                               };
+
+            var data = dataDocument.Union(dataOperation);
             return data.ToList();
         }
         #endregion -- GET EXISITS CHARGE --
@@ -803,7 +886,7 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrent = currentUser.UserID;
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
                 settlement.Id = model.Settlement.Id = Guid.NewGuid();
                 settlement.SettlementNo = model.Settlement.SettlementNo = CreateSettlementNo();
@@ -811,40 +894,69 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.UserCreated = settlement.UserModified = userCurrent;
                 settlement.DatetimeCreated = settlement.DatetimeModified = DateTime.Now;
 
-                var hs = DataContext.Add(settlement);
-                if (hs.Success)
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    //Lấy các phí chứng từ IsFromShipment = true
-                    var chargeShipment = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && x.IsFromShipment == true).Select(s => s.Id).ToList();
-                    if (chargeShipment.Count > 0)
+                    try
                     {
-                        var listChargeShipment = csShipmentSurchargeRepo.Get(x => chargeShipment.Contains(x.Id)).ToList();
-                        listChargeShipment.ForEach(req =>
+                        var hs = DataContext.Add(settlement);
+                        if (hs.Success)
                         {
-                            req.SettlementCode = settlement.SettlementNo;
-                            req.UserModified = userCurrent;
-                            req.DatetimeModified = DateTime.Now;
-                        });
-                        dc.CsShipmentSurcharge.UpdateRange(listChargeShipment);
-                    }
+                            //Lấy các phí chứng từ IsFromShipment = true
+                            var chargeShipment = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && x.IsFromShipment == true).Select(s => s.Id).ToList();
+                            if (chargeShipment.Count > 0)
+                            {
+                                var listChargeShipment = csShipmentSurchargeRepo.Get(x => chargeShipment.Contains(x.Id)).ToList();
+                                //listChargeShipment.ForEach(req =>
+                                //{
+                                //    req.SettlementCode = settlement.SettlementNo;
+                                //    req.UserModified = userCurrent;
+                                //    req.DatetimeModified = DateTime.Now;
+                                //});
+                                foreach (var item in listChargeShipment)
+                                {
+                                    item.SettlementCode = settlement.SettlementNo;
+                                    item.UserModified = userCurrent;
+                                    item.DatetimeModified = DateTime.Now;
+                                    csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                                }
+                            }
 
-                    //Lấy các phí hiện trường IsFromShipment = false & thực hiện insert các charge mới
-                    var chargeScene = model.ShipmentCharge.Where(x => x.Id == Guid.Empty && x.IsFromShipment == false).ToList();
-                    if (chargeScene.Count > 0)
+                            //Lấy các phí hiện trường IsFromShipment = false & thực hiện insert các charge mới
+                            var chargeScene = model.ShipmentCharge.Where(x => x.Id == Guid.Empty && x.IsFromShipment == false).ToList();
+                            if (chargeScene.Count > 0)
+                            {
+                                var listChargeSceneAdd = mapper.Map<List<CsShipmentSurcharge>>(chargeScene);
+                                //listChargeSceneAdd.ForEach(req =>
+                                //{
+                                //    req.Id = Guid.NewGuid();
+                                //    req.SettlementCode = settlement.SettlementNo;
+                                //    req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
+                                //    req.UserCreated = req.UserModified = userCurrent;
+                                //});
+                                foreach (var item in listChargeSceneAdd)
+                                {
+                                    item.Id = Guid.NewGuid();
+                                    item.SettlementCode = settlement.SettlementNo;
+                                    item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                                    item.UserCreated = item.UserModified = userCurrent;
+                                    csShipmentSurchargeRepo.Add(item);
+                                }
+                            }
+                        }
+                        //dc.SaveChanges();
+                        trans.Commit();
+                        return hs;
+                    }
+                    catch (Exception ex)
                     {
-                        var listChargeSceneAdd = mapper.Map<List<CsShipmentSurcharge>>(chargeScene);
-                        listChargeSceneAdd.ForEach(req =>
-                        {
-                            req.Id = Guid.NewGuid();
-                            req.SettlementCode = settlement.SettlementNo;
-                            req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
-                            req.UserCreated = req.UserModified = userCurrent;
-                        });
-                        dc.CsShipmentSurcharge.AddRange(listChargeSceneAdd);
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
                     }
                 }
-                dc.SaveChanges();
-                return hs;
             }
             catch (Exception ex)
             {
@@ -857,7 +969,7 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrent = currentUser.UserID;
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
 
@@ -873,84 +985,132 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     settlement.StatusApproval = Constants.STATUS_APPROVAL_NEW;
                 }
-
-                var hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
-                if (hs.Success)
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    //Start --Phí chứng từ (IsFromShipment = true)--
-                    //Cập nhật SettlementCode = null cho các SettlementNo
-                    var chargeShipmentOld = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == true).ToList();
-                    if (chargeShipmentOld.Count > 0)
+                    try
                     {
-                        chargeShipmentOld.ForEach(req =>
+                        var hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
+                        if (hs.Success)
                         {
-                            req.SettlementCode = null;
-                            req.UserModified = userCurrent;
-                            req.DatetimeModified = DateTime.Now;
-                        });
-                        dc.CsShipmentSurcharge.UpdateRange(chargeShipmentOld);
-                    }
-                    //Cập nhật SettlementCode = SettlementNo cho các SettlementNo
-                    var chargeShipmentUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && x.IsFromShipment == true).Select(s => s.Id).ToList();
-                    if (chargeShipmentUpdate.Count > 0)
-                    {
-                        var listChargeShipmentUpdate = csShipmentSurchargeRepo.Get(x => chargeShipmentUpdate.Contains(x.Id)).ToList();
-                        listChargeShipmentUpdate.ForEach(req =>
-                        {
-                            req.SettlementCode = settlement.SettlementNo;
-                            req.UserModified = userCurrent;
-                            req.DatetimeModified = DateTime.Now;
-                        });
-                        dc.CsShipmentSurcharge.UpdateRange(listChargeShipmentUpdate);
-                    }
-                    //End --Phí chứng từ (IsFromShipment = true)--
+                            //Start --Phí chứng từ (IsFromShipment = true)--
+                            //Cập nhật SettlementCode = null cho các SettlementNo
+                            var chargeShipmentOld = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == true).ToList();
+                            if (chargeShipmentOld.Count > 0)
+                            {
+                                //chargeShipmentOld.ForEach(req =>
+                                //{
+                                //    req.SettlementCode = null;
+                                //    req.UserModified = userCurrent;
+                                //    req.DatetimeModified = DateTime.Now;
+                                //});
+                                foreach (var item in chargeShipmentOld)
+                                {
+                                    item.SettlementCode = null;
+                                    item.UserModified = userCurrent;
+                                    item.DatetimeModified = DateTime.Now;
+                                    csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                                }
+                                //dc.CsShipmentSurcharge.UpdateRange(chargeShipmentOld);
+                            }
+                            //Cập nhật SettlementCode = SettlementNo cho các SettlementNo
+                            var chargeShipmentUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && x.IsFromShipment == true).Select(s => s.Id).ToList();
+                            if (chargeShipmentUpdate.Count > 0)
+                            {
+                                var listChargeShipmentUpdate = csShipmentSurchargeRepo.Get(x => chargeShipmentUpdate.Contains(x.Id)).ToList();
+                                //listChargeShipmentUpdate.ForEach(req =>
+                                //{
+                                //    req.SettlementCode = settlement.SettlementNo;
+                                //    req.UserModified = userCurrent;
+                                //    req.DatetimeModified = DateTime.Now;
+                                //});
+                                foreach (var item in listChargeShipmentUpdate)
+                                {
+                                    item.SettlementCode = settlement.SettlementNo;
+                                    item.UserModified = userCurrent;
+                                    item.DatetimeModified = DateTime.Now;
+                                    csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                                }
+                                //dc.CsShipmentSurcharge.UpdateRange(listChargeShipmentUpdate);
+                            }
+                            //End --Phí chứng từ (IsFromShipment = true)--
 
-                    //Start --Phí hiện trường (IsFromShipment = false)--
-                    var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false).ToList();
-                    var idsChargeScene = chargeScene.Select(x => x.Id);
-                    //Add các phí hiện trường mới (nếu có)
-                    var chargeSceneAdd = model.ShipmentCharge.Where(x => x.Id == Guid.Empty && x.IsFromShipment == false).ToList();
-                    if (chargeSceneAdd.Count > 0)
-                    {
-                        var listChargeSceneAdd = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneAdd);
-                        listChargeSceneAdd.ForEach(req =>
-                        {
-                            req.Id = Guid.NewGuid();
-                            req.SettlementCode = settlement.SettlementNo;
-                            req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
-                            req.UserCreated = req.UserModified = userCurrent;
-                        });
-                        dc.CsShipmentSurcharge.AddRange(listChargeSceneAdd);
-                    }
+                            //Start --Phí hiện trường (IsFromShipment = false)--
+                            var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false).ToList();
+                            var idsChargeScene = chargeScene.Select(x => x.Id);
+                            //Add các phí hiện trường mới (nếu có)
+                            var chargeSceneAdd = model.ShipmentCharge.Where(x => x.Id == Guid.Empty && x.IsFromShipment == false).ToList();
+                            if (chargeSceneAdd.Count > 0)
+                            {
+                                var listChargeSceneAdd = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneAdd);
+                                //listChargeSceneAdd.ForEach(req =>
+                                //{
+                                //    req.Id = Guid.NewGuid();
+                                //    req.SettlementCode = settlement.SettlementNo;
+                                //    req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
+                                //    req.UserCreated = req.UserModified = userCurrent;
+                                //});
+                                foreach (var item in listChargeSceneAdd)
+                                {
+                                    item.Id = Guid.NewGuid();
+                                    item.SettlementCode = settlement.SettlementNo;
+                                    item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                                    item.UserCreated = item.UserModified = userCurrent;
+                                    csShipmentSurchargeRepo.Add(item);
+                                }
+                                //dc.CsShipmentSurcharge.AddRange(listChargeSceneAdd);
+                            }
 
-                    //Cập nhật lại các thông tin của phí hiện trường (nếu có edit chỉnh sửa phí hiện trường)
-                    var chargeSceneUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && idsChargeScene.Contains(x.Id) && x.IsFromShipment == false);
-                    var idChargeSceneUpdate = chargeSceneUpdate.Select(s => s.Id).ToList();
-                    if (chargeSceneUpdate.Count() > 0)
-                    {
-                        var listChargeExists = csShipmentSurchargeRepo.Get(x => idChargeSceneUpdate.Contains(x.Id));
-                        var listChargeSceneUpdate = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneUpdate);
-                        listChargeSceneUpdate.ForEach(req =>
-                        {
-                            req.UserCreated = listChargeExists.Where(x => x.Id == req.Id).First().UserCreated;
-                            req.DatetimeCreated = listChargeExists.Where(x => x.Id == req.Id).First().DatetimeCreated;
-                            req.UserModified = userCurrent;
-                            req.DatetimeModified = DateTime.Now;
-                        });
+                            //Cập nhật lại các thông tin của phí hiện trường (nếu có edit chỉnh sửa phí hiện trường)
+                            var chargeSceneUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && idsChargeScene.Contains(x.Id) && x.IsFromShipment == false);
+                            var idChargeSceneUpdate = chargeSceneUpdate.Select(s => s.Id).ToList();
+                            if (chargeSceneUpdate.Count() > 0)
+                            {
+                                var listChargeExists = csShipmentSurchargeRepo.Get(x => idChargeSceneUpdate.Contains(x.Id));
+                                var listChargeSceneUpdate = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneUpdate);
+                                //listChargeSceneUpdate.ForEach(req =>
+                                //{
+                                //    req.UserCreated = listChargeExists.Where(x => x.Id == req.Id).First().UserCreated;
+                                //    req.DatetimeCreated = listChargeExists.Where(x => x.Id == req.Id).First().DatetimeCreated;
+                                //    req.UserModified = userCurrent;
+                                //    req.DatetimeModified = DateTime.Now;
+                                //});
+                                foreach (var item in listChargeSceneUpdate)
+                                {
+                                    item.UserCreated = listChargeExists.Where(x => x.Id == item.Id).First().UserCreated;
+                                    item.DatetimeCreated = listChargeExists.Where(x => x.Id == item.Id).First().DatetimeCreated;
+                                    item.UserModified = userCurrent;
+                                    item.DatetimeModified = DateTime.Now;
+                                    csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                                }
+                                //dc.CsShipmentSurcharge.UpdateRange(listChargeSceneUpdate);
+                            }
 
-                        dc.CsShipmentSurcharge.UpdateRange(listChargeSceneUpdate);
+                            //Xóa các phí hiện trường đã chọn xóa của user
+                            var chargeSceneRemove = chargeScene.Where(x => !model.ShipmentCharge.Select(s => s.Id).Contains(x.Id)).ToList();
+                            if (chargeSceneRemove.Count > 0)
+                            {
+                                foreach (var item in chargeSceneRemove)
+                                {
+                                    csShipmentSurchargeRepo.Delete(x => x.Id == item.Id);
+                                }
+                                //dc.CsShipmentSurcharge.RemoveRange(chargeSceneRemove);
+                            }
+                            //End --Phí hiện trường (IsFromShipment = false)--
+                        }
+                        //dc.SaveChanges();
+                        trans.Commit();
+                        return hs;
                     }
-
-                    //Xóa các phí hiện trường đã chọn xóa của user
-                    var chargeSceneRemove = chargeScene.Where(x => !model.ShipmentCharge.Select(s => s.Id).Contains(x.Id)).ToList();
-                    if (chargeSceneRemove.Count > 0)
+                    catch (Exception ex)
                     {
-                        dc.CsShipmentSurcharge.RemoveRange(chargeSceneRemove);
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
                     }
-                    //End --Phí hiện trường (IsFromShipment = false)--
+                    finally
+                    {
+                        trans.Dispose();
+                    }
                 }
-                dc.SaveChanges();
-                return hs;
             }
             catch (Exception ex)
             {
@@ -1000,7 +1160,7 @@ namespace eFMS.API.Accounting.DL.Services
                        from cstd in cstd2.DefaultIfEmpty()
                        join cst in csTrans on cstd.JobId equals cst.Id into cst2
                        from cst in cst2.DefaultIfEmpty()
-                       join request in advRequest on new { JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo), HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno), MBL = (opst.Mblno == null ? cstd.Mawb : opst.Mblno) } equals new { JobId = request.JobId, HBL = request.Hbl, MBL = request.Mbl } into request1
+                       join request in advRequest on new { JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo), HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno), MBL = (opst.Mblno == null ? cst.Mawb : opst.Mblno) } equals new { JobId = request.JobId, HBL = request.Hbl, MBL = request.Mbl } into request1
                        from request in request1.DefaultIfEmpty()
                        join advance in advPayment on request.AdvanceNo equals advance.AdvanceNo into advance1
                        from advance in advance1.DefaultIfEmpty()
@@ -1027,7 +1187,7 @@ namespace eFMS.API.Accounting.DL.Services
                            PSC = opst.SumPackages.HasValue ? opst.SumPackages.Value : 0,
                            CBM = opst.SumCbm.HasValue ? opst.SumCbm.Value : 0,
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
-                           MBL = (opst.Mblno == null ? cstd.Mawb : opst.Mblno),
+                           MBL = (opst.Mblno == null ? cst.Mawb : opst.Mblno),
                            StlCSName = string.Empty
                        };
 
@@ -1101,7 +1261,7 @@ namespace eFMS.API.Accounting.DL.Services
                            SltDpComment = string.Empty,
                            Shipper = string.Empty,
                            ShipmentInfo = string.Empty,
-                           MBLNO = (opst.Mblno == null ? cstd.Mawb : opst.Mblno),
+                           MBLNO = (opst.Mblno == null ? cst.Mawb : opst.Mblno),
                            VAT = 0,
                            BFVATAmount = 0,
                            ContainerQty = string.Empty,
@@ -1138,49 +1298,57 @@ namespace eFMS.API.Accounting.DL.Services
             var listSettlementPayment = new List<AscSettlementPaymentRequestReport>();
 
             listSettlementPayment = GetChargeOfSettlement(settlementNo, settlement.SettlementCurrency).ToList();
+            if (listSettlementPayment.Count == 0)
+            {
+                return null;
+            }
 
             var parameter = new AscSettlementPaymentRequestReportParams();
             parameter = GetFirstShipmentOfSettlement(settlementNo);
-            parameter.SettleRequester = settlement != null && !string.IsNullOrEmpty(settlement.Requester) ? GetEmployeeByUserId(settlement.Requester)?.EmployeeNameVn : string.Empty;
-            parameter.SettleRequestDate = settlement.RequestDate != null ? settlement.RequestDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-
-            //Lấy thông tin các User Approve Settlement
-            var infoSettleAprove = GetInfoApproveSettlementNoCheckBySettlementNo(settlementNo);
-            parameter.StlDpManagerName = infoSettleAprove != null ? infoSettleAprove.ManagerName : string.Empty;
-            parameter.StlDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.ManagerAprDate.HasValue ? infoSettleAprove.ManagerAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-            parameter.StlAscDpManagerName = infoSettleAprove != null ? infoSettleAprove.AccountantName : string.Empty;
-            parameter.StlAscDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.AccountantAprDate.HasValue ? infoSettleAprove.AccountantAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-            parameter.StlBODSignDate = infoSettleAprove != null && infoSettleAprove.BuheadAprDate.HasValue ? infoSettleAprove.BuheadAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-
-            parameter.CompanyName = Constants.COMPANY_NAME;
-            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
-            parameter.Website = Constants.COMPANY_WEBSITE;
-            parameter.Contact = currentUser.UserID;//Get user login
-
-            //Lấy ra tổng Advance Amount của các charge thuộc Settlement
-            decimal advanceAmount = 0;
-            var shipments = listSettlementPayment.GroupBy(x => new { x.JobID, x.MBLNO, x.HBL }).Select(x => new { JobID = x.Key.JobID, MBLNO = x.Key.MBLNO, HBL = x.Key.HBL });
-            foreach (var item in shipments)
+            if (parameter != null)
             {
-                advanceAmount += GetAdvanceAmountByShipmentAndCurrency(item.JobID, item.MBLNO, item.HBL, settlement.SettlementCurrency);
-            }
-            parameter.AdvValue = advanceAmount > 0 ? String.Format("{0:n}", advanceAmount) : string.Empty;
-            parameter.AdvCurrency = advanceAmount > 0 ? settlement.SettlementCurrency : string.Empty;
+                parameter.SettleRequester = (settlement != null && !string.IsNullOrEmpty(settlement.Requester)) ? GetEmployeeByUserId(settlement.Requester)?.EmployeeNameEn : string.Empty;
 
-            //Chuyển tiền Amount thành chữ
-            decimal _amount = advanceAmount > 0 ? advanceAmount : 0;
-            var _inword = string.Empty;
-            if (_amount > 0)
-            {
-                var _currency = settlement.SettlementCurrency == Constants.CURRENCY_LOCAL ?
-                           (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
-                        :
-                        settlement.SettlementCurrency;
+                parameter.SettleRequestDate = settlement.RequestDate != null ? settlement.RequestDate.Value.ToString("dd/MM/yyyy") : string.Empty;
 
-                _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
+                //Lấy thông tin các User Approve Settlement
+                var infoSettleAprove = GetInfoApproveSettlementNoCheckBySettlementNo(settlementNo);
+                parameter.StlDpManagerName = infoSettleAprove != null ? infoSettleAprove.ManagerName : string.Empty;
+                parameter.StlDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.ManagerAprDate.HasValue ? infoSettleAprove.ManagerAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                parameter.StlAscDpManagerName = infoSettleAprove != null ? infoSettleAprove.AccountantName : string.Empty;
+                parameter.StlAscDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.AccountantAprDate.HasValue ? infoSettleAprove.AccountantAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                parameter.StlBODSignDate = infoSettleAprove != null && infoSettleAprove.BuheadAprDate.HasValue ? infoSettleAprove.BuheadAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+
+                parameter.CompanyName = Constants.COMPANY_NAME;
+                parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+                parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
+                parameter.Website = Constants.COMPANY_WEBSITE;
+                parameter.Contact = currentUser.UserID;//Get user login
+
+                //Lấy ra tổng Advance Amount của các charge thuộc Settlement
+                decimal advanceAmount = 0;
+                var shipments = listSettlementPayment.GroupBy(x => new { x.JobID, x.MBLNO, x.HBL }).Select(x => new { JobID = x.Key.JobID, MBLNO = x.Key.MBLNO, HBL = x.Key.HBL });
+                foreach (var item in shipments)
+                {
+                    advanceAmount += GetAdvanceAmountByShipmentAndCurrency(item.JobID, item.MBLNO, item.HBL, settlement.SettlementCurrency);
+                }
+                parameter.AdvValue = advanceAmount > 0 ? String.Format("{0:n}", advanceAmount) : string.Empty;
+                parameter.AdvCurrency = advanceAmount > 0 ? settlement.SettlementCurrency : string.Empty;
+
+                //Chuyển tiền Amount thành chữ
+                decimal _amount = advanceAmount > 0 ? advanceAmount : 0;
+                var _inword = string.Empty;
+                if (_amount > 0)
+                {
+                    var _currency = settlement.SettlementCurrency == Constants.CURRENCY_LOCAL ?
+                               (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
+                            :
+                            settlement.SettlementCurrency;
+
+                    _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
+                }
+                parameter.Inword = _inword;
             }
-            parameter.Inword = _inword;
 
             result = new Crystal
             {
@@ -1203,7 +1371,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var userCurrent = currentUser.UserID;
 
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
                 var acctApprove = mapper.Map<AcctApproveSettlement>(settlement);
 
@@ -1216,63 +1384,81 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
 
-                //Lấy ra brandId của user 
-                var brandOfUser = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
-                if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
-
-                //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
-                acctApprove.Leader = GetLeaderIdOfUser(userCurrent);
-                acctApprove.Manager = GetManagerIdOfUser(userCurrent, brandOfUser.ToString());
-                if (string.IsNullOrEmpty(acctApprove.Manager)) return new HandleState("Not found department manager of user");
-                acctApprove.Accountant = GetAccountantId(brandOfUser.ToString());
-                if (string.IsNullOrEmpty(acctApprove.Accountant)) return new HandleState("Not found accountant manager");
-                acctApprove.Buhead = GetBUHeadId(brandOfUser.ToString());
-
-                var checkExistsApproveBySettlementNo = acctApproveSettlementRepo.Get(x => x.SettlementNo == acctApprove.SettlementNo && x.IsDeputy == false).FirstOrDefault();
-                if (checkExistsApproveBySettlementNo == null) //Insert AcctApproveSettlement
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    acctApprove.Id = Guid.NewGuid();
-                    acctApprove.RequesterAprDate = DateTime.Now;
-                    acctApprove.UserCreated = acctApprove.UserModified = userCurrent;
-                    acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
-                    acctApprove.IsDeputy = false;
-                    dc.AcctApproveSettlement.Add(acctApprove);
-                }
-                else //Update AcctApproveSettlement by SettlementNo
-                {
-                    checkExistsApproveBySettlementNo.RequesterAprDate = DateTime.Now;
-                    checkExistsApproveBySettlementNo.UserModified = userCurrent;
-                    checkExistsApproveBySettlementNo.DateModified = DateTime.Now;
-                    dc.AcctApproveSettlement.Update(checkExistsApproveBySettlementNo);
-                }
-                dc.SaveChanges();
+                    try
+                    {
+                        //Lấy ra brandId của user 
+                        var brandOfUser = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                        if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
 
-                var emailLeaderOrManager = string.Empty;
-                var userLeaderOrManager = string.Empty;
-                //Send mail đề nghị approve đến Leader(Nếu có) nếu không có thì send tới Manager Dept
-                //Lấy ra Leader của User & Manager Dept của User Requester
-                if (string.IsNullOrEmpty(acctApprove.Leader))
-                {
-                    userLeaderOrManager = acctApprove.Manager;
-                    //Lấy ra employeeId của managerIdOfUser
-                    var employeeIdOfUserManager = GetEmployeeIdOfUser(userLeaderOrManager);
-                    //Lấy ra email của Manager
-                    emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserManager)?.Email;
+                        //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
+                        acctApprove.Leader = GetLeaderIdOfUser(userCurrent);
+                        acctApprove.Manager = GetManagerIdOfUser(userCurrent, brandOfUser.ToString());
+                        if (string.IsNullOrEmpty(acctApprove.Manager)) return new HandleState("Not found department manager of user");
+                        acctApprove.Accountant = GetAccountantId(brandOfUser.ToString());
+                        if (string.IsNullOrEmpty(acctApprove.Accountant)) return new HandleState("Not found accountant manager");
+                        acctApprove.Buhead = GetBUHeadId(brandOfUser.ToString());
+
+                        var checkExistsApproveBySettlementNo = acctApproveSettlementRepo.Get(x => x.SettlementNo == acctApprove.SettlementNo && x.IsDeputy == false).FirstOrDefault();
+                        if (checkExistsApproveBySettlementNo == null) //Insert AcctApproveSettlement
+                        {
+                            acctApprove.Id = Guid.NewGuid();
+                            acctApprove.RequesterAprDate = DateTime.Now;
+                            acctApprove.UserCreated = acctApprove.UserModified = userCurrent;
+                            acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
+                            acctApprove.IsDeputy = false;
+                            //dc.AcctApproveSettlement.Add(acctApprove);
+                            var hsAddApproveSettlement = acctApproveSettlementRepo.Add(acctApprove);
+                        }
+                        else //Update AcctApproveSettlement by SettlementNo
+                        {
+                            checkExistsApproveBySettlementNo.RequesterAprDate = DateTime.Now;
+                            checkExistsApproveBySettlementNo.UserModified = userCurrent;
+                            checkExistsApproveBySettlementNo.DateModified = DateTime.Now;
+                            //dc.AcctApproveSettlement.Update(checkExistsApproveBySettlementNo);
+                            var hsUpdateApproveSettlement = acctApproveSettlementRepo.Update(checkExistsApproveBySettlementNo, x => x.Id == checkExistsApproveBySettlementNo.Id);
+                        }
+                        //dc.SaveChanges();
+                        trans.Commit();
+
+                        var emailLeaderOrManager = string.Empty;
+                        var userLeaderOrManager = string.Empty;
+                        //Send mail đề nghị approve đến Leader(Nếu có) nếu không có thì send tới Manager Dept
+                        //Lấy ra Leader của User & Manager Dept của User Requester
+                        if (string.IsNullOrEmpty(acctApprove.Leader))
+                        {
+                            userLeaderOrManager = acctApprove.Manager;
+                            //Lấy ra employeeId của managerIdOfUser
+                            var employeeIdOfUserManager = GetEmployeeIdOfUser(userLeaderOrManager);
+                            //Lấy ra email của Manager
+                            emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserManager)?.Email;
+                        }
+                        else
+                        {
+                            userLeaderOrManager = acctApprove.Leader;
+                            //Lấy ra employeeId của managerIdOfUser
+                            var employeeIdOfUserLeader = GetEmployeeIdOfUser(userLeaderOrManager);
+                            //Lấy ra email của Leader (hiện tại chưa có nên gán rỗng)
+                            emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserLeader)?.Email;
+                        }
+
+                        if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not Found Leader or Manager");
+
+                        var sendMailResult = SendMailSuggestApproval(acctApprove.SettlementNo, userLeaderOrManager, emailLeaderOrManager);
+
+                        return !sendMailResult ? new HandleState("Send mail suggest Approval Failed") : new HandleState();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
                 }
-                else
-                {
-                    userLeaderOrManager = acctApprove.Leader;
-                    //Lấy ra employeeId của managerIdOfUser
-                    var employeeIdOfUserLeader = GetEmployeeIdOfUser(userLeaderOrManager);
-                    //Lấy ra email của Leader (hiện tại chưa có nên gán rỗng)
-                    emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserLeader)?.Email;
-                }
-
-                if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not Found Leader or Manager");
-
-                var sendMailResult = SendMailSuggestApproval(acctApprove.SettlementNo, userLeaderOrManager, emailLeaderOrManager);
-
-                return !sendMailResult ? new HandleState("Send mail suggest Approval Failed") : new HandleState();
             }
             catch (Exception ex)
             {
@@ -1693,12 +1879,12 @@ namespace eFMS.API.Accounting.DL.Services
                             sur.SettlementCode == settlementNo
                         && (ops.JobNo == null ? cst.JobNo : ops.JobNo) != null
                         && (ops.Hwbno == null ? cstd.Hwbno : ops.Hwbno) != null
-                        && (ops.Mblno == null ? cstd.Mawb : ops.Mblno) != null
+                        && (ops.Mblno == null ? cst.Mawb : ops.Mblno) != null
                         select new Shipments
                         {
                             JobId = (ops.JobNo == null ? cst.JobNo : ops.JobNo),
                             HBL = (ops.Hwbno == null ? cstd.Hwbno : ops.Hwbno),
-                            MBL = (ops.Mblno == null ? cstd.Mawb : ops.Mblno)
+                            MBL = (ops.Mblno == null ? cst.Mawb : ops.Mblno)
                         };
             var listShipment = query
                             .GroupBy(x => new { x.JobId, x.MBL, x.HBL })
@@ -1795,9 +1981,9 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy ra employeeId của User
-        private string GetEmployeeIdOfUser(string UserId)
+        private string GetEmployeeIdOfUser(string userName)
         {
-            return sysUserRepo.Get(x => x.Id == UserId).FirstOrDefault()?.EmployeeId;
+            return sysUserRepo.Get(x => x.Username == userName).FirstOrDefault()?.EmployeeId;
         }
 
         //Lấy info Employee của User dựa vào employeeId
@@ -1806,11 +1992,12 @@ namespace eFMS.API.Accounting.DL.Services
             return sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
         }
 
-        //Lấy info Employee của User dựa vào userId
-        private SysEmployee GetEmployeeByUserId(string userId)
+        //Lấy info Employee của User dựa vào userName
+        private SysEmployee GetEmployeeByUserId(string userName)
         {
-            var employeeId = GetEmployeeIdOfUser(userId);
-            return sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
+            var employeeId = GetEmployeeIdOfUser(userName);
+            var data = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
+            return data;
         }
 
         //Lấy ra ds các user được ủy quyền theo nhóm leader, manager department, accountant manager, BUHead dựa vào dept

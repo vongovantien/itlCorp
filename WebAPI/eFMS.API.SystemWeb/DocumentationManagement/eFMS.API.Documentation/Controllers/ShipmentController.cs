@@ -81,12 +81,17 @@ namespace eFMS.API.Documentation.Controllers
             List<string> shipmentNotExits = new List<string>();
             if(typeSearch == "JOBID")
             {
-                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.JobId).Contains(x)).Select(s => s.ToString()).ToList();
+                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.JobId).Contains(x)).Select(s => s).ToList();
+            }
+
+            if (typeSearch == "MBL")
+            {
+                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.MBL).Contains(x)).Select(s => s).ToList();
             }
 
             if (typeSearch == "HBL")
             {
-                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.HBL).Contains(x)).Select(s => s.ToString()).ToList();
+                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.HBL).Contains(x)).Select(s => s).ToList();
             }
 
             var _status = false;

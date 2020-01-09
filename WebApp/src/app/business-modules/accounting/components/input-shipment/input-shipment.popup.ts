@@ -8,7 +8,7 @@ import { ToastrService } from "ngx-toastr";
     selector: 'input-shipment-popup',
     templateUrl: './input-shipment.popup.html'
 })
-export class InputShipmentPopupComponent extends PopupBase {
+export class ShareAccountingInputShipmentPopupComponent extends PopupBase {
     @Output() onInputShipment: EventEmitter<any> = new EventEmitter<any>();
     shipmentTypes = [
         { text: 'JOB ID', id: 'JOBID' },
@@ -19,19 +19,19 @@ export class InputShipmentPopupComponent extends PopupBase {
     shipmentSearch: string = '';
     constructor(
         private _documentRepo: DocumentationRepo,
-        private _toastService: ToastrService,) {
+        private _toastService: ToastrService, ) {
         super();
         this.selectedShipmentType = "JOBID";
     }
 
-    ngOnInit() {}
+    ngOnInit() { }
 
     onChangeShipmentType(shipmentType: any) {
         this.selectedShipmentType = shipmentType.id;
     }
 
     Ok() {
-        const data: IInputShipment = {
+        const data: OperationInteface.IInputShipment = {
             type: this.selectedShipmentType,
             keyword: this.shipmentSearch,
         };
@@ -40,7 +40,7 @@ export class InputShipmentPopupComponent extends PopupBase {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    if(res.status){
+                    if (res.status) {
                         this._toastService.error(res.message);
                     }
                 }
@@ -51,10 +51,10 @@ export class InputShipmentPopupComponent extends PopupBase {
 
     closePopup() {
         this.hide();
+        const data: OperationInteface.IInputShipment = {
+            type: this.selectedShipmentType,
+            keyword: this.shipmentSearch,
+        };
+        this.onInputShipment.emit(data);
     }
-}
-
-interface IInputShipment {
-    type: string;
-    keyword: string;
 }
