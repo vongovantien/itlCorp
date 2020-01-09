@@ -59,5 +59,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string InternalReferenceNo { get; set; }
+        public string CoLoaderCode { get; set; }
     }
 }

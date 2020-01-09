@@ -27,14 +27,14 @@
                                 </button>
                             </div>
                         </td>
-                        <td>{{partner.id}}</td>
+                        <td>{{partner.accountNo}}</td>
                         <td>{{partner.shortName}}</td>
                         <td>{{partner.addressVn}}</td>
                         <td>{{partner.taxCode}}</td>
                         <td>{{partner.tel}}</td>
                         <td>{{partner.fax}}</td>
                         <td>{{partner.userCreatedName}}</td>
-                        <td>{{partner.datetimeModified}}</td>
+                        <td>{{partner.datetimeModified | date:'dd/MM/yyyy' }}</td>
                         <td [ngClass]="partner.active ? 'text-success' : 'text-danger'">
                             {{partner.active ? 'Active' : 'Inactive'}}</td>
                     </tr>
@@ -55,6 +55,9 @@
                                         </td>
                                         <td>
                                             <span>{{sale.company}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{sale.username}}</span>
                                         </td>
                                         <td [ngClass]="sale.status ? 'text-success' : 'text-danger'">
                                             {{sale.status ? 'Active' : 'Inactive'}}</td>

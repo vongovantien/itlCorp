@@ -8,7 +8,7 @@ namespace eFMS.API.Catalogue.Models
     public class CatSaleManEditModel
     {
         public Guid? Id { get; set; }
-        public string Saleman_ID { get; set; }
+        public string SaleManId { get; set; }
         public string Office { get; set; }
         public string Company { get; set; }
         public string Service { get; set; }
@@ -17,5 +17,9 @@ namespace eFMS.API.Catalogue.Models
         public DateTime? EffectDate { get; set; }
         public string Description { get; set; }
         public string UserCreated { get; set; }
+        public string FreightPayment { get; set; }
+        public string ServiceName { get; set; }
+        public DateTime? CreateDate { get; set; }
+
     }
 }

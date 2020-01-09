@@ -15,6 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-partner-data-add',
@@ -98,7 +99,7 @@ export class AddPartnerDataComponent extends AppList {
         if (this.saleMandetail.length > 0) {
             for (const it of this.saleMandetail) {
                 this.services.forEach(item => {
-                    if (it.service === item.text) {
+                    if (it.service === item.id) {
                         it.service = item.id;
                     }
                 });
@@ -110,7 +111,7 @@ export class AddPartnerDataComponent extends AppList {
             for (const it of this.saleMandetail) {
                 this.services.forEach(item => {
                     if (it.service === item.id) {
-                        it.service = item.text;
+                        it.service = item.id;
                     }
                 });
             }
@@ -118,7 +119,7 @@ export class AddPartnerDataComponent extends AppList {
 
 
         if (this.salemanToAdd.service !== null && this.salemanToAdd.office !== null) {
-            this._catalogueRepo.checkExistedSaleman(this.salemanToAdd.service, this.salemanToAdd.office)
+            this._catalogueRepo.checkExistedSaleman(this.salemanToAdd.service[0].id, this.salemanToAdd.office)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: any) => {
@@ -128,21 +129,17 @@ export class AddPartnerDataComponent extends AppList {
                                 this.toastr.error('Duplicate service, office with sale man!');
                             } else {
                                 this.saleMandetail.push(this.salemanToAdd);
-                                console.log(this.saleMandetail[0]);
                                 /// get detail employee --- to be continue
-                                this.getEmployee(this.saleMandetail[0].saleman_ID);
+                                this.getEmployee(this.saleMandetail[0].saleManId);
                                 this.poupSaleman.hide();
                                 for (const it of this.saleMandetail) {
 
                                     this.services.forEach(item => {
                                         if (it.service === item.id) {
-                                            it.service = item.text;
+                                            it.serviceName = item.text;
                                         }
                                     });
                                 }
-                                this.saleMandetail.forEach(element => {
-                                    element.status = element.status.value;
-                                });
 
                             }
                         }
@@ -161,6 +158,7 @@ export class AddPartnerDataComponent extends AppList {
     showPopupSaleman() {
         this.poupSaleman.isSave = false;
         this.poupSaleman.isDetail = false;
+        this.poupSaleman.resetForm();
         this.poupSaleman.show();
     }
 
@@ -174,7 +172,7 @@ export class AddPartnerDataComponent extends AppList {
     }
     deleteSaleman(index: any) {
         this.index = index;
-        this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].saleman_ID}?`;
+        this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].username}?`;
         this.confirmDeleteJobPopup.show();
     }
     getDataCombobox() {
@@ -209,7 +207,7 @@ export class AddPartnerDataComponent extends AppList {
                 (res: any) => {
                     if (!!res) {
                         this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
-                        this.selectedService = this.services[0];
+
                     }
                 },
             );
@@ -314,6 +312,10 @@ export class AddPartnerDataComponent extends AppList {
     onSubmit() {
         this.formPartnerComponent.isSubmitted = true;
         this.partner.saleMans = this.saleMandetail;
+        this.partner.saleMans.forEach(element => {
+            element.effectDate = element.effectDate !== null ? formatDate(element.effectDate.startDate !== undefined ? element.effectDate.startDate : element.effectDate, 'yyyy-MM-dd', 'en') : null;
+            element.createDate = element.createDate !== null ? formatDate(element.createDate.startDate !== undefined ? element.createDate.startDate : element.createDate, 'yyyy-MM-dd', 'en') : null;
+        });
         this.getFormPartnerData();
         if (this.partner.countryId == null || this.partner.provinceId == null
             || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
@@ -323,7 +325,6 @@ export class AddPartnerDataComponent extends AppList {
         this.formPartnerComponent.partnerWorkPlace.setErrors(null);
         this.formPartnerComponent.partnerAccountRef.setErrors(null);
         if (this.formPartnerComponent.partnerForm.valid) {
-            this.partner.accountNo = this.partner.id;
             if (this.saleMandetail.length === 0) {
                 if (this.isShowSaleMan) {
                     this.toastr.error('Please add saleman and service for customer!');
@@ -334,7 +335,7 @@ export class AddPartnerDataComponent extends AppList {
             if (this.saleMandetail.length > 0) {
                 for (const it of this.saleMandetail) {
                     this.services.forEach(item => {
-                        if (it.service === item.text) {
+                        if (it.service[0].id === item.id) {
                             it.service = item.id;
                         }
                     });
@@ -354,7 +355,11 @@ export class AddPartnerDataComponent extends AppList {
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
-        this.partner.accountNo = formBody.internalReferenceNo + "." + formBody.taxCode;
+        // if (formBody.internalReferenceNo != null) {
+        //     this.partner.accountNo = formBody.internalReferenceNo + "." + formBody.taxCode;
+        // } else {
+        //     this.partner.accountNo = formBody.taxCode;
+        // }
         this.partner.partnerGroup = formBody.partnerGroup[0].id;
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
@@ -375,13 +380,17 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.addressShippingVn = formBody.shippingAddressVN;
         this.partner.addressShippingEn = formBody.shippingAddressEN;
         this.partner.shortName = formBody.shortName;
-        if (formBody.billingCountry.length > 0) {
-            this.partner.countryId = formBody.billingCountry[0].id;
+        if (formBody.billingCountry !== null) {
+            if (formBody.billingCountry.length > 0) {
+                this.partner.countryId = formBody.billingCountry[0].id;
+            }
         }
-        if (formBody.shippingCountry.length > 0) {
-            this.partner.countryShippingId = formBody.shippingCountry[0].id;
+        if (formBody.shippingCountry !== null) {
+            if (formBody.shippingCountry.length > 0) {
+                this.partner.countryShippingId = formBody.shippingCountry[0].id;
+            }
         }
-        this.partner.accountNo = formBody.partnerAccountNo;
+
         this.partner.tel = formBody.partnerContactNumber;
         this.partner.fax = formBody.partnerContactFaxNo;
         this.partner.taxCode = formBody.taxCode;
@@ -410,6 +419,7 @@ export class AddPartnerDataComponent extends AppList {
             this.partner.workPlaceId = formBody.partnerWorkPlace.length > 0 ? formBody.partnerWorkPlace[0].id : null;
         }
         this.partner.internalReferenceNo = formBody.internalReferenceNo;
+        this.partner.coLoaderCode = formBody.coLoaderCode;
     }
 
     onCreatePartner() {
@@ -452,18 +462,21 @@ export class AddPartnerDataComponent extends AppList {
             this.saleMandetail = this._sortService.sort(this.saleMandetail, sortData.sortField, sortData.order);
         }
     }
-    showDetailSaleMan(saleman: Saleman, index: any) {
-        this.poupSaleman.index = index;
+
+    showDetailSaleMan(saleman: Saleman, id: any) {
         this.poupSaleman.isDetail = true;
+        const obj = this.saleMandetail.find(x => x.id === id);
         const saleMane: any = {
-            description: saleman.description,
-            office: saleman.office,
-            effectDate: saleman.effectDate,
-            status: saleman.status === true ? 'Active' : 'Inactive',
+            description: obj.description,
+            office: obj.office,
+            effectDate: obj.effectDate,
+            status: obj.status,
             partnerId: null,
-            saleman_ID: saleman.saleman_ID,
-            service: saleman.service,
-            createDate: saleman.createDate
+            saleManId: obj.saleManId,
+            service: obj.service,
+            createDate: obj.createDate,
+            freightPayment: obj.freightPayment,
+            serviceName: obj.serviceName
 
         };
         this.poupSaleman.showSaleman(saleMane);

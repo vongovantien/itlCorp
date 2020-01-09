@@ -1,9 +1,9 @@
 export class SalemanAdd {
     id: string = '';
-    saleman_ID: string = '';
+    saleManId: string = '';
     office: string = '';
     company: string = '';
-    service: string = '';
+    service: any = '';
     partnerId: string = '';
     createDate: string = '';
     status?: boolean = false;
@@ -11,6 +11,7 @@ export class SalemanAdd {
     effectDate: any = '';
     statusString: string = '';
     userCreated: string = '';
+    username: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
