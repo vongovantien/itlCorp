@@ -13,7 +13,6 @@ import { SystemConstants } from 'src/constants/system.const';
 @Component({
     selector: 'add-charge',
     templateUrl: './add-charge.component.html',
-    styleUrls: ['./add-charge.component.scss']
 })
 export class AddChargeComponent extends AppPage {
     @ViewChild(FormAddChargeComponent, { static: false }) formAddCharge: FormAddChargeComponent;
@@ -39,6 +38,8 @@ export class AddChargeComponent extends AppPage {
         this.ChargeToAdd.charge.unitPrice = this.formAddCharge.unitPrice.value;
         this.ChargeToAdd.charge.currencyId = this.formAddCharge.currency.value[0].id;
         this.ChargeToAdd.charge.vatrate = this.formAddCharge.vat.value;
+        this.ChargeToAdd.charge.debitCharge = this.formAddCharge.debitCharge.value;
+
         let serviceTypeId = '';
         this.ChargeToAdd.charge.type = this.formAddCharge.type.value[0].id;
         if (this.formAddCharge.service.value !== null) {

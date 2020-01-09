@@ -4,7 +4,9 @@ import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/fo
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
-import { forkJoin } from 'rxjs';
+import { Observable } from 'rxjs';
+import { Charge } from '@models';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'form-add-charge',
@@ -12,8 +14,9 @@ import { forkJoin } from 'rxjs';
 })
 
 export class FormAddChargeComponent extends AppForm {
+
     formGroup: FormGroup;
-    isSubmitted: boolean = false;
+
     code: AbstractControl;
     nameEn: AbstractControl;
     nameVn: AbstractControl;
@@ -23,18 +26,25 @@ export class FormAddChargeComponent extends AppForm {
     vat: AbstractControl;
     type: AbstractControl;
     service: AbstractControl;
+    debitCharge: AbstractControl;
+
     ngDataUnit: any = [];
     ngDataCurrentcyUnit: any = [];
     activeServices: any = [];
+
     Charge: CatChargeToAddOrUpdate = null;
     serviceTypeId: string = '';
+
     requiredService: boolean = false;
+    isSubmitted: boolean = false;
+    isShowMappingSelling: boolean = false;
 
     ngDataType = [
         { id: "CREDIT", text: "CREDIT" },
         { id: "DEBIT", text: "DEBIT" },
         { id: "OBH", text: "OBH" }
     ];
+
     ngDataService = [
         { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },
         { text: ChargeConstants.AI_DES, id: ChargeConstants.AI_CODE },
@@ -48,6 +58,8 @@ export class FormAddChargeComponent extends AppForm {
         { text: ChargeConstants.CL_DES, id: ChargeConstants.CL_CODE }
     ];
 
+    debitCharges: Observable<Charge[]>;
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo
@@ -59,6 +71,8 @@ export class FormAddChargeComponent extends AppForm {
         this.getUnit();
         this.getCurrency();
         this.initForm();
+
+        this.debitCharges = this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.DEBIT });
     }
 
     initForm() {
@@ -71,8 +85,10 @@ export class FormAddChargeComponent extends AppForm {
             currency: [null, Validators.required],
             vat: [null, Validators.required],
             type: [null, Validators.required],
-            service: [null, Validators.required]
+            service: [null, Validators.required],
+            debitCharge: []
         });
+
         this.code = this.formGroup.controls["code"];
         this.nameEn = this.formGroup.controls["nameEn"];
         this.nameVn = this.formGroup.controls["nameVn"];
@@ -82,6 +98,21 @@ export class FormAddChargeComponent extends AppForm {
         this.vat = this.formGroup.controls["vat"];
         this.type = this.formGroup.controls["type"];
         this.service = this.formGroup.controls["service"];
+        this.debitCharge = this.formGroup.controls["debitCharge"];
+
+        this.type.valueChanges
+            .subscribe(
+                (value: CommonInterface.INg2Select[]) => {
+                    if (!!value && !!value.length) {
+                        if (value[0].id === CommonEnum.CHARGE_TYPE.CREDIT) {
+                            this.isShowMappingSelling = true;
+                        } else {
+                            this.isShowMappingSelling = false;
+                        }
+                    }
+                    console.log(value);
+                }
+            );
     }
 
 
@@ -151,7 +182,8 @@ export class FormAddChargeComponent extends AppForm {
             currency: [<CommonInterface.INg2Select>{ id: res.charge.currencyId, text: res.charge.currencyId }],
             vat: res.charge.vatrate,
             type: [<CommonInterface.INg2Select>{ id: res.charge.type, text: res.charge.type }],
-            service: [<CommonInterface.INg2Select>{ id: res.charge.serviceTypeId, text: '' }]
+            service: [<CommonInterface.INg2Select>{ id: res.charge.serviceTypeId, text: '' }],
+            debitCharge: res.charge.debitCharge
         });
         const itemUnit = this.ngDataUnit.find(x => x.id === res.charge.unitId);
         this.unit.setValue([<CommonInterface.INg2Select>{ id: res.charge.unitId, text: itemUnit.text }]);

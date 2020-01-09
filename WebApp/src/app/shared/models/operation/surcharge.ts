@@ -41,6 +41,11 @@ export class Surcharge {
     soaclosed: boolean = false;
     soano: string = '';
 
+    jobNo: string = null;
+    mblno: string = null;
+    hblno: string = null;
+    advanceNo: string = null;
+
     // * Custom
     obhId: string = null;
 

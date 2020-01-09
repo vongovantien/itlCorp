@@ -21,5 +21,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string PartnerShortName { get; set; }
         public string ReceiverShortName { get; set; }
         public string PayerShortName { get; set; }
+        public Guid? DebitCharge { get; set; }
+
     }
 }

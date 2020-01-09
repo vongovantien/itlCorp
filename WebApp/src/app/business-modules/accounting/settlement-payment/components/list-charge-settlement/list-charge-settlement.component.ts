@@ -105,7 +105,7 @@ export class SettlementListChargeComponent extends AppList {
         if (charges.length === 1) {
             const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === charges[0].hblid);
             if (indexChargeUpdating !== -1) {
-                this.surcharges[indexChargeUpdating] = this.surcharges.find(item => item.hblid === charges[0].hblid);
+                this.surcharges[indexChargeUpdating] = charges[0];
                 this.surcharges = [...this.surcharges];
             }
         } else {
@@ -123,6 +123,7 @@ export class SettlementListChargeComponent extends AppList {
     updateSurchargeWithIndex(index: number, surcharge: Surcharge) {
         this.surcharges[index] = surcharge;
         this.surcharges = [...this.surcharges];
+
     }
 
     onUpdateRequestSurcharge(surcharge: any) {
@@ -285,14 +286,10 @@ export class SettlementListChargeComponent extends AppList {
         if (!!shipment) {
             this.tableListChargePopup.selectedShipment = shipment;
 
-            // * Update value form.
-            this.tableListChargePopup.formGroup.patchValue({
-                shipment: shipment.hblid,
-            });
+
 
             // * Filter charge with hblID.
             const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid);
-
             if (!!surcharges.length) {
                 this.tableListChargePopup.charges = cloneDeep(surcharges);
 
@@ -302,6 +299,13 @@ export class SettlementListChargeComponent extends AppList {
                         item.payer = partner.shortName;
                     }
                 });
+
+                // * Update value form.
+                this.tableListChargePopup.formGroup.patchValue({
+                    shipment: shipment.hblid,
+                    advanceNo: surcharges[0].advanceNo
+                });
+
                 this.tableListChargePopup.isUpdate = true;
                 this.tableListChargePopup.show();
             }

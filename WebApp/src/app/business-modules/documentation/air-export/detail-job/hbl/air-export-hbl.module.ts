@@ -46,7 +46,7 @@ const LIB = [
     FroalaEditorModule.forRoot(),
     NgxCurrencyModule.forRoot({
         align: "right",
-        allowNegative: false,
+        allowNegative: true,
         allowZero: true,
         decimal: ".",
         precision: 3,

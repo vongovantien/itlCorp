@@ -124,7 +124,7 @@ export class CatalogueRepo {
         );
     }
 
-    getListCurrency(page?: number, size?: number, body?: any) {
+    getListCurrency(page?: number, size?: number, body: any = { active: true }) {
         if (!!page && !!size && !!body) {
             return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrency/paging`, body, {
                 page: '' + page,
@@ -136,7 +136,7 @@ export class CatalogueRepo {
                 })
             );
         } else {
-            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrency/getAllByQuery`, body).pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => {
                     return data;

@@ -153,26 +153,40 @@
                             </ng-select>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Purhase Order(P/O) No</label>
-                                    <input type="text" class="form-control" formControlName="pono">
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger':  isSubmitted && !personalIncharge.value}">
-                                    <label required>Personal In Charge</label>
-                                    <input type="text" class="form-control" formControlName="personalIncharge">
-                                </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Purhase Order(P/O) No</label>
+                            <input type="text" class="form-control" formControlName="pono">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Service Date</label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
+                                    formControlName="serviceDate" />
+                                <span class="m-input-icon_clear" (click)="resetFormControl(serviceDate)"
+                                    *ngIf="!!serviceDate.value && !!serviceDate.value.startDate">
+                                    <i class="la la-times"></i>
+                                </span>
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':  isSubmitted && !personalIncharge.value}">
+                            <label required>Personal In Charge</label>
+                            <input type="text" class="form-control" formControlName="personalIncharge">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
                         <label>Note</label>
                         <textarea cols="30" rows="6" class="form-control" formControlName="notes"></textarea>
                     </div>
