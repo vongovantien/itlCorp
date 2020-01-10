@@ -5,17 +5,31 @@ export interface ISurcharge {
     buyings: CsShipmentSurcharge[];
     sellings: CsShipmentSurcharge[];
     obhs: CsShipmentSurcharge[];
+    isLoading: boolean;
 }
 
 export const initialState: ISurcharge = {
     buyings: [],
     sellings: [],
     obhs: [],
+    isLoading: false
 };
 
 
 export function SurchargeReducer(state = initialState, action: SurchargeAction): ISurcharge {
     switch (action.type) {
+        case SurchargeActionTypes.GET_BUYING: {
+            return { ...state, isLoading: true };
+        }
+
+        case SurchargeActionTypes.GET_SELLING: {
+            return { ...state, isLoading: true };
+        }
+
+        case SurchargeActionTypes.GET_OBH: {
+            return { ...state, isLoading: true };
+        }
+
         case SurchargeActionTypes.GET_BUYING_SUCCESS: {
             for (const charge of action.payload) {
                 charge.invoiceDate = (!!charge.invoiceDate || (!!charge.invoiceDate && charge.invoiceDate.startDate)) ? { startDate: new Date(charge.invoiceDate), endDate: new Date(charge.invoiceDate) } : null;
@@ -23,7 +37,8 @@ export function SurchargeReducer(state = initialState, action: SurchargeAction):
             }
             return {
                 ...state,
-                buyings: action.payload
+                buyings: action.payload,
+                isLoading: false
             };
         }
         case SurchargeActionTypes.ADD_BUYING: {
@@ -53,7 +68,9 @@ export function SurchargeReducer(state = initialState, action: SurchargeAction):
             }
             return {
                 ...state,
-                sellings: action.payload
+                sellings: action.payload,
+                isLoading: false
+
             };
         }
         case SurchargeActionTypes.ADD_SELLING: {
@@ -83,7 +100,8 @@ export function SurchargeReducer(state = initialState, action: SurchargeAction):
             }
             return {
                 ...state,
-                obhs: action.payload
+                obhs: action.payload,
+                isLoading: false
             };
         }
         case SurchargeActionTypes.ADD_OBH: {

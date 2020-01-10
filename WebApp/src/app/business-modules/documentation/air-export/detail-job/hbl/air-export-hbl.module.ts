@@ -20,6 +20,7 @@ import { AirExportHBLAttachListComponent } from './components/attach-list/attach
 import { AirExportDetailHBLComponent } from './detail/detail-house-bill.component';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SeparateHouseBillComponent } from './components/form-separate-house-bill/form-separate-house-bill.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 
 const routing: Routes = [
@@ -71,6 +72,7 @@ const LIB = [
         FormsModule,
         RouterModule.forChild(routing),
         ReactiveFormsModule,
+        NgxSpinnerModule,
         ...LIB
     ],
     exports: [],
