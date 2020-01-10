@@ -25,7 +25,7 @@ import { ApporveSettlementPaymentComponent } from '../approve-payment/settlement
 import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
 import { SettlementFormCopyPopupComponent } from './components/popup/copy-settlement/copy-settlement.popup';
 import { SettlementTableListChargePopupComponent } from './components/popup/table-list-charge/table-list-charge.component';
-
+import { ShareAccountingModule } from '../share-accouting.module';
 
 const routing: Routes = [
     {
@@ -58,7 +58,7 @@ const COMPONENT = [
     SettlementShipmentItemComponent,
     SettlementTableSurchargeComponent,
     SettlementFormCopyPopupComponent,
-    SettlementTableListChargePopupComponent
+    SettlementTableListChargePopupComponent,
 ];
 
 const customCurrencyMaskConfig = {
@@ -89,6 +89,7 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         ShareApprovePaymentModule,
         BsDropdownModule.forRoot(),
+        ShareAccountingModule
 
 
     ],

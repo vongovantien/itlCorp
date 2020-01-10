@@ -197,13 +197,11 @@
             <param name="HBL"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetExistsCharge(System.String,System.String,System.String)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetExistsCharge(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria)">
             <summary>
             Get exists charge by shipment
             </summary>
-            <param name="JobId"></param>
-            <param name="HBL"></param>
-            <param name="MBL"></param>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CheckDuplicateShipmentSettlement(eFMS.API.Accounting.DL.Models.Criteria.CheckDuplicateShipmentSettlementCriteria)">

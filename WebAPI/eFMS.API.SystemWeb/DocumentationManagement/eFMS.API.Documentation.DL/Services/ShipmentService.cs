@@ -72,7 +72,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Id = x.x.Id,
                 JobId = x.x.JobNo,
                 HBL = x.y.Hwbno,
-                MBL = x.y.Mawb,
+                MBL = x.x.Mawb,
                 CustomerId = x.y.CustomerId,
                 AgentId = x.x.AgentId,
                 CarrierId = x.x.ColoaderId,
@@ -97,7 +97,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Id = x.y.Id,
                 JobId = x.x.JobNo,
                 HBL = x.y.Hwbno,
-                MBL = x.y.Mawb,
+                MBL = x.x.Mawb,
             });
             var shipmentsDocumention = surcharge.Join(shipmentDocumention, x => x.Hblid, y => y.Id, (x, y) => new { x, y })
                 .Select(x => new Shipments
@@ -196,7 +196,7 @@ namespace eFMS.API.Documentation.DL.Services
                               {
                                   JobId = cst.JobNo,
                                   Customer = cus.ShortName,
-                                  MBL = cstd.Mawb,
+                                  MBL = cst.Mawb,
                                   HBL = cstd.Hwbno,
                                   HBLID = cstd.Id,
                                   CustomNo = sur.ClearanceNo,

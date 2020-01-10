@@ -201,8 +201,8 @@ export class AccountingRepo {
     }
 
 
-    getExistingCharge(jobId: string, hbl: string, mbl: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, { jobId: jobId, HBL: hbl, MBL: mbl }).pipe(
+    getExistingCharge(body: any = {}) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, body).pipe(
             map((data: any) => data)
         );
     }
