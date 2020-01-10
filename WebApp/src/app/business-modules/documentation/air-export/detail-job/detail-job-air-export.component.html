@@ -99,6 +99,11 @@
                 <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="AirExport_assignment">
                 </ng-container>
             </tab>
+            <tab heading="Attach Files" (selectTab)="onSelectTab('files')" [active]="selectedTab === 'FILES'"
+                [disabled]="ACTION === 'COPY'">
+                <ng-container *ngIf="selectedTab === 'FILES'" loadModule="AirExport_attachFile">
+                </ng-container>
+            </tab>
         </tabset>
     </div>
     <ul class="m-nav-sticky fms-shipment-sidebar" *ngIf="ACTION !== 'COPY'">
@@ -117,6 +122,7 @@
 
 <info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Create Job'"></info-popup>
+
 <confirm-popup #duplicateconfirmTemplate
     [body]="'The system will open the Job Create Screen. Are you sure you want to leave?'"
     [title]="'Duplicate job detail'" [labelConfirm]="'Yes'" (onSubmit)="duplicateConfirm()"></confirm-popup>

@@ -595,9 +595,28 @@ export class DocumentationRepo {
         );
     }
 
-    generateHBLNo(transactionTypeEnum: number){
+    generateHBLNo(transactionTypeEnum: number) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GenerateHBLNo`, { transactionTypeEnum: transactionTypeEnum }).pipe(
             map((data: any) => data)
         );
     }
+
+    getHouseDIMByJob(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsDimensionDetail/GetDIMFromHouseBillsByJob`, { id: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    uploadFileShipment(jobId: string, body: any) {
+        return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UploadMultiFiles/${jobId}`, body, 'files').pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getShipmentFilesAttach(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/GetFileAttachs`, { jobId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }

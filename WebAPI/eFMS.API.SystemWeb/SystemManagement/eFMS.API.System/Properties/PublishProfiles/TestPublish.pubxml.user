@@ -8,4 +8,15 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <TimeStampOfAssociatedLegacyPublishXmlFile />
     <_PublishTargetUrl>\\192.168.7.31\inetpub\efms-api\System</_PublishTargetUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <File Include="wwwroot/images/30656999_1807629345973821_2602392457844883456_n.jpg">
+      <publishTime>01/09/2020 17:00:34</publishTime>
+    </File>
+    <File Include="wwwroot/images/465-2017-03-23.jpg">
+      <publishTime>01/09/2020 17:34:56</publishTime>
+    </File>
+    <File Include="wwwroot/images/Company/15977227_1163006263807334_9026136025525089353_n.jpg">
+      <publishTime>10/15/2019 17:27:30</publishTime>
+    </File>
+  </ItemGroup>
 </Project>

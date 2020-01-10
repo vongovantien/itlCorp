@@ -48,6 +48,9 @@ export * from './cd-note-air/add-cd-note/add-cd-note.popup';
 export * from './cd-note-air/add-remaining-charge/add-remaining-charge.popup';
 export * from './cd-note-air/cd-note-list/cd-note-list.component';
 export * from './cd-note-air/detail-cd-note/detail-cd-note.popup';
+
+export * from './files-attach/files-attach.component';
+
 // TODO export components from shareBussiness.
 
 

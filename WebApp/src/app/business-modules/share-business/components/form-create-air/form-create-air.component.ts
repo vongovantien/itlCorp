@@ -137,6 +137,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 (res: CsTransaction) => {
                     if (!!res) {
                         this.shipmentDetail = new CsTransaction(res);
+                        this.dimVolumePopup.jobId = this.shipmentDetail.id;
+
                         this._route.queryParams.subscribe((param: Params) => {
                             if (param.action === 'copy') {
                                 res.jobNo = null;
@@ -370,6 +372,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     showDIMVolume() {
         if (!this.isUpdate) {
             this._store.dispatch(new fromStore.InitDimensionAction([new DIM(), new DIM(), new DIM()]));  // * Dimension default = 3
+            this.dimVolumePopup.isShowGetFromHAWB = false;
         }
         this.dimVolumePopup.show();
     }

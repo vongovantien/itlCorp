@@ -227,6 +227,9 @@ export class AirImportHBLComponent extends AppList implements OnInit {
             case 'assignment':
                 this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
+            case 'files':
+                this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                break;
         }
     }
 
