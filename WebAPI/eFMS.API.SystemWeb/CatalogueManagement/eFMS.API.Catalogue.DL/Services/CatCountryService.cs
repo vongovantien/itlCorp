@@ -110,7 +110,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var newList = new List<CatCountry>();
                 foreach (var item in data)
                 {
-                    bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
+                    bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
                     DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var country = new CatCountry
                     {

@@ -166,7 +166,7 @@
                                 <td>
                                     <span *ngIf="item.districtNameError === null">{{ item.districtName }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="!item.districtNameError">{{ item.districtNameError }}</span>
+                                        *ngIf="item.districtNameError !== null">{{ item.districtNameError }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.status }}</span>

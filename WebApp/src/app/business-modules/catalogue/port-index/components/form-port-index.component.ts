@@ -59,16 +59,25 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     }
     onSubmit() {
         this.isSubmitted = true;
+
+        // Trick to remove validate ng-select
+        this.setError(this.country);
+        this.setError(this.zone);
+        this.setError(this.mode);
+
         const formData = this.portindexForm.getRawValue();
         if (this.portindexForm.valid) {
+
             this.portIndex.placeType = PlaceTypeEnum.Port;
-            this.portIndex.code = formData.code;
-            this.portIndex.nameEn = formData.portIndexeNameEN;
-            this.portIndex.nameVn = formData.portIndexeNameEN;
-            this.portIndex.countryID = formData.country[0].id;
-            this.portIndex.modeOfTransport = formData.mode[0].id;
-            this.portIndex.areaID = formData.zone[0].id;
             this.portIndex.active = !!this.isUpdate ? formData.active : true;
+
+            this.portIndex.code = !!formData.code && !!formData.code.length ? formData.code : null;
+            this.portIndex.nameEn = !!formData.portIndexeNameEN && !!formData.portIndexeNameEN.length ? formData.portIndexeNameEN : null;
+            this.portIndex.nameVn = !!formData.portIndexeNameEN && !!formData.portIndexeNameEN.length ? formData.portIndexeNameEN : null;
+            this.portIndex.countryID = !!formData.country && !!formData.country.length ? formData.country[0].id : null;
+            this.portIndex.modeOfTransport = !!formData.mode && !!formData.mode.length ? formData.mode[0].id : null;
+            this.portIndex.areaID = !!formData.zone && !!formData.zone.length ? formData.zone[0].id : null;
+
             if (this.isUpdate) {
                 this._catalogueRepo.updatePlace(this.portIndex.id, this.portIndex)
                     .subscribe(
@@ -84,8 +93,6 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
                         }
                     );
             }
-        } else {
-            console.log(this.portindexForm);
         }
     }
     onHandleResult(res: CommonInterface.IResult) {
@@ -101,29 +108,14 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.hide();
     }
     setFormValue(res: any) {
-        let zoneActive = [];
-        let modeActive = [];
-        let countryActive = [];
-        const indexZone = this.areas.findIndex(x => x.id === res.areaId);
-        const indexMode = this.modes.findIndex(x => x.id === res.modeOfTransport);
-        const indexCountry = this.countries.findIndex(x => x.id === res.countryId);
-
-        if (indexZone > -1) {
-            zoneActive = [this.areas[indexZone]];
-        }
-        if (indexMode > -1) {
-            modeActive = [this.modes[indexMode]];
-        }
-        if (indexCountry > -1) {
-            countryActive = [this.countries[indexCountry]];
-        }
+        console.log(res);
         this.portindexForm.setValue({
             code: res.code,
             portIndexeNameEN: res.nameEn,
             portIndexeNameLocal: res.nameVn,
-            country: countryActive || [],
-            zone: zoneActive || [],
-            mode: modeActive || [],
+            country: [this.countries.find(x => x.id === res.countryId)] || [],
+            zone: res.areaId != null ? [this.areas.find(x => x.id === res.areaId)] : [] || [],
+            mode: [this.modes.find(x => x.id === res.modeOfTransport)] || [],
             active: res.active
         });
     }
