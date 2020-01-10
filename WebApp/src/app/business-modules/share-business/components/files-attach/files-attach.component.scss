@@ -1,7 +1,6 @@
 :host /deep/ {
     .files-attach-wp {
         .dropzone {
-            border-color: #5d78ff;
             padding: 20px;
             text-align: center;
             cursor: pointer;
@@ -14,6 +13,11 @@
             position: relative;
             overflow: hidden;
             display: inline-block;
+            transition: color 0.3s ease;
+            -webkit-transition: color 0.3s ease;
+            &:hover {
+                border-color: #5d78ff;
+            }
             input[type="file"] {
                 position: absolute;
                 left: 0;
