@@ -38,7 +38,7 @@ const routing: Routes = [
     },
     {
         path: ':hblId/separate', component: SeparateHouseBillComponent,
-        data: { name: "Separate", path: ":id", level: 6 },
+        data: { name: "Separate Hawb", path: ":id", level: 6 },
     },
 ];
 

@@ -57,7 +57,6 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             }
         });
 
-
     }
 
 
@@ -81,6 +80,11 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
 
     ngAfterViewInit() {
         this.formCreateHBLComponent.isSeparate = true;
+        this._cd.detectChanges();
+    }
+
+    onCancel() {
+        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}`]);
     }
 
     saveHBLSeparate() {
@@ -93,18 +97,18 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         houseBill.jobId = this.jobId;
         if (!this.hblSeparateId) {
             houseBill.parentId = this.hblId;
-            this.createHbl(houseBill);
+            this.createHbl(houseBill, this.hblId);
         } else {
             const modelUpdate = this.getDataForm();
 
-            modelUpdate.id = this.hblId;
+            modelUpdate.id = this.hblSeparateId;
             modelUpdate.jobId = this.jobId;
             modelUpdate.parentId = this.hblId;
 
             for (const dim of modelUpdate.dimensionDetails) {
                 dim.hblId = this.hblSeparateId;
             }
-            this.updateHbl(modelUpdate);
+            this.updateHbl(modelUpdate, true);
         }
     }
 }
