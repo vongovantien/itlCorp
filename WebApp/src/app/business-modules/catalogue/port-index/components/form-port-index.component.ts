@@ -38,6 +38,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     ngOnInit() {
         this.initForm();
     }
+
     initForm() {
         this.portindexForm = this._fb.group({
             code: [null, Validators.required],
@@ -57,6 +58,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.mode = this.portindexForm.controls['mode'];
         this.active = this.portindexForm.controls['active'];
     }
+
     onSubmit() {
         this.isSubmitted = true;
 
@@ -95,6 +97,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
             }
         }
     }
+
     onHandleResult(res: CommonInterface.IResult) {
         if (res.status) {
             this._toastService.success(res.message);
@@ -104,11 +107,12 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
             this._toastService.error(res.message);
         }
     }
+
     onCancel() {
         this.hide();
     }
+
     setFormValue(res: any) {
-        console.log(res);
         this.portindexForm.setValue({
             code: res.code,
             portIndexeNameEN: res.nameEn,

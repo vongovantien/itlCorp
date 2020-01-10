@@ -3,6 +3,7 @@ import { AppForm } from 'src/app/app.form';
 import { IShareBussinessState, getDetailHBlState } from '@share-bussiness';
 import { Store } from '@ngrx/store';
 import { HouseBill } from '@models';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'air-export-hbl-attach-list',
@@ -20,12 +21,15 @@ export class AirExportHBLAttachListComponent extends AppForm implements OnInit {
 
     ngOnInit(): void {
         this._store.select(getDetailHBlState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (hbl: HouseBill) => {
-                    if (!!hbl.id) {
+                    if (!!hbl && !!hbl.id) {
                         this.attachList = hbl.attachList;
                     }
                 }
             );
     }
+
+
 }

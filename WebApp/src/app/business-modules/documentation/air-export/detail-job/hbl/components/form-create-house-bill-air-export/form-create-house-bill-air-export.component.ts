@@ -59,7 +59,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
     currencies: Observable<CommonInterface.INg2Select[]>;
-
+    isSeparate: boolean = false;
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameEn', label: 'Name ABBR' },
         { field: 'partnerNameVn', label: 'Name EN' },
@@ -166,7 +166,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
                             this.hwconstant = hbl.hwConstant;
-                            console.log(hbl);
 
                             this.updateFormValue(hbl);
                         }
@@ -184,7 +183,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                             this.shipmentDetail = new CsTransaction(shipment);
                             this.jobId = this.shipmentDetail.id;
                             this.hwconstant = this.shipmentDetail.hwConstant;
-                            console.log(this.hwconstant);
                             this.formCreate.patchValue({
                                 mawb: shipment.mawb,
                                 pod: shipment.pod,

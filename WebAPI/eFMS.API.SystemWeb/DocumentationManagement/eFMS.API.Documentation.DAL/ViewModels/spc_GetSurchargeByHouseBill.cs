@@ -56,5 +56,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string PartnerShortName { get; set; }
         public string ReceiverShortName { get; set; }
         public string PayerShortName { get; set; }
+        public Decimal? FinalExchangeRate { get; set; }
+
     }
 }

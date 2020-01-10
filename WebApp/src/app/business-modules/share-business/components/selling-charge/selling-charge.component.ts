@@ -65,11 +65,11 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
             { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
+            { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Voucher ID', field: 'voucherId', sortable: true },
             { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
-            { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
         ];
     }
 
