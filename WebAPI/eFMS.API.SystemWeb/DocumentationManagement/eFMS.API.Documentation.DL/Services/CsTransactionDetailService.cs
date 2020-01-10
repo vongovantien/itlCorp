@@ -119,7 +119,7 @@ namespace eFMS.API.Documentation.DL.Services
                             model.DimensionDetails.ForEach(x =>
                             {
                                 x.Id = Guid.NewGuid();
-                                x.Mblid = model.Id;
+                                x.Hblid = model.Id;
                             });
                             var d = dimensionDetailService.Add(model.DimensionDetails);
                         }
@@ -356,6 +356,38 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
+        public CsTransactionDetailModel GetSeparateByHblid(Guid hbId)
+        {
+            try
+            {
+                var queryDetail = csTransactionDetailRepo.Get(x => x.ParentId == hbId).FirstOrDefault();
+                var detail = mapper.Map<CsTransactionDetailModel>(queryDetail);
+                if (detail != null)
+                {
+                    var resultPartner = catPartnerRepo.Get(x => x.Id == detail.CustomerId).FirstOrDefault();
+                    var resultNoti = catPartnerRepo.Get(x => x.Id == detail.NotifyPartyId).FirstOrDefault();
+                    var resultSaleman = sysUserRepo.Get(x => x.Id == detail.SaleManId).FirstOrDefault();
+                    var pol = catPlaceRepo.Get(x => x.Id == detail.Pol).FirstOrDefault();
+                    var pod = catPlaceRepo.Get(x => x.Id == detail.Pod).FirstOrDefault();
+                    var shipment = csTransactionRepo.Get(x => x.Id == queryDetail.JobId).First();
+                    detail.CustomerName = resultPartner?.PartnerNameEn;
+                    detail.CustomerNameVn = resultPartner?.PartnerNameVn;
+                    detail.SaleManId = resultSaleman?.Id;
+                    detail.NotifyParty = resultNoti?.PartnerNameEn;
+                    detail.POLName = pol?.NameEn;
+                    detail.PODName = pod?.NameEn;
+                    detail.ShipmentEta = shipment.Eta;
+                    return detail;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+
+        }
+
         #region -- LIST & PAGING HOUSEBILLS --
         public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
         {
@@ -475,10 +507,15 @@ namespace eFMS.API.Documentation.DL.Services
                           PackageType = detail.PackageType,
                           CW = detail.ChargeWeight,
                           DatetimeCreated = detail.DatetimeCreated,
-                          DatetimeModified = detail.DatetimeModified
+                          DatetimeModified = detail.DatetimeModified,
+                          ParentId = detail.ParentId
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            results = res.OrderByDescending(o => o.DatetimeModified).ToList();
+            if(res.Count() > 0)
+            {
+                results = res.Where(x=>x.ParentId == null).OrderByDescending(o => o.DatetimeModified).ToList();
+            }
+
             //results.ForEach(fe => {
             //    fe.Containers = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
             //                                                            .Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));

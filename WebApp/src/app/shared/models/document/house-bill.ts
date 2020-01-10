@@ -152,6 +152,7 @@ export class HouseBill extends BaseModel {
     finalPOD: string = null;
     poInvoiceNo: string = null;
     issueHBLDate: string = null;
+    parentId: string = null;
 
     constructor(object?: any) {
         super();
