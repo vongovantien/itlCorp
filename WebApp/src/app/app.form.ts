@@ -32,6 +32,8 @@ export abstract class AppForm extends AppPage {
         typeButton: ButtonType.save,
     };
 
+    accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx';
+
     @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
         this.reset();
     }

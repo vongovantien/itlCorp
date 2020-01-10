@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
@@ -9,6 +10,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,13 +24,16 @@ namespace eFMS.API.Documentation.DL.Services
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICurrentUser currentUser;
+        private readonly IOptions<WebUrl> webUrl;
         public SysImageService(IContextBase<SysImage> repository, 
             IMapper mapper,
             IHostingEnvironment hostingEnvironment,
-            ICurrentUser currUser) : base(repository, mapper)
+            ICurrentUser currUser, 
+            IOptions<WebUrl> url) : base(repository, mapper)
         {
             _hostingEnvironment = hostingEnvironment;
             currentUser = currUser;
+            webUrl = url;
         }
 
         public async Task<HandleState> DeleteFile(Guid id)
@@ -52,32 +57,34 @@ namespace eFMS.API.Documentation.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = _hostingEnvironment.ContentRootPath;
+            string path = this.webUrl.Value.Url;
             try
             {
                 var list = new List<SysImage>();
                 /* Kiểm tra các thư mục có tồn tại */
                 var hs = new HandleState();
                 ImageHelper.CreateDirectoryFile(model.FolderName, model.JobId.ToString());
+                List<SysImage> resultUrls = new List<SysImage>();
                 foreach (var file in model.Files)
                 {
                     fileName = file.FileName;
                     string objectId = model.JobId.ToString();
                     await ImageHelper.SaveFile(fileName, model.FolderName, objectId, file);
-                    string urlFile = path + "/" + model.FolderName + "/files/" + objectId + "/" + fileName;
+                    string urlImage = path + "/" + model.FolderName + "/files/" + objectId + "/" + fileName;
                     var sysImage = new SysImage
                     {
                         Id = Guid.NewGuid(),
-                        Url = urlFile,
+                        Url = urlImage,
                         Name = fileName,
                         Folder = model.FolderName ?? "Shipment",
                         ObjectId = model.JobId.ToString(),
-                        UserCreated = currentUser.UserID,
-                        UserModified = currentUser.UserID,
+                        UserCreated = "admin",//currentUser.UserID,
+                        UserModified = "admin",// currentUser.UserID,
                         DateTimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now
                     };
-                    if(!DataContext.Any(x => x.ObjectId == objectId && x.Url == urlFile))
+                    resultUrls.Add(sysImage);
+                    if (!DataContext.Any(x => x.ObjectId == objectId && x.Url == urlImage))
                     {
                         list.Add(sysImage);
                     }
@@ -86,7 +93,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     hs = await DataContext.AddAsync(list);
                 }
-                return new ResultHandle { Data = list, Status = hs.Success, Message = hs.Message?.ToString() };
+                return new ResultHandle { Data = resultUrls, Status = hs.Success, Message = hs.Message?.ToString() };
 
             }
             catch (Exception ex)

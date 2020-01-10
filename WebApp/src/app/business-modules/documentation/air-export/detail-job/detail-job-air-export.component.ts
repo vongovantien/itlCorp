@@ -15,7 +15,7 @@ import { tap, map, switchMap, catchError, takeUntil, skip, finalize } from 'rxjs
 
 import * as fromShareBussiness from '../../../share-business/store';
 
-type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
 @Component({
     selector: 'app-detail-job-air-export',
@@ -191,6 +191,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 break;
             case 'assignment':
                 this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+            case 'files':
+                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: { tab: 'FILES' } });
                 break;
         }
     }

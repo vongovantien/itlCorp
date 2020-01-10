@@ -275,7 +275,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 foreach (var item in data)
                 {
-                    bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
+                    bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
                     DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var partner = mapper.Map<CatPartner>(item);
                     partner.UserCreated = currentUser.UserID;

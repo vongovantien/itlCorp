@@ -388,7 +388,7 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrent = currentUser.UserID;
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var advance = mapper.Map<AcctAdvancePayment>(model);
                 advance.Id = model.Id = Guid.NewGuid();
                 advance.AdvanceNo = model.AdvanceNo = CreateAdvanceNo();
@@ -396,23 +396,47 @@ namespace eFMS.API.Accounting.DL.Services
 
                 advance.DatetimeCreated = advance.DatetimeModified = DateTime.Now;
                 advance.UserCreated = advance.UserModified = userCurrent;
-
-                var hs = DataContext.Add(advance);
-                if (hs.Success)
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    var request = mapper.Map<List<AcctAdvanceRequest>>(model.AdvanceRequests);
-                    request.ForEach(req =>
+                    try
                     {
-                        req.Id = Guid.NewGuid();
-                        req.AdvanceNo = advance.AdvanceNo;
-                        req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
-                        req.UserCreated = req.UserModified = userCurrent;
-                        req.StatusPayment = Constants.STATUS_PAYMENT_NOTSETTLED;
-                    });
-                    dc.AcctAdvanceRequest.AddRange(request);
+                        var hs = DataContext.Add(advance);
+                        if (hs.Success)
+                        {
+                            var request = mapper.Map<List<AcctAdvanceRequest>>(model.AdvanceRequests);
+                            //request.ForEach(req =>
+                            //{
+                            //    req.Id = Guid.NewGuid();
+                            //    req.AdvanceNo = advance.AdvanceNo;
+                            //    req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
+                            //    req.UserCreated = req.UserModified = userCurrent;
+                            //    req.StatusPayment = Constants.STATUS_PAYMENT_NOTSETTLED;
+                            //});
+                            foreach (var item in request)
+                            {
+                                item.Id = Guid.NewGuid();
+                                item.AdvanceNo = advance.AdvanceNo;
+                                item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                                item.UserCreated = item.UserModified = userCurrent;
+                                item.StatusPayment = Constants.STATUS_PAYMENT_NOTSETTLED;
+                                var hsAddRequest = acctAdvanceRequestRepo.Add(item);
+                            }
+                            //dc.AcctAdvanceRequest.AddRange(request);
+                        }
+                        //dc.SaveChanges();
+                        trans.Commit();
+                        return hs;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
                 }
-                dc.SaveChanges();
-                return hs;
             }
             catch (Exception ex)
             {
@@ -461,16 +485,45 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var requests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).ToList();
                 if (requests == null) return new HandleState("Not Found Advance Request");
-                //Xóa các Advance Request có AdvanceNo = AdvanceNo truyền vào
-                dc.AcctAdvanceRequest.RemoveRange(requests);
-                var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
-                if (advance == null) return new HandleState("Not Found Advance Payment");
-                dc.AcctAdvancePayment.Remove(advance);
-                dc.SaveChanges();
-                return new HandleState();
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        //Xóa các Advance Request có AdvanceNo = AdvanceNo truyền vào
+                        foreach (var item in requests)
+                        {
+                            var advRequestDelete = acctAdvanceRequestRepo.Delete(x => x.Id == item.Id);
+                        }
+                        //dc.AcctAdvanceRequest.RemoveRange(requests);
+                        var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+                        if (advance == null) return new HandleState("Not Found Advance Payment");
+
+                        //dc.AcctAdvancePayment.Remove(advance);
+                        //dc.SaveChanges();
+                        var hs = DataContext.Delete(x => x.Id == advance.Id);
+                        if (hs.Success)
+                        {
+                            trans.Commit();
+                        }
+                        else
+                        {
+                            trans.Rollback();
+                        }
+                        return hs;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -527,7 +580,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var userCurrent = currentUser.UserID;
 
                 var advance = mapper.Map<AcctAdvancePayment>(model);
@@ -545,48 +598,82 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     advance.StatusApproval = Constants.STATUS_APPROVAL_NEW;
                 }
-
-                var hs = DataContext.Update(advance, x => x.Id == advance.Id);
-
-                if (hs.Success)
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    var request = mapper.Map<List<AcctAdvanceRequest>>(model.AdvanceRequests);
-                    //Lấy ra các Request cũ cần update
-                    var requestUpdate = request.Where(x => x.UserCreated != null && x.UserCreated != string.Empty).ToList();
-
-                    //Lấy ra các Request có cùng AdvanceNo và không tồn tại trong requestUpdate
-                    var requestNeedRemove = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && !requestUpdate.Contains(x)).ToList();
-                    //Xóa các requestNeedRemove
-                    dc.AcctAdvanceRequest.RemoveRange(requestNeedRemove);
-
-                    //Lấy ra những request mới (có UserCreated = null)
-                    var requestNew = request.Where(x => x.UserCreated == null || x.UserCreated == string.Empty).ToList();
-                    if (requestNew != null && requestNew.Count > 0)
+                    try
                     {
-                        requestNew.ForEach(req =>
+                        var hs = DataContext.Update(advance, x => x.Id == advance.Id);
+
+                        if (hs.Success)
                         {
-                            req.Id = Guid.NewGuid();
-                            req.AdvanceNo = advance.AdvanceNo;
-                            req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
-                            req.UserCreated = req.UserModified = userCurrent;
-                            req.StatusPayment = Constants.STATUS_PAYMENT_NOTSETTLED;
-                        });
-                        dc.AcctAdvanceRequest.AddRange(requestNew);
+                            var request = mapper.Map<List<AcctAdvanceRequest>>(model.AdvanceRequests);
+                            //Lấy ra các Request cũ cần update
+                            var requestUpdate = request.Where(x => x.UserCreated != null && x.UserCreated != string.Empty).ToList();
+
+                            //Lấy ra các Request có cùng AdvanceNo và không tồn tại trong requestUpdate
+                            var requestNeedRemove = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && !requestUpdate.Contains(x)).ToList();
+                            //Xóa các requestNeedRemove
+                            //dc.AcctAdvanceRequest.RemoveRange(requestNeedRemove);
+                            foreach (var item in requestNeedRemove)
+                            {
+                                var hsRequestNeedRemove = acctAdvanceRequestRepo.Delete(x => x.Id == item.Id);
+                            }
+
+                            //Lấy ra những request mới (có UserCreated = null)
+                            var requestNew = request.Where(x => x.UserCreated == null || x.UserCreated == string.Empty).ToList();
+                            if (requestNew != null && requestNew.Count > 0)
+                            {
+                                //requestNew.ForEach(req =>
+                                //{
+                                //    req.Id = Guid.NewGuid();
+                                //    req.AdvanceNo = advance.AdvanceNo;
+                                //    req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
+                                //    req.UserCreated = req.UserModified = userCurrent;
+                                //    req.StatusPayment = Constants.STATUS_PAYMENT_NOTSETTLED;
+                                //});
+                                //dc.AcctAdvanceRequest.AddRange(requestNew);
+                                foreach (var item in requestNew)
+                                {
+                                    item.Id = Guid.NewGuid();
+                                    item.AdvanceNo = advance.AdvanceNo;
+                                    item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                                    item.UserCreated = item.UserModified = userCurrent;
+                                    item.StatusPayment = Constants.STATUS_PAYMENT_NOTSETTLED;
+                                    var hsRequestNew = acctAdvanceRequestRepo.Add(item);
+                                }
+                            }
+
+                            if (requestUpdate != null && requestUpdate.Count > 0)
+                            {
+                                //Cập nhật những request cũ cần update
+                                //requestUpdate.ForEach(req =>
+                                //{
+                                //    req.DatetimeModified = DateTime.Now;
+                                //    req.UserModified = userCurrent;
+                                //});
+                                //dc.AcctAdvanceRequest.UpdateRange(requestUpdate);
+                                foreach (var item in requestUpdate)
+                                {
+                                    item.DatetimeModified = DateTime.Now;
+                                    item.UserModified = userCurrent;
+                                    var hsRequestUpdate = acctAdvanceRequestRepo.Update(item, x => x.Id == item.Id);
+                                }
+                            }
+                        }
+                        //dc.SaveChanges();
+                        trans.Commit();
+                        return hs;
                     }
-
-                    if (requestUpdate != null && requestUpdate.Count > 0)
+                    catch (Exception ex)
                     {
-                        //Cập nhật những request cũ cần update
-                        requestUpdate.ForEach(req =>
-                        {
-                            req.DatetimeModified = DateTime.Now;
-                            req.UserModified = userCurrent;
-                        });
-                        dc.AcctAdvanceRequest.UpdateRange(requestUpdate);
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
                     }
                 }
-                dc.SaveChanges();
-                return hs;
             }
             catch (Exception ex)
             {
@@ -651,7 +738,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             //Lấy ra tên requester
-            var employeeId = sysUserRepo.Get(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var employeeId = sysUserRepo.Get(x => x.Username == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
             var requesterName = sysEmployeeRepo.Get(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
 
             string managerName = string.Empty;
@@ -836,7 +923,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             //Lấy ra tên requester
-            var employeeId = sysUserRepo.Get(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var employeeId = sysUserRepo.Get(x => x.Username == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
             var requesterName = sysEmployeeRepo.Get(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
 
             string managerName = string.Empty;
@@ -1032,9 +1119,9 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy ra employeeId của User
-        private string GetEmployeeIdOfUser(string UserId)
+        private string GetEmployeeIdOfUser(string userName)
         {
-            return sysUserRepo.Get(x => x.Id == UserId).FirstOrDefault()?.EmployeeId;
+            return sysUserRepo.Get(x => x.Username == userName).FirstOrDefault()?.EmployeeId;
         }
 
         //Lấy info Employee của User dựa vào employeeId
@@ -1044,10 +1131,11 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy info Employee của User dựa vào userId
-        private SysEmployee GetEmployeeByUserId(string userId)
+        private SysEmployee GetEmployeeByUserId(string userName)
         {
-            var employeeId = GetEmployeeIdOfUser(userId);
-            return sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
+            var employeeId = GetEmployeeIdOfUser(userName);
+            var data = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
+            return data;
         }
 
 
@@ -1057,9 +1145,7 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrent = currentUser.UserID;
-
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var acctApprove = mapper.Map<AcctApproveAdvance>(approve);
 
                 if (!string.IsNullOrEmpty(approve.AdvanceNo))
@@ -1072,64 +1158,81 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
 
-                //Lấy ra brandId của user 
-                var brandOfUser = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
-                if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
-
-                //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
-                acctApprove.Leader = GetLeaderIdOfUser(userCurrent);
-                acctApprove.Manager = GetManagerIdOfUser(userCurrent, brandOfUser.ToString());
-                if (string.IsNullOrEmpty(acctApprove.Manager)) return new HandleState("Not found department manager of user");
-                acctApprove.Accountant = GetAccountantId(brandOfUser.ToString());
-                if (string.IsNullOrEmpty(acctApprove.Accountant)) return new HandleState("Not found accountant manager");
-                acctApprove.Buhead = GetBUHeadId(brandOfUser.ToString());//Lấy ra BuHead dựa vào Brand của userCurrent
-
-
-                var checkExistsApproveByAdvanceNo = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == acctApprove.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
-                if (checkExistsApproveByAdvanceNo == null) //Insert AcctApproveAdvance
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    acctApprove.Id = Guid.NewGuid();
-                    acctApprove.RequesterAprDate = DateTime.Now;
-                    acctApprove.UserCreated = acctApprove.UserModified = userCurrent;
-                    acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
-                    acctApprove.IsDeputy = false;
-                    dc.AcctApproveAdvance.Add(acctApprove);
-                }
-                else //Update AcctApproveAdvance by AdvanceNo
-                {
-                    checkExistsApproveByAdvanceNo.RequesterAprDate = DateTime.Now;
-                    checkExistsApproveByAdvanceNo.UserModified = userCurrent;
-                    checkExistsApproveByAdvanceNo.DateModified = DateTime.Now;
-                    dc.AcctApproveAdvance.Update(checkExistsApproveByAdvanceNo);
-                }
-                dc.SaveChanges();
+                    try
+                    {
+                        //Lấy ra brandId của user 
+                        var brandOfUser = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                        if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
 
-                var emailLeaderOrManager = string.Empty;
-                var userLeaderOrManager = string.Empty;
-                //Send mail đề nghị approve đến Leader(Nếu có) nếu không có thì send tới Manager Dept
-                //Lấy ra Leader của User & Manager Dept của User Requester
-                if (string.IsNullOrEmpty(acctApprove.Leader))
-                {
-                    userLeaderOrManager = acctApprove.Manager;
-                    //Lấy ra employeeId của managerIdOfUser
-                    var employeeIdOfUserManager = GetEmployeeIdOfUser(userLeaderOrManager);
-                    //Lấy ra email của Manager
-                    emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserManager)?.Email;
+                        //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
+                        acctApprove.Leader = GetLeaderIdOfUser(userCurrent);
+                        acctApprove.Manager = GetManagerIdOfUser(userCurrent, brandOfUser.ToString());
+                        if (string.IsNullOrEmpty(acctApprove.Manager)) return new HandleState("Not found department manager of user");
+                        acctApprove.Accountant = GetAccountantId(brandOfUser.ToString());
+                        if (string.IsNullOrEmpty(acctApprove.Accountant)) return new HandleState("Not found accountant manager");
+                        acctApprove.Buhead = GetBUHeadId(brandOfUser.ToString());//Lấy ra BuHead dựa vào Brand của userCurrent
+
+                        var checkExistsApproveByAdvanceNo = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == acctApprove.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+                        if (checkExistsApproveByAdvanceNo == null) //Insert AcctApproveAdvance
+                        {
+                            acctApprove.Id = Guid.NewGuid();
+                            acctApprove.RequesterAprDate = DateTime.Now;
+                            acctApprove.UserCreated = acctApprove.UserModified = userCurrent;
+                            acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
+                            acctApprove.IsDeputy = false;
+                            //dc.AcctApproveAdvance.Add(acctApprove);
+                            var hsAddApproveAdvance = acctApproveAdvanceRepo.Add(acctApprove);
+                        }
+                        else //Update AcctApproveAdvance by AdvanceNo
+                        {
+                            checkExistsApproveByAdvanceNo.RequesterAprDate = DateTime.Now;
+                            checkExistsApproveByAdvanceNo.UserModified = userCurrent;
+                            checkExistsApproveByAdvanceNo.DateModified = DateTime.Now;
+                            //dc.AcctApproveAdvance.Update(checkExistsApproveByAdvanceNo);
+                            var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(checkExistsApproveByAdvanceNo, x => x.Id == checkExistsApproveByAdvanceNo.Id);
+                        }
+                        //dc.SaveChanges();
+                        trans.Commit();
+
+                        var emailLeaderOrManager = string.Empty;
+                        var userLeaderOrManager = string.Empty;
+                        //Send mail đề nghị approve đến Leader(Nếu có) nếu không có thì send tới Manager Dept
+                        //Lấy ra Leader của User & Manager Dept của User Requester
+                        if (string.IsNullOrEmpty(acctApprove.Leader))
+                        {
+                            userLeaderOrManager = acctApprove.Manager;
+                            //Lấy ra employeeId của managerIdOfUser
+                            var employeeIdOfUserManager = GetEmployeeIdOfUser(userLeaderOrManager);
+                            //Lấy ra email của Manager
+                            emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserManager)?.Email;
+                        }
+                        else
+                        {
+                            userLeaderOrManager = acctApprove.Leader;
+                            //Lấy ra employeeId của managerIdOfUser
+                            var employeeIdOfUserLeader = GetEmployeeIdOfUser(userLeaderOrManager);
+                            //Lấy ra email của Leader (hiện tại chưa có nên gán rỗng)
+                            emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserLeader)?.Email;
+                        }
+
+                        if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not Found Leader or Manager of user");
+
+                        var sendMailResult = SendMailSuggestApproval(acctApprove.AdvanceNo, userLeaderOrManager, emailLeaderOrManager);
+
+                        return !sendMailResult ? new HandleState("Send mail suggest approval failed") : new HandleState();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
                 }
-                else
-                {
-                    userLeaderOrManager = acctApprove.Leader;
-                    //Lấy ra employeeId của managerIdOfUser
-                    var employeeIdOfUserLeader = GetEmployeeIdOfUser(userLeaderOrManager);
-                    //Lấy ra email của Leader (hiện tại chưa có nên gán rỗng)
-                    emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserLeader)?.Email;
-                }
-
-                if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not Found Leader or Manager of user");
-
-                var sendMailResult = SendMailSuggestApproval(acctApprove.AdvanceNo, userLeaderOrManager, emailLeaderOrManager);
-
-                return !sendMailResult ? new HandleState("Send mail suggest approval failed") : new HandleState();
             }
             catch (Exception ex)
             {
@@ -1354,84 +1457,102 @@ namespace eFMS.API.Accounting.DL.Services
             var userAprNext = string.Empty;
             var emailUserAprNext = string.Empty;
 
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
-
-            if (advance == null) return new HandleState("Not found Advance Payment");
-
-            var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
-
-            if (approve == null) return new HandleState("Not found Advance Approval by AdvanceNo is " + advance.AdvanceNo);
-
-            //Lấy ra brandId của user requester
-            var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.WorkPlaceId;
-            if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
-
-            //Lấy ra brandId của userId
-            var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
-            if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
-
-            //Lấy ra dept code của userApprove dựa vào userApprove
-            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
-            if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
-
-            //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
-            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
-            if (approve != null && advance != null)
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                if (userCurrent == GetLeaderIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                try
                 {
-                    advance.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
-                    approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
+                    var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
 
-                    //Lấy email của Department Manager
-                    userAprNext = GetManagerIdOfUser(userCurrent, brandOfUserId.ToString());
-                    var userAprNextId = GetEmployeeIdOfUser(userAprNext);
-                    emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                    if (advance == null) return new HandleState("Not found Advance Payment");
+
+                    var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+
+                    if (approve == null) return new HandleState("Not found Advance Approval by AdvanceNo is " + advance.AdvanceNo);
+
+                    //Lấy ra brandId của user requester
+                    var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.WorkPlaceId;
+                    if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
+
+                    //Lấy ra brandId của userId
+                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                    if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
+
+                    //Lấy ra dept code của userApprove dựa vào userApprove
+                    var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
+                    if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
+
+                    //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
+                    var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
+                    if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                    if (approve != null && advance != null)
+                    {
+                        if (userCurrent == GetLeaderIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            advance.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
+                            approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
+
+                            //Lấy email của Department Manager
+                            userAprNext = GetManagerIdOfUser(userCurrent, brandOfUserId.ToString());
+                            var userAprNextId = GetEmployeeIdOfUser(userAprNext);
+                            emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                        }
+                        else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            advance.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
+                            approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
+                            approve.ManagerApr = userCurrent;
+
+                            //Lấy email của Accountant Manager
+                            userAprNext = GetAccountantId(brandOfUserId.ToString());
+                            var userAprNextId = GetEmployeeIdOfUser(userAprNext);
+                            emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                        }
+                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            advance.StatusApproval = Constants.STATUS_APPROVAL_DONE;
+                            approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
+                            approve.AccountantApr = userCurrent;
+                            approve.BuheadApr = approve.Buhead;
+
+                            //Send mail approval success when Accountant approved, mail send to requester
+                            SendMailApproved(advance.AdvanceNo, DateTime.Now);
+                        }
+
+                        advance.UserModified = approve.UserModified = userCurrent;
+                        advance.DatetimeModified = approve.DateModified = DateTime.Now;
+
+                        //dc.AcctAdvancePayment.Update(advance);
+                        //dc.AcctApproveAdvance.Update(approve);
+                        //dc.SaveChanges();
+                        var hsUpdateAdvance = DataContext.Update(advance, x => x.Id == advance.Id);
+                        var hsUpdateApprove = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
+                        trans.Commit();
+                    }
+
+                    if (userCurrent == GetAccountantId(brandOfUserId.ToString()))
+                    {
+                        return new HandleState();
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(emailUserAprNext)) return new HandleState("Not found email of user " + userAprNext);
+
+                        //Send mail đề nghị approve
+                        var sendMailResult = SendMailSuggestApproval(advance.AdvanceNo, userAprNext, emailUserAprNext);
+
+                        return sendMailResult ? new HandleState() : new HandleState("Send mail suggest Approval Failed");
+                    }
                 }
-                else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                catch (Exception ex)
                 {
-                    advance.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
-                    approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
-                    approve.ManagerApr = userCurrent;
-
-                    //Lấy email của Accountant Manager
-                    userAprNext = GetAccountantId(brandOfUserId.ToString());
-                    var userAprNextId = GetEmployeeIdOfUser(userAprNext);
-                    emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
                 }
-                else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                finally
                 {
-                    advance.StatusApproval = Constants.STATUS_APPROVAL_DONE;
-                    approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
-                    approve.AccountantApr = userCurrent;
-                    approve.BuheadApr = approve.Buhead;
-
-                    //Send mail approval success when Accountant approved, mail send to requester
-                    SendMailApproved(advance.AdvanceNo, DateTime.Now);
+                    trans.Dispose();
                 }
-
-                advance.UserModified = approve.UserModified = userCurrent;
-                advance.DatetimeModified = approve.DateModified = DateTime.Now;
-
-                dc.AcctAdvancePayment.Update(advance);
-                dc.AcctApproveAdvance.Update(approve);
-                dc.SaveChanges();
-            }
-
-            if (userCurrent == GetAccountantId(brandOfUserId.ToString()))
-            {
-                return new HandleState();
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(emailUserAprNext)) return new HandleState("Not found email of user " + userAprNext);
-
-                //Send mail đề nghị approve
-                var sendMailResult = SendMailSuggestApproval(advance.AdvanceNo, userAprNext, emailUserAprNext);
-
-                return sendMailResult ? new HandleState() : new HandleState("Send mail suggest Approval Failed");
             }
         }
 
@@ -1799,7 +1920,8 @@ namespace eFMS.API.Accounting.DL.Services
                            from doc in doc2
                            join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
                            from adv in adv2
-                           select new AcctAdvanceRequestModel {
+                           select new AcctAdvanceRequestModel
+                           {
                                Id = req.Id,
                                JobId = req.JobId,
                                Hbl = req.Hbl,

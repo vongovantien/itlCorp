@@ -53,7 +53,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 2].Value = item.NameEn;
                 worksheet.Cells[i + 2, 3].Value = item.NameVn;
                 string inactivechar = "";
-                if (item.Inactive == true)
+                if (item.Active == true)
                 {
                     inactivechar = "Active";
                 }

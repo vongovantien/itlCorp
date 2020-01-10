@@ -8,6 +8,6 @@ namespace eFMS.API.ReportData.Models
         public string Code { get; set; }
         public string NameVn { get; set; }
         public string NameEn { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
     }
 }

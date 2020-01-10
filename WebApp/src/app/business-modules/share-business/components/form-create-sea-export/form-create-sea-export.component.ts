@@ -22,6 +22,7 @@ import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrier
 })
 
 export class ShareBussinessFormCreateSeaExportComponent extends AppForm implements OnInit {
+
     formGroup: FormGroup;
     etd: AbstractControl;
     eta: AbstractControl;
@@ -164,7 +165,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
             flightVesselName: [],
             pono: [],
             notes: [],
-            term: [],
+            term: [[this.termTypes[1]]],
             bookingNo: [],
 
             coloader: [],
@@ -173,7 +174,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
             agent: [],
 
             mbltype: [], // * select
-            shipmentType: [], // * select
+            shipmentType: [[this.shipmentTypes[0]]], // * select
             typeOfService: [], // * select
             personalIncharge: [],  // * select
         });

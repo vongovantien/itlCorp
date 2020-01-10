@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { DIM } from '@models';
 import { ToastrService } from 'ngx-toastr';
@@ -6,9 +6,12 @@ import { ToastrService } from 'ngx-toastr';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { skip, takeUntil } from 'rxjs/operators';
+import { skip, takeUntil, catchError } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
+import { DocumentationRepo } from '@repositories';
+import { ConfirmPopupComponent } from '@common';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
     selector: 'dim-volume-popup',
@@ -16,10 +19,15 @@ import * as fromStore from './../../store';
 })
 
 export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements OnInit {
+    @ViewChild('confirmDeleteDim', { static: false }) confirmDeleteDIMpopup: ConfirmPopupComponent;
+
 
     @Output() onUpdate: EventEmitter<DIM[]> = new EventEmitter<DIM[]>();
 
+    jobId: string;
+
     dims: DIM[] = [];
+    dimsTemp: DIM[] = []; // dim temp;
 
     hwConstant: number = SystemConstants.HW_AIR_CONSTANT; // ? 6000
     cbmConstant: number = SystemConstants.CBM_AIR_CONSTANT; // ? 166.67
@@ -28,10 +36,14 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
     totalCBM: number = null;
 
     isCBMChecked: boolean = false;
+    isShowGetFromHAWB: boolean = true;
+
+    selectedIndexDIMItem: number;
 
     constructor(
         private _toastService: ToastrService,
-        private _store: Store<fromStore.IShareBussinessState>
+        private _store: Store<fromStore.IShareBussinessState>,
+        private _documentRepo: DocumentationRepo
     ) {
         super();
     }
@@ -44,8 +56,9 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
             )
             .subscribe(
                 (dims: DIM[]) => {
-                    console.log("dims from store", dims);
                     this.dims = dims;
+                    this.dimsTemp = cloneDeep(dims);
+
                     this.calculateHWDimension();
                 }
             );
@@ -53,33 +66,51 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
 
     addDIM() {
         this.isSubmitted = false;
-        this.dims.push(new DIM());
+        // this.dims.push(new DIM());
+        this.dimsTemp.push(new DIM());
     }
 
-    delete(index: number) {
+    delete(dimItem: DIM, index: number) {
+        this.selectedIndexDIMItem = index;
+        if (dimItem.id === SystemConstants.EMPTY_GUID) {
+            this.isSubmitted = false;
+            this.dimsTemp.splice(index, 1);
+
+            this.calculateHWDimension();
+        } else {
+            this.confirmDeleteDIMpopup.show();
+        }
+    }
+
+    onDeleteDIMItem() {
         this.isSubmitted = false;
-        this.dims.splice(index, 1);
+        this.dimsTemp.splice(this.selectedIndexDIMItem, 1);
 
         this.calculateHWDimension();
     }
 
     saveDIM() {
-        if (!this.dims.length) {
-            this._toastService.warning("Please Add Dimension Information");
-            return;
-        }
-
+        // if (!this.dims.length) {
+        //     this._toastService.warning("Please Add Dimension Information");
+        //     return;
+        // }
         this.isSubmitted = true;
 
         if (!this.checkValidate()) {
             return;
         } else {
+            this.isSubmitted = false;
 
-            console.log(this.dims);
+            this.dims = cloneDeep(this.dimsTemp);
+
             this.onUpdate.emit(this.dims);
             this.hide();
-            this.isSubmitted = false;
         }
+    }
+
+    closePopup() {
+        this.dimsTemp = cloneDeep(this.dims);
+        this.hide();
     }
 
     updateHeightWeight(dimItem: DIM) {
@@ -93,24 +124,26 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
     }
 
     calculateHWDimension() {
-        if (!!this.dims.length) {
-            for (const item of this.dims) {
+        if (!!this.dimsTemp.length) {
+            for (const item of this.dimsTemp) {
                 this.updateHeightWeight(item);
             }
+        } else {
+            this.totalCBM = this.totalHW = 0;
         }
     }
 
     updateTotalHeightWeight() {
-        this.totalHW = +this.dims.reduce((acc: number, curr: DIM) => acc += curr.hw, 0).toFixed(3);
+        this.totalHW = +this.dimsTemp.reduce((acc: number, curr: DIM) => acc += curr.hw, 0).toFixed(3);
     }
 
     updateCBM() {
-        this.totalCBM = +this.dims.reduce((acc: number, curr: DIM) => acc += curr.cbm, 0).toFixed(3);
+        this.totalCBM = +this.dimsTemp.reduce((acc: number, curr: DIM) => acc += curr.cbm, 0).toFixed(3);
     }
 
     checkValidate() {
         let valid: boolean = true;
-        for (const item of this.dims) {
+        for (const item of this.dimsTemp) {
             if (
                 item.length === null
                 || item.width === null
@@ -122,5 +155,23 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
             }
         }
         return valid;
+    }
+
+    onGetDimsFromHAWB() {
+        if (!!this.jobId) {
+            this._documentRepo.getHouseDIMByJob(this.jobId).pipe(
+                catchError(this.catchError)
+            ).subscribe(
+                (res: DIM[]) => {
+                    if (!!res && !!res.length) {
+                        this.dimsTemp = cloneDeep(res);
+
+                        this.calculateHWDimension();
+                    } else {
+                        this._toastService.warning("Not found DIMs from HAWB");
+                    }
+                }
+            );
+        }
     }
 }

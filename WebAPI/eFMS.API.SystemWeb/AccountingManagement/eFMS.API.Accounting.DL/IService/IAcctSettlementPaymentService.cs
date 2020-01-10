@@ -29,7 +29,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<SettlementPaymentMngt> GetSettlementPaymentMngts(string JobId, string MBL, string HBL);
 
-        List<ShipmentChargeSettlement> GetExistsCharge(string JobId, string HBL, string MBL);
+        List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria);
 
         IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo);
 

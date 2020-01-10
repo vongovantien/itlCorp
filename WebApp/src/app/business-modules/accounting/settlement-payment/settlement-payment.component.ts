@@ -183,11 +183,14 @@ export class SettlementPaymentComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    setTimeout(() => {
-                        this.previewPopup.show();
-                    }, 1000);
-
+                    if (res != null) {
+                        this.dataReport = res;
+                        setTimeout(() => {
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
                 },
             );
     }

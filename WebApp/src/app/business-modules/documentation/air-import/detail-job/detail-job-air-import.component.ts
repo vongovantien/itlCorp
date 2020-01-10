@@ -194,6 +194,9 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
             case 'assignment':
                 this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
+            case 'files':
+                this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                break;
         }
     }
 

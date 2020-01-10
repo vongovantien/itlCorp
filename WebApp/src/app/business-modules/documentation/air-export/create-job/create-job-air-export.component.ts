@@ -17,7 +17,7 @@ import {
 
 import * as fromShareBusiness from './../../../share-business/store';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
 @Component({
     selector: 'app-create-job-air-export',
@@ -104,11 +104,9 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     saveJob(body: any) {
-        this._progressRef.start();
         this._documenRepo.createTransaction(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: any) => {

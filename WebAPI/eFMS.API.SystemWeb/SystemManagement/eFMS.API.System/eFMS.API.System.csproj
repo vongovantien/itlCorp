@@ -10,7 +10,6 @@
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
 </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="Controllers\SysEmployeesController.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
@@ -18,9 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="NewFolder\" />
     <Folder Include="Resources\Files\" />
     <Folder Include="ViewModels\" />
-    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>

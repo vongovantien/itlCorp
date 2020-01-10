@@ -10,4 +10,9 @@ namespace OperationInteface {
         hblid?: string;
         service?: string;
     }
+    
+    export interface IInputShipment {
+        type: string;
+        keyword: string;
+    }
 }

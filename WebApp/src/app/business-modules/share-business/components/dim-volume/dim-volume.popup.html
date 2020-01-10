@@ -5,9 +5,22 @@
                 <h5 class="modal-title">
                     DIM - Volume
                 </h5>
+
                 <button type="button" (click)="confirmCancel.show()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+
+                <div class="modal-actions c-button-actions" *ngIf="!!isShowGetFromHAWB">
+                    <button class="btn btn-sm btn-primary m-btn--square m-btn--icon"
+                        (click)="confirmGetFromHAWB.show()">
+                        <span>
+                            <i class="la la-refresh"></i>
+                            <span>
+                                Get From HAWB
+                            </span>
+                        </span>
+                    </button>
+                </div>
             </div>
             <div class="modal-body pb-0">
                 <div class="row align-items-center m--margin-bottom-10">
@@ -17,10 +30,11 @@
                     <div class="col-md-2">Package</div>
                     <div class="col-md-3">Height Weight</div>
                     <div class="col-md-1 pointer text-center">
+
                     </div>
                 </div>
-                <ng-container *ngIf="!!dims.length; else placeholder">
-                    <ng-container *ngFor="let item of dims; let i=index; trackBy: trackByFn">
+                <ng-container *ngIf="!!dimsTemp.length; else placeholder">
+                    <ng-container *ngFor="let item of dimsTemp; let i=index; trackBy: trackByFn">
                         <div class="row m--align-center m--margin-bottom-20 m-form m-form--state">
                             <div class="col-md-2">
                                 <div class="form-group"
@@ -57,7 +71,7 @@
                                 </div>
                             </div>
                             <div class="col-md-1 pointer text-center">
-                                <a title="Delete" (click)="delete(i)">
+                                <a title="Delete" (click)="delete(item,i)">
                                     <i class="fa fa-times fa-2x text-danger"></i>
                                 </a>
                             </div>
@@ -134,5 +148,12 @@
     </div>
 </div>
 
-<confirm-popup #confirmCancel [body]="'Are you sure want to exit?'" [title]="'Alert'" [labelConfirm]="'Yes'"
-    [labelCancel]="'No'" (onSubmit)="hide(); confirmCancel.hide()"></confirm-popup>
+<confirm-popup #confirmCancel [body]="'Are you sure you want to exit without saving?'" [title]="'Alert'"
+    [labelConfirm]="'Yes'" [labelCancel]="'No'" (onSubmit)=" confirmCancel.hide();closePopup();"></confirm-popup>
+
+<confirm-popup #confirmGetFromHAWB body="Do you want to update DIM from HAWB?"
+    (onSubmit)="confirmGetFromHAWB.hide();onGetDimsFromHAWB()" [labelConfirm]="'Yes'" [labelCancel]="'No'">
+</confirm-popup>
+
+<confirm-popup #confirmDeleteDim [body]="'Are you sure want to delete DIM?'" [title]="'Alert'" [labelConfirm]="'Yes'"
+    [labelCancel]="'No'" (onSubmit)="confirmDeleteDim.hide(); onDeleteDIMItem()"></confirm-popup>
