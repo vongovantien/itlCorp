@@ -120,7 +120,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         ];
         this.configPartner = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
-                { field: 'id', label: 'Partner ID' },
                 { field: 'shortName', label: 'Name ABBR' },
                 { field: 'partnerNameEn', label: 'Name EN' },
                 { field: 'taxCode', label: 'Tax Code' },
