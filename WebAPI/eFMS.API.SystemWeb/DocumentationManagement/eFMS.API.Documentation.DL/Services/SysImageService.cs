@@ -64,7 +64,7 @@ namespace eFMS.API.Documentation.DL.Services
                 /* Kiểm tra các thư mục có tồn tại */
                 var hs = new HandleState();
                 ImageHelper.CreateDirectoryFile(model.FolderName, model.JobId.ToString());
-                List<string> resultUrls = new List<string>();
+                List<SysImage> resultUrls = new List<SysImage>();
                 foreach (var file in model.Files)
                 {
                     fileName = file.FileName;
@@ -83,7 +83,7 @@ namespace eFMS.API.Documentation.DL.Services
                         DateTimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now
                     };
-                    resultUrls.Add(urlImage);
+                    resultUrls.Add(sysImage);
                     if (!DataContext.Any(x => x.ObjectId == objectId && x.Url == urlImage))
                     {
                         list.Add(sysImage);
