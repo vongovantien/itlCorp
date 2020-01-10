@@ -255,6 +255,11 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
+                                    <input type="number" class="form-control" [(ngModel)]="charge.finalExchangeRate">
+                                </div>
+                            </td>
+                            <td class="disabled">
+                                <div class="form-group ">
                                     <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherId">
                                 </div>
                             </td>
@@ -274,15 +279,8 @@
                                         [(ngModel)]="charge.voucherIdredate">
                                 </div>
                             </td>
-                            <td class="disabled">
-                                <div class="form-group ">
-                                    <input type="text" class="form-control" disabled
-                                        [(ngModel)]="charge.finalExchangeRate">
-                                </div>
-                            </td>
 
                         </tr>
-
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
                     </tr>

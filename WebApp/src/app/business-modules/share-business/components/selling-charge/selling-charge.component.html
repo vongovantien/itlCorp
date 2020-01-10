@@ -206,7 +206,6 @@
                                         [(ngModel)]="charge.settlementCode" disabled readonly>
                                 </div>
                             </td>
-
                             <td>
                                 <div class="form-group table-date">
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
@@ -222,6 +221,12 @@
                                             </span>
                                         </span>
                                     </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group ">
+                                    <input type="number" class="form-control" disabled
+                                        [(ngModel)]="charge.finalExchangeRate">
                                 </div>
                             </td>
                             <td>
@@ -257,15 +262,7 @@
                                     <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherIddate">
                                 </div>
                             </td>
-                            <td class="disabled">
-                                <div class="form-group ">
-                                    <input type="text" class="form-control" disabled
-                                        [(ngModel)]="charge.finalExchangeRate">
-                                </div>
-                            </td>
-
                         </tr>
-
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
                     </tr>
