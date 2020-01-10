@@ -42,7 +42,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
     }
 
     chooseFile(event: any) {
-        const fileList: FileList[] = event.target.files;
+        const fileList: FileList[] = event.target['files'];
         if (fileList.length > 0) {
             this._progressRef.start();
             this._documentRepo.uploadFileShipment(this.jobId, fileList)

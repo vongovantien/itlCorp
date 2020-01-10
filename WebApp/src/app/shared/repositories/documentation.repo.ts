@@ -608,7 +608,7 @@ export class DocumentationRepo {
     }
 
     uploadFileShipment(jobId: string, body: any) {
-        return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UploadMultiFiles/${jobId}`, body).pipe(
+        return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UploadMultiFiles/${jobId}`, body, 'files').pipe(
             map((data: any) => data)
         );
     }

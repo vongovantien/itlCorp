@@ -62,7 +62,7 @@ export class ApiService {
         }
         const formData = new FormData();
         for (const file of files) {
-            formData.append(name || file.name, file);
+            formData.append(name, file);
         }
         const options = {
             params: params,
