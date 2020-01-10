@@ -109,8 +109,4 @@ export abstract class PopupBase extends AppPage {
     setError(control: FormControl | AbstractControl, err: ValidationErrors = null) {
         control.setErrors(err);
     }
-    setError(control: FormControl | AbstractControl, err: ValidationErrors = null) {
-        control.setErrors(err);
-    }
-
 }
