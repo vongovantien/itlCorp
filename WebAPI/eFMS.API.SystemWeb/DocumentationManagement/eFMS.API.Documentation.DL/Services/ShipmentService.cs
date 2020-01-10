@@ -242,7 +242,21 @@ namespace eFMS.API.Documentation.DL.Services
                     MBL = x.Mblno,
                     JobId = x.JobNo
                 });
-            var result = new ResultHandle { Data = opShipments };
+            var csTransactions = csRepository.Get(x => criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
+                                                 && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb) : true
+                                              );
+            if (criteria.ShipmentPropertySearch == ShipmentPropertySearch.HBL)
+            {
+                var shipmentDetails = detailRepository.Get(x => criteria.Keywords.Contains(x.Hwbno));
+                csTransactions = csTransactions.Join(shipmentDetails, x => x.Id, y => y.JobId, (x, y) => x);
+            }
+            var csShipments = csTransactions
+                .Select(x => new Shipments {
+                    MBL = x.Mawb,
+                    JobId = x.JobNo
+                });
+            var shipments = opShipments.Union(csShipments);
+            var result = new ResultHandle { Data = shipments };
             return result;
         }
     }
