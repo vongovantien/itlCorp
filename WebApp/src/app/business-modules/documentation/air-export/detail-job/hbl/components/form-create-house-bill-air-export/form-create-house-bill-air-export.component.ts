@@ -166,7 +166,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
                             this.hwconstant = hbl.hwConstant;
-                            console.log(hbl);
 
                             this.updateFormValue(hbl);
                         }
@@ -184,7 +183,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                             this.shipmentDetail = new CsTransaction(shipment);
                             this.jobId = this.shipmentDetail.id;
                             this.hwconstant = this.shipmentDetail.hwConstant;
-                            console.log(this.hwconstant);
                             this.formCreate.patchValue({
                                 mawb: shipment.mawb,
                                 pod: shipment.pod,

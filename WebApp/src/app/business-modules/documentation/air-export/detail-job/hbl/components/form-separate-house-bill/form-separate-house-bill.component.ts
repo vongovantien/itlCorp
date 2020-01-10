@@ -20,12 +20,13 @@ import { forkJoin } from 'rxjs';
     templateUrl: 'form-separate-house-bill.component.html'
 })
 
-export class SeparateHouseBillComponent extends AirExportDetailHBLComponent {
+export class SeparateHouseBillComponent extends AirExportDetailHBLComponent implements OnInit {
     form: FormGroup;
     hblId: string = '';
     jobId: string = '';
     hblDetail: any;
-
+    hblSeprateDetail: any;
+    hblSeparateId: string;
 
     constructor(
         protected _progressService: NgProgress,
@@ -52,11 +53,11 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent {
             if (param.hblId) {
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
-                this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
-                this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-                this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
+                this.getSeparate();
             }
         });
+
+
     }
 
 
@@ -64,51 +65,23 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent {
         this._documentationRepo.getSeparate(this.hblId)
             .pipe(catchError(this.catchError))
             .subscribe((res: any) => {
-                if (!!res) {
-                    this.hblId = res.id;
-                    console.log(this.hblId);
-                    this.hblDetail = res;
-                    console.log(this.hblDetail);
-                    this.formCreateHBLComponent.updateFormValue(this.hblDetail);
+                console.log(res);
+                if (!!res && !!res.id && res.id !== SystemConstants.EMPTY_GUID) {
+                    this.hblSeparateId = res.id;
+                    this.hblSeprateDetail = res;
+                    this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(res.id));
+                    this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(res.id));
 
+                } else {
+                    this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
+                    this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
                 }
             });
     }
 
     ngAfterViewInit() {
         this.formCreateHBLComponent.isSeparate = true;
-        this._store.select(getDimensionVolumesState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                map((dims: DIM[]) => dims.map(d => new DIM(d))),
-                tap(
-                    (dims: DIM[]) => {
-                        this.formCreateHBLComponent.dims = dims;
-                    }
-                ),
-                mergeMap(
-                    () => this._store.select(getDetailHBlState).pipe(takeUntil(this.ngUnsubscribe))
-                )
-            )
-            .subscribe(
-                (hbl: HouseBill) => {
-                    if (!!hbl && hbl.id && hbl.id !== SystemConstants.EMPTY_GUID) {
-                        this.hblDetail = hbl;
-                        console.log(this.hblDetail);
-                        this.formCreateHBLComponent.totalCBM = this.hblDetail.cbm;
-                        this.formCreateHBLComponent.totalHeightWeight = this.hblDetail.hw;
-                        this.formCreateHBLComponent.jobId = this.hblDetail.jobId;
-                        this.formCreateHBLComponent.hblId = this.hblDetail.id;
-                        this.formCreateHBLComponent.hwconstant = this.hblDetail.hwConstant;
-                        this.formCreateHBLComponent.updateFormValue(this.hblDetail);
-                        this.getSeparate();
-                    }
-
-                }
-            );
     }
-
-
 
     saveHBLSeparate() {
         this.formCreateHBLComponent.isSubmitted = true;
@@ -118,24 +91,20 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent {
         }
         const houseBill: HouseBill = this.getDataForm();
         houseBill.jobId = this.jobId;
-        if (!!this.hblDetail) {
-            if (this.hblDetail.parentId == null) {
-                houseBill.parentId = this.hblId;
-                console.log(houseBill);
-                this.createHbl(houseBill);
-            } else {
-                const modelUpdate = this.getDataForm();
-                modelUpdate.id = this.hblId;
-                modelUpdate.jobId = this.jobId;
-                modelUpdate.parentId = this.hblDetail.parentId;
+        if (!this.hblSeparateId) {
+            houseBill.parentId = this.hblId;
+            this.createHbl(houseBill);
+        } else {
+            const modelUpdate = this.getDataForm();
 
-                for (const dim of modelUpdate.dimensionDetails) {
-                    dim.hblId = this.hblId;
-                    dim.mblId = this.jobId;
-                }
-                this.updateHbl(modelUpdate);
+            modelUpdate.id = this.hblId;
+            modelUpdate.jobId = this.jobId;
+            modelUpdate.parentId = this.hblId;
+
+            for (const dim of modelUpdate.dimensionDetails) {
+                dim.hblId = this.hblSeparateId;
             }
-
+            this.updateHbl(modelUpdate);
         }
     }
 }

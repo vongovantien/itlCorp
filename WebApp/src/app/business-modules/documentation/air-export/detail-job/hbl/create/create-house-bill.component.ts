@@ -61,7 +61,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             });
     }
 
-    generateHblNo(transactionType: number){
+    generateHblNo(transactionType: number) {
         this._documentationRepo.generateHBLNo(transactionType)
             .pipe(
                 catchError(this.catchError),

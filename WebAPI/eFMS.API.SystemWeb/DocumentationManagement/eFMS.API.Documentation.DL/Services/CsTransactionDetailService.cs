@@ -119,7 +119,7 @@ namespace eFMS.API.Documentation.DL.Services
                             model.DimensionDetails.ForEach(x =>
                             {
                                 x.Id = Guid.NewGuid();
-                                x.Mblid = model.Id;
+                                x.Hblid = model.Id;
                             });
                             var d = dimensionDetailService.Add(model.DimensionDetails);
                         }
@@ -328,7 +328,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
-                var queryDetail = csTransactionDetailRepo.Get(x => x.Id == Id && x.ParentId == null ).FirstOrDefault();
+                var queryDetail = csTransactionDetailRepo.Get(x => x.Id == Id).FirstOrDefault();
                 var detail = mapper.Map<CsTransactionDetailModel>(queryDetail);
                 if (detail != null)
                 {

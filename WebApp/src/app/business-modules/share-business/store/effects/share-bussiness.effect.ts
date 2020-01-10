@@ -97,7 +97,9 @@ export class ShareBussinessEffects {
             mergeMap(
                 (id: string) => this._documentRepo.getDetailHbl(id)
                     .pipe(
-                        map((data: any) => new GetDetailHBLSuccessAction(data)),
+                        map((data: any) => {
+                            return new GetDetailHBLSuccessAction(data)
+                        }),
                         catchError(err => of(new GetDetailHBLFailAction(err)))
                     )
             )
