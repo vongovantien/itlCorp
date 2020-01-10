@@ -329,6 +329,13 @@ namespace eFMS.API.Catalogue.Controllers
                 };
                 list.Add(warehouse);
             }
+            list = list.Where(x => x.Code != null 
+                || x.NameEn != null 
+                || x.NameVn != null 
+                || x.Address != null 
+                || x.CountryName != null 
+                || x.ProvinceName != null 
+                || x.DisplayName != null).ToList();
             return list;
         }
         private List<CatPlaceImportModel> ReadPortIndexFromExel(ExcelWorksheet worksheet, int rowCount)

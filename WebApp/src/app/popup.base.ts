@@ -1,6 +1,7 @@
 import { ModalOptions, ModalDirective } from "ngx-bootstrap";
 import { AppPage } from "src/app/app.base";
 import { ViewChild } from "@angular/core";
+import { FormControl, AbstractControl, ValidationErrors } from "@angular/forms";
 
 export abstract class PopupBase extends AppPage {
 
@@ -105,5 +106,7 @@ export abstract class PopupBase extends AppPage {
         this.page = 1;  // TODO reset page to initial
         this.requestList(data);
     }
-
+    setError(control: FormControl | AbstractControl, err: ValidationErrors = null) {
+        control.setErrors(err);
+    }
 }

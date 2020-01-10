@@ -72,12 +72,12 @@ export class PortIndexImportComponent extends AppPage implements OnInit {
     }
 
     import(element) {
-        this._progressRef.start();
         if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {
             this.importAlert.show();
         } else {
             const data = this.data.filter(x => x.isValid);
+            this._progressRef.start();
             this.catalogueRepo.importPlace(data)
                 .pipe(
                     finalize(() => {
