@@ -1457,84 +1457,102 @@ namespace eFMS.API.Accounting.DL.Services
             var userAprNext = string.Empty;
             var emailUserAprNext = string.Empty;
 
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
-
-            if (advance == null) return new HandleState("Not found Advance Payment");
-
-            var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
-
-            if (approve == null) return new HandleState("Not found Advance Approval by AdvanceNo is " + advance.AdvanceNo);
-
-            //Lấy ra brandId của user requester
-            var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.WorkPlaceId;
-            if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
-
-            //Lấy ra brandId của userId
-            var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
-            if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
-
-            //Lấy ra dept code của userApprove dựa vào userApprove
-            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
-            if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
-
-            //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
-            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
-            if (approve != null && advance != null)
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                if (userCurrent == GetLeaderIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                try
                 {
-                    advance.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
-                    approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
+                    var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
 
-                    //Lấy email của Department Manager
-                    userAprNext = GetManagerIdOfUser(userCurrent, brandOfUserId.ToString());
-                    var userAprNextId = GetEmployeeIdOfUser(userAprNext);
-                    emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                    if (advance == null) return new HandleState("Not found Advance Payment");
+
+                    var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+
+                    if (approve == null) return new HandleState("Not found Advance Approval by AdvanceNo is " + advance.AdvanceNo);
+
+                    //Lấy ra brandId của user requester
+                    var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.WorkPlaceId;
+                    if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
+
+                    //Lấy ra brandId của userId
+                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                    if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
+
+                    //Lấy ra dept code của userApprove dựa vào userApprove
+                    var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
+                    if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
+
+                    //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
+                    var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
+                    if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                    if (approve != null && advance != null)
+                    {
+                        if (userCurrent == GetLeaderIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            advance.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
+                            approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
+
+                            //Lấy email của Department Manager
+                            userAprNext = GetManagerIdOfUser(userCurrent, brandOfUserId.ToString());
+                            var userAprNextId = GetEmployeeIdOfUser(userAprNext);
+                            emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                        }
+                        else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            advance.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
+                            approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
+                            approve.ManagerApr = userCurrent;
+
+                            //Lấy email của Accountant Manager
+                            userAprNext = GetAccountantId(brandOfUserId.ToString());
+                            var userAprNextId = GetEmployeeIdOfUser(userAprNext);
+                            emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                        }
+                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            advance.StatusApproval = Constants.STATUS_APPROVAL_DONE;
+                            approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
+                            approve.AccountantApr = userCurrent;
+                            approve.BuheadApr = approve.Buhead;
+
+                            //Send mail approval success when Accountant approved, mail send to requester
+                            SendMailApproved(advance.AdvanceNo, DateTime.Now);
+                        }
+
+                        advance.UserModified = approve.UserModified = userCurrent;
+                        advance.DatetimeModified = approve.DateModified = DateTime.Now;
+
+                        //dc.AcctAdvancePayment.Update(advance);
+                        //dc.AcctApproveAdvance.Update(approve);
+                        //dc.SaveChanges();
+                        var hsUpdateAdvance = DataContext.Update(advance, x => x.Id == advance.Id);
+                        var hsUpdateApprove = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
+                        trans.Commit();
+                    }
+
+                    if (userCurrent == GetAccountantId(brandOfUserId.ToString()))
+                    {
+                        return new HandleState();
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(emailUserAprNext)) return new HandleState("Not found email of user " + userAprNext);
+
+                        //Send mail đề nghị approve
+                        var sendMailResult = SendMailSuggestApproval(advance.AdvanceNo, userAprNext, emailUserAprNext);
+
+                        return sendMailResult ? new HandleState() : new HandleState("Send mail suggest Approval Failed");
+                    }
                 }
-                else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                catch (Exception ex)
                 {
-                    advance.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
-                    approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
-                    approve.ManagerApr = userCurrent;
-
-                    //Lấy email của Accountant Manager
-                    userAprNext = GetAccountantId(brandOfUserId.ToString());
-                    var userAprNextId = GetEmployeeIdOfUser(userAprNext);
-                    emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
                 }
-                else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                finally
                 {
-                    advance.StatusApproval = Constants.STATUS_APPROVAL_DONE;
-                    approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
-                    approve.AccountantApr = userCurrent;
-                    approve.BuheadApr = approve.Buhead;
-
-                    //Send mail approval success when Accountant approved, mail send to requester
-                    SendMailApproved(advance.AdvanceNo, DateTime.Now);
+                    trans.Dispose();
                 }
-
-                advance.UserModified = approve.UserModified = userCurrent;
-                advance.DatetimeModified = approve.DateModified = DateTime.Now;
-
-                dc.AcctAdvancePayment.Update(advance);
-                dc.AcctApproveAdvance.Update(approve);
-                dc.SaveChanges();
-            }
-
-            if (userCurrent == GetAccountantId(brandOfUserId.ToString()))
-            {
-                return new HandleState();
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(emailUserAprNext)) return new HandleState("Not found email of user " + userAprNext);
-
-                //Send mail đề nghị approve
-                var sendMailResult = SendMailSuggestApproval(advance.AdvanceNo, userAprNext, emailUserAprNext);
-
-                return sendMailResult ? new HandleState() : new HandleState("Send mail suggest Approval Failed");
             }
         }
 

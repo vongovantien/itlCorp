@@ -1472,85 +1472,102 @@ namespace eFMS.API.Accounting.DL.Services
 
             var userAprNext = string.Empty;
             var emailUserAprNext = string.Empty;
-
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
-
-            if (settlement == null) return new HandleState("Not Found Settlement Payment");
-
-            var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
-
-            if (approve == null) return new HandleState("Not Found Settlement Approval by SettlementNo is " + settlement.SettlementNo);
-
-            //Lấy ra brandId của user requester
-            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester)?.WorkPlaceId;
-            if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
-
-            //Lấy ra brandId của userId
-            var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
-            if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
-
-            //Lấy ra dept code của userApprove dựa vào userApprove
-            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
-            if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
-
-            //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
-            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
-            if (approve != null && settlement != null)
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                if (userCurrent == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                try
                 {
-                    settlement.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
-                    approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
+                    //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                    var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
 
-                    //Lấy email của Department Manager
-                    userAprNext = GetManagerIdOfUser(userCurrent, brandOfUserId.ToString());
-                    var userAprNextId = GetEmployeeIdOfUser(userAprNext);
-                    emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                    if (settlement == null) return new HandleState("Not Found Settlement Payment");
+
+                    var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
+
+                    if (approve == null) return new HandleState("Not Found Settlement Approval by SettlementNo is " + settlement.SettlementNo);
+
+                    //Lấy ra brandId của user requester
+                    var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester)?.WorkPlaceId;
+                    if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
+
+                    //Lấy ra brandId của userId
+                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                    if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
+
+                    //Lấy ra dept code của userApprove dựa vào userApprove
+                    var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
+                    if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
+
+                    //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
+                    var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
+                    if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                    if (approve != null && settlement != null)
+                    {
+                        if (userCurrent == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            settlement.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
+                            approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
+
+                            //Lấy email của Department Manager
+                            userAprNext = GetManagerIdOfUser(userCurrent, brandOfUserId.ToString());
+                            var userAprNextId = GetEmployeeIdOfUser(userAprNext);
+                            emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                        }
+                        else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            settlement.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
+                            approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
+                            approve.ManagerApr = userCurrent;
+
+                            //Lấy email của Accountant Manager
+                            userAprNext = GetAccountantId(brandOfUserId.ToString());
+                            var userAprNextId = GetEmployeeIdOfUser(userAprNext);
+                            emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                        }
+                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            settlement.StatusApproval = Constants.STATUS_APPROVAL_DONE;
+                            approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
+                            approve.AccountantApr = userCurrent;
+                            approve.BuheadApr = approve.Buhead;
+
+                            //Send mail approval success when Accountant approved, mail send to requester
+                            SendMailApproved(settlement.SettlementNo, DateTime.Now);
+                        }
+
+                        settlement.UserModified = approve.UserModified = userCurrent;
+                        settlement.DatetimeModified = approve.DateModified = DateTime.Now;
+
+                        //dc.AcctSettlementPayment.Update(settlement);
+                        //dc.AcctApproveSettlement.Update(approve);
+                        //dc.SaveChanges();
+                        var hsUpdateSettle = DataContext.Update(settlement, x => x.Id == settlement.Id);
+                        var hsUpdateApprove = acctApproveSettlementRepo.Update(approve , x => x.Id == approve.Id);
+                        trans.Commit();
+                    }
+
+                    if (userCurrent == GetAccountantId(brandOfUserId.ToString()))
+                    {
+                        return new HandleState();
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(emailUserAprNext)) return new HandleState("Not found email of user " + userAprNext);
+
+                        //Send mail đề nghị approve
+                        var sendMailResult = SendMailSuggestApproval(settlement.SettlementNo, userAprNext, emailUserAprNext);
+
+                        return sendMailResult ? new HandleState() : new HandleState("Send mail Suggest Approval Failed");
+                    }
                 }
-                else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                catch (Exception ex)
                 {
-                    settlement.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
-                    approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
-                    approve.ManagerApr = userCurrent;
-
-                    //Lấy email của Accountant Manager
-                    userAprNext = GetAccountantId(brandOfUserId.ToString());
-                    var userAprNextId = GetEmployeeIdOfUser(userAprNext);
-                    emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
                 }
-                else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                finally
                 {
-                    settlement.StatusApproval = Constants.STATUS_APPROVAL_DONE;
-                    approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
-                    approve.AccountantApr = userCurrent;
-                    approve.BuheadApr = approve.Buhead;
-
-                    //Send mail approval success when Accountant approved, mail send to requester
-                    SendMailApproved(settlement.SettlementNo, DateTime.Now);
+                    trans.Dispose();
                 }
-
-                settlement.UserModified = approve.UserModified = userCurrent;
-                settlement.DatetimeModified = approve.DateModified = DateTime.Now;
-
-                dc.AcctSettlementPayment.Update(settlement);
-                dc.AcctApproveSettlement.Update(approve);
-                dc.SaveChanges();
-            }
-
-            if (userCurrent == GetAccountantId(brandOfUserId.ToString()))
-            {
-                return new HandleState();
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(emailUserAprNext)) return new HandleState("Not found email of user " + userAprNext);
-
-                //Send mail đề nghị approve
-                var sendMailResult = SendMailSuggestApproval(settlement.SettlementNo, userAprNext, emailUserAprNext);
-
-                return sendMailResult ? new HandleState() : new HandleState("Send mail Suggest Approval Failed");
             }
         }
 
@@ -1558,64 +1575,82 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var userCurrent = currentUser.UserID;
 
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
-
-            if (settlement == null) return new HandleState("Not Found Settlement Payment");
-
-            var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
-            if (approve == null) return new HandleState("Not Found Approve Settlement by SettlementNo " + settlement.SettlementNo);
-
-            //Lấy ra brandId của user requester
-            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester)?.WorkPlaceId;
-            if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
-
-            //Lấy ra brandId của userId
-            var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
-            if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
-
-            //Lấy ra dept code của userApprove dựa vào userApprove
-            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
-            if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
-
-            //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
-            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
-            if (approve != null && settlement != null)
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                if (userCurrent == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                try
                 {
-                    approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
+                    var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
+
+                    if (settlement == null) return new HandleState("Not Found Settlement Payment");
+
+                    var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
+                    if (approve == null) return new HandleState("Not Found Approve Settlement by SettlementNo " + settlement.SettlementNo);
+
+                    //Lấy ra brandId của user requester
+                    var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester)?.WorkPlaceId;
+                    if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
+
+                    //Lấy ra brandId của userId
+                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                    if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
+
+                    //Lấy ra dept code của userApprove dựa vào userApprove
+                    var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
+                    if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
+
+                    //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
+                    var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
+                    if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                    if (approve != null && settlement != null)
+                    {
+                        if (userCurrent == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
+                        }
+                        else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
+                            approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
+                        }
+                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
+                            approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
+                        }
+
+                        approve.UserModified = userCurrent;
+                        approve.DateModified = DateTime.Now;
+                        approve.Comment = comment;
+                        approve.IsDeputy = true;
+                        //dc.AcctApproveSettlement.Update(approve);
+                        var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
+
+                        //Cập nhật lại advance status của Settlement Payment
+                        settlement.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
+                        settlement.UserModified = userCurrent;
+                        settlement.DatetimeModified = DateTime.Now;
+                        //dc.AcctSettlementPayment.Update(settlement);
+                        var hsUpdateSettle = DataContext.Update(settlement, x => x.Id == settlement.Id);
+
+                        //dc.SaveChanges();
+                        trans.Commit();
+                    }
+
+                    //Send mail denied approval
+                    var sendMailResult = SendMailDeniedApproval(settlement.SettlementNo, comment, DateTime.Now);
+                    return sendMailResult ? new HandleState() : new HandleState("Send mail Deny Approval Failed");
                 }
-                else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                catch (Exception ex)
                 {
-                    approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
-                    approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
                 }
-                else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                finally
                 {
-                    approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
-                    approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
+                    trans.Dispose();
                 }
-
-                approve.UserModified = userCurrent;
-                approve.DateModified = DateTime.Now;
-                approve.Comment = comment;
-                approve.IsDeputy = true;
-                dc.AcctApproveSettlement.Update(approve);
-
-                //Cập nhật lại advance status của Settlement Payment
-                settlement.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
-                settlement.UserModified = userCurrent;
-                settlement.DatetimeModified = DateTime.Now;
-                dc.AcctSettlementPayment.Update(settlement);
-
-                dc.SaveChanges();
             }
-
-            //Send mail denied approval
-            var sendMailResult = SendMailDeniedApproval(settlement.SettlementNo, comment, DateTime.Now);
-            return sendMailResult ? new HandleState() : new HandleState("Send mail Deny Approval Failed");
         }
 
         public AcctApproveSettlementModel GetInfoApproveSettlementBySettlementNo(string settlementNo)

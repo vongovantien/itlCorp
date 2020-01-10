@@ -429,7 +429,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     mapShipment(type: string) {
         var _shipment = [];
-        if (this.shipmentInput !== null) {
+        if (this.shipmentInput !== null && this.shipmentInput !== undefined) {
             const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
             if (this.shipmentInput.type === type) {
                 _shipment = _keyword;
