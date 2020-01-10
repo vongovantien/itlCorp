@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace eFMS.API.Documentation.Models
+namespace eFMS.API.Documentation.DL.Models.Criteria
 {
     public class ShipmentCriteria
     {

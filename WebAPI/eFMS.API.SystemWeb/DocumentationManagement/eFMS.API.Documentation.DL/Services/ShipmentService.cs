@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.EF;
@@ -228,6 +230,20 @@ namespace eFMS.API.Documentation.DL.Services
                 Service = CustomData.Services.FirstOrDefault(s => s.Value == x.Service)?.DisplayName
             }).ToList();
             return dataList;
+        }
+
+        public ResultHandle UnLockShipment(ShipmentCriteria criteria)
+        {
+            var opShipments = opsRepository.Get(x => criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo): true
+                                                  && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno): true
+                                                  )
+                .Select(x => new Shipments
+                {
+                    MBL = x.Mblno,
+                    JobId = x.JobNo
+                });
+            var result = new ResultHandle { Data = opShipments };
+            return result;
         }
     }
 }
