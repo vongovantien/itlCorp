@@ -9,13 +9,11 @@
     <AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
 </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="wwwroot\**" />
-    <Content Remove="wwwroot\**" />
-    <EmbeddedResource Remove="wwwroot\**" />
-    <None Remove="wwwroot\**" />
-  </ItemGroup>
+<ItemGroup>
+  <Compile Remove="wwwroot\**" />
+  <EmbeddedResource Remove="wwwroot\**" />
+  <None Remove="wwwroot\**" />
+</ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Controllers\OpsStageAssignedController.cs" />
@@ -34,7 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 
