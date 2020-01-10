@@ -70,7 +70,7 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string MSG_PLACE_PROVINCE_NAME_EMPTY = "Province name is not allow empty!|wrong";
         public static readonly string MSG_PLACE_PROVINCE_NOT_FOUND = "MSG_PLACE_PROVINCE_NOT_FOUND";
         public static readonly string MSG_PLACE_DISTRICT_NAME_EMPTY = "Province name is not allow empty!|wrong";
-        public static readonly string MSG_PLACE_DISTRICT_NOT_FOUND = "MSG_PLACE_PROVINCE_NOT_FOUND";
+        public static readonly string MSG_PLACE_DISTRICT_NOT_FOUND = "MSG_PLACE_DISTRICT_NOT_FOUND";
         public static readonly string MSG_PLACE_CODE_DUPLICATE = "MSG_PLACE_CODE_DUPLICATE";
         public static readonly string MSG_PLACE_PORTINDEX_MODE_EMPTY = "MSG_PLACE_PORTINDEX_MODE_EMPTY";
         public static readonly string MSG_PLACE_PORTINDEX_MODE_NOT_FOUND = "MSG_PLACE_PORTINDEX_MODE_NOT_FOUND";

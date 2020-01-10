@@ -73,12 +73,12 @@ export class PartnerDataImportComponent extends AppPage implements OnInit {
     }
 
     async import(element) {
-        this._progressRef.start();
         if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {
             this.importAlert.show();
         } else {
             const data = this.data.filter(x => x.isValid);
+            this._progressRef.start();
             this._catalogueRepo.importPartner(data)
                 .pipe(
                     finalize(() => {

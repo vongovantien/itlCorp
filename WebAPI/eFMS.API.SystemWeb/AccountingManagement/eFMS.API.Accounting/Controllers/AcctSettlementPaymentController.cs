@@ -229,15 +229,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// Get exists charge by shipment
         /// </summary>
-        /// <param name="JobId"></param>
-        /// <param name="HBL"></param>
-        /// <param name="MBL"></param>
+        /// <param name="criteria"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GetExistsCharge")]
-        public IActionResult GetExistsCharge(string JobId, string HBL, string MBL)
+        public IActionResult GetExistsCharge([FromQuery]ExistsChargeCriteria criteria)
         {
-            var data = acctSettlementPaymentService.GetExistsCharge(JobId, HBL, MBL);
+            var data = acctSettlementPaymentService.GetExistsCharge(criteria);
             return Ok(data);
         }
 

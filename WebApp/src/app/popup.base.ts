@@ -106,9 +106,7 @@ export abstract class PopupBase extends AppPage {
         this.page = 1;  // TODO reset page to initial
         this.requestList(data);
     }
-
     setError(control: FormControl | AbstractControl, err: ValidationErrors = null) {
         control.setErrors(err);
     }
-
 }

@@ -217,6 +217,7 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(results);
         }
 
+        [Authorize]
         [HttpDelete("DeleteAttachedFile/{id}")]
         public IActionResult DeleteAttachedFile([Required]Guid id)
         {

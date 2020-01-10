@@ -3,6 +3,7 @@ using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -81,12 +82,17 @@ namespace eFMS.API.Documentation.Controllers
             List<string> shipmentNotExits = new List<string>();
             if(typeSearch == "JOBID")
             {
-                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.JobId).Contains(x)).Select(s => s.ToString()).ToList();
+                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.JobId).Contains(x)).Select(s => s).ToList();
+            }
+
+            if (typeSearch == "MBL")
+            {
+                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.MBL).Contains(x)).Select(s => s).ToList();
             }
 
             if (typeSearch == "HBL")
             {
-                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.HBL).Contains(x)).Select(s => s.ToString()).ToList();
+                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.HBL).Contains(x)).Select(s => s).ToList();
             }
 
             var _status = false;
@@ -98,6 +104,17 @@ namespace eFMS.API.Documentation.Controllers
             }
             ResultHandle result = new ResultHandle { Status = _status, Message = _message };
             return Ok(result);
+        }
+        
+        [HttpPost("UnLockShipment")]
+        public IActionResult UnLockShipment(ShipmentCriteria criteria)
+        {
+            switch (criteria.ShipmentPropertySearch)
+            {
+                case ShipmentPropertySearch.JOBID:
+                    break;
+            }
+            return Ok();
         }
     }
 }

@@ -712,26 +712,30 @@ namespace eFMS.API.Catalogue.DL.Services
                     else
                     {
                         result.CountryId = country.Id;
-                        if (string.IsNullOrEmpty(item.ProvinceName)) break;
-                        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
-                        if (province == null)
+                        if (!string.IsNullOrEmpty(item.ProvinceName))
                         {
-                            result.ProvinceNameError = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
-                            result.IsValid = false;
-                        }
-                        else
-                        {
-                            result.ProvinceId = province.Id;
-                            if (string.IsNullOrEmpty(item.DistrictName)) break;
-                            var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && (i.ProvinceId == province.Id || province == null));
-                            if (district == null)
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
+                            if (province == null)
                             {
-                                result.DistrictNameError = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_DISTRICT_NOT_FOUND], item.DistrictName, item.ProvinceName);
+                                result.ProvinceNameError = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
                                 result.IsValid = false;
                             }
                             else
                             {
-                                result.DistrictId = district.Id;
+                                result.ProvinceId = province.Id;
+                                if (!string.IsNullOrEmpty(item.DistrictName))
+                                {
+                                    var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && (i.ProvinceId == province.Id || province == null));
+                                    if (district == null)
+                                    {
+                                        result.DistrictNameError = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_DISTRICT_NOT_FOUND], item.DistrictName, item.ProvinceName);
+                                        result.IsValid = false;
+                                    }
+                                    else
+                                    {
+                                        result.DistrictId = district.Id;
+                                    }
+                                }
                             }
                         }
                     }
@@ -791,7 +795,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 foreach (var item in data)
                 {
-                    bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
+                    bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
                     DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now: null;
                     var catPlace = new CatPlace
                     {   Id = Guid.NewGuid(),

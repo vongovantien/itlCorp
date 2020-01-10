@@ -9,7 +9,7 @@ namespace eFMS.API.ReportData.Models
     {
         public class Catelogue
         {
-            public const string CountryUrl = "/Catalogue/api/v1/en-US/CatCountry/query";
+            public const string CountryUrl = "/api/v1/en-US/CatCountry/query";//"/Catalogue/api/v1/en-US/CatCountry/query";
             public const string CatplaceUrl = "/Catalogue/api/v1/en-US/CatPlace/query";
             public const string CatPartnerUrl = "/Catalogue/api/v1/en-US/CatPartner/query";
             public const string CatCommodityUrl = "/Catalogue/api/v1/en-US/CatCommonity/query";

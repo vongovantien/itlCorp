@@ -118,7 +118,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
             portIndexeNameEN: res.nameEn,
             portIndexeNameLocal: res.nameVn,
             country: [this.countries.find(x => x.id === res.countryId)] || [],
-            zone: [this.areas.find(x => x.id === res.areaId)] || [],
+            zone: res.areaId != null ? [this.areas.find(x => x.id === res.areaId)] : [] || [],
             mode: [this.modes.find(x => x.id === res.modeOfTransport)] || [],
             active: res.active
         });

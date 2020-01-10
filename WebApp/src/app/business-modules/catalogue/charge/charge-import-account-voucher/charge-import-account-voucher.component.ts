@@ -115,13 +115,13 @@ export class ChargeImportAccountVoucherComponent extends AppPage implements OnIn
 
 
     import(element) {
-        this._progressRef.start();
         if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {
             this.importAlert.show();
             this._progressRef.complete();
         } else {
             const data = this.data.filter(x => x.isValid);
+            this._progressRef.start();
             this._catalogueRepo.importChargeVoucher(data)
                 .pipe(
                     finalize(() => {

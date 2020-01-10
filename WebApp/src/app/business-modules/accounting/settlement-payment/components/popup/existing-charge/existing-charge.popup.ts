@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemConstants } from 'src/constants/system.const';
 import { catchError, finalize } from 'rxjs/operators';
@@ -8,6 +8,7 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { Surcharge } from 'src/app/shared/models';
 import { ToastrService } from 'ngx-toastr';
+import { ShareAccountingInputShipmentPopupComponent } from 'src/app/business-modules/accounting/components/input-shipment/input-shipment.popup';
 
 @Component({
     selector: 'existing-charge-popup',
@@ -16,6 +17,7 @@ import { ToastrService } from 'ngx-toastr';
 
 export class SettlementExistingChargePopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChild(ShareAccountingInputShipmentPopupComponent, { static: false }) inputShipmentPopupComponent: ShareAccountingInputShipmentPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -49,7 +51,9 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         typeButton: ButtonType.reset,
     };
 
-
+    shipmentInput: OperationInteface.IInputShipment;
+    isLoadingShipmentGrid: boolean = false;
+    isLoadingPartnerGrid: boolean = false;
     constructor(
         private _dataService: DataService,
         private _catalogue: CatalogueRepo,
@@ -82,8 +86,11 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
             this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
         } else {
+            this.isLoadingShipmentGrid = true;
             this._catalogue.getListPartner(null, null, { active: true })
-                .pipe(catchError(this.catchError))
+                .pipe(catchError(this.catchError),finalize(()=>{
+                    this.isLoadingShipmentGrid = false;
+                }))
                 .subscribe(
                     (dataPartner: any) => {
                         this.getPartnerData(dataPartner);
@@ -144,10 +151,13 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
 
     getShipment(partnerId: string, service: string[]) {
+        this.isLoadingShipmentGrid = true;
         this._documentRepo.getShipmentByPartnerOrService(partnerId, service)
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError),finalize(()=>{
+                this.isLoadingShipmentGrid = false;
+            }))
             .subscribe(
-                (res: any) => {
+                (res: any) => {                    
                     this.configShipment.dataSource = res;
                     this.configShipment.displayFields = [
                         { field: 'jobId', label: 'Job No' },
@@ -168,13 +178,37 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     searchCharge() {
-        if (!this.selectedShipmentData) {
+        if (!this.selectedShipmentData && !this.shipmentInput) {
             return;
         } else {
             this.isLoading = true;
             this.isCheckAll = false;
 
-            this._accoutingRepo.getExistingCharge(this.selectedShipmentData.jobId, this.selectedShipmentData.hbl, this.selectedShipmentData.mbl)
+            // this._accoutingRepo.getExistingCharge(this.selectedShipmentData.jobId, this.selectedShipmentData.hbl, this.selectedShipmentData.mbl)
+            //     .pipe(catchError(this.catchError), finalize(() => this.isLoading = false))
+            //     .subscribe(
+            //         (res: any) => {
+            //             this.charges = res;
+            //         }
+            //     );
+            var _jobIds = [];
+            var _hbls = [];
+            var _mbls = [];
+            _jobIds = this.mapShipment("JOBID");
+            _hbls = this.mapShipment("HBL");
+            _mbls = this.mapShipment("MBL");
+            if (this.selectedShipmentData) {
+                _jobIds.push(this.selectedShipmentData.jobId);
+                _hbls.push(this.selectedShipmentData.hbl);
+                _mbls.push(this.selectedShipmentData.mbl);
+            }
+            const body = {
+                jobIds: _jobIds,
+                hbls: _hbls,
+                mbls: _mbls
+            };
+            console.log(body)
+            this._accoutingRepo.getExistingCharge(body)
                 .pipe(catchError(this.catchError), finalize(() => this.isLoading = false))
                 .subscribe(
                     (res: any) => {
@@ -182,6 +216,20 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                     }
                 );
         }
+    }
+
+    mapShipment(type: string) {
+        var _shipment = [];
+        console.log(this.shipmentInput)
+        if (this.shipmentInput) {
+            if (this.shipmentInput.keyword.length > 0) {
+                const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
+                if (this.shipmentInput.type === type) {
+                    _shipment = _keyword;
+                }
+            }
+        }
+        return _shipment;
     }
 
     reset() {
@@ -192,6 +240,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.charges = [];
         this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
 
+        this.resetFormShipmentInput();
     }
 
     onChangeCheckBoxCharge() {
@@ -227,6 +276,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.resetShipment();
         this.resetPartner();
         this.hide();
+
+        this.resetFormShipmentInput();
     }
 
     submit() {
@@ -241,6 +292,20 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this.onRequest.emit(this.selectedCharge);
             this.hide();
         }
+    }
+
+    openInputShipment() {
+        this.inputShipmentPopupComponent.show();
+    }
+
+    onShipmentList(data: any) {
+        this.shipmentInput = data;
+    }
+
+    resetFormShipmentInput(){
+        this.inputShipmentPopupComponent.shipmentSearch = '';
+        this.shipmentInput = null;
+        this.inputShipmentPopupComponent.selectedShipmentType = "JOBID";
     }
 }
 

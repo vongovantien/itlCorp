@@ -3,7 +3,9 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -33,7 +35,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         ExportSOADetailResult GetDataExportSOABySOANo(string soaNo, string currencyLocal);
 
-        IQueryable<ChargeSOAResult> GetChargeShipmentDocAndOperation();
+        IQueryable<ChargeSOAResult> GetChargeShipmentDocAndOperation(Expression<Func<ChargeSOAResult, bool>> query);
 
         ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria);
 

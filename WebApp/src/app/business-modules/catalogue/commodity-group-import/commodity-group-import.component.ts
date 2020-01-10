@@ -116,8 +116,8 @@ export class CommodityGroupImportComponent extends AppPage implements OnInit {
     if (this.totalRows - this.totalValidRows > 0) {
       this.importAlert.show();
     } else {
-      this._progressRef.start();
       const data = this.data.filter(x => x.isValid);
+      this._progressRef.start();
       this.catalogueRepo.importCommodityGroup(data)
         .pipe(
           finalize(() => {
