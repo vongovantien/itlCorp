@@ -19,6 +19,7 @@ import { AirExportHBLFormCreateComponent } from './components/form-create-house-
 import { AirExportHBLAttachListComponent } from './components/attach-list/attach-list-house-bill-air-export.component';
 import { AirExportDetailHBLComponent } from './detail/detail-house-bill.component';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 
 const routing: Routes = [
@@ -66,6 +67,7 @@ const LIB = [
         FormsModule,
         RouterModule.forChild(routing),
         ReactiveFormsModule,
+        NgxSpinnerModule,
         ...LIB
     ],
     exports: [],
