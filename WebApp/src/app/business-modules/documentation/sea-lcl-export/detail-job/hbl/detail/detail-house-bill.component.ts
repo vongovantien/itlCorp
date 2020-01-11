@@ -134,6 +134,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+                        this._router.navigate([`/home/documentation/sea-lcl-export/${this.jobId}/hbl`]);
                     } else {
                         this._toastService.error(res.message);
                     }

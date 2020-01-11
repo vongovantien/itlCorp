@@ -332,7 +332,7 @@ export interface ITransactionDetail {
     originBLNumber: number;
     referenceNo: string;
     customerId: string;
-    csMawbcontainers: any[];
+    csMawbcontainers: Container[];
     commodity: string;
     packageContainer: string;
     desOfGoods: string;

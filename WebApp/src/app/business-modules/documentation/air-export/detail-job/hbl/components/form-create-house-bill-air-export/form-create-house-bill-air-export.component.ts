@@ -144,34 +144,48 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             })
         );
 
+
         if (this.isUpdate) {
+            this._store.select(getDetailHBlState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (hbl: HouseBill) => {
+                        if (!!hbl && hbl.id && hbl.id !== SystemConstants.EMPTY_GUID) {
+                            // this.totalCBM = hbl.cbm;
+                            // this.totalHeightWeight = hbl.hw;
+                            this.jobId = hbl.jobId;
+                            this.hblId = hbl.id;
+                            this.hwconstant = hbl.hwConstant;
+                            console.log("cbm from store", hbl.cbm);
+                            console.log("hw from store", hbl.hw);
+                            this.updateFormValue(hbl);
+                        }
+                    });
+
             this._store.select(getDimensionVolumesState)
                 .pipe(
                     takeUntil(this.ngUnsubscribe),
                     map((dims: DIM[]) => dims.map(d => new DIM(d))),
-                    tap(
-                        (dims: DIM[]) => {
-                            this.dims = dims;
-                        }
-                    ),
-                    mergeMap(
-                        () => this._store.select(getDetailHBlState).pipe(takeUntil(this.ngUnsubscribe))
-                    )
                 )
                 .subscribe(
-                    (hbl: HouseBill) => {
-                        if (!!hbl && hbl.id && hbl.id !== SystemConstants.EMPTY_GUID) {
-                            this.totalCBM = hbl.cbm;
-                            this.totalHeightWeight = hbl.hw;
-                            this.jobId = hbl.jobId;
-                            this.hblId = hbl.id;
-                            this.hwconstant = hbl.hwConstant;
+                    (dims: DIM[]) => {
+                        this.dims = dims;
+                        // * Update dimension Form Array.
+                        this.formCreate.setControl('dimensionDetails', this.setDimensionDetails(this.dims));
 
-                            this.updateFormValue(hbl);
-                        }
+                        this.updateHeightWeight(this.dims);
+                        this.formCreate.get('dimensionDetails')
+                            .valueChanges
+                            .pipe(
+                                // debounceTime(500),
+                                // distinctUntilChanged(),
+                            )
+                            .subscribe(changes => {
+                                console.log("caculating from store");
+                                this.updateHeightWeight(changes);
+                            });
+                    });
 
-                    }
-                );
         } else {
             // * get detail shipment from store.
             this._store.select(getTransactionDetailCsTransactionState)
@@ -310,6 +324,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 distinctUntilChanged(),
             )
             .subscribe(changes => {
+                console.log("caculating from form");
                 this.updateHeightWeight(changes);
             });
 
@@ -337,19 +352,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
         };
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
-
-        // * Update dimension Form Array.
-        this.formCreate.setControl('dimensionDetails', this.setDimensionDetails(this.dims));
-
-        this.formCreate.get('dimensionDetails')
-            .valueChanges
-            .pipe(
-                debounceTime(500),
-                distinctUntilChanged(),
-            )
-            .subscribe(changes => {
-                this.updateHeightWeight(changes);
-            });
     }
 
     setDimensionDetails(dims: DIM[]): FormArray {
@@ -445,14 +447,18 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             });
             this.totalHeightWeight = this.updateTotalHeightWeight(dims);
             this.totalCBM = this.updateCBM(dims);
+
+            console.log("after caculate");
+            console.log(this.totalCBM);
+            console.log(this.totalHeightWeight);
         }
     }
 
     calculateHWDimension(dims: DIM[]) {
         if (!!dims.length) {
-            for (const item of dims) {
-                this.updateHeightWeight(dims);
-            }
+            // for (const item of dims) {
+            this.updateHeightWeight(dims);
+            // }
         } else {
             this.totalCBM = this.totalHeightWeight = 0;
         }

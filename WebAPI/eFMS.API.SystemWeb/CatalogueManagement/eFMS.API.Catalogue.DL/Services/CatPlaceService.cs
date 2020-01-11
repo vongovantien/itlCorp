@@ -151,7 +151,7 @@ namespace eFMS.API.Catalogue.DL.Services
             // Join left với country.
             var places = from x in DataContext.Get(x => (x.PlaceTypeId == placetype || string.IsNullOrEmpty(placetype)
                                             && (x.Active == criteria.Active || criteria.Active == null))
-                                            && (x.ModeOfTransport.IndexOf(criteria.ModeOfTransport,StringComparison.OrdinalIgnoreCase) > -1))
+                                            && (x.ModeOfTransport.IndexOf(criteria.ModeOfTransport,StringComparison.OrdinalIgnoreCase) > -1) || string.IsNullOrEmpty(criteria.ModeOfTransport))
                          join coun in countries on x.CountryId equals coun.Id into coun2
                          from coun in coun2.DefaultIfEmpty()
                          select new sp_GetCatPlace

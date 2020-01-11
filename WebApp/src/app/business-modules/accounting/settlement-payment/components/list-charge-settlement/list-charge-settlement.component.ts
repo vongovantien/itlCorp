@@ -123,7 +123,6 @@ export class SettlementListChargeComponent extends AppList {
     updateSurchargeWithIndex(index: number, surcharge: Surcharge) {
         this.surcharges[index] = surcharge;
         this.surcharges = [...this.surcharges];
-
     }
 
     onUpdateRequestSurcharge(surcharge: any) {
@@ -297,6 +296,10 @@ export class SettlementListChargeComponent extends AppList {
                     const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.paymentObjectId);
                     if (!!partner) {
                         item.payer = partner.shortName;
+                    }
+
+                    if (!!item.invoiceDate && typeof item.invoiceDate === 'string') {
+                        item.invoiceDate = { startDate: new Date(item.invoiceDate), endDate: new Date(item.invoiceDate) };
                     }
                 });
 

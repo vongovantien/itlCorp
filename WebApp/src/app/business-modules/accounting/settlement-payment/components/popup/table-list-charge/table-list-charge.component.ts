@@ -445,7 +445,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 }
             }
         }
-
         if (this.isUpdate) {
             this.onUpdate.emit(listChargesToSave);
         } else {
