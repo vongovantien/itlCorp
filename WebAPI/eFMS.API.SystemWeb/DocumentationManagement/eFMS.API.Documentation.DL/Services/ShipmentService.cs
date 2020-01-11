@@ -240,7 +240,9 @@ namespace eFMS.API.Documentation.DL.Services
                 .Select(x => new Shipments
                 {
                     MBL = x.Mblno,
-                    JobId = x.JobNo
+                    JobId = x.JobNo,
+                    Id = x.Id,
+                    Service = "OPS"
                 });
             var csTransactions = csRepository.Get(x => criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
                                                  && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb) : true
@@ -253,11 +255,40 @@ namespace eFMS.API.Documentation.DL.Services
             var csShipments = csTransactions
                 .Select(x => new Shipments {
                     MBL = x.Mawb,
-                    JobId = x.JobNo
+                    JobId = x.JobNo,
+                    Id = x.Id, 
+                    Service = "CS"
                 });
             var shipments = opShipments.Union(csShipments);
-            var result = new ResultHandle { Data = shipments };
-            return result;
+            List<string> results = new List<string>();
+            try
+            {
+                foreach (var item in shipments)
+                {
+                    if (item.Service == "OPS")
+                    {
+                        var shipment = opsRepository.Get(x => x.Id == item.Id)?.FirstOrDefault();
+                        if (shipment != null)
+                        {
+                            if (shipment.IsLocked == true)
+                            {
+                                shipment.IsLocked = false;
+                                string log = shipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/mm/yyyy") + " by " + "admin";
+                                shipment.LockedLog = shipment.LockedLog + log + ";";
+                                var s = opsRepository.Update(shipment, x => x.Id == shipment.Id);
+                            }
+                            var logs = shipment.LockedLog.Split(';').Where(x => x.Length > 0).ToList();
+                            results.AddRange(logs);
+                        }
+                    }
+                }
+                var result = new ResultHandle { Status = true, Data = results, Message = "Unlock successfull" };
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new ResultHandle { Status = false, Message = ex.Message };
+            }
         }
     }
 }
