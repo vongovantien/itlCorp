@@ -13,6 +13,7 @@ import { ShareBussinessModule } from 'src/app/business-modules/share-business/sh
 import { ChargeConstants } from 'src/constants/charge.const';
 import { SeaLCLImportCreateHouseBillComponent } from './create/sea-lcl-import-create-house-bill.component';
 import { SeaLCLImportDetailHouseBillComponent } from './detail/sea-lcl-import-detail-house-bill.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 
 const routing: Routes = [
@@ -51,6 +52,7 @@ const COMPONENTS = [
         FormsModule,
         RouterModule.forChild(routing),
         ReactiveFormsModule,
+        NgxSpinnerModule,
         ...LIB
     ],
     exports: [],

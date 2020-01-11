@@ -14,6 +14,7 @@ import { AirImportHBLComponent } from './air-import-hbl.component';
 import { AirImportHBLFormCreateComponent } from './components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
 import { AirImportCreateHBLComponent } from './create/create-house-bill.component';
 import { AirImportDetailHBLComponent } from './detail/detail-house-bill.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 
 
@@ -49,6 +50,7 @@ const LIB = [
         FormsModule,
         RouterModule.forChild(routing),
         ReactiveFormsModule,
+        NgxSpinnerModule,
         ...LIB
 
     ],

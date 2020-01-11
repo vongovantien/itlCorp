@@ -13,6 +13,7 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SeaLCLExportHBLComponent } from './sea-lcl-export-hbl.component';
 import { SeaLCLExportCreateHBLComponent } from './create/create-house-bill.component';
 import { SeaLCLExportDetailHBLComponent } from './detail/detail-house-bill.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 
 const routing: Routes = [
@@ -47,6 +48,7 @@ const LIB = [
         FormsModule,
         RouterModule.forChild(routing),
         ReactiveFormsModule,
+        NgxSpinnerModule,
         ...LIB
 
     ],

@@ -13,6 +13,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { SeaFCLExportCreateHBLComponent } from './create/create-house-bill.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SeaFCLExportDetailHBLComponent } from './detail/detail-house-bill.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 
 const routing: Routes = [
@@ -46,6 +47,7 @@ const LIB = [
         FormsModule,
         RouterModule.forChild(routing),
         ReactiveFormsModule,
+        NgxSpinnerModule,
         ...LIB
 
     ],
