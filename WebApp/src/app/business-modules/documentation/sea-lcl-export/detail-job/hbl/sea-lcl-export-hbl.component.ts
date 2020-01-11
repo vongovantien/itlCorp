@@ -88,6 +88,7 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
             .subscribe(
                 (hbls: any[]) => {
                     this.houseBills = hbls;
+                    console.log(this.houseBills);
                     if (!!this.houseBills.length) {
                         this.totalGW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
                         this.totalCBM = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
