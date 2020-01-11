@@ -88,7 +88,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         this.updateHbl(modelUpdate);
     }
 
-    updateHbl(body: any) {
+    updateHbl(body: any, isSeparate?: boolean) {
         this._progressRef.start();
         this._documentationRepo.updateHbl(body)
             .pipe(
@@ -99,7 +99,11 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl`]);
+                        if (!isSeparate) {
+                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl`]);
+                        } else {
+                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}`]);
+                        }
                     } else {
                         this._toastService.error(res.message);
                     }
