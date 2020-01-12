@@ -14,6 +14,7 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? RequestDate { get; set; }
         public DateTime? DeadlinePayment { get; set; }
         public string StatusApproval { get; set; }
+        public string LockedLog { get; set; }
         public string AdvanceNote { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Documentation.DL.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -7,10 +8,11 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
 {
     public class ShipmentCriteria
     {
-        [Required]
         public ShipmentPropertySearch ShipmentPropertySearch { get; set; }
-        [Required]
         public List<string> Keywords { get; set; }
+        public TransactionTypeEnum TransactionType { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
     }
     public enum ShipmentPropertySearch
     {
