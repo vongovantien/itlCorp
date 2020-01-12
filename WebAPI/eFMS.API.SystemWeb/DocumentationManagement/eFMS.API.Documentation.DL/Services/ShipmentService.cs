@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.EF;
@@ -225,9 +228,153 @@ namespace eFMS.API.Documentation.DL.Services
                 HBL = x.HBL,
                 HBLID = x.HBLID,
                 CustomNo = x.CustomNo,
-                Service = CustomData.Services.FirstOrDefault(s => s.Value == x.Service)?.DisplayName
+                Service = Common.CustomData.Services.FirstOrDefault(s => s.Value == x.Service)?.DisplayName
             }).ToList();
             return dataList;
+        }
+        private IQueryable<Shipments> GetShipmentToUnLock(ShipmentCriteria criteria) {
+            IQueryable<Shipments> opShipments = null;
+            string transactionType = string.Empty;
+            if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic || criteria.TransactionType == 0)
+            {
+                opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
+                                                      && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno) : true)
+                                                        || criteria.Keywords == null)
+                                                      &&
+                                                        (
+                                                                (((x.ServiceDate ?? null) >= (criteria.FromDate ?? null)) && ((x.ServiceDate ?? null) <= (criteria.ToDate ?? null)))
+                                                            || (criteria.FromDate == null && criteria.ToDate == null)
+                                                        )
+                                                      )
+                    .Select(x => new Shipments
+                    {
+                        MBL = x.Mblno,
+                        JobId = x.JobNo,
+                        Id = x.Id,
+                        Service = "OPS"
+                    });
+                if(criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
+                {
+                    return opShipments;
+                }
+            }
+            else
+            {
+                transactionType = DataTypeEx.GetType(criteria.TransactionType);
+            }
+            var csTransactions = csRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
+                                                 && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb) : true)
+                                                    || criteria.Keywords == null)
+                                                 && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType) || criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
+                                              );
+            csTransactions = GetShipmentServicesByTime(csTransactions, criteria);
+            if (criteria.ShipmentPropertySearch == ShipmentPropertySearch.HBL)
+            {
+                var shipmentDetails = detailRepository.Get(x => criteria.Keywords.Contains(x.Hwbno));
+                csTransactions = csTransactions.Join(shipmentDetails, x => x.Id, y => y.JobId, (x, y) => x);
+            }
+            var csShipments = csTransactions
+                .Select(x => new Shipments
+                {
+                    MBL = x.Mawb,
+                    JobId = x.JobNo,
+                    Id = x.Id,
+                    Service = "CS"
+                });
+            var shipments = opShipments.Union(csShipments);
+            return shipments;
+        }
+
+        private IQueryable<CsTransaction> GetShipmentServicesByTime(IQueryable<CsTransaction> csTransactions, ShipmentCriteria criteria)
+        {
+            switch (criteria.TransactionType)
+            {
+                case TransactionTypeEnum.AirExport:
+                    csTransactions = csTransactions.Where(x => (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                                                        || (criteria.FromDate == null && criteria.ToDate == null));
+                    break;
+                case TransactionTypeEnum.AirImport:
+                    csTransactions = csTransactions.Where(x => (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                        || (criteria.FromDate == null && criteria.ToDate == null));
+                    break;
+                case TransactionTypeEnum.SeaFCLExport:
+                    csTransactions = csTransactions.Where(x => (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                        || (criteria.FromDate == null && criteria.ToDate == null));
+                    break;
+                case TransactionTypeEnum.SeaFCLImport:
+                    csTransactions = csTransactions.Where(x => (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                        || (criteria.FromDate == null && criteria.ToDate == null));
+                    break;
+                case TransactionTypeEnum.SeaLCLExport:
+                    csTransactions = csTransactions.Where(x => (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                        || (criteria.FromDate == null && criteria.ToDate == null));
+                    break;
+                case TransactionTypeEnum.SeaLCLImport:
+                    csTransactions = csTransactions.Where(x => (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                        || (criteria.FromDate == null && criteria.ToDate == null));
+                    break;
+            }
+            return csTransactions;
+        }
+
+        public ResultHandle UnLockShipment(ShipmentCriteria criteria)
+        {
+            var shipments = GetShipmentToUnLock(criteria);
+            var results = new List<string>();
+            try
+            {
+                foreach (var item in shipments)
+                {
+                    if (item.Service == "OPS")
+                    {
+                        var opsShipment = opsRepository.Get(x => x.Id == item.Id)?.FirstOrDefault();
+                        var logs = opsShipment.LockedLog.Split(';').Where(x => x.Length > 0).ToList();
+                        if (opsShipment != null)
+                        {
+                            if (opsShipment.IsLocked == true)
+                            {
+                                opsShipment.IsLocked = false;
+                                string log = opsShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/mm/yyyy") + " by " + "admin";
+                                opsShipment.LockedLog = opsShipment.LockedLog + log + ";";
+                                var isSuccessLockOps = opsRepository.Update(opsShipment, x => x.Id == opsShipment.Id);
+                                if (isSuccessLockOps.Success == false)
+                                {
+                                    log = opsShipment.JobNo + " unlock failed " + isSuccessLockOps.Message;
+                                }
+                                if(log.Length > 0) logs.Add(log);
+                            }
+                            if(logs.Count > 0) results.AddRange(logs);
+                        }
+                    }
+                    else
+                    {
+                        var csShipment = csRepository.Get(x => x.Id == item.Id)?.FirstOrDefault();
+                        var logs = csShipment.LockedLog.Split(';').Where(x => x.Length > 0).ToList();
+                        if (csShipment != null)
+                        {
+                            if (csShipment.IsLocked == true)
+                            {
+                                csShipment.IsLocked = false;
+                                string log = csShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/mm/yyyy") + " by " + "admin";
+                                csShipment.LockedLog = csShipment.LockedLog + log + ";";
+                                var isSuccessLockCs = csRepository.Update(csShipment, x => x.Id == csShipment.Id);
+                                if (isSuccessLockCs.Success == false)
+                                {
+                                    log = csShipment.JobNo + " unlock failed " + isSuccessLockCs.Message;
+                                }
+                                if(log.Length > 0) logs.Add(log);
+                            }
+                            if(logs.Count > 0) results.AddRange(logs);
+                        }
+                    }
+                }
+                var result = new ResultHandle { Status = true, Data = results, Message = "Done" };
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new ResultHandle { Status = false, Message = ex.Message };
+            }
         }
     }
 }

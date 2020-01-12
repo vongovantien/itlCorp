@@ -2,6 +2,7 @@
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -50,6 +51,6 @@ namespace eFMS.API.Accounting.DL.IService
         Crystal Preview(string settlementNo);
 
         List<ShipmentChargeSettlement> CopyChargeFromSettlementOldToSettlementNew(ShipmentsCopyCriteria criteria);
-
+        ResultHandle UnLock(List<string> keyWords);
     }
 }
