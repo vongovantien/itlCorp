@@ -112,8 +112,8 @@ export const language = {
         { name: "Ecus Connection", route_child: "ecus-connection", display: true },
         { name: "KPI", route_child: "kpi", display: true },
         { name: "Nhà Cung Cấp", route_child: "supplier", display: true },
-        { name: "Truy Xuất Lịch Sử", route_child: "log-viewer", display: true }
-
+        { name: "Truy Xuất Lịch Sử", route_child: "log-viewer", display: true },
+        { name: "Mở khóa", route_child: "unlock", display: true }
       ]
     },
 
