@@ -508,7 +508,7 @@ namespace eFMS.API.Documentation.DL.Services
                           CW = detail.ChargeWeight,
                           DatetimeCreated = detail.DatetimeCreated,
                           DatetimeModified = detail.DatetimeModified,
-                          ParentId = detail.ParentId
+                          ParentId = detail.ParentId,
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             if(res.Count() > 0)
