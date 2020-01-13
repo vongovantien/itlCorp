@@ -334,7 +334,9 @@ namespace eFMS.API.Documentation.DL.Services
                             if (opsShipment.IsLocked == false)
                             {
                                 opsShipment.IsLocked = true;
-                                string log = opsShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
+                                opsShipment.DatetimeModified = DateTime.Now;
+                                opsShipment.UserModified = currentUser.UserID;
+                                string log = opsShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName;
                                 opsShipment.LockedLog = opsShipment.LockedLog + log + ";";
                                 var isSuccessLockOps = opsRepository.Update(opsShipment, x => x.Id == opsShipment.Id);
                                 if (isSuccessLockOps.Success == false)
@@ -355,7 +357,9 @@ namespace eFMS.API.Documentation.DL.Services
                             if (csShipment.IsLocked == false)
                             {
                                 csShipment.IsLocked = true;
-                                string log = csShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
+                                csShipment.DatetimeModified = DateTime.Now;
+                                csShipment.UserModified = currentUser.UserID;
+                                string log = csShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName;
                                 csShipment.LockedLog = csShipment.LockedLog + log + ";";
                                 var isSuccessLockCs = csRepository.Update(csShipment, x => x.Id == csShipment.Id);
                                 if (isSuccessLockCs.Success == false)

@@ -1950,8 +1950,10 @@ namespace eFMS.API.Accounting.DL.Services
                     if (item.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
                     {
                         item.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
-                        log = item.AdvanceNo = item.AdvanceNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
-
+                        item.UserModified = currentUser.UserName;
+                        item.DatetimeModified = DateTime.Now;
+                        log = item.AdvanceNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
+                        item.LockedLog = item.LockedLog + log + ";";
                         var hs = DataContext.Update(item, x => x.Id == item.Id);
                         if (hs.Success == false)
                         {

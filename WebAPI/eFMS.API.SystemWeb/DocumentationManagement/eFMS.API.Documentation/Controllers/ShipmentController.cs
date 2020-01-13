@@ -108,6 +108,7 @@ namespace eFMS.API.Documentation.Controllers
         }
         
         [HttpPost("UnLockShipment")]
+        [Authorize]
         public IActionResult UnLockShipment(ShipmentCriteria criteria)
         {
             ResultHandle result = shipmentService.UnLockShipment(criteria);
