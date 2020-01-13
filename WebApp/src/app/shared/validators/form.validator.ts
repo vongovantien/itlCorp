@@ -28,6 +28,11 @@ export class FormValidators extends Validators {
         }
         return null;
     }
-
+    static required(control: FormControl): ValidationErrors {
+        if (control.value !== null) {
+            return control.value.trim() === "" ? { "required": true } : null;
+        }
+        return { "required": true };
+    }
     // TODO Custom validator Fn here !
 }
