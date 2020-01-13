@@ -466,7 +466,8 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        [HttpPost]
+        [HttpPost("UnLock")]
+        [Authorize]
         public IActionResult UnLock(List<string> keyWords)
         {
             if (keyWords == null) return Ok(new ResultHandle { Status = false, Message = "Key word not allow null" });

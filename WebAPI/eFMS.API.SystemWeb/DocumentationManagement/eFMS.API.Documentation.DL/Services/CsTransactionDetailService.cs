@@ -86,7 +86,6 @@ namespace eFMS.API.Documentation.DL.Services
             model.Active = true;
             string contSealNo = string.Empty;
 
-            model.ContSealNo = contSealNo;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -113,6 +112,11 @@ namespace eFMS.API.Documentation.DL.Services
                             });
 
                             var t = containerService.Add(model.CsMawbcontainers);
+                            if (t.Success)
+                            {
+                                model.ContSealNo = contSealNo;
+                                var updateDetail = Update(model, x => x.Id == model.Id);
+                            }
                         }
                         if (model.DimensionDetails != null)
                         {
