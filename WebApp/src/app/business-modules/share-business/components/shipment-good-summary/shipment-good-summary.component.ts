@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { Params } from '@angular/router';
 import { ActionsSubject, Store } from '@ngrx/store';
 
@@ -23,6 +23,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
 
     @ViewChild(ShareBussinessContainerListPopupComponent, { static: false }) containerPopup: ShareBussinessContainerListPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmRefresh: ConfirmPopupComponent;
+    @Input() type: string = 'import';
 
     mblid: string = null;
     hblid: string = null;
