@@ -17,6 +17,7 @@ import * as fromShareBussiness from './../../../../share-business/store';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -33,7 +34,7 @@ export class SeaFCLImportHBLComponent extends AppList {
     houseBill: HouseBill[] = [];
 
     containers: Observable<Container[]>;
-    selectedShipment: any; // TODO model.
+    selectedShipment: Observable<any>; // TODO model.
     selectedHbl: HouseBill;
 
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
@@ -44,6 +45,8 @@ export class SeaFCLImportHBLComponent extends AppList {
     totalCBM: number;
     totalGW: number;
 
+    spinnerSurcharge: string = 'spinnerSurcharge';
+
     constructor(
         private _router: Router,
         private _sortService: SortService,
@@ -52,7 +55,8 @@ export class SeaFCLImportHBLComponent extends AppList {
         private _progressService: NgProgress,
         private _store: Store<fromShareBussiness.ITransactionState>,
         private cdr: ChangeDetectorRef,
-        private _activedRoute: ActivatedRoute
+        private _activedRoute: ActivatedRoute,
+        private _spinner: NgxSpinnerService
     ) {
         super();
         this.requestSort = this.sortLocal;
@@ -85,6 +89,16 @@ export class SeaFCLImportHBLComponent extends AppList {
 
         this.containers = this._store.select(fromShareBussiness.getHBLContainersState);
         this.selectedShipment = this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState);
+
+        this._store.select(fromShareBussiness.getSurchargeLoadingState).subscribe(
+            (loading: boolean) => {
+                if (loading) {
+                    this._spinner.show(this.spinnerSurcharge);
+                } else {
+                    this._spinner.hide(this.spinnerSurcharge);
+                }
+            }
+        );
     }
 
     ngAfterViewInit() {

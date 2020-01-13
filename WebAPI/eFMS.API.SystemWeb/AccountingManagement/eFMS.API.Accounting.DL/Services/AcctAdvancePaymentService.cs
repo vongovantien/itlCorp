@@ -1936,5 +1936,38 @@ namespace eFMS.API.Accounting.DL.Services
             var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo));
             return data.ToList();
         }
+
+        public ResultHandle UnLock(List<string> keyWords)
+        {
+            var advanceToUnLocks = DataContext.Get(x => keyWords.Contains(x.AdvanceNo));
+            try
+            {
+                List<string> results = new List<string>();
+                foreach (var item in advanceToUnLocks)
+                {
+                    string log = string.Empty;
+                    var logs = item.LockedLog.Split(';').Where(x => x.Length > 0).ToList();
+                    if (item.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
+                    {
+                        item.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
+                        log = item.AdvanceNo = item.AdvanceNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/mm/yyyy") + " by " + "admin";
+
+                        var hs = DataContext.Update(item, x => x.Id == item.Id);
+                        if (hs.Success == false)
+                        {
+                            log = item.AdvanceNo + " unlock failed " + hs.Message;
+                        }
+                        if (log.Length > 0) logs.Add(log);
+                    }
+                    if(logs.Count > 0)  results.AddRange(logs);
+                }
+                return new ResultHandle { Status = true, Message = "Done", Data = results };
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 }

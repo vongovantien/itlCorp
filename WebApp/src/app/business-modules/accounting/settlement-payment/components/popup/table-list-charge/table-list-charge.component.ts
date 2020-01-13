@@ -10,7 +10,6 @@ import { Observable, forkJoin, of } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder, FormControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
-import { ChargeConstants } from 'src/constants/charge.const';
 import { SystemConstants } from 'src/constants/system.const';
 import { ToastrService } from 'ngx-toastr';
 import cloneDeep from 'lodash/cloneDeep';
@@ -231,6 +230,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     const advance: IAdvanceShipment = this.advs.find(i => i.jobId === this.selectedShipment.jobId);
                     if (!!advance) {
                         this.advanceNo.setValue(advance.advanceNo);
+                        this.selectedAdvance = advance;
                     }
                 }
 
@@ -391,6 +391,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.isSubmitted = false;
 
         const newCharge = this.charges[index];
+
         newCharge.currencyId = this.currencyId;
         newCharge.id = SystemConstants.EMPTY_GUID;
         newCharge.hblid = this.selectedShipment.hblid;
@@ -398,9 +399,13 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         newCharge.jobId = this.selectedShipment.jobId;
         newCharge.mbl = this.selectedShipment.mbl;
         newCharge.hbl = this.selectedShipment.hbl;
-        newCharge.advanceNo = this.selectedAdvance.advanceNo;
+        newCharge.advanceNo = !!this.selectedAdvance ? this.selectedAdvance.advanceNo : null;
+        newCharge.clearanceNo = !!this.selectedCD ? this.selectedCD.clearanceNo : null;
         newCharge.settlementCode = this.settlementCode;
 
+        if (!this.charges[index].invoiceDate || !!this.charges[index].invoiceDate && !this.charges[index].invoiceDate.startDate) {
+            newCharge.invoiceDate = null;
+        }
         this.charges.push(new Surcharge(newCharge));
     }
 
@@ -440,14 +445,10 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 }
             }
         }
-
         if (this.isUpdate) {
             this.onUpdate.emit(listChargesToSave);
-            console.log("lit charge to save", listChargesToSave);
         } else {
             this.onChange.emit(listChargesToSave);
-            console.log("lit charge to save", listChargesToSave);
-
         }
 
         this.hide();

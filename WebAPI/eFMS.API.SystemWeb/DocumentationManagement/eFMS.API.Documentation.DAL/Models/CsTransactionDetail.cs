@@ -137,7 +137,5 @@ namespace eFMS.API.Documentation.Service.Models
         public string AttachList { get; set; }
         public string Route { get; set; }
         public string PoinvoiceNo { get; set; }
-
-        public virtual CsTransaction Job { get; set; }
     }
 }

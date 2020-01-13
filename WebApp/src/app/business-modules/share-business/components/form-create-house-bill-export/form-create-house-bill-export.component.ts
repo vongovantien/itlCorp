@@ -128,7 +128,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                         this.formCreate.patchValue({
                             bookingNo: this.shipmmentDetail.bookingNo,
                             mawb: this.shipmmentDetail.mawb,
-                            oceanVoyNo: !!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '' + ' - ' + !!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : '',
+                            oceanVoyNo: (!!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '') + ' - ' + (!!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : ''),
                             pod: this.shipmmentDetail.pod,
                             pol: this.shipmmentDetail.pol,
                         });

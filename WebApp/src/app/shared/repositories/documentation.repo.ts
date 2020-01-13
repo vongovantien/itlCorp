@@ -624,4 +624,12 @@ export class DocumentationRepo {
         );
     }
 
+
+    deleteShipmentFilesAttach(fileId: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteAttachedFile/${fileId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
 }

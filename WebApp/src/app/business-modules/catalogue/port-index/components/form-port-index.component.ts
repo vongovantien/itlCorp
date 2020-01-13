@@ -5,6 +5,7 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
+import { FormValidators } from 'src/app/shared/validators/form.validator';
 
 @Component({
     selector: 'app-form-port-index',
@@ -41,9 +42,9 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
 
     initForm() {
         this.portindexForm = this._fb.group({
-            code: [null, Validators.required],
-            portIndexeNameEN: [null, Validators.required],
-            portIndexeNameLocal: [null, Validators.required],
+            code: [null, FormValidators.required],
+            portIndexeNameEN: [null, FormValidators.required],
+            portIndexeNameLocal: [null, FormValidators.required],
             country: [null, Validators.required],
             zone: [null, Validators.required],
             mode: [null, Validators.required],
@@ -63,23 +64,12 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.isSubmitted = true;
 
         // Trick to remove validate ng-select
-        this.setError(this.country);
         this.setError(this.zone);
-        this.setError(this.mode);
 
         const formData = this.portindexForm.getRawValue();
+        this.trimInputForm(formData);
         if (this.portindexForm.valid) {
-
-            this.portIndex.placeType = PlaceTypeEnum.Port;
-            this.portIndex.active = !!this.isUpdate ? formData.active : true;
-
-            this.portIndex.code = !!formData.code && !!formData.code.length ? formData.code : null;
-            this.portIndex.nameEn = !!formData.portIndexeNameEN && !!formData.portIndexeNameEN.length ? formData.portIndexeNameEN : null;
-            this.portIndex.nameVn = !!formData.portIndexeNameEN && !!formData.portIndexeNameEN.length ? formData.portIndexeNameEN : null;
-            this.portIndex.countryID = !!formData.country && !!formData.country.length ? formData.country[0].id : null;
-            this.portIndex.modeOfTransport = !!formData.mode && !!formData.mode.length ? formData.mode[0].id : null;
-            this.portIndex.areaID = !!formData.zone && !!formData.zone.length ? formData.zone[0].id : null;
-
+            this.setPortIndexModel();
             if (this.isUpdate) {
                 this._catalogueRepo.updatePlace(this.portIndex.id, this.portIndex)
                     .subscribe(
@@ -96,6 +86,21 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
                     );
             }
         }
+    }
+    trimInputForm(formData) {
+        this.trimInputValue(this.code, formData.code);
+        this.trimInputValue(this.portIndexeNameEN, formData.portIndexeNameEN);
+        this.trimInputValue(this.portIndexeNameLocal, formData.portIndexeNameLocal);
+    }
+    setPortIndexModel() {
+        this.portIndex.placeType = PlaceTypeEnum.Port;
+        this.portIndex.active = !!this.isUpdate ? this.active.value : true;
+        this.portIndex.code = this.code.value;
+        this.portIndex.nameEn = this.portIndexeNameEN.value;
+        this.portIndex.nameVn = this.portIndexeNameLocal.value;
+        this.portIndex.countryID = this.country.value[0].id;
+        this.portIndex.modeOfTransport = this.mode.value[0].id;
+        this.portIndex.areaID = this.zone.value !== null ? this.zone.value[0].id : null;
     }
 
     onHandleResult(res: CommonInterface.IResult) {

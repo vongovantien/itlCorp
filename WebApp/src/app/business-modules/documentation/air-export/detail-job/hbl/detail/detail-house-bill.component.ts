@@ -83,7 +83,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
         for (const dim of modelUpdate.dimensionDetails) {
             dim.hblId = this.hblId;
-            dim.mblId = this.jobId;
+            // dim.mblId = this.jobId;
         }
         this.updateHbl(modelUpdate);
     }
@@ -132,8 +132,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 },
             );
     }
-
-
 
     previewAttachList() {
         this._documentationRepo.previewAirAttachList(this.hblId)

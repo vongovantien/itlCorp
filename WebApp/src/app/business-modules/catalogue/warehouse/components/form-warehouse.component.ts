@@ -8,6 +8,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { ToastrService } from 'ngx-toastr';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgProgress } from '@ngx-progressbar/core';
+import { FormValidators } from 'src/app/shared/validators/form.validator';
 
 @Component({
     selector: 'form-warehouse',
@@ -48,13 +49,13 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
 
     initForm() {
         this.warehouseForm = this._fb.group({
-            code: [{ value: null, disabled: true }, Validators.required],
-            warehouseNameEN: [null, Validators.required],
-            warehouseNameVN: [null, Validators.required],
+            code: [{ value: null, disabled: true }, FormValidators.required],
+            warehouseNameEN: [null, FormValidators.required],
+            warehouseNameVN: [null, FormValidators.required],
             country: [null, Validators.required],
             province: [null, Validators.required],
             district: [null, Validators.required],
-            address: [null, Validators.required],
+            address: [null, FormValidators.required],
             active: [true]
         });
         this.code = this.warehouseForm.controls['code'];
@@ -99,16 +100,9 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
     onSubmit() {
         this.isSubmitted = true;
         const formData = this.warehouseForm.getRawValue();
+        this.trimInputForm(formData);
         if (this.warehouseForm.valid) {
-            this.warehouse.placeType = PlaceTypeEnum.Warehouse;
-            this.warehouse.code = formData.code;
-            this.warehouse.nameEn = formData.warehouseNameEN;
-            this.warehouse.nameVn = formData.warehouseNameVN;
-            this.warehouse.countryID = formData.country[0].id;
-            this.warehouse.provinceID = formData.province[0].id;
-            this.warehouse.districtID = formData.district[0].id;
-            this.warehouse.address = formData.address;
-            this.warehouse.active = !!this.isUpdate ? formData.active : true;
+            this.setWarehouseModel();
             if (this.isUpdate) {
                 this._catalogueRepo.updatePlace(this.warehouse.id, this.warehouse)
                     .subscribe(
@@ -127,6 +121,23 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
         } else {
             console.log(this.warehouseForm);
         }
+    }
+    setWarehouseModel() {
+        this.warehouse.placeType = PlaceTypeEnum.Warehouse;
+        this.warehouse.code = this.code.value;
+        this.warehouse.nameEn = this.warehouseNameEN.value;
+        this.warehouse.nameVn = this.warehouseNameVN.value;
+        this.warehouse.countryID = this.country.value[0].id;
+        this.warehouse.provinceID = this.province.value[0].id;
+        this.warehouse.districtID = this.district.value[0].id;
+        this.warehouse.address = this.address.value;
+        this.warehouse.active = !!this.isUpdate ? this.active.value : true;
+    }
+    trimInputForm(formData: any) {
+        this.trimInputValue(this.code, formData.code);
+        this.trimInputValue(this.warehouseNameEN, formData.warehouseNameEN);
+        this.trimInputValue(this.warehouseNameVN, formData.warehouseNameVN);
+        this.trimInputValue(this.address, formData.address);
     }
     onHandleResult(res: CommonInterface.IResult) {
         if (res.status) {
