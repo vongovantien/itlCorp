@@ -515,15 +515,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 results = res.Where(x=>x.ParentId == null).OrderByDescending(o => o.DatetimeModified).ToList();
             }
-
-            //results.ForEach(fe => {
-            //    fe.Containers = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
-            //                                                            .Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));
-            //    fe.Packages = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
-            //                                                            .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + "x" + GetUnitNameById(s.PackageTypeId)) : string.Empty));
-            //    fe.GW = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Sum(s => s.Gw);
-            //    fe.CBM = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Sum(s => s.Cbm);
-            //});
+            results.ForEach(fe =>
+            {
+                fe.Packages = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
+                                                                        .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + "x" + GetUnitNameById(s.PackageTypeId)) : string.Empty));
+            });
             return results;
         }
 
