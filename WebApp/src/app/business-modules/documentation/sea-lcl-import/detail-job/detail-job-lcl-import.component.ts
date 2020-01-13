@@ -142,7 +142,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                         // * get detail & container list.
-                        this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                        this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
                         this.formCreateComponent.formCreate.controls['jobId'].setValue(this.jobId);
                     } else {

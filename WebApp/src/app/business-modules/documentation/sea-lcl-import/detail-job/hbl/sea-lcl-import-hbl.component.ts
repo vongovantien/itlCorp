@@ -16,6 +16,7 @@ import { takeUntil, take, catchError, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../share-business/store';
 import { SortService } from '@services';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'app-sea-lcl-import-hbl',
@@ -42,12 +43,16 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
 
     dataReport: any = null;
 
+    spinnerSurcharge: string = 'spinnerSurcharge';
+
     constructor(
         private _router: Router,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _spinner: NgxSpinnerService
+
     ) {
         super();
 
@@ -77,6 +82,16 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
         ];
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+
+        this._store.select(fromShareBussiness.getSurchargeLoadingState).subscribe(
+            (loading: boolean) => {
+                if (loading) {
+                    this._spinner.show(this.spinnerSurcharge);
+                } else {
+                    this._spinner.hide(this.spinnerSurcharge);
+                }
+            }
+        );
     }
 
     getHouseBills(id: string) {

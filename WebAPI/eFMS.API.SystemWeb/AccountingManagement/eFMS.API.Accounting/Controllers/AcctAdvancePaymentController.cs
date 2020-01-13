@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
+using System.Collections.Generic;
+
 namespace eFMS.API.Accounting.Controllers
 {
     /// <summary>
@@ -460,6 +462,15 @@ namespace eFMS.API.Accounting.Controllers
         {
             var data = acctAdvancePaymentService.GetAdvancesOfShipment();
             return Ok(data);
+        }
+
+        [HttpPost("UnLock")]
+        [Authorize]
+        public IActionResult UnLock(List<string> keyWords)
+        {
+            if (keyWords == null) return Ok(new ResultHandle { Status = false, Message = "Key word not allow null" });
+            ResultHandle result = acctAdvancePaymentService.UnLock(keyWords);
+            return Ok(result);
         }
     }
 }

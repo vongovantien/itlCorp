@@ -547,5 +547,14 @@ namespace eFMS.API.Accounting.Controllers
             var data = acctSettlementPaymentService.CopyChargeFromSettlementOldToSettlementNew(criteria);
             return Ok(data);
         }
+
+        [HttpPost("UnLock")]
+        [Authorize]
+        public IActionResult UnLock(List<string> keyWords)
+        {
+            if (keyWords == null) return Ok(new ResultHandle { Status = false, Message = "Key word not allow null" });
+            ResultHandle result = acctSettlementPaymentService.UnLock(keyWords);
+            return Ok(result);
+        }
     }
 }

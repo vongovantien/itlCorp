@@ -132,7 +132,13 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         const modelUpdate = this.onSubmitData();
 
         //  * Update field
+
         modelUpdate.csMawbcontainers = this.containers;
+
+        modelUpdate.csMawbcontainers.forEach(c => {
+            c.mblid = this.jobId;
+        });
+
         modelUpdate.id = this.jobId;
         modelUpdate.branchId = this.fclImportDetail.branchId;
         modelUpdate.transactionType = this.fclImportDetail.transactionType;

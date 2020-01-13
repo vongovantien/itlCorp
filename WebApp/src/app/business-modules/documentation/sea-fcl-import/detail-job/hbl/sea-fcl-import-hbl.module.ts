@@ -16,6 +16,7 @@ import { ShareBussinessModule } from 'src/app/business-modules/share-business/sh
 import { FormSearchHouseBillComponent } from './components/form-search-house-bill/form-search-house-bill.component';
 
 import { ChargeConstants } from 'src/constants/charge.const';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 const routing: Routes = [
     {
@@ -58,6 +59,7 @@ const LIB = [
         FormsModule,
         ReactiveFormsModule,
         RouterModule.forChild(routing),
+        NgxSpinnerModule,
         ...LIB
 
     ],

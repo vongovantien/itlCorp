@@ -61,7 +61,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             });
     }
 
-    generateHblNo(transactionType: number){
+    generateHblNo(transactionType: number) {
         this._documentationRepo.generateHBLNo(transactionType)
             .pipe(
                 catchError(this.catchError),
@@ -101,7 +101,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             attachList: this.attachListComponent.attachList,
             dimensionDetails: form.dimensionDetails,
             hwConstant: this.formCreateHBLComponent.hwconstant
-
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
@@ -141,7 +140,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         return valid;
     }
 
-    createHbl(houseBill: HouseBill) {
+    createHbl(houseBill: HouseBill, hbId?: string) {
         this._progressRef.start();
         this._documentationRepo.createHousebill(houseBill)
             .pipe(
@@ -152,9 +151,11 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.gotoList();
-                    } else {
-
+                        if (!hbId) {
+                            this.gotoList();
+                        } else {
+                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${hbId}`]);
+                        }
                     }
                 }
             );

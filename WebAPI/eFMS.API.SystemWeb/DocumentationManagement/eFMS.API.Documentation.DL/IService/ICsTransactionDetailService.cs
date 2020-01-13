@@ -31,6 +31,8 @@ namespace eFMS.API.Documentation.DL.IService
 
         //CsTransactionDetailModel GetById(CsTransactionDetailCriteria csTransactionDetailCriteria);
         CsTransactionDetailModel GetById(Guid Id);
+        CsTransactionDetailModel GetSeparateByHblid(Guid hbId);
+
         Crystal PreviewProofOfDelivery(Guid Id);
         Crystal PreviewAirProofOfDelivery(Guid Id);
 

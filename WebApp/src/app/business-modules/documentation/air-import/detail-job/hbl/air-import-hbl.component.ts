@@ -15,6 +15,7 @@ import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 import * as fromShareBussiness from '../../../../share-business/store';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/share-business/components/selling-charge/selling-charge.component';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 
 @Component({
@@ -43,12 +44,16 @@ export class AirImportHBLComponent extends AppList implements OnInit {
     totalGW: number;
     totalCW: number;
 
+    spinnerSurcharge: string = 'spinnerSurcharge';
+
     constructor(
         private _router: Router,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
+        private _spinner: NgxSpinnerService
+
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -79,6 +84,16 @@ export class AirImportHBLComponent extends AppList implements OnInit {
         ];
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+
+        this._store.select(fromShareBussiness.getSurchargeLoadingState).subscribe(
+            (loading: boolean) => {
+                if (loading) {
+                    this._spinner.show(this.spinnerSurcharge);
+                } else {
+                    this._spinner.hide(this.spinnerSurcharge);
+                }
+            }
+        );
     }
 
     getHouseBills(id: string) {

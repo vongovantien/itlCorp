@@ -12,6 +12,7 @@ import * as fromShareBussiness from '@share-bussiness';
 
 
 import { catchError, finalize } from 'rxjs/operators';
+import { SeparateHouseBillComponent } from '../components/form-separate-house-bill/form-separate-house-bill.component';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -22,7 +23,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     hblId: string;
 
-    hblDetail: CsTransactionDetail;
+    // hblDetail: CsTransactionDetail;
 
     dataReport: Crystal;
 
@@ -82,12 +83,12 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
         for (const dim of modelUpdate.dimensionDetails) {
             dim.hblId = this.hblId;
-            dim.mblId = this.jobId;
+            // dim.mblId = this.jobId;
         }
         this.updateHbl(modelUpdate);
     }
 
-    updateHbl(body: any) {
+    updateHbl(body: any, isSeparate?: boolean) {
         this._progressRef.start();
         this._documentationRepo.updateHbl(body)
             .pipe(
@@ -98,7 +99,11 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl`]);
+                        if (!isSeparate) {
+                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl`]);
+                        } else {
+                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}`]);
+                        }
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -127,7 +132,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             );
     }
 
-    previewAttachList(){
+    previewAttachList() {
         this._documentationRepo.previewAirAttachList(this.hblId)
             .pipe(
                 catchError(this.catchError),
@@ -147,4 +152,9 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 },
             );
     }
+
+    gotoSeparate() {
+        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}/separate`]);
+    }
+
 }

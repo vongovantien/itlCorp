@@ -19,6 +19,8 @@ import { AirExportHBLFormCreateComponent } from './components/form-create-house-
 import { AirExportHBLAttachListComponent } from './components/attach-list/attach-list-house-bill-air-export.component';
 import { AirExportDetailHBLComponent } from './detail/detail-house-bill.component';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { SeparateHouseBillComponent } from './components/form-separate-house-bill/form-separate-house-bill.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 
 const routing: Routes = [
@@ -33,7 +35,11 @@ const routing: Routes = [
     {
         path: ':hblId', component: AirExportDetailHBLComponent,
         data: { name: 'House Bill Detail', path: ':id', level: 5 }
-    }
+    },
+    {
+        path: ':hblId/separate', component: SeparateHouseBillComponent,
+        data: { name: "Separate Hawb", path: ":id", level: 6 },
+    },
 ];
 
 const LIB = [
@@ -66,6 +72,7 @@ const LIB = [
         FormsModule,
         RouterModule.forChild(routing),
         ReactiveFormsModule,
+        NgxSpinnerModule,
         ...LIB
     ],
     exports: [],
@@ -74,7 +81,8 @@ const LIB = [
         AirExportCreateHBLComponent,
         AirExportHBLFormCreateComponent,
         AirExportHBLAttachListComponent,
-        AirExportDetailHBLComponent
+        AirExportDetailHBLComponent,
+        SeparateHouseBillComponent
     ],
     providers: [],
 })

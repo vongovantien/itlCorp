@@ -52,6 +52,11 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
         }
+        this.requestSurchargeListComponent.surcharges.forEach(s => {
+            if (!!s.invoiceDate && typeof s.invoiceDate !== 'string') {
+                s.invoiceDate = formatDate(s.invoiceDate, 'yyyy-MM-dd', 'en');
+            }
+        });
 
         this._progressRef.start();
         const body: IDataSettlement = {

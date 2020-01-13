@@ -134,7 +134,9 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
             this.infoPopup.show();
             return;
         }
+
         const modelUpdate = this.onsubmitData();
+
         modelUpdate.jobId = this.hblDetail.jobId;
         modelUpdate.id = this.hblDetail.id;
         modelUpdate.consigneeDescription = this.formHouseBill.consigneeDescription.value;
@@ -152,6 +154,11 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
 
+        // Update field container
+        modelUpdate.csMawbcontainers.forEach(c => {
+            c.hblid = this.hblId;
+        });
+
         this.updateHbl(modelUpdate);
     }
 
@@ -166,6 +173,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+                        this._router.navigate([`/home/documentation/sea-lcl-import/${this.jobId}/hbl`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -175,27 +183,26 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     getDetailHbl() {
         this.formHouseBill.isDetail = true;
-        this._progressRef.start();
+        // this._progressRef.start();
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
                 skip(1),
-                takeUntil(this.ngUnsubscribe)
+                catchError(this.catchError),
+                // takeUntil(this.ngUnsubscribe),
+                finalize(() => this._progressRef.complete()),
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 
                         // * Dispatch to save containers.
                         this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
+                        // this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: this.hblId }));
 
                         // * Get container to update model
                         this.getListContainer();
-
                     }
                 },
             );
@@ -270,6 +277,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 },
             );
     }
+
     previewDeliveryOrder() {
         this._documentationRepo.previewDeliveryOrder(this.hblId)
             .pipe(
@@ -290,6 +298,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 },
             );
     }
+
     exportDangerousGoods() {
         this._exportRepository.exportDangerousGoods(this.hblId)
             .pipe(catchError(this.catchError))

@@ -12,6 +12,7 @@ using ITL.NetCore.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Contexts;
+using eFMS.API.Documentation.DL.Common;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -21,17 +22,20 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatPlace> placeRepository;
         private readonly IContextBase<SysUser> userRepository;
         private readonly IContextBase<CsMawbcontainer> containerRepository;
+        private readonly IContextBase<CatUnit> unitRepository;
         public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository, 
             IMapper mapper,
             IContextBase<CatPartner> partnerRepo,
             IContextBase<CatPlace> placeRepo,
             IContextBase<SysUser> userRepo,
-            IContextBase<CsMawbcontainer> containerRepo) : base(repository, mapper)
+            IContextBase<CsMawbcontainer> containerRepo,
+            IContextBase<CatUnit> unitRepo) : base(repository, mapper)
         {
             partnerRepository = partnerRepo;
             placeRepository = placeRepo;
             userRepository = userRepo;
             containerRepository = containerRepo;
+            unitRepository = unitRepo;
         }
 
         public HandleState AddOrUpdate(CsShippingInstructionModel model)
@@ -69,23 +73,30 @@ namespace eFMS.API.Documentation.DL.Services
         {
             Crystal result = new Crystal();
             var instructions = new List<SeaShippingInstruction>();
+            var units = unitRepository.Get();
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = "itl",
-                CompanyAddress1 = "52 Trường Sơn",
-                CompanyAddress2 = "54 Trường Sơn",
+                CompanyName = Constants.COMPANY_NAME,
+                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
                 CompanyDescription = "itl company",
                 Contact = model.IssuedUserName,
                 Tel = string.Empty,
                 Website = string.Empty,
                 DecimalNo = 2
             };
-            var containers = containerRepository.Get(x => x.Mblid == model.JobId);
-            if (containers == null) return result;
-            var total = containers.Sum(x => x.Quantity);
-            foreach (var item in containers)
+            if (model.CsTransactionDetails == null) return result;
+            var total = model.CsTransactionDetails.Count();
+            foreach (var item in model.CsTransactionDetails)
             {
-                var instruction = new SeaShippingInstruction {
+                string noPieces = string.Empty;
+                if(item.PackageQty != null && item.PackageQty != 0 && item.PackageType != null && item.PackageType != 0)
+                {
+                    var packageType = unitRepository.Get(x => x.Id == item.PackageType)?.FirstOrDefault();
+                    noPieces = noPieces + item.PackageQty + " " + packageType.UnitNameEn;
+                }
+                var instruction = new SeaShippingInstruction
+                {
                     TRANSID = model.BookingNo,
                     Attn = model.InvoiceNoticeRecevier,
                     ToPartner = model.SupplierName,
@@ -99,18 +110,18 @@ namespace eFMS.API.Documentation.DL.Services
                     PlaceDelivery = model.PoDelivery,
                     Vessel = model.VoyNo,
                     Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
-                    ShippingMarks = item.MarkNo,
-                    Containers = item.ContainerNo + "/ " + item.SealNo,
-                    ContSealNo = item.SealNo,
-                    NoofPeace = item.PackageQuantity?.ToString(),
-                    SIDescription = item.Description,
-                    GrossWeight = item.Gw,
-                    CBM = item.Cbm,
-                    Qty = total?.ToString(),
+                    ShippingMarks = item.ShippingMark,
+                    Containers = item.ContSealNo,
+                    // ContSealNo = item.SealNo,
+                    NoofPeace = noPieces,
+                    SIDescription = item.DesOfGoods,
+                    GrossWeight = item.GW,
+                    CBM = item.CBM,
+                    Qty = total.ToString(),
                     RateRequest = model.Remark,
                     Payment = model.PaymenType,
                     ShippingMarkImport = string.Empty,
-                    MaskNos = item.MarkNo
+                    MaskNos = string.Empty
                 };
                 instructions.Add(instruction);
             }
@@ -129,23 +140,28 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewOCL(CsShippingInstructionReportModel model)
         {
             Crystal result = new Crystal();
-            var containerRS = new List<OnBoardContainerReportResult>();
+            var shippingInstructions = new List<OnBoardContainerReportResult>();
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = "itl",
-                CompanyAddress1 = "52 Trường Sơn",
-                CompanyAddress2 = "54 Trường Sơn",
+                CompanyName = Constants.COMPANY_NAME,
+                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
                 CompanyDescription = "itl company",
                 Contact = model.IssuedUserName,
                 Tel = string.Empty,
                 Website = string.Empty,
                 DecimalNo = 2
             };
-            var containers = containerRepository.Get(x => x.Mblid == model.JobId);
-            if (containers == null) return result;
-            var total = containers.Sum(x => x.Quantity);
-            foreach (var item in containers)
+            if (model.CsTransactionDetails == null) return result;
+            var total = model.CsTransactionDetails.Count();
+            foreach (var item in model.CsTransactionDetails)
             {
+                string noPieces = string.Empty;
+                if (item.PackageQty != null && item.PackageQty != 0 && item.PackageType != null && item.PackageType != 0)
+                {
+                    var packageType = unitRepository.Get(x => x.Id == item.PackageType)?.FirstOrDefault();
+                    noPieces = noPieces + item.PackageQty + " " + packageType.UnitNameEn;
+                }
                 var container = new OnBoardContainerReportResult
                 {
                     TRANSID = model.BookingNo,
@@ -164,33 +180,73 @@ namespace eFMS.API.Documentation.DL.Services
                     PortofDischarge = model.PodName,
                     PlaceDelivery = model.PoDelivery,
                     Vessel = model.VoyNo,
-                    ContSealNo = item.SealNo,
+                    ContSealNo = item.ContSealNo,
                     Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
-                    ShippingMarks = item.MarkNo,
+                    ShippingMarks = item.ShippingMark,
                     RateRequest = model.Remark,
                     Payment = model.PaymenType,
-                    NoofPeace = item.PackageQuantity?.ToString(),
-                    Containers = item.ContainerNo + "/ " + item.SealNo,
-                    MaskNos = item.MarkNo,
-                    SIDescription = item.Description,
-                    GrossWeight = item.Gw,
-                    CBM = item.Cbm,
+                    NoofPeace = noPieces,
+                    Containers = item.ContSealNo,
+                    MaskNos = item.ShippingMark,
+                    SIDescription = item.DesOfGoods,
+                    GrossWeight = item.GW,
+                    CBM = item.CBM,
                     SeaLCL = false,
                     SeaFCL = true,
                     NotifyParty = model.CargoNoticeRecevier,
                     CTNS = string.Empty,
                     Measurement = string.Empty,
-                    Qty = total?.ToString()
+                    Qty = total.ToString()
                 };
-                containerRS.Add(container);
+                shippingInstructions.Add(container);
             }
+            //foreach (var item in containers)
+            //{
+            //    var container = new OnBoardContainerReportResult
+            //    {
+            //        TRANSID = model.BookingNo,
+            //        ShippingMarkImport = string.Empty,
+            //        CheckAttachNull = string.Empty,
+            //        DatePackage = model.InvoiceDate,
+            //        ToPartner = model.SupplierName,
+            //        Attn = model.InvoiceNoticeRecevier,
+            //        Notify = model.InvoiceNoticeRecevier,
+            //        Re = model.BookingNo,
+            //        ShipperDf = model.ActualShipperDescription,
+            //        GoodsDelivery = model.ConsigneeDescription,
+            //        RealShipper = string.Empty,
+            //        RealConsignee = string.Empty,
+            //        PortofLoading = model.PodName,
+            //        PortofDischarge = model.PodName,
+            //        PlaceDelivery = model.PoDelivery,
+            //        Vessel = model.VoyNo,
+            //        ContSealNo = item.SealNo,
+            //        Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
+            //        ShippingMarks = item.MarkNo,
+            //        RateRequest = model.Remark,
+            //        Payment = model.PaymenType,
+            //        NoofPeace = item.PackageQuantity?.ToString(),
+            //        Containers = item.ContainerNo + "/ " + item.SealNo,
+            //        MaskNos = item.MarkNo,
+            //        SIDescription = item.Description,
+            //        GrossWeight = item.Gw,
+            //        CBM = item.Cbm,
+            //        SeaLCL = false,
+            //        SeaFCL = true,
+            //        NotifyParty = model.CargoNoticeRecevier,
+            //        CTNS = string.Empty,
+            //        Measurement = string.Empty,
+            //        Qty = total?.ToString()
+            //    };
+            //    containerRS.Add(container);
+            //}
             result = new Crystal
             {
                 ReportName = "SeaOnboardContainerList.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
-            result.AddDataSource(containerRS);
+            result.AddDataSource(shippingInstructions);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
             return result;

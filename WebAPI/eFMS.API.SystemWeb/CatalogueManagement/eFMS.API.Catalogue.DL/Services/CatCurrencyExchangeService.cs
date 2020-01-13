@@ -35,13 +35,43 @@ namespace eFMS.API.Catalogue.DL.Services
                                          && x.DatetimeModified.Value.Year == date.Year
                                          && x.DatetimeModified.Value.Day == date.Day
                                          ).OrderBy(x => x.DatetimeCreated).ThenBy(x =>x.DatetimeModified).LastOrDefault(); 
-            if (data == null) return null;
+            if (data == null)
+            {
+                var newestExchanges = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchangeNewest>();
+                var newList = new List<CatCurrencyExchange>();
+                foreach (var item in newestExchanges)
+                {
+                    if (item.DatetimeCreated.Value.Date < DateTime.Now.Date)
+                    {
+                        var exchange = new CatCurrencyExchange
+                        {
+                            CurrencyFromId = item.CurrencyFromID,
+                            DatetimeCreated = new DateTime(date.Year, date.Month, date.Day),
+                            DatetimeModified = new DateTime(date.Year, date.Month, date.Day),
+                            UserCreated = "system",
+                            UserModified = "system",
+                            Rate = item.Rate,
+                            Active = true,
+                            CurrencyToId = item.CurrencyToID
+                        };
+                        newList.Add(exchange);
+                    }
+                }
+                if(newList.Count > 0)
+                {
+                    var hs = DataContext.Add(newList);
+                    if (hs.Success == false) return null;
+                    data = newList.Where(x => x.CurrencyFromId == fromCurrency
+                                             && x.CurrencyToId == localCurrency
+                                             ).OrderBy(x => x.DatetimeCreated).ThenBy(x => x.DatetimeModified).LastOrDefault();
+                }
+            }
             return new vw_catCurrencyExchangeNewest
             {
                 CurrencyFromID = data.CurrencyFromId,
                 Rate = data.Rate,
                 DatetimeCreated = data.DatetimeModified ?? data.DatetimeCreated
-            }; ;
+            };
         }
 
         public object GetCurrency()

@@ -116,6 +116,9 @@ export abstract class AppForm extends AppPage {
         }
     }
 
+    trimInputValue(control: FormControl | AbstractControl, value: string) {
+        control.setValue(value != null ? value.trim() : value);
+    }
 }
 
 

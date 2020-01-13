@@ -601,6 +601,11 @@ export class DocumentationRepo {
         );
     }
 
+    getSeparate(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetSeparateByHblid`, { hbId: id });
+    }
+
+
     getHouseDIMByJob(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsDimensionDetail/GetDIMFromHouseBillsByJob`, { id: jobId }).pipe(
             map((data: any) => data)
@@ -618,5 +623,13 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+
+    deleteShipmentFilesAttach(fileId: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteAttachedFile/${fileId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 
 }

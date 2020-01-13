@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { DocumentationRepo } from '@repositories';
@@ -7,6 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { getParamsRouterState } from '@store';
 import { Params } from '@angular/router';
+import { ConfirmPopupComponent } from '@common';
 
 
 @Component({
@@ -16,8 +17,12 @@ import { Params } from '@angular/router';
 })
 export class ShareBussinessFilesAttachComponent extends AppForm implements OnInit {
 
+    @ViewChild('confirmDelete', { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
     jobId: string;
+
     files: IShipmentAttachFile[] = [];
+    selectedFile: IShipmentAttachFile;
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -75,7 +80,35 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                 }
             );
     }
+
+    deleteFile(file: IShipmentAttachFile) {
+        if (!!file) {
+            this.selectedFile = file;
+            this.confirmDeletePopup.show();
+        }
+    }
+
+    onDeleteFile() {
+        this.confirmDeletePopup.hide();
+        this._progressRef.start();
+        this._documentRepo.deleteShipmentFilesAttach(this.selectedFile.id)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this._progressRef.complete();
+                this.isLoading = false;
+            }))
+            .subscribe(
+                (res: any) => {
+                    if (res.result.success) {
+                        this._toastService.success("File deleted Successfully!");
+                        this.getFileShipment(this.jobId);
+                    } else {
+                        this._toastService.error("some thing wrong");
+                    }
+                }
+            );
+    }
 }
+
 
 interface IShipmentAttachFile {
     id: string;

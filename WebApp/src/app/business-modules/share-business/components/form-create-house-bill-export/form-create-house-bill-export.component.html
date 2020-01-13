@@ -14,8 +14,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [currentActiveItemId]="{ field: 'id', value: customer.value,hardValue: shipmmentDetail.customerName}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200"
-                            (remove)="resetFormControl(customer)">
+                            [displayFields]="displayFieldsCustomer" [height]="200" (remove)="resetFormControl(customer)"
+                            placeholder="Please select Payer">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -26,7 +26,8 @@
                             [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
                             [selectedDisplayFields]="['username']" [dataSources]="saleMans"
                             [displayFields]="[{field: 'username', label: 'User Name'}]" [height]="200"
-                            [disabled]="!customer.value" (remove)="resetFormControl(saleMan)">
+                            [disabled]="!customer.value" (remove)="resetFormControl(saleMan)"
+                            placeholder="Select saleman">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -38,7 +39,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
                             [currentActiveItemId]="{ field: 'id', value: shipper.value,hardValue: shipmmentDetail.supp}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200" (remove)="resetFormControl(shipper)">
+                            [displayFields]="displayFieldsCustomer" [height]="200" (remove)="resetFormControl(shipper)"
+                            placeholder="Please select shipper">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="shipperDescription"></textarea>
@@ -51,7 +53,7 @@
                             [currentActiveItemId]="{ field: 'id', value: consignee.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
                             [displayFields]="displayFieldsCustomer" [height]="200"
-                            (remove)="resetFormControl(consignee)">
+                            (remove)="resetFormControl(consignee)" placeholder="Please select consignee">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="consigneeDescription"></textarea>
@@ -64,7 +66,7 @@
                             [currentActiveItemId]="{ field: 'id', value: notifyParty.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
                             [displayFields]="displayFieldsCustomer" [height]="200"
-                            (remove)="resetFormControl(notifyParty)">
+                            (remove)="resetFormControl(notifyParty)" placeholder="Select notify">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="notifyPartyDescription"></textarea>
@@ -108,7 +110,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'country')"
                             [currentActiveItemId]="{ field: 'id', value: country.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="countries | async"
-                            [displayFields]="displayFieldsCountry" [height]="200" (remove)="resetFormControl(country)">
+                            [displayFields]="displayFieldsCountry" [height]="200" (remove)="resetFormControl(country)"
+                            placeholder="Select country">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -124,7 +127,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                             [currentActiveItemId]="{ field: 'id', value: pol.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pol)">
+                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pol)"
+                            placeholder="Select port">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -135,7 +139,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                             [currentActiveItemId]="{ field: 'id', value: pod.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pod)">
+                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pod)"
+                            placeholder="Please select port">
                         </app-combo-grid-virtual-scroll>
                         <div class="form-control-feedback"
                             *ngIf="isSubmitted && formCreate.errors | equalError:'invalidPort'">Port of
@@ -221,7 +226,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'forwarding')"
                             [currentActiveItemId]="{ field: 'id', value: forwardingAgent.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                            [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(forwardingAgent)">
+                            [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(forwardingAgent)"
+                            placeholder="Select forwarding agent">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="forwardingAgentDescription"></textarea>
@@ -278,7 +284,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'deliveryGood')"
                             [currentActiveItemId]="{ field: 'id', value: goodsDelivery.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                            [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(goodsDelivery)">
+                            [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(goodsDelivery)"
+                            placeholder="Select delivery good">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="goodsDeliveryDescription"></textarea>

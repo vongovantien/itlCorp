@@ -70,8 +70,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     typeOfMoves: CommonInterface.INg2Select[];
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'partnerNameEn', label: 'Name ABBR' },
-        { field: 'partnerNameVn', label: 'Name EN' },
+        { field: 'partnerNameVn', label: 'Name ABBR' },
+        { field: 'partnerNameEn', label: 'Name EN' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
 
@@ -128,7 +128,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                         this.formCreate.patchValue({
                             bookingNo: this.shipmmentDetail.bookingNo,
                             mawb: this.shipmmentDetail.mawb,
-                            oceanVoyNo: !!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '' + ' - ' + !!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : '',
+                            oceanVoyNo: (!!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '') + ' - ' + (!!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : ''),
                             pod: this.shipmmentDetail.pod,
                             pol: this.shipmmentDetail.pol,
                         });

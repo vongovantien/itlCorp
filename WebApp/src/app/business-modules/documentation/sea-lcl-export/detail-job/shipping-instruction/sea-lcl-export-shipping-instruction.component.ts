@@ -176,7 +176,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     }
     previewSIReport() {
         if (this.billInstructionComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
-            this._toastService.warning('There is no container data to display preview');
+            this._toastService.warning('This shipment have not saved. please save.');
             return;
         }
         this._documentRepo.previewSIReport(this.billInstructionComponent.shippingInstruction)
@@ -190,14 +190,14 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                             this.previewPopup.show();
                         }, 1000);
                     } else {
-                        this._toastService.warning('There is no container data to display preview');
+                        this._toastService.warning('This shipment does not have any house bill ');
                     }
                 },
             );
     }
     previewOCL() {
         if (this.billInstructionComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
-            this._toastService.warning('There is no container data to display preview');
+            this._toastService.warning('This shipment have not saved. please save.');
             return;
         }
         this._documentRepo.previewOCLReport(this.billInstructionComponent.shippingInstruction)
@@ -211,7 +211,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                             this.previewPopup.show();
                         }, 1000);
                     } else {
-                        this._toastService.warning('There is no container data to display preview');
+                        this._toastService.warning('This shipment does not have any house bill ');
                     }
                 },
             );
