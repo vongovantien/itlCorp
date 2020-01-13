@@ -9,7 +9,7 @@ import { SortService } from 'src/app/shared/services';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
-import { CsShipmentSurcharge, Partner } from 'src/app/shared/models';
+import { CsShipmentSurcharge, Partner, Charge } from 'src/app/shared/models';
 
 import * as fromStore from './../../store';
 
@@ -72,7 +72,11 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     }
 
     getCharge() {
-        this.listCharges = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.OBH });
+        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.OBH }).subscribe(
+            (charges: Charge[]) => {
+                this.listCharges = charges;
+            }
+        );
     }
 
     selectPartnerTypes(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge, type: string) {

@@ -42,7 +42,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     headerPartner: CommonInterface.IHeaderTable[] = [];
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
 
-    listCharges: Observable<Charge[]>;
+    listCharges: Charge[];
     listUnits: Unit[] = [];
     listCurrency: Observable<Currency[]>;
     listPartner: Partner[] = new Array<Partner>();
@@ -61,6 +61,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     isDuplicateInvoice: boolean = false;
 
     selectedSurcharge: CsShipmentSurcharge;
+
+    selectedIndexCharge: number = -1;
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -224,7 +226,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getCharge() {
-        this.listCharges = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT });
+        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT })
+            .subscribe(
+                (charges: Charge[]) => {
+                    this.listCharges = charges;
+                }
+            );
     }
 
     sortSurcharge() {
@@ -298,6 +305,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     deleteCharge(charge: CsShipmentSurcharge, index: number, type: CommonEnum.SurchargeTypeEnum | string) {
         this.isSubmitted = false;
+        this.selectedIndexCharge = index;
+
         if (charge.id === SystemConstants.EMPTY_GUID) {
             switch (type) {
                 case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
@@ -337,8 +346,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-
-                            this.getSurcharges(type);
+                            if (this.selectedIndexCharge > -1) {
+                                this.charges = [...this.charges.slice(0, this.selectedIndexCharge), ...this.charges.slice(this.selectedIndexCharge + 1)];
+                            }
+                            // this.getSurcharges(type);
                             this.getProfit();
                         } else {
                             this._toastService.error(res.message);

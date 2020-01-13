@@ -10,7 +10,7 @@ export class CsShipmentSurcharge {
     currencyId: string = null;
     includedVat: boolean = null;
     vatrate: number = null;
-    total: number = null;
+    total: number = 0;
     payerId: string = null;
     objectBePaid: string = null;
     paymentObjectId: string = null;

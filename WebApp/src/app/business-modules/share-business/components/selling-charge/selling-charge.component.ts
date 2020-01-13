@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
-import { CsShipmentSurcharge } from 'src/app/shared/models';
+import { CsShipmentSurcharge, Charge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
@@ -74,7 +74,11 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     getCharge() {
-        this.listCharges = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.DEBIT });
+        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.DEBIT }).subscribe(
+            (charges: Charge[]) => {
+                this.listCharges = charges;
+            }
+        );
     }
 
     saveSellingSurCharge() {

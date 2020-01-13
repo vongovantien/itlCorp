@@ -87,7 +87,7 @@
                                         [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                         (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                         [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                        [dataSources]="listCharges | async"
+                                        [dataSources]="listCharges"
                                         [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                         [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null"
                                         placeholder="Select charge">
