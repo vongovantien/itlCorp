@@ -75,6 +75,8 @@ export class CsTransaction {
 
     dimensionDetails: DIM[] = [];
     issuedBy: string = null;
+    route: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

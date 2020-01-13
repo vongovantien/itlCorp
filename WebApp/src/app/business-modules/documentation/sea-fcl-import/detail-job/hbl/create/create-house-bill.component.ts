@@ -78,6 +78,10 @@ export class CreateHouseBillComponent extends AppForm {
             if (param.jobId) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
+                // * Get default containers from masterbill.
+                this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+
                 this.getDetailShipment();
             }
         });

@@ -254,6 +254,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 Validators.min(0)
             ])],
             issuedBy: [],
+            route: [],
 
             // * Date
             etd: [null, this.type !== 'import' ? Validators.required : null],
@@ -262,14 +263,14 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             flightDate: [],
 
             // * select
-            mbltype: [null, Validators.required],
+            mbltype: [],
             shipmentType: [[this.shipmentTypes[0]], Validators.required],
             paymentTerm: [],
             commodity: [],
             packageType: [],
 
             // * Combogrid.
-            agentId: [],
+            agentId: [null, Validators.required],
             pol: [],
             pod: [null, Validators.required],
             coloaderId: [],

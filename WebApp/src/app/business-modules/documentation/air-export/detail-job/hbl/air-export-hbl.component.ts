@@ -184,8 +184,7 @@ export class AirExportHBLComponent extends AppList implements OnInit {
     }
 
     gotoCreate() {
-        this._spinner.show(this.spinnerSurcharge);
-        // this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/new`]);
+        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/new`]);
     }
 
     selectHBL(hbl: HouseBill) {

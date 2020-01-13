@@ -17,6 +17,7 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
 import * as fromStore from '../../store';
+import cloneDeep from 'lodash/cloneDeep';
 
 
 @Component({
@@ -70,11 +71,10 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
             .subscribe(
                 (res: fromStore.IContainerState | any) => {
                     this.containers = res;
-                    if (!this.initContainers.length) {
-                        this.initContainers = res;
-                    }
+                    this.initContainers = cloneDeep(res);
                 }
             );
+
     }
 
     configHeader() {
@@ -98,14 +98,16 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     addNewContainer() {
         this.isSubmitted = false;
-        this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
+        this.initContainers = [...this.initContainers, new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' })];
+        // this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
     }
 
     deleteContainerItem(index: number, container: Container) {
         this.selectedIndexContainer = index;
 
         if (container.id === SystemConstants.EMPTY_GUID) {
-            this._store.dispatch(new fromStore.DeleteContainerAction(index)); // * DISPATCH DELETE ACTION
+            // this._store.dispatch(new fromStore.DeleteContainerAction(index)); // * DISPATCH DELETE ACTION
+            this.initContainers = [...this.initContainers.slice(0, this.selectedIndexContainer), ...this.initContainers.slice(this.selectedIndexContainer + 1)];
         } else {
             this.confirmDeleteContainerPopup.show();
         }
@@ -114,6 +116,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
     onDeleteContainer() {
         this.confirmDeleteContainerPopup.hide();
         if (this.selectedIndexContainer > -1) {
+            this.initContainers = [...this.initContainers.slice(0, this.selectedIndexContainer), ...this.initContainers.slice(this.selectedIndexContainer + 1)];
             this._store.dispatch(new fromStore.DeleteContainerAction(this.selectedIndexContainer)); // * DISPATCH DELETE ACTION
         }
     }
@@ -143,6 +146,9 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         if (this.checkValidateContainer()) {
             // * DISPATCH SAVE ACTION
             if (this.checkDuplicate()) {
+
+                this.containers = cloneDeep(this.initContainers);
+
                 for (const container of this.containers) {
                     container.commodityName = this.getCommodityName(container.commodityId);
                     container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
@@ -153,8 +159,6 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
                 }
                 this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
 
-                this.initContainers = this.containers;
-
                 this.isSubmitted = false;
                 this.hide();
             }
@@ -163,7 +167,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     checkValidateContainer() {
         let valid: boolean = true;
-        for (const container of this.containers) {
+        for (const container of this.initContainers) {
             if (
                 !container.containerTypeId
                 || !container.quantity
@@ -183,10 +187,10 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
     checkDuplicate() {
         let valid: boolean = true;
         if (
-            this.utility.checkDuplicateInObject("containerTypeId", this.containers)
-            && this.utility.checkDuplicateInObject("packageTypeId", this.containers)
-            && this.utility.checkDuplicateInObject("packageQuantity", this.containers)
-            && this.utility.checkDuplicateInObject("containerNo", this.containers)
+            this.utility.checkDuplicateInObject("containerTypeId", this.initContainers)
+            && this.utility.checkDuplicateInObject("packageTypeId", this.initContainers)
+            && this.utility.checkDuplicateInObject("packageQuantity", this.initContainers)
+            && this.utility.checkDuplicateInObject("containerNo", this.initContainers)
         ) {
             this.isDuplicateContPakage = true;
             valid = false;
@@ -229,9 +233,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     closePopup() {
         this.isSubmitted = false;
-        // if (!this.isAdd) {
-        //     this._store.dispatch(new fromStore.GetContainerSuccessAction(this.initContainers));
-        // }
+        this.initContainers = cloneDeep(this.containers);
         this.hide();
     }
 
@@ -239,6 +241,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         this.containerImportPopup.mblid = this.mblid;
         this.containerImportPopup.hblid = this.hblid;
         this.containerImportPopup.data = [];
+
         this.containerImportPopup.getData();
         this.containerImportPopup.show();
     }

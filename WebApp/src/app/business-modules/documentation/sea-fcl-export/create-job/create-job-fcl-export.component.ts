@@ -127,10 +127,10 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             return;
         }
 
-        if (!this.containers.length) {
-            this._toastService.warning('Please add container to create new job');
-            return;
-        }
+        // if (!this.containers.length) {
+        //     this._toastService.warning('Please add container to create new job');
+        //     return;
+        // }
 
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model

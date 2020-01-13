@@ -23,9 +23,8 @@
                     <div class="col-md-4">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !mbltype.valid}">
-                                    <label required>MAWB Type </label>
+                                <div class="form-group">
+                                    <label>MAWB Type </label>
                                     <ng-select #hawb [items]="billTypes" placeholder="Please select" [allowClear]="true"
                                         (opened)="closeOtherSelects(hawb)" formControlName="mbltype">
                                     </ng-select>
@@ -43,8 +42,9 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Airline/Co-Loader</label>
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':isSubmitted  && !coloaderId.value}">
+                            <label required>Airline/Co-Loader</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [currentActiveItemId]="{ field: 'id', value: coloaderId.value, hardValue: shipmentDetail.supplierName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
@@ -276,9 +276,19 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Issued By</label>
-                            <input type="text" class="form-control" formControlName="issuedBy">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Issued By</label>
+                                    <input type="text" class="form-control" formControlName="issuedBy">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Route</label>
+                                    <input type="text" class="form-control" formControlName="route">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">

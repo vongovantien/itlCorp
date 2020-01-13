@@ -53,9 +53,9 @@
                             </th>
                         </thead>
                         <tbody>
-                            <ng-container *ngIf="!!containers.length">
+                            <ng-container *ngIf="!!initContainers.length">
                                 <tr class="text-center m-form m-form--state"
-                                    *ngFor="let container of containers | filter: keyword: ['containerTypeId','seaNo','markNo']; let i = index; trackBy: trackByFn">
+                                    *ngFor="let container of initContainers | filter: keyword: ['containerTypeId','seaNo','markNo']; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col fixed-side">
                                         <div class="table-actions">
                                             <button type="button" (click)="deleteContainerItem(i,container)"
@@ -82,7 +82,7 @@
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !container.quantity}">
                                             <input type="number" class="form-control" [(ngModel)]="container.quantity"
                                                 (ngModelChange)="onChangeDataFormTable()" name="quantity"
-                                                appIntergerInputCheck min="0" step="1">
+                                                appIntergerInputCheck min="1" step="1">
                                         </div>
                                     </td>
                                     <td>
@@ -186,7 +186,7 @@
 
                                 </tr>
                             </ng-container>
-                            <tr *ngIf="!containers.length" app-table-none-record [colspan]="headers.length  + 1">
+                            <tr *ngIf="!initContainers.length" app-table-none-record [colspan]="headers.length  + 1">
                             </tr>
                         </tbody>
                     </table>

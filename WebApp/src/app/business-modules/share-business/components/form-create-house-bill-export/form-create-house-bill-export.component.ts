@@ -285,7 +285,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     }
 
     getDescription(fullName: string, address: string, tel: string, fax: string) {
-        return `${fullName} \n ${address} \n Tel No: ${!!tel ? tel : ''} \n Fax No: ${!!fax ? fax : ''} \n`;
+        return `${fullName} \n${address} \nTel No: ${!!tel ? tel : ''} \nFax No: ${!!fax ? fax : ''} \n`;
     }
 
     getDropdownData() {
