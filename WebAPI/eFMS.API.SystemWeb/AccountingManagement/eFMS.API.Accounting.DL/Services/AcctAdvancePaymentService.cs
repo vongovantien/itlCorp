@@ -1946,11 +1946,11 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (var item in advanceToUnLocks)
                 {
                     string log = string.Empty;
-                    var logs = item.LockedLog.Split(';').Where(x => x.Length > 0).ToList();
+                    var logs = item.LockedLog!= null? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList(): new List<string>();
                     if (item.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
                     {
                         item.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
-                        log = item.AdvanceNo = item.AdvanceNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/mm/yyyy") + " by " + "admin";
+                        log = item.AdvanceNo = item.AdvanceNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
 
                         var hs = DataContext.Update(item, x => x.Id == item.Id);
                         if (hs.Success == false)

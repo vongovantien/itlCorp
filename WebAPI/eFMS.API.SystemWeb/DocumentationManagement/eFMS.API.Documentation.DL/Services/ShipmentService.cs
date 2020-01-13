@@ -328,13 +328,13 @@ namespace eFMS.API.Documentation.DL.Services
                     if (item.Service == "OPS")
                     {
                         var opsShipment = opsRepository.Get(x => x.Id == item.Id)?.FirstOrDefault();
-                        var logs = opsShipment.LockedLog.Split(';').Where(x => x.Length > 0).ToList();
+                        var logs = opsShipment.LockedLog!= null? opsShipment.LockedLog.Split(';').Where(x => x.Length > 0).ToList(): new List<string>();
                         if (opsShipment != null)
                         {
-                            if (opsShipment.IsLocked == true)
+                            if (opsShipment.IsLocked == false)
                             {
-                                opsShipment.IsLocked = false;
-                                string log = opsShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/mm/yyyy") + " by " + "admin";
+                                opsShipment.IsLocked = true;
+                                string log = opsShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
                                 opsShipment.LockedLog = opsShipment.LockedLog + log + ";";
                                 var isSuccessLockOps = opsRepository.Update(opsShipment, x => x.Id == opsShipment.Id);
                                 if (isSuccessLockOps.Success == false)
@@ -349,13 +349,13 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         var csShipment = csRepository.Get(x => x.Id == item.Id)?.FirstOrDefault();
-                        var logs = csShipment.LockedLog.Split(';').Where(x => x.Length > 0).ToList();
+                        var logs = csShipment.LockedLog!= null? csShipment.LockedLog.Split(';').Where(x => x.Length > 0).ToList(): new List<string>();
                         if (csShipment != null)
                         {
-                            if (csShipment.IsLocked == true)
+                            if (csShipment.IsLocked == false)
                             {
-                                csShipment.IsLocked = false;
-                                string log = csShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/mm/yyyy") + " by " + "admin";
+                                csShipment.IsLocked = true;
+                                string log = csShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
                                 csShipment.LockedLog = csShipment.LockedLog + log + ";";
                                 var isSuccessLockCs = csRepository.Update(csShipment, x => x.Id == csShipment.Id);
                                 if (isSuccessLockCs.Success == false)
