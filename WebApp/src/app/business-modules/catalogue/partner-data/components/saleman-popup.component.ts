@@ -193,6 +193,7 @@ export class SalemanPopupComponent extends PopupBase {
     onCreate() {
         this.isSave = true;
         this.setError(this.freightPayment);
+        this.trimInputValue(this.description, this.description.value);
         if (this.form.valid) {
             const salemans: any = {
                 company: this.office.value,
@@ -205,7 +206,7 @@ export class SalemanPopupComponent extends PopupBase {
                 createDate: new Date(),
                 username: this.selectedDataSaleMan.username,
                 freightPayment: this.freightPayment.value[0].id,
-                description: this.description.value,
+                description: this.description.value != null ? this.description.value.trim() : this.description.value,
                 serviceName: this.service.value[0].text,
             };
             console.log(salemans);

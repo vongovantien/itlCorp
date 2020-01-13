@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
+using ITL.NetCore.Common;
+using eFMS.API.Common;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -14,5 +17,6 @@ namespace eFMS.API.Documentation.DL.IService
         IQueryable<Shipments> GetShipmentsCreditPayer(string partner, List<string> services);
 
         List<ShipmentsCopy> GetListShipmentBySearchOptions(string searchOption, List<string> keywords);
+        ResultHandle UnLockShipment(ShipmentCriteria criteria);
     }
 }

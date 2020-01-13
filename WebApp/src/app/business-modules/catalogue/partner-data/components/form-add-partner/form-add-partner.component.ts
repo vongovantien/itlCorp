@@ -5,6 +5,7 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { SalemanPopupComponent } from '../saleman-popup.component';
 import { Partner } from 'src/app/shared/models';
+import { FormValidators } from 'src/app/shared/validators/form.validator';
 
 @Component({
     selector: 'form-add-partner',
@@ -57,6 +58,7 @@ export class FormAddPartnerComponent extends AppForm {
     active: AbstractControl;
     note: AbstractControl;
     isPublic: boolean = false;
+    coLoaderCode: AbstractControl;
 
     constructor(
         private _fb: FormBuilder,
@@ -166,17 +168,17 @@ export class FormAddPartnerComponent extends AppForm {
             partnerAccountNo: [{ value: null, disabled: true }],
             internalReferenceNo: [null],
             nameENFull: [null, Validators.compose([
-                Validators.required,
+                FormValidators.required,
             ])],
             nameLocalFull: [null, Validators.compose([
-                Validators.required,
+                FormValidators.required,
             ])],
             shortName: [null, Validators.compose([
-                Validators.required
+                FormValidators.required
             ])],
             partnerAccountRef: [null],
             taxCode: [null, Validators.compose([
-                Validators.required
+                FormValidators.required
             ])],
             partnerGroup: [null, Validators.compose([
                 Validators.required
@@ -189,10 +191,10 @@ export class FormAddPartnerComponent extends AppForm {
             ])],
             zipCodeShipping: [null],
             shippingAddressEN: [null, Validators.compose([
-                Validators.required
+                FormValidators.required
             ])],
             shippingAddressVN: [null, Validators.compose([
-                Validators.required
+                FormValidators.required
             ])],
             billingCountry: [null, Validators.compose([
                 Validators.required
@@ -202,10 +204,10 @@ export class FormAddPartnerComponent extends AppForm {
             ])],
             billingZipcode: [null],
             billingAddressEN: [null, Validators.compose([
-                Validators.required
+                FormValidators.required
             ])],
             billingAddressLocal: [null, Validators.compose([
-                Validators.required
+                FormValidators.required
             ])],
             partnerContactPerson: [null],
             partnerContactNumber: [null],
@@ -253,6 +255,8 @@ export class FormAddPartnerComponent extends AppForm {
         this.partnerSwiftCode = this.partnerForm.controls['partnerSwiftCode'];
         this.partnerWorkPlace = this.partnerForm.controls['partnerWorkPlace'];
         this.active = this.partnerForm.controls['active'];
+        this.coLoaderCode = this.partnerForm.controls['coLoaderCode'];
+        this.note = this.partnerForm.controls['note'];
     }
 
     setFormData(partner: Partner) {
@@ -321,7 +325,6 @@ export class FormAddPartnerComponent extends AppForm {
             partnerSwiftCode: partner.swiftCode,
             partnerWorkPlace: workPlaceActive,
             active: partner.active === null ? false : partner.active,
-            // public: partner.public === null ? false : partner.public,
             note: partner.note,
             coLoaderCode: partner.coLoaderCode
         });

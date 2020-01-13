@@ -15,5 +15,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string CarrierId { get; set; }
         public Guid HBLID { get; set; }
         public string Service { get; set; }
+        public string LockedLog { get; set; }
     }
 }

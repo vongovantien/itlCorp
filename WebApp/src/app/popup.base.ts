@@ -109,4 +109,7 @@ export abstract class PopupBase extends AppPage {
     setError(control: FormControl | AbstractControl, err: ValidationErrors = null) {
         control.setErrors(err);
     }
+    trimInputValue(control: FormControl | AbstractControl, value: string) {
+        control.setValue(value != null ? value.trim() : value);
+    }
 }

@@ -20,7 +20,7 @@ using System.Linq;
 
 namespace eFMS.API.Accounting.DL.Services
 {
-    public class AcctSettlementPaymentService : RepositoryBase<AcctSettlementPayment, AcctSettlementPaymentModel>, IService.IAcctSettlementPaymentService
+    public class AcctSettlementPaymentService : RepositoryBase<AcctSettlementPayment, AcctSettlementPaymentModel>, IAcctSettlementPaymentService
     {
         private readonly ICurrentUser currentUser;
         private readonly IOptions<WebUrl> webUrl;
@@ -2542,6 +2542,38 @@ namespace eFMS.API.Accounting.DL.Services
             return isApproved;
         }
 
+        public ResultHandle UnLock(List<string> keyWords)
+        {
+            var settleToUnLocks = DataContext.Get(x => keyWords.Contains(x.SettlementNo));
+            try
+            {
+                List<string> results = new List<string>();
+                foreach (var item in settleToUnLocks)
+                {
+                    string log = string.Empty;
+                    var logs = item.LockedLog!= null? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList(): new List<string>();
+                    if (item.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
+                    {
+                        item.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
+                        log = item.SettlementNo = item.SettlementNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
+
+                        var hs = DataContext.Update(item, x => x.Id == item.Id);
+                        if (hs.Success == false)
+                        {
+                            log = item.SettlementNo + " unlock failed " + hs.Message;
+                        }
+                        if (log.Length > 0) logs.Add(log);
+                    }
+                    if (logs.Count > 0) results.AddRange(logs);
+                }
+                return new ResultHandle { Status = true, Message = "Done", Data = results };
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
 
         #endregion
     }
