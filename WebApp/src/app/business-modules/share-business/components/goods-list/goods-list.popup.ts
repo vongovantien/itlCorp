@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
@@ -16,6 +16,7 @@ import { ShareGoodsImportComponent } from '../goods-import/goods-import.componen
 })
 
 export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContainerListPopupComponent implements OnInit {
+
     @ViewChild(ShareGoodsImportComponent, { static: false }) goodsImportPopup: ShareGoodsImportComponent;
     @ViewChild('confirmCancel', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
 
@@ -49,7 +50,7 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
     //  * Override check validate.
     checkValidateContainer() {
         let valid: boolean = true;
-        for (const container of this.containers) {
+        for (const container of this.initContainers) {
             if (
                 (!!container.containerNo || !!container.sealNo || !!container.markNo) && !container.quantity
                 || !container.packageTypeId
@@ -66,34 +67,18 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
         return valid;
     }
 
-    closePopup() {
-        this.isSubmitted = false;
-
-        if (!this.containers.length) {
-            if (!this.isAdd) {
-                this._store.dispatch(new fromStore.GetContainerSuccessAction(this.initContainers));
-            }
-            this.hide();
-        } else {
-            this.confirmCancelPopup.show();
-        }
-
-    }
-
     onSubmitCancel() {
         this.confirmCancelPopup.hide();
         this.onSaveContainerList();
     }
 
     onCancel() {
-        this.confirmCancelPopup.hide();
         this.isSubmitted = false;
 
-        if (!this.isAdd) {
-            this._store.dispatch(new fromStore.GetContainerSuccessAction(this.initContainers));
-        }
-        this.hide();
+        this.confirmCancelPopup.hide();
+        this.closePopup();
     }
+
     showImportPopup() {
         this.goodsImportPopup.mblid = this.mblid;
         this.goodsImportPopup.hblid = this.hblid;

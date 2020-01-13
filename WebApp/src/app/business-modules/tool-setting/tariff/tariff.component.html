@@ -13,77 +13,80 @@
         </div>
     </app-sub-header>
     <div class="m-content">
-        <tabset>
-            <tab heading="OPS Tariff">
-                <form-search-tariff (onSearch)="searchTariff($event)"></form-search-tariff>
-                <div class="m-portlet">
-                    <div class="m-portlet__body">
-                        <div class="m-form m--margin-bottom-10">
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <div class="m-input-icon m-input-icon--left">
-                                            <input type="text" class="form-control m-input m-input--square"
-                                                placeholder="Search..." [(ngModel)]="keyword" name="keyword">
-                                            <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                <span>
-                                                    <i class="la la-search"></i>
+        <div class="m-portlet__body">
+            <tabset class="custom-class-tab">
+                <tab heading="OPS Tariff">
+                    <form-search-tariff (onSearch)="searchTariff($event)"></form-search-tariff>
+                    <div class="m-portlet">
+                        <div class="m-portlet__body">
+                            <div class="m-form m--margin-bottom-10">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <div class="m-input-icon m-input-icon--left">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    placeholder="Search..." [(ngModel)]="keyword" name="keyword">
+                                                <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                    <span>
+                                                        <i class="la la-search"></i>
+                                                    </span>
                                                 </span>
-                                            </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="table-wrapper">
-                            <table class="table table-striped table-brand dataTable">
-                                <thead app-table-header [headers]="headers"
-                                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                                    <th class="first table-actions-col"></th>
-                                </thead>
-                                <tbody>
-                                    <ng-container *ngIf="!isLoading && !!tariffs.length">
-                                        <tr class=""
-                                            *ngFor="let tariff of tariffs | filter : keyword : ['tariffName','tariffType','customerID','supplierID','serviceMode','status']; let i = index; trackBy: trackByFn">
-                                            <td class="table-actions-col">
-                                                <div class="table-actions">
-                                                    <a [routerLink]="[tariff.id]" [queryParams]="{action: 'copy'}"
-                                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit">
-                                                        <i class="la la-copy"></i>
+                            <div class="table-wrapper">
+                                <table class="table table-striped table-brand dataTable">
+                                    <thead app-table-header [headers]="headers"
+                                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                        <th class="first table-actions-col"></th>
+                                    </thead>
+                                    <tbody>
+                                        <ng-container *ngIf="!isLoading && !!tariffs.length">
+                                            <tr class=""
+                                                *ngFor="let tariff of tariffs | filter : keyword : ['tariffName','tariffType','customerID','supplierID','serviceMode','status']; let i = index; trackBy: trackByFn">
+                                                <td class="table-actions-col">
+                                                    <div class="table-actions">
+                                                        <a [routerLink]="[tariff.id]" [queryParams]="{action: 'copy'}"
+                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit">
+                                                            <i class="la la-copy"></i>
+                                                        </a>
+                                                        <button (click)="showDeletePopup(tariff)"
+                                                            [disabled]="tariff.status"
+                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                            <i class="la la-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <a class="text-underline" [routerLink]="tariff.id"
+                                                        [title]="tariff.tariffName">
+                                                        {{tariff.tariffName}}
                                                     </a>
-                                                    <button (click)="showDeletePopup(tariff)" [disabled]="tariff.status"
-                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a class="text-underline" [routerLink]="tariff.id"
-                                                    [title]="tariff.tariffName">
-                                                    {{tariff.tariffName}}
-                                                </a>
-                                            </td>
-                                            <td>{{tariff.tariffType}}</td>
-                                            <td>{{tariff.customerName}}</td>
-                                            <td>{{tariff.supplierName}}</td>
-                                            <td>{{tariff.serviceMode}}</td>
-                                            <td>{{tariff.effectiveDate | date: 'dd/MM/yyyy'}}</td>
-                                            <td>{{tariff.expiredDate | date: 'dd/MM/yyyy'}}</td>
-                                            <td [ngClass]="tariff.status ? 'text-success' : 'text-danger'">
-                                                {{tariff.status ? 'Active' : 'Inactive'}}</td>
-                                        </tr>
-                                    </ng-container>
-                                    <tr app-table-none-record *ngIf="!isLoading && !tariffs.length"
-                                        [colspan]="headers.length + 1"></tr>
-                                    <tr app-table-loading *ngIf="isLoading"></tr>
-                                </tbody>
-                            </table>
+                                                </td>
+                                                <td>{{tariff.tariffType}}</td>
+                                                <td>{{tariff.customerName}}</td>
+                                                <td>{{tariff.supplierName}}</td>
+                                                <td>{{tariff.serviceMode}}</td>
+                                                <td>{{tariff.effectiveDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td>{{tariff.expiredDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td [ngClass]="tariff.status ? 'text-success' : 'text-danger'">
+                                                    {{tariff.status ? 'Active' : 'Inactive'}}</td>
+                                            </tr>
+                                        </ng-container>
+                                        <tr app-table-none-record *ngIf="!isLoading && !tariffs.length"
+                                            [colspan]="headers.length + 1"></tr>
+                                        <tr app-table-loading *ngIf="isLoading"></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </tab>
-        </tabset>
+                </tab>
+            </tabset>
+        </div>
     </div>
 </div>
 

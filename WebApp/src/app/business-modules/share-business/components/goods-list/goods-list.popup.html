@@ -5,7 +5,7 @@
                 <h5 class="modal-title">
                     HBL List of Goods
                 </h5>
-                <button type="button" (click)="closePopup()" class="close">
+                <button type="button" (click)="confirmCancel.show()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -53,9 +53,9 @@
                             </th>
                         </thead>
                         <tbody>
-                            <ng-container *ngIf="!!containers.length">
+                            <ng-container *ngIf="!!initContainers.length">
                                 <tr class="text-center m-form m-form--state"
-                                    *ngFor="let container of containers | filter: keyword: ['containerTypeId','sealNo','markNo']; let i = index; trackBy: trackByFn">
+                                    *ngFor="let container of initContainers | filter: keyword: ['containerTypeId','sealNo','markNo']; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col fixed-side">
                                         <div class="table-actions">
                                             <button type="button" (click)="deleteContainerItem(i,container)"
@@ -161,7 +161,7 @@
                                     </td>
                                 </tr>
                             </ng-container>
-                            <tr *ngIf="!containers.length" app-table-none-record [colspan]="headers.length  + 1">
+                            <tr *ngIf="!initContainers.length" app-table-none-record [colspan]="headers.length  + 1">
                             </tr>
                         </tbody>
                     </table>
@@ -183,7 +183,7 @@
                                 </span>
                             </button>
                             <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel"
-                                (click)="closePopup()">
+                                (click)="confirmCancel.show()">
                                 <span>
                                     <i class="la la-ban"></i>
                                     <span>
