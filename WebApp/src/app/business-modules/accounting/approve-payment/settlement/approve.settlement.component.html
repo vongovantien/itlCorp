@@ -43,7 +43,7 @@
                         <div class="text-center w-50 m-auto m--margin-top-20" *ngIf="!!approveInfo">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save" (click)="showModalApprove()" *ngIf="!approveInfo.isApproved">
+                                title="Approve" (click)="showModalApprove()" *ngIf="!approveInfo.isApproved">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
@@ -52,7 +52,7 @@
                                 </span>
                             </button>
                             <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save & Send Request" *ngIf="!approveInfo.isApproved" (click)="showDenyPopup()">
+                                title="Deny" *ngIf="!approveInfo.isRequester && (approveInfo.statusApproval === 'RequestApproval' || approveInfo.statusApproval === 'DepartmentManagerApproved')" (click)="showDenyPopup()">
                                 <span>
                                     <i class="la la-times"></i>
                                     <span>

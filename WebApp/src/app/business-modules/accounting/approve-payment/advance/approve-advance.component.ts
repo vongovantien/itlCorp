@@ -81,7 +81,7 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                                 note: this.advancePayment.advanceNote,
                                 currency: this.formCreateComponent.currencyList.filter(currency => currency.id === this.advancePayment.advanceCurrency)[0]
                             });
-                        }, 100);
+                        }, 1000);
 
                         this.listRequestAdvancePaymentComponent.listRequestAdvancePayment = this.advancePayment.advanceRequests;
                         this.listRequestAdvancePaymentComponent.totalAmount = this.listRequestAdvancePaymentComponent.updateTotalAmount(this.advancePayment.advanceRequests);

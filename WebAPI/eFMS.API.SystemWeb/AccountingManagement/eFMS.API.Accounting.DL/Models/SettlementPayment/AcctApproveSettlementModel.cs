@@ -10,5 +10,7 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string AccountantName { get; set; }
         public string BUHeadName { get; set; }
         public bool IsApproved { get; set; }
+        public string StatusApproval { get; set; }
+        public bool IsRequester { get; set; }
     }
 }

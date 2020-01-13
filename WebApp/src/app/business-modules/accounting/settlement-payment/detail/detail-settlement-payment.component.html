@@ -34,7 +34,7 @@
                         <div class="m--align-center m--margin-top-20">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save" (click)="updateSettlement()">
+                                title="Save" (click)="updateSettlement()" *ngIf="!!settlementPayment && (settlementPayment.settlement.statusApproval == 'Denied' || settlementPayment.settlement.statusApproval === 'New')">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
@@ -44,7 +44,7 @@
                             </button>
                             <button
                                 class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save & Send Request" (click)="saveAndSendRequest()">
+                                title="Save & Send Request" (click)="saveAndSendRequest()" *ngIf="!!settlementPayment && (settlementPayment.settlement.statusApproval == 'Denied' || settlementPayment.settlement.statusApproval === 'New')">
                                 <span>
                                     <i class="la la-download"></i>
                                     <span>

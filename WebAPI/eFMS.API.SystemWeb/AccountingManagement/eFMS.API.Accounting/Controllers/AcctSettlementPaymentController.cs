@@ -315,11 +315,13 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Update(CreateUpdateSettlementModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            if (!model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
-            {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the settlement payment status is New or Deny" };
-                return Ok(_result);
-            }
+
+            //Đã check bên trong function UpdateSettlementPayment
+            //if (!model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+            //{
+            //    ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the settlement payment status is New or Deny" };
+            //    return Ok(_result);
+            //}
 
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)
@@ -376,6 +378,7 @@ namespace eFMS.API.Accounting.Controllers
             HandleState hs;
             if (string.IsNullOrEmpty(model.Settlement.SettlementNo))//Insert Settlement Payment
             {
+                model.Settlement.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctSettlementPaymentService.AddSettlementPayment(model);
             }
             else //Update Settlement Payment
@@ -385,6 +388,7 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the settlement payment status is New or Deny" };
                     return Ok(_result);
                 }
+                model.Settlement.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
             }
 
@@ -417,23 +421,21 @@ namespace eFMS.API.Accounting.Controllers
                 return Ok(_result);
             }
 
-            AcctApproveSettlementModel approve = new AcctApproveSettlementModel
-            {
-                SettlementNo = model.Settlement.SettlementNo,
-                Requester = model.Settlement.Requester
-            };
-            var resultInsertUpdateApprove = acctSettlementPaymentService.InsertOrUpdateApprovalSettlement(approve);
-            if (!resultInsertUpdateApprove.Success)
-            {
-                ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
-                return BadRequest(_result);
-            }
-
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
-            if (!hs.Success)
+            if (hs.Success)
             {
-                return Ok(result);
+                AcctApproveSettlementModel approve = new AcctApproveSettlementModel
+                {
+                    SettlementNo = model.Settlement.SettlementNo,
+                    Requester = model.Settlement.Requester
+                };
+                var resultInsertUpdateApprove = acctSettlementPaymentService.InsertOrUpdateApprovalSettlement(approve);
+                if (!resultInsertUpdateApprove.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
+                    return BadRequest(_result);
+                }
             }
             return Ok(result);
         }

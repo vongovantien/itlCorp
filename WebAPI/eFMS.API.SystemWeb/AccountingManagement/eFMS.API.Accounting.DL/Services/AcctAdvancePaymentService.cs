@@ -140,10 +140,10 @@ namespace eFMS.API.Accounting.DL.Services
                             !string.IsNullOrEmpty(criteria.Requester) ?
                             (
                                     ad.Requester == criteria.Requester
-                                || (apr.Manager == criteria.Requester && apr.ManagerAprDate != null)
-                                || (apr.Accountant == criteria.Requester && apr.AccountantAprDate != null)
-                                || (apr.ManagerApr == criteria.Requester && apr.ManagerAprDate != null)
-                                || (apr.AccountantApr == criteria.Requester && apr.AccountantAprDate != null)
+                                || (apr.Manager == criteria.Requester && (ad.StatusApproval != Constants.STATUS_APPROVAL_NEW && ad.StatusApproval != Constants.STATUS_APPROVAL_DENIED))// && apr.ManagerAprDate != null)
+                                || (apr.Accountant == criteria.Requester && (ad.StatusApproval != Constants.STATUS_APPROVAL_NEW && ad.StatusApproval != Constants.STATUS_APPROVAL_DENIED && ad.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))// && apr.AccountantAprDate != null)
+                                || (apr.ManagerApr == criteria.Requester && (ad.StatusApproval != Constants.STATUS_APPROVAL_NEW && ad.StatusApproval != Constants.STATUS_APPROVAL_DENIED))// && apr.ManagerAprDate != null)
+                                || (apr.AccountantApr == criteria.Requester && (ad.StatusApproval != Constants.STATUS_APPROVAL_NEW && ad.StatusApproval != Constants.STATUS_APPROVAL_DENIED && ad.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))// && apr.AccountantAprDate != null)
                             )
                             :
                                 true
@@ -253,11 +253,11 @@ namespace eFMS.API.Accounting.DL.Services
         public string GetAdvanceStatusPayment(string advanceNo)
         {
             var requestTmp = acctAdvanceRequestRepo.Get();
-            var result = requestTmp.Where(x => x.StatusPayment == Constants.STATUS_PAYMENT_NOTSETTLED && x.AdvanceNo == advanceNo).Count() == requestTmp.Where(x => x.AdvanceNo == advanceNo).Count()
+            var result = requestTmp.Where(x => x.StatusPayment == Constants.STATUS_PAYMENT_NOTSETTLED && x.AdvanceNo == advanceNo).Select(s => s.Id).Count() == requestTmp.Where(x => x.AdvanceNo == advanceNo).Select(s => s.Id).Count()
                             ?
                                 Constants.STATUS_PAYMENT_NOTSETTLED
                             :
-                                requestTmp.Where(x => x.StatusPayment == Constants.STATUS_PAYMENT_SETTLED && x.AdvanceNo == advanceNo).Count() == requestTmp.Where(x => x.AdvanceNo == advanceNo).Count() ?
+                                requestTmp.Where(x => x.StatusPayment == Constants.STATUS_PAYMENT_SETTLED && x.AdvanceNo == advanceNo).Select(s => s.Id).Count() == requestTmp.Where(x => x.AdvanceNo == advanceNo).Select(s => s.Id).Count() ?
                                     Constants.STATUS_PAYMENT_SETTLED
                                 :
                                     Constants.STATUS_PAYMENT_PARTIALSETTLEMENT;
@@ -343,7 +343,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         {
                                             JobId = t.JobNo,
                                             HBL = td.Hwbno,
-                                            MBL = td.Mawb,
+                                            MBL = t.Mawb,
                                         });
 
             var shipments = shipmentsOperation.Union(shipmentsDocumention).ToList();
@@ -486,21 +486,28 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                var requests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).ToList();
-                if (requests == null) return new HandleState("Not Found Advance Request");
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
+                        var requests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo);
+                        //if (requests == null) return new HandleState("Not Found Advance Request");
                         //Xóa các Advance Request có AdvanceNo = AdvanceNo truyền vào
-                        foreach (var item in requests)
+                        if (requests != null)
                         {
-                            var advRequestDelete = acctAdvanceRequestRepo.Delete(x => x.Id == item.Id);
+                            foreach (var item in requests)
+                            {
+                                var advRequestDelete = acctAdvanceRequestRepo.Delete(x => x.Id == item.Id);
+                            }
                         }
                         //dc.AcctAdvanceRequest.RemoveRange(requests);
                         var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
-                        if (advance == null) return new HandleState("Not Found Advance Payment");
-
+                        if (advance == null) return new HandleState("Not found Advance Payment No: " + advanceNo);
+                        if(    advance.StatusApproval != Constants.STATUS_APPROVAL_NEW 
+                            && advance.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
+                        {
+                            return new HandleState("Not allow delete. Advance Payment are awaiting approval.");
+                        }
                         //dc.AcctAdvancePayment.Remove(advance);
                         //dc.SaveChanges();
                         var hs = DataContext.Delete(x => x.Id == advance.Id);
@@ -550,6 +557,7 @@ namespace eFMS.API.Accounting.DL.Services
             advanceModel = mapper.Map<AcctAdvancePaymentModel>(advance);
             //Mapper List<AcctAdvanceRequest> thành List<AcctAdvanceRequestModel>
             advanceModel.AdvanceRequests = mapper.Map<List<AcctAdvanceRequestModel>>(request);
+            advanceModel.NumberOfRequests = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Count();
 
             return advanceModel;
         }
@@ -572,6 +580,7 @@ namespace eFMS.API.Accounting.DL.Services
             advanceModel = mapper.Map<AcctAdvancePaymentModel>(advance);
             //Mapper List<AcctAdvanceRequest> thành List<AcctAdvanceRequestModel>
             advanceModel.AdvanceRequests = mapper.Map<List<AcctAdvanceRequestModel>>(request);
+            advanceModel.NumberOfRequests = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Count();
 
             return advanceModel;
         }
@@ -586,7 +595,13 @@ namespace eFMS.API.Accounting.DL.Services
                 var advance = mapper.Map<AcctAdvancePayment>(model);
 
                 var advanceCurrent = DataContext.Get(x => x.Id == advance.Id).FirstOrDefault();
-                if (advanceCurrent == null) return new HandleState("Not Found Advance Payment");
+                if (advanceCurrent == null) return new HandleState("Not found advance payment");
+
+                //Get Advance current from Database
+                if (!advanceCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !advanceCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                {
+                    return new HandleState("Only allowed to edit the advance payment status is New or Deny");
+                }
 
                 advance.DatetimeCreated = advanceCurrent.DatetimeCreated;
                 advance.UserCreated = advanceCurrent.UserCreated;
@@ -594,10 +609,11 @@ namespace eFMS.API.Accounting.DL.Services
                 advance.DatetimeModified = DateTime.Now;
                 advance.UserModified = userCurrent;
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
-                if (advanceCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                if (model.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED) && advanceCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
                 {
                     advance.StatusApproval = Constants.STATUS_APPROVAL_NEW;
                 }
+                
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -1024,7 +1040,7 @@ namespace eFMS.API.Accounting.DL.Services
             };
 
             //Chuyển tiền Amount thành chữ
-            decimal _amount = acctAdvance.AdvValue.HasValue ? acctAdvance.AdvValue.Value : 0;
+            decimal _amount = acctAdvance.AdvValue ?? 0; //acctAdvance.AdvValue.HasValue ? acctAdvance.AdvValue.Value : 0;
 
             var _currency = advance.AdvanceCurrency == Constants.CURRENCY_LOCAL ?
                        (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
@@ -1151,8 +1167,10 @@ namespace eFMS.API.Accounting.DL.Services
                 if (!string.IsNullOrEmpty(approve.AdvanceNo))
                 {
                     var advance = DataContext.Get(x => x.AdvanceNo == approve.AdvanceNo).FirstOrDefault();
-                    //&& advance.StatusApproval != "RequestApproval"
-                    if (advance.StatusApproval != Constants.STATUS_APPROVAL_NEW && advance.StatusApproval != Constants.STATUS_APPROVAL_DENIED && advance.StatusApproval != Constants.STATUS_APPROVAL_DONE)
+                    if (advance.StatusApproval != Constants.STATUS_APPROVAL_NEW
+                        && advance.StatusApproval != Constants.STATUS_APPROVAL_DENIED 
+                        && advance.StatusApproval != Constants.STATUS_APPROVAL_DONE
+                        && advance.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL)
                     {
                         return new HandleState("Awaiting Approval");
                     }
@@ -1217,7 +1235,7 @@ namespace eFMS.API.Accounting.DL.Services
                             emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserLeader)?.Email;
                         }
 
-                        if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not Found Leader or Manager of user");
+                        if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not found Leader or Manager of user");
 
                         var sendMailResult = SendMailSuggestApproval(acctApprove.AdvanceNo, userLeaderOrManager, emailLeaderOrManager);
 
@@ -1258,13 +1276,13 @@ namespace eFMS.API.Accounting.DL.Services
         //Nếu group hiện tại đã được approve thì không cho approve nữa
         private HandleState CheckApprovedOfDeptPrevAndDeptCurrent(string advanceNo, string userId, string deptOfUser)
         {
-            HandleState result = new HandleState("Not Found");
+            HandleState result = new HandleState("Not found");
 
             //Lấy ra Advance Approval dựa vào advanceNo
             var acctApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeputy == false).FirstOrDefault();
             if (acctApprove == null)
             {
-                result = new HandleState("Not Found Advance Approval by AdvanceNo is " + advanceNo);
+                result = new HandleState("Not found Advance Approval by AdvanceNo is " + advanceNo);
                 return result;
             }
 
@@ -1272,7 +1290,7 @@ namespace eFMS.API.Accounting.DL.Services
             var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
             if (advance == null)
             {
-                result = new HandleState("Not Found Advance Payment by AdvanceNo is" + advanceNo);
+                result = new HandleState("Not found Advance Payment by AdvanceNo is" + advanceNo);
                 return result;
             }
 
@@ -1312,7 +1330,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
-                            result = new HandleState("Manager Department Approved");
+                            result = new HandleState("Manager department approved");
                         }
                     }
                     else
@@ -1374,7 +1392,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.LeaderAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.Leader))
                         {
-                            result = new HandleState("Leader Approved");
+                            result = new HandleState("Leader approved");
                         }
                     }
                     else
@@ -1409,7 +1427,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
-                            result = new HandleState("Manager Department Approved");
+                            result = new HandleState("Manager Department approved");
                         }
                     }
                     else
@@ -1436,7 +1454,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
-                            result = new HandleState("Accountant Approved");
+                            result = new HandleState("Accountant approved");
                         }
                     }
                     else
@@ -1468,7 +1486,17 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
 
-                    if (approve == null) return new HandleState("Not found Advance Approval by AdvanceNo is " + advance.AdvanceNo);
+                    if (approve == null)
+                    {
+                        if(acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Any() == false)
+                        {
+                            return new HandleState("Not found Advance Approval by AdvanceNo is " + advance.AdvanceNo);
+                        }
+                        else
+                        {
+                            return new HandleState("Not allow approve");
+                        }
+                    }
 
                     //Lấy ra brandId của user requester
                     var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.WorkPlaceId;
@@ -1489,6 +1517,13 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         if (userCurrent == GetLeaderIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
+                            if(    advance.StatusApproval == Constants.STATUS_APPROVAL_LEADERAPPROVED
+                                || advance.StatusApproval == Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED
+                                || advance.StatusApproval == Constants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                                || advance.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            {
+                                return new HandleState("Leader approved");
+                            }
                             advance.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
                             approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
 
@@ -1499,6 +1534,12 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
+                            if (   advance.StatusApproval == Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED 
+                                || advance.StatusApproval == Constants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                                || advance.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            {
+                                return new HandleState("Manager department approved");
+                            }
                             advance.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
                             approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
                             approve.ManagerApr = userCurrent;
@@ -1510,6 +1551,10 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
+                            if (advance.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            {
+                                return new HandleState("Chief accountant approved");
+                            }
                             advance.StatusApproval = Constants.STATUS_APPROVAL_DONE;
                             approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
                             approve.AccountantApr = userCurrent;
@@ -1541,7 +1586,7 @@ namespace eFMS.API.Accounting.DL.Services
                         //Send mail đề nghị approve
                         var sendMailResult = SendMailSuggestApproval(advance.AdvanceNo, userAprNext, emailUserAprNext);
 
-                        return sendMailResult ? new HandleState() : new HandleState("Send mail suggest Approval Failed");
+                        return sendMailResult ? new HandleState() : new HandleState("Send mail suggest Approval failed");
                     }
                 }
                 catch (Exception ex)
@@ -1560,64 +1605,110 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var userCurrent = currentUser.UserID;
 
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
-
-            if (advance == null) return new HandleState("Not Found Advance Payment");
-
-            var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
-            if (approve == null) return new HandleState("Not Found Approve Advance by advanceNo " + advance.AdvanceNo);
-
-            //Lấy ra brandId của user requester
-            var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.WorkPlaceId;
-            if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
-
-            //Lấy ra brandId của userId
-            var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
-            if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
-
-            //Lấy ra dept code của userApprove dựa vào userApprove
-            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
-            if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
-
-            //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
-            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
-            if (approve != null && advance != null)
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                if (userCurrent == GetLeaderIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                try
                 {
-                    approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
+                    var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
+
+                    if (advance == null) return new HandleState("Not found Advance Payment");
+
+                    var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+                    if (approve == null)
+                    {
+                        if (acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Any() == false)
+                        {
+                            return new HandleState("Not found Approve Advance by advanceNo " + advance.AdvanceNo);
+                        }
+                        else
+                        {
+                            return new HandleState("Not allow deny");
+                        }
+                    }
+
+                    //Lấy ra brandId của user requester
+                    var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.WorkPlaceId;
+                    if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
+
+                    //Lấy ra brandId của userId
+                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                    if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
+
+                    //Lấy ra dept code của userApprove dựa vào userApprove
+                    var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
+                    if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
+
+                    //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
+                    //var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
+                    //if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                    if (approve != null && advance != null)
+                    {
+                        if (advance.StatusApproval == Constants.STATUS_APPROVAL_DENIED)
+                        {
+                            return new HandleState("Advance payment has been denied");
+                        }
+
+                        if (userCurrent == GetLeaderIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
+                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
+                            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                            approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
+                        }
+                        else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            //Cho phép User Manager thực hiện deny khi user Manager đã Approved, 
+                            //nếu Chief Accountant đã Approved thì User Manager ko được phép deny
+                            if (advance.StatusApproval == Constants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || advance.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            {
+                                return new HandleState("Not allow deny. Advance payment has been approved");
+                            }
+
+                            approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
+                            approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
+                        }
+                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        {
+                            //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
+                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
+                            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                            approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
+                            approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
+                        }
+
+                        approve.UserModified = userCurrent;
+                        approve.DateModified = DateTime.Now;
+                        approve.Comment = comment;
+                        approve.IsDeputy = true;
+                        //dc.AcctApproveAdvance.Update(approve);
+                        var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
+
+                        //Cập nhật lại advance status của Advance Payment
+                        advance.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
+                        advance.UserModified = userCurrent;
+                        advance.DatetimeModified = DateTime.Now;
+                        //dc.AcctAdvancePayment.Update(advance);
+                        var hsUpdateAdvancePayment = DataContext.Update(advance, x => x.Id == advance.Id);
+
+                        //dc.SaveChanges();
+                        trans.Commit();
+                    }
+
+                    //Send mail denied approval
+                    var sendMailResult = SendMailDeniedApproval(advance.AdvanceNo, comment, DateTime.Now);
+                    return sendMailResult ? new HandleState() : new HandleState("Send mail deny approval failed");
                 }
-                else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                catch (Exception ex)
                 {
-                    approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
-                    approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
                 }
-                else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                finally
                 {
-                    approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
-                    approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
+                    trans.Dispose();
                 }
-
-                approve.UserModified = userCurrent;
-                approve.DateModified = DateTime.Now;
-                approve.Comment = comment;
-                approve.IsDeputy = true;
-                dc.AcctApproveAdvance.Update(approve);
-
-                //Cập nhật lại advance status của Advance Payment
-                advance.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
-                advance.UserModified = userCurrent;
-                advance.DatetimeModified = DateTime.Now;
-                dc.AcctAdvancePayment.Update(advance);
-
-                dc.SaveChanges();
             }
-
-            //Send mail denied approval
-            var sendMailResult = SendMailDeniedApproval(advance.AdvanceNo, comment, DateTime.Now);
-            return sendMailResult ? new HandleState() : new HandleState("Send mail deny Approval Failed");
         }
 
         //Send Mail đề nghị Approve
@@ -1625,6 +1716,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Lấy ra AdvancePayment dựa vào AdvanceNo
             var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            if (advance == null) return false;
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(advance.Requester);
@@ -1636,15 +1728,17 @@ namespace eFMS.API.Accounting.DL.Services
             string jobIds = string.Empty;
             jobIds = String.Join("; ", requests.ToList());
 
-            var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Sum(x => x.Amount);
+            var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Select(s => s.Amount).Sum();
             if (totalAmount != null)
             {
                 totalAmount = Math.Round(totalAmount.Value, 2);
             }
 
             //Mail Info
-            string subject = "eFMS - Advance Payment Approval Request from [RequesterName]";
+            string subject = "eFMS - Advance Payment Approval Request from [RequesterName] - [NumberOfRequest] times";
             subject = subject.Replace("[RequesterName]", requesterName);
+            var numberOfRequest = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Count();
+            subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
             string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [UserName],</b></i></p><p>You have new Advance Payment Approval Request from <b>[RequesterName]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu duyệt tạm ứng từ <b>[RequesterName]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Chi tiết phiếu tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{0}'/></p></div>", logoeFMSBase64());
             body = body.Replace("[UserName]", userReciver);
             body = body.Replace("[RequesterName]", requesterName);
@@ -1695,6 +1789,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Lấy ra AdvancePayment dựa vào AdvanceNo
             var advance = DataContext.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            if (advance == null) return false;
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(advance.Requester);
@@ -1707,7 +1802,7 @@ namespace eFMS.API.Accounting.DL.Services
             string jobIds = string.Empty;
             jobIds = String.Join("; ", requests.ToList());
 
-            var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Sum(x => x.Amount);
+            var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Select(s => s.Amount).Sum();
             if (totalAmount != null)
             {
                 totalAmount = Math.Round(totalAmount.Value, 2);
@@ -1746,6 +1841,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Lấy ra AdvancePayment dựa vào AdvanceNo
             var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            if (advance == null) return false;
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(advance.Requester);
@@ -1757,7 +1853,7 @@ namespace eFMS.API.Accounting.DL.Services
             string jobIds = string.Empty;
             jobIds = String.Join("; ", requests.ToList());
 
-            var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Sum(x => x.Amount);
+            var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Select(s => s.Amount).Sum();
             if (totalAmount != null)
             {
                 totalAmount = Math.Round(totalAmount.Value, 2);
@@ -1870,6 +1966,8 @@ namespace eFMS.API.Accounting.DL.Services
                 aprAdvanceMap.ManagerName = string.IsNullOrEmpty(aprAdvanceMap.Manager) ? null : GetEmployeeByUserId(aprAdvanceMap.Manager)?.EmployeeNameVn;
                 aprAdvanceMap.AccountantName = string.IsNullOrEmpty(aprAdvanceMap.Accountant) ? null : GetEmployeeByUserId(aprAdvanceMap.Accountant)?.EmployeeNameVn;
                 aprAdvanceMap.BUHeadName = string.IsNullOrEmpty(aprAdvanceMap.Buhead) ? null : GetEmployeeByUserId(aprAdvanceMap.Buhead)?.EmployeeNameVn;
+                aprAdvanceMap.StatusApproval = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo).FirstOrDefault()?.StatusApproval;
+                aprAdvanceMap.IsRequester = (userCurrent == approveAdvance.Requester) ? true : false;
             }
             else
             {
@@ -1884,8 +1982,8 @@ namespace eFMS.API.Accounting.DL.Services
         public List<AcctAdvanceRequestModel> GetAdvancesOfShipment()
         {
             var request = acctAdvanceRequestRepo.Get();
-            var opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false);
-            var docShipment = csTransactionRepo.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var docShipment = csTransactionRepo.Get(x => x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
             var surcharge = csShipmentSurchargeRepo.Get();
 
             var requestOrder = request.GroupBy(g => new { g.AdvanceNo, g.Hbl }).Select(s => new AcctAdvanceRequest
