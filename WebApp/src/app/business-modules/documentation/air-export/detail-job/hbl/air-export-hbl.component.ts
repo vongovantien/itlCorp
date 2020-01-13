@@ -33,6 +33,7 @@ export class AirExportHBLComponent extends AppList implements OnInit {
     houseBills: HouseBill[] = [];
 
     selectedHbl: CsTransactionDetail;
+    selectedIndexHBL: number = -1;
 
     selectedTabSurcharge: string = 'BUY';
 
@@ -114,12 +115,13 @@ export class AirExportHBLComponent extends AppList implements OnInit {
             );
     }
 
-    showDeletePopup(hbl: CsTransactionDetail, event: Event) {
+    showDeletePopup(hbl: CsTransactionDetail, event: Event, index: number) {
         event.preventDefault();
         event.stopImmediatePropagation();
         event.stopPropagation();
 
         this.confirmDeleteHBLPopup.show();
+        this.selectedIndexHBL = index;
         this.selectedHbl = hbl;
 
     }
@@ -139,7 +141,12 @@ export class AirExportHBLComponent extends AppList implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.getHouseBills(this.jobId);
+                        if (this.selectedIndexHBL > -1) {
+                            this.houseBills = [...this.houseBills.slice(0, this.selectedIndexHBL), ...this.houseBills.slice(this.selectedIndexHBL + 1)];
+                            if (!!this.houseBills.length) {
+                                this.selectHBL(this.houseBills[0]);
+                            }
+                        }
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }
