@@ -117,8 +117,8 @@ export const language = {
                 { name: "Ecus Connection", route_child: "ecus-connection", display: true },
                 { name: "KPI", route_child: "kpi", display: true },
                 { name: "Supplier", route_child: "supplier", display: true },
-                { name: "Catalog Log Viewer", route_child: "log-viewer", display: true }
-
+                { name: "Catalog Log Viewer", route_child: "log-viewer", display: true },
+                { name: "Unlock", route_child: "unlock", display: true }
             ]
         },
 

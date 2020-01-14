@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, ViewChild, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild, OnInit, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
@@ -17,8 +17,8 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
 import * as fromStore from '../../store';
-import cloneDeep from 'lodash/cloneDeep';
 
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
     selector: 'container-list-popup',
@@ -28,6 +28,8 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     @ViewChild(ShareContainerImportComponent, { static: false }) containerImportPopup: ShareContainerImportComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteContainerPopup: ConfirmPopupComponent;
+
+    @Input() type: string = 'import';
 
     mblid: string = null;
     hblid: string = null;
@@ -98,11 +100,15 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     addNewContainer() {
         this.isSubmitted = false;
+        this.isDuplicateContPakage = false;
         this.initContainers = [...this.initContainers, new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' })];
         // this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
     }
 
     deleteContainerItem(index: number, container: Container) {
+        this.isSubmitted = false;
+        this.isDuplicateContPakage = false;
+
         this.selectedIndexContainer = index;
 
         if (container.id === SystemConstants.EMPTY_GUID) {
@@ -114,6 +120,9 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
     }
 
     onDeleteContainer() {
+        this.isSubmitted = false;
+        this.isDuplicateContPakage = false;
+
         this.confirmDeleteContainerPopup.hide();
         if (this.selectedIndexContainer > -1) {
             this.initContainers = [...this.initContainers.slice(0, this.selectedIndexContainer), ...this.initContainers.slice(this.selectedIndexContainer + 1)];
@@ -186,19 +195,36 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     checkDuplicate() {
         let valid: boolean = true;
-        if (
-            this.utility.checkDuplicateInObject("containerTypeId", this.initContainers)
-            && this.utility.checkDuplicateInObject("packageTypeId", this.initContainers)
-            && this.utility.checkDuplicateInObject("packageQuantity", this.initContainers)
-            && this.utility.checkDuplicateInObject("containerNo", this.initContainers)
-        ) {
-            this.isDuplicateContPakage = true;
-            valid = false;
-            this._toastService.warning("Cont Type, Container No, Package Type, Package Qty is Duplicated");
-            return;
+        if (this.type === 'import') {
+            if (
+                this.utility.checkDuplicateInObject("containerTypeId", this.initContainers)
+                && this.utility.checkDuplicateInObject("packageTypeId", this.initContainers)
+                && this.utility.checkDuplicateInObject("packageQuantity", this.initContainers)
+                && this.utility.checkDuplicateInObject("containerNo", this.initContainers)
+            ) {
+                this.isDuplicateContPakage = true;
+                valid = false;
+                this._toastService.warning("Cont type, Container no, Package type, Package qty is Duplicated");
+                return;
+            } else {
+                valid = true;
+                this.isDuplicateContPakage = false;
+            }
         } else {
-            valid = true;
-            this.isDuplicateContPakage = false;
+            if (
+                this.utility.checkDuplicateInObject("containerTypeId", this.initContainers)
+                && this.utility.checkDuplicateInObject("packageTypeId", this.initContainers)
+                && this.utility.checkDuplicateInObject("quantity", this.initContainers)
+                && this.utility.checkDuplicateInObject("containerNo", this.initContainers)
+            ) {
+                this.isDuplicateContPakage = true;
+                valid = false;
+                this._toastService.warning("Cont type, Cont no, Package type, Cont quantity is Duplicated");
+                return;
+            } else {
+                valid = true;
+                this.isDuplicateContPakage = false;
+            }
         }
 
         return valid;

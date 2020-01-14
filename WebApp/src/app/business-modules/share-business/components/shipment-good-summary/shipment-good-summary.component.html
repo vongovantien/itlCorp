@@ -80,7 +80,7 @@
     </div>
 </div>
 
-<container-list-popup></container-list-popup>
+<container-list-popup [type]="type"></container-list-popup>
 
 <confirm-popup [body]="'All manually entered data will be refresh, are you sure you want to perform this action ?'"
     [labelConfirm]="'Yes'" [labelConfirm]="'No'" (onSubmit)="onRefresh()" [title]="'Alert'"

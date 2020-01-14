@@ -64,7 +64,8 @@ const routes: Routes = [
             name: "Log Viewer",
             level: 2
         }
-    }
+    },
+    { path: 'unlock', loadChildren: () => import('./unlock/unlock.module').then(m => m.UnlockModule) }
 ];
 
 @NgModule({
