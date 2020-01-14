@@ -389,6 +389,7 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.bankAccountAddress = this.formPartnerComponent.partnerBankAccountAddress.value;
         this.partner.note = this.formPartnerComponent.note.value;
         this.partner.public = this.formPartnerComponent.isPublic;
+        this.partner.workPhoneEx = this.formPartnerComponent.employeeWorkPhone.value;
         this.partner.countryId = !!formBody.billingCountry && !!formBody.billingCountry.length ? formBody.billingCountry[0].id : null;
         this.partner.countryShippingId = !!formBody.shippingCountry && formBody.shippingCountry.length ? formBody.shippingCountry[0].id : null;
         this.partner.provinceId = !!formBody.billingProvince && !!formBody.billingProvince.length ? formBody.billingProvince[0].id : null;
