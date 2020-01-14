@@ -166,6 +166,7 @@ export class SeaFCLImportHBLComponent extends AppList {
             .subscribe(
                 (hbls: any[]) => {
                     this.houseBill = hbls;
+                    console.log(this.houseBill);
                     if (!!this.houseBill.length) {
                         this.totalGW = this.houseBill.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
                         this.totalCBM = this.houseBill.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);

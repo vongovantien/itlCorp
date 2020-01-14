@@ -104,6 +104,7 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
             .subscribe(
                 (hbls: any[]) => {
                     this.houseBills = hbls;
+                    console.log(this.houseBills);
                     if (!!this.houseBills.length) {
                         this.totalGW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
                         this.totalCBM = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
@@ -144,6 +145,7 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
+                        this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
                         this.getHouseBills(this.jobId);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');

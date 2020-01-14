@@ -111,8 +111,9 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             );
     }
 
-    preview(reportType: string) {
-        this._documentationRepo.previewHouseAirwayBillLastest(this.hblId, reportType)
+    preview(reportType: string, separateId?: string) {
+        const id = !separateId ? this.hblId : separateId;
+        this._documentationRepo.previewHouseAirwayBillLastest(id, reportType)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
