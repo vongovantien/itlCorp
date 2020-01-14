@@ -190,33 +190,11 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                         this.eta.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
                         this.mindateEtaWareHouse = this.createMoment(new Date(this.shipmentDetail.eta));
 
-
                     }
-
-
                 }
             );
 
     }
-
-    // async getPort() {
-    //     this._spinner.show();
-    //     try {
-    //         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
-    //             this.configPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
-    //         } else {
-    //             const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port, active: true, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }).toPromise();
-    //             this.configPort = ports || [];
-    //             this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
-    //             this.configPort.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
-    //         }
-    //     } catch (error) {
-
-    //     }
-    //     finally {
-    //         this._spinner.hide();
-    //     }
-    // }
 
     getPorts() {
         this.ports = this._store.select(getCataloguePortState).pipe(
@@ -345,7 +323,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this.shipperDescription = this.formGroup.controls['shipperDescription'];
         this.notifyPartyDescription = this.formGroup.controls['notifyPartyDescription'];
         this.alsonotifyPartyDescription = this.formGroup.controls['alsonotifyPartyDescription'];
-
         this.etd.valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
