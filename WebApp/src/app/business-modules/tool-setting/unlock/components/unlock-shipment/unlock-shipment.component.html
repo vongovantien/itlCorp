@@ -81,4 +81,5 @@
     </div>
 </div>
 
-<confirm-popup [body]="lockHistory"></confirm-popup>
+
+<unlock-history-popup [body]="lockHistory" (onUnlock)="onUnlockShipment($event)"></unlock-history-popup>

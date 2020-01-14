@@ -303,6 +303,30 @@ export class AccountingRepo {
         );
     }
 
+    getAdvancePaymentToUnlock(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/GetAdvancesToUnlock`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getSettlementPaymentToUnlock(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctSettlementPayment/GetSettlePaymentsToUnlock`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    unlockSettlement(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctSettlementPayment/UnLock`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    unlockAdvance(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/UnLock`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 
 
