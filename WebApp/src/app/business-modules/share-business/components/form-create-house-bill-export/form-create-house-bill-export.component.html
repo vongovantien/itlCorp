@@ -74,13 +74,13 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !hwbno.value}">
-                        <label required>House Bill of Lading No</label>
+                        <label required>HBL No</label>
                         <input type="text" class="form-control" formControlName="hwbno">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !hbltype.value}">
-                        <label required>House Bill of Lading Type</label>
+                        <label required>HBL Type</label>
                         <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
                             formControlName="hbltype" (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
                         </ng-select>

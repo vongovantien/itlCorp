@@ -81,7 +81,9 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
         // * Get default exchange rate.
         this.getExchangeRate('USD', formatDate(new Date(), 'yyyy-MM-dd', 'en')).then(
             (exchangeRate: IExchangeRate) => {
-                this.defaultExchangeRate = exchangeRate.rate;
+                if (!!exchangeRate) {
+                    this.defaultExchangeRate = exchangeRate.rate;
+                }
             }
         );
 

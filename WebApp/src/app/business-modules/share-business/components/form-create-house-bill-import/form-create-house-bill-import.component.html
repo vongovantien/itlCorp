@@ -131,13 +131,13 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': (hwbno.dirty && !hwbno.valid) || (isSubmited && !hwbno.valid)}">
                                 <label class="form-control-label" for="">
-                                    House Bill of Lading No. <span class="m--font-danger">(*)</span>
+                                    HBL No. <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     formControlName="hbOfladingNo">
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (hwbno.errors | equalError: 'required') || (hwbno.errors | equalError: 'required') && hwbno.dirty">
-                                    House Bill of Lading No required!
+                                    HBL No required!
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -190,7 +190,7 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': (hbltype.dirty && !hbltype.valid) || (isSubmited && !hbltype.valid)}">
                                 <label class="form-control-label" for="">
-                                    House Bill of Lading Type. <span class="m--font-danger">(*)</span>
+                                    HBL Type. <span class="m--font-danger">(*)</span>
                                 </label>
 
                                 <ng-select [items]="hbOfladingTypesString" placeholder="select"
@@ -198,7 +198,7 @@
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="(hbltype.dirty && !hbltype.valid) || (isSubmited && !hbltype.valid)">
-                                    House Bill of Lading Type is required !
+                                    HBL Type is required !
                                 </div>
                             </div>
                             <div class="form-group">

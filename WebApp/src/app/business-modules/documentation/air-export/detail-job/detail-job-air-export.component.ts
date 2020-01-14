@@ -321,14 +321,12 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 this._progressRef.complete();
             })
         ).subscribe(
-            (respone: CommonInterface.IResult[] = []) => {
-                respone.forEach(r => {
-                    if (r[0].status) {
-                        this._toastService.success(r[0].message);
-                    } else {
-                        this._toastService.error(r[0].message);
-                    }
-                });
+            (r: CommonInterface.IResult[] = []) => {
+                if (r[1].status) {
+                    this._toastService.success(r[1].message);
+                } else {
+                    this._toastService.error(r[1].message);
+                }
             },
         );
     }

@@ -33,8 +33,10 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     @ViewChild(ShareBusinessFormCreateHouseBillExportComponent, { static: false }) formCreateHBLComponent: ShareBusinessFormCreateHouseBillExportComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent, { static: false }) goodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+
     jobId: string;
     containers: Container[] = [];
+
     selectedHbl: any = {}; // TODO model.
 
     constructor(
@@ -70,6 +72,9 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                 if (param.jobId) {
                     this.jobId = param.jobId;
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
+                    // * Get default containers from masterbill.
+                    this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                 }
             });
 
@@ -98,8 +103,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         }
 
         const modelAdd = this.getDataForm();
-        this.createHbl(modelAdd);
 
+        this.createHbl(modelAdd);
     }
 
     getDataForm() {

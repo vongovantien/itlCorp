@@ -84,7 +84,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     ];
     termTypes: CommonInterface.INg2Select[] = [
         { id: 'Prepaid', text: 'Prepaid' },
-        { id: 'Collect', text: 'Collect' }
+        { id: 'Collect', text: 'Collect' },
+        { id: 'Sea - Air Difference', text: 'Sea - Air Difference' }
     ];
     wts: CommonInterface.INg2Select[] = [
         { id: 'PP', text: 'PP' },
@@ -247,7 +248,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             dueCarrierCll: [],
             totalCll: [],
             shippingMark: [],
-            issuedBy: [],
+            issuedBy: [{ value: null, disabled: true }],
             sci: [],
             currConvertRate: [],
             ccchargeInDrc: [],
@@ -262,6 +263,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             rateCharge: [],
             total: [{ value: null, disabled: true }],
             seaAir: [],
+            route: [],
 
             // * Combogrid
             customerId: [null, Validators.required],
@@ -407,7 +409,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     getDescription(fullName: string, address: string, tel: string, fax: string) {
-        return `${fullName} \n ${address} \n Tel No: ${!!tel ? tel : ''} \n Fax No: ${!!fax ? fax : ''} \n`;
+        return `${fullName} \n${address} \nTel No: ${!!tel ? tel : ''} \nFax No: ${!!fax ? fax : ''} \n`;
     }
 
     createDIMItem(): FormGroup {

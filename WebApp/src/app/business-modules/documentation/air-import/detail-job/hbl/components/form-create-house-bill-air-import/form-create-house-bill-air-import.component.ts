@@ -128,7 +128,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         ];
         this.termTypes = [
             { id: 'Prepaid', text: 'Prepaid' },
-            { id: 'Collect', text: 'Collect' }
+            { id: 'Collect', text: 'Collect' },
+            { id: 'Sea - Air Difference', text: 'Sea - Air Difference' }
         ];
         this.wts = [
             { id: 'PP', text: 'PP' },
