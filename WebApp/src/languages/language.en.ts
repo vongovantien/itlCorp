@@ -141,8 +141,8 @@ export const language = {
             "display_child": false,
             "display": !environment.production,
             "childs": [
-                { name: "Form", route_child: "form", display: true },
-                { name: "Table", route_child: "table", display: true }
+                { name: "Form", route_child: "form", display: !environment.production },
+                { name: "Table", route_child: "table", display: !environment.production }
             ]
         }
     ],
