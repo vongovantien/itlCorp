@@ -71,7 +71,8 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [currentActiveItemId]="{ field: 'id', value: coloader.value}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
-                                [displayFields]="displayFieldsSupplier" (remove)="resetFormControl(coloader)">
+                                [displayFields]="displayFieldsSupplier" (remove)="resetFormControl(coloader)"
+                                [loading]="isLoadingCarrier | async">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -97,7 +98,8 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                                 [currentActiveItemId]="{ field: 'id', value: agent.value}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                                [displayFields]="displayFieldsSupplier" (remove)="resetFormControl(agent)">
+                                [displayFields]="displayFieldsSupplier" (remove)="resetFormControl(agent)"
+                                [loading]="isLoadingAgent | async">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -107,7 +109,8 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                                 [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                                [displayFields]="displayFieldPort" (remove)="resetFormControl(pol)">
+                                [displayFields]="displayFieldPort" (remove)="resetFormControl(pol)"
+                                [loading]="isLoadingPort | async">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -117,7 +120,8 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                                 [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                                [displayFields]="displayFieldPort" (remove)="resetFormControl(pod)">
+                                [displayFields]="displayFieldPort" (remove)="resetFormControl(pod)"
+                                [loading]="isLoadingPort | async">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
