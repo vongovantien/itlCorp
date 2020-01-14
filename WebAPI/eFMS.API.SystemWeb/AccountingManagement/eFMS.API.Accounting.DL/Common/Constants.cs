@@ -18,6 +18,7 @@ namespace eFMS.API.Accounting.DL.Common
         public static readonly string STATUS_APPROVAL_LEADERAPPROVED = "LeaderApproved";
         public static readonly string STATUS_APPROVAL_DEPARTMENTAPPROVED = "DepartmentManagerApproved";
         public static readonly string STATUS_APPROVAL_ACCOUNTANTAPPRVOVED = "AccountantManagerApproved";
+        public static readonly string STATUS_APPROVAL_REQUESTAPPROVAL = "RequestApproval";
         #endregion -- STATUS APPROVAL --
 
         #region -- TYPE CHARGE --

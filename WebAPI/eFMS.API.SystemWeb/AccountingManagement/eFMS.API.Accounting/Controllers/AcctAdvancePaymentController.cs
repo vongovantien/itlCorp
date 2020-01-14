@@ -243,11 +243,12 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            if (!model.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
-            {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
-                return BadRequest(_result);
-            }
+            //Đã check bên trong function UpdateAdvancePayment
+            //if (!model.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+            //{
+            //    ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
+            //    return BadRequest(_result);
+            //}
 
             if (model.AdvanceRequests.Count > 0)
             {
@@ -334,7 +335,7 @@ namespace eFMS.API.Accounting.Controllers
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
                 if (model.PaymentMethod.Equals(Constants.PAYMENT_METHOD_CASH))
                 {
-                    var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
+                    var totalAmount = model.AdvanceRequests.Select(s => s.Amount).Sum();
                     if (totalAmount > 100000000)
                     {
                         ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
@@ -364,8 +365,7 @@ namespace eFMS.API.Accounting.Controllers
             HandleState hs;
             if (string.IsNullOrEmpty(model.AdvanceNo))//Insert Advance Payment
             {
-                //Change request: Bỏ status RequestApproval
-                //model.StatusApproval = "RequestApproval";
+                model.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctAdvancePaymentService.AddAdvancePayment(model);
             }
             else //Update Advance Payment
@@ -375,28 +375,26 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
                     return BadRequest(_result);
                 }
-                //Change request: Bỏ status RequestApproval
-                //model.StatusApproval = "RequestApproval";
-                hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
-            }
 
-            AcctApproveAdvanceModel approve = new AcctApproveAdvanceModel
-            {
-                AdvanceNo = model.AdvanceNo,
-                Requester = model.Requester
-            };
-            var resultInsertUpdateApprove = acctAdvancePaymentService.InsertOrUpdateApprovalAdvance(approve);
-            if (!resultInsertUpdateApprove.Success)
-            {
-                ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
-                return BadRequest(_result);
+                model.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
+                hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
-            if (!hs.Success)
+            if (hs.Success)
             {
-                return Ok(result);
+                AcctApproveAdvanceModel approve = new AcctApproveAdvanceModel
+                {
+                    AdvanceNo = model.AdvanceNo,
+                    Requester = model.Requester
+                };
+                var resultInsertUpdateApprove = acctAdvancePaymentService.InsertOrUpdateApprovalAdvance(approve);
+                if (!resultInsertUpdateApprove.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
+                    return BadRequest(_result);
+                }
             }
             return Ok(result);
         }

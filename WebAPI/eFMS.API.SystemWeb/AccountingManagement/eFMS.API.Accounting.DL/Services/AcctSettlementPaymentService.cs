@@ -5,7 +5,6 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
-using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -181,10 +180,10 @@ namespace eFMS.API.Accounting.DL.Services
                             !string.IsNullOrEmpty(criteria.Requester) ?
                             (
                                     set.Requester == criteria.Requester
-                                || (apr.Manager == criteria.Requester && apr.ManagerAprDate != null)
-                                || (apr.Accountant == criteria.Requester && apr.AccountantAprDate != null)
-                                || (apr.ManagerApr == criteria.Requester && apr.ManagerAprDate != null)
-                                || (apr.AccountantApr == criteria.Requester && apr.AccountantAprDate != null)
+                                || (apr.Manager == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED))//apr.ManagerAprDate != null)
+                                || (apr.Accountant == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED && set.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))//apr.AccountantAprDate != null)
+                                || (apr.ManagerApr == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED))//apr.ManagerAprDate != null)
+                                || (apr.AccountantApr == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED && set.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))//apr.AccountantAprDate != null)
                             )
                             :
                                 true
@@ -272,27 +271,79 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
-            var data = from set in settlement
-                       join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
-                       from sur in sc.DefaultIfEmpty()
-                       join ops in opst on sur.Hblid equals ops.Hblid into op
-                       from ops in op.DefaultIfEmpty()
-                       join cstd in csTransDe on sur.Hblid equals cstd.Id into csd
-                       from cstd in csd.DefaultIfEmpty()
-                       join cst in csTrans on cstd.JobId equals cst.Id into cs
-                       from cst in cs.DefaultIfEmpty()
-                       where
-                            sur.SettlementCode == settlementNo
-                       select new ShipmentOfSettlementResult
-                       {
-                           JobId = (cst.JobNo != null ? cst.JobNo : ops.JobNo),
-                           HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno),
-                           MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno),
-                           Amount = sur.Total != null ? sur.Total : 0,
-                           ChargeCurrency = sur.CurrencyId,
-                           SettlementCurrency = set.SettlementCurrency
-                       };
+            //var data = from set in settlement
+            //           join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
+            //           from sur in sc.DefaultIfEmpty()
+            //           join ops in opst on sur.Hblid equals ops.Hblid into op
+            //           from ops in op.DefaultIfEmpty()
+            //           join cstd in csTransDe on sur.Hblid equals cstd.Id into csd
+            //           from cstd in csd.DefaultIfEmpty()
+            //           join cst in csTrans on cstd.JobId equals cst.Id into cs
+            //           from cst in cs.DefaultIfEmpty()
+            //           where
+            //                sur.SettlementCode == settlementNo
+            //           select new ShipmentOfSettlementResult
+            //           {
+            //               JobId = (cst.JobNo != null ? cst.JobNo : ops.JobNo),
+            //               HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno),
+            //               MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno),
+            //               Amount = sur.Total != null ? sur.Total : 0,
+            //               ChargeCurrency = sur.CurrencyId,
+            //               SettlementCurrency = set.SettlementCurrency
+            //           };
 
+            //data = data.GroupBy(x => new
+            //{
+            //    x.JobId,
+            //    x.HBL,
+            //    x.MBL,
+            //    x.SettlementCurrency
+            //}
+            //).Select(s => new ShipmentOfSettlementResult
+            //{
+            //    JobId = s.Key.JobId,
+            //    Amount = s.Sum(su => su.Amount * GetRateCurrencyExchange(currencyExchange, su.ChargeCurrency, su.SettlementCurrency)),
+            //    HBL = s.Key.HBL,
+            //    MBL = s.Key.MBL,
+            //    SettlementCurrency = s.Key.SettlementCurrency
+            //}
+            //);
+
+            var dataOperation = from set in settlement
+                                join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
+                                from sur in sc.DefaultIfEmpty()
+                                join ops in opst on sur.Hblid equals ops.Hblid into op
+                                from ops in op.DefaultIfEmpty()
+                                where
+                                     sur.SettlementCode == settlementNo
+                                select new ShipmentOfSettlementResult
+                                {
+                                    JobId = ops.JobNo,
+                                    HBL = ops.Hwbno,
+                                    MBL = ops.Mblno,
+                                    Amount = sur.Total != null ? sur.Total : 0,
+                                    ChargeCurrency = sur.CurrencyId,
+                                    SettlementCurrency = set.SettlementCurrency
+                                };
+            var dataDocument = from set in settlement
+                               join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
+                               from sur in sc.DefaultIfEmpty()
+                               join cstd in csTransDe on sur.Hblid equals cstd.Id into csd
+                               from cstd in csd.DefaultIfEmpty()
+                               join cst in csTrans on cstd.JobId equals cst.Id into cs
+                               from cst in cs.DefaultIfEmpty()
+                               where
+                                    sur.SettlementCode == settlementNo
+                               select new ShipmentOfSettlementResult
+                               {
+                                   JobId = cst.JobNo,
+                                   HBL = cstd.Hwbno,
+                                   MBL = cst.Mawb,
+                                   Amount = sur.Total != null ? sur.Total : 0,
+                                   ChargeCurrency = sur.CurrencyId,
+                                   SettlementCurrency = set.SettlementCurrency
+                               };
+            var data = dataOperation.Union(dataDocument);
             data = data.GroupBy(x => new
             {
                 x.JobId,
@@ -301,15 +352,14 @@ namespace eFMS.API.Accounting.DL.Services
                 x.SettlementCurrency
             }
             ).Select(s => new ShipmentOfSettlementResult
-            {
-                JobId = s.Key.JobId,
-                Amount = s.Sum(su => su.Amount * GetRateCurrencyExchange(currencyExchange, su.ChargeCurrency, su.SettlementCurrency)),
-                HBL = s.Key.HBL,
-                MBL = s.Key.MBL,
-                SettlementCurrency = s.Key.SettlementCurrency
-            }
+                {
+                    JobId = s.Key.JobId,
+                    Amount = s.Sum(su => su.Amount * GetRateCurrencyExchange(currencyExchange, su.ChargeCurrency, su.SettlementCurrency)),
+                    HBL = s.Key.HBL,
+                    MBL = s.Key.MBL,
+                    SettlementCurrency = s.Key.SettlementCurrency
+                }
             );
-
             return data.ToList();
         }
         #endregion --- LIST SETTLEMENT PAYMENT ---
@@ -322,8 +372,9 @@ namespace eFMS.API.Accounting.DL.Services
                 //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
                 var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
-                if (settlement == null) return new HandleState("Not Found Settlement Payment");
-                if (!settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                if (settlement == null) return new HandleState("Not found Settlement Payment");
+                if (   !settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) 
+                    && !settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
                 {
                     return new HandleState("Not allow delete. Settlements are awaiting approval.");
                 }
@@ -398,6 +449,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var settlement = DataContext.Get(x => x.Id == idSettlement).FirstOrDefault();
             var settlementMap = mapper.Map<AcctSettlementPaymentModel>(settlement);
+            settlementMap.NumberOfRequests = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo).Select(s => s.Id).Count();
             return settlementMap;
         }
 
@@ -411,27 +463,60 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
-            var dataQuery = from sur in surcharge
-                            join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
-                            from opst in opst2.DefaultIfEmpty()
-                            join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
-                            from cstd in cstd2.DefaultIfEmpty()
-                            join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                            from cst in cst2.DefaultIfEmpty()
-                            join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
-                            from settle in settle2.DefaultIfEmpty()
-                            where sur.SettlementCode == settlementNo
-                            select new ShipmentSettlement
-                            {
-                                SettlementNo = sur.SettlementCode,
-                                JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
-                                HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
-                                MBL = (opst.Mblno == null ? cst.Mawb : opst.Mblno),
-                                CurrencyShipment = settle.SettlementCurrency,
-                                TotalAmount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
-                            };
+            //var dataQuery = from sur in surcharge
+            //                join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
+            //                from opst in opst2.DefaultIfEmpty()
+            //                join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
+            //                from cstd in cstd2.DefaultIfEmpty()
+            //                join cst in csTrans on cstd.JobId equals cst.Id into cst2
+            //                from cst in cst2.DefaultIfEmpty()
+            //                join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
+            //                from settle in settle2.DefaultIfEmpty()
+            //                where sur.SettlementCode == settlementNo
+            //                select new ShipmentSettlement
+            //                {
+            //                    SettlementNo = sur.SettlementCode,
+            //                    JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
+            //                    HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
+            //                    MBL = (opst.Mblno == null ? cst.Mawb : opst.Mblno),
+            //                    CurrencyShipment = settle.SettlementCurrency,
+            //                    TotalAmount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
+            //                };
 
-            dataQuery = dataQuery
+            var dataOperation = from sur in surcharge
+                                join opst in opsTrans on sur.Hblid equals opst.Hblid
+                                join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
+                                from settle in settle2.DefaultIfEmpty()
+                                where sur.SettlementCode == settlementNo
+                                select new ShipmentSettlement
+                                {
+                                    SettlementNo = sur.SettlementCode,
+                                    JobId = opst.JobNo,
+                                    HBL = opst.Hwbno,
+                                    MBL = opst.Mblno,
+                                    CurrencyShipment = settle.SettlementCurrency,
+                                    TotalAmount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
+                                };
+            var dataDocument = from sur in surcharge
+                               join cstd in csTransD on sur.Hblid equals cstd.Id //into cstd2
+                               //from cstd in cstd2.DefaultIfEmpty()
+                               join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                               from cst in cst2.DefaultIfEmpty()
+                               join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
+                               from settle in settle2.DefaultIfEmpty()
+                               where sur.SettlementCode == settlementNo
+                               select new ShipmentSettlement
+                               {
+                                   SettlementNo = sur.SettlementCode,
+                                   JobId = cst.JobNo,
+                                   HBL = cstd.Hwbno,
+                                   MBL = cst.Mawb,
+                                   CurrencyShipment = settle.SettlementCurrency,
+                                   TotalAmount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
+                               };
+            var dataQuery = dataOperation.Union(dataDocument);
+
+            var dataGroup = dataQuery.ToList()
                         .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment })
                         .Select(x => new ShipmentSettlement
                         {
@@ -444,7 +529,7 @@ namespace eFMS.API.Accounting.DL.Services
                         });
 
             var shipmentSettlement = new List<ShipmentSettlement>();
-            foreach (var item in dataQuery)
+            foreach (var item in dataGroup)
             {
                 shipmentSettlement.Add(new ShipmentSettlement
                 {
@@ -472,60 +557,161 @@ namespace eFMS.API.Accounting.DL.Services
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
 
-            var data = from sur in surcharge
-                       join cc in charge on sur.ChargeId equals cc.Id into cc2
-                       from cc in cc2.DefaultIfEmpty()
-                       join u in unit on sur.UnitId equals u.Id into u2
-                       from u in u2.DefaultIfEmpty()
-                       join par in payer on sur.PayerId equals par.Id into par2
-                       from par in par2.DefaultIfEmpty()
-                       join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
-                       from pae in pae2.DefaultIfEmpty()
-                       join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
-                       from opst in opst2.DefaultIfEmpty()
-                       join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
-                       from cstd in cstd2.DefaultIfEmpty()
-                       join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                       from cst in cst2.DefaultIfEmpty()
-                       where
-                                sur.SettlementCode == settlementNo
-                            && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
-                            && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
-                            && (opst.Mblno == null ? cst.Mawb : opst.Mblno) == MBL
-                       select new ShipmentChargeSettlement
-                       {
-                           Id = sur.Id,
-                           JobId = JobId,
-                           MBL = MBL,
-                           HBL = HBL,
-                           ChargeCode = cc.Code,
-                           Hblid = sur.Hblid,
-                           Type = sur.Type,
-                           SettlementCode = sur.SettlementCode,
-                           ChargeId = sur.ChargeId,
-                           ChargeName = cc.ChargeNameEn,
-                           Quantity = sur.Quantity,
-                           UnitId = sur.UnitId,
-                           UnitName = u.UnitNameEn,
-                           UnitPrice = sur.UnitPrice,
-                           CurrencyId = sur.CurrencyId,
-                           Vatrate = sur.Vatrate,
-                           Total = sur.Total != null ? sur.Total : 0,
-                           PayerId = sur.PayerId,
-                           Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
-                           PaymentObjectId = sur.PaymentObjectId,
-                           OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
-                           InvoiceNo = sur.InvoiceNo,
-                           SeriesNo = sur.SeriesNo,
-                           InvoiceDate = sur.InvoiceDate,
-                           ClearanceNo = sur.ClearanceNo,
-                           ContNo = sur.ContNo,
-                           Notes = sur.Notes,
-                           IsFromShipment = sur.IsFromShipment,
-                           TypeOfFee = sur.TypeOfFee,
-                           AdvanceNo = sur.AdvanceNo
-                       };
+            //var data = from sur in surcharge
+            //           join cc in charge on sur.ChargeId equals cc.Id into cc2
+            //           from cc in cc2.DefaultIfEmpty()
+            //           join u in unit on sur.UnitId equals u.Id into u2
+            //           from u in u2.DefaultIfEmpty()
+            //           join par in payer on sur.PayerId equals par.Id into par2
+            //           from par in par2.DefaultIfEmpty()
+            //           join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+            //           from pae in pae2.DefaultIfEmpty()
+            //           join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
+            //           from opst in opst2.DefaultIfEmpty()
+            //           join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
+            //           from cstd in cstd2.DefaultIfEmpty()
+            //           join cst in csTrans on cstd.JobId equals cst.Id into cst2
+            //           from cst in cst2.DefaultIfEmpty()
+            //           where
+            //                    sur.SettlementCode == settlementNo
+            //                && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
+            //                && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
+            //                && (opst.Mblno == null ? cst.Mawb : opst.Mblno) == MBL
+            //           select new ShipmentChargeSettlement
+            //           {
+            //               Id = sur.Id,
+            //               JobId = JobId,
+            //               MBL = MBL,
+            //               HBL = HBL,
+            //               ChargeCode = cc.Code,
+            //               Hblid = sur.Hblid,
+            //               Type = sur.Type,
+            //               SettlementCode = sur.SettlementCode,
+            //               ChargeId = sur.ChargeId,
+            //               ChargeName = cc.ChargeNameEn,
+            //               Quantity = sur.Quantity,
+            //               UnitId = sur.UnitId,
+            //               UnitName = u.UnitNameEn,
+            //               UnitPrice = sur.UnitPrice,
+            //               CurrencyId = sur.CurrencyId,
+            //               Vatrate = sur.Vatrate,
+            //               Total = sur.Total != null ? sur.Total : 0,
+            //               PayerId = sur.PayerId,
+            //               Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+            //               PaymentObjectId = sur.PaymentObjectId,
+            //               OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
+            //               InvoiceNo = sur.InvoiceNo,
+            //               SeriesNo = sur.SeriesNo,
+            //               InvoiceDate = sur.InvoiceDate,
+            //               ClearanceNo = sur.ClearanceNo,
+            //               ContNo = sur.ContNo,
+            //               Notes = sur.Notes,
+            //               IsFromShipment = sur.IsFromShipment,
+            //               TypeOfFee = sur.TypeOfFee,
+            //               AdvanceNo = sur.AdvanceNo
+            //           };
 
+            var dataOperation = from sur in surcharge
+                                join cc in charge on sur.ChargeId equals cc.Id into cc2
+                                from cc in cc2.DefaultIfEmpty()
+                                join u in unit on sur.UnitId equals u.Id into u2
+                                from u in u2.DefaultIfEmpty()
+                                join par in payer on sur.PayerId equals par.Id into par2
+                                from par in par2.DefaultIfEmpty()
+                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                                from pae in pae2.DefaultIfEmpty()
+                                join opst in opsTrans on sur.Hblid equals opst.Hblid //into opst2
+                                //from opst in opst2.DefaultIfEmpty()
+                                where
+                                        sur.SettlementCode == settlementNo
+                                     && opst.JobNo == JobId
+                                     && opst.Hwbno == HBL
+                                     && opst.Mblno == MBL
+                                select new ShipmentChargeSettlement
+                                {
+                                    Id = sur.Id,
+                                    JobId = JobId,
+                                    MBL = MBL,
+                                    HBL = HBL,
+                                    ChargeCode = cc.Code,
+                                    Hblid = sur.Hblid,
+                                    Type = sur.Type,
+                                    SettlementCode = sur.SettlementCode,
+                                    ChargeId = sur.ChargeId,
+                                    ChargeName = cc.ChargeNameEn,
+                                    Quantity = sur.Quantity,
+                                    UnitId = sur.UnitId,
+                                    UnitName = u.UnitNameEn,
+                                    UnitPrice = sur.UnitPrice,
+                                    CurrencyId = sur.CurrencyId,
+                                    Vatrate = sur.Vatrate,
+                                    Total = sur.Total != null ? sur.Total : 0,
+                                    PayerId = sur.PayerId,
+                                    Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                    PaymentObjectId = sur.PaymentObjectId,
+                                    OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
+                                    InvoiceNo = sur.InvoiceNo,
+                                    SeriesNo = sur.SeriesNo,
+                                    InvoiceDate = sur.InvoiceDate,
+                                    ClearanceNo = sur.ClearanceNo,
+                                    ContNo = sur.ContNo,
+                                    Notes = sur.Notes,
+                                    IsFromShipment = sur.IsFromShipment,
+                                    TypeOfFee = sur.TypeOfFee,
+                                    AdvanceNo = sur.AdvanceNo
+                                };
+            var dataDocument = from sur in surcharge
+                               join cc in charge on sur.ChargeId equals cc.Id into cc2
+                               from cc in cc2.DefaultIfEmpty()
+                               join u in unit on sur.UnitId equals u.Id into u2
+                               from u in u2.DefaultIfEmpty()
+                               join par in payer on sur.PayerId equals par.Id into par2
+                               from par in par2.DefaultIfEmpty()
+                               join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                               from pae in pae2.DefaultIfEmpty()
+                               join cstd in csTransD on sur.Hblid equals cstd.Id //into cstd2
+                               //from cstd in cstd2.DefaultIfEmpty()
+                               join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                               from cst in cst2.DefaultIfEmpty()
+                               where
+                                       sur.SettlementCode == settlementNo
+                                    && cst.JobNo == JobId
+                                    && cstd.Hwbno == HBL
+                                    && cst.Mawb == MBL
+                               select new ShipmentChargeSettlement
+                               {
+                                   Id = sur.Id,
+                                   JobId = JobId,
+                                   MBL = MBL,
+                                   HBL = HBL,
+                                   ChargeCode = cc.Code,
+                                   Hblid = sur.Hblid,
+                                   Type = sur.Type,
+                                   SettlementCode = sur.SettlementCode,
+                                   ChargeId = sur.ChargeId,
+                                   ChargeName = cc.ChargeNameEn,
+                                   Quantity = sur.Quantity,
+                                   UnitId = sur.UnitId,
+                                   UnitName = u.UnitNameEn,
+                                   UnitPrice = sur.UnitPrice,
+                                   CurrencyId = sur.CurrencyId,
+                                   Vatrate = sur.Vatrate,
+                                   Total = sur.Total != null ? sur.Total : 0,
+                                   PayerId = sur.PayerId,
+                                   Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                   PaymentObjectId = sur.PaymentObjectId,
+                                   OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
+                                   InvoiceNo = sur.InvoiceNo,
+                                   SeriesNo = sur.SeriesNo,
+                                   InvoiceDate = sur.InvoiceDate,
+                                   ClearanceNo = sur.ClearanceNo,
+                                   ContNo = sur.ContNo,
+                                   Notes = sur.Notes,
+                                   IsFromShipment = sur.IsFromShipment,
+                                   TypeOfFee = sur.TypeOfFee,
+                                   AdvanceNo = sur.AdvanceNo
+                               };
+            var data = dataOperation.Union(dataDocument);
             return data.ToList();
         }
 
@@ -540,63 +726,156 @@ namespace eFMS.API.Accounting.DL.Services
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
 
-            var data = from sur in surcharge
-                       join cc in charge on sur.ChargeId equals cc.Id into cc2
-                       from cc in cc2.DefaultIfEmpty()
-                       join u in unit on sur.UnitId equals u.Id into u2
-                       from u in u2.DefaultIfEmpty()
-                       join par in payer on sur.PayerId equals par.Id into par2
-                       from par in par2.DefaultIfEmpty()
-                       join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
-                       from pae in pae2.DefaultIfEmpty()
-                       join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
-                       from opst in opst2.DefaultIfEmpty()
-                       join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
-                       from cstd in cstd2.DefaultIfEmpty()
-                       join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                       from cst in cst2.DefaultIfEmpty()
-                       where
-                            sur.SettlementCode == settlementNo
-                       select new ShipmentChargeSettlement
-                       {
-                           Id = sur.Id,
-                           JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
-                           MBL = (opst.Mblno == null ? cst.Mawb : opst.Mblno),
-                           HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
-                           ChargeCode = cc.Code,
-                           Hblid = sur.Hblid,
-                           Type = sur.Type,
-                           SettlementCode = sur.SettlementCode,
-                           ChargeId = sur.ChargeId,
-                           ChargeName = cc.ChargeNameEn,
-                           Quantity = sur.Quantity,
-                           UnitId = sur.UnitId,
-                           UnitName = u.UnitNameEn,
-                           UnitPrice = sur.UnitPrice,
-                           CurrencyId = sur.CurrencyId,
-                           Vatrate = sur.Vatrate,
-                           Total = sur.Total != null ? sur.Total : 0,
-                           PayerId = sur.PayerId,
-                           Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
-                           PaymentObjectId = sur.PaymentObjectId,
-                           OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
-                           InvoiceNo = sur.InvoiceNo,
-                           SeriesNo = sur.SeriesNo,
-                           InvoiceDate = sur.InvoiceDate,
-                           ClearanceNo = sur.ClearanceNo,
-                           ContNo = sur.ContNo,
-                           Notes = sur.Notes,
-                           IsFromShipment = sur.IsFromShipment,
-                           TypeOfFee = sur.TypeOfFee
-                       };
+            //var data = from sur in surcharge
+            //           join cc in charge on sur.ChargeId equals cc.Id into cc2
+            //           from cc in cc2.DefaultIfEmpty()
+            //           join u in unit on sur.UnitId equals u.Id into u2
+            //           from u in u2.DefaultIfEmpty()
+            //           join par in payer on sur.PayerId equals par.Id into par2
+            //           from par in par2.DefaultIfEmpty()
+            //           join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+            //           from pae in pae2.DefaultIfEmpty()
+            //           join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
+            //           from opst in opst2.DefaultIfEmpty()
+            //           join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
+            //           from cstd in cstd2.DefaultIfEmpty()
+            //           join cst in csTrans on cstd.JobId equals cst.Id into cst2
+            //           from cst in cst2.DefaultIfEmpty()
+            //           where
+            //                sur.SettlementCode == settlementNo
+            //           select new ShipmentChargeSettlement
+            //           {
+            //               Id = sur.Id,
+            //               JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
+            //               MBL = (opst.Mblno == null ? cst.Mawb : opst.Mblno),
+            //               HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
+            //               ChargeCode = cc.Code,
+            //               Hblid = sur.Hblid,
+            //               Type = sur.Type,
+            //               SettlementCode = sur.SettlementCode,
+            //               ChargeId = sur.ChargeId,
+            //               ChargeName = cc.ChargeNameEn,
+            //               Quantity = sur.Quantity,
+            //               UnitId = sur.UnitId,
+            //               UnitName = u.UnitNameEn,
+            //               UnitPrice = sur.UnitPrice,
+            //               CurrencyId = sur.CurrencyId,
+            //               Vatrate = sur.Vatrate,
+            //               Total = sur.Total != null ? sur.Total : 0,
+            //               PayerId = sur.PayerId,
+            //               Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+            //               PaymentObjectId = sur.PaymentObjectId,
+            //               OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
+            //               InvoiceNo = sur.InvoiceNo,
+            //               SeriesNo = sur.SeriesNo,
+            //               InvoiceDate = sur.InvoiceDate,
+            //               ClearanceNo = sur.ClearanceNo,
+            //               ContNo = sur.ContNo,
+            //               Notes = sur.Notes,
+            //               IsFromShipment = sur.IsFromShipment,
+            //               TypeOfFee = sur.TypeOfFee
+            //           };
 
-            return data.OrderByDescending(x => x.JobId);
+            var dataOperation = from sur in surcharge
+                                join cc in charge on sur.ChargeId equals cc.Id into cc2
+                                from cc in cc2.DefaultIfEmpty()
+                                join u in unit on sur.UnitId equals u.Id into u2
+                                from u in u2.DefaultIfEmpty()
+                                join par in payer on sur.PayerId equals par.Id into par2
+                                from par in par2.DefaultIfEmpty()
+                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                                from pae in pae2.DefaultIfEmpty()
+                                join opst in opsTrans on sur.Hblid equals opst.Hblid
+                                where
+                                     sur.SettlementCode == settlementNo
+                                select new ShipmentChargeSettlement
+                                {
+                                    Id = sur.Id,
+                                    JobId = opst.JobNo,
+                                    MBL = opst.Mblno,
+                                    HBL = opst.Hwbno,
+                                    ChargeCode = cc.Code,
+                                    Hblid = sur.Hblid,
+                                    Type = sur.Type,
+                                    SettlementCode = sur.SettlementCode,
+                                    ChargeId = sur.ChargeId,
+                                    ChargeName = cc.ChargeNameEn,
+                                    Quantity = sur.Quantity,
+                                    UnitId = sur.UnitId,
+                                    UnitName = u.UnitNameEn,
+                                    UnitPrice = sur.UnitPrice,
+                                    CurrencyId = sur.CurrencyId,
+                                    Vatrate = sur.Vatrate,
+                                    Total = sur.Total != null ? sur.Total : 0,
+                                    PayerId = sur.PayerId,
+                                    Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                    PaymentObjectId = sur.PaymentObjectId,
+                                    OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
+                                    InvoiceNo = sur.InvoiceNo,
+                                    SeriesNo = sur.SeriesNo,
+                                    InvoiceDate = sur.InvoiceDate,
+                                    ClearanceNo = sur.ClearanceNo,
+                                    ContNo = sur.ContNo,
+                                    Notes = sur.Notes,
+                                    IsFromShipment = sur.IsFromShipment,
+                                    TypeOfFee = sur.TypeOfFee
+                                };
+            var dataDocument = from sur in surcharge
+                               join cc in charge on sur.ChargeId equals cc.Id into cc2
+                               from cc in cc2.DefaultIfEmpty()
+                               join u in unit on sur.UnitId equals u.Id into u2
+                               from u in u2.DefaultIfEmpty()
+                               join par in payer on sur.PayerId equals par.Id into par2
+                               from par in par2.DefaultIfEmpty()
+                               join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                               from pae in pae2.DefaultIfEmpty()
+                               join cstd in csTransD on sur.Hblid equals cstd.Id //into cstd2
+                               //from cstd in cstd2.DefaultIfEmpty()
+                               join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                               from cst in cst2.DefaultIfEmpty()
+                               where
+                                    sur.SettlementCode == settlementNo
+                               select new ShipmentChargeSettlement
+                               {
+                                   Id = sur.Id,
+                                   JobId = cst.JobNo,
+                                   MBL = cst.Mawb,
+                                   HBL = cstd.Hwbno,
+                                   ChargeCode = cc.Code,
+                                   Hblid = sur.Hblid,
+                                   Type = sur.Type,
+                                   SettlementCode = sur.SettlementCode,
+                                   ChargeId = sur.ChargeId,
+                                   ChargeName = cc.ChargeNameEn,
+                                   Quantity = sur.Quantity,
+                                   UnitId = sur.UnitId,
+                                   UnitName = u.UnitNameEn,
+                                   UnitPrice = sur.UnitPrice,
+                                   CurrencyId = sur.CurrencyId,
+                                   Vatrate = sur.Vatrate,
+                                   Total = sur.Total != null ? sur.Total : 0,
+                                   PayerId = sur.PayerId,
+                                   Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                   PaymentObjectId = sur.PaymentObjectId,
+                                   OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
+                                   InvoiceNo = sur.InvoiceNo,
+                                   SeriesNo = sur.SeriesNo,
+                                   InvoiceDate = sur.InvoiceDate,
+                                   ClearanceNo = sur.ClearanceNo,
+                                   ContNo = sur.ContNo,
+                                   Notes = sur.Notes,
+                                   IsFromShipment = sur.IsFromShipment,
+                                   TypeOfFee = sur.TypeOfFee
+                               };
+            var data = dataOperation.Union(dataDocument);
+            data = data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();
+            return data;
         }
 
         #endregion --- DETAILS SETTLEMENT PAYMENT ---
 
         #region --- PAYMENT MANAGEMENT ---
-        public List<AdvancePaymentMngt> GetAdvancePaymentMngts(string JobId, string MBL, string HBL)
+        public List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl)
         {
             var advance = acctAdvancePaymentRepo.Get();
             var request = acctAdvanceRequestRepo.Get();
@@ -606,9 +885,9 @@ namespace eFMS.API.Accounting.DL.Services
                        from ad in ad2.DefaultIfEmpty()
                        where
                             ad.StatusApproval == Constants.STATUS_APPROVAL_DONE
-                       && req.JobId == JobId
-                       && req.Mbl == MBL
-                       && req.Hbl == HBL
+                       && req.JobId == jobId
+                       && req.Mbl == mbl
+                       && req.Hbl == hbl
                        select new AdvancePaymentMngt
                        {
                            AdvanceNo = ad.AdvanceNo,
@@ -634,13 +913,14 @@ namespace eFMS.API.Accounting.DL.Services
                     TotalAmount = item.TotalAmount,
                     AdvanceCurrency = item.AdvanceCurrency,
                     AdvanceDate = item.AdvanceDate,
-                    ChargeAdvancePaymentMngts = request.Where(x => x.AdvanceNo == item.AdvanceNo && x.JobId == JobId && x.Mbl == MBL && x.Hbl == HBL).Select(x => new ChargeAdvancePaymentMngt { AdvanceNo = x.AdvanceNo, TotalAmount = x.Amount.Value, AdvanceCurrency = x.RequestCurrency, Description = x.Description }).ToList()
+                    ChargeAdvancePaymentMngts = request.Where(x => x.AdvanceNo == item.AdvanceNo && x.JobId == jobId && x.Mbl == mbl && x.Hbl == hbl)
+                    .Select(x => new ChargeAdvancePaymentMngt { AdvanceNo = x.AdvanceNo, TotalAmount = x.Amount.Value, AdvanceCurrency = x.RequestCurrency, Description = x.Description }).ToList()
                 });
             }
             return dataResult;
         }
 
-        public List<SettlementPaymentMngt> GetSettlementPaymentMngts(string JobId, string MBL, string HBL)
+        public List<SettlementPaymentMngt> GetSettlementPaymentMngts(string jobId, string mbl, string hbl)
         {
             var settlement = DataContext.Get();
             var surcharge = csShipmentSurchargeRepo.Get();
@@ -654,32 +934,75 @@ namespace eFMS.API.Accounting.DL.Services
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
             //Chỉ lấy ra những settlement có status là done
-            var data = from settle in settlement
-                       join sur in surcharge on settle.SettlementNo equals sur.SettlementCode into sur2
-                       from sur in sur2.DefaultIfEmpty()
-                       join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
-                       from pae in pae2.DefaultIfEmpty()
-                       join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
-                       from opst in opst2.DefaultIfEmpty()
-                       join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
-                       from cstd in cstd2.DefaultIfEmpty()
-                       join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                       from cst in cst2.DefaultIfEmpty()
-                       where
-                                settle.StatusApproval == Constants.STATUS_APPROVAL_DONE
-                            && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
-                            && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
-                            && (opst.Mblno == null ? cst.Mawb : opst.Mblno) == MBL
-                       select new SettlementPaymentMngt
-                       {
-                           SettlementNo = settle.SettlementNo,
-                           TotalAmount = sur.Total != null ? sur.Total : 0,
-                           SettlementCurrency = settle.SettlementCurrency,
-                           ChargeCurrency = sur.CurrencyId,
-                           SettlementDate = settle.DatetimeCreated
-                       };
+            //var data = from settle in settlement
+            //           join sur in surcharge on settle.SettlementNo equals sur.SettlementCode into sur2
+            //           from sur in sur2.DefaultIfEmpty()
+            //           join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+            //           from pae in pae2.DefaultIfEmpty()
+            //           join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
+            //           from opst in opst2.DefaultIfEmpty()
+            //           join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
+            //           from cstd in cstd2.DefaultIfEmpty()
+            //           join cst in csTrans on cstd.JobId equals cst.Id into cst2
+            //           from cst in cst2.DefaultIfEmpty()
+            //           where
+            //                    settle.StatusApproval == Constants.STATUS_APPROVAL_DONE
+            //                && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
+            //                && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
+            //                && (opst.Mblno == null ? cst.Mawb : opst.Mblno) == MBL
+            //           select new SettlementPaymentMngt
+            //           {
+            //               SettlementNo = settle.SettlementNo,
+            //               TotalAmount = sur.Total != null ? sur.Total : 0,
+            //               SettlementCurrency = settle.SettlementCurrency,
+            //               ChargeCurrency = sur.CurrencyId,
+            //               SettlementDate = settle.DatetimeCreated
+            //           };
+            var dataOperation = from settle in settlement
+                                join sur in surcharge on settle.SettlementNo equals sur.SettlementCode into sur2
+                                from sur in sur2.DefaultIfEmpty()
+                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                                from pae in pae2.DefaultIfEmpty()
+                                join opst in opsTrans on sur.Hblid equals opst.Hblid //into opst2
+                                //from opst in opst2.DefaultIfEmpty()
+                                where
+                                        settle.StatusApproval == Constants.STATUS_APPROVAL_DONE
+                                     && opst.JobNo == jobId
+                                     && opst.Hwbno == hbl
+                                     && opst.Mblno == mbl
+                                select new SettlementPaymentMngt
+                                {
+                                    SettlementNo = settle.SettlementNo,
+                                    TotalAmount = sur.Total != null ? sur.Total : 0,
+                                    SettlementCurrency = settle.SettlementCurrency,
+                                    ChargeCurrency = sur.CurrencyId,
+                                    SettlementDate = settle.DatetimeCreated
+                                };
+            var dataDocument = from settle in settlement
+                               join sur in surcharge on settle.SettlementNo equals sur.SettlementCode into sur2
+                               from sur in sur2.DefaultIfEmpty()
+                               join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                               from pae in pae2.DefaultIfEmpty()
+                               join cstd in csTransD on sur.Hblid equals cstd.Id //into cstd2
+                               //from cstd in cstd2.DefaultIfEmpty()
+                               join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                               from cst in cst2.DefaultIfEmpty()
+                               where
+                                       settle.StatusApproval == Constants.STATUS_APPROVAL_DONE
+                                    && cst.JobNo == jobId
+                                    && cstd.Hwbno == hbl
+                                    && cst.Mawb == mbl
+                               select new SettlementPaymentMngt
+                               {
+                                   SettlementNo = settle.SettlementNo,
+                                   TotalAmount = sur.Total != null ? sur.Total : 0,
+                                   SettlementCurrency = settle.SettlementCurrency,
+                                   ChargeCurrency = sur.CurrencyId,
+                                   SettlementDate = settle.DatetimeCreated
+                               };
+            var data = dataOperation.Union(dataDocument);
 
-            data = data.GroupBy(x => new { x.SettlementNo, x.SettlementCurrency, x.SettlementDate })
+            var dataGrp = data.ToList().GroupBy(x => new { x.SettlementNo, x.SettlementCurrency, x.SettlementDate })
                 .Select(s => new SettlementPaymentMngt
                 {
                     SettlementNo = s.Key.SettlementNo,
@@ -689,7 +1012,7 @@ namespace eFMS.API.Accounting.DL.Services
                 });
 
             var dataResult = new List<SettlementPaymentMngt>();
-            foreach (var item in data)
+            foreach (var item in dataGrp)
             {
                 dataResult.Add(new SettlementPaymentMngt
                 {
@@ -697,37 +1020,99 @@ namespace eFMS.API.Accounting.DL.Services
                     TotalAmount = item.TotalAmount,
                     SettlementCurrency = item.SettlementCurrency,
                     SettlementDate = item.SettlementDate,
-                    ChargeSettlementPaymentMngts =
-                      (from sur in surcharge
-                       join cc in charge on sur.ChargeId equals cc.Id into cc2
-                       from cc in cc2.DefaultIfEmpty()
-                       join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
-                       from pae in pae2.DefaultIfEmpty()
-                       join par in payer on sur.PayerId equals par.Id into par2
-                       from par in par2.DefaultIfEmpty()
-                       join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
-                       from opst in opst2.DefaultIfEmpty()
-                       join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
-                       from cstd in cstd2.DefaultIfEmpty()
-                       join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                       from cst in cst2.DefaultIfEmpty()
-                       where
-                            sur.SettlementCode == item.SettlementNo
-                        && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
-                        && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
-                        && (opst.Mblno == null ? cst.Mawb : opst.Mblno) == MBL
-                       select new ChargeSettlementPaymentMngt
-                       {
-                           SettlementNo = item.SettlementNo,
-                           ChargeName = cc.ChargeNameEn,
-                           TotalAmount = sur.Total != null ? sur.Total : 0,
-                           SettlementCurrency = sur.CurrencyId,
-                           OBHPartner = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
-                           Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
-                       }).ToList()
+                    ChargeSettlementPaymentMngts = GetListChargeSettlementPaymentMngt(item.SettlementNo, jobId, hbl, mbl).ToList()
+                    //(from sur in surcharge
+                    // join cc in charge on sur.ChargeId equals cc.Id into cc2
+                    // from cc in cc2.DefaultIfEmpty()
+                    // join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                    // from pae in pae2.DefaultIfEmpty()
+                    // join par in payer on sur.PayerId equals par.Id into par2
+                    // from par in par2.DefaultIfEmpty()
+                    // join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
+                    // from opst in opst2.DefaultIfEmpty()
+                    // join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
+                    // from cstd in cstd2.DefaultIfEmpty()
+                    // join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                    // from cst in cst2.DefaultIfEmpty()
+                    // where
+                    //      sur.SettlementCode == item.SettlementNo
+                    //  && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
+                    //  && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
+                    //  && (opst.Mblno == null ? cst.Mawb : opst.Mblno) == MBL
+                    // select new ChargeSettlementPaymentMngt
+                    // {
+                    //     SettlementNo = item.SettlementNo,
+                    //     ChargeName = cc.ChargeNameEn,
+                    //     TotalAmount = sur.Total != null ? sur.Total : 0,
+                    //     SettlementCurrency = sur.CurrencyId,
+                    //     OBHPartner = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
+                    //     Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
+                    // }).ToList()
                 });
             }
             return dataResult;
+        }
+        public IQueryable<ChargeSettlementPaymentMngt> GetListChargeSettlementPaymentMngt(string settlementNo, string jobId, string hbl, string mbl)
+        {
+            var settlement = DataContext.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var charge = catChargeRepo.Get();
+            var payee = catPartnerRepo.Get();
+            var payer = catPartnerRepo.Get();
+            var opsTrans = opsTransactionRepo.Get();
+            var csTransD = csTransactionDetailRepo.Get();
+            var csTrans = csTransactionRepo.Get();
+
+            var dataOperation = from sur in surcharge
+                                join cc in charge on sur.ChargeId equals cc.Id into cc2
+                                from cc in cc2.DefaultIfEmpty()
+                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                                from pae in pae2.DefaultIfEmpty()
+                                join par in payer on sur.PayerId equals par.Id into par2
+                                from par in par2.DefaultIfEmpty()
+                                join opst in opsTrans on sur.Hblid equals opst.Hblid //into opst2
+                                //from opst in opst2.DefaultIfEmpty()
+                                where
+                                    sur.SettlementCode == settlementNo
+                                 && opst.JobNo == jobId
+                                 && opst.Hwbno == hbl
+                                 && opst.Mblno == mbl
+                                select new ChargeSettlementPaymentMngt
+                                {
+                                    SettlementNo = settlementNo,
+                                    ChargeName = cc.ChargeNameEn,
+                                    TotalAmount = sur.Total != null ? sur.Total : 0,
+                                    SettlementCurrency = sur.CurrencyId,
+                                    OBHPartner = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
+                                    Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
+                                };
+            var dataDocument = from sur in surcharge
+                               join cc in charge on sur.ChargeId equals cc.Id into cc2
+                               from cc in cc2.DefaultIfEmpty()
+                               join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                               from pae in pae2.DefaultIfEmpty()
+                               join par in payer on sur.PayerId equals par.Id into par2
+                               from par in par2.DefaultIfEmpty()
+                               join cstd in csTransD on sur.Hblid equals cstd.Id //into cstd2
+                               //from cstd in cstd2.DefaultIfEmpty()
+                               join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                               from cst in cst2.DefaultIfEmpty()
+                               where
+                                   sur.SettlementCode == settlementNo
+                                && cst.JobNo == jobId
+                                && cstd.Hwbno == hbl
+                                && cst.Mawb == mbl
+                               select new ChargeSettlementPaymentMngt
+                               {
+                                   SettlementNo = settlementNo,
+                                   ChargeName = cc.ChargeNameEn,
+                                   TotalAmount = sur.Total != null ? sur.Total : 0,
+                                   SettlementCurrency = sur.CurrencyId,
+                                   OBHPartner = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
+                                   Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
+                               };
+            var data = dataOperation.Union(dataDocument);
+            return data;
         }
         #endregion --- PAYMENT MANAGEMENT ---
 
@@ -975,16 +1360,24 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var settlementCurrent = DataContext.Get(x => x.Id == settlement.Id).FirstOrDefault();
                 if (settlementCurrent == null) return new HandleState("Not found settlement payment");
+
+                //Get Advance current from Database
+                if (!settlementCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !settlementCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                {
+                    return new HandleState("Only allowed to edit the advance payment status is New or Deny");
+                }
+
                 settlement.DatetimeCreated = settlementCurrent.DatetimeCreated;
                 settlement.UserCreated = settlementCurrent.UserCreated;
 
                 settlement.DatetimeModified = DateTime.Now;
                 settlement.UserModified = userCurrent;
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
-                if (settlementCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                if (model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED) && settlementCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
                 {
                     settlement.StatusApproval = Constants.STATUS_APPROVAL_NEW;
                 }
+                
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -1378,7 +1771,10 @@ namespace eFMS.API.Accounting.DL.Services
                 if (!string.IsNullOrEmpty(settlement.SettlementNo))
                 {
                     var settle = DataContext.Get(x => x.SettlementNo == settlement.SettlementNo).FirstOrDefault();
-                    if (settle.StatusApproval != Constants.STATUS_APPROVAL_NEW && settle.StatusApproval != Constants.STATUS_APPROVAL_DENIED && settle.StatusApproval != Constants.STATUS_APPROVAL_DONE)
+                    if (settle.StatusApproval != Constants.STATUS_APPROVAL_NEW 
+                        && settle.StatusApproval != Constants.STATUS_APPROVAL_DENIED 
+                        && settle.StatusApproval != Constants.STATUS_APPROVAL_DONE
+                        && settle.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL)
                     {
                         return new HandleState("Awaiting Approval");
                     }
@@ -1443,7 +1839,7 @@ namespace eFMS.API.Accounting.DL.Services
                             emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserLeader)?.Email;
                         }
 
-                        if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not Found Leader or Manager");
+                        if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not found Leader or Manager");
 
                         var sendMailResult = SendMailSuggestApproval(acctApprove.SettlementNo, userLeaderOrManager, emailLeaderOrManager);
 
@@ -1479,11 +1875,21 @@ namespace eFMS.API.Accounting.DL.Services
                     //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                     var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
 
-                    if (settlement == null) return new HandleState("Not Found Settlement Payment");
+                    if (settlement == null) return new HandleState("Not found Settlement Payment");
 
                     var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
 
-                    if (approve == null) return new HandleState("Not Found Settlement Approval by SettlementNo is " + settlement.SettlementNo);
+                    if (approve == null)
+                    {
+                        if(acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo).Select(s => s.Id).Any() == false)
+                        {
+                            return new HandleState("Not found Settlement Approval by SettlementNo is " + settlement.SettlementNo);
+                        }
+                        else
+                        {
+                            return new HandleState("Not allow approve");
+                        }
+                    }                        
 
                     //Lấy ra brandId của user requester
                     var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester)?.WorkPlaceId;
@@ -1504,6 +1910,13 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         if (userCurrent == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
+                            if (   settlement.StatusApproval == Constants.STATUS_APPROVAL_LEADERAPPROVED
+                                || settlement.StatusApproval == Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED
+                                || settlement.StatusApproval == Constants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                                || settlement.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            {
+                                return new HandleState("Leader approved");
+                            }
                             settlement.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
                             approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
 
@@ -1514,6 +1927,12 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
+                            if (   settlement.StatusApproval == Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED
+                                || settlement.StatusApproval == Constants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                                || settlement.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            {
+                                return new HandleState("Manager department approved");
+                            }
                             settlement.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
                             approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
                             approve.ManagerApr = userCurrent;
@@ -1525,6 +1944,10 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
+                            if (settlement.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            {
+                                return new HandleState("Chief accountant approved");
+                            }
                             settlement.StatusApproval = Constants.STATUS_APPROVAL_DONE;
                             approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
                             approve.AccountantApr = userCurrent;
@@ -1541,7 +1964,7 @@ namespace eFMS.API.Accounting.DL.Services
                         //dc.AcctApproveSettlement.Update(approve);
                         //dc.SaveChanges();
                         var hsUpdateSettle = DataContext.Update(settlement, x => x.Id == settlement.Id);
-                        var hsUpdateApprove = acctApproveSettlementRepo.Update(approve , x => x.Id == approve.Id);
+                        var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
                         trans.Commit();
                     }
 
@@ -1582,11 +2005,21 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
 
-                    if (settlement == null) return new HandleState("Not Found Settlement Payment");
+                    if (settlement == null) return new HandleState("Not found Settlement Payment");
 
                     var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
-                    if (approve == null) return new HandleState("Not Found Approve Settlement by SettlementNo " + settlement.SettlementNo);
-
+                    if (approve == null)
+                    {
+                        if(acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo).Select(s => s.Id).Any() == false)
+                        {
+                            return new HandleState("Not found Approve Settlement by SettlementNo " + settlement.SettlementNo);
+                        }
+                        else
+                        {
+                            return new HandleState("Not allow deny");
+                        }
+                    }
+                    
                     //Lấy ra brandId của user requester
                     var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester)?.WorkPlaceId;
                     if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
@@ -1600,21 +2033,37 @@ namespace eFMS.API.Accounting.DL.Services
                     if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
 
                     //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-                    var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
-                    if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                    //var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
+                    //if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                     if (approve != null && settlement != null)
                     {
+                        if (settlement.StatusApproval == Constants.STATUS_APPROVAL_DENIED)
+                        {
+                            return new HandleState("Settlement payment denied");
+                        }
+
                         if (userCurrent == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
+                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
+                            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                             approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
                         }
                         else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
+                            //Cho phép User Manager thực hiện deny khi user Manager đã Approved, 
+                            //nếu Chief Accountant đã Approved thì User Manager ko được phép deny
+                            if (settlement.StatusApproval == Constants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || settlement.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            {
+                                return new HandleState("Not allow deny. Advance payment has been approved");
+                            }
+
                             approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
                             approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
                         }
                         else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
+                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
+                            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                             approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
                             approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
                         }
@@ -1639,7 +2088,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     //Send mail denied approval
                     var sendMailResult = SendMailDeniedApproval(settlement.SettlementNo, comment, DateTime.Now);
-                    return sendMailResult ? new HandleState() : new HandleState("Send mail Deny Approval Failed");
+                    return sendMailResult ? new HandleState() : new HandleState("Send mail deny approval failed");
                 }
                 catch (Exception ex)
                 {
@@ -1671,6 +2120,8 @@ namespace eFMS.API.Accounting.DL.Services
                 aprSettlementMap.ManagerName = string.IsNullOrEmpty(aprSettlementMap.Manager) ? null : GetEmployeeByUserId(aprSettlementMap.Manager)?.EmployeeNameVn;
                 aprSettlementMap.AccountantName = string.IsNullOrEmpty(aprSettlementMap.Accountant) ? null : GetEmployeeByUserId(aprSettlementMap.Accountant)?.EmployeeNameVn;
                 aprSettlementMap.BUHeadName = string.IsNullOrEmpty(aprSettlementMap.Buhead) ? null : GetEmployeeByUserId(aprSettlementMap.Buhead)?.EmployeeNameVn;
+                aprSettlementMap.StatusApproval = DataContext.Get(x => x.SettlementNo == aprSettlementMap.SettlementNo).FirstOrDefault()?.StatusApproval;
+                aprSettlementMap.IsRequester = (userCurrent == aprSettlementMap.Requester) ? true : false;
             }
             else
             {
@@ -2053,13 +2504,13 @@ namespace eFMS.API.Accounting.DL.Services
         //Nếu group hiện tại đã được approve thì không cho approve nữa
         private HandleState CheckApprovedOfDeptPrevAndDeptCurrent(string settlementNo, string userId, string deptOfUser)
         {
-            HandleState result = new HandleState("Not Found");
+            HandleState result = new HandleState("Not found");
 
             //Lấy ra Settlement Approval dựa vào settlementNo
             var acctApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeputy == false).FirstOrDefault();
             if (acctApprove == null)
             {
-                result = new HandleState("Not Found Settlement Approval by SettlementNo is " + settlementNo);
+                result = new HandleState("Not found Settlement Approval by SettlementNo is " + settlementNo);
                 return result;
             }
 
@@ -2067,7 +2518,7 @@ namespace eFMS.API.Accounting.DL.Services
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null)
             {
-                result = new HandleState("Not Found Settlement Payment by SettlementNo is" + settlementNo);
+                result = new HandleState("Not found Settlement Payment by SettlementNo is" + settlementNo);
                 return result;
             }
 
@@ -2133,7 +2584,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
-                            result = new HandleState("Accountant Approved");
+                            result = new HandleState("Chief Accountant Approved");
                         }
                     }
                     else
@@ -2231,7 +2682,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
-                            result = new HandleState("Accountant Approved");
+                            result = new HandleState("Chief Accountant Approved");
                         }
                     }
                     else
@@ -2253,6 +2704,7 @@ namespace eFMS.API.Accounting.DL.Services
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            if (settlement == null) return false;
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
@@ -2289,8 +2741,10 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             //Mail Info
-            string subject = "eFMS - Settlement Payment Approval Request from [RequesterName]";
+            string subject = "eFMS - Settlement Payment Approval Request from [RequesterName] - [NumberOfRequest] times";
             subject = subject.Replace("[RequesterName]", requesterName);
+            var numberOfRequest = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo).Select(s => s.Id).Count();
+            subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
             string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p> <i> <b>Dear Mr/Mrs [UserName],</b> </i></p><p>You have new Settlement Payment Approval Request from <b>[RequesterName]</b> as below info:</p><p> <i>Anh/ Chị có một yêu cầu duyệt thanh toán từ <b>[RequesterName]</b> với thông tin như sau: </i></p><ul><li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li><li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You click here to check more detail and approve: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Detail Payment Request</a> </span></p><p> <i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Chi tiết phiếu đề nghị thanh toán</a> </span> </i></p><p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='{0}'/></p></div>", logoeFMSBase64());
             body = body.Replace("[UserName]", userReciver);
             body = body.Replace("[RequesterName]", requesterName);
@@ -2345,6 +2799,7 @@ namespace eFMS.API.Accounting.DL.Services
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            if (settlement == null) return false;
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
@@ -2418,6 +2873,7 @@ namespace eFMS.API.Accounting.DL.Services
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            if (settlement == null) return false;
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);

@@ -91,7 +91,7 @@ export class SettlementFormSearchComponent extends AppForm {
     getStatusApproval(): CommonInterface.ICommonTitleValue[] {
         return [
             { title: 'New', value: 'New' },
-            // { title: 'Request Approval', value: 'RequestApproval' },
+            { title: 'Request Approval', value: 'RequestApproval' },
             { title: 'Leader Approved', value: 'LeaderApproved' },
             { title: 'Department Manager Approved', value: 'DepartmentManagerApproved' },
             { title: 'Accountant Manager Approved', value: 'AccountantManagerApproved' },

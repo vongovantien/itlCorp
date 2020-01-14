@@ -1296,7 +1296,7 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.AgentId)
                     .HasColumnName("AgentID")
-                    .HasMaxLength(1600);
+                    .HasMaxLength(10);
 
                 entity.Property(e => e.BookingNo).HasMaxLength(800);
 
@@ -1391,6 +1391,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Pono)
                     .HasColumnName("PONo")
                     .HasMaxLength(1600);
+
+                entity.Property(e => e.Route).HasMaxLength(100);
 
                 entity.Property(e => e.ServiceDate).HasColumnType("datetime");
 
