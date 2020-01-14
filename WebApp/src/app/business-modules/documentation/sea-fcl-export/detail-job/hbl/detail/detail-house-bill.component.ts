@@ -118,6 +118,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
 
+
         this.updateHbl(modelUpdate);
     }
 
