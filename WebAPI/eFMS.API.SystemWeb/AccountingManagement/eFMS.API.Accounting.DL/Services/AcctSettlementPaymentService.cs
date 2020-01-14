@@ -2577,6 +2577,62 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
+        public LockedLogResultModel GetSettlePaymentsToUnlock(List<string> keyWords)
+        {
+            var result = new LockedLogResultModel();
+            var settlesToUnLock = DataContext.Get(x => keyWords.Contains(x.SettlementNo));
+            if (settlesToUnLock == null) return result;
+            result.LockedLogs = settlesToUnLock.Select(x => new LockedLogModel
+            {
+                Id = x.Id,
+                SettlementNo = x.SettlementNo,
+                LockedLog = x.LockedLog
+            });
+            if (result.LockedLogs != null)
+            {
+                result.Logs = new List<string>();
+                foreach (var item in settlesToUnLock)
+                {
+                    var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
+                    result.Logs.AddRange(logs);
+                }
+            }
+            return result;
+        }
+
+        public HandleState UnLock(List<LockedLogModel> settlePayments)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var item in settlePayments)
+                    {
+                        var settle = DataContext.Get(x => x.Id == item.Id)?.FirstOrDefault();
+                        if (settle.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
+                        {
+                            settle.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
+                            settle.UserModified = currentUser.UserName;
+                            settle.DatetimeModified = DateTime.Now;
+                            var log = item.SettlementNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
+                            item.LockedLog = item.LockedLog + log + ";";
+                            var hs = DataContext.Update(settle, x => x.Id == item.Id);
+                        }
+                    }
+                    trans.Commit();
+                    return new HandleState();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
         #endregion
     }
 }

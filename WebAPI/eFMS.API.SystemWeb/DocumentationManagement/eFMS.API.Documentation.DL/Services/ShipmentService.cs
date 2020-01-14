@@ -7,6 +7,8 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
+using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
@@ -14,21 +16,24 @@ using System.Linq;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class ShipmentService : IShipmentService
+    public class ShipmentService : RepositoryBase<CsTransaction, CsTransactionModel>, IShipmentService
     {
-        readonly IContextBase<CsTransaction> csRepository;
         readonly IContextBase<OpsTransaction> opsRepository;
         readonly IContextBase<CsTransactionDetail> detailRepository;
         readonly IContextBase<CsShipmentSurcharge> surCharge;
         readonly IContextBase<CatPartner> catPartnerRepo;
-        readonly IMapper mapper;
         readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         private readonly ICurrentUser currentUser;
-        public ShipmentService(IContextBase<CsTransaction> cs, IContextBase<OpsTransaction> ops, IMapper iMapper, IContextBase<CsTransactionDetail> detail, IContextBase<CsShipmentSurcharge> surcharge, IContextBase<CatPartner> catPartner, IContextBase<OpsStageAssigned> opsStageAssigned, ICurrentUser user)
+
+        public ShipmentService(IContextBase<CsTransaction> repository, IMapper mapper,
+            IContextBase<OpsTransaction> ops,
+            IContextBase<CsTransactionDetail> detail,
+            IContextBase<CsShipmentSurcharge> surcharge,
+            IContextBase<CatPartner> catPartner,
+            IContextBase<OpsStageAssigned> opsStageAssigned,
+            ICurrentUser user) : base(repository, mapper)
         {
-            csRepository = cs;
             opsRepository = ops;
-            mapper = iMapper;
             detailRepository = detail;
             surCharge = surcharge;
             catPartnerRepo = catPartner;
@@ -69,7 +74,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Service = "CL"
             });
             //End change request
-            var transactions = csRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var transactions = DataContext.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
             var shipmentsDocumention = transactions.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
             {
                 Id = x.x.Id,
@@ -94,7 +99,7 @@ namespace eFMS.API.Documentation.DL.Services
                 && (x.PayerId == partner || x.PaymentObjectId == partner)
             );
 
-            var transactions = csRepository.Get(x => x.IsLocked == false && services.Contains(x.TransactionType));
+            var transactions = DataContext.Get(x => x.IsLocked == false && services.Contains(x.TransactionType));
             var shipmentDocumention = transactions.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
             {
                 Id = x.y.Id,
@@ -145,7 +150,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (string.IsNullOrEmpty(searchOption) || keywords == null || keywords.Count == 0 || keywords.Any(x => x == null)) return dataList;
 
             var surcharge = surCharge.Get();
-            var cstran = csRepository.Get();
+            var cstran = DataContext.Get();
             var cstrandel = detailRepository.Get();
             //var opstran = opsRepository.Get(x => x.CurrentStatus != "Canceled");
 
@@ -232,59 +237,6 @@ namespace eFMS.API.Documentation.DL.Services
             }).ToList();
             return dataList;
         }
-        private IQueryable<Shipments> GetShipmentToUnLock(ShipmentCriteria criteria) {
-            IQueryable<Shipments> opShipments = null;
-            string transactionType = string.Empty;
-            if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic || criteria.TransactionType == 0)
-            {
-                opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
-                                                      && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno) : true)
-                                                        || criteria.Keywords == null)
-                                                      &&
-                                                        (
-                                                                (((x.ServiceDate ?? null) >= (criteria.FromDate ?? null)) && ((x.ServiceDate ?? null) <= (criteria.ToDate ?? null)))
-                                                            || (criteria.FromDate == null && criteria.ToDate == null)
-                                                        )
-                                                      )
-                    .Select(x => new Shipments
-                    {
-                        MBL = x.Mblno,
-                        JobId = x.JobNo,
-                        Id = x.Id,
-                        Service = "OPS"
-                    });
-                if(criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
-                {
-                    return opShipments;
-                }
-            }
-            else
-            {
-                transactionType = DataTypeEx.GetType(criteria.TransactionType);
-            }
-            var csTransactions = csRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
-                                                 && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb) : true)
-                                                    || criteria.Keywords == null)
-                                                 && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType) || criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
-                                              );
-            csTransactions = GetShipmentServicesByTime(csTransactions, criteria);
-            if (criteria.ShipmentPropertySearch == ShipmentPropertySearch.HBL)
-            {
-                var shipmentDetails = detailRepository.Get(x => criteria.Keywords.Contains(x.Hwbno));
-                csTransactions = csTransactions.Join(shipmentDetails, x => x.Id, y => y.JobId, (x, y) => x);
-            }
-            var csShipments = csTransactions
-                .Select(x => new Shipments
-                {
-                    MBL = x.Mawb,
-                    JobId = x.JobNo,
-                    Id = x.Id,
-                    Service = "CS"
-                });
-            var shipments = opShipments.Union(csShipments);
-            return shipments;
-        }
-
         private IQueryable<CsTransaction> GetShipmentServicesByTime(IQueryable<CsTransaction> csTransactions, ShipmentCriteria criteria)
         {
             switch (criteria.TransactionType)
@@ -316,68 +268,131 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return csTransactions;
         }
-
-        public ResultHandle UnLockShipment(ShipmentCriteria criteria)
+        public LockedLogResultModel GetShipmentToUnLock(ShipmentCriteria criteria)
         {
-            var shipments = GetShipmentToUnLock(criteria);
-            var results = new List<string>();
-            try
+            LockedLogResultModel result = null;
+            IQueryable<LockedLogModel> opShipments = null;
+            string transactionType = string.Empty;
+            if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic || criteria.TransactionType == 0)
             {
-                foreach (var item in shipments)
+                opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
+                                                      && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno) : true)
+                                                        || criteria.Keywords == null)
+                                                      &&
+                                                        (
+                                                                (((x.ServiceDate ?? null) >= (criteria.FromDate ?? null)) && ((x.ServiceDate ?? null) <= (criteria.ToDate ?? null)))
+                                                            || (criteria.FromDate == null && criteria.ToDate == null)
+                                                        )
+                                                      )
+                    .Select(x => new LockedLogModel
+                    {
+                        Id = x.Id,
+                        OPSShipmentNo = x.JobNo,
+                        LockedLog = x.LockedLog
+                    });
+                if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
                 {
-                    if (item.Service == "OPS")
-                    {
-                        var opsShipment = opsRepository.Get(x => x.Id == item.Id)?.FirstOrDefault();
-                        var logs = opsShipment.LockedLog!= null? opsShipment.LockedLog.Split(';').Where(x => x.Length > 0).ToList(): new List<string>();
-                        if (opsShipment != null)
-                        {
-                            if (opsShipment.IsLocked == false)
-                            {
-                                opsShipment.IsLocked = true;
-                                opsShipment.DatetimeModified = DateTime.Now;
-                                opsShipment.UserModified = currentUser.UserID;
-                                string log = opsShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName;
-                                opsShipment.LockedLog = opsShipment.LockedLog + log + ";";
-                                var isSuccessLockOps = opsRepository.Update(opsShipment, x => x.Id == opsShipment.Id);
-                                if (isSuccessLockOps.Success == false)
-                                {
-                                    log = opsShipment.JobNo + " unlock failed " + isSuccessLockOps.Message;
-                                }
-                                if(log.Length > 0) logs.Add(log);
-                            }
-                            if(logs.Count > 0) results.AddRange(logs);
-                        }
-                    }
-                    else
-                    {
-                        var csShipment = csRepository.Get(x => x.Id == item.Id)?.FirstOrDefault();
-                        var logs = csShipment.LockedLog!= null? csShipment.LockedLog.Split(';').Where(x => x.Length > 0).ToList(): new List<string>();
-                        if (csShipment != null)
-                        {
-                            if (csShipment.IsLocked == false)
-                            {
-                                csShipment.IsLocked = true;
-                                csShipment.DatetimeModified = DateTime.Now;
-                                csShipment.UserModified = currentUser.UserID;
-                                string log = csShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName;
-                                csShipment.LockedLog = csShipment.LockedLog + log + ";";
-                                var isSuccessLockCs = csRepository.Update(csShipment, x => x.Id == csShipment.Id);
-                                if (isSuccessLockCs.Success == false)
-                                {
-                                    log = csShipment.JobNo + " unlock failed " + isSuccessLockCs.Message;
-                                }
-                                if(log.Length > 0) logs.Add(log);
-                            }
-                            if(logs.Count > 0) results.AddRange(logs);
-                        }
-                    }
+                    result = GetLogHistory(opShipments);
+                    return result;
                 }
-                var result = new ResultHandle { Status = true, Data = results, Message = "Done" };
-                return result;
             }
-            catch (Exception ex)
+            else
             {
-                return new ResultHandle { Status = false, Message = ex.Message };
+                transactionType = DataTypeEx.GetType(criteria.TransactionType);
+            }
+            var csTransactions = DataContext.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
+                                                 && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb) : true)
+                                                    || criteria.Keywords == null)
+                                                 && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType) || criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
+                                              );
+            csTransactions = GetShipmentServicesByTime(csTransactions, criteria);
+            if (criteria.ShipmentPropertySearch == ShipmentPropertySearch.HBL)
+            {
+                var shipmentDetails = detailRepository.Get(x => criteria.Keywords.Contains(x.Hwbno));
+                csTransactions = csTransactions.Join(shipmentDetails, x => x.Id, y => y.JobId, (x, y) => x);
+            }
+            var csShipments = csTransactions
+                .Select(x => new LockedLogModel
+                {
+                    Id = x.Id,
+                    CSShipmentNo = x.JobNo,
+                    LockedLog = x.LockedLog
+                });
+            var shipments = opShipments.Union(csShipments);
+            result = GetLogHistory(shipments);
+            return result;
+        }
+
+        private LockedLogResultModel GetLogHistory(IQueryable<LockedLogModel> shipments)
+        {
+            var result = new LockedLogResultModel();
+            if (shipments == null) return result;
+            result.LockedLogs = shipments;
+            result.Logs = new List<string>();
+            foreach(var item in shipments)
+            {
+                var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
+                if(logs.Count > 0)
+                {
+                    result.Logs.AddRange(logs);
+                }
+            }
+            return result;
+        }
+
+        public HandleState UnLockShipment(List<LockedLogModel> shipments)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var item in shipments)
+                    {
+                        if (item.OPSShipmentNo != null)
+                        {
+                            var opsShipment = opsRepository.Get(x => x.Id == item.Id)?.FirstOrDefault();
+                            if (opsShipment != null)
+                            {
+                                if (opsShipment.IsLocked == true)
+                                {
+                                    opsShipment.IsLocked = false;
+                                    opsShipment.DatetimeModified = DateTime.Now;
+                                    opsShipment.UserModified = currentUser.UserID;
+                                    string log = opsShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName + ";";
+                                    opsShipment.LockedLog = opsShipment.LockedLog + log;
+                                    var isSuccessLockOps = opsRepository.Update(opsShipment, x => x.Id == opsShipment.Id);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var csShipment = DataContext.Get(x => x.Id == item.Id)?.FirstOrDefault();
+                            if (csShipment != null)
+                            {
+                                if (csShipment.IsLocked == true)
+                                {
+                                    csShipment.IsLocked = false;
+                                    csShipment.DatetimeModified = DateTime.Now;
+                                    csShipment.UserModified = currentUser.UserID;
+                                    string log = csShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName + ";";
+                                    csShipment.LockedLog = csShipment.LockedLog + log;
+                                    var isSuccessLockCs = DataContext.Update(csShipment, x => x.Id == csShipment.Id);
+                                }
+                            }
+                        }
+                    }
+                    trans.Commit();
+                    return new HandleState();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
         }
     }

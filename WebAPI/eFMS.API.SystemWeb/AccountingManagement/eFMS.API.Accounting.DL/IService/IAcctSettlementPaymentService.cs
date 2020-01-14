@@ -51,6 +51,7 @@ namespace eFMS.API.Accounting.DL.IService
         Crystal Preview(string settlementNo);
 
         List<ShipmentChargeSettlement> CopyChargeFromSettlementOldToSettlementNew(ShipmentsCopyCriteria criteria);
-        ResultHandle UnLock(List<string> keyWords);
+        LockedLogResultModel GetSettlePaymentsToUnlock(List<string> keyWords);
+        HandleState UnLock(List<LockedLogModel> settlePayments);
     }
 }

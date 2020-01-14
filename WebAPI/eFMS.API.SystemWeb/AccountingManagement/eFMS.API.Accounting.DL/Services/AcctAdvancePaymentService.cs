@@ -1936,39 +1936,60 @@ namespace eFMS.API.Accounting.DL.Services
             var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo));
             return data.ToList();
         }
-
-        public ResultHandle UnLock(List<string> keyWords)
+        
+        public LockedLogResultModel GetAdvanceToUnlock(List<string> keyWords)
         {
-            var advanceToUnLocks = DataContext.Get(x => keyWords.Contains(x.AdvanceNo));
-            try
+            var result = new LockedLogResultModel();
+            var advancesToUnLock = DataContext.Get(x => keyWords.Contains(x.AdvanceNo));
+            if (advancesToUnLock == null) return result;
+            result.LockedLogs = advancesToUnLock.Select(x => new LockedLogModel {
+                                                Id = x.Id,
+                                                AdvanceNo = x.AdvanceNo,
+                                                LockedLog = x.LockedLog
+                                            });
+            if(result.LockedLogs != null)
             {
-                List<string> results = new List<string>();
-                foreach (var item in advanceToUnLocks)
+                result.Logs = new List<string>();
+                foreach(var item in advancesToUnLock)
                 {
-                    string log = string.Empty;
-                    var logs = item.LockedLog!= null? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList(): new List<string>();
-                    if (item.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
-                    {
-                        item.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
-                        item.UserModified = currentUser.UserName;
-                        item.DatetimeModified = DateTime.Now;
-                        log = item.AdvanceNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
-                        item.LockedLog = item.LockedLog + log + ";";
-                        var hs = DataContext.Update(item, x => x.Id == item.Id);
-                        if (hs.Success == false)
-                        {
-                            log = item.AdvanceNo + " unlock failed " + hs.Message;
-                        }
-                        if (log.Length > 0) logs.Add(log);
-                    }
-                    if(logs.Count > 0)  results.AddRange(logs);
+                    var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
+                    result.Logs.AddRange(logs);
                 }
-                return new ResultHandle { Status = true, Message = "Done", Data = results };
             }
-            catch (Exception)
-            {
+            return result;
+        }
 
-                throw;
+        public HandleState UnLock(List<LockedLogModel> advancePayments)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var item in advancePayments)
+                    {
+                        var payment = DataContext.Get(x => x.Id == item.Id)?.FirstOrDefault();
+                        if (payment.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
+                        {
+                            payment.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
+                            payment.UserModified = currentUser.UserName;
+                            payment.DatetimeModified = DateTime.Now;
+                            var log = item.AdvanceNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
+                            item.LockedLog = item.LockedLog + log + ";";
+                            var hs = DataContext.Update(payment, x => x.Id == item.Id);
+                        }
+                    }
+                    trans.Commit();
+                    return new HandleState();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
         }
     }

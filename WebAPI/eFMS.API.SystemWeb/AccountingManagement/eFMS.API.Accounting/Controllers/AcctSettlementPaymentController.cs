@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using System.Linq;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
+using eFMS.API.Accounting.DL.Models;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -546,12 +547,19 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpPost("GetSettlePayments")]
+        public IActionResult GetSettlePayments(List<string> keyWords)
+        {
+            if (keyWords == null) return Ok(new LockedLogResultModel());
+            LockedLogResultModel result = acctSettlementPaymentService.GetSettlePaymentsToUnlock(keyWords);
+            return Ok(result);
+        }
+
         [HttpPost("UnLock")]
         [Authorize]
-        public IActionResult UnLock(List<string> keyWords)
+        public IActionResult UnLock(List<LockedLogModel> advancePayments)
         {
-            if (keyWords == null) return Ok(new ResultHandle { Status = false, Message = "Key word not allow null" });
-            ResultHandle result = acctSettlementPaymentService.UnLock(keyWords);
+            var result = acctSettlementPaymentService.UnLock(advancePayments);
             return Ok(result);
         }
     }

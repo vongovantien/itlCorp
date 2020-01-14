@@ -466,12 +466,18 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpPost("GetAdvancePayment")]
+        public IActionResult GetAdvancePayment(List<string> keyWords)
+        {
+            if (keyWords == null) return Ok(new LockedLogResultModel());
+            LockedLogResultModel result = acctAdvancePaymentService.GetAdvanceToUnlock(keyWords);
+            return Ok(result);
+        }
         [HttpPost("UnLock")]
         [Authorize]
-        public IActionResult UnLock(List<string> keyWords)
+        public IActionResult UnLock(List<LockedLogModel> advancePayments)
         {
-            if (keyWords == null) return Ok(new ResultHandle { Status = false, Message = "Key word not allow null" });
-            ResultHandle result = acctAdvancePaymentService.UnLock(keyWords);
+            var result = acctAdvancePaymentService.UnLock(advancePayments);
             return Ok(result);
         }
     }

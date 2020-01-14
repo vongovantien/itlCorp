@@ -49,6 +49,7 @@ namespace eFMS.API.Accounting.DL.IService
         AcctApproveAdvanceModel GetInfoApproveAdvanceByAdvanceNo(string advanceNo);
 
         List<AcctAdvanceRequestModel> GetAdvancesOfShipment();
-        ResultHandle UnLock(List<string> keyWords);
+        LockedLogResultModel GetAdvanceToUnlock(List<string> keyWords);
+        HandleState UnLock(List<LockedLogModel> advancePayments);
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -107,11 +108,18 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
         
+        [HttpPost("GetShipmentToUnLock")]
+        public IActionResult GetShipmentToUnLock(ShipmentCriteria criteria)
+        {
+            var results = shipmentService.GetShipmentToUnLock(criteria);
+            return Ok(results);
+        }
+
         [HttpPost("UnLockShipment")]
         [Authorize]
-        public IActionResult UnLockShipment(ShipmentCriteria criteria)
+        public IActionResult UnLockShipment([FromBody]List<LockedLogModel> shipments)
         {
-            ResultHandle result = shipmentService.UnLockShipment(criteria);
+            HandleState result = shipmentService.UnLockShipment(shipments);
             return Ok(result);
         }
     }
