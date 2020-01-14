@@ -17,7 +17,8 @@ import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'form-separate-house-bill',
-    templateUrl: 'form-separate-house-bill.component.html'
+    templateUrl: 'form-separate-house-bill.component.html',
+    styleUrls: ['./form-separate-house-bill.component.scss']
 })
 
 export class SeparateHouseBillComponent extends AirExportDetailHBLComponent implements OnInit {

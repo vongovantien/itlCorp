@@ -59,7 +59,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
     currencies: Observable<CommonInterface.INg2Select[]>;
-    isSeparate: boolean = false;
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameEn', label: 'Name ABBR' },
         { field: 'partnerNameVn', label: 'Name EN' },
@@ -116,6 +115,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     dims: DIM[] = []; // * Dimension details.
     isLoadingPort: any;
+    isSeparate: boolean = false;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
