@@ -30,7 +30,8 @@
                                     [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                     [dataSources]="configCustomer.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'Customer')"
-                                    [displayFields]="configPartner.displayFields" (remove)="resetFormControl(customer)">
+                                    [displayFields]="configPartner.displayFields" (remove)="resetFormControl(customer)"
+                                    placeholder="Select customer">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback" *ngIf="isSubmited && !customer.value">
                                     Customer is required!
@@ -45,7 +46,8 @@
                                     [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
                                     [selectedDisplayFields]="['username']" [dataSources]="saleMans"
                                     [displayFields]="[{field: 'username', label: 'User Name'}]" [height]="150"
-                                    [disabled]="!customer.value" (remove)="resetFormControl(saleMan)">
+                                    [disabled]="!customer.value" (remove)="resetFormControl(saleMan)"
+                                    placeholder="Select Salemans">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -61,7 +63,8 @@
                                     [dataSources]="configShipper.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'Shipper')"
                                     [selectedDisplayFields]="configPartner.selectedDisplayFields"
-                                    [displayFields]="configPartner.displayFields" (remove)="resetFormControl(shipper)">
+                                    [displayFields]="configPartner.displayFields" (remove)="resetFormControl(shipper)"
+                                    placeholder="Select Shipper">
                                 </app-combo-grid-virtual-scroll>
                                 <textarea rows="3" class="form-control m-input m-input--square"
                                     formControlName="shipperDescription"></textarea>
@@ -80,8 +83,8 @@
                                     [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                     [dataSources]="configConsignee.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'Consignee')"
-                                    [displayFields]="configPartner.displayFields"
-                                    (remove)="resetFormControl(consignee)">
+                                    [displayFields]="configPartner.displayFields" (remove)="resetFormControl(consignee)"
+                                    placeholder="Select Consginee">
                                 </app-combo-grid-virtual-scroll>
                                 <textarea rows="3" class="form-control m-input m-input--square"
                                     formControlName="consigneeDescription"></textarea>
@@ -102,7 +105,7 @@
                                     [dataSources]="configNotifyParty.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'NotifyParty')"
                                     [displayFields]="configPartner.displayFields"
-                                    (remove)="resetFormControl(notifyParty)">
+                                    (remove)="resetFormControl(notifyParty)" placeholder="Select Notify Party">
                                 </app-combo-grid-virtual-scroll>
                                 <textarea rows="3" class="form-control m-input m-input--square"
                                     formControlName="notifyPartyDescription"></textarea>
@@ -121,7 +124,7 @@
                                     [dataSources]="configAlsoNotifyParty.dataSource"
                                     (itemSelected)="onSelectDataFormInfo($event, 'AlsoNotifyParty')"
                                     [displayFields]="configPartner.displayFields"
-                                    (remove)="resetFormControl(alsoNotifyParty)">
+                                    (remove)="resetFormControl(alsoNotifyParty)" placeholder="Select Also Notify Party">
                                 </app-combo-grid-virtual-scroll>
                                 <textarea rows="3" class="form-control m-input m-input--square"
                                     formControlName="alsonotifyPartyDescription"></textarea>
@@ -220,9 +223,10 @@
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                     [selectedDisplayFields]="configPort.selectedDisplayFields"
-                                    [dataSources]="configPort.dataSource"
+                                    [dataSources]="ports | async"
                                     (itemSelected)="onSelectDataFormInfo($event, 'PortOfLoading')"
-                                    [displayFields]="configPort.displayFields" (remove)="resetFormControl(pol)">
+                                    [displayFields]="configPort.displayFields" (remove)="resetFormControl(pol)"
+                                    placeholder="Select Port Of Loading" [loading]="isLoadingPort | async">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback" *ngIf="isSubmited &&  !pol.value  ">
                                     Port of Loading is required!
@@ -238,9 +242,10 @@
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                     [selectedDisplayFields]="configPort.selectedDisplayFields"
-                                    [dataSources]="configPort.dataSource"
+                                    [dataSources]="ports | async"
                                     (itemSelected)="onSelectDataFormInfo($event, 'PortOfDischarge')"
-                                    [displayFields]="configPort.displayFields" (remove)="resetFormControl(pod)">
+                                    [displayFields]="configPort.displayFields" (remove)="resetFormControl(pod)"
+                                    placeholder="Select Port Of Discharge" [loading]="isLoadingPort | async">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback" *ngIf="isSubmited &&  !pod.value  ">
                                     Port of Discharge is required!
