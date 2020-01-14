@@ -90,9 +90,14 @@ export class PartnerListComponent extends AppList implements OnInit {
             .pipe(catchError(this.catchError), finalize(() => {
             })).subscribe(
                 (res: any) => {
-                    this.saleMans = res;
-                    console.log(this.saleMans);
-                    this.replaceService();
+                    if (res !== null) {
+                        this.saleMans = res;
+                        console.log(this.saleMans);
+                        this.replaceService();
+                    } else {
+                        this.saleMans = [];
+                    }
+
                 }
             );
         // if (!!this.customers[indexs].saleManRequests.length) {
