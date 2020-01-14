@@ -136,7 +136,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                             amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
                             currency: this.formCreateSurcharge.currencyList.filter(currency => currency.id === this.settlementPayment.settlement.settlementCurrency)[0]
                         });
-                    }, 300);
+                    }, 1000);
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;

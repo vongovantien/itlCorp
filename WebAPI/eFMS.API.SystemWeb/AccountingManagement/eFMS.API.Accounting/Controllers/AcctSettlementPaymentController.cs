@@ -549,7 +549,7 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        [HttpPost("GetSettlePayments")]
+        [HttpPost("GetSettlePaymentsToUnlock")]
         public IActionResult GetSettlePayments(List<string> keyWords)
         {
             if (keyWords == null) return Ok(new LockedLogResultModel());

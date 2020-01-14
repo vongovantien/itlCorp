@@ -65,7 +65,8 @@
                                             <span>{{sale.createDate | date: 'dd/MM/yyyy'}}</span>
                                         </td>
                                     </tr>
-                                    <tr *ngIf="!saleMans" app-table-none-record [colspan]="headerSalemans.length">
+                                    <tr *ngIf="saleMans.length == 0" app-table-none-record
+                                        [colspan]="headerSalemans.length">
                                     </tr>
                                 </ng-container>
                             </tbody>

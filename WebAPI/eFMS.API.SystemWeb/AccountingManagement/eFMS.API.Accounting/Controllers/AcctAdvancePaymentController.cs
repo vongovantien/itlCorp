@@ -464,7 +464,7 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        [HttpPost("GetAdvancePayment")]
+        [HttpPost("GetAdvancesToUnlock")]
         public IActionResult GetAdvancePayment(List<string> keyWords)
         {
             if (keyWords == null) return Ok(new LockedLogResultModel());
