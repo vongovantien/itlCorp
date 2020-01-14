@@ -99,7 +99,7 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.AgentId)
                     .HasColumnName("AgentID")
-                    .HasMaxLength(1600);
+                    .HasMaxLength(10);
 
                 entity.Property(e => e.BookingNo).HasMaxLength(800);
 
@@ -158,6 +158,8 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.IsLocked).HasDefaultValueSql("((0))");
 
+                entity.Property(e => e.IssuedBy).HasMaxLength(50);
+
                 entity.Property(e => e.JobNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -192,6 +194,8 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.Pono)
                     .HasColumnName("PONo")
                     .HasMaxLength(1600);
+
+                entity.Property(e => e.Route).HasMaxLength(100);
 
                 entity.Property(e => e.ServiceDate).HasColumnType("datetime");
 
@@ -480,6 +484,8 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.PackageContainer).HasMaxLength(1600);
 
+                entity.Property(e => e.ParentId).HasColumnName("ParentID");
+
                 entity.Property(e => e.PickupPlace).HasMaxLength(500);
 
                 entity.Property(e => e.PlaceFreightPay).HasMaxLength(4000);
@@ -520,8 +526,6 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.Sci)
                     .HasColumnName("SCI")
                     .HasMaxLength(250);
-
-                entity.Property(e => e.SeaAir).HasMaxLength(250);
 
                 entity.Property(e => e.ServiceType).HasMaxLength(160);
 
@@ -592,12 +596,6 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.Wtpp)
                     .HasColumnName("WTPP")
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Job)
-                    .WithMany(p => p.CsTransactionDetail)
-                    .HasForeignKey(d => d.JobId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>
