@@ -16,10 +16,11 @@ import {
     ShareBussinessHBLGoodSummaryLCLComponent
 } from 'src/app/business-modules/share-business';
 
-import { skip, catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 
+import isUUID from 'validator/lib/isUUID';
 
 @Component({
     selector: 'app-create-hbl-lcl-export',
@@ -69,9 +70,11 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     ngOnInit() {
         this._activedRoute.params
             .subscribe((param: Params) => {
-                if (param.jobId) {
+                if (param.jobId && isUUID(param.jobId)) {
                     this.jobId = param.jobId;
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                } else {
+                    this.gotoList();
                 }
             });
     }

@@ -445,7 +445,7 @@ export class PartnerDetailComponent extends AppList {
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerContactFaxNo, formBody.partnerContactFaxNo);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerWebsite, formBody.partnerWebsite);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerbankAccountNo, formBody.partnerbankAccountNo);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerBankAccountName, formBody.partnerbankAccountNo);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerBankAccountName, formBody.partnerBankAccountName);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerBankAccountAddress, formBody.partnerBankAccountAddress);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerSwiftCode, formBody.partnerSwiftCode);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.note, formBody.note);

@@ -281,7 +281,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 chargeItem.chargeCode = data.code;
                 chargeItem.chargeName = data.chargeNameEn;
                 chargeItem.chargeId = data.id;
-                chargeItem.type = data.type;
+                chargeItem.type = this.updateChargeType(data.type);
                 // * Unit, Unit Price had value
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
                     this.listUnits.pipe(
@@ -510,6 +510,17 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             control.setValue(null);
             control.markAsUntouched({ onlySelf: true });
             control.markAsPristine({ onlySelf: true });
+        }
+    }
+
+    updateChargeType(type: string) {
+        switch (type) {
+            case CommonEnum.CHARGE_TYPE.CREDIT:
+                return CommonEnum.SurchargeTypeEnum.BUYING_RATE;
+            case CommonEnum.CHARGE_TYPE.DEBIT:
+                return CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+            default:
+                break;
         }
     }
 

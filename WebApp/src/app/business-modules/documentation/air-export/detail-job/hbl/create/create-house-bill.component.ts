@@ -13,14 +13,18 @@ import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { catchError, finalize, takeUntil, map, tap, mergeMap } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
 import { HouseBill, DIM } from '@models';
-
-import _merge from 'lodash/merge';
 import { AbstractControl } from '@angular/forms';
-import { AirExportHBLAttachListComponent } from '../components/attach-list/attach-list-house-bill-air-export.component';
 import { ShareBusinessImportHouseBillDetailComponent } from '@share-bussiness';
+
+import { AirExportHBLAttachListComponent } from '../components/attach-list/attach-list-house-bill-air-export.component';
 import { getDimensionVolumesState, getDetailHBlState } from './../../../../../share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+
+import _merge from 'lodash/merge';
+
+import isUUID from 'validator/lib/isUUID';
+
 @Component({
     selector: 'app-create-hbl-air-export',
     templateUrl: './create-house-bill.component.html',
@@ -32,8 +36,10 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(AirExportHBLAttachListComponent, { static: false }) attachListComponent: AirExportHBLAttachListComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+
     jobId: string;
     selectedHbl: any = {}; // TODO model.
+
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -53,10 +59,12 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     ngOnInit() {
         this._activedRoute.params
             .subscribe((param: Params) => {
-                if (param.jobId) {
+                if (isUUID(param.jobId)) {
                     this.jobId = param.jobId;
                     this.generateHblNo(CommonEnum.TransactionTypeEnum.AirExport);
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                } else {
+                    this.gotoList();
                 }
             });
     }

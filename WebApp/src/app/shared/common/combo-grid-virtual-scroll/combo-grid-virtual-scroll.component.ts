@@ -85,6 +85,10 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                     this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
                 } else if (!!activeItemData.hardValue) {
                     this.displaySelectedStr = activeItemData.hardValue;
+                } else {
+                    if (this.loading) {
+                        this.loading = false;
+                    }
                 }
             }
         }
@@ -120,13 +124,24 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             if (itemIndex !== -1) {
                 this.indexSelected = itemIndex;
                 this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
-            }
-            if (itemIndex === -1 && data.hardValue != null) {
+            } else if (!!data.hardValue) {
                 this.displaySelectedStr = data.hardValue;
+            } else {
+                setTimeout(() => {
+                    if (this.loading) {
+                        this.loading = false;
+                    }
+                }, 500);
             }
+
         } else {
             this.indexSelected = -1;
             this.displaySelectedStr = null;
+            setTimeout(() => {
+                if (this.loading) {
+                    this.loading = false;
+                }
+            }, 500);
         }
     }
 

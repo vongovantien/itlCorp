@@ -16,6 +16,7 @@ import * as fromShareBussiness from './../../../share-business/store';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
+import isUUID from 'validator/lib/isUUID';
 
 @Component({
     selector: 'app-detail-job-fcl-import',
@@ -72,14 +73,17 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             switchMap(() => of(this.jobId))
         ).subscribe(
             (jobId: string) => {
-                this.jobId = jobId;
-                this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
-                this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
-                this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                if (isUUID(jobId)) {
+                    this.jobId = jobId;
+                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
+                    this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
+                    this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
 
-
-                this.getDetailSeaFCLImport();
-                this.getListContainer();
+                    this.getDetailSeaFCLImport();
+                    this.getListContainer();
+                } else {
+                    this.gotoList();
+                }
             }
         );
     }

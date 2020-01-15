@@ -65,6 +65,7 @@ export class PartnerListComponent extends AppList implements OnInit {
         console.log(this.dataSearch);
         this.getPartners();
     }
+
     replaceService() {
         for (const item of this.saleMans) {
             this.services.forEach(itemservice => {
@@ -74,6 +75,7 @@ export class PartnerListComponent extends AppList implements OnInit {
             });
         }
     }
+
     getService() {
         this._catalogueRepo.getListService()
             .pipe(catchError(this.catchError))
@@ -85,44 +87,24 @@ export class PartnerListComponent extends AppList implements OnInit {
                 },
             );
     }
+
     showSaleman(partnerId: string) {
         this._catalogueRepo.getListSaleman(partnerId)
             .pipe(catchError(this.catchError), finalize(() => {
             })).subscribe(
                 (res: any) => {
-                    if (res !== null) {
-                        this.saleMans = res;
-                        console.log(this.saleMans);
-                        this.replaceService();
-                    } else {
-                        this.saleMans = [];
-                    }
-
+                    this.saleMans = res || [];
+                    this.replaceService();
                 }
             );
-        // if (!!this.customers[indexs].saleManRequests.length) {
-        //     this.saleMans = this.customers[indexs].saleManRequests;
-        //     this.replaceService();
-        // } else {
-        //     this._progressRef.start();
-        //     this._catalogueRepo.getListSaleman(partnerId)
-        //         .pipe(
-        //             catchError(this.catchError),
-        //             finalize(() => this._progressRef.complete())
-        //         ).subscribe(
-        //             (res: Saleman[]) => {
-        //                 this.saleMans = res || [];
-        //                 this.customers[indexs].saleManRequests = this.saleMans;
-        //                 this.replaceService();
-        //             }
-        //         );
-        // }
     }
+
     sortBySaleman(sortData: CommonInterface.ISortData): void {
         if (!!sortData.sortField) {
             this.saleMans = this._sortService.sort(this.saleMans, sortData.sortField, sortData.order);
         }
     }
+
     searchPartner(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
         this.dataSearch[event.field] = event.searchString;
@@ -147,9 +129,11 @@ export class PartnerListComponent extends AppList implements OnInit {
     sortPartners() {
         this.partners = this._sortService.sort(this.partners, this.sort, this.order);
     }
+
     showDetail(item) {
         this.detail.emit(item);
     }
+
     showConfirmDelete(item) {
         this.deleteConfirm.emit(item);
     }

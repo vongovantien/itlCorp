@@ -13,6 +13,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
+import isUUID from 'validator/lib/isUUID';
 
 @Component({
     selector: 'app-detail-hbl-lcl-export',
@@ -53,7 +54,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.hblId) {
+            if (param.hblId && isUUID(param.hblId)) {
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
@@ -62,7 +63,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
                 this.getDetailHbl();
 
             } else {
-                // TODO handle error. 
+                this.gotoList();
             }
         });
 

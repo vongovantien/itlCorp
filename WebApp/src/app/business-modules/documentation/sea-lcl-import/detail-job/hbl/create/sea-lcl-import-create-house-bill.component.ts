@@ -24,6 +24,7 @@ import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
+import isUUID from 'validator/lib/isUUID';
 
 
 import { forkJoin } from 'rxjs';
@@ -85,9 +86,11 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.jobId) {
+            if (param.jobId && isUUID(param.jobId)) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+            } else {
+                this.combackToHBLList();
             }
         });
     }
