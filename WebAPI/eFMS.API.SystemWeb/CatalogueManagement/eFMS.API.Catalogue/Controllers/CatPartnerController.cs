@@ -142,19 +142,22 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost("CheckTaxCode")]
         public IActionResult CheckTaxCode(CatPartnerEditModel model)
         {
-            if(string.IsNullOrEmpty(model.Id))
+            string refNo = model.InternalReferenceNo == null ? "" : model.InternalReferenceNo.Trim().ToLower();
+            if (string.IsNullOrEmpty(model.Id))
             {
                 var result = catPartnerService.Get(x => x.TaxCode.Trim() == model.TaxCode.Trim().ToLower()
-                                                    && (((string.IsNullOrEmpty( x.InternalReferenceNo)? "": x.InternalReferenceNo.Trim()) == model.InternalReferenceNo.Trim().ToLower()) 
-                                                    || string.IsNullOrEmpty(model.InternalReferenceNo)
-                                                    )
+                                                    && (
+                                                      ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
+                                                      || refNo.Length == 0)
                             )?.FirstOrDefault();
                 return Ok(result);
             }
             else
             {
                 var result = catPartnerService.Get(x => x.TaxCode.Trim() == model.TaxCode.Trim().ToLower() && x.Id != model.Id
-                                                    && ((x.InternalReferenceNo == null ? "" : x.InternalReferenceNo.Trim()) == model.InternalReferenceNo.Trim().ToLower() || string.IsNullOrEmpty(model.InternalReferenceNo))
+                                                      && (
+                                                      ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
+                                                      || refNo.Length == 0)
                             )?.FirstOrDefault();
                 return Ok(result);
             }

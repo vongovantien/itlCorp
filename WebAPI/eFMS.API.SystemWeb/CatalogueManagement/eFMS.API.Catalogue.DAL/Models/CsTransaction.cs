@@ -46,9 +46,11 @@ namespace eFMS.API.Catalogue.Service.Models
         public string TransactionType { get; set; }
         public string CurrentStatus { get; set; }
         public DateTime? LockedDate { get; set; }
+        public string LockedLog { get; set; }
         public bool? IsLocked { get; set; }
         public DateTime? FlightDate { get; set; }
         public decimal? Hwconstant { get; set; }
+        public string Route { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

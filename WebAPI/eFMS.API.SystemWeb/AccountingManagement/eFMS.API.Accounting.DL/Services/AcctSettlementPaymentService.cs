@@ -312,8 +312,8 @@ namespace eFMS.API.Accounting.DL.Services
             var dataOperation = from set in settlement
                                 join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
                                 from sur in sc.DefaultIfEmpty()
-                                join ops in opst on sur.Hblid equals ops.Hblid into op
-                                from ops in op.DefaultIfEmpty()
+                                join ops in opst on sur.Hblid equals ops.Hblid //into op
+                                //from ops in op.DefaultIfEmpty()
                                 where
                                      sur.SettlementCode == settlementNo
                                 select new ShipmentOfSettlementResult
@@ -328,8 +328,8 @@ namespace eFMS.API.Accounting.DL.Services
             var dataDocument = from set in settlement
                                join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
                                from sur in sc.DefaultIfEmpty()
-                               join cstd in csTransDe on sur.Hblid equals cstd.Id into csd
-                               from cstd in csd.DefaultIfEmpty()
+                               join cstd in csTransDe on sur.Hblid equals cstd.Id //into csd
+                               //from cstd in csd.DefaultIfEmpty()
                                join cst in csTrans on cstd.JobId equals cst.Id into cs
                                from cst in cs.DefaultIfEmpty()
                                where
@@ -344,7 +344,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    SettlementCurrency = set.SettlementCurrency
                                };
             var data = dataOperation.Union(dataDocument);
-            data = data.GroupBy(x => new
+            var dataGrp = data.ToList().GroupBy(x => new
             {
                 x.JobId,
                 x.HBL,
@@ -360,7 +360,7 @@ namespace eFMS.API.Accounting.DL.Services
                     SettlementCurrency = s.Key.SettlementCurrency
                 }
             );
-            return data.ToList();
+            return dataGrp.ToList();
         }
         #endregion --- LIST SETTLEMENT PAYMENT ---
 
@@ -1776,7 +1776,7 @@ namespace eFMS.API.Accounting.DL.Services
                         && settle.StatusApproval != Constants.STATUS_APPROVAL_DONE
                         && settle.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL)
                     {
-                        return new HandleState("Awaiting Approval");
+                        return new HandleState("Awaiting approval");
                     }
                 }
 
@@ -1843,7 +1843,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         var sendMailResult = SendMailSuggestApproval(acctApprove.SettlementNo, userLeaderOrManager, emailLeaderOrManager);
 
-                        return !sendMailResult ? new HandleState("Send mail suggest Approval Failed") : new HandleState();
+                        return !sendMailResult ? new HandleState("Send mail suggest approval failed") : new HandleState();
                     }
                     catch (Exception ex)
                     {
@@ -1875,7 +1875,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                     var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
 
-                    if (settlement == null) return new HandleState("Not found Settlement Payment");
+                    if (settlement == null) return new HandleState("Not found settlement payment");
 
                     var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
 
@@ -1979,7 +1979,7 @@ namespace eFMS.API.Accounting.DL.Services
                         //Send mail đề nghị approve
                         var sendMailResult = SendMailSuggestApproval(settlement.SettlementNo, userAprNext, emailUserAprNext);
 
-                        return sendMailResult ? new HandleState() : new HandleState("Send mail Suggest Approval Failed");
+                        return sendMailResult ? new HandleState() : new HandleState("Send mail suggest approval failed");
                     }
                 }
                 catch (Exception ex)
@@ -2005,14 +2005,14 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
 
-                    if (settlement == null) return new HandleState("Not found Settlement Payment");
+                    if (settlement == null) return new HandleState("Not found settlement payment");
 
                     var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
                     if (approve == null)
                     {
                         if(acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo).Select(s => s.Id).Any() == false)
                         {
-                            return new HandleState("Not found Approve Settlement by SettlementNo " + settlement.SettlementNo);
+                            return new HandleState("Not found approve settlement by SettlementNo " + settlement.SettlementNo);
                         }
                         else
                         {
@@ -2510,7 +2510,7 @@ namespace eFMS.API.Accounting.DL.Services
             var acctApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeputy == false).FirstOrDefault();
             if (acctApprove == null)
             {
-                result = new HandleState("Not found Settlement Approval by SettlementNo is " + settlementNo);
+                result = new HandleState("Not found settlement approval by SettlementNo is " + settlementNo);
                 return result;
             }
 
@@ -2518,7 +2518,7 @@ namespace eFMS.API.Accounting.DL.Services
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null)
             {
-                result = new HandleState("Not found Settlement Payment by SettlementNo is" + settlementNo);
+                result = new HandleState("Not found settlement payment by SettlementNo is" + settlementNo);
                 return result;
             }
 
@@ -2558,7 +2558,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
-                            result = new HandleState("Manager Department Approved");
+                            result = new HandleState("Manager department approved");
                         }
                     }
                     else
@@ -2584,7 +2584,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
-                            result = new HandleState("Chief Accountant Approved");
+                            result = new HandleState("Chief accountant approved");
                         }
                     }
                     else
@@ -2620,7 +2620,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.LeaderAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.Leader))
                         {
-                            result = new HandleState("Leader Approved");
+                            result = new HandleState("Leader approved");
                         }
                     }
                     else
@@ -2655,7 +2655,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
-                            result = new HandleState("Manager Department Approved");
+                            result = new HandleState("Manager department approved");
                         }
                     }
                     else
@@ -2682,7 +2682,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
-                            result = new HandleState("Chief Accountant Approved");
+                            result = new HandleState("Chief accountant approved");
                         }
                     }
                     else

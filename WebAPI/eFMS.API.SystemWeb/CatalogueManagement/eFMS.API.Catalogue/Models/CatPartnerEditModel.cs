@@ -64,6 +64,7 @@ namespace eFMS.API.Catalogue.Models
         public Guid? WorkPlaceId { get; set; }
         public string InternalReferenceNo { get; set; }
         public string CoLoaderCode { get; set; }
+        public string WorkPhoneEx { get; set; }
         public List<CatSaleManEditModel> SaleMans { get; set; }
     }
 }
