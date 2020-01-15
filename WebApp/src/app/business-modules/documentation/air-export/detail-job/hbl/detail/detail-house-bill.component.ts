@@ -6,13 +6,13 @@ import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
 import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
-import { CsTransactionDetail, Crystal } from '@models';
+import { Crystal } from '@models';
 import { ReportPreviewComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
 
-
 import { catchError, finalize } from 'rxjs/operators';
-import { SeparateHouseBillComponent } from '../components/form-separate-house-bill/form-separate-house-bill.component';
+import isUUID from 'validator/lib/isUUID';
+
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -22,8 +22,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     hblId: string;
-
-    // hblDetail: CsTransactionDetail;
 
     dataReport: Crystal;
 
@@ -52,7 +50,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.hblId) {
+            if (isUUID(param.hblId)) {
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
 
@@ -61,7 +59,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
 
             } else {
-                // TODO handle error. 
+                this.gotoList();
             }
         });
 

@@ -14,6 +14,7 @@ import { combineLatest, of, forkJoin } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
+import isUUID from 'validator/lib/isUUID';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
@@ -76,12 +77,14 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             switchMap(() => of(this.jobId)),
         ).subscribe(
             (jobId: string) => {
-                if (!!jobId) {
+                if (isUUID(jobId)) {
                     this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
                     this._store.dispatch(new fromShareBussiness.GetDimensionAction(jobId));
 
                     this.getDetailShipment();
+                } else {
+                    this.gotoList();
                 }
             }
         );

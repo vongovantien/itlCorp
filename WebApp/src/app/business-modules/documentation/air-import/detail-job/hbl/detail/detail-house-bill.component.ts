@@ -1,17 +1,21 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
 import { CsTransactionDetail } from '@models';
-import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { skip, catchError, takeUntil, finalize } from 'rxjs/operators';
-
-import * as fromShareBussiness from './../../../../../share-business/store';
 import { ReportPreviewComponent } from '@common';
 import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from '@share-bussiness';
+
+import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
+import { Crystal } from 'src/app/shared/models/report/crystal.model';
+
+import * as fromShareBussiness from './../../../../../share-business/store';
+import { skip, catchError, takeUntil, finalize } from 'rxjs/operators';
+
+import isUUID from 'validator/lib/isUUID';
+
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -59,7 +63,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.hblId) {
+            if (param.hblId && isUUID(param.hblId)) {
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
@@ -69,7 +73,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 this.getDetailHbl();
 
             } else {
-                // TODO handle error. 
+                this.gotoList();
             }
         });
 
@@ -224,7 +228,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     onPreview(type: string) {
         this.isClickSubMenu = false;
-        // Preview Arrival Notice
         if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
             const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
             this.previewArrivalNotice(_currency);

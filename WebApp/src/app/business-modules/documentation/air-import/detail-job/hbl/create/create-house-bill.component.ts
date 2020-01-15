@@ -5,21 +5,21 @@ import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-
-
-import * as fromShareBussiness from './../../../../../share-business/store';
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { catchError, finalize, skip, takeUntil, mergeMap } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { HouseBill, DeliveryOrder } from '@models';
 
-import _merge from 'lodash/merge';
+import * as fromShareBussiness from './../../../../../share-business/store';
+import { catchError, finalize, skip, takeUntil, mergeMap } from 'rxjs/operators';
 import { AirImportHBLFormCreateComponent } from '../components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
 import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, getDetailHBlState } from '@share-bussiness';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
-import { forkJoin } from 'rxjs';
-import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+
+import { forkJoin } from 'rxjs';
+import _merge from 'lodash/merge';
+import isUUID from 'validator/lib/isUUID';
+
 @Component({
     selector: 'app-create-hbl-air-import',
     templateUrl: './create-house-bill.component.html',
@@ -31,9 +31,11 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: true }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+
     jobId: string;
     hblDetail: any = {};
     selectedHbl: any = {};
+
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -53,21 +55,22 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     ngOnInit() {
         this._activedRoute.params
             .subscribe((param: Params) => {
-                if (param.jobId) {
+                if (isUUID(param.jobId)) {
                     this.jobId = param.jobId;
                     this.generateHblNo(CommonEnum.TransactionTypeEnum.AirImport);
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     this.getDetailShipment();
+                } else {
+                    this.gotoList();
                 }
             });
     }
 
     ngAfterViewInit() {
-        // this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
         this._cd.detectChanges();
     }
 
-    generateHblNo(transactionType: number){
+    generateHblNo(transactionType: number) {
         this._documentationRepo.generateHBLNo(transactionType)
             .pipe(
                 catchError(this.catchError),
@@ -113,24 +116,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     onImport(selectedData: any) {
         this.selectedHbl = selectedData;
         this.formCreateHBLComponent.updateFormValue(this.selectedHbl);
-        // if (!!this.selectedHbl) {
-        //     this._store.select(getDetailHBlState)
-        //         .pipe(
-        //             takeUntil(this.ngUnsubscribe),
-
-        //         )
-        //         .subscribe(
-        //             (hbl: HouseBill) => {
-        //                 if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
-
-        //                     this.formCreateHBLComponent.jobId = hbl.jobId;
-        //                     this.formCreateHBLComponent.hblId = hbl.id;
-
-        //                 }
-
-        //             }
-        //         );
-        // }
     }
 
 
@@ -145,7 +130,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
-        console.log(form);
         const formData = {
             mawb: form.mawb,
             customerId: form.customer,
@@ -180,7 +164,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
-        console.log(houseBill);
         return houseBill;
     }
 
@@ -200,7 +183,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
     checkValidateForm() {
         let valid: boolean = true;
-        // this.setError(this.formCreateHBLComponent.hbltype);
         this.setError(this.formCreateHBLComponent.freightPayment);
         this.setError(this.formCreateHBLComponent.packageType);
 
@@ -234,8 +216,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 ).subscribe(result => {
                     this._toastService.success(result[0].message, '');
                     this.gotoList();
-                }
-                );
+                });
         }
     }
 

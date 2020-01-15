@@ -7,11 +7,12 @@ import { ToastrService } from 'ngx-toastr';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SeaFCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 import { CsTransactionDetail } from 'src/app/shared/models';
+import { Crystal } from 'src/app/shared/models/report/crystal.model';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
-import { Crystal } from 'src/app/shared/models/report/crystal.model';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import isUUID from 'validator/lib/isUUID';
 
 @Component({
     selector: 'app-detail-hbl-fcl-export',
@@ -52,7 +53,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.hblId) {
+            if (param.hblId && isUUID(param.hblId)) {
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
@@ -61,7 +62,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 this.getDetailHbl();
 
             } else {
-                // TODO handle error. 
+                this.gotoList();
             }
         });
 

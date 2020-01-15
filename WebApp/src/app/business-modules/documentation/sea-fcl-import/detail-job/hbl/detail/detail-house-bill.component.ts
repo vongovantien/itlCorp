@@ -16,6 +16,7 @@ import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent } from 'src/app/business-modules/share-business';
+import isUUID from 'validator/lib/isUUID';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -65,7 +66,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
     ngAfterViewInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.hblId && param.jobId) {
+            if (param.hblId && param.jobId && isUUID(param.hblId)) {
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
@@ -74,7 +75,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 this.getDetailHbl();
 
             } else {
-                // TODO handle error. 
+                this.combackToHBLList();
             }
         });
     }

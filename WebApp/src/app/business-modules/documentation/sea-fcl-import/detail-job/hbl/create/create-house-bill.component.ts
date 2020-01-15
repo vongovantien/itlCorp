@@ -12,13 +12,14 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { finalize } from 'rxjs/internal/operators/finalize';
-import { catchError, takeUntil, mergeMap, map, skip } from 'rxjs/operators';
+import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { DeliveryOrder } from 'src/app/shared/models';
 import { forkJoin } from 'rxjs';
+import isUUID from 'validator/lib/isUUID';
 
 import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent } from 'src/app/business-modules/share-business';
 enum HBL_TAB {
@@ -75,7 +76,7 @@ export class CreateHouseBillComponent extends AppForm {
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.jobId) {
+            if (param.jobId && isUUID(param.jobId)) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
@@ -83,6 +84,8 @@ export class CreateHouseBillComponent extends AppForm {
                 this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
 
                 this.getDetailShipment();
+            } else {
+                this.combackToHBLList();
             }
         });
     }

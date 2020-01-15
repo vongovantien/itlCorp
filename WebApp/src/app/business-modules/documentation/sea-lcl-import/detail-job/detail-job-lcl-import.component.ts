@@ -14,6 +14,7 @@ import { combineLatest, of } from 'rxjs';
 import { switchMap, map, tap, skip, takeUntil, catchError, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
+import isUUID from 'validator/lib/isUUID';
 
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
@@ -75,11 +76,13 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
             switchMap(() => of(this.jobId)),
         ).subscribe(
             (jobId: string) => {
-                if (!!jobId) {
+                if (isUUID(jobId)) {
                     this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
 
                     this.getDetailSeaFCLImport();
+                } else {
+                    this.gotoList();
                 }
             }
         );

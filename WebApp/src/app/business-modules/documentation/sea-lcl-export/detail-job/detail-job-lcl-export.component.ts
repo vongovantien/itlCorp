@@ -14,7 +14,7 @@ import { tap, map, switchMap, catchError, takeUntil, skip, take, finalize } from
 import * as fromShareBussiness from './../../../share-business/store';
 import { NgProgress } from '@ngx-progressbar/core';
 
-
+import isUUID from 'validator/lib/isUUID';
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 @Component({
@@ -75,11 +75,13 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
             switchMap(() => of(this.jobId)),
         ).subscribe(
             (jobId: string) => {
-                if (!!jobId) {
+                if (isUUID(jobId)) {
                     this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
 
                     this.getDetailSeaLCLExport();
+                } else {
+                    this.gotoList();
                 }
             }
         );

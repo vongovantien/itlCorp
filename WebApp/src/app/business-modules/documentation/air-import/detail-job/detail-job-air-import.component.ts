@@ -2,19 +2,19 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
 
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { DIM, CsTransaction } from '@models';
+import { AirImportCreateJobComponent } from '../create-job/create-job-air-import.component';
 
 import { combineLatest, of, forkJoin } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, skip, take, finalize } from 'rxjs/operators';
+import { tap, map, switchMap, catchError, takeUntil, skip, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
-import { AirImportCreateJobComponent } from '../create-job/create-job-air-import.component';
-import { NgProgress } from '@ngx-progressbar/core';
-
+import isUUID from 'validator/lib/isUUID';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -78,12 +78,14 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
             switchMap(() => of(this.jobId)),
         ).subscribe(
             (jobId: string) => {
-                if (!!jobId) {
+                if (isUUID(jobId)) {
                     this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
                     this._store.dispatch(new fromShareBussiness.GetDimensionAction(jobId));
 
                     this.getDetailShipment();
+                } else {
+                    this.gotoList();
                 }
             }
         );

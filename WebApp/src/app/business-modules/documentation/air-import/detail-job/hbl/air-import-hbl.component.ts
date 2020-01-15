@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { AppList } from 'src/app/app.list';
@@ -11,11 +12,11 @@ import { CsTransactionDetail, HouseBill } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
-
 import * as fromShareBussiness from '../../../../share-business/store';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/share-business/components/selling-charge/selling-charge.component';
-import { NgxSpinnerService } from 'ngx-spinner';
+
+import isUUID from 'validator/lib/isUUID';
 
 
 @Component({
@@ -63,11 +64,13 @@ export class AirImportHBLComponent extends AppList implements OnInit {
         this._store.select(getParamsRouterState)
             .pipe(takeUntil(this.ngUnsubscribe), take(1))
             .subscribe((param: Params) => {
-                if (param.jobId) {
+                if (param.jobId && isUUID(param.jobId)) {
                     this.jobId = param.jobId;
 
                     this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
                     this.getHouseBills(this.jobId);
+                } else {
+                    this.gotoList();
                 }
             });
 
