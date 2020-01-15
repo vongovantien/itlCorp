@@ -116,7 +116,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends ShareBussinessShip
         this.containerDescription = '';
 
         containers.forEach((c: Container) => {
-            this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.containerTypeName || '', c.sealNo || '');
+            this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.sealNo || '', c.markNo || '');
         });
 
         const contObject: any[] = (containers || []).map((container: Container | any) => ({
