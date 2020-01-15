@@ -108,6 +108,7 @@ export class CommodityGroupListComponent extends AppList {
     onSearch(event: { field: string, searchString: string, displayName: string }) {
         this.dataSearch = {};
         this.dataSearch[event.field] = event.searchString;
+        this.page = 1;
         this.getGroupCommodities();
     }
 
