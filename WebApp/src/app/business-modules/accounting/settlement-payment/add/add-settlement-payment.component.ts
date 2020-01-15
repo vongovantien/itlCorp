@@ -81,7 +81,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
 
                         this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}`]);
                     } else {
-                        this._toastService.warning(res.message);
+                        this._toastService.warning(res.message,'',{ enableHtml: true });
                     }
                     this.requestSurchargeListComponent.selectedIndexSurcharge = null;
                 }
@@ -116,7 +116,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
 
                         this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}/approve`]);
                     } else {
-                        this._toastService.warning(res.message);
+                        this._toastService.warning(res.message, '', { enableHtml: true });
                     }
                     this.requestSurchargeListComponent.selectedIndexSurcharge = null;
 

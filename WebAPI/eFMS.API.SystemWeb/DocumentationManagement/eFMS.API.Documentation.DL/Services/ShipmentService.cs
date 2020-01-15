@@ -46,9 +46,9 @@ namespace eFMS.API.Documentation.DL.Services
             var userCurrent = currentUser.UserID;
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
-            var shipmentsOperation = from ops in opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false)
-                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId into osa2
-                                     from osa in osa2.DefaultIfEmpty()
+            var shipmentsOperation = from ops in opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED && x.IsLocked == false)
+                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId //into osa2
+                                     //from osa in osa2.DefaultIfEmpty()
                                      where osa.MainPersonInCharge == userCurrent
                                      select new Shipments
                                      {
@@ -74,7 +74,10 @@ namespace eFMS.API.Documentation.DL.Services
                 Service = "CL"
             });
             //End change request
-            var transactions = DataContext.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var transactions = from cst in DataContext.Get(x => x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED && x.IsLocked == false)
+                               join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
+                               where osa.MainPersonInCharge == userCurrent
+                               select cst;
             var shipmentsDocumention = transactions.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
             {
                 Id = x.x.Id,
@@ -122,7 +125,7 @@ namespace eFMS.API.Documentation.DL.Services
             //Nếu có chứa Service Custom Logistic
             if (services.Contains("CL"))
             {
-                var shipmentOperation = opsRepository.Get(x => x.IsLocked == false && x.CurrentStatus != "Canceled");
+                var shipmentOperation = opsRepository.Get(x => x.IsLocked == false && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
                 var shipmentsOperation = surcharge.Join(shipmentOperation, x => x.Hblid, y => y.Hblid, (x, y) => new { x, y }).Select(x => new Shipments
                 {
                     JobId = x.y.JobNo,
@@ -150,13 +153,17 @@ namespace eFMS.API.Documentation.DL.Services
             if (string.IsNullOrEmpty(searchOption) || keywords == null || keywords.Count == 0 || keywords.Any(x => x == null)) return dataList;
 
             var surcharge = surCharge.Get();
-            var cstran = DataContext.Get();
+            var cstran = from cstd in DataContext.Get(x => x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED)
+                         join osa in opsStageAssignedRepo.Get() on cstd.Id equals osa.JobId //So sánh bằng
+                         where osa.MainPersonInCharge == userCurrent
+                         select cstd;
+
             var cstrandel = detailRepository.Get();
-            //var opstran = opsRepository.Get(x => x.CurrentStatus != "Canceled");
+            //var opstran = opsRepository.Get(x => x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
 
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
-            var opstran = from ops in opsRepository.Get(x => x.CurrentStatus != "Canceled")
+            var opstran = from ops in opsRepository.Get(x => x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED)
                           join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId //So sánh bằng
                           where osa.MainPersonInCharge == userCurrent
                           select ops;

@@ -37,7 +37,7 @@
                                 </span>
                             </button>
                             <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Deny" *ngIf="!approveInfo.isRequester && (approveInfo.statusApproval === 'RequestApproval' || approveInfo.statusApproval === 'DepartmentManagerApproved')" (click)="showDenyPopup()">
+                                title="Deny" *ngIf="!approveInfo.isApproved || (approveInfo.isManager && (approveInfo.statusApproval === 'RequestApproval' || approveInfo.statusApproval === 'DepartmentManagerApproved'))" (click)="showDenyPopup()">
                                 <span>
                                     <i class="la la-times"></i>
                                     <span>

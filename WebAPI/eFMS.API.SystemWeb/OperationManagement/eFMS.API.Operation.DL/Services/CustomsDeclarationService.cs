@@ -957,8 +957,8 @@ namespace eFMS.API.Operation.DL.Services
             var userCurrent = currentUser.UserID;
             var customs = DataContext.Get();
             var shipmentsOperation = from ops in opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false)
-                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId into osa2
-                                     from osa in osa2.DefaultIfEmpty()
+                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId //into osa2
+                                     //from osa in osa2.DefaultIfEmpty()
                                      where osa.MainPersonInCharge == userCurrent
                                      select ops;
             

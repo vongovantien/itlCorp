@@ -91,7 +91,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId, 'GROUP');
                     } else {
-                        this._toastService.warning(res.message);
+                        this._toastService.warning(res.message, '', {enableHtml: true});
                     }
                 }
             );
@@ -182,7 +182,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
 
                         this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}/approve`]);
                     } else {
-                        this._toastService.warning(res.message);
+                        this._toastService.warning(res.message, '', { enableHtml: true });
                     }
                 }
             );
