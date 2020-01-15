@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 
@@ -21,8 +20,8 @@ export class SeaFclExportBillDetailComponent extends AppList {
             { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
             { title: 'Description', field: 'desOfGoods', sortable: true },
             { title: 'Shipping Marks', field: 'shippingMark', sortable: true },
-            { title: 'Containers', field: 'PackageContainer', sortable: true },
-            { title: 'Packages', field: 'PackageContainer', sortable: true },
+            { title: 'Containers', field: 'contSealNo', sortable: true },
+            { title: 'Packages', field: 'packageContainer', sortable: true },
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true }
         ];

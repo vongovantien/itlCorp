@@ -16,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/share-business/components/manifest/form-manifest/components/form-manifest.component';
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'app-sea-lcl-export-manifest',
@@ -26,6 +27,7 @@ export class SeaLclExportManifestComponent extends AppList {
     @ViewChild(ShareBusinessFormManifestComponent, { static: false }) formManifest: ShareBusinessFormManifestComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(ShareBusinessAddHblToManifestComponent, { static: false }) AddHblToManifestPopup: ShareBusinessAddHblToManifestComponent;
+    portType: CommonEnum.PORT_TYPE = CommonEnum.PORT_TYPE.SEA;
     housebills: any[] = [];
     housebillsRoot: any[] = [];
     housebillsChange: any[] = [];

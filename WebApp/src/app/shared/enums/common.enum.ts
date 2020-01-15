@@ -106,6 +106,11 @@ export namespace CommonEnum {
         AIR_INLAND = 'AIR - INLAND',
         INALAND_AIR_SEA = 'INLAND - AIR - SEA'
     }
+
+    export enum PORT_TYPE {
+        AIR = 1,
+        SEA = 2,
+    }
 }
 
 

@@ -16,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/share-business/components/manifest/form-manifest/components/form-manifest.component';
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
+import { TransactionTypeEnum, CommonEnum } from '@enums';
 
 @Component({
     selector: 'app-sea-fcl-export-manifest',
@@ -27,6 +28,7 @@ export class SeaFclExportManifestComponent extends AppList {
     @ViewChild(ShareBusinessFormManifestComponent, { static: false }) formManifest: ShareBusinessFormManifestComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(ShareBusinessAddHblToManifestComponent, { static: false }) AddHblToManifestPopup: ShareBusinessAddHblToManifestComponent;
+    portType: CommonEnum.PORT_TYPE = CommonEnum.PORT_TYPE.SEA;
     housebills: any[] = [];
     housebillsRoot: any[] = [];
     housebillsChange: any[] = [];
@@ -62,15 +64,15 @@ export class SeaFclExportManifestComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: 'HBL No', field: 'hwbNo', sortable: true, width: 100 },
-            { title: 'No of Pieces', field: 'packageContainer', sortable: true },
-            { title: 'G.W', field: 'grossWeight', sortable: true },
+            { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
+            { title: 'No of Pieces', field: 'packages', sortable: true },
+            { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
             { title: 'Destination', field: 'podName', sortable: true },
             { title: 'Shipper', field: 'shipperName', sortable: true },
-            { title: 'Consignee', field: 'consignee', sortable: true },
+            { title: 'Consignee', field: 'consigneeName', sortable: true },
             { title: 'Description', field: 'desOfGoods', sortable: true },
-            { title: 'Freight Charge', field: '', sortable: true },
+            { title: 'Freight Charge', field: 'freightPayment', sortable: true },
 
         ];
 

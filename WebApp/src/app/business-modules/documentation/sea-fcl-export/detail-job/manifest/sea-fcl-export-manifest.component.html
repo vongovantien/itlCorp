@@ -24,7 +24,7 @@
     </div>
 </div>
 
-<form-manifest>
+<form-manifest [type]="portType">
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="row">
@@ -121,7 +121,7 @@
                                     <span>{{housebill.desOfGoods}}</span>
                                 </td>
                                 <td>
-                                    <span></span>
+                                    <span>{{ housebill.freightPayment}}</span>
                                 </td>
                             </ng-container>
                         </tr>
