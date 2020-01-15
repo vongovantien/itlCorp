@@ -39,11 +39,11 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
             { title: 'G.W', field: 'gw', sortable: true, required: true },
             { title: 'CBM', field: 'cbm', sortable: true, required: true },
             { title: 'Package Type', field: 'packageTypeId', sortable: true, required: true },
-            { title: 'Package Q`Ty', field: 'packageQuantity', sortable: true, required: true },
+            { title: 'Package Q`Ty', field: 'packageQuantity', sortable: true, required: true, width: 175 },
             { title: 'Container No', field: 'containerNo', sortable: true, },
             { title: 'Seal No', field: 'sealNo', sortable: true, },
             { title: 'Mark No', field: 'markNo', sortable: true, },
-            { title: 'Commodity', field: 'commodityId', sortable: true, },
+            { title: 'Commodity', field: 'commodityId', sortable: true, width: 175 },
             { title: 'Description', field: 'description', sortable: true, },
         ];
     }
