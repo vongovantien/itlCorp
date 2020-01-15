@@ -1,9 +1,12 @@
-import { Component, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { ToastrService } from 'ngx-toastr';
 import { CommonEnum } from '@enums';
 import { formatDate } from '@angular/common';
-import { ConfirmPopupComponent } from '@common';
+import { DocumentationRepo } from '@repositories';
+import { NgProgress } from '@ngx-progressbar/core';
+import { catchError, finalize } from 'rxjs/operators';
+import { UnlockHistoryPopupComponent } from '../unlock-history/unlock-history.popup';
 
 @Component({
     selector: 'unlock-shipment',
@@ -13,7 +16,7 @@ import { ConfirmPopupComponent } from '@common';
 
 export class UnlockShipmentComponent extends AppForm implements OnInit {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
+    @ViewChild(UnlockHistoryPopupComponent, { static: false }) confirmPopup: UnlockHistoryPopupComponent;
 
     options: CommonInterface.INg2Select[] = [
         { id: 1, text: 'Job ID' },
@@ -37,12 +40,18 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
     isSelectOption: boolean = true;
     isSelectServiceDate: boolean = false;
 
-    lockHistory: string;
+    lockHistory: string[] = [];
+    shipmentUnlock: any;
+
 
     constructor(
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _documentRepo: DocumentationRepo,
+        private _ngProgressService: NgProgress,
     ) {
         super();
+
+        this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit() {
@@ -80,25 +89,59 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
     }
 
     unlock() {
+        let body = {};
         if (this.isSelectOption) {
             if (!this.keyword.trim()) {
                 this._toastService.warning("Please input keyword");
                 return;
             }
+            body = {
+                shipmentPropertySearch: this.selectedOption[0].id,
+                keywords: !!this.keyword ? this.keyword.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
+            };
+        } else {
+            body = {
+                fromDate: !!this.selectedRange && !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
+                toDate: !!this.selectedRange && !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,
+                transactionType: this.selectedService[0].id !== 'All' ? this.selectedService[0].id : 0
+            };
         }
-        const body: IShipmentLock = {
-            shipmentPropertySearch: this.selectedOption[0].id,
-            keywords: !!this.keyword ? this.keyword.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
-            fromDate: !!this.selectedRange && !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
-            toDate: !!this.selectedRange && !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,
-            transactionType: this.selectedService[0].id !== 'All' ? this.selectedService[0].id : null
-        };
 
-        if (!!body) {
-            this.confirmPopup.show();
+        this._progressRef.start();
+        this._documentRepo.getShipmentToUnlock(body)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: IShipmentLockInfo) => {
+                    if (!!res.logs && !!res.logs.length) {
+                        this.lockHistory = (res.logs || []);
+                    } else {
+                        this.lockHistory = [];
+                    }
+                    this.confirmPopup.show();
+
+                    if (!!res.lockedLogs) {
+                        this.shipmentUnlock = res.lockedLogs;
+                    }
+                }
+            );
+    }
+
+    onUnlockShipment($event: boolean) {
+        if ($event && !!this.shipmentUnlock) {
+            this._progressRef.start();
+            this._documentRepo.unlockShipment(this.shipmentUnlock)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: any) => {
+                        if (res.success) {
+                            this._toastService.success("Unlock Successful");
+                        } else {
+                            this._toastService.error("Unlock failed, Please check again!");
+                        }
+                    }
+                );
         }
 
-        console.log(body);
     }
 }
 
@@ -108,5 +151,18 @@ interface IShipmentLock {
     transactionType: number;
     fromDate: string;
     toDate: string;
+}
+
+
+export interface IShipmentLockInfo {
+    lockedLogs: {
+        id: string;
+        advanceNo: string;
+        settlementNo: string;
+        lockedLog: string;
+        opsShipmentNo: string;
+        csShipmentNo: string;
+    };
+    logs: string[];
 }
 

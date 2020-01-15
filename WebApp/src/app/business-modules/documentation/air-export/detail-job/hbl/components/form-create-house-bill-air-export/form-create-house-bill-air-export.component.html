@@ -14,7 +14,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [currentActiveItemId]="{ field: 'id', value: customerId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200" [loading]="isLoading"
+                            [displayFields]="displayFieldsCustomer" [height]="200"
                             (remove)="resetFormControl(customerId)">
                         </app-combo-grid-virtual-scroll>
                     </div>
@@ -26,20 +26,19 @@
                             [currentActiveItemId]="{ field: 'id', value: saleManId.value}"
                             [selectedDisplayFields]="['username']" [dataSources]="saleMans | async"
                             [displayFields]="[{field: 'username', label: 'User Name'}]" [height]="200"
-                            [disabled]="!customerId.value" [loading]="isLoading" (remove)="resetFormControl(saleManId)">
+                            [disabled]="!customerId.value" (remove)="resetFormControl(saleManId)">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
             </div>
-            <div class="row div-inside"
-                [ngClass]="{'bg-secondary': isSeparate == false, 'bg-separate': isSeparate == true}">
+            <div class="row div-inside bg-secondary">
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !shipperId.value}">
                         <label required>Shipper</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
                             [currentActiveItemId]="{ field: 'id', value: shipperId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200" [loading]="isLoading"
+                            [displayFields]="displayFieldsCustomer" [height]="200"
                             (remove)="resetFormControl(shipperId)">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
@@ -52,7 +51,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consignee')"
                             [currentActiveItemId]="{ field: 'id', value: consigneeId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200" [loading]="isLoading"
+                            [displayFields]="displayFieldsCustomer" [height]="200"
                             (remove)="resetFormControl(consigneeId)">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
@@ -66,7 +65,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                             [currentActiveItemId]="{ field: 'id', value: forwardingAgentId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200" [loading]="isLoading"
+                            [displayFields]="displayFieldsCustomer" [height]="200"
                             (remove)="resetFormControl(forwardingAgentId)">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
@@ -150,7 +149,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                             [currentActiveItemId]="{ field: 'id', value: pol.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort" [loading]="isLoading" (remove)="resetFormControl(pol)">
+                            [displayFields]="displayFieldPort" [loading]="isLoadingPort | async"
+                            (remove)="resetFormControl(pol)">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -216,7 +216,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                             [currentActiveItemId]="{ field: 'id', value: pod.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort" [loading]="isLoading" (remove)="resetFormControl(pod)">
+                            [displayFields]="displayFieldPort" [loading]="isLoadingPort | async"
+                            (remove)="resetFormControl(pod)">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -380,8 +381,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row div-inside"
-                [ngClass]="{' bg-secondary': isSeparate == false, 'bg-separate': isSeparate == true}">
+            <div class="row div-inside bg-secondary">
                 <div class="col-md-4">
                     <div class="row">
                         <div class="col">

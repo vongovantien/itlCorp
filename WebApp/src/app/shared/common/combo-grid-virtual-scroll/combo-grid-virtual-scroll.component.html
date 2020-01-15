@@ -1,6 +1,6 @@
 <div class="dropdown e--combogrid" (clickOutside)="keyword = ''">
     <input (click)="clickSearch()" class="form-control m-input m-input--square dropdown-toggle pos-rel"
-        [disabled]="loading ? true : Disabled" type="text" readonly data-toggle="dropdown"
+        [disabled]="!!loading && !displaySelectedStr ? true : Disabled" type="text" readonly data-toggle="dropdown"
         [value]="displaySelectedStr == '' ? null : displaySelectedStr"
         [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''"
         [placeholder]="loading ? '' : placeholder">

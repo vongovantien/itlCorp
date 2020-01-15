@@ -29,6 +29,7 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
         protected _toastService: ToastrService
     ) {
         super(_catalogueRepo, _store, cdRef, _sortService, _toastService);
+        this.requestSort = this.sortHBLGoods;
     }
 
     configHeader() {
@@ -85,5 +86,9 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
         this.goodsImportPopup.data = [];
         this.goodsImportPopup.getData();
         this.goodsImportPopup.show();
+    }
+
+    sortHBLGoods() {
+        this.initContainers = this._sortService.sort(this.initContainers, this.sortField, this.order)
     }
 }

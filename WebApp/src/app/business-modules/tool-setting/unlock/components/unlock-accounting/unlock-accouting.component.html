@@ -4,16 +4,13 @@
             <h4 class="text-center text-info">Unlock Payment Request</h4>
             <div class="form-group m-form__group">
                 <div class="m-radio-list">
-                    <label class="m-radio m-radio--bold m-radio--state-success">
-                        <input name="example_5_1" type="radio">
-                        Advance Payment
-                        <span></span>
-                    </label>
-                    <label class="m-radio m-radio--bold m-radio--state-success">
-                        <input name="example_5_1" type="radio">
-                        Settlement Payment
-                        <span></span>
-                    </label>
+                    <ng-container *ngFor="let type of types">
+                        <label class="m-radio m-radio--bold m-radio--state-success">
+                            <input name="selectedType" [(ngModel)]="selectedType" [value]="type" type="radio">
+                            {{type.title}}
+                            <span></span>
+                        </label>
+                    </ng-container>
                 </div>
             </div>
         </div>
@@ -36,3 +33,5 @@
         </div>
     </div>
 </div>
+
+<unlock-history-popup [body]="lockHistory" (onUnlock)="onUnlockAccounting($event)"></unlock-history-popup>

@@ -14,7 +14,7 @@ import { takeUntil, skip, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../share-business/store';
-import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState } from '@store';
+import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, getCatalogueCarrierLoadingState, getCatalogueAgentLoadingState, getCataloguePortLoadingState } from '@store';
 
 @Component({
     selector: 'form-create-sea-export',
@@ -73,6 +73,9 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     ];
 
     userLogged: User;
+    isLoadingPort: Observable<boolean>;
+    isLoadingAgent: Observable<boolean>;
+    isLoadingCarrier: Observable<boolean>;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -95,6 +98,10 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
         this.ports = this._store.select(getCataloguePortState);
+
+        this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
+        this.isLoadingAgent = this._store.select(getCatalogueAgentLoadingState);
+        this.isLoadingCarrier = this._store.select(getCatalogueCarrierLoadingState);
 
 
         this.getUserLogged();
