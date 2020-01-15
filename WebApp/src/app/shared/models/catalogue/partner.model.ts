@@ -55,6 +55,7 @@ export class Partner {
     userCreatedName: string = '';
     internalReferenceNo: string = '';
     coLoaderCode: string = '';
+    workPhoneEx: string = '';
     saleManRequests: SaleManRequest[] = [];
     saleMans: SaleManRequest[] = [];
 

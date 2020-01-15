@@ -40,7 +40,7 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
             { title: 'MBL No', field: 'mawb', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
             { title: 'SaleMan', field: 'saleManName', sortable: true },
-            { title: 'Shipment Date', field: 'etd', sortable: true }
+            { title: 'Shipment Date', field: this.typeFCL === 'Export' ? 'etd' : 'eta', sortable: true }
         ];
 
     }

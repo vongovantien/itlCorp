@@ -12,6 +12,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string PaymentMethod { get; set; }
         public string SettlementCurrency { get; set; }
         public string StatusApproval { get; set; }
+        public string LockedLog { get; set; }
         public string Note { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }

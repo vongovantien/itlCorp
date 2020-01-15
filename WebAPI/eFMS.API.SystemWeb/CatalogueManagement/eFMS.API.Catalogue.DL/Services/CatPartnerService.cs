@@ -281,7 +281,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.UserCreated = currentUser.UserID;
                     partner.DatetimeModified = DateTime.Now;
                     partner.DatetimeCreated = DateTime.Now;
-                    partner.Id = partner.AccountNo = partner.TaxCode;
+                    partner.Id = Guid.NewGuid().ToString();
+                    partner.AccountNo = partner.TaxCode;
                     partner.Active = active;
                     partner.InactiveOn = inactiveDate;
                     DataContext.Add(partner, false);

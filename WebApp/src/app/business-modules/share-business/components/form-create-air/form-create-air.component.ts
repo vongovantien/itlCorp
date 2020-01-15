@@ -123,6 +123,18 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this._store.dispatch(new GetCatalogueUnitAction({ active: true }));
         this._store.dispatch(new GetCatalogueCommodityAction({ active: true }));
 
+        this.isLoadingPort = this._store.select(getCataloguePortLoadingState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        );
+
+        this.isLoadingAirline = this._store.select(getCatalogueCarrierLoadingState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        );
+
+        this.isLoadingAgent = this._store.select(getCatalogueAgentLoadingState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        );
+
         this.getUserLogged();
         this.initForm();
         this.getCarriers();
@@ -328,28 +340,16 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.carries = this._store.select(getCatalogueCarrierState).pipe(
             takeUntil(this.ngUnsubscribe)
         );
-
-        this.isLoadingAirline = this._store.select(getCatalogueCarrierLoadingState).pipe(
-            takeUntil(this.ngUnsubscribe)
-        );
     }
 
     getPorts() {
         this.ports = this._store.select(getCataloguePortState).pipe(
             takeUntil(this.ngUnsubscribe)
         );
-
-        this.isLoadingPort = this._store.select(getCataloguePortLoadingState).pipe(
-            takeUntil(this.ngUnsubscribe)
-        );
     }
 
     getAgents() {
         this.agents = this._store.select(getCatalogueAgentState).pipe(
-            takeUntil(this.ngUnsubscribe)
-        );
-
-        this.isLoadingAgent = this._store.select(getCatalogueAgentLoadingState).pipe(
             takeUntil(this.ngUnsubscribe)
         );
     }
