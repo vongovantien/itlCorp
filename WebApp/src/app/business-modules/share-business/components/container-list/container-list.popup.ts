@@ -273,7 +273,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
     }
 
     sortContainer(sortField: string) {
-        this.containers = this._sortService.sort(this.containers, sortField, this.order);
+        this.initContainers = this._sortService.sort(this.initContainers, sortField, this.order);
     }
 
     onChangeDataFormTable() {

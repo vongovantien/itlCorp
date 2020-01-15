@@ -624,12 +624,24 @@ export class DocumentationRepo {
         );
     }
 
-
     deleteShipmentFilesAttach(fileId: string) {
         return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteAttachedFile/${fileId}`).pipe(
             map((data: any) => data)
         );
     }
+
+    getShipmentToUnlock(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentToUnLock`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    unlockShipment(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/UnLockShipment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 
 
 }

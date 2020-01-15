@@ -15,7 +15,7 @@ import { map, tap, takeUntil, catchError, skip, mergeMap, debounceTime, distinct
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
-import { GetCataloguePortAction, getCataloguePortState } from '@store';
+import { GetCataloguePortAction, getCataloguePortState, getCataloguePortLoadingState } from '@store';
 import { FormValidators } from 'src/app/shared/validators';
 
 @Component({
@@ -59,7 +59,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
     currencies: Observable<CommonInterface.INg2Select[]>;
-    isSeparate: boolean = false;
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameEn', label: 'Name ABBR' },
         { field: 'partnerNameVn', label: 'Name EN' },
@@ -115,6 +114,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     AA: string = 'As Arranged';
 
     dims: DIM[] = []; // * Dimension details.
+    isLoadingPort: any;
+    isSeparate: boolean = false;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -135,7 +136,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
 
         this.ports = this._store.select(getCataloguePortState);
+
         this.saleMans = this._systemRepo.getListSystemUser();
+
+        this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
 
         this.currencies = this._catalogueRepo.getCurrencyBy({ active: true }).pipe(
             map((currencies: Currency[]) => this.utility.prepareNg2SelectData(currencies, 'id', 'id')),

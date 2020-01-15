@@ -42,13 +42,13 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (!!changes.dataSources) {
+        if (!!changes.dataSources && !!changes.dataSources.currentValue) {
             this.setDataSource(changes.dataSources.currentValue);
         }
-        if (!!changes.displayFields) {
+        if (!!changes.displayFields && !!changes.displayFields.currentValue) {
             this.setDisplayFields(changes.displayFields.currentValue);
         }
-        if (!!changes.selectedDisplayFields) {
+        if (!!changes.selectedDisplayFields && !!changes.selectedDisplayFields.currentValue) {
             this.setSelectedDisplayFields(changes.selectedDisplayFields.currentValue);
         }
         if (!!changes.currentActiveItemId && (changes.currentActiveItemId.previousValue !== changes.currentActiveItemId.currentValue)) {
@@ -56,6 +56,9 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         }
         if (changes.disabled !== undefined && changes.disabled !== null) {
             this.setDisabled(changes.disabled.currentValue);
+        }
+        if (!!changes.loading && typeof changes.loading.currentValue === 'boolean') {
+            this.loading = changes.loading.currentValue;
         }
     }
 
@@ -73,15 +76,14 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             this.ConstDataSources = cloneDeep(data);
             if (this.CurrentActiveItemIdObj !== null) {
                 const activeItemData = this.CurrentActiveItemIdObj;
+
+                this.loading = true;
                 const itemIndex = this.ConstDataSources.findIndex(o => o[activeItemData.field] === activeItemData.value);
 
                 if (itemIndex !== -1) {
                     this.indexSelected = itemIndex;
-                    const item = this.ConstDataSources[itemIndex];
-
-                    this.setCurrentActiveItem(item);
-                }
-                if (itemIndex === -1 && activeItemData.hardValue != null) {
+                    this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
+                } else if (!!activeItemData.hardValue) {
                     this.displaySelectedStr = activeItemData.hardValue;
                 }
             }
@@ -112,12 +114,12 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         if (data.value != null) {
             this.CurrentActiveItemIdObj = data;
 
+            this.loading = true;
             const itemIndex = this.ConstDataSources.findIndex(i => i[data.field] === data.value);
 
             if (itemIndex !== -1) {
                 this.indexSelected = itemIndex;
-                const item = this.ConstDataSources[itemIndex];
-                this.setCurrentActiveItem(item);
+                this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
             }
             if (itemIndex === -1 && data.hardValue != null) {
                 this.displaySelectedStr = data.hardValue;
