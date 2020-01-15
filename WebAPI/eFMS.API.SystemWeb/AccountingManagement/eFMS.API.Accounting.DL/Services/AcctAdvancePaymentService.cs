@@ -1620,7 +1620,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                             approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
                         }
-                        else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || CheckDeputyManagerByUser(userCurrent))
                         {
                             //Cho phép User Manager thực hiện deny khi user Manager đã Approved, 
                             //nếu Chief Accountant đã Approved thì User Manager ko được phép deny
@@ -1632,13 +1632,18 @@ namespace eFMS.API.Accounting.DL.Services
                             approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
                             approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
                         }
-                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || CheckDeputyAccountantByUser(userCurrent))
                         {
                             //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
                             var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
                             if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                             approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
                             approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
+                        }
+                        else
+                        {
+                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
+                            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                         }
 
                         approve.UserModified = userCurrent;
@@ -1883,7 +1888,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 isApproved = true;
                 var isDeptWaitingApprove = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo && (x.StatusApproval != Constants.STATUS_APPROVAL_NEW && x.StatusApproval != Constants.STATUS_APPROVAL_DENIED)).Any();
-                if (string.IsNullOrEmpty(approveAdvance.ManagerApr) && approveAdvance.ManagerAprDate == null)
+                if (string.IsNullOrEmpty(approveAdvance.ManagerApr) && approveAdvance.ManagerAprDate == null && isDeptWaitingApprove)
                 {
                     isApproved = false;
                 }
@@ -1892,7 +1897,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 isApproved = true;
                 var isDeptWaitingApprove = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo && (x.StatusApproval != Constants.STATUS_APPROVAL_NEW && x.StatusApproval != Constants.STATUS_APPROVAL_DENIED && x.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any();
-                if (string.IsNullOrEmpty(approveAdvance.AccountantApr) && approveAdvance.AccountantAprDate == null)
+                if (string.IsNullOrEmpty(approveAdvance.AccountantApr) && approveAdvance.AccountantAprDate == null && isDeptWaitingApprove)
                 {
                     isApproved = false;
                 }
