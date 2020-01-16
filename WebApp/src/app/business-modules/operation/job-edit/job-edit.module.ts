@@ -19,7 +19,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 
 const routing: Routes = [
     {
-        path: ":id", component: OpsModuleBillingJobEditComponent, data: { name: "Job Edit", level: 3, serviceId: ChargeConstants.CL_CODE }
+        path: ":id", component: OpsModuleBillingJobEditComponent, data: { name: "", serviceId: ChargeConstants.CL_CODE }
     },
 
 ];

@@ -8,17 +8,25 @@ const routes: Routes = [
   },
   {
     path: 'statement-of-account', loadChildren: () => import('./statement-of-account/statement-of-account.module').then(m => m.StatementOfAccountModule),
+    data: {
+      name: 'Statement Of Account'
+    }
   },
   {
     path: 'advance-payment', loadChildren: () => import('./advance-payment/advance-payment.module').then(m => m.AdvancePaymentModule),
+    data: {
+      name: 'Advance Payment'
+    }
   },
   {
     path: 'settlement-payment', loadChildren: () => import('./settlement-payment/settlement-payment.module').then(m => m.SettlementPaymentModule),
+    data: {
+      name: 'Settlement Payment'
+    }
   },
   {
     path: 'account-receivable-payable', component: AccountReceivablePayableComponent, data: {
       name: "Account Receivable Payable",
-      level: 2
     }
   },
   // TODO another MODULE...

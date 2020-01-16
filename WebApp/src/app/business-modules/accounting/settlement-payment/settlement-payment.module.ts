@@ -29,22 +29,24 @@ import { ShareAccountingModule } from '../share-accouting.module';
 
 const routing: Routes = [
     {
-        path: '', component: SettlementPaymentComponent, pathMatch: 'full', data: {
-            name: "Settlement Payment",
-            level: 2
-        }
-    },
-    {
-        path: "new", component: SettlementPaymentAddNewComponent,
-        data: { name: "New", path: "New", level: 3 }
-    },
-    {
-        path: ":id", component: SettlementPaymentDetailComponent,
-        data: { name: "Detail", path: "Detail", level: 3 }
-    },
-    {
-        path: ":id/approve", component: ApporveSettlementPaymentComponent,
-        data: { name: "Approve", path: "Approve", level: 3 }
+        path: '', data: { name: "", },
+        children: [
+            {
+                path: '', component: SettlementPaymentComponent
+            },
+            {
+                path: "new", component: SettlementPaymentAddNewComponent,
+                data: { name: "New", path: "New" }
+            },
+            {
+                path: ":id", component: SettlementPaymentDetailComponent,
+                data: { name: "Detail", path: "Detail" }
+            },
+            {
+                path: ":id/approve", component: ApporveSettlementPaymentComponent,
+                data: { name: "Approve", path: "Approve" }
+            },
+        ]
     },
 ];
 

@@ -14,8 +14,14 @@ import { FormWarehouseComponent } from './components/form-warehouse.component';
 
 
 const routing: Routes = [
-    { path: '', component: WarehouseComponent, data: { name: "Warehouse", level: 2 } },
-    { path: 'import', component: WarehouseImportComponent, data: { name: "Warehouse Import", level: 3 } },
+    {
+        path: '', data: { name: "" }, children: [
+            {
+                path: '', component: WarehouseComponent
+            },
+            { path: 'import', component: WarehouseImportComponent, data: { name: "Import", level: 3 } },
+        ]
+    },
 
 ];
 @NgModule({

@@ -13,8 +13,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 const routing: Routes = [
     {
         path: "", component: AssigmentComponent, pathMatch: 'full', data: {
-            name: "Assigment",
-            level: 2
+            name: "",
         }
     },
 ];

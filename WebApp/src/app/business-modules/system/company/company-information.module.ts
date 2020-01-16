@@ -21,17 +21,21 @@ import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
 
 const routing: Routes = [
     {
-        path: "", component: ComanyInformationComponent, pathMatch: 'full',
-        data: { name: "Company Information", path: "company-information", level: 2 }
+        path: "", data: { name: "" },
+        children: [
+            {
+                path: "", component: ComanyInformationComponent
+            },
+            {
+                path: "new", component: CompanyInformationAddComponent,
+                data: { name: "New" }
+            },
+            {
+                path: ":id", component: CompanyInformationDetailComponent,
+                data: { name: "Detail" }
+            }
+        ]
     },
-    {
-        path: "new", component: CompanyInformationAddComponent,
-        data: { name: "New", path: "New", level: 3 }
-    },
-    {
-        path: ":id", component: CompanyInformationDetailComponent,
-        data: { name: "Detail", path: "Detail", level: 3 }
-    }
 ];
 
 @NgModule({

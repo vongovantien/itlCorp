@@ -14,23 +14,23 @@ import { JobManagementFormSearchComponent } from './components/form-search-job/f
 
 const routing: Routes = [
     {
-        path: '', pathMatch: 'full', component: JobManagementComponent, data: {
-            name: "Job Management",
-            level: 2
-        }
+        path: '', data: { name: "" }, children: [
+            {
+                path: '', component: JobManagementComponent
+            },
+            {
+                path: "job-create",
+                component: JobManagementCreateJobComponent,
+                data: { name: "Create", }
+            },
+            {
+                path: "job-edit",
+                loadChildren: () => import('./../job-edit/job-edit.module').then(m => m.JobEditModule),
+                data: { name: 'Detail Job' }
+            },
+        ]
     },
-    {
-        path: "job-create",
-        component: JobManagementCreateJobComponent,
-        data: {
-            name: "Job Create",
-            level: 3
-        }
-    },
-    {
-        path: "job-edit",
-        loadChildren: () => import('./../job-edit/job-edit.module').then(m => m.JobEditModule),
-    },
+
 
 ];
 

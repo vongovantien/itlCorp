@@ -21,11 +21,11 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 const routing: Routes = [
     {
         path: '', component: AirImportHBLComponent,
-        data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.AI_CODE }
+        data: { name: '', path: 'hbl', level: 4, serviceId: ChargeConstants.AI_CODE }
     },
     {
         path: 'new', component: AirImportCreateHBLComponent,
-        data: { name: 'New House Bill Detail', path: ':id', level: 5 }
+        data: { name: 'New House Bill ', path: ':id', level: 5 }
     },
     {
         path: ':hblId', component: AirImportDetailHBLComponent,

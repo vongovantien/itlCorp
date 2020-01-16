@@ -11,7 +11,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { FormCreateCurrencyPopupComponent } from './components/form-create/form-create-currency.popup';
 
 const routing: Routes = [
-    { path: '', component: CurrencyComponent, data: { name: "Currency", level: 2 } }
+    { path: '', component: CurrencyComponent, data: { name: "" } }
 ];
 
 @NgModule({

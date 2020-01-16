@@ -19,30 +19,34 @@ import { AirExportManifestComponent } from './detail-job/manifest/air-export-man
 
 const routing: Routes = [
     {
-        path: '', pathMatch: 'full', component: AirExportComponent, data: {
-            name: "Air Export", path: "air-export", level: 2
+        path: '', component: AirExportComponent, data: {
+            name: "",
         },
     },
     {
         path: 'new', component: AirExportCreateJobComponent,
-        data: { name: "Create New Job", path: "new", level: 3 }
+        data: { name: "Create New Job" }
     },
     {
-        path: ':jobId', component: AirExportDetailJobComponent,
-        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.AirExport },
+        path: ':jobId',
+        data: { transactionType: CommonEnum.TransactionTypeEnum.AirExport, name: "Job Detail" },
+        children: [
+            {
+                path: '', component: AirExportDetailJobComponent, data: { name: "" }
+            },
+            {
+                path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-export-hbl.module').then(m => m.AirExportHBLModule),
+                data: {
+                    name: "House Bill",
+                },
+            },
+            {
+                path: 'manifest', component: AirExportManifestComponent,
+                data: { name: "Manifest", },
+            },
+
+        ]
     },
-    {
-        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/air-export-hbl.module').then(m => m.AirExportHBLModule),
-    },
-    {
-        path: ':jobId/manifest', component: AirExportManifestComponent,
-        data: { name: "Manifest", path: ":jobId", level: 4 },
-    },
-    // {
-    //     path: ':jobId/si', component: AirExportShippingInstructionComponent, data: {
-    //         name: "Shipping Instructions", path: ":jobId", level: 4
-    //     }
-    // }
 ];
 
 const LIB = [

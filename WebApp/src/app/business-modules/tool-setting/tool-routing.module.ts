@@ -48,6 +48,7 @@ const routes: Routes = [
     },
     {
         path: 'tariff', loadChildren: () => import('./tariff/tariff.module').then(m => m.TariffModule),
+        data: { name: 'Tariff' }
     },
     {
         path: 'exchange-rate',
@@ -65,7 +66,7 @@ const routes: Routes = [
             level: 2
         }
     },
-    { path: 'unlock', loadChildren: () => import('./unlock/unlock.module').then(m => m.UnlockModule) }
+    { path: 'unlock', loadChildren: () => import('./unlock/unlock.module').then(m => m.UnlockModule), data: { name: 'Unlock' } }
 ];
 
 @NgModule({
