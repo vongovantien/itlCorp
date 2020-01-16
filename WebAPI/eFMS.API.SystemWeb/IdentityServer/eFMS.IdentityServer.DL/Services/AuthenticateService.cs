@@ -102,7 +102,7 @@ namespace eFMS.IdentityServer.DL.Services
             }
             var user = DataContext.Get(x => x.Username == username).FirstOrDefault();
 
-            if (user == null)
+            if (user == null && !isAuthenticated)
             {
                 modelReturn = null;
                 return -2;
