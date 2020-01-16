@@ -839,19 +839,20 @@ namespace eFMS.API.Documentation.DL.Services
                 var dataConsignee = catPartnerRepo.First(x => x.Id == data.ConsigneeId);
 
                 var proofOfDelivery = new ProofOfDeliveryReport();
-                proofOfDelivery.MAWB = data.Mawb;
-                proofOfDelivery.HWBNO = data.Hwbno;
-                proofOfDelivery.PortofDischarge = dataPOD?.NameEn;
-                proofOfDelivery.DepartureAirport = dataPOL?.NameEn;
-                proofOfDelivery.ShippingMarkImport = data.ShippingMark;
-                proofOfDelivery.Consignee = dataConsignee.PartnerNameEn;
-                proofOfDelivery.ATTN = dataATTN?.PartnerNameEn;
+                proofOfDelivery.MAWB = data.Mawb?.ToUpper();
+                proofOfDelivery.HWBNO = data.Hwbno?.ToUpper();
+                proofOfDelivery.PortofDischarge = dataPOD?.NameEn?.ToUpper();
+                proofOfDelivery.DepartureAirport = dataPOL?.NameEn?.ToUpper();
+                proofOfDelivery.ShippingMarkImport = data.ShippingMark?.ToUpper();
+                proofOfDelivery.Consignee = dataConsignee.PartnerNameEn?.ToUpper();
+                proofOfDelivery.ATTN = dataATTN?.PartnerNameEn?.ToUpper();
                 proofOfDelivery.TotalValue = 0;
                 var csMawbcontainers = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
                 foreach (var item in csMawbcontainers)
                 {
                     proofOfDelivery.Description += item.Description + string.Join(",", data.Commodity);
                 }
+                proofOfDelivery.Description = proofOfDelivery.Description?.ToUpper();
                 if (csMawbcontainers.Count() > 0)
                 {
                     proofOfDelivery.NoPieces = csMawbcontainers.Sum(x => x.Quantity) ?? 0;
@@ -899,17 +900,17 @@ namespace eFMS.API.Documentation.DL.Services
 
 
                 var proofOfDelivery = new AirProofOfDeliveryReport();
-                proofOfDelivery.MAWB = data.Mawb;
-                proofOfDelivery.HWBNO = data.Hwbno;
-                proofOfDelivery.LastDestination = dataPOD?.NameEn;
-                proofOfDelivery.DepartureAirport = dataPOL?.NameEn;
-                proofOfDelivery.ShippingMarkImport = data.ShippingMark;
-                proofOfDelivery.Consignee = dataConsignee.PartnerNameEn;
-                proofOfDelivery.ATTN = dataATTN?.PartnerNameEn;
+                proofOfDelivery.MAWB = data.Mawb?.ToUpper();
+                proofOfDelivery.HWBNO = data.Hwbno?.ToUpper();
+                proofOfDelivery.LastDestination = dataPOD?.NameEn?.ToUpper();
+                proofOfDelivery.DepartureAirport = dataPOL?.NameEn?.ToUpper();
+                proofOfDelivery.ShippingMarkImport = data.ShippingMark?.ToUpper();
+                proofOfDelivery.Consignee = dataConsignee.PartnerNameEn?.ToUpper();
+                proofOfDelivery.ATTN = dataATTN?.PartnerNameEn?.ToUpper();
                 proofOfDelivery.TotalValue = 0;
-                proofOfDelivery.Shipper = dataShipper.PartnerNameEn;
+                proofOfDelivery.Shipper = dataShipper.PartnerNameEn?.ToUpper();
                 proofOfDelivery.WChargeable = data.ChargeWeight ?? 0;
-                proofOfDelivery.Description = data.DesOfGoods;
+                proofOfDelivery.Description = data.DesOfGoods?.ToUpper();
                 proofOfDelivery.NoPieces = data.PackageQty ?? 0;
                 proofOfDelivery.GW = data.GrossWeight ?? 0;
                 proofOfDelivery.NW = data.NetWeight ?? 0;
@@ -953,19 +954,19 @@ namespace eFMS.API.Documentation.DL.Services
                 var dataShipper = catPartnerRepo.First(x => x.Id == data.ShipperId);
 
                 var documentRelease = new AirDocumentReleaseReport();
-                documentRelease.Consignee = dataConsignee.PartnerNameEn;
-                documentRelease.HWBNO = data.Hwbno;
-                documentRelease.FlightNo = data.FlightNo;
+                documentRelease.Consignee = dataConsignee.PartnerNameEn?.ToUpper();
+                documentRelease.HWBNO = data.Hwbno?.ToUpper();
+                documentRelease.FlightNo = data.FlightNo?.ToUpper();
                 documentRelease.CussignedDate = data.FlightDate;
-                documentRelease.DepartureAirport = dataPOL?.NameEn;
-                documentRelease.LastDestination = dataPOD?.NameEn;
+                documentRelease.DepartureAirport = dataPOL?.NameEn?.ToUpper();
+                documentRelease.LastDestination = dataPOD?.NameEn?.ToUpper();
                 documentRelease.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : "";
                 documentRelease.WChargeable = data.ChargeWeight ?? 0;
                 listDocument.Add(documentRelease);
             }
 
             var parameter = new AirDocumentReleaseReportParams();
-            parameter.MAWB = data?.Mawb;
+            parameter.MAWB = data?.Mawb?.ToUpper();
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
             parameter.CompanyDescription = string.Empty;
@@ -1000,32 +1001,34 @@ namespace eFMS.API.Documentation.DL.Services
                 var dataShipper = catPartnerRepo.Get(x => x.Id == data.ShipperId).FirstOrDefault();
 
                 var housebill = new SeaHBillofLadingReport();
-                housebill.HWBNO = data.Hwbno; //HouseBill No
+                housebill.HWBNO = data.Hwbno?.ToUpper(); //HouseBill No
                 housebill.OSI = string.Empty; //Để trống
                 housebill.CheckNullAttach = string.Empty; //Để trống
-                housebill.ReferrenceNo = data.ReferenceNo; //ReferenceNo
-                housebill.Shipper = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription);//dataShipper?.PartnerNameEn; //Shipper name
+                housebill.ReferrenceNo = data.ReferenceNo?.ToUpper(); //ReferenceNo
+                housebill.Shipper = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription)?.ToUpper();//dataShipper?.PartnerNameEn; //Shipper name
                 housebill.ConsigneeID = data.ConsigneeId; //NOT USE
-                housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription);//dataConsignee?.PartnerNameEn;
-                housebill.Notify = ReportUltity.ReplaceNullAddressDescription(data.NotifyPartyDescription);
-                housebill.PlaceAtReceipt = data.PickupPlace;// Place of receipt
-                housebill.PlaceDelivery = data.DeliveryPlace;// Place of Delivery
-                housebill.LocalVessel = data.LocalVoyNo;
+                housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription)?.ToUpper();//dataConsignee?.PartnerNameEn;
+                housebill.Notify = ReportUltity.ReplaceNullAddressDescription(data.NotifyPartyDescription)?.ToUpper();
+                housebill.PlaceAtReceipt = data.PickupPlace?.ToUpper();// Place of receipt
+                housebill.PlaceDelivery = data.DeliveryPlace?.ToUpper();// Place of Delivery
+                housebill.LocalVessel = data.LocalVoyNo?.ToUpper();
                 housebill.FromSea = string.Empty; //NOT USE
-                housebill.OceanVessel = data.OceanVoyNo;
+                housebill.OceanVessel = data.OceanVoyNo?.ToUpper();
                 if (dataPOL != null)
                 {
                     var polCountry = countryRepository.Get(x => x.Id == dataPOL.CountryId).FirstOrDefault()?.NameEn;
                     housebill.DepartureAirport = dataPOL?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty); //POL
+                    housebill.DepartureAirport = housebill.DepartureAirport?.ToUpper();
                 }
                 if (dataPOD != null)
                 {
                     var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
                     housebill.PortofDischarge = dataPOD?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //POD
+                    housebill.PortofDischarge = housebill.PortofDischarge?.ToUpper();
                 }
                 housebill.TranShipmentTo = string.Empty; //NOT USE
-                housebill.GoodsDelivery = data.GoodsDeliveryDescription; //Good delivery
-                housebill.CleanOnBoard = data.OnBoardStatus; //On board status                
+                housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
+                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper(); //On board status                
                 housebill.NoPieces = string.Empty; //Tạm thời để trống
                 var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
                 if (conts != null && conts.Count() > 0)
@@ -1037,13 +1040,14 @@ namespace eFMS.API.Documentation.DL.Services
                         var contUnit = catUnitRepo.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
                         if (contUnit != null)
                         {
-                            hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + (!cont.Equals(contLast) ? ", " : string.Empty));
+                            hbConstainers += (cont.Quantity + " x " + contUnit.UnitNameEn + (!cont.Equals(contLast) ? ", " : string.Empty));
                         }
                     }
-                    housebill.Qty = hbConstainers; //Qty Container (Số Lượng container + Cont Type)
+                    housebill.Qty = hbConstainers?.ToUpper(); //Qty Container (Số Lượng container + Cont Type)
                     housebill.MaskNos = string.Join("\r\n", conts.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "-" + x.SealNo : string.Empty));
+                    housebill.MaskNos = housebill.MaskNos?.ToUpper();
                 }
-                housebill.Description = data.DesOfGoods;//Description of goods
+                housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
                 housebill.GrossWeight = data.GrossWeight ?? 0;
                 housebill.GrwDecimal = 2;
                 housebill.Unit = "PKS"; //Đang gán cứng
@@ -1053,9 +1057,9 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.TotalPackages = string.Empty; //NOT USE
                 housebill.OriginCode = string.Empty; //NOT USE
                 housebill.ICASNC = string.Empty; //NOT USE
-                housebill.Movement = data.MoveType; //Type of move
+                housebill.Movement = data.MoveType?.ToUpper(); //Type of move
                 housebill.AccountingInfo = string.Empty; //NOT USE
-                housebill.SayWord = "SAY: " + data.InWord; //Inword
+                housebill.SayWord = "SAY: " + data.InWord?.ToUpper(); //Inword
                 housebill.strOriginLandPP = string.Empty; //NOT USE
                 housebill.strOriginLandCC = string.Empty; //NOT USE
                 housebill.strOriginTHCPP = string.Empty; //NOT USE
@@ -1066,9 +1070,9 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.strDesTHCCC = string.Empty; //NOT USE
                 housebill.strDesLandPP = string.Empty; //NOT USE
                 housebill.strDesLandCC = string.Empty; //NOT USE
-                housebill.FreightPayAt = data.PlaceFreightPay; //Freight Payable at
-                housebill.ExecutedAt = data.IssueHblplace; //Place of Issue HBL
-                housebill.ExecutedOn = data.DatetimeCreated != null ? data.DatetimeCreated.Value.ToString("dd MMM, yyyy") : string.Empty; //Created Date
+                housebill.FreightPayAt = data.PlaceFreightPay?.ToUpper(); //Freight Payable at
+                housebill.ExecutedAt = data.IssueHblplace?.ToUpper(); //Place of Issue HBL
+                housebill.ExecutedOn = data.DatetimeCreated != null ? data.DatetimeCreated.Value.ToString("dd MMM, yyyy").ToUpper() : string.Empty; //Created Date
                 housebill.NoofOriginBL = data.OriginBlnumber.ToString(); //Number of Origin B/L
                 housebill.ForCarrier = string.Empty; //Để trống
                 housebill.SeaLCL = false; //NOT USE
@@ -1113,7 +1117,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var freightCharges = new List<FreightCharge>() {
-                new FreightCharge(){ FreightCharges = "FREIGHT " + data.FreightPayment }
+                new FreightCharge(){ FreightCharges = "FREIGHT " + data.FreightPayment?.ToUpper() }
             };
 
             result = new Crystal
@@ -1166,83 +1170,85 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var housebill = new HouseAirwayBillLastestReport();
                 housebill.MAWB = data.Mawb; //NOT USE
-                housebill.HWBNO = data.Hwbno; //Housebill No
-                housebill.ATTN = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription); //ShipperName & Address
+                housebill.HWBNO = data.Hwbno?.ToUpper(); //Housebill No
+                housebill.ATTN = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription)?.ToUpper(); //ShipperName & Address
                 housebill.ISSUED = string.Empty; //NOT USE
                 housebill.ConsigneeID = data.ConsigneeId; //NOT USE
-                housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription); //Consignee & Address
+                housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription)?.ToUpper(); //Consignee & Address
                 housebill.ICASNC = string.Empty; //NOT USE
-                housebill.AccountingInfo = "FREIGHT " + data.FreightPayment; //'FREIGHT ' + Air Freight
+                housebill.AccountingInfo = "FREIGHT " + data.FreightPayment?.ToUpper(); //'FREIGHT ' + Air Freight
                 housebill.AgentIATACode = string.Empty; //Gán rỗng
                 housebill.AccountNo = string.Empty; //NOT USE
                 if (dataPOL != null)
                 {
                     var polCountry = countryRepository.Get(x => x.Id == dataPOL.CountryId).FirstOrDefault()?.NameEn;
                     housebill.DepartureAirport = dataPOL?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty); //AOL - Departure
+                    housebill.DepartureAirport = housebill.DepartureAirport?.ToUpper();
                 }
                 housebill.ReferrenceNo = string.Empty; //NOT USE
                 housebill.OSI = string.Empty; //NOT USE
-                housebill.FirstDestination = data.FirstCarrierTo;
-                housebill.FirstCarrier = data.FirstCarrierBy;
-                housebill.SecondDestination = data.TransitPlaceTo1;
-                housebill.SecondCarrier = data.TransitPlaceBy1;
-                housebill.ThirdDestination = data.TransitPlaceTo2;
-                housebill.ThirdCarrier = data.TransitPlaceBy2;
-                housebill.Currency = data.CurrencyId; //Currency
-                housebill.CHGSCode = data.Chgs; //CHGS
-                housebill.WTPP = data.WtorValpayment; //WT/VAL là PP
-                housebill.WTCLL = data.WtorValpayment; //WT/VAL là CLL
-                housebill.ORPP = data.OtherPayment; //Other Là PP
-                housebill.ORCLL = data.OtherPayment; //Other Là CLL
-                housebill.DlvCarriage = data.Dclrca; //DCLR-CA
-                housebill.DlvCustoms = data.Dclrcus; //DCLR-CUS
+                housebill.FirstDestination = data.FirstCarrierTo?.ToUpper();
+                housebill.FirstCarrier = data.FirstCarrierBy?.ToUpper();
+                housebill.SecondDestination = data.TransitPlaceTo1?.ToUpper();
+                housebill.SecondCarrier = data.TransitPlaceBy1?.ToUpper();
+                housebill.ThirdDestination = data.TransitPlaceTo2?.ToUpper();
+                housebill.ThirdCarrier = data.TransitPlaceBy2?.ToUpper();
+                housebill.Currency = data.CurrencyId?.ToUpper(); //Currency
+                housebill.CHGSCode = data.Chgs?.ToUpper(); //CHGS
+                housebill.WTPP = data.WtorValpayment?.ToUpper(); //WT/VAL là PP
+                housebill.WTCLL = data.WtorValpayment?.ToUpper(); //WT/VAL là CLL
+                housebill.ORPP = data.OtherPayment?.ToUpper(); //Other Là PP
+                housebill.ORCLL = data.OtherPayment?.ToUpper(); //Other Là CLL
+                housebill.DlvCarriage = data.Dclrca?.ToUpper(); //DCLR-CA
+                housebill.DlvCustoms = data.Dclrcus?.ToUpper(); //DCLR-CUS
                 if (dataPOD != null)
                 {
                     var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
                     housebill.LastDestination = dataPOL?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
+                    housebill.LastDestination = housebill.LastDestination?.ToUpper();
                 }
-                housebill.FlightNo = data.FlightNo; //Flight No
+                housebill.FlightNo = data.FlightNo?.ToUpper(); //Flight No
                 housebill.FlightDate = data.FlightDate; //Flight Date
                 housebill.ConnectingFlight = string.Empty; //Để rỗng
                 housebill.ConnectingFlightDate = null; //Gán null
-                housebill.insurAmount = data.IssuranceAmount; //Issurance Amount
-                housebill.HandlingInfo = data.HandingInformation; //Handing Information
-                housebill.Notify = data.Notify; //Notify
+                housebill.insurAmount = data.IssuranceAmount?.ToUpper(); //Issurance Amount
+                housebill.HandlingInfo = data.HandingInformation?.ToUpper(); //Handing Information
+                housebill.Notify = data.Notify?.ToUpper(); //Notify
                 housebill.SCI = string.Empty; //NOT USE
                 housebill.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
                 housebill.GrossWeight = data.GrossWeight ?? 0; //GrossWeight
                 housebill.GrwDecimal = 2; //NOT USE
-                housebill.Wlbs = data.KgIb; //KgIb
+                housebill.Wlbs = data.KgIb?.ToUpper(); //KgIb
                 housebill.RateClass = string.Empty; //NOT USE
-                housebill.ItemNo = data.ComItemNo; //ComItemNo - Commodity Item no
+                housebill.ItemNo = data.ComItemNo?.ToUpper(); //ComItemNo - Commodity Item no
                 housebill.WChargeable = data.ChargeWeight ?? 0; //CW
                 housebill.ChWDecimal = 2; //NOT USE
                 housebill.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
                 housebill.Ttal = data.Total != null ? data.Total.ToString() : string.Empty;
-                housebill.Description = data.DesOfGoods; //Natural and Quality Goods
-                housebill.WghtPP = data.Wtpp; //WT (prepaid)
-                housebill.WghtCC = data.Wtcll; //WT (Collect)
+                housebill.Description = data.DesOfGoods?.ToUpper(); //Natural and Quality Goods
+                housebill.WghtPP = data.Wtpp?.ToUpper(); //WT (prepaid)
+                housebill.WghtCC = data.Wtcll?.ToUpper(); //WT (Collect)
                 housebill.ValChPP = string.Empty; //NOT USE
                 housebill.ValChCC = string.Empty; //NOT USE
                 housebill.TxPP = string.Empty; //NOT USE
                 housebill.TxCC = string.Empty; //NOT USE
-                housebill.OrchW = data.OtherCharge; //Other Charge
+                housebill.OrchW = data.OtherCharge?.ToUpper(); //Other Charge
                 housebill.OChrVal = string.Empty; //NOT USE
-                housebill.TTChgAgntPP = data.DueAgentPp; //Due to agent (prepaid)
-                housebill.TTChgAgntCC = data.DueAgentCll; //Due to agent (Collect)
+                housebill.TTChgAgntPP = data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)
+                housebill.TTChgAgntCC = data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
                 housebill.TTCarrPP = string.Empty; //NOT USE
                 housebill.TTCarrCC = string.Empty; //NOT USE
-                housebill.TtalPP = data.TotalPp; //Total (prepaid)
-                housebill.TtalCC = data.TotalCll; //Total (Collect)
+                housebill.TtalPP = data.TotalPp?.ToUpper(); //Total (prepaid)
+                housebill.TtalCC = data.TotalCll?.ToUpper(); //Total (Collect)
                 housebill.CurConvRate = string.Empty; //NOT USE
                 housebill.CCChgDes = string.Empty; //NOT USE
-                housebill.SpecialNote = data.ShippingMark; //Shipping Mark
+                housebill.SpecialNote = data.ShippingMark?.ToUpper(); //Shipping Mark
                 housebill.ShipperCertf = string.Empty; //NOT USE
-                housebill.ExecutedOn = data.IssueHblplace; //Issued On
-                housebill.ExecutedAt = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy") : string.Empty; //Issue At
+                housebill.ExecutedOn = data.IssueHblplace?.ToUpper(); //Issued On
+                housebill.ExecutedAt = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy")?.ToUpper() : string.Empty; //Issue At
                 housebill.Signature = string.Empty; //NOT USE
                 var dimHbl = dimensionDetailService.Get(x => x.Hblid == hblId);
-                string _dimensions = string.Join("\r\n", dimHbl.Select(s => s.Length + "*" + s.Width + "*" + s.Height + "*" + s.Package));
+                string _dimensions = string.Join("\r\n", dimHbl.Select(s => (int)s.Length + "*" + (int)s.Width + "*" + (int)s.Height + "*" + (int)s.Package));
                 housebill.Dimensions = _dimensions; //Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
                 housebill.ShipPicture = null; //NOT USE
                 housebill.PicMarks = string.Empty; //Gán rỗng
@@ -1270,7 +1276,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             var parameter = new HouseAirwayBillLastestReportParams()
             {
-                MAWBN = data != null ? data.Mawb : string.Empty
+                MAWBN = data != null ? data.Mawb?.ToUpper() : string.Empty
             };
             result.SetParameter(parameter);
             return result;
@@ -1284,9 +1290,9 @@ namespace eFMS.API.Documentation.DL.Services
             if (data != null)
             {
                 var housebill = new AirAttachedListReport();
-                housebill.HBLNo = data.Hwbno;
+                housebill.HBLNo = data.Hwbno?.ToUpper();
                 housebill.IssuedDate = data.Etd;//ETD of Housebill
-                housebill.AttachedList = ReportUltity.ReplaceHtmlBaseForPreviewReport(data.AttachList);
+                housebill.AttachedList = ReportUltity.ReplaceHtmlBaseForPreviewReport(data.AttachList)?.ToUpper();
                 housebills.Add(housebill);
             }
             result = new Crystal
@@ -1308,25 +1314,25 @@ namespace eFMS.API.Documentation.DL.Services
             if(data != null)
             {
                 var authorizeLetter = new AirImptAuthorisedLetterReport {
-                    HWBNO = data.Hwbno,
-                    DONo = data.DeliveryOrderNo,
-                    Consignee = data.ConsigneeDescription,
-                    FlightNo = data.FlightNo,
+                    HWBNO = data.Hwbno?.ToUpper(),
+                    DONo = data.DeliveryOrderNo?.ToUpper(),
+                    Consignee = data.ConsigneeDescription?.ToUpper(),
+                    FlightNo = data.FlightNo?.ToUpper(),
                     FlightDate = data.FlightDate,
-                    DepartureAirport = data.PODName,
+                    DepartureAirport = data.PODName?.ToUpper(),
                     NoPieces = data.PackageQty?.ToString(),
-                    Description = data.DesOfGoods,
+                    Description = data.DesOfGoods?.ToUpper(),
                     WChargeable = data.ChargeWeight,
-                    DeliveryOrderNote = data.DeliveryOrderNo,
-                    FirstDestination = data.FirstCarrierTo,
-                    SecondDestination = data.TransitPlaceTo1,
-                    Notify = data.NotifyPartyDescription
+                    DeliveryOrderNote = data.DeliveryOrderNo?.ToUpper(),
+                    FirstDestination = data.FirstCarrierTo?.ToUpper(),
+                    SecondDestination = data.TransitPlaceTo1?.ToUpper(),
+                    Notify = data.NotifyPartyDescription?.ToUpper()
                 };
                 authorizeLetters.Add(authorizeLetter);
             }
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
-                MAWB = data.Mawb,
+                MAWB = data.Mawb?.ToUpper(),
                 CompanyName = Constants.COMPANY_NAME,
                 CompanyAddress1 = Constants.COMPANY_ADDRESS1,
                 CompanyAddress2 = Constants.COMPANY_ADDRESS2,
@@ -1355,25 +1361,25 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var authorizeLetter = new AirImptAuthorisedLetterReport
                 {
-                    HWBNO = data.Hwbno,
-                    DONo = data.DeliveryOrderNo,
-                    Consignee = data.ConsigneeDescription,
-                    FlightNo = data.FlightNo,
+                    HWBNO = data.Hwbno?.ToUpper(),
+                    DONo = data.DeliveryOrderNo?.ToUpper(),
+                    Consignee = data.ConsigneeDescription?.ToUpper(),
+                    FlightNo = data.FlightNo?.ToUpper(),
                     FlightDate = data.FlightDate,
                     NoPieces = data.PackageQty?.ToString(),
-                    Description = data.DesOfGoods,
+                    Description = data.DesOfGoods?.ToUpper(),
                     WChargeable = data.ChargeWeight,
-                    DeliveryOrderNote = data.DeliveryOrderNo,
-                    FirstDestination = data.FirstCarrierTo,
-                    SecondDestination = data.TransitPlaceTo1,
+                    DeliveryOrderNote = data.DeliveryOrderNo?.ToUpper(),
+                    FirstDestination = data.FirstCarrierTo?.ToUpper(),
+                    SecondDestination = data.TransitPlaceTo1?.ToUpper(),
                     CBM = data.Cbm,
-                    Notify = data.NotifyPartyDescription
+                    Notify = data.NotifyPartyDescription?.ToUpper()
                 };
                 authorizeLetters.Add(authorizeLetter);
             }
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
-                MAWB = data.Mawb,
+                MAWB = data.Mawb?.ToUpper(),
                 CompanyName = Constants.COMPANY_NAME,
                 CompanyAddress1 = Constants.COMPANY_ADDRESS1,
                 CompanyAddress2 = Constants.COMPANY_ADDRESS2,
