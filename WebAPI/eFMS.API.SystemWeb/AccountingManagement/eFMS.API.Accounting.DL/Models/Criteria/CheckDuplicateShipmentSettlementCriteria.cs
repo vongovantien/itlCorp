@@ -14,5 +14,8 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string CustomNo { get; set; }
         public string InvoiceNo { get; set; }
         public string ContNo { get; set; }
+        public string JobNo { get; set; }
+        public string HBLNo { get; set; }
+        public string MBLNo { get; set; }
     }
 }

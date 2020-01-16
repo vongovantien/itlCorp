@@ -55,5 +55,7 @@ namespace eFMS.API.Documentation.DL.Common
         public const string HOUSEAIRWAYBILLLASTEST_ITL_FRAME = "LASTEST_ITL_FRAME";
 
         public const string CODE_ITL = "ITL7939";
+
+        public static readonly string CURRENT_STATUS_CANCELED = "Canceled";
     }
 }

@@ -249,7 +249,8 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
         {
             var data = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(criteria);
-            ResultHandle result = new ResultHandle { Status = data, Message = data ? "Charge has already existed!" : "" };
+            //ResultHandle result = new ResultHandle { Status = data, Message = data ? "Charge has already existed!" : "" };
+            ResultHandle result = new ResultHandle { Status = data.Status, Message = data.Message };
             return Ok(result);
         }
 
@@ -280,10 +281,15 @@ namespace eFMS.API.Accounting.Controllers
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
                         ContNo = item.ContNo,
+                        MBLNo = item.MBL,
+                        HBLNo = item.HBL,
+                        JobNo = item.JobId
                     };
-                    if (acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment))
+                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
+                    if (_checkDuplicate.Status)
                     {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = "Charge has already existed!" };
+                        //ResultHandle _result = new ResultHandle { Status = false, Message = "Charge has already existed!" };
+                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
                         return Ok(_result);
                     }
                 }
@@ -339,10 +345,15 @@ namespace eFMS.API.Accounting.Controllers
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
                         ContNo = item.ContNo,
+                        MBLNo = item.MBL,
+                        HBLNo = item.HBL,
+                        JobNo = item.JobId
                     };
-                    if (acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment))
+                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
+                    if (_checkDuplicate.Status)
                     {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = "Charge has already existed!" };
+                        //ResultHandle _result = new ResultHandle { Status = false, Message = "Charge has already existed!" };
+                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
                         return Ok(_result);
                     }
                 }
@@ -377,22 +388,6 @@ namespace eFMS.API.Accounting.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             HandleState hs;
-            if (string.IsNullOrEmpty(model.Settlement.SettlementNo))//Insert Settlement Payment
-            {
-                model.Settlement.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
-                hs = acctSettlementPaymentService.AddSettlementPayment(model);
-            }
-            else //Update Settlement Payment
-            {
-                if (!model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
-                {
-                    ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the settlement payment status is New or Deny" };
-                    return Ok(_result);
-                }
-                model.Settlement.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
-                hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
-            }
-
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)
             {
@@ -407,11 +402,16 @@ namespace eFMS.API.Accounting.Controllers
                         Partner = item.Type.Equals(Constants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
-                        ContNo = item.ContNo
+                        ContNo = item.ContNo,
+                        MBLNo = item.MBL,
+                        HBLNo = item.HBL,
+                        JobNo = item.JobId
                     };
-                    if (acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment))
+                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
+                    if (_checkDuplicate.Status)
                     {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = "Charge has already existed!" };
+                        //ResultHandle _result = new ResultHandle { Status = false, Message = "Charge has already existed!" };
+                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
                         return Ok(_result);
                     }
                 }
@@ -420,6 +420,22 @@ namespace eFMS.API.Accounting.Controllers
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
                 return Ok(_result);
+            }
+
+            if (string.IsNullOrEmpty(model.Settlement.SettlementNo))//Insert Settlement Payment
+            {
+                model.Settlement.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
+                hs = acctSettlementPaymentService.AddSettlementPayment(model);
+            }
+            else //Update Settlement Payment
+            {
+                if (!model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the settlement payment status is New or Deny" };
+                    return Ok(_result);
+                }
+                model.Settlement.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
+                hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
