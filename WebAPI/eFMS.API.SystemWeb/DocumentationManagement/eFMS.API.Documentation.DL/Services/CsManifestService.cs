@@ -221,30 +221,28 @@ namespace eFMS.API.Documentation.DL.Services
             var units = unitRepository.Get().ToList();
             var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
             model.PolName = model.Pol != null? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn: null;
+
+            var shipmentContainers = containerService.Get(x => x.Mblid == model.JobId);
+            if (shipmentContainers.Count() == 0) return null;
+            foreach (var container in shipmentContainers)
+            {
+                container.ContainerTypeName = units.Where(x => x.Id == container.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn;
+                var containerTemp = new SeaImportCargoManifestContainer
+                {
+                    Qty = container.Quantity,
+                    ContType = container.ContainerTypeName,
+                    ContainerNo = container.ContainerNo,
+                    SealNo = container.SealNo,
+                    TotalPackages = container.PackageQuantity,
+                    UnitPack = container.PackageTypeName,
+                    GrossWeight = container.Gw,
+                    CBM = container.Cbm,
+                    DecimalNo = 2
+                };
+                containers.Add(containerTemp);
+            }
             if (model.CsTransactionDetails.Count > 0)
             {
-                var shipmentContainers = containerService.Get(x => x.Mblid == model.JobId);
-                if (shipmentContainers.Count() > 0)
-                {
-                    foreach (var container in shipmentContainers)
-                    {
-                        container.ContainerTypeName = units.Where(x => x.Id == container.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn;
-                        var containerTemp = new SeaImportCargoManifestContainer
-                        {
-                            Qty = container.Quantity,
-                            ContType = container.ContainerTypeName,
-                            ContainerNo = container.ContainerNo,
-                            SealNo = container.SealNo,
-                            TotalPackages = container.PackageQuantity,
-                            UnitPack = container.PackageTypeName,
-                            GrossWeight = container.Gw,
-                            CBM = container.Cbm,
-                            DecimalNo = 2
-                        };
-                        containers.Add(containerTemp);
-                    }
-                }
-
                 foreach (var item in model.CsTransactionDetails)
                 {
                     string totalPackages = item.PackageContainer + "\n" + item.ContSealNo;

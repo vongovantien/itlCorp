@@ -34,7 +34,7 @@ enum PartnerDataTab {
     templateUrl: './partner.component.html'
 })
 export class PartnerComponent extends AppList implements OnInit {
-    @ViewChild(PartnerListComponent, { static: false }) allPartnerComponent: any;
+    @ViewChild(PartnerListComponent, { static: false }) allPartnerComponent: PartnerListComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: any;
     pager: PagerSetting = PAGINGSETTING;
     partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
@@ -110,7 +110,9 @@ export class PartnerComponent extends AppList implements OnInit {
                 this.criteria.userCreated = event.searchString;
             }
         }
+
         this.allPartnerComponent.dataSearch = this.criteria;
+        this.allPartnerComponent.page = 1;
         this.allPartnerComponent.getPartners();
     }
     tabSelect(tabName) {

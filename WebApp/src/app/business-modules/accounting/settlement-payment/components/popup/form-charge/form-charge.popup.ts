@@ -602,7 +602,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                             this.onRequest.emit(body);
                         }
                     } else {
-                        this._toastService.warning(res.message);
+                        this._toastService.warning(res.message, '', {enableHtml: true});
                     }
                 }
             );

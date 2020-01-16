@@ -16,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/share-business/components/manifest/form-manifest/components/form-manifest.component';
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'app-sea-fcl-import-manifest',
@@ -34,7 +35,7 @@ export class SeaFclImportManifestComponent extends AppList {
     saveButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.save
     };
-
+    portType: CommonEnum.PORT_TYPE = CommonEnum.PORT_TYPE.SEA;
     cancelButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.cancel
     };
@@ -312,6 +313,8 @@ export class SeaFclImportManifestComponent extends AppList {
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
+                    } else {
+                        this._toastService.warning('There is no container data to display preview');
                     }
                 },
             );

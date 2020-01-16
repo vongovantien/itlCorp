@@ -1,21 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { AppList } from 'src/app/app.list';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { finalize, catchError } from 'rxjs/operators';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
 import { FormValidators } from '@validators';
+import { Store } from '@ngrx/store';
+import * as fromShare from './../../../../../share-business/store';
+import { GetCataloguePortAction, getCataloguePortState } from '@store';
+import { CommonEnum, TransactionTypeEnum } from '@enums';
+import { PortIndex } from '@models';
+import { AppForm } from 'src/app/app.form';
 
 @Component({
     selector: 'form-manifest',
     templateUrl: './form-manifest.component.html'
 })
-export class ShareBusinessFormManifestComponent extends AppList {
+export class ShareBusinessFormManifestComponent extends AppForm {
+    @Input() type: CommonEnum.PORT_TYPE;
     formGroup: FormGroup;
     referenceNo: AbstractControl;
     supplier: AbstractControl;
@@ -25,11 +32,6 @@ export class ShareBusinessFormManifestComponent extends AppList {
     date: AbstractControl;
     pol: AbstractControl;
     pod: AbstractControl;
-
-    configPortOfLoading: CommonInterface.IComboGirdConfig | any = {};
-    configPortOfDischarge: CommonInterface.IComboGirdConfig | any = {};
-    configPort: CommonInterface.IComboGirdConfig | any = {};
-
     selectedPortOfLoading: any = {};
     selectedPortOfDischarge: any = {};
 
@@ -48,55 +50,37 @@ export class ShareBusinessFormManifestComponent extends AppList {
     isImport: boolean = false;
     defaultMarksOfNationality: string = '';
     defaultVoyNo: string = '';
+    ports: Observable<PortIndex[]>;
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Port Code' },
+        { field: 'nameEn', label: 'Port Name' },
+        { field: 'countryNameEN', label: 'Country' },
+    ];
 
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _dataService: DataService,
         private _spinner: NgxSpinnerService,
-        private _documentRepo: DocumentationRepo
-
+        private _documentRepo: DocumentationRepo,
+        private _store: Store<fromShare.IShareBussinessState>
 
     ) {
         super();
     }
 
     ngOnInit() {
-        this.getMasterData();
-        this.configPort = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'code', label: 'Port Code' },
-                { field: 'nameEn', label: 'Port Name' },
-                { field: 'countryNameEN', label: 'Country' },
-
-            ]
-        }, { selectedDisplayFields: ['nameEn'], });
-
-
+        switch (this.type) {
+            case CommonEnum.PORT_TYPE.SEA:
+                this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
+                break;
+            case CommonEnum.PORT_TYPE.AIR:
+                this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
+                break;
+        }
+        this.ports = this._store.select(getCataloguePortState);
         this.initForm();
     }
-
-
-    getMasterData() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
-            this.configPortOfLoading.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
-        }
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT)) {
-            this.configPortOfDischarge.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PORT);
-        }
-        forkJoin([
-            this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port })
-
-        ]).pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
-            .subscribe(
-                ([ports]: any = [[]]) => {
-                    this.configPortOfLoading.dataSource = ports || [];
-                    this.configPortOfDischarge.dataSource = ports || [];
-                    this.isLoading = false;
-                }
-            );
-    }
-
 
     getShipmentDetail(id: any) {
         this._documentRepo.getDetailTransaction(id).subscribe(

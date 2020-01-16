@@ -11,6 +11,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string BUHeadName { get; set; }    
         public bool IsApproved { get; set; }
         public string StatusApproval { get; set; }
-        public bool IsRequester { get; set; }
+        public bool IsManager { get; set; }
     }
 }

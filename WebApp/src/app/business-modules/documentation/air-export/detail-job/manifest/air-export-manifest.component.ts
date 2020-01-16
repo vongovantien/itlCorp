@@ -16,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/share-business/components/manifest/form-manifest/components/form-manifest.component';
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'app-air-export-manifest',
@@ -30,6 +31,7 @@ export class AirExportManifestComponent extends AppList {
     housebills: any[] = [];
     housebillsRoot: any[] = [];
     housebillsChange: any[] = [];
+    portType: CommonEnum.PORT_TYPE = CommonEnum.PORT_TYPE.AIR;
     manifest: any = {};
     saveButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.save

@@ -97,12 +97,18 @@
                             <label class="form-control-label" *ngIf="isAir">
                                 Airport Departure <span class="m--font-danger">(*)</span>
                             </label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pol.value}"
+                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
+                                [currentActiveItemId]="{ field: 'id', value: pol.value}"
+                                [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
+                                [displayFields]="displayFieldPort" (remove)="resetFormControl(pol)"
+                                (itemSelected)="onSelectDataFormInfo($event, 'PortOfLoading')">
+                            </app-combo-grid-virtual-scroll>
+                            <!-- <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                 [selectedDisplayFields]="configPort.selectedDisplayFields"
                                 [dataSources]="configPortOfLoading.dataSource"
                                 [displayFields]="configPort.displayFields"
                                 (itemSelected)="onSelectDataFormInfo($event, 'PortOfLoading')">
-                            </app-combo-grid-virtual-scroll>
+                            </app-combo-grid-virtual-scroll> -->
                             <div class="form-control-feedback" *ngIf="isSubmitted &&  !pol.value  ">
                                 Port of Loading is required!
                             </div>
@@ -117,12 +123,18 @@
                             <label class="form-control-label" *ngIf="isAir">
                                 Airport Arrival <span class="m--font-danger">(*)</span>
                             </label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pod.value}"
+                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
+                                [currentActiveItemId]="{ field: 'id', value: pod.value}"
+                                [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
+                                [displayFields]="displayFieldPort" (remove)="resetFormControl(pod)"
+                                (itemSelected)="onSelectDataFormInfo($event, 'PortOfDischarge')">
+                            </app-combo-grid-virtual-scroll>
+                            <!-- <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                 [selectedDisplayFields]="configPort.selectedDisplayFields"
                                 [dataSources]="configPortOfDischarge.dataSource"
                                 [displayFields]="configPort.displayFields"
                                 (itemSelected)="onSelectDataFormInfo($event, 'PortOfDischarge')">
-                            </app-combo-grid-virtual-scroll>
+                            </app-combo-grid-virtual-scroll> -->
                             <div class="form-control-feedback" *ngIf="isSubmitted &&  !pod.value">
                                 Port of Discharge is required!
                             </div>

@@ -124,6 +124,14 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
+            var isManagerDeputy = false;
+            var isAccountantDeputy = false;
+            if (!string.IsNullOrEmpty(criteria.Requester))
+            {
+                isManagerDeputy = CheckDeputyManagerByUser(criteria.Requester);
+                isAccountantDeputy = CheckDeputyAccountantByUser(criteria.Requester);
+            }
+
             List<string> refNo = new List<string>();
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
@@ -180,10 +188,12 @@ namespace eFMS.API.Accounting.DL.Services
                             !string.IsNullOrEmpty(criteria.Requester) ?
                             (
                                     set.Requester == criteria.Requester
-                                || (apr.Manager == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED))//apr.ManagerAprDate != null)
-                                || (apr.Accountant == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED && set.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))//apr.AccountantAprDate != null)
-                                || (apr.ManagerApr == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED))//apr.ManagerAprDate != null)
-                                || (apr.AccountantApr == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED && set.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))//apr.AccountantAprDate != null)
+                                || (apr.Manager == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED))
+                                || (apr.Accountant == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED && set.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))
+                                || (apr.ManagerApr == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED))
+                                || (apr.AccountantApr == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED && set.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))
+                                || (isManagerDeputy && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED))
+                                || (isAccountantDeputy && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED && set.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))
                             )
                             :
                                 true
@@ -369,7 +379,6 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrenct = currentUser.UserID;
-                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
                 var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
                 if (settlement == null) return new HandleState("Not found Settlement Payment");
@@ -387,13 +396,6 @@ namespace eFMS.API.Accounting.DL.Services
                         var surchargeShipment = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == true).ToList();
                         if (surchargeShipment != null && surchargeShipment.Count > 0)
                         {
-                            //surchargeShipment.ForEach(sur =>
-                            //{
-                            //    sur.SettlementCode = null;
-                            //    sur.UserModified = userCurrenct;
-                            //    sur.DatetimeModified = DateTime.Now;
-                            //});
-                            //dc.CsShipmentSurcharge.UpdateRange(surchargeShipment);
                             foreach (var item in surchargeShipment)
                             {
                                 item.SettlementCode = null;
@@ -406,14 +408,12 @@ namespace eFMS.API.Accounting.DL.Services
                         var surchargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == false).ToList();
                         if (surchargeScene != null && surchargeScene.Count > 0)
                         {
-                            //dc.CsShipmentSurcharge.RemoveRange(surchargeScene);
                             foreach (var item in surchargeScene)
                             {
                                 var hsRemoveSurchargeScene = csShipmentSurchargeRepo.Delete(x => x.Id == item.Id);
                             }
                         }
-                        //dc.SaveChanges();
-                        //return new HandleState();
+
                         var hs = DataContext.Delete(x => x.Id == settlement.Id);
                         if (hs.Success)
                         {
@@ -1129,7 +1129,7 @@ namespace eFMS.API.Accounting.DL.Services
             var unit = catUnitRepo.Get();
             var payer = catPartnerRepo.Get();
             var payee = catPartnerRepo.Get();
-            var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != "Canceled");
+            var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
 
@@ -1237,31 +1237,71 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion -- GET EXISITS CHARGE --
 
         #region -- INSERT & UPDATE SETTLEMENT PAYMENT --
-        public bool CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
+        public ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
         {
-            var result = false;
+            var result = new ResultModel();
             if (criteria.SurchargeID == Guid.Empty)
             {
-                result = csShipmentSurchargeRepo.Get(x =>
-                       x.ChargeId == criteria.ChargeID
-                    && x.Hblid == criteria.HBLID
-                    && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
-                    && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
-                    && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
-                    && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
-                    ).Any();
+                if (!string.IsNullOrEmpty(criteria.CustomNo) || !string.IsNullOrEmpty(criteria.InvoiceNo) || !string.IsNullOrEmpty(criteria.ContNo))
+                {
+                    var surChargeExists = csShipmentSurchargeRepo.Get(x =>
+                               x.ChargeId == criteria.ChargeID
+                            && x.Hblid == criteria.HBLID
+                            && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
+                            && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
+                            && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
+                            && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                    );
+
+                    var isExists = surChargeExists.Select(s => s.Id).Any();
+                    result.Status = isExists;
+                    if (isExists)
+                    {
+                        var charge = catChargeRepo.Get();
+                        var data = from sur in surChargeExists
+                                   join chg in charge on sur.ChargeId equals chg.Id
+                                   select new { JobNo = criteria.JobNo, HBLNo = criteria.HBLNo, MBLNo = criteria.MBLNo, ChargeName = chg.ChargeNameEn, SettlementCode = sur.SettlementCode };
+                        string msg = string.Join("<br/>", data.ToList()
+                            .Select(s => !string.IsNullOrEmpty(s.JobNo)
+                            && !string.IsNullOrEmpty(s.HBLNo)
+                            && !string.IsNullOrEmpty(s.MBLNo)
+                            ? string.Format(@"Shipment: [{0}-{1}-{2}] Charge [{3}] has already existed in settlement: {4}", s.JobNo, s.HBLNo, s.MBLNo, s.ChargeName, s.SettlementCode)
+                            : string.Format(@"Charge [{0}] has already existed in settlement: {1}.", s.ChargeName, s.SettlementCode)));
+                        result.Message = msg;
+                    }
+                }
             }
             else
             {
-                result = csShipmentSurchargeRepo.Get(x =>
-                   x.Id != criteria.SurchargeID
-                && x.ChargeId == criteria.ChargeID
-                && x.Hblid == criteria.HBLID
-                && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
-                && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
-                && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
-                && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
-                ).Any();
+                if (!string.IsNullOrEmpty(criteria.CustomNo) || !string.IsNullOrEmpty(criteria.InvoiceNo) || !string.IsNullOrEmpty(criteria.ContNo))
+                {
+                    var surChargeExists = csShipmentSurchargeRepo.Get(x =>
+                               x.Id != criteria.SurchargeID
+                            && x.ChargeId == criteria.ChargeID
+                            && x.Hblid == criteria.HBLID
+                            && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
+                            && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
+                            && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
+                            && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                    );
+
+                    var isExists = surChargeExists.Select(s => s.Id).Any();
+                    result.Status = isExists;
+                    if (isExists)
+                    {
+                        var charge = catChargeRepo.Get();
+                        var data = from sur in surChargeExists
+                                   join chg in charge on sur.ChargeId equals chg.Id
+                                   select new { JobNo = criteria.JobNo, HBLNo = criteria.HBLNo, MBLNo = criteria.MBLNo, ChargeName = chg.ChargeNameEn, SettlementCode = sur.SettlementCode };
+                        string msg = string.Join("<br/>", data.ToList()
+                            .Select(s => !string.IsNullOrEmpty(s.JobNo)
+                            && !string.IsNullOrEmpty(s.HBLNo)
+                            && !string.IsNullOrEmpty(s.MBLNo)
+                            ? string.Format(@"Shipment: [{0}-{1}-{2}] Charge [{3}] has already existed in settlement: {4}", s.JobNo, s.HBLNo, s.MBLNo, s.ChargeName, s.SettlementCode)
+                            : string.Format(@"Charge [{0}] has already existed in settlement: {1}.", s.ChargeName, s.SettlementCode)));
+                        result.Message = msg;
+                    }
+                }
             }
             return result;
         }
@@ -1354,7 +1394,6 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrent = currentUser.UserID;
-                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
 
@@ -1390,12 +1429,6 @@ namespace eFMS.API.Accounting.DL.Services
                             var chargeShipmentOld = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == true).ToList();
                             if (chargeShipmentOld.Count > 0)
                             {
-                                //chargeShipmentOld.ForEach(req =>
-                                //{
-                                //    req.SettlementCode = null;
-                                //    req.UserModified = userCurrent;
-                                //    req.DatetimeModified = DateTime.Now;
-                                //});
                                 foreach (var item in chargeShipmentOld)
                                 {
                                     item.SettlementCode = null;
@@ -1403,19 +1436,12 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.DatetimeModified = DateTime.Now;
                                     csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                                 }
-                                //dc.CsShipmentSurcharge.UpdateRange(chargeShipmentOld);
                             }
                             //Cập nhật SettlementCode = SettlementNo cho các SettlementNo
                             var chargeShipmentUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && x.IsFromShipment == true).Select(s => s.Id).ToList();
                             if (chargeShipmentUpdate.Count > 0)
                             {
                                 var listChargeShipmentUpdate = csShipmentSurchargeRepo.Get(x => chargeShipmentUpdate.Contains(x.Id)).ToList();
-                                //listChargeShipmentUpdate.ForEach(req =>
-                                //{
-                                //    req.SettlementCode = settlement.SettlementNo;
-                                //    req.UserModified = userCurrent;
-                                //    req.DatetimeModified = DateTime.Now;
-                                //});
                                 foreach (var item in listChargeShipmentUpdate)
                                 {
                                     item.SettlementCode = settlement.SettlementNo;
@@ -1423,7 +1449,6 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.DatetimeModified = DateTime.Now;
                                     csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                                 }
-                                //dc.CsShipmentSurcharge.UpdateRange(listChargeShipmentUpdate);
                             }
                             //End --Phí chứng từ (IsFromShipment = true)--
 
@@ -1435,13 +1460,6 @@ namespace eFMS.API.Accounting.DL.Services
                             if (chargeSceneAdd.Count > 0)
                             {
                                 var listChargeSceneAdd = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneAdd);
-                                //listChargeSceneAdd.ForEach(req =>
-                                //{
-                                //    req.Id = Guid.NewGuid();
-                                //    req.SettlementCode = settlement.SettlementNo;
-                                //    req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
-                                //    req.UserCreated = req.UserModified = userCurrent;
-                                //});
                                 foreach (var item in listChargeSceneAdd)
                                 {
                                     item.Id = Guid.NewGuid();
@@ -1450,7 +1468,6 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.UserCreated = item.UserModified = userCurrent;
                                     csShipmentSurchargeRepo.Add(item);
                                 }
-                                //dc.CsShipmentSurcharge.AddRange(listChargeSceneAdd);
                             }
 
                             //Cập nhật lại các thông tin của phí hiện trường (nếu có edit chỉnh sửa phí hiện trường)
@@ -1460,13 +1477,6 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 var listChargeExists = csShipmentSurchargeRepo.Get(x => idChargeSceneUpdate.Contains(x.Id));
                                 var listChargeSceneUpdate = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneUpdate);
-                                //listChargeSceneUpdate.ForEach(req =>
-                                //{
-                                //    req.UserCreated = listChargeExists.Where(x => x.Id == req.Id).First().UserCreated;
-                                //    req.DatetimeCreated = listChargeExists.Where(x => x.Id == req.Id).First().DatetimeCreated;
-                                //    req.UserModified = userCurrent;
-                                //    req.DatetimeModified = DateTime.Now;
-                                //});
                                 foreach (var item in listChargeSceneUpdate)
                                 {
                                     item.UserCreated = listChargeExists.Where(x => x.Id == item.Id).First().UserCreated;
@@ -1475,7 +1485,6 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.DatetimeModified = DateTime.Now;
                                     csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                                 }
-                                //dc.CsShipmentSurcharge.UpdateRange(listChargeSceneUpdate);
                             }
 
                             //Xóa các phí hiện trường đã chọn xóa của user
@@ -1486,11 +1495,9 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     csShipmentSurchargeRepo.Delete(x => x.Id == item.Id);
                                 }
-                                //dc.CsShipmentSurcharge.RemoveRange(chargeSceneRemove);
                             }
                             //End --Phí hiện trường (IsFromShipment = false)--
                         }
-                        //dc.SaveChanges();
                         trans.Commit();
                         return hs;
                     }
@@ -1764,8 +1771,6 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var userCurrent = currentUser.UserID;
 
-                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-
                 var acctApprove = mapper.Map<AcctApproveSettlement>(settlement);
 
                 if (!string.IsNullOrEmpty(settlement.SettlementNo))
@@ -1804,7 +1809,6 @@ namespace eFMS.API.Accounting.DL.Services
                             acctApprove.UserCreated = acctApprove.UserModified = userCurrent;
                             acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
                             acctApprove.IsDeputy = false;
-                            //dc.AcctApproveSettlement.Add(acctApprove);
                             var hsAddApproveSettlement = acctApproveSettlementRepo.Add(acctApprove);
                         }
                         else //Update AcctApproveSettlement by SettlementNo
@@ -1812,7 +1816,6 @@ namespace eFMS.API.Accounting.DL.Services
                             checkExistsApproveBySettlementNo.RequesterAprDate = DateTime.Now;
                             checkExistsApproveBySettlementNo.UserModified = userCurrent;
                             checkExistsApproveBySettlementNo.DateModified = DateTime.Now;
-                            //dc.AcctApproveSettlement.Update(checkExistsApproveBySettlementNo);
                             var hsUpdateApproveSettlement = acctApproveSettlementRepo.Update(checkExistsApproveBySettlementNo, x => x.Id == checkExistsApproveBySettlementNo.Id);
                         }
                         //dc.SaveChanges();
@@ -1872,7 +1875,6 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 try
                 {
-                    //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                     var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
 
                     if (settlement == null) return new HandleState("Not found settlement payment");
@@ -1908,7 +1910,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                     if (approve != null && settlement != null)
                     {
-                        if (userCurrent == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        if (userCurrent == GetLeaderIdOfUser(settlement.Requester))
                         {
                             if (   settlement.StatusApproval == Constants.STATUS_APPROVAL_LEADERAPPROVED
                                 || settlement.StatusApproval == Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED
@@ -1925,7 +1927,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var userAprNextId = GetEmployeeIdOfUser(userAprNext);
                             emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
                         }
-                        else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || CheckDeputyManagerByUser(userCurrent))
                         {
                             if (   settlement.StatusApproval == Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED
                                 || settlement.StatusApproval == Constants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
@@ -1942,7 +1944,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var userAprNextId = GetEmployeeIdOfUser(userAprNext);
                             emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
                         }
-                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || CheckDeputyAccountantByUser(userCurrent))
                         {
                             if (settlement.StatusApproval == Constants.STATUS_APPROVAL_DONE)
                             {
@@ -1960,9 +1962,6 @@ namespace eFMS.API.Accounting.DL.Services
                         settlement.UserModified = approve.UserModified = userCurrent;
                         settlement.DatetimeModified = approve.DateModified = DateTime.Now;
 
-                        //dc.AcctSettlementPayment.Update(settlement);
-                        //dc.AcctApproveSettlement.Update(approve);
-                        //dc.SaveChanges();
                         var hsUpdateSettle = DataContext.Update(settlement, x => x.Id == settlement.Id);
                         var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
                         trans.Commit();
@@ -1998,7 +1997,6 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var userCurrent = currentUser.UserID;
 
-            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -2042,13 +2040,13 @@ namespace eFMS.API.Accounting.DL.Services
                             return new HandleState("Settlement payment denied");
                         }
 
-                        if (userCurrent == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        if (userCurrent == GetLeaderIdOfUser(settlement.Requester))
                         {
                             var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
                             if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                             approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
                         }
-                        else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || CheckDeputyManagerByUser(userCurrent))
                         {
                             //Cho phép User Manager thực hiện deny khi user Manager đã Approved, 
                             //nếu Chief Accountant đã Approved thì User Manager ko được phép deny
@@ -2060,29 +2058,31 @@ namespace eFMS.API.Accounting.DL.Services
                             approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
                             approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
                         }
-                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || CheckDeputyAccountantByUser(userCurrent))
                         {
                             var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
                             if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                             approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
                             approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
                         }
+                        else
+                        {
+                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
+                            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                        }
 
                         approve.UserModified = userCurrent;
                         approve.DateModified = DateTime.Now;
                         approve.Comment = comment;
                         approve.IsDeputy = true;
-                        //dc.AcctApproveSettlement.Update(approve);
                         var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
 
                         //Cập nhật lại advance status của Settlement Payment
                         settlement.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
                         settlement.UserModified = userCurrent;
                         settlement.DatetimeModified = DateTime.Now;
-                        //dc.AcctSettlementPayment.Update(settlement);
                         var hsUpdateSettle = DataContext.Update(settlement, x => x.Id == settlement.Id);
 
-                        //dc.SaveChanges();
                         trans.Commit();
                     }
 
@@ -2121,7 +2121,9 @@ namespace eFMS.API.Accounting.DL.Services
                 aprSettlementMap.AccountantName = string.IsNullOrEmpty(aprSettlementMap.Accountant) ? null : GetEmployeeByUserId(aprSettlementMap.Accountant)?.EmployeeNameVn;
                 aprSettlementMap.BUHeadName = string.IsNullOrEmpty(aprSettlementMap.Buhead) ? null : GetEmployeeByUserId(aprSettlementMap.Buhead)?.EmployeeNameVn;
                 aprSettlementMap.StatusApproval = DataContext.Get(x => x.SettlementNo == aprSettlementMap.SettlementNo).FirstOrDefault()?.StatusApproval;
-                aprSettlementMap.IsRequester = (userCurrent == aprSettlementMap.Requester) ? true : false;
+
+                var isManagerDeputy = CheckDeputyManagerByUser(userCurrent);
+                aprSettlementMap.IsManager = (userCurrent == approveSettlement.Manager || userCurrent == approveSettlement.ManagerApr || isManagerDeputy) ? true : false;
             }
             else
             {
@@ -2504,7 +2506,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Nếu group hiện tại đã được approve thì không cho approve nữa
         private HandleState CheckApprovedOfDeptPrevAndDeptCurrent(string settlementNo, string userId, string deptOfUser)
         {
-            HandleState result = new HandleState("Not found");
+            HandleState result = new HandleState("Not allow approve/deny");
 
             //Lấy ra Settlement Approval dựa vào settlementNo
             var acctApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeputy == false).FirstOrDefault();
@@ -2534,8 +2536,8 @@ namespace eFMS.API.Accounting.DL.Services
             if (string.IsNullOrEmpty(acctApprove.Leader))
             {
                 //Manager Department Approve
-                //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt hay không
-                if (userId == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt (Manager Dept) hay không
+                if (userId == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || CheckDeputyManagerByUser(userId))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
@@ -2569,7 +2571,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Accountant Approve
                 //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt hay không
-                if (userId == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                if (userId == GetAccountantId(brandOfUserId.ToString()) || CheckDeputyAccountantByUser(userId))
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
@@ -2596,7 +2598,7 @@ namespace eFMS.API.Accounting.DL.Services
             else //Trường hợp có leader
             {
                 //Leader Approve
-                if (userId == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                if (userId == GetLeaderIdOfUser(settlement.Requester))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
@@ -2630,7 +2632,8 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 //Manager Department Approve
-                if (userId == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt (Manager Dept) hay không
+                if (userId == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || CheckDeputyManagerByUser(userId))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
@@ -2666,8 +2669,8 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 //Accountant Approve
-                //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt hay không
-                if (userId == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt (Accoutant) hay không
+                if (userId == GetAccountantId(brandOfUserId.ToString()) || CheckDeputyAccountantByUser(userId))
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
@@ -2950,6 +2953,9 @@ namespace eFMS.API.Accounting.DL.Services
         private bool CheckUserInApproveSettlementAndDeptApproved(string userCurrent, AcctApproveSettlementModel approveSettlement)
         {
             var isApproved = false;
+            var isDeputyManage = CheckDeputyManagerByUser(userCurrent);
+            var isDeputyAccoutant = CheckDeputyAccountantByUser(userCurrent);
+
             if (userCurrent == approveSettlement.Requester) //Requester
             {
                 isApproved = true;
@@ -2966,18 +2972,20 @@ namespace eFMS.API.Accounting.DL.Services
                     isApproved = false;
                 }
             }
-            else if (userCurrent == approveSettlement.Manager || userCurrent == approveSettlement.ManagerApr) //Dept Manager
+            else if (userCurrent == approveSettlement.Manager || userCurrent == approveSettlement.ManagerApr || isDeputyManage) //Dept Manager
             {
                 isApproved = true;
-                if (string.IsNullOrEmpty(approveSettlement.ManagerApr) && approveSettlement.ManagerAprDate == null)
+                var isDeptWaitingApprove = DataContext.Get(x => x.SettlementNo == approveSettlement.SettlementNo && (x.StatusApproval != Constants.STATUS_APPROVAL_NEW && x.StatusApproval != Constants.STATUS_APPROVAL_DENIED)).Any();
+                if (string.IsNullOrEmpty(approveSettlement.ManagerApr) && approveSettlement.ManagerAprDate == null && isDeptWaitingApprove)
                 {
                     isApproved = false;
-                }
+                }                
             }
-            else if (userCurrent == approveSettlement.Accountant || userCurrent == approveSettlement.AccountantApr) //Accountant Manager
+            else if (userCurrent == approveSettlement.Accountant || userCurrent == approveSettlement.AccountantApr || isDeputyAccoutant) //Accountant Manager
             {
                 isApproved = true;
-                if (string.IsNullOrEmpty(approveSettlement.AccountantApr) && approveSettlement.AccountantAprDate == null)
+                var isDeptWaitingApprove = DataContext.Get(x => x.SettlementNo == approveSettlement.SettlementNo && (x.StatusApproval != Constants.STATUS_APPROVAL_NEW && x.StatusApproval != Constants.STATUS_APPROVAL_DENIED && x.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any();
+                if (string.IsNullOrEmpty(approveSettlement.AccountantApr) && approveSettlement.AccountantAprDate == null && isDeptWaitingApprove)
                 {
                     isApproved = false;
                 }
@@ -3088,6 +3096,34 @@ namespace eFMS.API.Accounting.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        private bool CheckDeputyManagerByUser(string user)
+        {
+            var result = false;
+            //Lấy ra brandId của user
+            var brandOfUserId = GetEmployeeByUserId(user)?.WorkPlaceId;
+            //Lấy ra dept code của user dựa vào user
+            var deptCodeOfUser = GetInfoDeptOfUser(user, brandOfUserId.ToString())?.Code;
+            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser != Constants.DEPT_CODE_ACCOUNTANT)
+            {
+                result = GetListUserDeputyByDept(deptCodeOfUser).Contains(user) ? true : false;
+            }
+            return result;
+        }
+
+        private bool CheckDeputyAccountantByUser(string user)
+        {
+            var result = false;
+            //Lấy ra brandId của user
+            var brandOfUserId = GetEmployeeByUserId(user)?.WorkPlaceId;
+            //Lấy ra dept code của user dựa vào user
+            var deptCodeOfUser = GetInfoDeptOfUser(user, brandOfUserId.ToString())?.Code;
+            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser == Constants.DEPT_CODE_ACCOUNTANT)
+            {
+                result = GetListUserDeputyByDept(deptCodeOfUser).Contains(user) ? true : false;
+            }
+            return result;
         }
         #endregion
     }

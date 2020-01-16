@@ -68,6 +68,7 @@ export class UnitComponent extends AppList implements OnInit {
     searchUnit(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
         this.dataSearch[event.field] = event.searchString;
+        this.page = 1;
         this.getUnits();
     }
 

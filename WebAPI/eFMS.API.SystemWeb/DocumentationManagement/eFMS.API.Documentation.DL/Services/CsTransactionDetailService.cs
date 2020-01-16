@@ -1055,7 +1055,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ICASNC = string.Empty; //NOT USE
                 housebill.Movement = data.MoveType; //Type of move
                 housebill.AccountingInfo = string.Empty; //NOT USE
-                housebill.SayWord = data.InWord; //Inword
+                housebill.SayWord = "SAY: " + data.InWord; //Inword
                 housebill.strOriginLandPP = string.Empty; //NOT USE
                 housebill.strOriginLandCC = string.Empty; //NOT USE
                 housebill.strOriginTHCPP = string.Empty; //NOT USE
