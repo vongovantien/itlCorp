@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective } from '.';
+import { StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective } from '.';
 import { LoadModuleDirective } from './load-module.directive';
 
 const APP_DIRECTIVES = [
@@ -15,7 +15,8 @@ const APP_DIRECTIVES = [
     ClickOutSideDirective,
     LoadModuleDirective,
     AppLoadingButtonDirective,
-    AppRequiredDirective
+    AppRequiredDirective,
+    NumericDirective
 ];
 @NgModule({
     declarations: [

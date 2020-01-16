@@ -1,7 +1,7 @@
 import { Directive, ElementRef, HostListener } from '@angular/core';
 
 @Directive({
-    selector: '[appIntergerInputCheck]'
+    selector: '[integer]'
 })
 export class IntergerInputDirective {
     constructor(private el: ElementRef) {

@@ -65,7 +65,7 @@ const routes: Routes = [
                 path: 'documentation',
                 loadChildren: () => import('./business-modules/documentation/documentation.module').then(m => m.DocumentationModule),
                 data: {
-                    name: 'documentation',
+                    name: 'Documentation',
                     path: '/',
                 }
             },
