@@ -90,7 +90,7 @@
                                         [dataSources]="listCharges"
                                         [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                         [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null"
-                                        placeholder="Select charge">
+                                        placeholder="Select charge" (remove)="charge.chargeId = null">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </td>

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemConstants } from 'src/constants/system.const';
 import { catchError, finalize } from 'rxjs/operators';
@@ -61,7 +61,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         private _accoutingRepo: AccountingRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
-        private _documentRepo: DocumentationRepo
+        private _documentRepo: DocumentationRepo,
+        private _cd: ChangeDetectorRef
     ) {
         super();
     }
@@ -88,7 +89,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         } else {
             this.isLoadingShipmentGrid = true;
             this._catalogue.getListPartner(null, null, { active: true })
-                .pipe(catchError(this.catchError),finalize(()=>{
+                .pipe(catchError(this.catchError), finalize(() => {
                     this.isLoadingShipmentGrid = false;
                 }))
                 .subscribe(
@@ -123,7 +124,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
-                this.selectedPartner = { field: data.partnerNameEn, value: data.partnerNameEn };
+                this.selectedPartner = { field: 'id', value: data.partnerNameEn };
                 this.selectedPartnerData = data;
 
                 this.resetShipment();
@@ -141,8 +142,24 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
                 break;
             case 'shipment':
-                this.selectedShipment = { field: data.jobId, value: data.hbl };
+                this.selectedShipment = { field: 'jobId', value: data.hbl };
                 this.selectedShipmentData = data;
+                break;
+            default:
+                break;
+        }
+    }
+
+    onRemoveDataFormInfo(type: string) {
+        switch (type) {
+            case 'partner':
+                this.selectedPartner = {};
+                this.selectedPartnerData = null;
+                this.resetShipment();
+                break;
+            case 'shipment':
+                this.selectedShipment = {};
+                this.selectedShipmentData = null;
                 break;
             default:
                 break;
@@ -153,11 +170,11 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     getShipment(partnerId: string, service: string[]) {
         this.isLoadingShipmentGrid = true;
         this._documentRepo.getShipmentByPartnerOrService(partnerId, service)
-            .pipe(catchError(this.catchError),finalize(()=>{
+            .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoadingShipmentGrid = false;
             }))
             .subscribe(
-                (res: any) => {                    
+                (res: any) => {
                     this.configShipment.dataSource = res;
                     this.configShipment.displayFields = [
                         { field: 'jobId', label: 'Job No' },
@@ -184,16 +201,9 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this.isLoading = true;
             this.isCheckAll = false;
 
-            // this._accoutingRepo.getExistingCharge(this.selectedShipmentData.jobId, this.selectedShipmentData.hbl, this.selectedShipmentData.mbl)
-            //     .pipe(catchError(this.catchError), finalize(() => this.isLoading = false))
-            //     .subscribe(
-            //         (res: any) => {
-            //             this.charges = res;
-            //         }
-            //     );
-            var _jobIds = [];
-            var _hbls = [];
-            var _mbls = [];
+            let _jobIds = [];
+            let _hbls = [];
+            let _mbls = [];
             _jobIds = this.mapShipment("JOBID");
             _hbls = this.mapShipment("HBL");
             _mbls = this.mapShipment("MBL");
@@ -207,7 +217,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 hbls: _hbls,
                 mbls: _mbls
             };
-            console.log(body)
             this._accoutingRepo.getExistingCharge(body)
                 .pipe(catchError(this.catchError), finalize(() => this.isLoading = false))
                 .subscribe(
@@ -219,8 +228,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     mapShipment(type: string) {
-        var _shipment = [];
-        console.log(this.shipmentInput)
+        let _shipment = [];
         if (this.shipmentInput) {
             if (this.shipmentInput.keyword.length > 0) {
                 const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
@@ -256,7 +264,12 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     resetShipment() {
         this.selectedShipment = {};
         this.selectedShipmentData = null;
-        this.configShipment.dataSource = [];
+        this.configShipment = {
+            ...this.configShipment,
+            dataSource: [],
+        };
+        this._cd.detectChanges();
+        console.log(this.configShipment);
     }
 
     resetPartner() {
@@ -286,7 +299,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             .map((surcharge: Surcharge) => new Surcharge(surcharge));
 
         if (!this.selectedCharge.length) {
-            this._toastService.warning(`Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
+            this._toastService.warning(`Don't have any charges in this period, Please check it again! `);
             return;
         } else {
             this.onRequest.emit(this.selectedCharge);
@@ -302,7 +315,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.shipmentInput = data;
     }
 
-    resetFormShipmentInput(){
+    resetFormShipmentInput() {
         this.inputShipmentPopupComponent.shipmentSearch = '';
         this.shipmentInput = null;
         this.inputShipmentPopupComponent.selectedShipmentType = "JOBID";

@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mawb.value}">
-                        <label required>Master Bill of Lading</label>
+                        <label required>MBL No</label>
                         <input type="text" class="form-control" formControlName="mawb">
                     </div>
                 </div>
@@ -14,8 +14,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [currentActiveItemId]="{ field: 'id', value: customer.value,hardValue: shipmmentDetail.customerName}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200" (remove)="resetFormControl(customer)"
-                            placeholder="Please select Payer">
+                            [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(customer)"
+                            placeholder="Please select Payer" [loading]="isLoadingCustomer">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -25,9 +25,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'sale')"
                             [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
                             [selectedDisplayFields]="['username']" [dataSources]="saleMans"
-                            [displayFields]="[{field: 'username', label: 'User Name'}]" [height]="200"
-                            [disabled]="!customer.value" (remove)="resetFormControl(saleMan)"
-                            placeholder="Select saleman">
+                            [displayFields]="[{field: 'username', label: 'User Name'}]" [disabled]="!customer.value"
+                            (remove)="resetFormControl(saleMan)" placeholder="Select saleman">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -39,8 +38,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
                             [currentActiveItemId]="{ field: 'id', value: shipper.value,hardValue: shipmmentDetail.supp}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200" (remove)="resetFormControl(shipper)"
-                            placeholder="Please select shipper">
+                            [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(shipper)"
+                            placeholder="Please select shipper" [loading]="isLoadingShipper">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="shipperDescription"></textarea>
@@ -52,8 +51,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consignee')"
                             [currentActiveItemId]="{ field: 'id', value: consignee.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200"
-                            (remove)="resetFormControl(consignee)" placeholder="Please select consignee">
+                            [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(consignee)"
+                            placeholder="Please select consignee" [loading]="isLoadingConsignee">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="consigneeDescription"></textarea>
@@ -65,8 +64,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'notify')"
                             [currentActiveItemId]="{ field: 'id', value: notifyParty.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200"
-                            (remove)="resetFormControl(notifyParty)" placeholder="Select notify">
+                            [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(notifyParty)"
+                            placeholder="Select notify">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="notifyPartyDescription"></textarea>
@@ -110,7 +109,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'country')"
                             [currentActiveItemId]="{ field: 'id', value: country.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="countries | async"
-                            [displayFields]="displayFieldsCountry" [height]="200" (remove)="resetFormControl(country)"
+                            [displayFields]="displayFieldsCountry" (remove)="resetFormControl(country)"
                             placeholder="Select country">
                         </app-combo-grid-virtual-scroll>
                     </div>

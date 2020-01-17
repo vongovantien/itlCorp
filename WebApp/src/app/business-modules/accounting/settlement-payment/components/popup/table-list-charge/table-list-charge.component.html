@@ -18,7 +18,8 @@
                                     (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
                                     [selectedDisplayFields]="['jobId','mbl','hbl']" [dataSources]="shipments"
                                     [displayFields]="configShipmentDisplayFields"
-                                    [placeholder]="'Please Select Shipment'" (remove)="resetFormControl(shipment)">
+                                    [placeholder]="'Please Select Shipment'"
+                                    (remove)="resetFormControl(shipment); charges = []">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
