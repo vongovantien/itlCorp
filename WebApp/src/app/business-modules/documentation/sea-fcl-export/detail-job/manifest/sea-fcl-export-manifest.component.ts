@@ -4,7 +4,7 @@ import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, take, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { getParamsRouterState } from 'src/app/store';
 import { Params, Router } from '@angular/router';
@@ -79,8 +79,10 @@ export class SeaFclExportManifestComponent extends AppList {
     }
     ngAfterViewInit() {
         this._store.select(getParamsRouterState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
                 if (param.id) {
+                    console.log(param.id);
                     this.jobId = param.id;
                     this.formManifest.jobId = this.jobId;
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);
@@ -249,7 +251,8 @@ export class SeaFclExportManifestComponent extends AppList {
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
-                })
+                }),
+                take(1),
             ).subscribe(
                 (res: any) => {
                     this.AddHblToManifestPopup.houseBills = this.housebills;
@@ -268,7 +271,6 @@ export class SeaFclExportManifestComponent extends AppList {
                             element.isRemoved = false;
                         });
                     }
-                    console.log(hasHbl);
                     this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
                 },
             );
