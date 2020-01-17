@@ -53,6 +53,7 @@ import {
     ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
     ShareBussinessCdNoteDetailAirPopupComponent,
     ShareBussinessFilesAttachComponent,
+    ShareBusinessHousebillsInManifestComponent
 } from './components';
 
 
@@ -100,7 +101,8 @@ const COMPONENTS = [
     ShareBussinessCdNoteAddAirPopupComponent,
     ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
     ShareBussinessCdNoteDetailAirPopupComponent,
-    ShareBussinessFilesAttachComponent
+    ShareBussinessFilesAttachComponent,
+    ShareBusinessHousebillsInManifestComponent
 ];
 
 
