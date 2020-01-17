@@ -87,6 +87,10 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     ];
 
     shipmmentDetail: CsTransaction = new CsTransaction();
+    isLoadingCustomer: boolean = false;
+    isLoadingShipper: boolean = false;
+    isLoadingConsignee: boolean = false;
+
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -105,7 +109,15 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.getSaleMans();
         this.getDropdownData();
 
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+        this.isLoadingCustomer = true;
+        this.isLoadingShipper = true;
+        this.isLoadingConsignee = true;
+
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER).pipe(
+            finalize(() => {
+                this.isLoadingCustomer = false;
+            })
+        );
         this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.consignees = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CONSIGNEE);
 
