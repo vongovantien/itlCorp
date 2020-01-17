@@ -131,10 +131,10 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                             oceanVoyNo: (!!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '') + ' - ' + (!!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : ''),
                             pod: this.shipmmentDetail.pod,
                             pol: this.shipmmentDetail.pol,
-                            serviceType: !!this.shipmmentDetail.typeOfService ? [{ id: this.shipmmentDetail.typeOfService, text: this.shipmmentDetail.typeOfService }] : null
+                            serviceType: !!this.shipmmentDetail.typeOfService ? [{ id: this.shipmmentDetail.typeOfService, text: this.shipmmentDetail.typeOfService }] : null,
+                            issueHbldate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null
                         });
                     }
-
                 }
             );
 
@@ -183,13 +183,13 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             oceanVoyNo: [null, Validators.required],
             shipperDescription: [],
             consigneeDescription: [],
-            notifyPartyDescription: [],
+            notifyPartyDescription: ['SAME AS CONSIGNEE'],
             bookingNo: [],
             goodsDeliveryDescription: [],
             forwardingAgentDescription: [],
             placeFreightPay: [null, Validators.required],
             originBlnumber: [],
-            issueHblplace: [],
+            issueHblplace: ['Ho Chi Minh, Viet Nam'],
             referenceNo: [],
             exportReferenceNo: [],
             moveType: [],

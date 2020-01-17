@@ -52,7 +52,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group" [ngClass]="{'m-form__group has-danger':  isSubmitted && !mawb.value}">
-                            <label required>MBL No</label>
+                            <label>MBL No</label>
                             <input type="text" class="form-control" formControlName="mawb">
                         </div>
                     </div>
@@ -66,8 +66,9 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Shipping Line/Co-Loader</label>
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':  isSubmitted && !coloader.value}">
+                            <label required>Shipping Line/Co-Loader</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [currentActiveItemId]="{ field: 'id', value: coloader.value}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
@@ -165,7 +166,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>Service Date</label>
+                            <label>ATD</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
