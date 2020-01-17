@@ -103,7 +103,6 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
             .subscribe(
                 (containers: any) => {
                     this.containers = containers || [];
-                    console.log("list container", this.containers);
                 }
             );
     }
@@ -111,6 +110,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
     onSaveHBL() {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
+        this.goodSummaryComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
             this.infoPopup.show();

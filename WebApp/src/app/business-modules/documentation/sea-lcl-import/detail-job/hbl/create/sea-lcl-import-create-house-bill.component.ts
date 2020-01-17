@@ -140,12 +140,24 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         if (this.formHouseBill.PortChargeLikePortLoading === true || this.formHouseBill.saleMan.value === null) {
             valid = false;
         }
+        if (
+            this.hblGoodsSummaryComponent.grossWeight === null
+            || this.hblGoodsSummaryComponent.totalCBM === null
+            || this.hblGoodsSummaryComponent.packageQty === null
+            || this.hblGoodsSummaryComponent.grossWeight < 0
+            || this.hblGoodsSummaryComponent.totalCBM < 0
+            || this.hblGoodsSummaryComponent.packageQty < 0
+        ) {
+            valid = false;
+        }
         return valid;
     }
 
     oncreate() {
         this.confirmCreatePopup.hide();
         this.formHouseBill.isSubmited = true;
+        this.hblGoodsSummaryComponent.isSubmitted = true;
+
         if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
             this.arrivalNoteComponent.isSubmitted = true;
             this.deliveryComponent.isSubmitted = true;
