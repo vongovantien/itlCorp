@@ -726,7 +726,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             //Lấy ra tên requester
-            var employeeId = sysUserRepo.Get(x => x.Username == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var employeeId = sysUserRepo.Get(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
             var requesterName = sysEmployeeRepo.Get(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
 
             string managerName = string.Empty;
@@ -747,7 +747,7 @@ namespace eFMS.API.Accounting.DL.Services
                 AdvContactID = "N/A",
                 AdvContact = requesterName,//cần lấy ra username
                 AdvAddress = string.Empty,
-                AdvValue = advance.AdvanceRequests.Sum(x => x.Amount),
+                AdvValue = advance.AdvanceRequests.Select(s => s.Amount).Sum(),
                 AdvCurrency = advance.AdvanceCurrency,
                 AdvCondition = advance.AdvanceNote,
                 AdvRef = strJobId,
@@ -812,9 +812,9 @@ namespace eFMS.API.Accounting.DL.Services
                 AdvCSSignDate = null,
                 AdvCSStickApp = null,
                 AdvCSStickDeny = null,
-                TotalNorm = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_NORM).Sum(x => x.Amount),
-                TotalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_INVOICE).Sum(x => x.Amount),
-                TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_OTHER).Sum(x => x.Amount)
+                TotalNorm = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_NORM).Select(s => s.Amount).Sum(),
+                TotalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_INVOICE).Select(s => s.Amount).Sum(),
+                TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_OTHER).Select(s => s.Amount).Sum()
             };
 
             acctAdvance.TotalNorm = acctAdvance.TotalNorm != 0 ? acctAdvance.TotalNorm : null;
@@ -911,7 +911,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             //Lấy ra tên requester
-            var employeeId = sysUserRepo.Get(x => x.Username == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var employeeId = sysUserRepo.Get(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
             var requesterName = sysEmployeeRepo.Get(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
 
             string managerName = string.Empty;
@@ -932,7 +932,7 @@ namespace eFMS.API.Accounting.DL.Services
                 AdvContactID = "N/A",
                 AdvContact = requesterName,
                 AdvAddress = string.Empty,
-                AdvValue = advance.AdvanceRequests.Sum(x => x.Amount),
+                AdvValue = advance.AdvanceRequests.Select(s => s.Amount).Sum(),
                 AdvCurrency = advance.AdvanceCurrency,
                 AdvCondition = advance.AdvanceNote,
                 AdvRef = strJobId,
@@ -997,9 +997,9 @@ namespace eFMS.API.Accounting.DL.Services
                 AdvCSSignDate = null,
                 AdvCSStickApp = null,
                 AdvCSStickDeny = null,
-                TotalNorm = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_NORM).Sum(x => x.Amount),
-                TotalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_INVOICE).Sum(x => x.Amount),
-                TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_OTHER).Sum(x => x.Amount)
+                TotalNorm = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_NORM).Select(s => s.Amount).Sum(),
+                TotalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_INVOICE).Select(s => s.Amount).Sum(),
+                TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == Constants.ADVANCE_TYPE_OTHER).Select(s => s.Amount).Sum()
             };
 
             acctAdvance.TotalNorm = acctAdvance.TotalNorm != 0 ? acctAdvance.TotalNorm : null;
@@ -1107,9 +1107,9 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy ra employeeId của User
-        private string GetEmployeeIdOfUser(string userName)
+        private string GetEmployeeIdOfUser(string userId)
         {
-            return sysUserRepo.Get(x => x.Username == userName).FirstOrDefault()?.EmployeeId;
+            return sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
         }
 
         //Lấy info Employee của User dựa vào employeeId
@@ -1119,9 +1119,9 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy info Employee của User dựa vào userId
-        private SysEmployee GetEmployeeByUserId(string userName)
+        private SysEmployee GetEmployeeByUserId(string userId)
         {
-            var employeeId = GetEmployeeIdOfUser(userName);
+            var employeeId = GetEmployeeIdOfUser(userId);
             var data = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
             return data;
         }

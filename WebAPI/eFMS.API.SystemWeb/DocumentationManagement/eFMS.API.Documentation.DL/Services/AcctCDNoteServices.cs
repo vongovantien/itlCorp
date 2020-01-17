@@ -761,17 +761,17 @@ namespace eFMS.API.Documentation.DL.Services
                         SortIndex = null,
                         Subject = subject,
                         PartnerID = model.PartnerId,
-                        PartnerName = model.PartnerNameEn,
-                        PersonalContact = model.PartnerPersonalContact,
-                        Address = model.PartnerShippingAddress,
-                        Taxcode = model.PartnerTaxcode,
-                        Workphone = model.PartnerTel,
-                        Fax = model.PartnerFax,
+                        PartnerName = model.PartnerNameEn?.ToUpper(),
+                        PersonalContact = model.PartnerPersonalContact?.ToUpper(),
+                        Address = model.PartnerShippingAddress?.ToUpper(),
+                        Taxcode = model.PartnerTaxcode?.ToUpper(),
+                        Workphone = model.PartnerTel?.ToUpper(),
+                        Fax = model.PartnerFax?.ToUpper(),
                         TransID = trans,
                         LoadingDate = null,
                         Commodity = "N/A",
-                        PortofLading = model.PolName,
-                        PortofUnlading = model.PodName,
+                        PortofLading = model.PolName?.ToUpper(),
+                        PortofUnlading = model.PodName?.ToUpper(),
                         MAWB = model.MbLadingNo,
                         Invoice = model.CDNote.InvoiceNo,
                         EstimatedVessel = "N/A",
@@ -790,8 +790,8 @@ namespace eFMS.API.Documentation.DL.Services
                         InputData = "N/A",
                         PONo = string.Empty,
                         TransNotes = "N/A",
-                        Shipper = model.PartnerNameEn,
-                        Consignee = model.PartnerNameEn,
+                        Shipper = model.PartnerNameEn?.ToUpper(),
+                        Consignee = model.PartnerNameEn?.ToUpper(),
                         ContQty = model.HbConstainers,
                         ContSealNo = "N/A",
                         Deposit = null,
@@ -807,7 +807,7 @@ namespace eFMS.API.Documentation.DL.Services
                         SOTK = "N/A",
                         NgayDK = null,
                         Cuakhau = port,
-                        DeliveryPlace = model.WarehouseName,
+                        DeliveryPlace = model.WarehouseName?.ToUpper(),
                         TransDate = null,
                         Unit = item.CurrencyId,
                         UnitPieaces = "N/A"
@@ -898,18 +898,20 @@ namespace eFMS.API.Documentation.DL.Services
 
                     var charge = new SeaDebitAgentsNewReport();
                     //Thông tin Partner
-                    charge.PartnerID = data.PartnerId;
-                    charge.PartnerName = data.PartnerNameEn;
-                    charge.Address = data.PartnerShippingAddress;
-                    charge.Workphone = data.PartnerTel;
-                    charge.Fax = data.PartnerFax;
-                    charge.Taxcode = data.PartnerTaxcode;
-                    charge.PersonalContact = data.PartnerPersonalContact;
+                    charge.PartnerID = data.PartnerId?.ToUpper();
+                    charge.PartnerName = data.PartnerNameEn?.ToUpper();
+                    charge.Address = data.PartnerShippingAddress?.ToUpper();
+                    charge.Workphone = data.PartnerTel?.ToUpper();
+                    charge.Fax = data.PartnerFax?.ToUpper();
+                    charge.Taxcode = data.PartnerTaxcode?.ToUpper();
+                    charge.PersonalContact = data.PartnerPersonalContact?.ToUpper();
 
                     //Thông tin Shipment
-                    charge.TransID = data.JobNo;
+                    charge.TransID = data.JobNo?.ToUpper();
                     charge.DepartureAirport = data.Pol + (!string.IsNullOrEmpty(data.PolCountry) ? ", " + data.PolCountry : string.Empty); //POL
+                    charge.DepartureAirport = charge.DepartureAirport?.ToUpper();
                     charge.PlaceDelivery = data.Pod + (!string.IsNullOrEmpty(data.PodCountry) ? ", " + data.PodCountry : string.Empty); //POD
+                    charge.PlaceDelivery = charge.PlaceDelivery?.ToUpper();
                     if (data.Etd != null)
                     {
                         charge.LoadingDate = data.Etd.Value;//ETD
@@ -918,15 +920,15 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         charge.ETA = data.Eta.Value; //ETA
                     }
-                    charge.ATTN = data.HbShippers;//Shipper -- lấy từ Housebill
-                    charge.LocalVessel = data.Vessel;//Vessel
-                    charge.MAWB = data.MbLadingNo; //MBLNO
-                    charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
-                    charge.ContainerSize = data.HbPackages; //Quantity Cont
+                    charge.ATTN = data.HbShippers?.ToUpper();//Shipper -- lấy từ Housebill
+                    charge.LocalVessel = data.Vessel?.ToUpper();//Vessel
+                    charge.MAWB = data.MbLadingNo?.ToUpper(); //MBLNO
+                    charge.Consignee = data.HbConsignees?.ToUpper();//Consignee -- lấy từ Housebill
+                    charge.ContainerSize = data.HbPackages?.ToUpper(); //Quantity Cont
                     charge.GrossWeight = data.HbGrossweight ?? 0;//Total GW of HBL
                     charge.CBM = data.Volum ?? 0; //Total CBM of HBL
-                    charge.SealNo = data.HbSealNo; //Cont/Seal No
-                    charge.HWBNO = data.HbLadingNo; //HBLNOs
+                    charge.SealNo = data.HbSealNo?.ToUpper(); //Cont/Seal No
+                    charge.HWBNO = data.HbLadingNo?.ToUpper(); //HBLNOs
 
                     //Thông tin list charge
                     charge.Subject = "LOCAL CHARGES";
@@ -987,6 +989,7 @@ namespace eFMS.API.Documentation.DL.Services
                 :
                     InWordCurrency.ConvertNumberCurrencyToStringUSD(_balanceAmount, _currency);
             parameter.InwordVND = !string.IsNullOrEmpty(_inword) ? _inword.ToUpper() : string.Empty;
+            parameter.InwordVND = parameter.InwordVND?.ToUpper();
             parameter.IssueInv = string.Empty; //Tạm thời để trống
             parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
             parameter.OtherRef = string.Empty;//Tạm thời để trống
@@ -1001,12 +1004,12 @@ namespace eFMS.API.Documentation.DL.Services
             var officeOfUser = GetInfoBankOfOfficeByUserId(_currentUser);
             if (officeOfUser != null)
             {
-                _accountName = officeOfUser.BankAccountName;
-                _bankName = officeOfUser.BankName;
-                _bankAddress = officeOfUser.BankAddress;
-                _swiftAccs = officeOfUser.SwiftCode;
-                _accsUsd = officeOfUser.BankAccountUsd;
-                _accsVnd = officeOfUser.BankAccountVnd;
+                _accountName = officeOfUser.BankAccountName?.ToUpper();
+                _bankName = officeOfUser.BankName?.ToUpper();
+                _bankAddress = officeOfUser.BankAddress?.ToUpper();
+                _swiftAccs = officeOfUser.SwiftCode?.ToUpper();
+                _accsUsd = officeOfUser.BankAccountUsd?.ToUpper();
+                _accsVnd = officeOfUser.BankAccountVnd?.ToUpper();
             }
             //Thông tin Bank
             parameter.AccountName = _accountName ?? string.Empty;
@@ -1063,30 +1066,32 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.IndexSort = i++;
 
                     //Thông tin Partner
-                    charge.PartnerID = data.PartnerId;
-                    charge.PartnerName = data.PartnerNameEn;
-                    charge.Address = data.PartnerShippingAddress;
-                    charge.Workphone = data.PartnerTel;
-                    charge.Fax = data.PartnerFax;
-                    charge.TaxCode = data.PartnerTaxcode;
-                    charge.PersonalContact = data.PartnerPersonalContact;
+                    charge.PartnerID = data.PartnerId?.ToUpper();
+                    charge.PartnerName = data.PartnerNameEn?.ToUpper();
+                    charge.Address = data.PartnerShippingAddress?.ToUpper();
+                    charge.Workphone = data.PartnerTel?.ToUpper();
+                    charge.Fax = data.PartnerFax?.ToUpper();
+                    charge.TaxCode = data.PartnerTaxcode?.ToUpper();
+                    charge.PersonalContact = data.PartnerPersonalContact?.ToUpper();
                     charge.Cell = string.Empty; //NOT USE
 
                     //Thông tin Shipment
-                    charge.TransID = data.JobNo;
+                    charge.TransID = data.JobNo?.ToUpper();
                     charge.DepartureAirport = data.Pol + (!string.IsNullOrEmpty(data.PolCountry) ? ", " + data.PolCountry : string.Empty); //POL
+                    charge.DepartureAirport = charge.DepartureAirport?.ToUpper();
                     charge.LastDestination = data.Pod + (!string.IsNullOrEmpty(data.PodCountry) ? ", " + data.PodCountry : string.Empty); //POD
+                    charge.LastDestination = charge.LastDestination?.ToUpper();
                     if (data.Etd != null)
                     {
                         charge.LoadingDate = data.Etd.Value;//ETD
                     }                    
                     charge.ATTN = string.Empty; //NOT USE
-                    charge.FlightNo = data.Vessel;//Flight No
+                    charge.FlightNo = data.Vessel?.ToUpper();//Flight No
                     charge.FlightDate = data.VesselDate; //Flight Date
-                    charge.MAWB = data.MbLadingNo; //MBLNO
-                    charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
+                    charge.MAWB = data.MbLadingNo?.ToUpper(); //MBLNO
+                    charge.Consignee = data.HbConsignees?.ToUpper();//Consignee -- lấy từ Housebill
                     charge.GrossWeight = data.HbGrossweight;//Total GW of HBL
-                    charge.HWBNO = data.HbLadingNo; //HBLNOs
+                    charge.HWBNO = data.HbLadingNo?.ToUpper(); //HBLNOs
                     charge.WChargeable = data.HbChargeWeight; //Total Charge Weight of HBL
 
                     //Thông tin list charge
@@ -1162,6 +1167,7 @@ namespace eFMS.API.Documentation.DL.Services
                 :
                     InWordCurrency.ConvertNumberCurrencyToStringUSD(_balanceAmount, _currency);
             parameter.InwordVND = !string.IsNullOrEmpty(_inword) ? _inword.ToUpper() : string.Empty;
+            parameter.InwordVND = parameter.InwordVND?.ToUpper();
             parameter.IssueInv = string.Empty; //Tạm thời để trống
             parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
             parameter.OtherRef = string.Empty;//Tạm thời để trống
@@ -1176,12 +1182,12 @@ namespace eFMS.API.Documentation.DL.Services
             var officeOfUser = GetInfoBankOfOfficeByUserId(_currentUser);
             if (officeOfUser != null)
             {
-                _accountName = officeOfUser.BankAccountName;
-                _bankName = officeOfUser.BankName;
-                _bankAddress = officeOfUser.BankAddress;
-                _swiftAccs = officeOfUser.SwiftCode;
-                _accsUsd = officeOfUser.BankAccountUsd;
-                _accsVnd = officeOfUser.BankAccountVnd;
+                _accountName = officeOfUser.BankAccountName?.ToUpper();
+                _bankName = officeOfUser.BankName?.ToUpper();
+                _bankAddress = officeOfUser.BankAddress?.ToUpper();
+                _swiftAccs = officeOfUser.SwiftCode?.ToUpper();
+                _accsUsd = officeOfUser.BankAccountUsd?.ToUpper();
+                _accsVnd = officeOfUser.BankAccountVnd?.ToUpper();
             }
             //Thông tin Bank
             parameter.AccountName = _accountName ?? string.Empty;
@@ -1192,7 +1198,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.AccsVND = _accsVnd ?? string.Empty;
 
             parameter.Currency = criteria.Currency;
-            parameter.HBLList = _hbllist;
+            parameter.HBLList = _hbllist?.ToUpper();
             parameter.DecimalNo = 2;
             //Exchange Rate USD to VND
             var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == Constants.CURRENCY_USD && x.CurrencyToId == Constants.CURRENCY_LOCAL && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
