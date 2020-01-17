@@ -96,7 +96,6 @@ export class AddPartnerDataComponent extends AppList {
 
     closepp(param: SalemanAdd) {
         this.salemanToAdd = param;
-        this.poupSaleman.hide();
         this.poupSaleman.isDetail = false;
 
         if (this.saleMandetail.length > 0) {
@@ -132,6 +131,7 @@ export class AddPartnerDataComponent extends AppList {
                             } else {
                                 this.saleMandetail.push(this.salemanToAdd);
                                 console.log(this.saleMandetail);
+                                this.poupSaleman.hide();
 
                                 /// get detail employee --- to be continue
                                 this.getEmployee(this.saleMandetail[0].saleManId);
@@ -142,7 +142,17 @@ export class AddPartnerDataComponent extends AppList {
                                             it.serviceName = item.text;
                                         }
                                     });
+                                    this.offices.forEach(item => {
+                                        if (it.office === item.id) {
+                                            it.officeName = item.branchNameEn;
+                                        }
+                                        if (it.company === item.buid) {
+                                            it.companyName = item.abbrCompany;
+                                        }
+                                    });
                                 }
+
+
                             }
                         }
 

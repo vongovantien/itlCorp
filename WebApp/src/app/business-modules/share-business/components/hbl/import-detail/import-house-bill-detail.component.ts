@@ -19,6 +19,7 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
     isCheckHbl: boolean = false;
     pageChecked: number = 0;
     typeFCL: string = '';
+    typeTransaction: number = null;
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -61,6 +62,9 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
         }
         if (this.typeFCL !== '') {
             data.typeFCL = this.typeFCL;
+        }
+        if (this.typeTransaction !== null) {
+            data.typeTransaction = this.typeTransaction;
         }
         this._documentRepo.getListHblPaging(this.page, this.pageSize, data).pipe(
             catchError(this.catchError),

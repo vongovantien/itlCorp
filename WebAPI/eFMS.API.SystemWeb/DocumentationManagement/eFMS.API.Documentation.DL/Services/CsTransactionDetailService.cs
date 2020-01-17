@@ -402,6 +402,7 @@ namespace eFMS.API.Documentation.DL.Services
                          join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id.ToString() into salemans
                          from sale in salemans.DefaultIfEmpty()
                          select new { detail, tran, cus, sale });
+            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
             if (criteria.All == null)
             {
                 if (criteria.TypeFCL == "Export")
@@ -412,7 +413,9 @@ namespace eFMS.API.Documentation.DL.Services
                  && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.detail.Etd >= criteria.FromDate || criteria.FromDate == null)
                  && (x.detail.Etd <= criteria.ToDate || criteria.ToDate == null)
-                 && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                 && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 &&(x.tran.TransactionType == transactionType)
+                 );
                 }
                 else
                 {
@@ -423,6 +426,7 @@ namespace eFMS.API.Documentation.DL.Services
                                          && (x.detail.Eta >= criteria.FromDate || criteria.FromDate == null)
                                          && (x.detail.Eta <= criteria.ToDate || criteria.ToDate == null)
                                          && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                         && (x.tran.TransactionType == transactionType )
                                          );
                 }
             }

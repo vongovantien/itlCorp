@@ -98,16 +98,20 @@ namespace eFMS.API.Catalogue.DL.Services
             if (criteria.All == null)
             {
                 query = query.Where(x => 
-                           (x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.saleman.Office ?? "").IndexOf(criteria.Office ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           //(x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           (x.saleman.Company == criteria.Company || criteria.Company == Guid.Empty  )
+                           //&& (x.saleman.Office ?? "").IndexOf(criteria.Office ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           && (x.saleman.Office == criteria.Office || criteria.Office == Guid.Empty)
                            && (x.saleman.Status == criteria.Status || criteria.Status == null)
                            );
             }
             else
             {
                 query = query.Where(x =>
-                             (x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                            || (x.saleman.Office ?? "").IndexOf(criteria.Office ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                            //(x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                            (x.saleman.Company == criteria.Company || criteria.Company == Guid.Empty)
+                            //|| (x.saleman.Office ?? "").IndexOf(criteria.Office ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                            || (x.saleman.Office == criteria.Office || criteria.Office == Guid.Empty)
                             || (x.saleman.Status == criteria.Status || criteria.Status == null)
                             || (x.saleman.PartnerId == criteria.PartnerId)
                             );
