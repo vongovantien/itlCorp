@@ -83,43 +83,44 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     }
 
     getShipmentDetail(id: any) {
-        this._documentRepo.getDetailTransaction(id).subscribe(
-            (res: any) => {
-                if (!!res) {
-                    this.shipmentDetail = res;
-                    console.log(this.shipmentDetail);
-                    if (this.supplier.value === null) {
-                        this.supplier.setValue(this.shipmentDetail.supplierName);
-                    }
-                    if (this.pol.value === null) {
-                        this.pol.setValue(this.shipmentDetail.pol);
-                    }
-                    if (this.pod.value === null) {
-                        this.pod.setValue(this.shipmentDetail.pod);
-                    }
-                    if (this.marksOfNationality.value === null) {
-                        this.marksOfNationality.setValue(this.defaultMarksOfNationality);
-                    }
-                    if (this.freightCharge.value === null) {
-                        if (this.shipmentDetail.paymentTerm !== null) {
-                            this.freightCharge.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.paymentTerm, text: this.shipmentDetail.paymentTerm }]);
+        this._store.select(fromShare.getTransactionDetailCsTransactionState)
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.shipmentDetail = res;
+                        console.log(this.shipmentDetail);
+                        if (this.supplier.value === null) {
+                            this.supplier.setValue(this.shipmentDetail.supplierName);
+                        }
+                        if (this.pol.value === null) {
+                            this.pol.setValue(this.shipmentDetail.pol);
+                        }
+                        if (this.pod.value === null) {
+                            this.pod.setValue(this.shipmentDetail.pod);
+                        }
+                        if (this.marksOfNationality.value === null) {
+                            this.marksOfNationality.setValue(this.defaultMarksOfNationality);
+                        }
+                        if (this.freightCharge.value === null) {
+                            if (this.shipmentDetail.paymentTerm !== null) {
+                                this.freightCharge.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.paymentTerm, text: this.shipmentDetail.paymentTerm }]);
+                            }
+                        }
+                        if (this.vesselNo.value === null) {
+                            this.vesselNo.setValue(this.defaultVoyNo);
+                        }
+                        if (!this.isImport) {
+                            this.date.setValue({ startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) });
+                        } else {
+                            this.date.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
+                        }
+                        if (this.agent.value === null) {
+                            this.agent.setValue('TYPE NAME OF AGENT WHO ASSEMBLED THIS MANIFEST: INDO TRANS LOGISTICS CORPORATION \nSIGNATURE OF ASSEMBLING AGENT: PHONE# OF ASSEMBLING AGENT: (84 - 8) 3948 6888 \nRECEIVED BY CUSTOMS');
                         }
                     }
-                    if (this.vesselNo.value === null) {
-                        this.vesselNo.setValue(this.defaultVoyNo);
-                    }
-                    if (!this.isImport) {
-                        this.date.setValue({ startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) });
-                    } else {
-                        this.date.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                    }
-                    if (this.agent.value === null) {
-                        this.agent.setValue('TYPE NAME OF AGENT WHO ASSEMBLED THIS MANIFEST: INDO TRANS LOGISTICS CORPORATION \nSIGNATURE OF ASSEMBLING AGENT: PHONE# OF ASSEMBLING AGENT: (84 - 8) 3948 6888 \nRECEIVED BY CUSTOMS');
-                    }
-                }
 
-            }
-        );
+                }
+            );
     }
 
     onSelectDataFormInfo(data: any, key: string) {
