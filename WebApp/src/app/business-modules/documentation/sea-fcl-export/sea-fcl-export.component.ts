@@ -76,7 +76,7 @@ export class SeaFCLExportComponent extends AppList {
             { title: 'POD', field: 'podName', sortable: true },
             { title: 'Total Cont', field: 'sumCont', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
-            { title: 'Creator', field: 'userCreated', sortable: true },
+            { title: 'Creator', field: 'creatorName', sortable: true },
             { title: 'Created Date', field: 'datetimeCreated', sortable: true },
             { title: 'Modified Date', field: 'datetimeModified', sortable: true },
         ];

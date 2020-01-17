@@ -65,7 +65,7 @@ export class AirImportComponent extends AppList {
             { title: 'Package Qty', field: 'packageQty', sortable: true },
             { title: 'G.W', field: 'grossWeight', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
-            { title: 'Creator', field: 'userCreated', sortable: true },
+            { title: 'Creator', field: 'creatorName', sortable: true },
             { title: 'Modified Date', field: 'datetimeModified', sortable: true },
         ];
         this.headersHBL = [
