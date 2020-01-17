@@ -325,7 +325,21 @@ namespace eFMS.API.Documentation.DL.Services
                     CSShipmentNo = x.JobNo,
                     LockedLog = x.LockedLog
                 });
-            var shipments = opShipments.Union(csShipments);
+
+            IQueryable<LockedLogModel> shipments = null;
+
+            if (opShipments != null && csShipments != null)
+            {
+                 shipments =  opShipments.Union(csShipments);
+            }
+            else if( csShipments == null && opShipments != null)
+            {
+                 shipments = opShipments;
+            }
+            else if(opShipments == null && csShipments != null)
+            {
+                 shipments = csShipments;
+            }
             result = GetLogHistory(shipments);
             return result;
         }
@@ -334,7 +348,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = new LockedLogResultModel();
             if (shipments == null) return result;
-            result.LockedLogs = shipments;
+            result.LockedLogs = shipments.Where(x=>x.IsLocked == true);
             result.Logs = new List<string>();
             foreach(var item in shipments)
             {

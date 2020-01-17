@@ -70,29 +70,34 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
     onUnlockAccounting($event: boolean) {
         if ($event) {
             if (this.selectedType.value === 1) {
-                this._accountingRepo.unlockAdvance(this.selectedDataAccountingToUnlock)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: any) => {
-                            if (res.success) {
-                                this._toastService.success("Unlock Successfull");
-                            } else {
-                                this._toastService.error("Unlock failed, Please check again!");
+                if (!!this.selectedDataAccountingToUnlock) {
+                    this._accountingRepo.unlockAdvance(this.selectedDataAccountingToUnlock)
+                        .pipe(catchError(this.catchError))
+                        .subscribe(
+                            (res: any) => {
+                                if (res.success) {
+                                    this._toastService.success("Unlock Successfull");
+                                } else {
+                                    this._toastService.error("Unlock failed, Please check again!");
+                                }
                             }
-                        }
-                    )
+                        )
+                }
             } else {
-                this._accountingRepo.unlockSettlement(this.selectedDataAccountingToUnlock)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: any) => {
-                            if (res.success) {
-                                this._toastService.success("Unlock Successfull");
-                            } else {
-                                this._toastService.error("Unlock failed, Please check again!");
+                if (!!this.selectedDataAccountingToUnlock) {
+                    this._accountingRepo.unlockSettlement(this.selectedDataAccountingToUnlock)
+                        .pipe(catchError(this.catchError))
+                        .subscribe(
+                            (res: any) => {
+                                if (res.success) {
+                                    this._toastService.success("Unlock Successfull");
+                                } else {
+                                    this._toastService.error("Unlock failed, Please check again!");
+                                }
                             }
-                        }
-                    );
+                        );
+                }
+
             }
         }
     }

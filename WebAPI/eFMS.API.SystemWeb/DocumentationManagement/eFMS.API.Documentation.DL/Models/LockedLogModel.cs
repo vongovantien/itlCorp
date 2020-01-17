@@ -13,6 +13,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string LockedLog { get; set; }
         public string OPSShipmentNo { get; set; }
         public string CSShipmentNo { get; set; }
+        public bool? IsLocked { get; set; }
     }
     public class LockedLogResultModel
     {
