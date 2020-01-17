@@ -139,16 +139,16 @@ namespace eFMS.API.Documentation.DL.Services
             model.PodName = model.Pod != null ? ports.Where(x => x.Id == model.Pod)?.FirstOrDefault()?.NameEn : null;
             var parameter = new SeaCargoManifestParameter
             {
-                ManifestNo = model.RefNo,
-                Owner = model.ManifestIssuer ?? string.Empty,
+                ManifestNo = model.RefNo?.ToUpper(),
+                Owner = model.ManifestIssuer?.ToUpper() ?? string.Empty,
                 Marks = model.MasksOfRegistration ?? string.Empty,
-                Flight = model.VoyNo ?? string.Empty,
-                PortLading = model.PolName,
-                PortUnlading = model.PodName,
+                Flight = model.VoyNo?.ToUpper() ?? string.Empty,
+                PortLading = model.PolName?.ToUpper(),
+                PortUnlading = model.PodName?.ToUpper(),
                 FlightDate = model.InvoiceDate?.ToString("dd/MM/yyyy"),
                 Eta = "Eta test",
-                Consolidater = model.Consolidator ?? string.Empty,
-                DeConsolidater = model.DeConsolidator ?? string.Empty,
+                Consolidater = model.Consolidator?.ToUpper() ?? string.Empty,
+                DeConsolidater = model.DeConsolidator?.ToUpper() ?? string.Empty,
                 Forwarder = "Forwarder",
                 OMB = "OMB",
                 ContainerNo = model.SealNoContainerNames ?? "",
@@ -180,9 +180,9 @@ namespace eFMS.API.Documentation.DL.Services
                         GrossWeight = item.GW ??0,
                         SeaCBM = item.CBM ?? 0,
                         NoOfAWB = 0,
-                        Destination = item.FinalDestinationPlace ?? string.Empty,
-                        Shipper = item.ShipperDescription ?? string.Empty,
-                        Consignee = item.ConsigneeDescription ?? string.Empty,
+                        Destination = item.FinalDestinationPlace?.ToUpper() ?? string.Empty,
+                        Shipper = item.ShipperDescription?.ToUpper() ?? string.Empty,
+                        Consignee = item.ConsigneeDescription?.ToUpper() ?? string.Empty,
                         Descriptions = item.DesOfGoods ?? string.Empty,
                         FreightCharge = item.FreightPayment != null? "Frieght: " + item.FreightPayment: string.Empty,
                         Notify = item.NotifyParty ?? string.Empty,
@@ -255,14 +255,14 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         DateConfirm = model.InvoiceDate,
                         LoadingDate = transaction.Etd,
-                        LocalVessel = transaction.FlightVesselName,
-                        ContSealNo = transaction.VoyNo,
-                        PortofDischarge = model.PodName,
-                        PlaceDelivery = transaction.PlaceDeliveryName,
+                        LocalVessel = transaction.FlightVesselName?.ToUpper(),
+                        ContSealNo = transaction.VoyNo?.ToUpper(),
+                        PortofDischarge = model.PodName?.ToUpper(),
+                        PlaceDelivery = transaction.PlaceDeliveryName?.ToUpper(),
                         HWBNO = item.Hwbno,
-                        ATTN = item.ShipperDescription,
-                        Consignee = item.ConsigneeDescription,
-                        Notify = item.NotifyPartyDescription,
+                        ATTN = item.ShipperDescription?.ToUpper(),
+                        Consignee = item.ConsigneeDescription?.ToUpper(),
+                        Notify = item.NotifyPartyDescription?.ToUpper(),
                         TotalPackages = totalPackages,
                         ShippingMarkImport = item.ShippingMark,
                         Description = item.DesOfGoods,
@@ -270,7 +270,7 @@ namespace eFMS.API.Documentation.DL.Services
                         GrossWeight = item.GrossWeight ?? 0,
                         CBM = item.CBM,
                         Liner = item.ColoaderId,
-                        OverseasAgent = transaction.AgentName
+                        OverseasAgent = transaction.AgentName?.ToUpper()
                     };
                     manifests.Add(manifest);
                     
@@ -321,16 +321,16 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var manifest = new AirCargoManifestReport {
                         Billype = "H",
-                        HWBNO = item.Hwbno,
+                        HWBNO = item.Hwbno?.ToUpper(),
                         Pieces = item.PackageQty?.ToString(),
                         GrossWeight = item.GrossWeight ?? 0,
-                        ShipperName = item.ShipperDescription,
-                        Consignees = item.ConsigneeDescription,
+                        ShipperName = item.ShipperDescription?.ToUpper(),
+                        Consignees = item.ConsigneeDescription?.ToUpper(),
                         Description = item.DesOfGoods,
-                        FirstDest = item.FirstCarrierBy,
-                        SecondDest = item.TransitPlaceTo1,
-                        ThirdDest = item.TransitPlaceTo2,
-                        Notify = item.NotifyPartyDescription
+                        FirstDest = item.FirstCarrierBy?.ToUpper(),
+                        SecondDest = item.TransitPlaceTo1?.ToUpper(),
+                        ThirdDest = item.TransitPlaceTo2?.ToUpper(),
+                        Notify = item.NotifyPartyDescription?.ToUpper()
                     };
                     manifests.Add(manifest);
                 }
@@ -342,12 +342,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 AWB = transaction.Mawb ?? string.Empty,
                 Marks = model.MasksOfRegistration?? string.Empty,
-                Flight = transaction.FlightVesselName?? string.Empty,
-                PortLading = model.PolName?? string.Empty,
-                PortUnlading = model.PodName?? string.Empty,
+                Flight = transaction.FlightVesselName?.ToUpper() ?? string.Empty,
+                PortLading = model.PolName?.ToUpper() ?? string.Empty,
+                PortUnlading = model.PodName?.ToUpper() ?? string.Empty,
                 FlightDate = transaction.FlightDate == null?string.Empty: transaction.FlightDate.Value.ToString("MMM dd, yyyy"),
                 Shipper = Constants.COMPANY_NAME + "\n" + Constants.COMPANY_ADDRESS1,
-                Consignee = transaction.AgentName?? string.Empty,
+                Consignee = transaction.AgentName?.ToUpper() ?? string.Empty,
                 Contact = currentUser.UserName
             };
             result = new Crystal

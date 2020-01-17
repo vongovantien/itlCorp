@@ -255,7 +255,7 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewArrivalNoticeSIF(PreviewArrivalNoticeCriteria criteria)
         {
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
             var listCharge = new List<SeaArrivalNotesReport>();
 
             var arrival = GetArrival(criteria.HblId, string.Empty);
@@ -425,7 +425,7 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewArrivalNoticeAir(PreviewArrivalNoticeCriteria criteria)
         {
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
             var listCharge = new List<AirImptArrivalReport>();
             var arrival = GetArrival(criteria.HblId, string.Empty);
             var houseBill = houseBills.GetById(criteria.HblId);

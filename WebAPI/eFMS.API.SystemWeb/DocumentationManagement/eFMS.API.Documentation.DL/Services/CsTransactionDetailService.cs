@@ -830,7 +830,7 @@ namespace eFMS.API.Documentation.DL.Services
             var data = GetById(Id);
             var listProof = new List<ProofOfDeliveryReport>();
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
@@ -868,7 +868,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user login
+            parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
             parameter.CurrDecimalNo = 0; //set 0 temporary
             result = new Crystal
@@ -889,7 +889,7 @@ namespace eFMS.API.Documentation.DL.Services
             var data = GetById(Id);
             var listProof = new List<AirProofOfDeliveryReport>();
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
@@ -923,7 +923,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user login
+            parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
             parameter.CurrDecimalNo = 0; //set 0 temporary
             result = new Crystal
@@ -943,7 +943,7 @@ namespace eFMS.API.Documentation.DL.Services
             var data = GetById(Id);
             var listDocument = new List<AirDocumentReleaseReport>();
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
            // var _currentUser = string.Empty;
             if (data != null)
             {
@@ -972,7 +972,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user login
+            parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
 
             result = new Crystal

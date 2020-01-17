@@ -1521,7 +1521,7 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewSIFFormPLsheet(Guid jobId, string currency)
         {
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
             var shipment = DataContext.First(x => x.Id == jobId);
             if (shipment == null) return result;
             var agent = catPartnerRepo.Get(x => x.Id == shipment.AgentId).FirstOrDefault();
@@ -1765,7 +1765,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var parameter = new FormPLsheetReportParameter();
-            parameter.Contact = _currentUser;//Get user login
+            parameter.Contact = _currentUser;//Get user name login
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
