@@ -338,21 +338,28 @@ namespace eFMS.API.Documentation.Controllers
             if (id == Guid.Empty)
             {
                 //Check trùng theo từng service
-                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType && x.CurrentStatus != TermData.Canceled))                
+                if(model.Mawb != null)
                 {
-                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                    if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() 
+                    && x.TransactionType == model.TransactionType 
+                    && x.CurrentStatus != TermData.Canceled))
+                    {
+                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                    }
                 }
             }
             else
             {
                 //Check trùng theo từng service
-                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower()
-                    && model.Mawb != null
-                    && x.TransactionType == model.TransactionType 
-                    && x.Id != id 
-                    && x.CurrentStatus != TermData.Canceled)))
+                if(model.Mawb != null)
+                {
+                    if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower()
+                        && x.TransactionType == model.TransactionType
+                        && x.Id != id
+                        && x.CurrentStatus != TermData.Canceled)))
                     {
-                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                    }
                 }
             }
 
