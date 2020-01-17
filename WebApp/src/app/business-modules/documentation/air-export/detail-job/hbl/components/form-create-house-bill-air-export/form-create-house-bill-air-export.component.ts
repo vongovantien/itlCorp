@@ -59,6 +59,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
     currencies: Observable<CommonInterface.INg2Select[]>;
+
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameEn', label: 'Name ABBR' },
         { field: 'partnerNameVn', label: 'Name EN' },
@@ -110,11 +111,13 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     totalCBM: number = null;
 
     shipmentDetail: CsTransaction;
+    selectedCustomer: Customer;
 
     AA: string = 'As Arranged';
 
     dims: DIM[] = []; // * Dimension details.
     isLoadingPort: any;
+
     isSeparate: boolean = false;
 
     constructor(
@@ -372,6 +375,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         switch (type) {
             case 'customer':
                 this.customerId.setValue(data.id);
+                this.selectedCustomer = data;
 
                 this.saleMans = this.saleMans.pipe(
                     tap((users: User[]) => {

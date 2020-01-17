@@ -14,17 +14,21 @@ import { FormUserGroupComponent } from './components/form-user-group/form-user-g
 
 const routing: Routes = [
     {
-        path: "", component: GroupComponent, pathMatch: 'full',
-        data: { name: "Group", path: "group", level: 2 }
+        path: "", data: { name: "" },
+        children: [
+            {
+                path: "", component: GroupComponent
+            },
+            {
+                path: "new", component: AddGroupComponent,
+                data: { name: "New" }
+            },
+            {
+                path: ":id", component: GroupDetailComponent,
+                data: { name: "Detail" }
+            }
+        ]
     },
-    {
-        path: "new", component: AddGroupComponent,
-        data: { name: "New", path: "New", level: 3 }
-    },
-    {
-        path: ":id", component: GroupDetailComponent,
-        data: { name: "Detail", path: "Detail", level: 3 }
-    }
 ];
 
 @NgModule({

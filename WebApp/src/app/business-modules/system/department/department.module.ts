@@ -12,16 +12,20 @@ import { SelectModule } from 'ng2-select';
 import { PaginationModule } from 'ngx-bootstrap';
 const routing: Routes = [
     {
-        path: '', component: DepartmentComponent, pathMatch: 'full',
-        data: { name: "Department", level: 2 }
-    },
-    {
-        path: "new", component: DepartmentAddNewComponent,
-        data: { name: "New", path: "New", level: 3 }
-    },
-    {
-        path: ":id", component: DepartmentDetailComponent,
-        data: { name: "Detail", path: "Detail", level: 3 }
+        path: '', data: { name: "" },
+        children: [
+            {
+                path: '', component: DepartmentComponent
+            },
+            {
+                path: "new", component: DepartmentAddNewComponent,
+                data: { name: "New", }
+            },
+            {
+                path: ":id", component: DepartmentDetailComponent,
+                data: { name: "Detail", }
+            },
+        ]
     },
 ]
 @NgModule({

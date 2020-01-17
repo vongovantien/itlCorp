@@ -5,8 +5,6 @@ import { SeaConsolExportComponent } from './sea-consol-export/sea-consol-export.
 import { SeaConsolImportComponent } from './sea-consol-import/sea-consol-import.component';
 import { InlandTruckingComponent } from './inland-trucking/inland-trucking.component';
 
-
-
 @NgModule({
   imports: [
     DocumentationRoutingModule

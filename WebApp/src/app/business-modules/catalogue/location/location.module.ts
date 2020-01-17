@@ -20,8 +20,17 @@ import { AppDistrictComponent } from './district/district.component';
 import { AppWardComponent } from './ward/ward.component';
 
 const routing: Routes = [
-    { path: '', component: LocationComponent, data: { name: "Location", level: 2 } },
-    { path: 'location-import', component: LocationImportComponent, data: { name: "Location Import", level: 3 } },
+    {
+        path: '', data: { name: "" },
+        children: [
+            {
+                path: '', component: LocationComponent
+            },
+            {
+                path: 'location-import', component: LocationImportComponent, data: { name: "Import" }
+            },
+        ]
+    },
 ];
 
 @NgModule({

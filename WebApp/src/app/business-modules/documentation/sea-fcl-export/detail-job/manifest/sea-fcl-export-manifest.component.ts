@@ -80,8 +80,8 @@ export class SeaFclExportManifestComponent extends AppList {
     ngAfterViewInit() {
         this._store.select(getParamsRouterState)
             .subscribe((param: Params) => {
-                if (param.id) {
-                    this.jobId = param.id;
+                if (param.jobId) {
+                    this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);
                     this.getHblList(this.jobId);

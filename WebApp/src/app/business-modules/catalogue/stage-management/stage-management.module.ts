@@ -13,8 +13,17 @@ import { StageManagementAddPopupComponent } from './components/form-create/form-
 
 
 const routing: Routes = [
-    { path: '', component: StageManagementComponent, data: { name: "Stage Management", level: 2 } },
-    { path: 'stage-import', component: StageImportComponent, data: { name: "Stage Import", level: 3 } },
+    {
+        path: '', data: { name: "" },
+        children: [
+            {
+                path: '', component: StageManagementComponent
+            },
+            {
+                path: 'stage-import', component: StageImportComponent, data: { name: "Import" }
+            },
+        ]
+    },
 ];
 
 @NgModule({
@@ -37,4 +46,5 @@ const routing: Routes = [
     ],
     providers: [],
 })
-export class StateManagementModule { }
+export class
+    StateManagementModule { }

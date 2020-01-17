@@ -16,20 +16,29 @@ import { SeaLCLImportLazyLoadModule } from './sea-lcl-import-lazy-load.module';
 
 const routing: Routes = [
     {
-        path: '', pathMatch: 'full', component: SeaLCLImportComponent,
-        data: { name: "Sea LCL Import", path: "sea-lcl-import", level: 2 }
+        path: '', component: SeaLCLImportComponent, data: {
+            name: "",
+        },
     },
     {
         path: 'new', component: SeaLCLImportCreateJobComponent,
-        data: { name: "Create New Job", path: "new", level: 3 }
+        data: { name: "Create New Job" }
     },
     {
-        path: ':jobId', component: SeaLCLImportDetailJobComponent,
-        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaLCLImport },
+        path: ':jobId',
+        data: { transactionType: CommonEnum.TransactionTypeEnum.SeaLCLImport, name: "Job Detail" },
+        children: [
+            {
+                path: '', component: SeaLCLImportDetailJobComponent, data: { name: "" }
+            },
+            {
+                path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-lcl-import-hbl.module').then(m => m.SeaLCLImportHBLModule),
+                data: {
+                    name: "House Bill",
+                },
+            },
+        ]
     },
-    {
-        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-lcl-import-hbl.module').then(m => m.SeaLCLImportHBLModule),
-    }
 ];
 
 const LIBS = [

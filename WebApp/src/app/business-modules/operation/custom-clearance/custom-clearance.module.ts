@@ -16,36 +16,35 @@ import { CustomClearanceImportComponent } from './import/custom-clearance-import
 const routing: Routes = [
     {
         path: "",
-        component: CustomClearanceComponent,
-        data: {
-            name: "Custom Clearance",
-            level: 2
-        }
+        data: { name: "", },
+        children: [
+            {
+                path: '', component: CustomClearanceComponent
+            },
+            {
+                path: "new",
+                component: CustomClearanceAddnewComponent,
+                data: {
+                    name: "New",
+                }
+            },
+            {
+                path: "detail",
+                component: CustomClearanceEditComponent,
+                data: {
+                    name: "Detail",
+                }
+            },
+            {
+                path: "import",
+                component: CustomClearanceImportComponent,
+                data: {
+                    name: "Import",
+                }
+            },
+        ]
     },
-    {
-        path: "new",
-        component: CustomClearanceAddnewComponent,
-        data: {
-            name: "Add Custom Clearance",
-            level: 3
-        }
-    },
-    {
-        path: "detail",
-        component: CustomClearanceEditComponent,
-        data: {
-            name: "Detail/Edit Custom Clearance",
-            level: 3
-        }
-    },
-    {
-        path: "import",
-        component: CustomClearanceImportComponent,
-        data: {
-            name: "Import Custom Clearance",
-            level: 3
-        }
-    },
+
 ];
 
 const LIB = [

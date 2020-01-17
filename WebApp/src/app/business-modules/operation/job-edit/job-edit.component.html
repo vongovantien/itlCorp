@@ -500,9 +500,8 @@
                                                             Container Qty
                                                         </label>
                                                         <input type="number"
-                                                            class="form-control m-input m-input--square" min="1"
-                                                            appIntergerInputCheck name="sumContainers"
-                                                            placeholder="Enter number"
+                                                            class="form-control m-input m-input--square" min="1" integer
+                                                            name="sumContainers" placeholder="Enter number"
                                                             [(ngModel)]="opsTransaction.sumContainers"
                                                             #sumContainers="ngModel">
                                                         <div class="form-control-feedback"
@@ -523,7 +522,7 @@
                                                             <div class="col-md-6">
                                                                 <input type="number" class="form-control m-input"
                                                                     min="1" autocomplete="nope" aria-label=""
-                                                                    name="sumPackages" appIntergerInputCheck
+                                                                    name="sumPackages" integer
                                                                     placeholder="Enter number"
                                                                     [(ngModel)]="opsTransaction.sumPackages"
                                                                     #sumPackages="ngModel">

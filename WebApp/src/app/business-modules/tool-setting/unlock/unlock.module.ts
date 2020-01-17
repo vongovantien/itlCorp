@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 import { UnlockHistoryPopupComponent } from './components/unlock-history/unlock-history.popup';
 
 const routing: Route[] = [
-    { path: '', component: UnlockComponent, data: { name: "Unlock", level: 2 } },
+    { path: '', component: UnlockComponent, data: { name: "" } },
 
 ];
 

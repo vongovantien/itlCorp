@@ -16,9 +16,20 @@ import { NgxCurrencyModule } from 'ngx-currency';
 import { TariffDetailComponent } from './detail/detail-tariff.component';
 
 const routing: Routes = [
-    { path: '', component: TariffComponent, data: { name: "Tariff", level: 2 } },
-    { path: 'new', component: TariffAddComponent, data: { name: "New", level: 3 } },
-    { path: ':id', component: TariffDetailComponent, data: { name: "Detail", level: 3 } },
+    {
+        path: '', data: { name: "" },
+        children: [
+            {
+                path: '', component: TariffComponent
+            },
+            {
+                path: 'new', component: TariffAddComponent, data: { name: "New" }
+            },
+            {
+                path: ':id', component: TariffDetailComponent, data: { name: "Detail" }
+            },
+        ]
+    },
 ];
 
 const customCurrencyMaskConfig = {

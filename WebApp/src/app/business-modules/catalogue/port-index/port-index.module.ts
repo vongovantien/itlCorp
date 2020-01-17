@@ -12,8 +12,18 @@ import { PaginationModule, ModalModule } from 'ngx-bootstrap';
 import { FormPortIndexComponent } from './components/form-port-index.component';
 
 const routing: Routes = [
-    { path: '', component: PortIndexComponent, data: { name: "Port Index", level: 2 } },
-    { path: 'import', component: PortIndexImportComponent, data: { name: "Port Index Import", level: 3 } },
+    {
+        path: '', data: { name: "" },
+        children: [
+            {
+                path: '', component: PortIndexComponent
+
+            },
+            {
+                path: 'import', component: PortIndexImportComponent, data: { name: "Import" }
+            },
+        ]
+    },
 ];
 
 @NgModule({

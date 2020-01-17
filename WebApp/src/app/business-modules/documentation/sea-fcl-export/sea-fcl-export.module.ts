@@ -22,31 +22,37 @@ import { SeaFclExportManifestComponent } from './detail-job/manifest/sea-fcl-exp
 
 const routing: Routes = [
     {
-        path: '', pathMatch: 'full', component: SeaFCLExportComponent, data: {
-            name: "Sea FCL Export", path: "sea-fcl-export", level: 2
+        path: '', component: SeaFCLExportComponent, data: {
+            name: "",
         },
     },
     {
-        path: 'new', component: SeaFCLExportCreateJobComponent, data: {
-            name: "Create New Job", path: "sea-fcl-export", level: 3
-        }
+        path: 'new', component: SeaFCLExportCreateJobComponent,
+        data: { name: "Create New Job" }
     },
     {
-        path: ':jobId', component: SeaFCLExportDetailJobComponent, data: {
-            name: "Job Detail", path: "sea-fcl-export", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport
-        }
-    },
-    {
-        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-export-hbl.module').then(m => m.SeaFCLExportHBLModule),
-    },
-    {
-        path: ':jobId/si', component: SeaFclExportShippingInstructionComponent, data: {
-            name: "Shipping Instructions", path: ":jobId", level: 4
-        }
-    },
-    {
-        path: ':id/manifest', component: SeaFclExportManifestComponent,
-        data: { name: "Manifest", path: ":id", level: 4 },
+        path: ':jobId',
+        data: { transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport, name: "Job Detail" },
+        children: [
+            {
+                path: '', component: SeaFCLExportDetailJobComponent, data: { name: "" }
+            },
+            {
+                path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-export-hbl.module').then(m => m.SeaFCLExportHBLModule),
+                data: {
+                    name: "House Bill",
+                },
+            },
+            {
+                path: 'manifest', component: SeaFclExportManifestComponent,
+                data: { name: "Manifest", },
+            },
+            {
+                path: 'si', component: SeaFclExportShippingInstructionComponent, data: {
+                    name: "Shipping Instructions",
+                }
+            },
+        ]
     },
 ];
 

@@ -13,13 +13,23 @@ import { FormAddUserComponent } from './components/form-add-user/form-add-user.c
 import { UserDetailsComponent } from './details/user-details.component';
 import { UserManagementImportComponent } from './import/user-management-import.component';
 const routing: Routes = [
-    { path: 'import', component: UserManagementImportComponent, data: { name: "Import User", level: 3 } },
-
-    { path: '', component: UserManagementComponent, data: { name: "User Management", level: 2 } },
-    { path: 'new', component: UserAddNewComponent, data: { name: "Create User", level: 3 } },
-    { path: ':id', component: UserDetailsComponent, data: { name: "Edit User", level: 3 } },
-
-
+    {
+        path: '', data: { name: "" },
+        children: [
+            {
+                path: '', component: UserManagementComponent
+            },
+            {
+                path: 'import', component: UserManagementImportComponent, data: { name: "Import" }
+            },
+            {
+                path: 'new', component: UserAddNewComponent, data: { name: "Create User" }
+            },
+            {
+                path: ':id', component: UserDetailsComponent, data: { name: "Edit User" }
+            },
+        ]
+    },
 ];
 
 @NgModule({

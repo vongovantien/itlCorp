@@ -10,9 +10,11 @@
                     <a class="dropdown-item pointer" (click)="preview('ITL')">ITL H-B/L Preview</a>
                     <a class="dropdown-item pointer" (click)="preview('FBL_FRAME')">VLA (Frame) H-B/L Preview</a>
                     <a class="dropdown-item pointer" (click)="preview('ITL_SEKO')">ITL H-B/L SEKO Preview</a>
-                    <a class="dropdown-item pointer" (click)="preview('ITL_FRAME_KESCO')">ITL (Frame) H-B/L KESCO Preview</a>
+                    <a class="dropdown-item pointer" (click)="preview('ITL_FRAME_KESCO')">ITL (Frame) H-B/L KESCO
+                        Preview</a>
                     <a class="dropdown-item pointer" (click)="preview('ITL_KESCO')">ITL H-B/L KESKO Preview</a>
-                    <a class="dropdown-item pointer" (click)="preview('ITL_FRAME_SAMKIP')">ITL (Frame) H-B/L SAMKIP Preview</a>
+                    <a class="dropdown-item pointer" (click)="preview('ITL_FRAME_SAMKIP')">ITL (Frame) H-B/L SAMKIP
+                        Preview</a>
                 </div>
             </div>
 
@@ -34,8 +36,8 @@
 <info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Create HBL'"></info-popup>
 
-<confirm-popup [body]="'You are about to create a new  HBL, are you sure all entered details are correct ?'"
-    [labelCancel]="'No'" (onSubmit)="onSaveHBL()" [labelConfirm]="'Yes'">
+<confirm-popup [body]="'You are about to update HBL, are you sure all entered details are correct ?'"
+    [labelCancel]="'No'" (onSubmit)="onSaveHBL()" [labelConfirm]="'Yes'" title="Update HBL">
 </confirm-popup>
 
 <ng-container *ngIf="dataReport">

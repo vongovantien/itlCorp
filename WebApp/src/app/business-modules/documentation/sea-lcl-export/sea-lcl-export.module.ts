@@ -22,29 +22,38 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 const routing: Routes = [
     {
-        path: '', pathMatch: 'full', component: SeaLCLExportComponent,
-        data: { name: "Sea LCL Export", path: "sea-lcl-export", level: 2 }
+        path: '', component: SeaLCLExportComponent, data: {
+            name: "",
+        },
     },
     {
         path: 'new', component: SeaLCLExportCreateJobComponent,
-        data: { name: "Create New Job", path: "new", level: 3 }
+        data: { name: "Create New Job" }
     },
     {
-        path: ':jobId', component: SeaLCLExportDetailJobComponent,
-        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaLCLExport },
+        path: ':jobId',
+        data: { transactionType: CommonEnum.TransactionTypeEnum.SeaLCLExport, name: "Job Detail" },
+        children: [
+            {
+                path: '', component: SeaLCLExportDetailJobComponent, data: { name: "" }
+            },
+            {
+                path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-lcl-export-hbl.module').then(m => m.SeaLCLExportHBLModule),
+                data: {
+                    name: "House Bill",
+                },
+            },
+            {
+                path: 'manifest', component: SeaLclExportManifestComponent,
+                data: { name: "Manifest", },
+            },
+            {
+                path: 'si', component: SeaLclExportShippingInstructionComponent, data: {
+                    name: "Shipping Instructions",
+                }
+            }
+        ]
     },
-    {
-        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-lcl-export-hbl.module').then(m => m.SeaLCLExportHBLModule),
-    },
-    {
-        path: ':id/manifest', component: SeaLclExportManifestComponent,
-        data: { name: "Manifest", path: ":id", level: 4 },
-    },
-    {
-        path: ':jobId/si', component: SeaLclExportShippingInstructionComponent, data: {
-            name: "Shipping Instructions", path: ":jobId", level: 4
-        }
-    }
 
 ];
 

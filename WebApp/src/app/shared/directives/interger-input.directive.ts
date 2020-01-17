@@ -1,27 +1,53 @@
 import { Directive, ElementRef, HostListener } from '@angular/core';
 
 @Directive({
-  selector: '[appIntergerInputCheck]'
+    selector: '[integer]'
 })
 export class IntergerInputDirective {
-  // Allow decimal numbers and negative values
-  private regex: RegExp = new RegExp(/^[1-9][0-9]*$/);
-  // Allow key codes for special events. Reflect :
-  // Backspace, tab, end, home
-  private specialKeys: Array<string> = ['Backspace', 'Tab', 'End', 'Home'];
+    constructor(private el: ElementRef) {
+    }
 
-  constructor(private el: ElementRef) {
-  }
-  @HostListener('keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent) {
-    // Allow Backspace, tab, end, and home keys
-    if (this.specialKeys.indexOf(event.key) !== -1) {
-      return;
+    // tslint:disable: deprecation
+    @HostListener('keydown', ['$event'])
+    onKeyDown(e: KeyboardEvent) {
+        if (
+            // Allow: Delete, Backspace, Tab, Escape, Enter
+            [46, 8, 9, 27, 13].indexOf(e.keyCode) !== -1 ||
+            (e.keyCode === 65 && e.ctrlKey === true) || // Allow: Ctrl+A
+            (e.keyCode === 67 && e.ctrlKey === true) || // Allow: Ctrl+C
+            (e.keyCode === 86 && e.ctrlKey === true) || // Allow: Ctrl+V
+            (e.keyCode === 88 && e.ctrlKey === true) || // Allow: Ctrl+X
+            (e.keyCode === 65 && e.metaKey === true) || // Cmd+A (Mac)
+            (e.keyCode === 67 && e.metaKey === true) || // Cmd+C (Mac)
+            (e.keyCode === 86 && e.metaKey === true) || // Cmd+V (Mac)
+            (e.keyCode === 88 && e.metaKey === true) || // Cmd+X (Mac)
+            (e.keyCode >= 35 && e.keyCode <= 39) // Home, End, Left, Right
+        ) {
+            return;
+        }
+        if (
+            (e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) &&
+            (e.keyCode < 96 || e.keyCode > 105)
+        ) {
+            e.preventDefault();
+        }
     }
-    let current: string = this.el.nativeElement.value;
-    let next: string = current.concat(event.key);
-    if (next && !String(next).match(this.regex)) {
-      event.preventDefault();
+
+    @HostListener('paste', ['$event'])
+    onPaste(event: ClipboardEvent) {
+        event.preventDefault();
+        const pastedInput: string = event.clipboardData
+            .getData('text/plain')
+            .replace(/\D/g, ''); // get a digit-only string
+        document.execCommand('insertText', false, pastedInput);
     }
-  }
+
+    @HostListener('drop', ['$event'])
+    onDrop(event: DragEvent) {
+        event.preventDefault();
+        const textData = event.dataTransfer
+            .getData('text').replace(/\D/g, '');
+        this.el.nativeElement.focus();
+        document.execCommand('insertText', false, textData);
+    }
 }

@@ -17,11 +17,32 @@ import { FormAddChargeComponent } from './components/form-add-charge/form-add-ch
 import { VoucherListComponent } from './components/voucher-list/voucher-list.component';
 
 const routing: Routes = [
-    { path: '', component: ChargeComponent, data: { name: "Charge", level: 2 } },
-    { path: 'addnew', component: AddChargeComponent, data: { name: "Addnew Charge", level: 3 } },
-    { path: 'import', component: ChargeImportComponent, data: { name: "Import", level: 3 } },
-    { path: 'import-account-voucher', component: ChargeImportAccountVoucherComponent },
-    { path: ':id', component: DetailChargeComponent, data: { name: "Edit Charge", level: 3 } },
+    {
+        path: '', data: { name: "" },
+        children: [
+            {
+                path: '', component: ChargeComponent
+            },
+            {
+
+                path: 'addnew', component: AddChargeComponent, data: { name: "New" }
+            },
+            {
+
+                path: 'import', component: ChargeImportComponent, data: { name: "Import" }
+            },
+            {
+
+                path: 'import-account-voucher', component: ChargeImportAccountVoucherComponent, data: { name: "Import Account Voucher" }
+            },
+            {
+
+                path: ':id', component: DetailChargeComponent, data: { name: "Detail" }
+            },
+        ]
+    },
+
+
 
 ];
 @NgModule({
@@ -48,4 +69,6 @@ const routing: Routes = [
     ],
     providers: [],
 })
-export class ChargeModule { }
+export class
+
+    ChargeModule { }

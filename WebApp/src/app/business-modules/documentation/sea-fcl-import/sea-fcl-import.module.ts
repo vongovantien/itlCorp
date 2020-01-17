@@ -16,28 +16,34 @@ import { ShareBussinessModule } from '../../share-business/share-bussines.module
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 const routing: Routes = [
-
     {
-        path: '', pathMatch: 'full', component: SeaFCLImportManagementComponent,
-        data: { name: "Sea FCL Import", path: "sea-fcl-import", level: 2 }
+        path: '', component: SeaFCLImportManagementComponent, data: {
+            name: "",
+        },
     },
     {
         path: 'new', component: SeaFCLImportCreateJobComponent,
-        data: { name: "Create New Job", path: "new", level: 3 }
+        data: { name: "Create New Job" }
     },
     {
-        path: ':jobId', component: SeaFCLImportDetailJobComponent,
-        data: { name: "Job Detail", path: ":jobId", level: 3, transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport },
+        path: ':jobId',
+        data: { transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport, name: "Job Detail" },
+        children: [
+            {
+                path: '', component: SeaFCLImportDetailJobComponent, data: { name: "" }
+            },
+            {
+                path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),
+                data: {
+                    name: "House Bill",
+                },
+            },
+            {
+                path: 'manifest', component: SeaFclImportManifestComponent,
+                data: { name: "Manifest", },
+            },
+        ]
     },
-    {
-        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),
-    },
-    {
-        path: ':jobId/manifest', component: SeaFclImportManifestComponent,
-        data: { name: "Manifest", path: ":jobId", level: 4 },
-    },
-
-
 ];
 
 
