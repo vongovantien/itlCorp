@@ -411,10 +411,10 @@ namespace eFMS.API.Documentation.DL.Services
                  && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                 && (x.detail.Etd >= criteria.FromDate || criteria.FromDate == null)
-                 && (x.detail.Etd <= criteria.ToDate || criteria.ToDate == null)
+                 && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
+                 && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
                  && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                 &&(x.tran.TransactionType == transactionType)
+                 &&(x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                  );
                 }
                 else
@@ -426,8 +426,8 @@ namespace eFMS.API.Documentation.DL.Services
                                          && (x.detail.Eta >= criteria.FromDate || criteria.FromDate == null)
                                          && (x.detail.Eta <= criteria.ToDate || criteria.ToDate == null)
                                          && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                         && (x.tran.TransactionType == transactionType )
-                                         );
+                                         && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType)
+                                         ));
                 }
             }
             else

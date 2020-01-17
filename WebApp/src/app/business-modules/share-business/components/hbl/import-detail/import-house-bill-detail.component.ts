@@ -64,7 +64,7 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
             data.typeFCL = this.typeFCL;
         }
         if (this.typeTransaction !== null) {
-            data.typeTransaction = this.typeTransaction;
+            data.transactionType = this.typeTransaction;
         }
         this._documentRepo.getListHblPaging(this.page, this.pageSize, data).pipe(
             catchError(this.catchError),
