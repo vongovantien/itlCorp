@@ -360,6 +360,7 @@ namespace eFMS.API.Documentation.DL.Services
                         cdNote.Total = totalDebit - totalCredit;
                         cdNote.soaNo = String.Join(", ", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
                         cdNote.total_charge = chargesOfCDNote.Count();
+                        cdNote.UserCreated = sysUserRepo.Get(x => x.Id == cdNote.UserCreated).FirstOrDefault()?.Username;
                         listCDNote.Add(cdNote);
                     }
 
