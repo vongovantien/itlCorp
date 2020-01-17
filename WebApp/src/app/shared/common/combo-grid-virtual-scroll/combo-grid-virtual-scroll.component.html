@@ -27,7 +27,7 @@
                 <div class="table-filter-block">
                     <div class="search-field">
                         <input #inputSearch class="form-control m-input m-input--square cbgr-input-search" type="text"
-                            placeholder="Search..." autofocus [(ngModel)]="keyword">
+                            placeholder="Search..." autofocus [(ngModel)]="keyword" (keyup)="handleKeyUp($event)">
                         <i class="icon-search"></i>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                     <table class="table table-hover">
                         <tbody>
                             <ng-container *ngIf="!!DataSources.length">
-                                <tr class="data-row pointer"
+                                <tr class="data-row pointer" #listItem
                                     *cdkVirtualFor="let item of DataSources | filter :keyword: searchKeys; let i= index;trackBy: trackByFn"
                                     data-id="{{(i+1)}}" (click)="emitSelected(item,i)"
                                     [class.data-selected]="indexSelected !== -1 && i === indexSelected">

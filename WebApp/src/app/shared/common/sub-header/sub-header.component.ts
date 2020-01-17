@@ -16,6 +16,8 @@ export class SubHeaderComponent {
     ngOnInit() { }
 
     resetBreadcrumb(name: string) {
-        this.breadcrumComponent.breadcrumbs[this.breadcrumComponent.breadcrumbs.length - 1].name = name;
+        setTimeout(() => {
+            this.breadcrumComponent.breadcrumbs[this.breadcrumComponent.breadcrumbs.length - 1].name = name;
+        }, 200);
     }
 }

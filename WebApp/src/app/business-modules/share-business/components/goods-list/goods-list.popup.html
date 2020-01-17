@@ -203,3 +203,6 @@
 
 <confirm-popup #confirmCancel [body]="'Do you want to save your changes to List of Goods ?'" [title]="'Alert'"
     [labelConfirm]="'Yes'" [labelCancel]="'No'" (onSubmit)="onSubmitCancel()" (onCancel)="onCancel()"></confirm-popup>
+
+<confirm-popup #confirmDeleteContainerPopup [body]="'Are you sure you want to delete ?'" [title]="'Alert'"
+    [labelConfirm]="'Yes'" (onSubmit)="onDeleteContainer()"></confirm-popup>

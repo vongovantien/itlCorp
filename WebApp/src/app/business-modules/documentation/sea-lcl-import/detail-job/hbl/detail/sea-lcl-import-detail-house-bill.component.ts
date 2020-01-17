@@ -131,6 +131,8 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     onUpdateHblDetail() {
         this.formHouseBill.isSubmited = true;
+        this.hblGoodsSummaryComponent.isSubmitted = true;
+
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;

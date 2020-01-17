@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mawb.value}">
-                        <label required>MAWB</label>
+                        <label required>MAWB No</label>
                         <input type="text" class="form-control" formControlName="mawb">
                     </div>
                 </div>
@@ -263,7 +263,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted && (formCreate.errors | equalError:'invalidGW') }">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && (formCreate.errors | equalError:'invalidGW') }">
                                 <label>G.W</label>
                                 <input type="number" class="form-control" formControlName="grossWeight">
                                 <div class="form-control-feedback"
