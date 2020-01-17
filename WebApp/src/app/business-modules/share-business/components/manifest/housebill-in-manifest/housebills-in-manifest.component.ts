@@ -1,6 +1,6 @@
 import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
 import { ShareBusinessAddHblToManifestComponent } from '../popup/add-hbl-to-manifest.popup';
 @Component({
     selector: 'housebills-in-manifest',
@@ -13,6 +13,7 @@ export class ShareBusinessHousebillsInManifestComponent extends PopupBase {
     housebills: any[] = [];
     checkAll = false;
     manifest: any = {};
+    @Output() emitVolum = new EventEmitter<object>();
 
     constructor(
         private _sortService: SortService
@@ -72,10 +73,12 @@ export class ShareBusinessHousebillsInManifestComponent extends PopupBase {
         });
         this.manifest.weight = totalGW;
         this.manifest.volume = totalCBM;
+        this.emitVolum.emit(this.manifest);
         // this.formManifest.volume.setValue(this.manifest.volume);
         // this.formManifest.weight.setValue(this.manifest.weight);
     }
     showPopupAddHbl() {
+        this.addHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
         this.addHblToManifestPopup.show();
     }
     sortHouseBills(sortData: CommonInterface.ISortData): void {

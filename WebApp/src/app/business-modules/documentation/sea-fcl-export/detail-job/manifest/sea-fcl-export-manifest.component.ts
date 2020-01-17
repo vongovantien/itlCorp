@@ -4,7 +4,7 @@ import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { getParamsRouterState } from 'src/app/store';
 import { Params, Router } from '@angular/router';
@@ -79,8 +79,10 @@ export class SeaFclExportManifestComponent extends AppList {
     }
     ngAfterViewInit() {
         this._store.select(getParamsRouterState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
                 if (param.jobId) {
+                    console.log(param.jobId)
                     this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);

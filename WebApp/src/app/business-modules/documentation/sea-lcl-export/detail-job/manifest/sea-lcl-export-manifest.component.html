@@ -25,7 +25,7 @@
 </div>
 
 <form-manifest [type]="portType">
-    <housebills-in-manifest></housebills-in-manifest>
+    <housebills-in-manifest (emitVolum)="getVolumn($event)"></housebills-in-manifest>
 </form-manifest>
 <add-hbl-to-manifest-popup-share (onAdd)="onAdd()"></add-hbl-to-manifest-popup-share>
 <ng-container *ngIf="dataReport">

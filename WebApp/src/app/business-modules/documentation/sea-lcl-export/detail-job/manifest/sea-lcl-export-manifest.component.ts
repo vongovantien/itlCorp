@@ -89,16 +89,6 @@ export class SeaLclExportManifestComponent extends AppList {
                 }
             });
     }
-
-    showPopupAddHbl() {
-
-        this.AddHblToManifestPopup.show();
-
-    }
-    removeAllChecked() {
-        this.checkAll = false;
-    }
-
     refreshManifest() {
         this.getManifest(this.jobId);
         this.getHblList(this.jobId);
@@ -117,7 +107,11 @@ export class SeaLclExportManifestComponent extends AppList {
         this._router.navigate([`/home/documentation/sea-lcl-export/${this.jobId}`]);
     }
 
-
+    getVolumn(event) {
+        this.manifest = event;
+        this.formManifest.volume.setValue(this.manifest.volume);
+        this.formManifest.weight.setValue(this.manifest.weight);
+    }
     getTotalWeight() {
         this.totalCBM = 0;
         this.totalGW = 0;
@@ -192,23 +186,6 @@ export class SeaLclExportManifestComponent extends AppList {
         return true;
     }
 
-    onRemove() {
-        if (this.checkIsChecked() === false) {
-            return;
-        }
-        this.housebills.forEach(x => {
-            if (x.isChecked) {
-                x.isRemoved = true;
-                x.isChecked = false;
-                x.manifestRefNo = null;
-            }
-
-        });
-        this.getTotalWeight();
-        this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
-        this.AddHblToManifestPopup.checkAll = false;
-    }
-
     onAdd() {
         if (this.checkIsChecked() === false) {
             return;
@@ -221,24 +198,6 @@ export class SeaLclExportManifestComponent extends AppList {
         });
         this.getTotalWeight();
         this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
-    }
-
-    checkAllChange() {
-        if (this.checkAll) {
-            this.housebills.forEach(x => {
-                x.isChecked = true;
-            });
-        } else {
-            this.housebills.forEach(x => {
-                x.isChecked = false;
-            });
-        }
-    }
-
-    sortHouseBills(sortData: CommonInterface.ISortData): void {
-        if (!!sortData.sortField) {
-            this.housebills = this._sortService.sort(this.housebills, sortData.sortField, sortData.order);
-        }
     }
 
     getHblList(jobId: string) {
@@ -262,16 +221,14 @@ export class SeaLclExportManifestComponent extends AppList {
                         }
                     });
                     this.housebills = res;
-                    const hasHbl = this.housebills.some(element => element.isRemoved === false);
-                    if (!hasHbl) {
-                        this.housebills.forEach(element => {
-                            element.isRemoved = false;
-                        });
-                    }
+                    this.getTotalWeight();
+                    // const hasHbl = this.housebills.some(element => element.isRemoved === false);
+                    // if (!hasHbl) {
+                    //     this.housebills.forEach(element => {
+                    //         element.isRemoved = false;
+                    //     });
+                    // }
                     this.houseBillInManifest.housebills = this.housebills;
-                    console.log(hasHbl);
-                    console.log(this.housebills);
-                    console.log(this.AddHblToManifestPopup.houseBills);
                     this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
                 },
             );
