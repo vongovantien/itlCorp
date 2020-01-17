@@ -167,7 +167,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
             eta: [], // * Date
             serviceDate: [],
 
-            mawb: [null, Validators.required],
+            mawb: [],
             voyNo: [],
             flightVesselName: [],
             pono: [],
@@ -175,7 +175,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
             term: [[this.termTypes[1]]],
             bookingNo: [],
 
-            coloader: [],
+            coloader: [null, Validators.required],
             pol: [null, Validators.required],
             pod: [],
             agent: [],
