@@ -251,8 +251,7 @@ export class SeaFclExportManifestComponent extends AppList {
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
-                }),
-                take(1),
+                })
             ).subscribe(
                 (res: any) => {
                     this.AddHblToManifestPopup.houseBills = this.housebills;
