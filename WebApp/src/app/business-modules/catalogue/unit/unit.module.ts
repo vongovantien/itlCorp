@@ -12,7 +12,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { FormCreateUnitPopupComponent } from './components/form/form-unit.popup';
 
 const routing: Routes = [
-    { path: '', component: UnitComponent, data: { name: "Unit", level: 2 } },
+    { path: '', component: UnitComponent, data: { name: "" } },
 ];
 
 @NgModule({

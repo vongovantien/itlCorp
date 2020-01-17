@@ -50,6 +50,7 @@ export * from './cd-note-air/cd-note-list/cd-note-list.component';
 export * from './cd-note-air/detail-cd-note/detail-cd-note.popup';
 
 export * from './files-attach/files-attach.component';
+export * from './manifest/housebill-in-manifest/housebills-in-manifest.component';
 
 // TODO export components from shareBussiness.
 

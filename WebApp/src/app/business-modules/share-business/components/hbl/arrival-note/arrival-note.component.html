@@ -107,7 +107,8 @@
                                                         <div class="col-md-6 p-r-none">
                                                             <input type="number" class="form-control"
                                                                 [(ngModel)]="charge.quantity"
-                                                                (ngModelChange)="onChangeQuantity($event, charge)">
+                                                                (ngModelChange)="onChangeQuantity($event, charge)"
+                                                                numeric decimals="3">
                                                         </div>
                                                         <div class="col-md-6 p-l-none">
                                                             <select class="form-control border"
@@ -135,7 +136,7 @@
                                             <td>
                                                 <div class="form-group"
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice < 0}">
-                                                    <input type="number" class="form-control"
+                                                    <input type="number" class="form-control" numeric decimals="3"
                                                         [(ngModel)]="charge.unitPrice"
                                                         (ngModelChange)="onChangeUnitPrice($event,charge)">
                                                 </div>

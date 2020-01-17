@@ -14,9 +14,20 @@ import { CommodityGroupAddPopupComponent } from './components/form-create-commod
 import { CommodityGroupListComponent } from './components/list-commodity-group/list-commodity-group.component';
 
 const routing: Routes = [
-    { path: '', component: CommodityComponent, data: { name: "Commodity", level: 2 } },
-    { path: 'commodity-import', component: CommodityImportComponent, data: { name: "Commodity Import", level: 3 } },
-    { path: 'commodity-group-import', component: CommodityGroupImportComponent, data: { name: "Commodity Group Import", level: 3 } },
+    {
+        path: '', data: { name: "" },
+        children: [
+            {
+                path: '', component: CommodityComponent
+            },
+            {
+                path: 'commodity-import', component: CommodityImportComponent, data: { name: "Import" }
+            },
+            {
+                path: 'commodity-group-import', component: CommodityGroupImportComponent, data: { name: "Group Import" }
+            },
+        ]
+    },
 ];
 @NgModule({
     imports: [

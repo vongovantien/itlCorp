@@ -81,9 +81,8 @@ export class SeaFclExportManifestComponent extends AppList {
         this._store.select(getParamsRouterState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
-                if (param.id) {
-                    console.log(param.id);
-                    this.jobId = param.id;
+                if (param.jobId) {
+                    this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);
                     this.getHblList(this.jobId);

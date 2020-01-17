@@ -5,10 +5,9 @@ import { SeaConsolExportComponent } from './sea-consol-export/sea-consol-export.
 import { SeaConsolImportComponent } from './sea-consol-import/sea-consol-import.component';
 
 const routes: Routes = [
-
     {
         path: '',
-        redirectTo: 'inland-trucking',
+        redirectTo: 'air-export',
         pathMatch: 'full'
     },
     {
@@ -18,12 +17,6 @@ const routes: Routes = [
             name: "Inland Trucking",
             level: 2
         },
-    },
-    {
-        path: 'air-export', loadChildren: () => import('./air-export/air-export.module').then(m => m.AirExportModule),
-    },
-    {
-        path: 'air-import', loadChildren: () => import('./air-import/air-import.module').then(m => m.AirImportModule),
     },
     {
         path: 'sea-consol-export',
@@ -41,20 +34,48 @@ const routes: Routes = [
             level: 2
         }
     },
-
     {
-        path: 'sea-fcl-import', loadChildren: () => import('./sea-fcl-import/sea-fcl-import.module').then(m => m.SeaFCLImportModule),
+        path: 'air-export', loadChildren: () => import('./air-export/air-export.module').then(m => m.AirExportModule),
+        data: {
+            name: 'Air Export',
+            path: '/'
+        }
+    },
+    {
+        path: 'air-import', loadChildren: () => import('./air-import/air-import.module').then(m => m.AirImportModule),
+        data: {
+            name: 'Air Import',
+            path: '/'
+        }
     },
     {
         path: 'sea-fcl-export', loadChildren: () => import('./sea-fcl-export/sea-fcl-export.module').then(m => m.SeaFCLExportModule),
+        data: {
+            name: 'Sea FCL Export',
+            path: '/'
+        }
     },
     {
-        path: 'sea-lcl-import', loadChildren: () => import('./sea-lcl-import/sea-lcl-import.module').then(m => m.SeaLCLImportModule),
-
+        path: 'sea-fcl-import', loadChildren: () => import('./sea-fcl-import/sea-fcl-import.module').then(m => m.SeaFCLImportModule),
+        data: {
+            name: 'Sea FCL Import',
+            path: '/'
+        }
     },
     {
         path: 'sea-lcl-export', loadChildren: () => import('./sea-lcl-export/sea-lcl-export.module').then(m => m.SeaLCLExportModule),
+        data: {
+            name: 'Sea LCL Export',
+            path: '/'
+        }
 
+    },
+    {
+        path: 'sea-lcl-import', loadChildren: () => import('./sea-lcl-import/sea-lcl-import.module').then(m => m.SeaLCLImportModule),
+        data: {
+            name: 'Sea LCL Import',
+            path: '/'
+        }
     },
 ];
 

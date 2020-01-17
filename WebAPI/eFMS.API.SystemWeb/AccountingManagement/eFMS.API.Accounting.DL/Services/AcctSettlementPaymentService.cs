@@ -1577,9 +1577,9 @@ namespace eFMS.API.Accounting.DL.Services
                            JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
                            AdvDate = (!string.IsNullOrEmpty(advance.StatusApproval) && advance.StatusApproval == Constants.STATUS_APPROVAL_DONE ? advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : string.Empty),
                            SettlementNo = settlementNo,
-                           Customer = cus.PartnerNameVn != null ? cus.PartnerNameVn : string.Empty,
-                           Consignee = cnee.PartnerNameVn != null ? cnee.PartnerNameVn : string.Empty,
-                           Consigner = cner.PartnerNameVn != null ? cner.PartnerNameVn : string.Empty,
+                           Customer = cus.PartnerNameVn != null ? cus.PartnerNameVn.ToUpper() : string.Empty,
+                           Consignee = cnee.PartnerNameVn != null ? cnee.PartnerNameVn.ToUpper() : string.Empty,
+                           Consigner = cner.PartnerNameVn != null ? cner.PartnerNameVn.ToUpper() : string.Empty,
                            ContainerQty = opst.SumContainers.HasValue ? opst.SumContainers.Value.ToString() + "/" : string.Empty,
                            GW = opst.SumGrossWeight.HasValue ? opst.SumGrossWeight.Value : 0,
                            NW = opst.SumNetWeight.HasValue ? opst.SumNetWeight.Value : 0,
@@ -1707,7 +1707,7 @@ namespace eFMS.API.Accounting.DL.Services
             parameter = GetFirstShipmentOfSettlement(settlementNo);
             if (parameter != null)
             {
-                parameter.SettleRequester = (settlement != null && !string.IsNullOrEmpty(settlement.Requester)) ? GetEmployeeByUserId(settlement.Requester)?.EmployeeNameEn : string.Empty;
+                parameter.SettleRequester = (settlement != null && !string.IsNullOrEmpty(settlement.Requester)) ? GetEmployeeByUserId(settlement.Requester)?.EmployeeNameVn : string.Empty;
 
                 parameter.SettleRequestDate = settlement.RequestDate != null ? settlement.RequestDate.Value.ToString("dd/MM/yyyy") : string.Empty;
 
@@ -2469,9 +2469,9 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy ra employeeId của User
-        private string GetEmployeeIdOfUser(string userName)
+        private string GetEmployeeIdOfUser(string userId)
         {
-            return sysUserRepo.Get(x => x.Username == userName).FirstOrDefault()?.EmployeeId;
+            return sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
         }
 
         //Lấy info Employee của User dựa vào employeeId
@@ -2480,10 +2480,10 @@ namespace eFMS.API.Accounting.DL.Services
             return sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
         }
 
-        //Lấy info Employee của User dựa vào userName
-        private SysEmployee GetEmployeeByUserId(string userName)
+        //Lấy info Employee của User dựa vào userId
+        private SysEmployee GetEmployeeByUserId(string userId)
         {
-            var employeeId = GetEmployeeIdOfUser(userName);
+            var employeeId = GetEmployeeIdOfUser(userId);
             var data = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
             return data;
         }

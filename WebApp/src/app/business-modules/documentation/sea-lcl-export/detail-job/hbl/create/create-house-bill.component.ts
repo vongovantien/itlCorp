@@ -92,6 +92,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     onSaveHBL() {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
+        this.goodSummaryComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
@@ -192,6 +193,17 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         this.setError(this.formCreateHBLComponent.originBlnumber);
 
         if (!this.formCreateHBLComponent.formCreate.valid) {
+            valid = false;
+        }
+
+        if (
+            this.goodSummaryComponent.grossWeight === null
+            || this.goodSummaryComponent.totalCBM === null
+            || this.goodSummaryComponent.packageQty === null
+            || this.goodSummaryComponent.grossWeight < 0
+            || this.goodSummaryComponent.totalCBM < 0
+            || this.goodSummaryComponent.packageQty < 0
+        ) {
             valid = false;
         }
         return valid;

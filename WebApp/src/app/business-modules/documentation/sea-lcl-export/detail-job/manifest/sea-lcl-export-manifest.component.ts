@@ -17,6 +17,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/share-business/components/manifest/form-manifest/components/form-manifest.component';
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
 import { CommonEnum } from '@enums';
+import { ShareBusinessHousebillsInManifestComponent } from 'src/app/business-modules/share-business/components';
 
 @Component({
     selector: 'app-sea-lcl-export-manifest',
@@ -27,6 +28,7 @@ export class SeaLclExportManifestComponent extends AppList {
     @ViewChild(ShareBusinessFormManifestComponent, { static: false }) formManifest: ShareBusinessFormManifestComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(ShareBusinessAddHblToManifestComponent, { static: false }) AddHblToManifestPopup: ShareBusinessAddHblToManifestComponent;
+    @ViewChild(ShareBusinessHousebillsInManifestComponent, { static: false }) houseBillInManifest: ShareBusinessHousebillsInManifestComponent;
     portType: CommonEnum.PORT_TYPE = CommonEnum.PORT_TYPE.SEA;
     housebills: any[] = [];
     housebillsRoot: any[] = [];
@@ -61,13 +63,13 @@ export class SeaLclExportManifestComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: 'HBL No', field: 'hwbNo', sortable: true, width: 100 },
-            { title: 'No of Pieces', field: 'packageContainer', sortable: true },
-            { title: 'G.W', field: 'grossWeight', sortable: true },
+            { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
+            { title: 'No of Pieces', field: 'packages', sortable: true },
+            { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
             { title: 'Destination', field: 'podName', sortable: true },
             { title: 'Shipper', field: 'shipperName', sortable: true },
-            { title: 'Consignee', field: 'consignee', sortable: true },
+            { title: 'Consignee', field: 'consigneeName', sortable: true },
             { title: 'Description', field: 'desOfGoods', sortable: true },
             { title: 'Freight Charge', field: '', sortable: true },
 
@@ -77,8 +79,8 @@ export class SeaLclExportManifestComponent extends AppList {
     ngAfterViewInit() {
         this._store.select(getParamsRouterState)
             .subscribe((param: Params) => {
-                if (param.id) {
-                    this.jobId = param.id;
+                if (param.jobId) {
+                    this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);
                     this.getHblList(this.jobId);
@@ -253,7 +255,7 @@ export class SeaLclExportManifestComponent extends AppList {
 
                     res.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
                         element.isChecked = false;
-                        if (element["manifestRefNo"] == null) {
+                        if (element["manifestRefNo"] == null || element["manifestRefNo"] === '') {
                             element.isRemoved = true;
                         } else {
                             element.isRemoved = false;
@@ -266,7 +268,10 @@ export class SeaLclExportManifestComponent extends AppList {
                             element.isRemoved = false;
                         });
                     }
+                    this.houseBillInManifest.housebills = this.housebills;
                     console.log(hasHbl);
+                    console.log(this.housebills);
+                    console.log(this.AddHblToManifestPopup.houseBills);
                     this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
                 },
             );

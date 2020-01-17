@@ -16,25 +16,30 @@ import { AdvancePaymentDetailComponent } from './detail/detail-advance-payment.c
 import { ApproveAdvancePaymentComponent } from '../approve-payment/advance/approve-advance.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from "ngx-currency";
-import { ProcessApporveComponent } from '../approve-payment/components/process-approve/process-approve.component';
 import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
 const routing: Routes = [
     {
-        path: "", component: AdvancePaymentComponent, pathMatch: 'full',
-        data: { name: "Advance Payment", path: "advance-payment", level: 2 }
+        path: "",
+        data: { name: "" },
+        children: [
+            {
+                path: '', component: AdvancePaymentComponent
+            },
+            {
+                path: "new", component: AdvancePaymentAddNewComponent,
+                data: { name: "New", }
+            },
+            {
+                path: ":id", component: AdvancePaymentDetailComponent,
+                data: { name: "Detail" }
+            },
+            {
+                path: ":id/approve", component: ApproveAdvancePaymentComponent,
+                data: { name: "Approve" }
+            }
+        ]
     },
-    {
-        path: "new", component: AdvancePaymentAddNewComponent,
-        data: { name: "New", path: "New", level: 3 }
-    },
-    {
-        path: ":id", component: AdvancePaymentDetailComponent,
-        data: { name: "Detail", path: "Detail", level: 3 }
-    },
-    {
-        path: ":id/approve", component: ApproveAdvancePaymentComponent,
-        data: { name: "Approve", path: "Approve", level: 3 }
-    }
+
 
 ];
 

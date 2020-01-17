@@ -11,15 +11,22 @@ import { OfficeDetailsComponent } from './details/office-details.component';
 import { OfficeFormSearchComponent } from './components/form-search-office/form-search-office.component';
 import { OfficeFormAddComponent } from './components/form-add-office/form-add-office.component';
 import { PaginationModule, TabsModule } from 'ngx-bootstrap';
-
-
-
 const routing: Routes = [
+    {
+        path: '', data: { name: "" },
+        children: [
+            {
+                path: '', component: OfficeComponent
+            },
+            {
+                path: 'addnew', component: OfficeAddNewComponent, data: { name: "New" }
+            },
+            {
 
-    { path: '', component: OfficeComponent, data: { name: "Office", level: 2 }, pathMatch: 'full' },
-    { path: 'addnew', component: OfficeAddNewComponent, data: { name: "Addnew Office", level: 3 } },
-    { path: ':id', component: OfficeDetailsComponent, data: { name: "Edit Office", level: 3 } },
-
+                path: ':id', component: OfficeDetailsComponent, data: { name: "Edit" }
+            },
+        ]
+    },
 ];
 
 @NgModule({

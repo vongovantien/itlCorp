@@ -20,36 +20,32 @@ import { ShareAccountingModule } from '../share-accouting.module';
 
 const routing: Routes = [
     {
-        path: "", component: StatementOfAccountComponent,
-        data: {
-            name: "Statement Of Account",
-            path: "statement-of-account",
-            level: 2
-        }
+        path: "",
+        data: { name: "", },
+        children: [
+            {
+                path: "", component: StatementOfAccountComponent,
+            },
+            {
+                path: "new", component: StatementOfAccountAddnewComponent, data: {
+                    name: "New",
+                }
+            },
+            {
+                path: "detail", component: StatementOfAccountDetailComponent,
+                data: {
+                    name: "Detail",
+                }
+            },
+            {
+                path: "edit", component: StatementOfAccountEditComponent,
+                data: {
+                    name: "Edit",
+                }
+            },
+        ]
     },
-    {
-        path: "new", component: StatementOfAccountAddnewComponent, data: {
-            name: "New",
-            path: "new",
-            level: 3
-        }
-    },
-    {
-        path: "detail", component: StatementOfAccountDetailComponent,
-        data: {
-            name: "Detail",
-            path: "detail",
-            level: 3
-        }
-    },
-    {
-        path: "edit", component: StatementOfAccountEditComponent,
-        data: {
-            name: "Edit",
-            path: "detail",
-            level: 3
-        }
-    },
+
 
 ];
 
@@ -58,7 +54,7 @@ const COMPONENTS = [
     StatementOfAccountAddChargeComponent,
     StatementOfAccountSummaryComponent,
     StatementOfAccountFormCreateComponent,
-    
+
 ];
 
 @NgModule({

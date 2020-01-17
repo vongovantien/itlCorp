@@ -22,15 +22,14 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SeparateHouseBillComponent } from './components/form-separate-house-bill/form-separate-house-bill.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
 
-
 const routing: Routes = [
     {
         path: '', component: AirExportHBLComponent,
-        data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.AE_CODE }
+        data: { name: '', path: '/', level: 4, serviceId: ChargeConstants.AE_CODE }
     },
     {
         path: 'new', component: AirExportCreateHBLComponent,
-        data: { name: 'New House Bill Detail', path: ':id', level: 5, transactionType: CommonEnum.TransactionTypeEnum.AirExport }
+        data: { name: 'New House Bill', path: ':id', level: 5, transactionType: CommonEnum.TransactionTypeEnum.AirExport }
     },
     {
         path: ':hblId', component: AirExportDetailHBLComponent,

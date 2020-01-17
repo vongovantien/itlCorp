@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { AppPaginationComponent } from './pagination/pagination.component';
 import { TableCellComponent } from './table-cell/table-cell.component';
 import { PipeModule } from '../pipes/pipe.module';
+import { RouterModule } from '@angular/router';
 
 const COMPONENTS = [
     SubHeaderComponent,
@@ -48,6 +49,7 @@ const COMPONENTS = [
         ...COMPONENTS
     ],
     imports: [
+        RouterModule,
         CommonModule,
         ModalModule,
         SelectModule,

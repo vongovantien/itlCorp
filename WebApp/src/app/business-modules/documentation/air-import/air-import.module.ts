@@ -16,30 +16,29 @@ import { AirImportDetailJobComponent } from './detail-job/detail-job-air-import.
 
 const routing: Routes = [
     {
-        path: '', pathMatch: 'full', component: AirImportComponent, data: {
-            name: "Air Import", path: "air-import", level: 2
+        path: '', component: AirImportComponent, data: {
+            name: "",
         },
     },
     {
         path: 'new', component: AirImportCreateJobComponent,
-        data: { name: "Create New Job", path: "new", level: 3 }
+        data: { name: "Create New Job" }
     },
     {
-        path: ':jobId', component: AirImportDetailJobComponent,
-        data: { name: "Job Detail", path: ":id", level: 3, transactionType: CommonEnum.TransactionTypeEnum.AirImport },
+        path: ':jobId',
+        data: { transactionType: CommonEnum.TransactionTypeEnum.AirImport, name: "Job Detail" },
+        children: [
+            {
+                path: '', component: AirImportDetailJobComponent, data: { name: "" }
+            },
+            {
+                path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-import-hbl.module').then(m => m.AirImportHBLModule),
+                data: {
+                    name: "House Bill",
+                },
+            },
+        ]
     },
-    {
-        path: ':jobId/hbl', loadChildren: () => import('./detail-job/hbl/air-import-hbl.module').then(m => m.AirImportHBLModule),
-    },
-    // {
-    //     path: ':id/manifest', component: AirImportManifestComponent,
-    //     data: { name: "Manifest", path: ":id", level: 4 },
-    // },
-    // {
-    //     path: ':jobId/si', component: AirImportShippingInstructionComponent, data: {
-    //         name: "Shipping Instructions", path: ":jobId", level: 4
-    //     }
-    // }
 ];
 
 const LIB = [

@@ -12,11 +12,20 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { PermissionDetailComponent } from './detail/detail-permission.component';
 
 const routing: Routes = [
-    { path: '', component: PermissionComponent, pathMatch: 'full', data: { name: "Permission", path: "permission", level: 2 } },
-    { path: 'new', component: PermissionCreateComponent, data: { name: "New", path: "new", level: 3 } },
-    { path: ':id', component: PermissionDetailComponent, data: { name: "New", path: "Detail", level: 3 } }
-
-
+    {
+        path: '', data: { name: "" },
+        children: [
+            {
+                path: '', component: PermissionComponent
+            },
+            {
+                path: 'new', component: PermissionCreateComponent, data: { name: "New" }
+            },
+            {
+                path: ':id', component: PermissionDetailComponent, data: { name: "Detail" }
+            }
+        ]
+    },
 ];
 
 const COMPONENTS = [

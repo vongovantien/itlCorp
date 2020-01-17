@@ -90,10 +90,9 @@ export class SeaFclImportManifestComponent extends AppList {
     }
 
     showPopupAddHbl() {
-
         this.AddHblToManifestPopup.show();
-
     }
+
     removeAllChecked() {
 
         this.checkAll = false;
