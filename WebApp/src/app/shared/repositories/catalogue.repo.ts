@@ -422,8 +422,8 @@ export class CatalogueRepo {
         );
     }
 
-    checkExistedSaleman(service: string, office: string) {
-        const body = { service: service, office: office };
+    checkExistedSaleman(body: any = {}) {
+        // const body = { service: service, office: office };
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/CheckExisted`, body).pipe(
             map((data: any) => data)
         );

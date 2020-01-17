@@ -121,7 +121,7 @@ export class AddPartnerDataComponent extends AppList {
         }
 
         if (this.salemanToAdd.service !== null && this.salemanToAdd.office !== null) {
-            this._catalogueRepo.checkExistedSaleman(this.salemanToAdd.service[0].id, this.salemanToAdd.office)
+            this._catalogueRepo.checkExistedSaleman(this.salemanToAdd)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: any) => {

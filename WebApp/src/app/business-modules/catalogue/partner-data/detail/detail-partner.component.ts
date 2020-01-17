@@ -171,6 +171,7 @@ export class PartnerDetailComponent extends AppList {
     }
     closePopupSaleman(param: SalemanAdd) {
         this.salemanToAdd = param;
+        this.salemanToAdd.partnerId = this.partner.id;
         this.poupSaleman.isDetail = false;
         this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.salemanToAdd.service && saleMane.office === this.salemanToAdd.office));
         if (this.isDup) {
@@ -184,7 +185,7 @@ export class PartnerDetailComponent extends AppList {
 
 
         if (this.salemanToAdd.service !== null && this.salemanToAdd.office !== null) {
-            this._catalogueRepo.checkExistedSaleman(this.salemanToAdd.service, this.salemanToAdd.office)
+            this._catalogueRepo.checkExistedSaleman(this.salemanToAdd)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: any) => {

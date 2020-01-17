@@ -209,11 +209,14 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
-                this.minDateETA = value.startDate; // * Update min date
+                console.log(value);
+                if (value.startDate !== null) {
+                    this.minDateETA = value.startDate; // * Update min date
 
-                this.isSubmitted = false;
-                this.resetFormControl(this.formCreate.controls["eta"]);
-                this.formCreate.controls["serviceDate"].setValue(null);
+                    this.isSubmitted = false;
+                    this.resetFormControl(this.formCreate.controls["eta"]);
+                    this.formCreate.controls["serviceDate"].setValue(null);
+                }
             });
 
         this.formCreate.controls["eta"].valueChanges

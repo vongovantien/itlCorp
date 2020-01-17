@@ -331,11 +331,7 @@ namespace eFMS.API.Documentation.Controllers
             if (model.TransactionType == string.Empty)
                 return stringLocalizer[LanguageSub.MSG_NOT_FOUND_TRANSACTION_TYPE].Value;
             string message = string.Empty;
-
-            if (string.IsNullOrEmpty(model.Mawb))
-            {
-                return stringLocalizer[LanguageSub.MSG_MBL_REQUIRED].Value;
-            }
+            
             //model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
             //if (model.TransactionType == string.Empty)
             //    message = "Not found type transaction";
@@ -350,8 +346,12 @@ namespace eFMS.API.Documentation.Controllers
             else
             {
                 //Check trùng theo từng service
-                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType && x.Id != id && x.CurrentStatus != TermData.Canceled)))
-                {
+                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower()
+                    && model.Mawb != null
+                    && x.TransactionType == model.TransactionType 
+                    && x.Id != id 
+                    && x.CurrentStatus != TermData.Canceled)))
+                    {
                     message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }
             }
