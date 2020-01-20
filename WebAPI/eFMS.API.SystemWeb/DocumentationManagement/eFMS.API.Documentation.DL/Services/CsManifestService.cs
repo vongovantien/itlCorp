@@ -202,7 +202,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 ReportName = "SeaCargoManifest.rpt",
                 AllowPrint = true,
-                AllowExport = true
+                AllowExport = true,
+                IsLandscape = true
             };
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
@@ -294,7 +295,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 ReportName = "SeaImportCargoManifest.rpt",
                 AllowPrint = true,
-                AllowExport = true
+                AllowExport = true,
+                IsLandscape = true
             };
             result.AddDataSource(manifests);
             result.AddSubReport("ContainerDetail", containers);
@@ -354,7 +356,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 ReportName = "Aircargomanifest.rpt",
                 AllowPrint = true,
-                AllowExport = true
+                AllowExport = true,
+                IsLandscape = true
             };
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;

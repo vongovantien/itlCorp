@@ -1,5 +1,5 @@
 <div class="modal fade" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog modal-report" role="document">
+    <div class="modal-dialog" [ngClass]="data.isLandscape === true ? 'modal-xl' : 'modal-lg'" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Preview</h5>
@@ -11,7 +11,7 @@
                 <form #formReport target="frame" method="POST" [action]="scr" (ngSubmit)="submitForm($event)">
                     <input name="crystal" type="hidden" [value]="value">
                 </form>
-                <iframe #frame id="frame" name="frame" src="" type="application/pdf" height="1200px" width="100%"
+                <iframe #frame id="frame" name="frame" src="" type="application/pdf" height="1080px" width="100%"
                     allowfullscreen frameborder="0"></iframe>
             </div>
             <div class="modal-footer m--align-center" (click)="hide()">

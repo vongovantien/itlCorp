@@ -50,6 +50,14 @@ namespace ReportPerview
                     Session["allowPrint"] = crystal.AllowPrint;
                     Session["allowExport"] = crystal.AllowExport;
                     rptViewer.ReportSource = rpt;
+                    if (rpt.PrintOptions.PaperOrientation == CrystalDecisions.Shared.PaperOrientation.Landscape)
+                    {
+                        rptViewer.Width = 1320;
+                    }
+                    else
+                    {
+                        rptViewer.Width = 790;
+                    }
                 }
                 else
                 {
