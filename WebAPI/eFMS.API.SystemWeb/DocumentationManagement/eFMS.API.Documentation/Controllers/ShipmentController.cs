@@ -80,7 +80,7 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult GetShipmentNotExist(string typeSearch, List<string> shipments)
         {
-            var listShipment = shipmentService.GetShipmentNotLocked();
+            var listShipment = shipmentService.GetShipmentNotDelete();
             List<string> shipmentNotExits = new List<string>();
             if(typeSearch == "JOBID")
             {
