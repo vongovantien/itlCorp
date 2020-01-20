@@ -408,23 +408,23 @@ namespace eFMS.API.Documentation.DL.Services
                 if (criteria.TypeFCL == "Export")
                 {
                     query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
-                 && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 &&  ((x.tran.Mawb?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0 )
                  && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                 && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
                  && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
                  && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                 &&(x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
+                 && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                  );
                 }
                 else
                 {
                     query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
-                                         && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                         && ((x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                          && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                         && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                         && (x.detail.Eta >= criteria.FromDate || criteria.FromDate == null)
-                                         && (x.detail.Eta <= criteria.ToDate || criteria.ToDate == null)
+                                         && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                         && (x.tran.Eta >= criteria.FromDate || criteria.FromDate == null)
+                                         && (x.tran.Eta <= criteria.ToDate || criteria.ToDate == null)
                                          && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                          && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType)
                                          ));
@@ -435,10 +435,11 @@ namespace eFMS.API.Documentation.DL.Services
                 query = query.Where(x => criteria.JobId != Guid.Empty && criteria.JobId != null ? x.detail.JobId == criteria.JobId : true
                                       || (x.tran.Mawb.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                       || (x.detail.Hwbno.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                      || (x.cus.PartnerNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                      || (x.cus.ShortName.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                       || (x.sale.Id.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
                                       && ((x.tran.Etd ?? null) >= (criteria.FromDate ?? null) && (x.tran.Etd ?? null) <= (criteria.ToDate ?? null))
-                                    );
+                                      && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
+                                      );
             }
             var res = from detail in query.Select(s => s.detail)
                       join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
