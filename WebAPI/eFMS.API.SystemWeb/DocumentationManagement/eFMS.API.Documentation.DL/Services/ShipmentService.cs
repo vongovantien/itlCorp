@@ -280,37 +280,35 @@ namespace eFMS.API.Documentation.DL.Services
             LockedLogResultModel result = null;
             IQueryable<LockedLogModel> opShipments = null;
             string transactionType = string.Empty;
-            if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic || criteria.TransactionType == 0)
-            {
-                opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
-                                                      && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno) : true)
-                                                        || criteria.Keywords == null)
-                                                      &&
-                                                        (
-                                                                (((x.ServiceDate ?? null) >= (criteria.FromDate ?? null)) && ((x.ServiceDate ?? null) <= (criteria.ToDate ?? null)))
-                                                            || (criteria.FromDate == null && criteria.ToDate == null)
-                                                        )
-                                                      )
-                    .Select(x => new LockedLogModel
-                    {
-                        Id = x.Id,
-                        OPSShipmentNo = x.JobNo,
-                        LockedLog = x.LockedLog
-                    });
-                if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
+            opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
+                                                    && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno) : true)
+                                                    || criteria.Keywords == null)
+                                                    &&
+                                                    (
+                                                            (((x.ServiceDate ?? null) >= (criteria.FromDate ?? null)) && ((x.ServiceDate ?? null) <= (criteria.ToDate ?? null)))
+                                                        || (criteria.FromDate == null && criteria.ToDate == null)
+                                                    )
+                                                    )
+                .Select(x => new LockedLogModel
                 {
-                    result = GetLogHistory(opShipments);
-                    return result;
-                }
-            }
-            else
+                    Id = x.Id,
+                    OPSShipmentNo = x.JobNo,
+                    LockedLog = x.LockedLog,
+                    IsLocked = x.IsLocked
+                });
+            if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
             {
+                result = GetLogHistory(opShipments);
+                return result;
+            }
+            if(criteria.TransactionType > 0){ 
+
                 transactionType = DataTypeEx.GetType(criteria.TransactionType);
             }
             var csTransactions = DataContext.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
                                                  && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb) : true)
                                                     || criteria.Keywords == null)
-                                                 && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType) || criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
+                                                 && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                                               );
             csTransactions = GetShipmentServicesByTime(csTransactions, criteria);
             if (criteria.ShipmentPropertySearch == ShipmentPropertySearch.HBL)
@@ -323,7 +321,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     Id = x.Id,
                     CSShipmentNo = x.JobNo,
-                    LockedLog = x.LockedLog
+                    LockedLog = x.LockedLog,
+                    IsLocked = x.IsLocked
                 });
 
             IQueryable<LockedLogModel> shipments = null;

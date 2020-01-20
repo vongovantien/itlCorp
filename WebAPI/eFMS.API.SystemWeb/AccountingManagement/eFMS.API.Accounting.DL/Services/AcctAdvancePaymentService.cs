@@ -2042,11 +2042,22 @@ namespace eFMS.API.Accounting.DL.Services
                         if (payment.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
                         {
                             payment.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
-                            payment.UserModified = currentUser.UserName;
+                            payment.UserModified = currentUser.UserID;
                             payment.DatetimeModified = DateTime.Now;
                             var log = item.AdvanceNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
                             item.LockedLog = item.LockedLog + log + ";";
                             var hs = DataContext.Update(payment, x => x.Id == item.Id);
+                            if (hs.Success)
+                            {
+                                var approveAdvances = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo);
+                                foreach(var approve in approveAdvances)
+                                {
+                                    approve.IsDeputy = true;
+                                    approve.UserModified = currentUser.UserID;
+                                    approve.DateModified = DateTime.Now;
+                                    acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
+                                }
+                            }
                         }
                     }
                     trans.Commit();

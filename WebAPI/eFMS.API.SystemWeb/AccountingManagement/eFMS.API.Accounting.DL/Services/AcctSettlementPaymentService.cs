@@ -3081,6 +3081,14 @@ namespace eFMS.API.Accounting.DL.Services
                             var log = item.SettlementNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
                             item.LockedLog = item.LockedLog + log + ";";
                             var hs = DataContext.Update(settle, x => x.Id == item.Id);
+                            var approveSettles = acctApproveSettlementRepo.Get(x => x.SettlementNo == item.SettlementNo);
+                            foreach (var approve in approveSettles)
+                            {
+                                approve.IsDeputy = true;
+                                approve.UserModified = currentUser.UserID;
+                                approve.DateModified = DateTime.Now;
+                                acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
+                            }
                         }
                     }
                     trans.Commit();
