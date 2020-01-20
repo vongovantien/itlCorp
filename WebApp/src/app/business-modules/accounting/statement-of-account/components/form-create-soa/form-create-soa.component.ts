@@ -72,6 +72,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     shipmentInput: OperationInteface.IInputShipment;
 
+    numberOfShipment: number = 0;
     constructor(
         private _toastService: ToastrService,
         private _dataService: DataService,
@@ -425,14 +426,21 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     onShipmentList(data: any) {
         this.shipmentInput = data;
+        if(data){
+            this.numberOfShipment = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).length;
+        } else {
+            this.numberOfShipment = 0;
+        }
     }
 
     mapShipment(type: string) {
         var _shipment = [];
-        if (this.shipmentInput !== null && this.shipmentInput !== undefined) {
-            const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
-            if (this.shipmentInput.type === type) {
-                _shipment = _keyword;
+        if (this.shipmentInput) {
+            if (this.shipmentInput.keyword.length > 0) {
+                const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
+                if (this.shipmentInput.type === type) {
+                    _shipment = _keyword;
+                }
             }
         }
         return _shipment;
