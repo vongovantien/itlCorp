@@ -1312,7 +1312,6 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrent = currentUser.UserID;
-                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
                 settlement.Id = model.Settlement.Id = Guid.NewGuid();
                 settlement.SettlementNo = model.Settlement.SettlementNo = CreateSettlementNo();
@@ -1332,12 +1331,6 @@ namespace eFMS.API.Accounting.DL.Services
                             if (chargeShipment.Count > 0)
                             {
                                 var listChargeShipment = csShipmentSurchargeRepo.Get(x => chargeShipment.Contains(x.Id)).ToList();
-                                //listChargeShipment.ForEach(req =>
-                                //{
-                                //    req.SettlementCode = settlement.SettlementNo;
-                                //    req.UserModified = userCurrent;
-                                //    req.DatetimeModified = DateTime.Now;
-                                //});
                                 foreach (var item in listChargeShipment)
                                 {
                                     item.SettlementCode = settlement.SettlementNo;
@@ -1352,13 +1345,18 @@ namespace eFMS.API.Accounting.DL.Services
                             if (chargeScene.Count > 0)
                             {
                                 var listChargeSceneAdd = mapper.Map<List<CsShipmentSurcharge>>(chargeScene);
-                                //listChargeSceneAdd.ForEach(req =>
-                                //{
-                                //    req.Id = Guid.NewGuid();
-                                //    req.SettlementCode = settlement.SettlementNo;
-                                //    req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
-                                //    req.UserCreated = req.UserModified = userCurrent;
-                                //});
+                                foreach (ShipmentChargeSettlement itemScene in chargeScene)
+                                {
+                                    foreach (CsShipmentSurcharge itemSceneAdd in listChargeSceneAdd)
+                                    {
+                                        if (itemSceneAdd.Id == itemScene.Id)
+                                        {
+                                            itemSceneAdd.JobNo = itemScene.JobId;
+                                            itemSceneAdd.Mblno = itemScene.MBL;
+                                            itemSceneAdd.Hblno = itemScene.HBL;
+                                        }
+                                    }
+                                }
                                 foreach (var item in listChargeSceneAdd)
                                 {
                                     item.Id = Guid.NewGuid();
@@ -1369,7 +1367,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
                             }
                         }
-                        //dc.SaveChanges();
                         trans.Commit();
                         return hs;
                     }
@@ -1461,6 +1458,18 @@ namespace eFMS.API.Accounting.DL.Services
                             if (chargeSceneAdd.Count > 0)
                             {
                                 var listChargeSceneAdd = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneAdd);
+                                foreach (ShipmentChargeSettlement itemScene in chargeSceneAdd)
+                                {
+                                    foreach (CsShipmentSurcharge itemSceneAdd in listChargeSceneAdd)
+                                    {
+                                        if (itemSceneAdd.Id == itemScene.Id)
+                                        {
+                                            itemSceneAdd.JobNo = itemScene.JobId;
+                                            itemSceneAdd.Mblno = itemScene.MBL;
+                                            itemSceneAdd.Hblno = itemScene.HBL;
+                                        }
+                                    }
+                                }
                                 foreach (var item in listChargeSceneAdd)
                                 {
                                     item.Id = Guid.NewGuid();
@@ -1478,6 +1487,18 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 var listChargeExists = csShipmentSurchargeRepo.Get(x => idChargeSceneUpdate.Contains(x.Id));
                                 var listChargeSceneUpdate = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneUpdate);
+                                foreach (ShipmentChargeSettlement itemScene in chargeSceneUpdate)
+                                {
+                                    foreach (CsShipmentSurcharge itemSceneUpdate in listChargeSceneUpdate)
+                                    {
+                                        if (itemSceneUpdate.Id == itemScene.Id)
+                                        {
+                                            itemSceneUpdate.JobNo = itemScene.JobId;
+                                            itemSceneUpdate.Mblno = itemScene.MBL;
+                                            itemSceneUpdate.Hblno = itemScene.HBL;
+                                        }
+                                    }
+                                }
                                 foreach (var item in listChargeSceneUpdate)
                                 {
                                     item.UserCreated = listChargeExists.Where(x => x.Id == item.Id).First().UserCreated;
