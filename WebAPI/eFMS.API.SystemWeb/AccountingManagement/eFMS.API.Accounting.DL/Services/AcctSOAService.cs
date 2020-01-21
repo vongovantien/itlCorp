@@ -1022,10 +1022,14 @@ namespace eFMS.API.Accounting.DL.Services
             //    && chg.CustomerID == criteria.CustomerID
             //    && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH)
             //);
+            //query = chg =>
+            //        string.IsNullOrEmpty(chg.SOANo)
+            //    && chg.CustomerID == criteria.CustomerID
+            //    && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH);
             query = chg =>
                     string.IsNullOrEmpty(chg.SOANo)
                 && chg.CustomerID == criteria.CustomerID
-                && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH);
+                && chg.IsOBH == criteria.IsOBH;
 
             if (string.IsNullOrEmpty(criteria.DateType) || criteria.DateType == "CreatedDate")
             {
@@ -1058,11 +1062,14 @@ namespace eFMS.API.Accounting.DL.Services
                 //       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
                 //       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
                 //);
-                query = query.And(chg =>
-                       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
-                       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
-                );
-
+                if (criteria.Type == "Debit")
+                {
+                    query = query.And(chg => chg.Debit.HasValue);
+                }
+                if(criteria.Type == "Credit")
+                {
+                    query = query.And(chg => chg.Credit.HasValue);
+                }
             }
 
             if (!string.IsNullOrEmpty(criteria.StrCreators) && criteria.StrCreators != "All")
@@ -1233,10 +1240,14 @@ namespace eFMS.API.Accounting.DL.Services
                 //       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
                 //       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
                 //);
-                query = query.And(chg =>
-                       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
-                       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
-                );
+                if (criteria.Type == "Debit")
+                {
+                    query = query.And(chg => chg.Debit.HasValue);
+                }
+                if (criteria.Type == "Credit")
+                {
+                    query = query.And(chg => chg.Credit.HasValue);
+                }
             }
 
             if (!string.IsNullOrEmpty(criteria.StrCreators) && criteria.StrCreators != "All")
