@@ -7,6 +7,7 @@ export class Crystal{
     parameter: any;
     allowPrint: boolean;
     allowExport: boolean;
+    isLandscape: boolean;
 }
 
 export class SubReport{
