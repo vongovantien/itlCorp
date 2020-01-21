@@ -185,6 +185,7 @@ export class CreateHouseBillComponent extends AppForm {
         const dataSearch = { jobId: this.jobId };
         dataSearch.jobId = this.jobId;
         this.importHouseBillPopup.typeFCL = '';
+        this.importHouseBillPopup.typeTransaction = 7;
         this.importHouseBillPopup.selected = - 1;
         this.importHouseBillPopup.getHourseBill(dataSearch);
         this.importHouseBillPopup.show();

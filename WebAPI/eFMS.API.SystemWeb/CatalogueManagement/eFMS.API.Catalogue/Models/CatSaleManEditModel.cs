@@ -9,8 +9,8 @@ namespace eFMS.API.Catalogue.Models
     {
         public Guid? Id { get; set; }
         public string SaleManId { get; set; }
-        public string Office { get; set; }
-        public string Company { get; set; }
+        public Guid Office { get; set; }
+        public Guid Company { get; set; }
         public string Service { get; set; }
         public bool? Status { get; set; }
         public string PartnerId { get; set; }

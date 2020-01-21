@@ -39,8 +39,9 @@
                                     <td>{{hbl.mawb}}</td>
                                     <td>{{hbl.customerName}}</td>
                                     <td>{{hbl.saleManName}}</td>
-                                    <td>{{typeFCL === 'Export' ? (hbl.etd | date : 'dd/MM/yyyy') : (hbl.eta | date : 'dd/MM/yyyy') }}
-                                    </td>
+                                    <!-- <td>{{typeFCL === 'Export' ? (hbl.etd | date : 'dd/MM/yyyy') : (hbl.eta | date : 'dd/MM/yyyy') }}
+                                    </td> -->
+                                    <td>{{ hbl.eta | date :'dd/MM/yyyy'}}</td>
 
                                 </tr>
 

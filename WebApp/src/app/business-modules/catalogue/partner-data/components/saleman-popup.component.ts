@@ -186,7 +186,7 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     onSelectOffice(office: any) {
-        this.office.setValue(office.abbrCompany);
+        this.office.setValue(office.id);
         this.selectedDataOffice = office;
     }
 
@@ -196,7 +196,7 @@ export class SalemanPopupComponent extends PopupBase {
         this.trimInputValue(this.description, this.description.value);
         if (this.form.valid) {
             const salemans: any = {
-                company: this.office.value,
+                company: this.selectedDataOffice.buid,
                 office: this.office.value,
                 effectDate: !!this.effectiveDate.value && !!this.effectiveDate.value.startDate ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
                 status: this.status.value,

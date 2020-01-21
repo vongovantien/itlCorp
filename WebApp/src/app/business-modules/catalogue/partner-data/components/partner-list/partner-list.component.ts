@@ -22,6 +22,7 @@ export class PartnerListComponent extends AppList implements OnInit {
     isCustomer = false;
     saleMans: any[] = [];
     services: any[] = [];
+    offices: any[] = [];
 
     constructor(private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
@@ -36,6 +37,7 @@ export class PartnerListComponent extends AppList implements OnInit {
 
     ngOnInit() {
         this.getService();
+        this.getOffice();
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
             { title: 'Service', field: 'service', sortable: true },
@@ -76,6 +78,33 @@ export class PartnerListComponent extends AppList implements OnInit {
         }
     }
 
+    replaceOffice() {
+        for (const it of this.saleMans) {
+            this.offices.forEach(item => {
+                if (it.office === item.id) {
+                    it.office = item.branchNameEn;
+                }
+                if (it.company === item.buid) {
+                    it.company = item.abbrCompany;
+                }
+            });
+        }
+
+    }
+
+
+    getOffice() {
+        this._catalogueRepo.getListBranch()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.offices = res;
+                    }
+                },
+            );
+    }
+
     getService() {
         this._catalogueRepo.getListService()
             .pipe(catchError(this.catchError))
@@ -95,6 +124,7 @@ export class PartnerListComponent extends AppList implements OnInit {
                 (res: any) => {
                     this.saleMans = res || [];
                     this.replaceService();
+                    this.replaceOffice();
                 }
             );
     }

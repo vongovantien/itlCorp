@@ -139,19 +139,25 @@ export class PartnerDetailComponent extends AppList {
             ).subscribe(
                 (res: any) => {
                     if (!!res) {
-                        if (!!res) {
-                            console.log(res);
-                            this.saleMandetail = (res || []).map((item: Saleman) => new Saleman(item));
-                            if (this.saleMandetail.length > 0) {
-                                for (const it of this.saleMandetail) {
-                                    const index = this.services.findIndex(x => x.id === it.service);
-                                    if (index > -1) {
-                                        it.serviceName = this.services[index].text;
+                        console.log(res);
+                        this.saleMandetail = (res || []).map((item: Saleman) => new Saleman(item));
+                        if (this.saleMandetail.length > 0) {
+                            for (const it of this.saleMandetail) {
+                                this.services.forEach(item => {
+                                    if (it.service === item.id) {
+                                        it.serviceName = item.text;
                                     }
-                                }
+                                });
+                                this.offices.forEach(item => {
+                                    if (it.office === item.id) {
+                                        it.officeName = item.branchNameEn;
+                                    }
+                                    if (it.company === item.buid) {
+                                        it.companyName = item.abbrCompany;
+                                    }
+                                });
                             }
                         }
-
                     }
 
                 },
@@ -204,7 +210,16 @@ export class PartnerDetailComponent extends AppList {
                                             it.serviceName = item.text;
                                         }
                                     });
+                                    this.offices.forEach(item => {
+                                        if (it.office === item.id) {
+                                            it.officeName = item.branchNameEn;
+                                        }
+                                        if (it.company === item.buid) {
+                                            it.companyName = item.abbrCompany;
+                                        }
+                                    });
                                 }
+
 
                             }
                         }
