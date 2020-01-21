@@ -1123,7 +1123,8 @@ namespace eFMS.API.Accounting.DL.Services
             var surcharge = csShipmentSurchargeRepo
                 .Get(x =>
                         x.IsFromShipment == true
-                    && (x.Type == Constants.TYPE_CHARGE_BUY || (x.PayerId != null && x.CreditNo != null))
+                    //&& (x.Type == Constants.TYPE_CHARGE_BUY || (x.PayerId != null && x.CreditNo != null))
+                    && (x.Type == Constants.TYPE_CHARGE_BUY || (x.PayerId == criteria.partnerId && x.CreditNo != null))
                 );
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();

@@ -54,6 +54,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     shipmentInput: OperationInteface.IInputShipment;
     isLoadingShipmentGrid: boolean = false;
     isLoadingPartnerGrid: boolean = false;
+
+    numberOfShipment: number = 0;
     constructor(
         private _dataService: DataService,
         private _catalogue: CatalogueRepo,
@@ -195,7 +197,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     searchCharge() {
-        if (!this.selectedShipmentData && !this.shipmentInput) {
+        if (!this.selectedPartnerData || (!this.selectedShipmentData && !this.shipmentInput)) {
             return;
         } else {
             this.isLoading = true;
@@ -213,6 +215,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 _mbls.push(this.selectedShipmentData.mbl);
             }
             const body = {
+                partnerId: this.selectedPartnerData.id,
                 jobIds: _jobIds,
                 hbls: _hbls,
                 mbls: _mbls
@@ -248,6 +251,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.charges = [];
         this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
 
+        this.numberOfShipment = 0;
         this.resetFormShipmentInput();
     }
 
@@ -269,7 +273,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             dataSource: [],
         };
         this._cd.detectChanges();
-        console.log(this.configShipment);
     }
 
     resetPartner() {
@@ -310,9 +313,15 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     openInputShipment() {
         this.inputShipmentPopupComponent.show();
     }
-
+    
     onShipmentList(data: any) {
         this.shipmentInput = data;
+        if(data){
+            this.numberOfShipment = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).length;
+            this.resetShipment();
+        } else {
+            this.numberOfShipment = 0;
+        }
     }
 
     resetFormShipmentInput() {

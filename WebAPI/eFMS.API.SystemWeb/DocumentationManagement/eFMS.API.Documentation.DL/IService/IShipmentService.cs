@@ -21,5 +21,6 @@ namespace eFMS.API.Documentation.DL.IService
         List<ShipmentsCopy> GetListShipmentBySearchOptions(string searchOption, List<string> keywords);
         LockedLogResultModel GetShipmentToUnLock(ShipmentCriteria criteria);
         HandleState UnLockShipment(List<LockedLogModel> shipments);
+        IQueryable<Shipments> GetShipmentNotDelete();
     }
 }
