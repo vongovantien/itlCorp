@@ -280,37 +280,35 @@ namespace eFMS.API.Documentation.DL.Services
             LockedLogResultModel result = null;
             IQueryable<LockedLogModel> opShipments = null;
             string transactionType = string.Empty;
-            if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic || criteria.TransactionType == 0)
-            {
-                opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
-                                                      && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno) : true)
-                                                        || criteria.Keywords == null)
-                                                      &&
-                                                        (
-                                                                (((x.ServiceDate ?? null) >= (criteria.FromDate ?? null)) && ((x.ServiceDate ?? null) <= (criteria.ToDate ?? null)))
-                                                            || (criteria.FromDate == null && criteria.ToDate == null)
-                                                        )
-                                                      )
-                    .Select(x => new LockedLogModel
-                    {
-                        Id = x.Id,
-                        OPSShipmentNo = x.JobNo,
-                        LockedLog = x.LockedLog
-                    });
-                if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
+            opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
+                                                    && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno) : true)
+                                                    || criteria.Keywords == null)
+                                                    &&
+                                                    (
+                                                            (((x.ServiceDate ?? null) >= (criteria.FromDate ?? null)) && ((x.ServiceDate ?? null) <= (criteria.ToDate ?? null)))
+                                                        || (criteria.FromDate == null && criteria.ToDate == null)
+                                                    )
+                                                    )
+                .Select(x => new LockedLogModel
                 {
-                    result = GetLogHistory(opShipments);
-                    return result;
-                }
-            }
-            else
+                    Id = x.Id,
+                    OPSShipmentNo = x.JobNo,
+                    LockedLog = x.LockedLog,
+                    IsLocked = x.IsLocked
+                });
+            if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
             {
+                result = GetLogHistory(opShipments);
+                return result;
+            }
+            if(criteria.TransactionType > 0){ 
+
                 transactionType = DataTypeEx.GetType(criteria.TransactionType);
             }
             var csTransactions = DataContext.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
                                                  && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb) : true)
                                                     || criteria.Keywords == null)
-                                                 && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType) || criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
+                                                 && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                                               );
             csTransactions = GetShipmentServicesByTime(csTransactions, criteria);
             if (criteria.ShipmentPropertySearch == ShipmentPropertySearch.HBL)
@@ -323,7 +321,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     Id = x.Id,
                     CSShipmentNo = x.JobNo,
-                    LockedLog = x.LockedLog
+                    LockedLog = x.LockedLog,
+                    IsLocked = x.IsLocked
                 });
 
             IQueryable<LockedLogModel> shipments = null;
@@ -415,6 +414,52 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public IQueryable<Shipments> GetShipmentNotDelete()
+        {
+
+            //Get list shipment operation: Current Status != 'Canceled'
+            var shipmentsOperation = from ops in opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED)
+                                     select new Shipments
+                                     {
+                                         Id = ops.Id,
+                                         JobId = ops.JobNo,
+                                         HBL = ops.Hwbno,
+                                         MBL = ops.Mblno,
+                                         CustomerId = ops.CustomerId,
+                                         AgentId = ops.AgentId,
+                                         CarrierId = ops.SupplierId,
+                                         HBLID = ops.Hblid
+                                     };
+            shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.AgentId, x.CarrierId, x.HBLID }).Select(s => new Shipments
+            {
+                Id = s.Key.Id,
+                JobId = s.Key.JobId,
+                HBL = s.Key.HBL,
+                MBL = s.Key.MBL,
+                CustomerId = s.Key.CustomerId,
+                AgentId = s.Key.AgentId,
+                CarrierId = s.Key.CarrierId,
+                HBLID = s.Key.HBLID,
+                Service = "CL"
+            });
+            //Get list shipment document: Current Status != 'Canceled'
+            var transactions = DataContext.Get(x => x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
+            var shipmentsDocumention = transactions.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
+            {
+                Id = x.x.Id,
+                JobId = x.x.JobNo,
+                HBL = x.y.Hwbno,
+                MBL = x.x.Mawb,
+                CustomerId = x.y.CustomerId,
+                AgentId = x.x.AgentId,
+                CarrierId = x.x.ColoaderId,
+                HBLID = x.y.Id,
+                Service = x.x.TransactionType
+            });
+            var shipments = shipmentsOperation.Union(shipmentsDocumention);
+            return shipments;
         }
     }
 }

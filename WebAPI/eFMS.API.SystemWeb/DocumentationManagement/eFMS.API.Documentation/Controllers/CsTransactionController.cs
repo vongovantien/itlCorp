@@ -340,7 +340,7 @@ namespace eFMS.API.Documentation.Controllers
                 //Check trùng theo từng service
                 if(model.Mawb != null)
                 {
-                    if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() 
+                    if (csTransactionService.Any(x => (x.Mawb??"").ToLower() == (model.Mawb??"").ToLower() 
                     && x.TransactionType == model.TransactionType 
                     && x.CurrentStatus != TermData.Canceled))
                     {
@@ -353,10 +353,10 @@ namespace eFMS.API.Documentation.Controllers
                 //Check trùng theo từng service
                 if(model.Mawb != null)
                 {
-                    if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower()
+                    if (csTransactionService.Any(x => (x.Mawb??"").ToLower() == (model.Mawb ?? "").ToLower()
                         && x.TransactionType == model.TransactionType
                         && x.Id != id
-                        && x.CurrentStatus != TermData.Canceled)))
+                        && x.CurrentStatus != TermData.Canceled))
                     {
                         message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                     }

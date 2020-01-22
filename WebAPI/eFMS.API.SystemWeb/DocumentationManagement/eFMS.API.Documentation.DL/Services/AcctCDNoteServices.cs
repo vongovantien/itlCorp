@@ -873,7 +873,7 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewSIF(PreviewCdNoteCriteria criteria)
         {
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
 
             var listCharge = new List<SeaDebitAgentsNewReport>();
             var data = GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
@@ -951,7 +951,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
             parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user login
+            parameter.Contact = _currentUser;//Get user name login
             parameter.CompanyDescription = string.Empty;
 
             parameter.DebitNo = criteria.CreditDebitNo;
@@ -990,7 +990,6 @@ namespace eFMS.API.Documentation.DL.Services
                 :
                     InWordCurrency.ConvertNumberCurrencyToStringUSD(_balanceAmount, _currency);
             parameter.InwordVND = !string.IsNullOrEmpty(_inword) ? _inword.ToUpper() : string.Empty;
-            parameter.InwordVND = parameter.InwordVND?.ToUpper();
             parameter.IssueInv = string.Empty; //Tạm thời để trống
             parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
             parameter.OtherRef = string.Empty;//Tạm thời để trống
@@ -1002,7 +1001,7 @@ namespace eFMS.API.Documentation.DL.Services
             var _swiftAccs = string.Empty;
             var _accsUsd = string.Empty;
             var _accsVnd = string.Empty;
-            var officeOfUser = GetInfoBankOfOfficeByUserId(_currentUser);
+            var officeOfUser = GetInfoBankOfOfficeByUserId(currentUser.UserID);
             if (officeOfUser != null)
             {
                 _accountName = officeOfUser.BankAccountName?.ToUpper();
@@ -1037,7 +1036,7 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewAir(PreviewCdNoteCriteria criteria)
         {
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
             var listCharge = new List<AirShipperDebitNewReport>();
             var data = GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
 
@@ -1129,7 +1128,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
             parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user login
+            parameter.Contact = _currentUser;//Get user name login
             parameter.CompanyDescription = string.Empty;
 
             parameter.DebitNo = criteria.CreditDebitNo;
@@ -1168,7 +1167,6 @@ namespace eFMS.API.Documentation.DL.Services
                 :
                     InWordCurrency.ConvertNumberCurrencyToStringUSD(_balanceAmount, _currency);
             parameter.InwordVND = !string.IsNullOrEmpty(_inword) ? _inword.ToUpper() : string.Empty;
-            parameter.InwordVND = parameter.InwordVND?.ToUpper();
             parameter.IssueInv = string.Empty; //Tạm thời để trống
             parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
             parameter.OtherRef = string.Empty;//Tạm thời để trống
@@ -1180,7 +1178,7 @@ namespace eFMS.API.Documentation.DL.Services
             var _swiftAccs = string.Empty;
             var _accsUsd = string.Empty;
             var _accsVnd = string.Empty;
-            var officeOfUser = GetInfoBankOfOfficeByUserId(_currentUser);
+            var officeOfUser = GetInfoBankOfOfficeByUserId(currentUser.UserID);
             if (officeOfUser != null)
             {
                 _accountName = officeOfUser.BankAccountName?.ToUpper();

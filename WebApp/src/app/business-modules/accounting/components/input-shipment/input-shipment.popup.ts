@@ -31,30 +31,36 @@ export class ShareAccountingInputShipmentPopupComponent extends PopupBase {
     }
 
     Ok() {
-        const data: OperationInteface.IInputShipment = {
-            type: this.selectedShipmentType,
-            keyword: this.shipmentSearch,
-        };
-        const keywords: string[] = this.shipmentSearch.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
-        this._documentRepo.GetShipmentNotExist(this.selectedShipmentType, keywords)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this._toastService.error(res.message);
+        let data: OperationInteface.IInputShipment = null;
+        if (this.shipmentSearch.length > 0) {
+            data = {
+                type: this.selectedShipmentType,
+                keyword: this.shipmentSearch,
+            };
+            const keywords: string[] = this.shipmentSearch.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
+            this._documentRepo.GetShipmentNotExist(this.selectedShipmentType, keywords)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        if (res.status) {
+                            this._toastService.error(res.message);
+                        }
                     }
-                }
-            );
+                );            
+        }
         this.onInputShipment.emit(data);
         this.hide();
     }
 
     closePopup() {
         this.hide();
-        const data: OperationInteface.IInputShipment = {
-            type: this.selectedShipmentType,
-            keyword: this.shipmentSearch,
-        };
+        let data: OperationInteface.IInputShipment = null;
+        if (this.shipmentSearch.length > 0) {
+            data = {
+                type: this.selectedShipmentType,
+                keyword: this.shipmentSearch,
+            };
+        }
         this.onInputShipment.emit(data);
     }
 }

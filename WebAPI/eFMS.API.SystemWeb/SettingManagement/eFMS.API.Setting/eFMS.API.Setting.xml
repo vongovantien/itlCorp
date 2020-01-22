@@ -10,6 +10,7 @@
             </summary>
             <param name="localizer"></param>
             <param name="service"></param>
+            <param name="currUser"></param>
         </member>
         <member name="M:eFMS.API.Setting.Controllers.TariffController.Paging(eFMS.API.Setting.DL.Models.Criteria.TariffCriteria,System.Int32,System.Int32)">
             <summary>

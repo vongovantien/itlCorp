@@ -500,6 +500,7 @@ namespace eFMS.API.Accounting.DL.Services
             var csTransDe = csTransactionDetailRepo.Get();
             var creditNote = acctCdnoteRepo.Get();
             var debitNote = acctCdnoteRepo.Get();
+            var charge = catChargeRepo.Get();
 
             //BUY & SELL
             //var queryBuySell = from sur in surcharge
@@ -548,17 +549,21 @@ namespace eFMS.API.Accounting.DL.Services
             //                   };
             //queryBuySell = queryBuySell.Where(x => !string.IsNullOrEmpty(x.Service));
             var queryBuySellOperation = from sur in surcharge
-                               join ops in opst on sur.Hblid equals ops.Hblid into ops2
-                               from ops in ops2.DefaultIfEmpty()
+                               join ops in opst on sur.Hblid equals ops.Hblid //into ops2
+                               //from ops in ops2.DefaultIfEmpty()
                                join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
                                from creditN in creditN2.DefaultIfEmpty()
                                join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
                                from debitN in debitN2.DefaultIfEmpty()
+                               join chg in charge on sur.ChargeId equals chg.Id into chg2
+                               from chg in chg2.DefaultIfEmpty()
                                select new ChargeSOAResult
                                {
                                    ID = sur.Id,
                                    HBLID = sur.Hblid,
                                    ChargeID = sur.ChargeId,
+                                   ChargeCode = chg.Code,
+                                   ChargeName = chg.ChargeNameEn,
                                    JobId = ops.JobNo,
                                    HBL = ops.Hwbno,
                                    MBL = ops.Mblno,
@@ -589,19 +594,23 @@ namespace eFMS.API.Accounting.DL.Services
             queryBuySellOperation = queryBuySellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryBuySellDocument = from sur in surcharge
-                                        join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
-                                        from cstd in cstd2.DefaultIfEmpty()
-                                        join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                                        from cst in cst2.DefaultIfEmpty()
+                                        join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
+                                        //from cstd in cstd2.DefaultIfEmpty()
+                                        join cst in csTrans on cstd.JobId equals cst.Id //into cst2
+                                        //from cst in cst2.DefaultIfEmpty()
                                         join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
                                         from creditN in creditN2.DefaultIfEmpty()
                                         join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
                                         from debitN in debitN2.DefaultIfEmpty()
-                                        select new ChargeSOAResult
+                                        join chg in charge on sur.ChargeId equals chg.Id into chg2
+                                        from chg in chg2.DefaultIfEmpty()
+                                       select new ChargeSOAResult
                                         {
                                             ID = sur.Id,
                                             HBLID = sur.Hblid,
                                             ChargeID = sur.ChargeId,
+                                            ChargeCode = chg.Code,
+                                            ChargeName = chg.ChargeNameEn,
                                             JobId = cst.JobNo,
                                             HBL = cstd.Hwbno,
                                             MBL = cst.Mawb,
@@ -643,6 +652,7 @@ namespace eFMS.API.Accounting.DL.Services
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
             var debitNote = acctCdnoteRepo.Get();
+            var charge = catChargeRepo.Get();
             //OBH Receiver (SELL - Credit)
             //var queryObhSell = from sur in surcharge
             //                   join ops in opst on sur.Hblid equals ops.Hblid into ops2
@@ -688,15 +698,19 @@ namespace eFMS.API.Accounting.DL.Services
             //                   };
             //queryObhSell = queryObhSell.Where(x => !string.IsNullOrEmpty(x.Service));
             var queryObhSellOperation = from sur in surcharge
-                               join ops in opst on sur.Hblid equals ops.Hblid into ops2
-                               from ops in ops2.DefaultIfEmpty()
+                               join ops in opst on sur.Hblid equals ops.Hblid //into ops2
+                               //from ops in ops2.DefaultIfEmpty()
                                join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
                                from debitN in debitN2.DefaultIfEmpty()
+                               join chg in charge on sur.ChargeId equals chg.Id into chg2
+                               from chg in chg2.DefaultIfEmpty()
                                select new ChargeSOAResult
                                {
                                    ID = sur.Id,
                                    HBLID = sur.Hblid,
                                    ChargeID = sur.ChargeId,
+                                   ChargeCode = chg.Code,
+                                   ChargeName = chg.ChargeNameEn,
                                    JobId = ops.JobNo,
                                    HBL = ops.Hwbno,
                                    MBL = ops.Mblno,
@@ -727,17 +741,21 @@ namespace eFMS.API.Accounting.DL.Services
             queryObhSellOperation = queryObhSellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryObhSellDocument = from sur in surcharge
-                               join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
-                               from cstd in cstd2.DefaultIfEmpty()
-                               join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                               from cst in cst2.DefaultIfEmpty()
+                               join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
+                               //from cstd in cstd2.DefaultIfEmpty()
+                               join cst in csTrans on cstd.JobId equals cst.Id //into cst2
+                               //from cst in cst2.DefaultIfEmpty()
                                join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
                                from debitN in debitN2.DefaultIfEmpty()
+                               join chg in charge on sur.ChargeId equals chg.Id into chg2
+                               from chg in chg2.DefaultIfEmpty()
                                select new ChargeSOAResult
                                {
                                    ID = sur.Id,
                                    HBLID = sur.Hblid,
                                    ChargeID = sur.ChargeId,
+                                   ChargeCode = chg.Code,
+                                   ChargeName = chg.ChargeNameEn,
                                    JobId = cst.JobNo,
                                    HBL = cstd.Hwbno,
                                    MBL = cst.Mawb,
@@ -780,6 +798,7 @@ namespace eFMS.API.Accounting.DL.Services
             var csTransDe = csTransactionDetailRepo.Get();
             var custom = customsDeclarationRepo.Get();
             var creditNote = acctCdnoteRepo.Get();
+            var charge = catChargeRepo.Get();
             //OBH Payer (BUY - Credit)
             //var queryObhBuy = from sur in surcharge
             //                  join ops in opst on sur.Hblid equals ops.Hblid into ops2
@@ -826,15 +845,19 @@ namespace eFMS.API.Accounting.DL.Services
             //queryObhBuy = queryObhBuy.Where(x => !string.IsNullOrEmpty(x.Service));
 
             var queryObhBuyOperation = from sur in surcharge
-                              join ops in opst on sur.Hblid equals ops.Hblid into ops2
-                              from ops in ops2.DefaultIfEmpty()
+                              join ops in opst on sur.Hblid equals ops.Hblid //into ops2
+                              //from ops in ops2.DefaultIfEmpty()
                               join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
                               from creditN in creditN2.DefaultIfEmpty()
+                              join chg in charge on sur.ChargeId equals chg.Id into chg2
+                              from chg in chg2.DefaultIfEmpty()
                               select new ChargeSOAResult
                               {
                                   ID = sur.Id,
                                   HBLID = sur.Hblid,
                                   ChargeID = sur.ChargeId,
+                                  ChargeCode = chg.Code,
+                                  ChargeName = chg.ChargeNameEn,
                                   JobId = ops.JobNo,
                                   HBL = ops.Hwbno,
                                   MBL = ops.Mblno,
@@ -865,17 +888,21 @@ namespace eFMS.API.Accounting.DL.Services
             queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryObhBuyDocument = from sur in surcharge
-                              join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
-                              from cstd in cstd2.DefaultIfEmpty()
-                              join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                              from cst in cst2.DefaultIfEmpty()
+                              join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
+                              //from cstd in cstd2.DefaultIfEmpty()
+                              join cst in csTrans on cstd.JobId equals cst.Id //into cst2
+                              //from cst in cst2.DefaultIfEmpty()
                               join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
                               from creditN in creditN2.DefaultIfEmpty()
+                              join chg in charge on sur.ChargeId equals chg.Id into chg2
+                              from chg in chg2.DefaultIfEmpty()
                               select new ChargeSOAResult
                               {
                                   ID = sur.Id,
                                   HBLID = sur.Hblid,
                                   ChargeID = sur.ChargeId,
+                                  ChargeCode = chg.Code,
+                                  ChargeName = chg.ChargeNameEn,
                                   JobId = cst.JobNo,
                                   HBL = cstd.Hwbno,
                                   MBL = cst.Mawb,
@@ -937,8 +964,8 @@ namespace eFMS.API.Accounting.DL.Services
             var dataMerge = queryBuySell.Union(queryObhBuy).Union(queryObhSell);
 
             var queryData = from data in dataMerge
-                            join chg in charge on data.ChargeID equals chg.Id into chg2
-                            from chg in chg2.DefaultIfEmpty()
+                            //join chg in charge on data.ChargeID equals chg.Id into chg2
+                            //from chg in chg2.DefaultIfEmpty()
                             join uni in unit on data.UnitId equals uni.Id into uni2
                             from uni in uni2.DefaultIfEmpty()
                             select new ChargeSOAResult
@@ -946,8 +973,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 ID = data.ID,
                                 HBLID = data.HBLID,
                                 ChargeID = data.ChargeID,
-                                ChargeCode = chg.Code,
-                                ChargeName = chg.ChargeNameEn,
+                                ChargeCode = data.ChargeCode,
+                                ChargeName = data.ChargeName,
                                 JobId = data.JobId,
                                 HBL = data.HBL,
                                 MBL = data.MBL,
@@ -995,10 +1022,14 @@ namespace eFMS.API.Accounting.DL.Services
             //    && chg.CustomerID == criteria.CustomerID
             //    && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH)
             //);
+            //query = chg =>
+            //        string.IsNullOrEmpty(chg.SOANo)
+            //    && chg.CustomerID == criteria.CustomerID
+            //    && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH);
             query = chg =>
                     string.IsNullOrEmpty(chg.SOANo)
                 && chg.CustomerID == criteria.CustomerID
-                && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH);
+                && chg.IsOBH == criteria.IsOBH;
 
             if (string.IsNullOrEmpty(criteria.DateType) || criteria.DateType == "CreatedDate")
             {
@@ -1031,11 +1062,14 @@ namespace eFMS.API.Accounting.DL.Services
                 //       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
                 //       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
                 //);
-                query = query.And(chg =>
-                       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
-                       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
-                );
-
+                if (criteria.Type == "Debit")
+                {
+                    query = query.And(chg => chg.Debit.HasValue);
+                }
+                if(criteria.Type == "Credit")
+                {
+                    query = query.And(chg => chg.Credit.HasValue);
+                }
             }
 
             if (!string.IsNullOrEmpty(criteria.StrCreators) && criteria.StrCreators != "All")
@@ -1206,10 +1240,14 @@ namespace eFMS.API.Accounting.DL.Services
                 //       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
                 //       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
                 //);
-                query = query.And(chg =>
-                       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
-                       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
-                );
+                if (criteria.Type == "Debit")
+                {
+                    query = query.And(chg => chg.Debit.HasValue);
+                }
+                if (criteria.Type == "Credit")
+                {
+                    query = query.And(chg => chg.Credit.HasValue);
+                }
             }
 
             if (!string.IsNullOrEmpty(criteria.StrCreators) && criteria.StrCreators != "All")

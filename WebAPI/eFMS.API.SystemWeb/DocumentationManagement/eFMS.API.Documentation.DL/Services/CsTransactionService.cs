@@ -1521,7 +1521,7 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewSIFFormPLsheet(Guid jobId, string currency)
         {
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
             var shipment = DataContext.First(x => x.Id == jobId);
             if (shipment == null) return result;
             var agent = catPartnerRepo.Get(x => x.Id == shipment.AgentId).FirstOrDefault();
@@ -1589,7 +1589,10 @@ namespace eFMS.API.Documentation.DL.Services
                         bool isOBH = false;
                         decimal cost = 0;
                         decimal revenue = 0;
-                        decimal saleProfit = 0;
+                        decimal costNonVat = 0;
+                        decimal revenueNonVat = 0;
+                        decimal saleProfitIncludeVAT = 0;
+                        decimal saleProfitNonVAT = 0;
                         string partnerName = string.Empty;
                         if (surcharge.Type == Constants.CHARGE_OBH_TYPE)
                         {
@@ -1599,12 +1602,15 @@ namespace eFMS.API.Documentation.DL.Services
                         if (surcharge.Type == Constants.CHARGE_BUY_TYPE)
                         {
                             cost = surcharge.Total;
+                            costNonVat = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
                         }
                         if (surcharge.Type == Constants.CHARGE_SELL_TYPE)
                         {
                             revenue = surcharge.Total;
+                            revenueNonVat = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
                         }
-                        saleProfit = cost + revenue;
+                        saleProfitIncludeVAT = cost + revenue;
+                        saleProfitNonVAT = costNonVat + revenueNonVat;
 
                         //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
                         var exchargeDateSurcharge = surcharge.ExchangeDate == null ? DateTime.Now : surcharge.ExchangeDate;
@@ -1657,14 +1663,14 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.VATAmount = 0; //NOT USE
                         charge.Cost = cost; //Phí chi của charge
                         charge.Revenue = revenue; //Phí thu của charge
-                        charge.Exchange = currency == Constants.CURRENCY_USD ? _exchangeRateUSD * saleProfit : 0; //Exchange phí của charge về USD
-                        charge.VNDExchange = surcharge.ExchangeRate != null ? surcharge.ExchangeRate.Value : 0;
+                        charge.Exchange = currency == Constants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : 0; //Exchange phí của charge về USD
+                        charge.VNDExchange = surcharge.ExchangeRate ?? 0;
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.DatePaid = DateTime.Now; //NOT USE
                         charge.Docs = surcharge.InvoiceNo; //InvoiceNo of charge
                         charge.Notes = surcharge.Notes;
                         charge.InputData = string.Empty; //Gán rỗng
-                        charge.SalesProfit = saleProfit;
+                        charge.SalesProfit = currency == Constants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : (surcharge.ExchangeRate ?? 0) * saleProfitNonVAT; //Non VAT
                         charge.Quantity = surcharge.Quantity;
                         charge.UnitPrice = surcharge.UnitPrice ?? 0;
                         charge.Unit = unitCode;
@@ -1765,7 +1771,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var parameter = new FormPLsheetReportParameter();
-            parameter.Contact = _currentUser;//Get user login
+            parameter.Contact = _currentUser;//Get user name login
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;

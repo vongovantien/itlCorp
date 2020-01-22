@@ -42,12 +42,13 @@ namespace eFMSWindowService
 
         protected override void OnStart(string[] args)
         {
+            WriteToFile("Service update job status is stopped at " + DateTime.Now);
             this.Start();
         }
 
         public new void Stop()
         {
-            WriteToFile("Service is stopped at " + DateTime.Now);
+            WriteToFile("Service update job status is stopped at " + DateTime.Now);
             timer.Stop();
             timer.Dispose();
         }

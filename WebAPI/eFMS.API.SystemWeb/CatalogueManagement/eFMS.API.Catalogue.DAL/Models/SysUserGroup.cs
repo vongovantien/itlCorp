@@ -8,6 +8,9 @@ namespace eFMS.API.Catalogue.Service.Models
         public int Id { get; set; }
         public short GroupId { get; set; }
         public string UserId { get; set; }
+        public string LevelPermission { get; set; }
+        public string Position { get; set; }
+        public Guid? PermissionId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

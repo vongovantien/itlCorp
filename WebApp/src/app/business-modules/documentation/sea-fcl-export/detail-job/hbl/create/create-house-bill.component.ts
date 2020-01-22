@@ -183,6 +183,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         const dataSearch = { jobId: this.jobId };
         dataSearch.jobId = this.jobId;
         this.importHouseBillPopup.typeFCL = 'Export';
+        this.importHouseBillPopup.typeTransaction = 6;
         this.importHouseBillPopup.selected = - 1;
         this.importHouseBillPopup.getHourseBill(dataSearch);
         this.importHouseBillPopup.show();

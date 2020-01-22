@@ -402,28 +402,32 @@ namespace eFMS.API.Documentation.DL.Services
                          join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id.ToString() into salemans
                          from sale in salemans.DefaultIfEmpty()
                          select new { detail, tran, cus, sale });
+            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
             if (criteria.All == null)
             {
                 if (criteria.TypeFCL == "Export")
                 {
                     query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
-                 && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 &&  ((x.tran.Mawb?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0 )
                  && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                 && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                 && (x.detail.Etd >= criteria.FromDate || criteria.FromDate == null)
-                 && (x.detail.Etd <= criteria.ToDate || criteria.ToDate == null)
-                 && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                 && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
+                 && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
+                 && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
+                 );
                 }
                 else
                 {
                     query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
-                                         && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                         && ((x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                          && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                         && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                         && (x.detail.Eta >= criteria.FromDate || criteria.FromDate == null)
-                                         && (x.detail.Eta <= criteria.ToDate || criteria.ToDate == null)
+                                         && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                         && (x.tran.Eta >= criteria.FromDate || criteria.FromDate == null)
+                                         && (x.tran.Eta <= criteria.ToDate || criteria.ToDate == null)
                                          && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                         );
+                                         && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType)
+                                         ));
                 }
             }
             else
@@ -431,10 +435,11 @@ namespace eFMS.API.Documentation.DL.Services
                 query = query.Where(x => criteria.JobId != Guid.Empty && criteria.JobId != null ? x.detail.JobId == criteria.JobId : true
                                       || (x.tran.Mawb.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                       || (x.detail.Hwbno.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                      || (x.cus.PartnerNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                      || (x.cus.ShortName.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                       || (x.sale.Id.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
                                       && ((x.tran.Etd ?? null) >= (criteria.FromDate ?? null) && (x.tran.Etd ?? null) <= (criteria.ToDate ?? null))
-                                    );
+                                      && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
+                                      );
             }
             var res = from detail in query.Select(s => s.detail)
                       join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
@@ -830,7 +835,7 @@ namespace eFMS.API.Documentation.DL.Services
             var data = GetById(Id);
             var listProof = new List<ProofOfDeliveryReport>();
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
@@ -868,7 +873,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user login
+            parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
             parameter.CurrDecimalNo = 0; //set 0 temporary
             result = new Crystal
@@ -889,7 +894,7 @@ namespace eFMS.API.Documentation.DL.Services
             var data = GetById(Id);
             var listProof = new List<AirProofOfDeliveryReport>();
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
@@ -923,7 +928,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user login
+            parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
             parameter.CurrDecimalNo = 0; //set 0 temporary
             result = new Crystal
@@ -943,7 +948,7 @@ namespace eFMS.API.Documentation.DL.Services
             var data = GetById(Id);
             var listDocument = new List<AirDocumentReleaseReport>();
             Crystal result = null;
-            var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserName;
            // var _currentUser = string.Empty;
             if (data != null)
             {
@@ -972,7 +977,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
             parameter.Website = Constants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user login
+            parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
 
             result = new Crystal

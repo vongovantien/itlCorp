@@ -49,7 +49,7 @@
                                 <label>Office <span class="m--font-danger">(*)</span></label>
                                 <app-combo-grid-virtual-scroll [disabled]="isDetail ? true : false"
                                     [selectedDisplayFields]="['abbrCompany']"
-                                    [currentActiveItemId]="{ field: 'abbrCompany', value: office.value}"
+                                    [currentActiveItemId]="{ field: 'id', value: office.value}"
                                     (itemSelected)="onSelectOffice($event)" [dataSources]="offices"
                                     [displayFields]="[{'field':'shortName','label':'Office Name Abbr'},{'field':'abbrCompany','label':'Company Name Abbr'}]">
                                 </app-combo-grid-virtual-scroll>

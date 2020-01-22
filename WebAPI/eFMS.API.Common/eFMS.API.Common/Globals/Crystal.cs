@@ -47,6 +47,7 @@ namespace eFMS.API.Common.Globals
         public Dictionary<string, object> Parameters;
         public bool AllowPrint { get; set; }
         public bool AllowExport { get; set; }
+        public bool IsLandscape { get; set; }
     }
     public class SubReport
     {

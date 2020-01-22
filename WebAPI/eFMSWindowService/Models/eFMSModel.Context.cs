@@ -27,12 +27,15 @@ namespace eFMSWindowService.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<catCurrencyExchange> catCurrencyExchanges { get; set; }
-        public virtual DbSet<vw_catCurrencyExchangeNewest> vw_catCurrencyExchangeNewest { get; set; }
     
         public virtual ObjectResult<Nullable<int>> sp_QueryAndUpdateCurrentStatusOfJob()
         {
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("sp_QueryAndUpdateCurrentStatusOfJob");
+        }
+    
+        public virtual int sp_AutoUpdateExchangeRate()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("sp_AutoUpdateExchangeRate");
         }
     }
 }

@@ -8,8 +8,8 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
     {
         public string All { get; set; }
         public string Saleman_ID { get; set; }
-        public string Office { get; set; }
-        public string Company { get; set; }
+        public Guid Office { get; set; }
+        public Guid Company { get; set; }
         public bool? Status { get; set; }
         public string Description { get; set; }
         public DateTime? EffectDate { get; set; }

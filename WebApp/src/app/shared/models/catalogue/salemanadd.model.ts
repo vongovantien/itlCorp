@@ -1,10 +1,10 @@
 export class SalemanAdd {
     id: string = '';
-    saleManId: string = '';
-    office: string = '';
-    company: string = '';
+    saleManId: any = '';
+    office: any = '';
+    company: any = '';
     service: any = '';
-    partnerId: string = '';
+    partnerId: any = '';
     createDate: string = '';
     status?: boolean = false;
     description: string = '';
