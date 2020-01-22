@@ -70,9 +70,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\catCurrencyExchange.cs">
-      <DependentUpon>eFMSModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\eFMSModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -87,9 +84,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>eFMSModel.edmx</DependentUpon>
-    </Compile>
-    <Compile Include="Models\vw_catCurrencyExchangeNewest.cs">
-      <DependentUpon>eFMSModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
