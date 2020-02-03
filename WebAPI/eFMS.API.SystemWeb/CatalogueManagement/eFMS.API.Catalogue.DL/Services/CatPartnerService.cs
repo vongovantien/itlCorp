@@ -97,7 +97,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         x.CreateDate = DateTime.Now;
                         x.UserCreated = currentUser.UserID;
                     });
-                    partner.SalePersonId = salemans.FirstOrDefault().Id.ToString();
+                    partner.SalePersonId = salemans.FirstOrDefault().SaleManId.ToString();
                     DataContext.Update(partner, x => x.Id == partner.Id);
                    salemanRepository.Add(salemans);
                 }

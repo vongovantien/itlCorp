@@ -121,6 +121,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         this.getDetailShipment();
         this.hblGoodsSummaryComponent.description = "AS PER BILL";
         this.formHouseBill.notifyPartyDescription.setValue("SAM AS CONSIGNEE");
+        this.formHouseBill.type = 'SLI';
         this._cd.detectChanges();
     }
 
