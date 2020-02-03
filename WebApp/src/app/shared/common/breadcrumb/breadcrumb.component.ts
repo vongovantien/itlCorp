@@ -20,7 +20,6 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
     ngAfterViewInit(): void {
         setTimeout(() => {
             this.breadcrumbs = this.createBreadcrumbs(this._activedRoute.root);
-            console.log(this.breadcrumbs);
         }, 50);
 
     }
