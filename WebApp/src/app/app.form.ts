@@ -34,6 +34,8 @@ export abstract class AppForm extends AppPage {
 
     accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx';
 
+    digitDecimal: number = 3;
+
     @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
         this.reset();
     }

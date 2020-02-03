@@ -74,6 +74,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     checkValidateForm() {
         [this.formCreateComponent.shipmentType,
         this.formCreateComponent.packageType,
+        this.formCreateComponent.mbltype,
         this.formCreateComponent.commodity,
         this.formCreateComponent.paymentTerm].forEach((control: AbstractControl) => this.setError(control));
 
@@ -153,6 +154,10 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
                     }
                 }
             );
+    }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/air-export"]);
     }
 }
 

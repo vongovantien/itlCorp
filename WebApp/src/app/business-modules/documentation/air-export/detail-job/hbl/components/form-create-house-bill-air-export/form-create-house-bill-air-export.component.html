@@ -387,7 +387,7 @@
                         <div class="col">
                             <div class="form-group">
                                 <label>Pieces</label>
-                                <input type="number" class="form-control" formControlName="packageQty">
+                                <input type="number" class="form-control" formControlName="packageQty" integer>
 
                             </div>
                         </div>
@@ -395,7 +395,8 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && (formCreate.errors | equalError:'invalidGW') }">
                                 <label>GW</label>
-                                <input type="number" class="form-control" formControlName="grossWeight">
+                                <input type="number" class="form-control" formControlName="grossWeight"
+                                    [decimals]="digitDecimal" numeric>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && (formCreate.errors | equalError:'invalidGW')">
                                     GW must be less than or equal CW
@@ -429,14 +430,16 @@
                         <div class="col pl-0">
                             <div class="form-group">
                                 <label>C.W</label>
-                                <input type="number" class="form-control" formControlName="chargeWeight">
+                                <input type="number" class="form-control" formControlName="chargeWeight"
+                                    [decimals]="digitDecimal" numeric>
 
                             </div>
                         </div>
                         <div class="col pl-0">
                             <div class="form-group">
                                 <label>Rate Charge</label>
-                                <input type="number" class="form-control" formControlName="rateCharge">
+                                <input type="number" class="form-control" formControlName="rateCharge"
+                                    [decimals]="digitDecimal" numeric>
                             </div>
                         </div>
                     </div>
@@ -503,16 +506,20 @@
                                         <ng-container [formGroupName]="j">
                                             <tr (click)="selectDIM(j)" [class.selected-row]="selectedIndexDIM === j">
                                                 <td>
-                                                    <input type="number" class="form-control" formControlName="length">
+                                                    <input type="number" class="form-control" formControlName="length"
+                                                        numeric [decimals]="digitDecimal">
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control" formControlName="width">
+                                                    <input type="number" class="form-control" formControlName="width"
+                                                        [decimals]="digitDecimal" numeric>
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control" formControlName="height">
+                                                    <input type="number" class="form-control" formControlName="height"
+                                                        [decimals]="digitDecimal" numeric>
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control" formControlName="package">
+                                                    <input type="number" class="form-control" formControlName="package"
+                                                        integer>
                                                 </td>
                                                 <td>
                                                     <a class="btn m-btn--icon m-btn--icon-only m--font-danger"

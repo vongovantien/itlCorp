@@ -158,4 +158,8 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
                 }
             );
     }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/air-import"]);
+    }
 }
