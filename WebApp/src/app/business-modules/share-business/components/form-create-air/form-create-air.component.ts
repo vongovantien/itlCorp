@@ -17,7 +17,7 @@ import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.p
 import * as fromStore from './../../store/index';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { DimensionActionTypes } from './../../store/index';
+
 
 @Component({
     selector: 'form-create-air',
@@ -91,6 +91,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     isLoadingAgent: Observable<boolean>;
     isLoadingAirline: Observable<boolean>;
     isLoadingPort: Observable<boolean>;
+    isUpdateDIM: boolean = false;
+
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -285,7 +287,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             packageType: [],
 
             // * Combogrid.
-            agentId: [null, Validators.required],
+            agentId: [],
             pol: [],
             pod: [null, Validators.required],
             coloaderId: [],
@@ -374,7 +376,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     showDIMVolume() {
-        if (!this.isUpdate) {
+        if (!this.isUpdate && !this.isUpdateDIM) {
             this._store.dispatch(new fromStore.InitDimensionAction([new DIM(), new DIM(), new DIM()]));  // * Dimension default = 3
             this.dimVolumePopup.isShowGetFromHAWB = false;
         }
@@ -382,6 +384,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     onUpdateDIM(dims: DIM[]) {
+        this.isUpdateDIM = true;
         this.dimensionDetails = dims;
         if (!!this.dimensionDetails.length) {
             const hw: number = this.dimensionDetails.reduce((acc: number, item: DIM) => acc += item.hw, 0);

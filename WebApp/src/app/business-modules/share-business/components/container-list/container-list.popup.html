@@ -225,5 +225,5 @@
 
 <container-import-popup></container-import-popup>
 
-<confirm-popup [body]="'Are you sure you want to delete ?'" [title]="'Alert'" [labelConfirm]="'Yes'"
-    (onSubmit)="onDeleteContainer()"></confirm-popup>
+<confirm-popup #confirmDeleteContainerPopup [body]="'Are you sure you want to delete ?'" [title]="'Alert'"
+    [labelConfirm]="'Yes'" (onSubmit)="onDeleteContainer()"></confirm-popup>

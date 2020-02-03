@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[numeric]'
@@ -7,11 +7,23 @@ import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 export class NumericDirective {
     @Input() decimals: number = 0;
 
-    private specialKeys = [
-        'Backspace', 'Tab', 'End', 'Home', 'ArrowLeft', 'ArrowRight', 'Delete'
+    private specialKeys: string[] = [
+        "Delete", "Backspace", "Tab", "Escape", "Enter", "Home", "End", 'ArrowLeft', 'ArrowRight'
     ];
 
-    constructor(private el: ElementRef) {
+    constructor(
+        private el: ElementRef,
+        private renderer: Renderer2
+    ) {
+    }
+
+    ngOnInit(): void {
+        if (!this.el.nativeElement.getAttribute('min')) {
+            this.renderer.setAttribute(this.el.nativeElement, 'min', '0');
+        }
+        if (!this.el.nativeElement.getAttribute('step')) {
+            this.renderer.setAttribute(this.el.nativeElement, 'step', 'any');
+        }
     }
 
     private check(value: string, decimals: number) {
@@ -22,30 +34,19 @@ export class NumericDirective {
             return String(value).match(new RegExp(regExpString));
         }
     }
-    // tslint:disable: deprecation
+
     @HostListener('keydown', ['$event'])
     onKeyDown(e: KeyboardEvent) {
-        // if (this.specialKeys.indexOf(event.key) !== -1) {
-        //     return;
-        // }
         if (
-            // Allow: Delete, Backspace, Tab, Escape, Enter
-            [46, 8, 9, 27, 13].indexOf(e.keyCode) !== -1 ||
-            (e.keyCode === 65 && e.ctrlKey === true) || // Allow: Ctrl+A
-            (e.keyCode === 67 && e.ctrlKey === true) || // Allow: Ctrl+C
-            (e.keyCode === 86 && e.ctrlKey === true) || // Allow: Ctrl+V
-            (e.keyCode === 88 && e.ctrlKey === true) || // Allow: Ctrl+X
-            (e.keyCode === 65 && e.metaKey === true) || // Cmd+A (Mac)
-            (e.keyCode === 67 && e.metaKey === true) || // Cmd+C (Mac)
-            (e.keyCode === 86 && e.metaKey === true) || // Cmd+V (Mac)
-            (e.keyCode === 88 && e.metaKey === true) || // Cmd+X (Mac)
-            (e.keyCode >= 35 && e.keyCode <= 39) // Home, End, Left, Right
+            this.specialKeys.indexOf(e.key) !== -1 ||
+            (e.key === "a" && e.ctrlKey === true) || // Allow: Ctrl+A
+            (e.key === 'c' && e.ctrlKey === true) || // Allow: Ctrl+C
+            (e.key === 'v' && e.ctrlKey === true) || // Allow: Ctrl+V
+            (e.key === 'x' && e.ctrlKey === true)  // Allow: Ctrl+X
         ) {
             return;
         }
 
-        // Do not use event.keycode this is deprecated.
-        // See: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
         const value: string = this.el.nativeElement.value;
         const next: string = value.concat(e.key);
         if (next && !this.check(next, this.decimals)) {

@@ -41,11 +41,11 @@
                     </table>
                 </div>
             </div>
-            <div>
+            <div *ngIf="!!DataSources.length; else placeholders">
                 <cdk-virtual-scroll-viewport [ngStyle]="{'height.px': height}" itemSize="10">
                     <table class="table table-hover">
                         <tbody>
-                            <ng-container *ngIf="!!DataSources.length">
+                            <ng-container>
                                 <tr class="data-row pointer" #listItem
                                     *cdkVirtualFor="let item of DataSources | filter :keyword: searchKeys; let i= index;trackBy: trackByFn"
                                     data-id="{{(i+1)}}" (click)="emitSelected(item,i)"
@@ -55,7 +55,6 @@
                                     </td>
                                 </tr>
                             </ng-container>
-                            <tr app-table-none-record *ngIf="!DataSources.length" [colspan]="DisplayFields.length"></tr>
                         </tbody>
                     </table>
                 </cdk-virtual-scroll-viewport>
@@ -63,3 +62,13 @@
         </div>
     </div>
 </div>
+
+<ng-template #placeholders>
+    <div>
+        <div class="no-data">
+            <i class="flaticon-coins"></i>
+            <span class="no-data-text">No records found</span>
+        </div>
+    </div>
+
+</ng-template>
