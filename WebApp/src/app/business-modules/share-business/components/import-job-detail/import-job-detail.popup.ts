@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
@@ -6,7 +6,6 @@ import { formatDate } from '@angular/common';
 import { catchError, finalize } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import * as fromShareBussiness from './../../../share-business/store';
-import { ShareBussinessShipmentGoodSummaryComponent } from '../shipment-good-summary/shipment-good-summary.component';
 
 @Component({
     selector: 'import-job-detail-popup',
@@ -42,14 +41,26 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
     }
 
     ngOnInit(): void {
-        this.headers = [
-            { title: 'Job ID', field: 'jobNo', sortable: true },
-            { title: 'MBL No', field: 'mawb', sortable: true },
-            { title: 'Supplier(Shipping Line)', field: 'supplierName', sortable: true },
-            { title: 'Shipment Date', field: 'etd', sortable: true }
-        ];
+        if (this.transactionType === 2 || this.transactionType === 3) {
+            this.headers = [
+                { title: 'Job ID', field: 'jobNo', sortable: true },
+                { title: 'MAWB No', field: 'mawb', sortable: true },
+                { title: 'Airline(Co-Loader)', field: 'supplierName', sortable: true },
+                { title: 'Shipment Date', field: 'etd', sortable: true }
+            ];
+        } else {
+            this.headers = [
+                { title: 'Job ID', field: 'jobNo', sortable: true },
+                { title: 'MBL No', field: 'mawb', sortable: true },
+                { title: 'Supplier(Shipping Line)', field: 'supplierName', sortable: true },
+                { title: 'Shipment Date', field: 'etd', sortable: true }
+            ];
+        }
+
+
         // this.getShippments(this.dataSearch);
     }
+
 
     onCancel() {
         this.hide();
@@ -90,6 +101,7 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
             },
         );
     }
+
     onImportShippment() {
         if (this.selected === -1) {
             this.isCheckShipment = false;
@@ -139,6 +151,10 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
     onSearchShippment(dataSearch: any) {
         this.dataSearch = dataSearch;
         this.getShippments(this.dataSearch);
+    }
+
+    showSearch() {
+
     }
 
 

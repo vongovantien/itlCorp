@@ -10,7 +10,8 @@
             <div class="modal-body">
                 <div class="bg-secondary m--padding-10 m--margin-bottom-10">
                     <div class="m-form m-form--state">
-                        <form-search-import-job (onSearch)="onSearchShippment($event)"></form-search-import-job>
+                        <form-search-import-job [isAir]="transactionType == 2 || transactionType == 3 ? true : false "
+                            (onSearch)="onSearchShippment($event)"></form-search-import-job>
                     </div>
                 </div>
 
