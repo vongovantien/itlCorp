@@ -6,7 +6,7 @@ import { formatDate } from '@angular/common';
 import { catchError, finalize } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import * as fromShareBussiness from './../../../share-business/store';
-import { ShareBussinessShipmentGoodSummaryComponent } from '../shipment-good-summary/shipment-good-summary.component';
+import { ShareBusinessFormSearchImportJobComponent } from './components/form-search-import/form-search-import-job-detail.component';
 
 @Component({
     selector: 'import-job-detail-popup',
@@ -14,17 +14,26 @@ import { ShareBussinessShipmentGoodSummaryComponent } from '../shipment-good-sum
 })
 
 export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
+
+    @ViewChild(ShareBusinessFormSearchImportJobComponent, { static: false }) formSearchImportJobComponent: ShareBusinessFormSearchImportJobComponent;
+
     @Output() onImport: EventEmitter<any> = new EventEmitter<any>();
+
     headers: CommonInterface.IHeaderTable[];
     dataSearch: any = {};
     shippments: any = [];
     containers: any = [];
+
     jobId: string = '';
     selected = -1;
     selectedShipment: any = {};
-    isCheckShipment: boolean = false;
+
     pageChecked: number = 0;
     transactionType: number;
+
+    isCheckShipment: boolean = false;
+
+    service: string = 'sea';
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -81,7 +90,6 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
                 if (!!res.data) {
                     this.shippments = res.data;
                     this.totalItems = res.totalItems || 0;
-                    console.log(this.shippments);
                 } else {
                     this.totalItems = 0;
                     this.shippments = [];
@@ -98,7 +106,6 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
             if (this.pageChecked !== this.page) {
                 return;
             }
-            console.log(this.selectedShipment);
             this._documentRepo.getDetailTransaction(this.selectedShipment.id).pipe()
                 .subscribe((resdetail: any) => {
                     const objShipment = resdetail;
@@ -115,7 +122,6 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
                             if (!!res) {
                                 this.containers = res;
                                 // updae seal, cont.
-                                console.log(this.containers);
                                 if (this.containers.length > 0) {
                                     this.containers.forEach(item => {
                                         item.sealNo = null;
@@ -140,6 +146,4 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
         this.dataSearch = dataSearch;
         this.getShippments(this.dataSearch);
     }
-
-
 }

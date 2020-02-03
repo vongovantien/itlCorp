@@ -29,7 +29,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareBusinessFormCreateAirComponent, { static: false }) formCreateComponent: ShareBusinessFormCreateAirComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
+    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     isImport: boolean = false;
     selectedJob: any = {}; // TODO model.
@@ -45,6 +45,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
 
     ngOnInit() {
         this._store.dispatch(new fromShareBusiness.TransactionGetDetailSuccessAction({}));
+        this.formImportJobDetailPopup.service = 'air';
     }
 
     onSubmitData() {
