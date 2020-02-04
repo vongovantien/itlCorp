@@ -51,23 +51,12 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
     }
 
     ngOnInit(): void {
-        if (this.transactionType === 2 || this.transactionType === 3) {
-            this.headers = [
-                { title: 'Job ID', field: 'jobNo', sortable: true },
-                { title: 'MAWB No', field: 'mawb', sortable: true },
-                { title: 'Airline(Co-Loader)', field: 'supplierName', sortable: true },
-                { title: 'Shipment Date', field: 'etd', sortable: true }
-            ];
-        } else {
-            this.headers = [
-                { title: 'Job ID', field: 'jobNo', sortable: true },
-                { title: 'MBL No', field: 'mawb', sortable: true },
-                { title: 'Supplier(Shipping Line)', field: 'supplierName', sortable: true },
-                { title: 'Shipment Date', field: 'etd', sortable: true }
-            ];
-        }
-
-
+        this.headers = [
+            { title: 'Job ID', field: 'jobNo', sortable: true },
+            { title: 'MBL No', field: 'mawb', sortable: true },
+            { title: 'Supplier(Shipping Line)', field: 'supplierName', sortable: true },
+            { title: 'Shipment Date', field: 'etd', sortable: true }
+        ];
         // this.getShippments(this.dataSearch);
     }
 
