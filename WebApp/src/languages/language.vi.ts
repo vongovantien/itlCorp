@@ -41,8 +41,8 @@ export const language = {
       display: true,
       childs: [
         { name: "Quản Lý Job", route_child: "job-management", display: true },
-        { name: "Điều Phối", route_child: "assigment", display: true },
-        { name: "Điều Phối Xe", route_child: "trucking-assigment", display: true },
+        // { name: "Điều Phối", route_child: "assigment", display: true },
+        // { name: "Điều Phối Xe", route_child: "trucking-assigment", display: true },
         { name: "Custom Clearance", route_child: "custom-clearance", display: true }
       ]
     },
@@ -74,7 +74,7 @@ export const language = {
       display_child: false,
       display: true,
       childs: [
-        { name: "Account Receivable Payable", route_child: "account-receivable-payable", display: true },
+        // { name: "Account Receivable Payable", route_child: "account-receivable-payable", display: true },
         { name: "Advance Payment", route_child: "advance-payment", display: true },
         { name: "Settlement Payment", route_child: "settlement-payment", display: true },
         { name: "Statement of Account", route_child: "statement-of-account", display: true }
@@ -105,12 +105,12 @@ export const language = {
       display_child: false,
       display: true,
       childs: [
-        { name: "Định Nghĩa ID", route_child: "id-definition", display: true },
+        // { name: "Định Nghĩa ID", route_child: "id-definition", display: true },
         { name: "Thuế Quan", route_child: "tariff", display: true },
         { name: "Tỉ Giá", route_child: "exchange-rate", display: true },
         { name: "Ecus Connection", route_child: "ecus-connection", display: true },
-        { name: "KPI", route_child: "kpi", display: true },
-        { name: "Nhà Cung Cấp", route_child: "supplier", display: true },
+        // { name: "KPI", route_child: "kpi", display: true },
+        // { name: "Nhà Cung Cấp", route_child: "supplier", display: true },
         { name: "Truy Xuất Lịch Sử", route_child: "log-viewer", display: true },
         { name: "Mở khóa", route_child: "unlock", display: true }
       ]
@@ -121,7 +121,7 @@ export const language = {
       icon: "icon-stats-bars",
       route_parent: "/home/report/",
       display_child: false,
-      display: true,
+      display: false,
       childs: [
         { name: "Báo Cáo P/L", route_child: "pl-report", display: true },
         { name: "Báo Cáo Hiệu Suất", route_child: "performance-report", display: true },
