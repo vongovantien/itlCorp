@@ -10,12 +10,15 @@ import { formatDate } from '@angular/common';
 
 export class ShareBusinessFormSearchImportJobComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataJobDetail> = new EventEmitter<ISearchDataJobDetail>();
+    @Input() service: string;
+
     filterTypes: CommonInterface.ICommonTitleValue[];
     formSearch: FormGroup;
     searchText: AbstractControl;
     filterType: AbstractControl;
     serviceDate: AbstractControl;
-    typeTransaction: number = null;
+
+
     constructor(
         private _fb: FormBuilder
     ) {
@@ -26,7 +29,7 @@ export class ShareBusinessFormSearchImportJobComponent extends AppForm {
         this.filterTypes = [
             { title: 'Job ID', value: 'jobNo' },
             { title: 'MBL', value: 'mawb' },
-            { title: 'Supplier', value: 'supplierName' },
+            { title: this.service === 'air' ? 'Airline' : 'Supplier', value: 'supplierName' },
         ];
         this.filterType.setValue(this.filterTypes[0]);
     }

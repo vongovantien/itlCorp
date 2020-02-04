@@ -18,22 +18,17 @@ export const language = {
       icon: "icon-books",
       route_parent: "/home/catalogue/",
       display_child: false,
+      display: true,
       childs: [
 
         { name: "Kho", route_child: "ware-house", display: true },
         { name: "Cửa Khẩu", route_child: "port-index", display: true },
-        // { name: "Port Index Import", route_child: "port-index-import" },
         { name: "Dữ Liệu Đối Tác", route_child: "partner-data", display: true },
         { name: "Hàng Hóa", route_child: "commodity", display: true },
-        { name: "Commodity Import", route_child: "commodity-import", display: false },
-        { name: "Commodity Group Import", route_child: "commodity-group-import", display: false },
         { name: "Quản Lí Stage", route_child: "stage-management", display: true },
-        { name: "Import Stage", route_child: "stage-import", display: false },
         { name: "Đơn Vị", route_child: "unit", display: true },
         { name: "Địa Điểm", route_child: "location", display: true },
         { name: "Phí", route_child: "charge", display: true },
-        { name: "Import Charge", route_child: "charge-import", display: false },
-        { name: "Import Account Voucher", route_child: "charge-import-account-voucher", display: false },
         { name: "Tiền Tệ", route_child: "currency", display: true }
       ]
     },
@@ -43,6 +38,7 @@ export const language = {
       icon: "icon-cogs",
       route_parent: "/home/operation/",
       display_child: false,
+      display: true,
       childs: [
         { name: "Quản Lý Job", route_child: "job-management", display: true },
         { name: "Điều Phối", route_child: "assigment", display: true },
@@ -56,6 +52,7 @@ export const language = {
       icon: "icon-file-text2",
       route_parent: "/home/documentation/",
       display_child: false,
+      display: true,
       childs: [
         // { name: "Inland Trucking", route_child: "inland-trucking", display: true },
         { name: "Air Export", route_child: "air-export", display: true },
@@ -63,7 +60,6 @@ export const language = {
         // { name: "Sea Consol Export", route_child: "sea-consol-export", display: true },
         // { name: "Sea Consol Import", route_child: "sea-consol-import", display: true },
         { name: "Sea FCL Export", route_child: "sea-fcl-export", display: true },
-        // { name: "Sea FCL Export Create", route_child: "sea-fcl-export-create", display: false },
         { name: "Sea FCL Import", route_child: "sea-fcl-import", display: true },
         { name: "Sea LCL Export", route_child: "sea-lcl-export", display: true },
         { name: "Sea LCL Import", route_child: "sea-lcl-import", display: true },
@@ -76,6 +72,7 @@ export const language = {
       icon: "icon-calculator",
       route_parent: "/home/accounting/",
       display_child: false,
+      display: true,
       childs: [
         { name: "Account Receivable Payable", route_child: "account-receivable-payable", display: true },
         { name: "Advance Payment", route_child: "advance-payment", display: true },
@@ -89,6 +86,7 @@ export const language = {
       icon: "icon-database",
       route_parent: "/home/system/",
       display_child: false,
+      display: true,
       childs: [
         { name: "Quản Lý Người Dùng", route_child: "user-management", display: true },
         { name: "Nhóm Người Dùng", route_child: "group", display: true },
@@ -105,6 +103,7 @@ export const language = {
       icon: "icon-wrench",
       route_parent: "/home/tool/",
       display_child: false,
+      display: true,
       childs: [
         { name: "Định Nghĩa ID", route_child: "id-definition", display: true },
         { name: "Thuế Quan", route_child: "tariff", display: true },
@@ -122,6 +121,7 @@ export const language = {
       icon: "icon-stats-bars",
       route_parent: "/home/report/",
       display_child: false,
+      display: true,
       childs: [
         { name: "Báo Cáo P/L", route_child: "pl-report", display: true },
         { name: "Báo Cáo Hiệu Suất", route_child: "performance-report", display: true },

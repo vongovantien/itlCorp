@@ -212,7 +212,7 @@
                                 <div class="form-group">
                                     <label>Package Qty</label>
                                     <input type="number" class="form-control" formControlName="packageQty"
-                                        placeholder="Package Quantity">
+                                        placeholder="Package Quantity" numeric [decimals]="digitDecimal">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -231,13 +231,14 @@
                                 <div class="form-group">
                                     <label>GW (KGS)</label>
                                     <input type="number" class="form-control" formControlName="grossWeight"
-                                        placeholder="Gross weight">
+                                        placeholder="Gross weight" numeric [decimals]="digitDecimal">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>CW (KGS)</label>
-                                    <input type="number" class="form-control" formControlName="chargeWeight">
+                                    <input type="number" class="form-control" formControlName="chargeWeight" numeric
+                                        [decimals]="digitDecimal">
                                 </div>
                             </div>
                         </div>
@@ -247,13 +248,15 @@
                             <div class="col-md-5">
                                 <div class="form-group">
                                     <label>CBM</label>
-                                    <input type="number" class="form-control" formControlName="cbm">
+                                    <input type="number" class="form-control" formControlName="cbm" numeric
+                                        [decimals]="digitDecimal">
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="form-group">
                                     <label>HW</label>
-                                    <input type="number" class="form-control" formControlName="hw">
+                                    <input type="number" class="form-control" formControlName="hw" numeric
+                                        [decimals]="digitDecimal">
                                 </div>
                             </div>
                             <div class="col-md-2 pointer d-flex align-items-end jusify-content-center">

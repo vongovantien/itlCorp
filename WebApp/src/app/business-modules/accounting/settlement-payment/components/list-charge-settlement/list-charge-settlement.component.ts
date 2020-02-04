@@ -285,8 +285,6 @@ export class SettlementListChargeComponent extends AppList {
         if (!!shipment) {
             this.tableListChargePopup.selectedShipment = shipment;
 
-
-
             // * Filter charge with hblID.
             const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid);
             if (!!surcharges.length) {

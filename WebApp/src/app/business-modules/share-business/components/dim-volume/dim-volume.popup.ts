@@ -110,6 +110,8 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
 
     closePopup() {
         this.dimsTemp = cloneDeep(this.dims);
+        this.isSubmitted = false;
+
         this.hide();
     }
 

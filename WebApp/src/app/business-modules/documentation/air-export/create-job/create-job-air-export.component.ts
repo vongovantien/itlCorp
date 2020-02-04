@@ -28,7 +28,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareBusinessFormCreateAirComponent, { static: false }) formCreateComponent: ShareBusinessFormCreateAirComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
+    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     isImport: boolean = false;
     selectedJob: any = {}; // TODO model.
@@ -44,6 +44,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
 
     ngOnInit() {
         this._store.dispatch(new fromShareBusiness.TransactionGetDetailSuccessAction({}));
+        this.formImportJobDetailPopup.service = 'air';
     }
 
     onSubmitData() {
@@ -74,6 +75,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     checkValidateForm() {
         [this.formCreateComponent.shipmentType,
         this.formCreateComponent.packageType,
+        this.formCreateComponent.mbltype,
         this.formCreateComponent.commodity,
         this.formCreateComponent.paymentTerm].forEach((control: AbstractControl) => this.setError(control));
 
@@ -153,6 +155,10 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
                     }
                 }
             );
+    }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/air-export"]);
     }
 }
 

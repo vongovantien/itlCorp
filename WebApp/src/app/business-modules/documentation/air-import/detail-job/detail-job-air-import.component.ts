@@ -220,10 +220,6 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
             );
     }
 
-    gotoList() {
-        this._router.navigate(["home/documentation/air-import"]);
-    }
-
     deleteJob() {
         this.confirmDeleteJobPopup.show();
     }
