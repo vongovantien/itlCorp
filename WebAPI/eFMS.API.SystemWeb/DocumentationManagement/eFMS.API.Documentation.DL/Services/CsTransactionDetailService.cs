@@ -526,8 +526,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
             results.ForEach(fe =>
             {
-                fe.Packages = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
-                                                                        .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + "x" + GetUnitNameById(s.PackageTypeId)) : string.Empty));
+                fe.Packages = string.Join(" ,", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
+                                                                        .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + " x" + ' ' + GetUnitNameById(s.PackageTypeId)) : string.Empty));
             });
             return results;
         }
