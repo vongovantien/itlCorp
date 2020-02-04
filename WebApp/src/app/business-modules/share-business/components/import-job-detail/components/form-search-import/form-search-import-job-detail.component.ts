@@ -10,16 +10,12 @@ import { formatDate } from '@angular/common';
 
 export class ShareBusinessFormSearchImportJobComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataJobDetail> = new EventEmitter<ISearchDataJobDetail>();
-    @Input() isAir: boolean = false;
-
-
     filterTypes: CommonInterface.ICommonTitleValue[];
     formSearch: FormGroup;
     searchText: AbstractControl;
     filterType: AbstractControl;
     serviceDate: AbstractControl;
     typeTransaction: number = null;
-
     constructor(
         private _fb: FormBuilder
     ) {
@@ -27,24 +23,13 @@ export class ShareBusinessFormSearchImportJobComponent extends AppForm {
     }
     ngOnInit() {
         this.initFormSearch();
-        console.log(this.isAir);
-        if (this.typeTransaction === 2 || this.typeTransaction === 3) {
-            this.filterTypes = [
-                { title: 'Job ID', value: 'jobNo' },
-                { title: 'MAWB', value: 'mawb' },
-                { title: 'Airline', value: 'supplierName' },
-            ];
-        } else {
-            this.filterTypes = [
-                { title: 'Job ID', value: 'jobNo' },
-                { title: 'MBL', value: 'mawb' },
-                { title: 'Supplier', value: 'supplierName' },
-            ];
-        }
-
+        this.filterTypes = [
+            { title: 'Job ID', value: 'jobNo' },
+            { title: 'MBL', value: 'mawb' },
+            { title: 'Supplier', value: 'supplierName' },
+        ];
         this.filterType.setValue(this.filterTypes[0]);
     }
-
     searchJob() {
         const body: ISearchDataJobDetail = {
             all: null,
@@ -56,8 +41,6 @@ export class ShareBusinessFormSearchImportJobComponent extends AppForm {
         };
         this.onSearch.emit(body);
     }
-
-
     resetSearch() {
         const date = new Date();
         this.serviceDate.setValue({
