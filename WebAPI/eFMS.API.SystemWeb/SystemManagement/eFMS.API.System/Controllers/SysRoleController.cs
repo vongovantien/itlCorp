@@ -22,17 +22,15 @@ namespace eFMS.API.System.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ISysRoleService roleService;
-        private readonly ISysMenuService menuService;
         /// <summary>
         /// Contructor
         /// </summary>
         /// <param name="localizer"></param>
         /// <param name="service"></param>
-        public SysRoleController(IStringLocalizer<LanguageSub> localizer, ISysRoleService service, ISysMenuService menu)
+        public SysRoleController(IStringLocalizer<LanguageSub> localizer, ISysRoleService service)
         {
             stringLocalizer = localizer;
             roleService = service;
-            menuService = menu;
         }
 
         /// <summary>
@@ -43,13 +41,6 @@ namespace eFMS.API.System.Controllers
         public IActionResult Get()
         {
             var results = roleService.Get();
-            return Ok(results);
-        }
-
-        [HttpGet("GetMenus")]
-        public IActionResult GetMenus()
-        {
-            var results = menuService.GetMenus();
             return Ok(results);
         }
     }

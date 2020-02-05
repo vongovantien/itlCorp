@@ -34,7 +34,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysEmployee, SysEmployeeModel>();
             CreateMap<SysPermissionSampleGeneralViewModel, SysPermissionSampleGeneral>();
             CreateMap<SysPermissionSampleSpecialModel, SysPermissionSampleSpecial>();
-            CreateMap<SysMenu, MenuModel>();
+            CreateMap<SysMenu, MenuUserModel>();
 
         }
     }

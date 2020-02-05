@@ -13,22 +13,33 @@ namespace eFMS.API.System.DL.Services
 {
     public class SysMenuService : RepositoryBase<SysMenu, SysMenuModel>, ISysMenuService
     {
-        public SysMenuService(IContextBase<SysMenu> repository, IMapper mapper) : base(repository, mapper)
+        private ISysUserPermissionService userpermissionService;
+        private ISysUserPermissionGeneralService permissionGeneralService;
+
+        public SysMenuService(IContextBase<SysMenu> repository, IMapper mapper,
+            ISysUserPermissionService userpermission,
+            ISysUserPermissionGeneralService permissionGeneral) : base(repository, mapper)
         {
+            userpermissionService = userpermission;
+            permissionGeneralService = permissionGeneral;
         }
 
-        public List<MenuModel> GetMenus()
+        public List<MenuUserModel> GetMenus(string userId, Guid officeId)
         {
-            var results = new List<MenuModel>();
-            var menus = DataContext.Get(x => x.Id != null).ToList();
-            var data = mapper.Map<List<MenuModel>>(menus);
+            var permissionId = userpermissionService.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
+            if (permissionId == null) return new List<MenuUserModel>();
+            var permissionMenus = permissionGeneralService.Get(x => x.UserPermissionId == permissionId && x.Access == true);
+            
+            var menus = DataContext.Get(x => x.Id != null);
+            var userMenus = menus.Join(permissionMenus, x => x.Id, y => y.MenuId, (x, y) => x).ToList();
+            var data = mapper.Map<List<MenuUserModel>>(menus);
             return FlatToHierarchy(data, null);
         }
-        public List<MenuModel> FlatToHierarchy(List<MenuModel> data, string parentId = null)
+        public List<MenuUserModel> FlatToHierarchy(List<MenuUserModel> data, string parentId = null)
         {
             return (from  x in data
                     where x.ParentId == parentId
-                    select new MenuModel
+                    select new MenuUserModel
                     {
                         Id = x.Id,
                         ParentId = x.ParentId,
@@ -42,8 +53,9 @@ namespace eFMS.API.System.DL.Services
                         Route = x.Route,
                         DisplayChild = x.DisplayChild,
                         Display = x.Display,
+                        OrderNumber = x.OrderNumber,
                         SubMenus = FlatToHierarchy(data, x.Id)
-                    }).ToList();
+                    }).OrderBy(x => x.OrderNumber).ToList();
         }
     }
 }

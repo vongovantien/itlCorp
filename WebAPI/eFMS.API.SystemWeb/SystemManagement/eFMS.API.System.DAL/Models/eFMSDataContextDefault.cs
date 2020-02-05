@@ -33,6 +33,7 @@ namespace eFMS.API.System.Service.Models
         public virtual DbSet<SysRolePermission> SysRolePermission { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysUserGroup> SysUserGroup { get; set; }
+        public virtual DbSet<SysUserPermission> SysUserPermission { get; set; }
         public virtual DbSet<SysUserPermissionGeneral> SysUserPermissionGeneral { get; set; }
         public virtual DbSet<SysUserPermissionSpecial> SysUserPermissionSpecial { get; set; }
         public virtual DbSet<SysUserRole> SysUserRole { get; set; }
@@ -94,11 +95,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Branch)
-                    .WithMany(p => p.CatDepartment)
-                    .HasForeignKey(d => d.BranchId)
-                    .HasConstraintName("FK_catDepartment_sysBranch");
             });
 
             modelBuilder.Entity<CatPlace>(entity =>
@@ -560,7 +556,13 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnName("Address_VN")
                     .HasMaxLength(4000);
 
-                entity.Property(e => e.BankAccountName).HasMaxLength(1000);
+                entity.Property(e => e.BankAccountNameEn)
+                    .HasColumnName("BankAccountName_EN")
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.BankAccountNameVn)
+                    .HasColumnName("BankAccountName_VN")
+                    .HasMaxLength(1000);
 
                 entity.Property(e => e.BankAccountUsd)
                     .HasColumnName("BankAccount_USD")
@@ -570,7 +572,13 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnName("BankAccount_VND")
                     .HasMaxLength(500);
 
-                entity.Property(e => e.BankAddress).HasMaxLength(4000);
+                entity.Property(e => e.BankAddressLocal)
+                    .HasColumnName("BankAddress_Local")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.BankAddressUsd)
+                    .HasColumnName("BankAddress_USD")
+                    .HasMaxLength(4000);
 
                 entity.Property(e => e.BankName).HasMaxLength(4000);
 
@@ -630,12 +638,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Website)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Bu)
-                    .WithMany(p => p.SysOffice)
-                    .HasForeignKey(d => d.Buid)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysBranch_sysBU");
             });
 
             modelBuilder.Entity<SysPermissionSample>(entity =>
@@ -966,6 +968,37 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<SysUserPermission>(entity =>
+            {
+                entity.ToTable("sysUserPermission");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.PermissionSampleId).HasColumnName("PermissionSampleID");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasColumnName("UserID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<SysUserPermissionGeneral>(entity =>
             {
                 entity.ToTable("sysUserPermissionGeneral");
@@ -995,16 +1028,11 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
-
-                entity.Property(e => e.UserId)
-                    .HasColumnName("UserID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.UserPermissionId).HasColumnName("UserPermissionID");
 
                 entity.Property(e => e.Write)
                     .HasMaxLength(20)
@@ -1035,16 +1063,11 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
-
-                entity.Property(e => e.UserId)
-                    .HasColumnName("UserID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.UserPermissionId).HasColumnName("UserPermissionID");
             });
 
             modelBuilder.Entity<SysUserRole>(entity =>
