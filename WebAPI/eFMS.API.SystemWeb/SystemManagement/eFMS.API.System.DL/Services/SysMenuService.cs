@@ -22,27 +22,28 @@ namespace eFMS.API.System.DL.Services
             var results = new List<MenuModel>();
             var menus = DataContext.Get(x => x.Id != null).ToList();
             var data = mapper.Map<List<MenuModel>>(menus);
-            List<MenuModel> hierarcy = new List<MenuModel>();
-
-            data.Where(x => x.ParentId == null).ToList().ForEach(x => hierarcy.Add(x)); //get parent
-
-            data.Where(a => a.ParentId != 0).ToList().
-                ForEach(a =>
-                {
-                    hierarcy.Where(b => b.Id == a.ParentId).ToList().ForEach(c => c.ChildLayers.Add(a)); //get childrens
-                });
-
-            return hierarcy;
+            return FlatToHierarchy(data, null);
         }
-
-        private List<MenuModel> GetChildren(List<MenuModel> data, string parentId)
+        public List<MenuModel> FlatToHierarchy(List<MenuModel> data, string parentId = null)
         {
-            var sublayers = data.Where(x => x.ParentId == parentId).ToList();
-            foreach(var item in sublayers)
-            {
-                var sublayers1 = data.Where(x => x.ParentId == item.ParentId).ToList();
-            }
-            return sublayers;
+            return (from  x in data
+                    where x.ParentId == parentId
+                    select new MenuModel
+                    {
+                        Id = x.Id,
+                        ParentId = x.ParentId,
+                        NameVn = x.NameVn,
+                        NameEn = x.NameEn,
+                        Description = x.Description,
+                        AssemplyName = x.AssemplyName,
+                        Icon = x.Icon,
+                        Sequence = x.Sequence,
+                        Arguments = x.Arguments,
+                        Route = x.Route,
+                        DisplayChild = x.DisplayChild,
+                        Display = x.Display,
+                        SubMenus = FlatToHierarchy(data, x.Id)
+                    }).ToList();
         }
     }
 }

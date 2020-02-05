@@ -17,6 +17,7 @@ namespace eFMS.API.System.Service.Models
         public string Route { get; set; }
         public bool? DisplayChild { get; set; }
         public bool? Display { get; set; }
+        public int? OrderNumber { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
     }
