@@ -42,8 +42,8 @@ export const language = {
             "display": true,
             "childs": [
                 { name: "Job Management", route_child: "job-management", display: true },
-                { name: "Assignment", route_child: "assigment", display: true },
-                { name: "Trucking Assigment", route_child: "trucking-assigment", display: true },
+                // { name: "Assignment", route_child: "assigment", display: true },
+                // { name: "Trucking Assigment", route_child: "trucking-assigment", display: true },
                 { name: "Custom Clearance", route_child: "custom-clearance", display: true }
             ]
         },
@@ -74,7 +74,7 @@ export const language = {
             "display_child": false,
             "display": true,
             "childs": [
-                { name: "Account Receivable Payable", route_child: "account-receivable-payable", display: true },
+                // { name: "Account Receivable Payable", route_child: "account-receivable-payable", display: true },
                 { name: "Advance Payment", route_child: "advance-payment", display: true },
                 { name: "Settlement Payment", route_child: "settlement-payment", display: true },
                 { name: "Statement of Account", route_child: "statement-of-account", display: true }
@@ -106,12 +106,12 @@ export const language = {
             "display_child": false,
             "display": true,
             "childs": [
-                { name: "ID Definition", route_child: "id-definition", display: true },
+                // { name: "ID Definition", route_child: "id-definition", display: true },
                 { name: "Tariff", route_child: "tariff", display: true },
                 { name: "Exchange Rate", route_child: "exchange-rate", display: true },
                 { name: "Ecus Connection", route_child: "ecus-connection", display: true },
-                { name: "KPI", route_child: "kpi", display: true },
-                { name: "Supplier", route_child: "supplier", display: true },
+                // { name: "KPI", route_child: "kpi", display: true },
+                // { name: "Supplier", route_child: "supplier", display: true },
                 { name: "Catalog Log Viewer", route_child: "log-viewer", display: true },
                 { name: "Unlock", route_child: "unlock", display: true }
             ]
@@ -122,7 +122,7 @@ export const language = {
             "icon": "icon-stats-bars",
             "route_parent": "/home/report/",
             "display_child": false,
-            "display": true,
+            "display": false,
             "childs": [
                 { name: "P/L Report", route_child: "pl-report", display: true },
                 { name: "Performance Report", route_child: "performance-report", display: true },

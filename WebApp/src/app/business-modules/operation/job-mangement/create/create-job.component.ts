@@ -17,12 +17,6 @@ import { AppPage } from "src/app/app.base";
 @Component({
     selector: "app-job-mangement-create",
     templateUrl: "./create-job.component.html",
-    styles:
-        [`
-            .form-add-job {
-                margin-left: 15px;
-            }
-        `]
 })
 export class JobManagementCreateJobComponent extends AppPage {
 
@@ -39,20 +33,6 @@ export class JobManagementCreateJobComponent extends AppPage {
 
     selectedDate: any;
 
-    public items: Array<string> = [
-        "option 1",
-        "option 2",
-        "option 3",
-        "option 4",
-        "option 5",
-        "option 6",
-        "option 7"
-    ];
-
-    private value: any = {};
-    private _disabledV: string = "0";
-    public disabled: boolean = false;
-
     isDisplay: boolean = true;
 
     commodityGroups: any[] = [];
@@ -64,7 +44,8 @@ export class JobManagementCreateJobComponent extends AppPage {
         private spinner: NgxSpinnerService,
         private _toaster: ToastrService,
         private _catalogueRepo: CatalogueRepo,
-        private _documentRepo: DocumentationRepo
+        private _documentRepo: DocumentationRepo,
+        private _router: Router
     ) {
         super();
         this.baseServices.dataStorage.subscribe(data => {
@@ -216,24 +197,8 @@ export class JobManagementCreateJobComponent extends AppPage {
         }, 300);
     }
 
-    private set disabledV(value: string) {
-        this._disabledV = value;
-        this.disabled = this._disabledV === "1";
-    }
+    gotoList() {
+        this._router.navigate(["home/operation/job-management"]);
 
-    public selected(value: any): void {
-        console.log("Selected value is: ", value);
-    }
-
-    public removed(value: any): void {
-        console.log("Removed value is: ", value);
-    }
-
-    public typed(value: any): void {
-        console.log("New search input: ", value);
-    }
-
-    public refreshValue(value: any): void {
-        this.value = value;
     }
 }

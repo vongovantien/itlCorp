@@ -57,6 +57,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         this._progressRef = this._ngProgressService.ref();
     }
 
+    ngOnInit() { }
+
     ngAfterViewInit() {
         combineLatest([
             this._activedRoute.params,

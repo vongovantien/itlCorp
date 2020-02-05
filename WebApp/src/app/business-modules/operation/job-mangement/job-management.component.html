@@ -48,22 +48,10 @@
             </div> -->
         </div>
         <div class="col-12">
-            <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
-                <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link active" data-toggle="tab" href="#job-tableview-tab" role="tab">
-                        Table View
-                    </a>
-                </li>
-                <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#job-stageview-tab" role="tab">
-                        Stage View
-                    </a>
-                </li>
-            </ul>
-            <div class="tab-content job-tab-content" id="jobTabContent">
-                <div class="tab-pane fade show active" id="job-tableview-tab" role="tabpanel" aria-labelledby="">
-                    <div class="m-portlet">
-                        <div class="m-portlet__body">
+            <div class="m-portlet__body">
+                <tabset class="custom-class-tab">
+                    <tab heading="Table View">
+                        <div class="bg-white p-4">
                             <div class="table-wrapper table-scrollable" id="ops-job-list-table">
                                 <table class="table table-hover table-brand dataTable">
                                     <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
@@ -211,15 +199,9 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-                    </div>
-                </div>
-
-                <div class="tab-pane fade" id="job-stageview-tab" role="tabpanel" aria-labelledby="">
-                    Stage view
-                </div>
-
+                    </tab>
+                </tabset>
             </div>
         </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
@@ -10,6 +10,7 @@ import { formatDate } from '@angular/common';
 })
 export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
     @Output() onImport: EventEmitter<any> = new EventEmitter<any>();
+
     headers: CommonInterface.IHeaderTable[];
     dataSearch: any = {};
     houseBill: any = [];

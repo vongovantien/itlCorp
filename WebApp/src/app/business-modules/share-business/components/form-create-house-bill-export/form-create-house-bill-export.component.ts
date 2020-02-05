@@ -68,6 +68,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     termTypes: CommonInterface.INg2Select[];
     originNumbers: CommonInterface.INg2Select[] = [{ id: 1, text: '1' }, { id: 2, text: '2' }, { id: 3, text: '3' }];
     typeOfMoves: CommonInterface.INg2Select[];
+    listSaleMan: any = [];
+    type: string = '';
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameVn', label: 'Name ABBR' },
@@ -295,7 +297,13 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             .subscribe((res: any) => {
                 this.saleMans = res || [];
             });
+        this._catalogueRepo.getListSaleManDetail().pipe(catchError(this.catchError))
+            .subscribe((res: any) => {
+                this.listSaleMan = res || [];
+                this.listSaleMan = this.listSaleMan.filter(x => x.service === this.type && x.status === true);
+            });
     }
+
 
     getDescription(fullName: string, address: string, tel: string, fax: string) {
         return `${fullName} \n${address} \nTel No: ${!!tel ? tel : ''} \nFax No: ${!!fax ? fax : ''} \n`;
@@ -367,8 +375,11 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         switch (type) {
             case 'customer':
                 this.customer.setValue(data.id);
+                const listSales = this.listSaleMan.filter(x => x.partnerId === data.id);
                 this.saleMans.forEach((item: User) => {
-                    if (item.id === data.salePersonId) {
+                    if (listSales.length > 0) {
+                        this.saleMan.setValue(listSales[0].saleManId);
+                    } else if (item.id === data.salePersonId) {
                         this.saleMan.setValue(item.id);
                     }
                 });

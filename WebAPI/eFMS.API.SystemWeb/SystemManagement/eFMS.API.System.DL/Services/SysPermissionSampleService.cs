@@ -52,11 +52,8 @@ namespace eFMS.API.System.DL.Services
         public SysPermissionSampleModel GetBy(Guid? id)
         {
             var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            var result = new SysPermissionSampleModel();
-            if (data != null)
-            {
-                result = mapper.Map<SysPermissionSampleModel>(data);
-            }
+            if (data == null) return null;
+            var result = mapper.Map<SysPermissionSampleModel>(data);
             result.SysPermissionSampleGenerals = permissionSampleGeneralService.GetBy(id);
             result.SysPermissionSampleSpecials = permissionSampleSpecialService.GetBy(id);
             return result;

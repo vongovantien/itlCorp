@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
@@ -60,6 +60,7 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
         // this.getShippments(this.dataSearch);
     }
 
+
     onCancel() {
         this.hide();
     }
@@ -98,6 +99,7 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
             },
         );
     }
+
     onImportShippment() {
         if (this.selected === -1) {
             this.isCheckShipment = false;

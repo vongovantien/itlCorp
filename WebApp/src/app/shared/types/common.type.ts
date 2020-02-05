@@ -3,6 +3,8 @@ namespace CommonType {
 
     export type ACTION_FORM = 'CREATE' | 'UPDATE' | 'COPY';
 
+    export type DIRECTION = 'left' | 'right';
+
     export const DATATYPE = {
         LINK: <DataType>'LINK',
         BOOLEAN: <DataType>'BOOLEAN',
@@ -14,6 +16,7 @@ namespace CommonType {
         UPDATE: <ACTION_FORM>'UPDATE',
         COPY: <ACTION_FORM>'COPY',
     };
+
 
 
 }

@@ -28,6 +28,8 @@ using ITL.NetCore.Connection.Caching;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.DL.Common;
+using System.Security.Claims;
+using IdentityModel;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -145,13 +147,35 @@ namespace eFMS.API.Catalogue.Infrastructure
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddIdentityServerAuthentication(options =>
+            .AddJwtBearer(options =>
             {
                 options.Authority = configuration["Authentication:Authority"];
                 options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
-                options.ApiName = configuration["Authentication:ApiName"];
-                options.ApiSecret = configuration["Authentication:ApiSecret"];
+                options.Audience = configuration["Authentication:ApiName"];
+                options.SaveToken = true;
+                options.Events = new JwtBearerEvents()
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        try
+                        {
+                            String userID = context.Principal.FindFirstValue("id");
+                            
+                                List<Claim> lstClaim = new List<Claim>();
+                                lstClaim.Add(new Claim(JwtClaimTypes.Role, "ABC"));
+                                context.Principal.AddIdentity(new ClaimsIdentity(lstClaim, JwtBearerDefaults.AuthenticationScheme, "name", "role"));
+                        }
+                        catch { }
+                    }
+                };
             });
+            //.AddIdentityServerAuthentication(options =>
+            //{
+            //    options.Authority = configuration["Authentication:Authority"];
+            //    options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
+            //    options.ApiName = configuration["Authentication:ApiName"];
+            //    options.ApiSecret = configuration["Authentication:ApiSecret"];
+            //});
             services.Configure<WebUrl>(option => {
                 option.Url = configuration.GetSection("WebUrl").Value;
             });

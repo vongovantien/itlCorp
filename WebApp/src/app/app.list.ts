@@ -19,8 +19,8 @@ export abstract class AppList extends AppPage {
     dataSearch: any = {};
 
     // * header table.
-    right: string = 'right';
-    left: string = 'left';
+    right: CommonType.DIRECTION = 'right';
+    left: CommonType.DIRECTION = 'left';
 
     headers: CommonInterface.IHeaderTable[];
 

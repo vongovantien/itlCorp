@@ -33,7 +33,6 @@ export class ShareBusinessFormSearchImportJobComponent extends AppForm {
         ];
         this.filterType.setValue(this.filterTypes[0]);
     }
-
     searchJob() {
         const body: ISearchDataJobDetail = {
             all: null,
@@ -45,8 +44,6 @@ export class ShareBusinessFormSearchImportJobComponent extends AppForm {
         };
         this.onSearch.emit(body);
     }
-
-
     resetSearch() {
         const date = new Date();
         this.serviceDate.setValue({
