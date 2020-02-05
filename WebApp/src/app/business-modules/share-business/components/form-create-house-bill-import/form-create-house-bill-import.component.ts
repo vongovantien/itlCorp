@@ -10,7 +10,7 @@ import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip, catchError } from 'rxjs/operators';
 
 import * as fromShare from './../../store';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
@@ -103,6 +103,8 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
     isLoadingPort: Observable<boolean>;
     object: any = { items: [] };
+    listSaleMan: any = [];
+    type: string = '';
 
     constructor(
         private _fb: FormBuilder,
@@ -438,8 +440,11 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                     this.consignee.setValue(data.id);
                     this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
+                const listSales = this.listSaleMan.filter(x => x.partnerId === data.id);
                 this.saleMans.forEach((item: User) => {
-                    if (item.id === data.salePersonId) {
+                    if (listSales.length > 0) {
+                        this.saleMan.setValue(listSales[0].saleManId);
+                    } else if (item.id === data.salePersonId) {
                         this.saleMan.setValue(item.id);
                     }
                 });
@@ -542,5 +547,11 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 this.saleMans = [];
             }
         });
+
+        this._catalogueRepo.getListSaleManDetail().pipe(catchError(this.catchError))
+            .subscribe((res: any) => {
+                this.listSaleMan = res || [];
+                this.listSaleMan = this.listSaleMan.filter(x => x.service === this.type && x.status === true);
+            });
     }
 }

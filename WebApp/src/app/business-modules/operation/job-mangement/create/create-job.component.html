@@ -85,9 +85,8 @@
                                             Product Service <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select [allowClear]="true" [items]="productServices"
-                                            (data)="refreshValue($event)"
                                             (selected)="OpsTransactionToAdd.productService=$event.id"
-                                            (removed)="OpsTransactionToAdd.productService=null" (typed)="typed($event)"
+                                            (removed)="OpsTransactionToAdd.productService=null"
                                             placeholder="Please Select">
                                         </ng-select>
                                         <div class="form-control-feedback"
@@ -103,9 +102,8 @@
                                             Service Mode <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select [allowClear]="true" [items]="serviceModes"
-                                            (data)="refreshValue($event)"
                                             (selected)="OpsTransactionToAdd.serviceMode=$event.id"
-                                            (removed)="OpsTransactionToAdd.serviceMode=null" (typed)="typed($event)"
+                                            (removed)="OpsTransactionToAdd.serviceMode=null"
                                             placeholder="Please Select">
                                         </ng-select>
                                         <div class="form-control-feedback"
@@ -121,9 +119,8 @@
                                             Shipment Mode <span class="m--font-danger">(*)</span>
                                         </label>
                                         <ng-select [allowClear]="true" [items]="shipmentModes"
-                                            (data)="refreshValue($event)"
                                             (selected)="OpsTransactionToAdd.shipmentMode=$event.id"
-                                            (removed)="OpsTransactionToAdd.shipmentMode=null" (typed)="typed($event)"
+                                            (removed)="OpsTransactionToAdd.shipmentMode=null"
                                             placeholder="Please Select">
                                         </ng-select>
                                         <div class="form-control-feedback"
@@ -271,10 +268,9 @@
                                             Commonity Group
                                         </label>
                                         <ng-select [allowClear]="true" [items]="commodityGroups"
-                                            (data)="refreshValue($event)"
                                             (selected)="OpsTransactionToAdd.commodityGroupId = $event.id"
                                             (removed)="OpsTransactionToAdd.commodityGroupId = ''"
-                                            (typed)="typed($event)" placeholder="Select Commonity Group">
+                                            placeholder="Select Commonity Group">
                                         </ng-select>
                                     </div>
                                 </div>
@@ -296,7 +292,7 @@
                             </span>
                         </button>
                         <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                            data-toggle="modal" data-target="#cancel-create-ops-job-modal">
+                            (click)="confirmCancel.show()">
                             <span>
                                 <i class="la la-ban"></i>
                                 <span>
@@ -313,46 +309,6 @@
     </div>
 </div>
 
-
-<!--end:: m-content-->
-
-<!--begin::cancel-create-ops-job-modal-->
-<div class="modal fade" id="cancel-create-ops-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Cancel</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="confirm-text-block">
-                    <span>All entered data will be discarded, <br>Are you sure you want to leave? </span>
-                </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    data-dismiss="modal" routerLink="/home/operation/job-management">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Yes
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            No
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<confirm-popup #confirmCancel body="All entered data will be discarded, <br>Are you sure you want to leave? "
+    (onSubmit)="confirmCancel.hide();gotoList()"></confirm-popup>
 <!--end::cancel-create-ops-job-modal-->

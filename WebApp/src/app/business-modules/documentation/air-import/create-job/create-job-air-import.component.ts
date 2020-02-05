@@ -29,7 +29,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareBusinessFormCreateAirComponent, { static: false }) formCreateComponent: ShareBusinessFormCreateAirComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
+    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     isImport: boolean = false;
     selectedJob: any = {}; // TODO model.
@@ -45,6 +45,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
 
     ngOnInit() {
         this._store.dispatch(new fromShareBusiness.TransactionGetDetailSuccessAction({}));
+        this.formImportJobDetailPopup.service = 'air';
     }
 
     onSubmitData() {
@@ -134,11 +135,16 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
     }
 
     showImportPopup() {
-        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirImport;
+
         this.formImportJobDetailPopup.getShippments();
         this.formImportJobDetailPopup.selected = -1;
         this.formImportJobDetailPopup.selectedShipment = null;
         this.formImportJobDetailPopup.show();
+    }
+
+    ngAfterViewInit() {
+        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirImport;
+
     }
 
     importJob(body: any) {
@@ -157,5 +163,9 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
                     }
                 }
             );
+    }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/air-import"]);
     }
 }

@@ -85,7 +85,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         this.importHouseBillPopup.typeFCL = 'Export';
         this.goodSummaryComponent.initContainer();
         this.goodSummaryComponent.containerPopup.isAdd = true;
-
+        this.formCreateHBLComponent.type = 'SFE';
         this._cd.detectChanges();
     }
 

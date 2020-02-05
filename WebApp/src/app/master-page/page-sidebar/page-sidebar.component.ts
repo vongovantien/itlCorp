@@ -21,7 +21,8 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         children: ""
     };
 
-    Menu: { parent_name: string; icon: string; route_parent: string; display_child: boolean; childs: { name: string; "route_child": string; }[]; }[];
+    Menu: IMenu[] = [];
+    // Menu: { parent_name: string; icon: string; route_parent: string; display_child: boolean; display: boolean, childs: { name: string; "route_child": string; display: boolean }[]; }[];
 
     constructor(private router: Router) {
     }
@@ -144,4 +145,19 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         }
     }
 
+}
+
+interface IMenu {
+    parent_name: string;
+    icon: string;
+    route_parent: string;
+    display_child: boolean;
+    display: boolean;
+    childs: IChildMenu[];
+}
+
+interface IChildMenu {
+    name: string;
+    route_child: string;
+    display: boolean;
 }

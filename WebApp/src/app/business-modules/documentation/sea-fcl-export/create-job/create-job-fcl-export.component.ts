@@ -196,4 +196,8 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
                 }
             );
     }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/sea-fcl-export"]);
+    }
 }

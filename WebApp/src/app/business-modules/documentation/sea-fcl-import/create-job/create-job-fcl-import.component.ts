@@ -201,6 +201,10 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
         this.formImportJobDetailPopup.getShippments();
         this.formImportJobDetailPopup.show();
     }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/sea-fcl-import"]);
+    }
 }
 
 

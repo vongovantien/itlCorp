@@ -81,7 +81,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
 
     ngAfterViewInit() {
         this.goodSummaryComponent.initContainer();
-
+        this.formCreateHBLComponent.type = 'SLE';
         this._cd.detectChanges();
     }
 

@@ -14,7 +14,7 @@ const routes: Routes = [
 
     {
         path: '',
-        redirectTo: 'login',
+        redirectTo: 'home',
         pathMatch: 'full'
     },
 
@@ -31,6 +31,10 @@ const routes: Routes = [
         },
         children: [
             {
+                path: '',
+                component: DashboardComponent
+            },
+            {
                 path: 'dashboard',
                 component: DashboardComponent
             },
@@ -39,8 +43,6 @@ const routes: Routes = [
                 loadChildren: () => import('./business-modules/system/system.module').then(m => m.SystemModule),
                 data: {
                     name: "System",
-                    path: "/",
-                    level: 1
                 }
             },
             {
@@ -48,8 +50,6 @@ const routes: Routes = [
                 loadChildren: () => import('./business-modules/catalogue/catalogue.module').then(m => m.CatalogueModule),
                 data: {
                     name: "Catalogue",
-                    path: "/",
-                    level: 1
                 }
             },
             {
@@ -57,25 +57,20 @@ const routes: Routes = [
                 loadChildren: () => import('./business-modules/accounting/accounting.module').then(m => m.AccountingModule),
                 data: {
                     name: "Accounting",
-                    path: "/",
-                    level: 1
                 }
             },
             {
                 path: 'documentation',
                 loadChildren: () => import('./business-modules/documentation/documentation.module').then(m => m.DocumentationModule),
                 data: {
-                    name: 'Documentation',
-                    path: '/',
+                    name: 'Services',
                 }
             },
             {
                 path: 'operation',
                 loadChildren: () => import('./business-modules/operation/operation.module').then(m => m.OperationModule),
                 data: {
-                    name: "Operation",
-                    path: "/",
-                    level: 1
+                    name: "Logistics",
                 }
             },
             {
@@ -83,8 +78,6 @@ const routes: Routes = [
                 loadChildren: () => import('./business-modules/report/report.module').then(m => m.ReportModule),
                 data: {
                     name: "Report",
-                    path: "/",
-                    level: 1
                 }
             },
             {
@@ -92,8 +85,6 @@ const routes: Routes = [
                 loadChildren: () => import('./business-modules/tool-setting/tool.module').then(m => m.ToolModule),
                 data: {
                     name: "Tool",
-                    path: "/",
-                    level: 1
                 }
             },
             {
@@ -101,8 +92,6 @@ const routes: Routes = [
                 loadChildren: () => import('./design-modules/design-modules.module').then(m => m.DesignModulesModule),
                 data: {
                     name: "Design Zone",
-                    path: "/",
-                    level: 1
                 }
             }
         ]

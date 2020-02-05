@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { formatDate } from '@angular/common';
@@ -10,11 +10,15 @@ import { formatDate } from '@angular/common';
 
 export class ShareBusinessFormSearchImportJobComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataJobDetail> = new EventEmitter<ISearchDataJobDetail>();
+    @Input() service: string;
+
     filterTypes: CommonInterface.ICommonTitleValue[];
     formSearch: FormGroup;
     searchText: AbstractControl;
     filterType: AbstractControl;
     serviceDate: AbstractControl;
+
+
     constructor(
         private _fb: FormBuilder
     ) {
@@ -25,11 +29,10 @@ export class ShareBusinessFormSearchImportJobComponent extends AppForm {
         this.filterTypes = [
             { title: 'Job ID', value: 'jobNo' },
             { title: 'MBL', value: 'mawb' },
-            { title: 'Supplier', value: 'supplierName' },
+            { title: this.service === 'air' ? 'Airline' : 'Supplier', value: 'supplierName' },
         ];
         this.filterType.setValue(this.filterTypes[0]);
     }
-
     searchJob() {
         const body: ISearchDataJobDetail = {
             all: null,
@@ -41,8 +44,6 @@ export class ShareBusinessFormSearchImportJobComponent extends AppForm {
         };
         this.onSearch.emit(body);
     }
-
-
     resetSearch() {
         const date = new Date();
         this.serviceDate.setValue({
