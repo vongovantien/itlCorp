@@ -95,7 +95,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
 
     constructor(
-        private _catalogueRepo: CatalogueRepo,
         private _fb: FormBuilder,
         private _store: Store<fromStore.IShareBussinessState>,
         private _route: ActivatedRoute,
