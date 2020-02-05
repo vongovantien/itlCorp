@@ -46,7 +46,7 @@
                             [ngClass]="{'m-form__group has-danger':isSubmitted  && !coloaderId.value}">
                             <label required>Airline/Co-Loader</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
-                                [currentActiveItemId]="{ field: 'id', value: coloaderId.value, hardValue: shipmentDetail.supplierName}"
+                                [currentActiveItemId]="{ field: 'id', value: coloaderId.value}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                 [displayFields]="displayFieldsSupplier" placeholder="Select airline"
                                 [loading]="isLoadingAirline | async" (remove)="resetFormControl(coloaderId)">
@@ -57,7 +57,7 @@
                         <div class="form-group">
                             <label>Agent</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
-                                [currentActiveItemId]="{ field: 'id', value: agentId.value,hardValue: shipmentDetail.agentName}"
+                                [currentActiveItemId]="{ field: 'id', value: agentId.value}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                                 [displayFields]="displayFieldsSupplier" placeholder="Select agent"
                                 (remove)="resetFormControl(agentId)" [loading]="isLoadingAgent | async">
@@ -119,7 +119,7 @@
                         <div class="form-group">
                             <label>A.O.L - Departure </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
-                                [currentActiveItemId]="{ field: 'id', value: pol.value, hardValue: shipmentDetail.polName}"
+                                [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort" placeholder="Select A.O.L"
                                 (remove)="resetFormControl(pol)" [loading]="isLoadingPort | async">
@@ -131,7 +131,7 @@
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !pod.value || (formGroup.errors | equalError:'invalidPort')}">
                             <label required>A.O.D - Destination</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
-                                [currentActiveItemId]="{ field: 'id', value: pod.value,hardValue: shipmentDetail.podName}"
+                                [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort" placeholder="Please select A.O.D"
                                 (remove)="resetFormControl(pod)" [loading]="isLoadingPort | async">

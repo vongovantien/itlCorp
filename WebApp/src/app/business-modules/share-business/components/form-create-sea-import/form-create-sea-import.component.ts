@@ -4,8 +4,6 @@ import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/fo
 
 import { AppForm } from 'src/app/app.form';
 import { DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { User } from 'src/app/shared/models';
 import { BaseService } from 'src/app/shared/services';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -209,13 +207,12 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
-                console.log(value);
                 if (value.startDate !== null) {
                     this.minDateETA = value.startDate; // * Update min date
 
                     this.isSubmitted = false;
-                    this.resetFormControl(this.formCreate.controls["eta"]);
-                    this.formCreate.controls["serviceDate"].setValue(null);
+                    // this.resetFormControl(this.formCreate.controls["eta"]);
+                    // this.formCreate.controls["serviceDate"].setValue(null);
                 }
             });
 

@@ -3,7 +3,6 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
 
-import { CatalogueRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { User, Unit, Customer, PortIndex, DIM, CsTransaction, Commodity } from '@models';
 import { FormValidators } from '@validators';
@@ -195,10 +194,9 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                             if (!!res.packageType) {
                                 this.formGroup.patchValue({ packageType: [this.units.find(u => u.id === +res.packageType)] });
                             }
-                            // * Update minDate ETA
-                            if (!!this.formGroup.value.etd) {
-                                this.minDateETA = this.createMoment(new Date(res.etd));
-                            }
+                            // if (!!this.formGroup.value.etd) {
+                            //     this.minDateETA = this.createMoment(new Date(res.etd));
+                            // }
 
                             // * Update commodity
                             const commodities: CommonInterface.INg2Select[] =
@@ -319,9 +317,9 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
                 if (!!value.startDate) {
-                    this.minDateETA = value.startDate; // * Update min date
+                    // this.minDateETA = value.startDate; // * Update min date
 
-                    this.resetFormControl(this.formGroup.controls["eta"]);
+                    // this.resetFormControl(this.formGroup.controls["eta"]);
 
                     // * serviceDate hadn't value
                     if (!this.formGroup.controls["serviceDate"].value || !this.formGroup.controls["serviceDate"].value.startDate) {
