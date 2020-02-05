@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { JobConstants } from 'src/constants/job.const';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
@@ -20,11 +19,6 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     shipments: Shipment[] = [];
     selectedShipment: Shipment = null;
-
-    totalInProcess = 0;
-    totalComplete = 0;
-    totalOverdued = 0;
-    totalCanceled = 0;
 
     customClearances: any[] = [];
     deleteMessage: string = '';
@@ -53,14 +47,11 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Customer', field: 'customerName', sortable: true },
             { title: 'Service Date', field: 'serviceDate', sortable: true },
             { title: 'Service Port', field: 'polName', sortable: true },
-            // { title: 'Flight/Vessel', field: 'flightVessel', sortable: true },
             { title: "Cont Q'ty", field: 'sumContainers', sortable: true },
             { title: "Pack Q'ty", field: 'sumPackages', sortable: true },
             { title: 'G.W', field: 'sumGrossWeight', sortable: true },
             { title: 'CBM', field: 'sumCbm', sortable: true },
-            // { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Modified Date', field: 'modifiedDate', sortable: true },
-            // { title: 'Status', field: 'currentStatus', sortable: true },
         ];
 
         this.headerCustomClearance = [
@@ -176,12 +167,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                 (responses: any) => {
                     if (!!responses.data) {
                         this.shipments = responses.data.opsTransactions.map((shipment: Shipment) => new Shipment(shipment));
-
                         this.totalItems = responses.totalItems || 0;
-                        this.totalInProcess = responses.data.toTalInProcessing;
-                        this.totalOverdued = responses.data.totalOverdued;
-                        this.totalComplete = responses.data.toTalFinish;
-                        this.totalCanceled = responses.data.totalCanceled;
                     } else {
                         this.totalItems = 0;
                         this.shipments = [];
