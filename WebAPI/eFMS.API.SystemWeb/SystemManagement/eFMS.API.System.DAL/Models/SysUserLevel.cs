@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace eFMS.API.System.Models
+namespace eFMS.API.System.Service.Models
 {
-    public class SysUserEditModel
+    public partial class SysUserLevel
     {
         public int Id { get; set; }
         public string UserId { get; set; }
@@ -20,5 +18,8 @@ namespace eFMS.API.System.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
+
+        public virtual SysGroup Group { get; set; }
+        public virtual SysUser User { get; set; }
     }
 }

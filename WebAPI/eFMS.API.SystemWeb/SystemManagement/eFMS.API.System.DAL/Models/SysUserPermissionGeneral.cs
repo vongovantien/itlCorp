@@ -6,9 +6,8 @@ namespace eFMS.API.System.Service.Models
     public partial class SysUserPermissionGeneral
     {
         public Guid Id { get; set; }
+        public Guid? UserPermissionId { get; set; }
         public string MenuId { get; set; }
-        public string UserId { get; set; }
-        public Guid? OfficeId { get; set; }
         public bool? Access { get; set; }
         public string Detail { get; set; }
         public string Write { get; set; }

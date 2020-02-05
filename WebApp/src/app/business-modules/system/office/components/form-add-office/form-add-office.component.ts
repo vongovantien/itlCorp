@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { Company } from 'src/app/shared/models';
@@ -7,12 +7,13 @@ import { Department } from 'src/app/shared/models/system/department';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { Router } from '@angular/router';
+import { AppForm } from 'src/app/app.form';
 
 @Component({
     selector: 'form-add-office',
     templateUrl: './form-add-office.component.html'
 })
-export class OfficeFormAddComponent extends AppList {
+export class OfficeFormAddComponent extends AppForm implements OnInit {
     selectedDataCompany: any;
     isSubmited: boolean = false;
     isDetail: boolean = false;
@@ -24,6 +25,7 @@ export class OfficeFormAddComponent extends AppList {
         selectedDisplayFields: [],
     };
     selectedCompany: Partial<CommonInterface.IComboGridData> = {};
+
     userHeaders: CommonInterface.IHeaderTable[];
     SelectedOffice: any = {};
     companies: Company[] = [];
@@ -41,9 +43,13 @@ export class OfficeFormAddComponent extends AppList {
     fax: AbstractControl;
     company: AbstractControl;
     bankAccountVND: AbstractControl;
-    bankAccountName: AbstractControl;
+    bankAccountUSD: AbstractControl;
+    bankAccountName_VN: AbstractControl;
+    bankAccountName_EN: AbstractControl;
+
     swiftCode: AbstractControl;
-    bankAddress: AbstractControl;
+    bankAddress_Local: AbstractControl;
+    bankAddress_En: AbstractControl;
     active: AbstractControl;
     bankName: AbstractControl;
     headers: CommonInterface.IHeaderTable[];
@@ -62,13 +68,14 @@ export class OfficeFormAddComponent extends AppList {
         private _router: Router
     ) {
         super();
-        this.requestSort = this.sortDepartment;
     }
 
     ngOnInit(): void {
         this.initForm();
         this.getDataComboBox();
         this.headers = [
+
+
             { title: 'Department Code', field: 'code', sortable: true },
             { title: 'Name EN', field: 'deptNameEn', sortable: true },
             { title: 'Name Local', field: 'deptName', sortable: true },
@@ -87,9 +94,7 @@ export class OfficeFormAddComponent extends AppList {
 
     }
     onSelectDataFormInfo(data: any) {
-        this.selectedCompany = { field: 'id', value: data.id };
-        this.selectedDataCompany = data;
-        console.log(this.selectedDataCompany);
+        this.company.setValue(data.id);
 
     }
 
@@ -100,7 +105,7 @@ export class OfficeFormAddComponent extends AppList {
 
     update(formdata: any, data: any) {
         this.formGroup.patchValue(formdata);
-        this.active.setValue(this.status.filter(i => i.value === data)[0]);
+        // this.active.setValue(this.status.filter(i => i.value === data)[0]);
     }
 
     getCompanies() {
@@ -122,7 +127,7 @@ export class OfficeFormAddComponent extends AppList {
     }
 
     sortDepartment(sort: string): void {
-        this.departments = this._sortService.sort(this.departments, sort, this.order);
+        // this.departments = this._sortService.sort(this.departments, sort, this.order);
     }
 
     gotoDetailDepartment(id: number) {
@@ -174,12 +179,14 @@ export class OfficeFormAddComponent extends AppList {
             tel: [],
             email: [],
             fax: [],
-            company: [],
+            company: [null, Validators.required],
             bankAccountVND: [],
-            bankAccountName: [],
+            bankAccountUSD: [],
+            bankAccountName_VN: [],
+            bankAccountName_EN: [],
             swiftCode: [],
-            bankAddress: [],
-            bankName: [],
+            bankAddress_Local: [],
+            bankAddress_En: [],
             active: [this.status[0]],
         });
 
@@ -192,15 +199,18 @@ export class OfficeFormAddComponent extends AppList {
         this.email = this.formGroup.controls['email'];
         this.fax = this.formGroup.controls['fax'];
         this.company = this.formGroup.controls['company'];
-        this.bankAccountName = this.formGroup.controls['bankAccountName'];
         this.swiftCode = this.formGroup.controls['swiftCode'];
-        this.bankAddress = this.formGroup.controls['bankAddress'];
         this.active = this.formGroup.controls['active'];
-        this.bankName = this.formGroup.controls['bankName'];
         this.addressVn = this.formGroup.controls['addressVn'];
         this.bankAccountVND = this.formGroup.controls['bankAccountVND'];
+        this.bankAccountUSD = this.formGroup.controls['bankAccountUSD'];
         this.branchNameVn = this.formGroup.controls['branchNameVn'];
+        this.bankAccountName_VN = this.formGroup.controls['bankAccountName_VN'];
 
+        this.bankAccountName_EN = this.formGroup.controls['bankAccountName_EN'];
+        this.bankAddress_Local = this.formGroup.controls['bankAddress_Local'];
+
+        this.bankAddress_En = this.formGroup.controls['bankAddress_En'];
     }
 }
 
@@ -208,7 +218,8 @@ export class OfficeFormAddComponent extends AppList {
 export interface IFormAddOffice {
     id: string;
     branchNameVn: string;
-    bankAccountName: string;
+    bankAccountName_VN: string;
+    bankAccountName_EN: string;
     branchNameEn: string;
     buid: string;
     addressVn: string;
@@ -219,8 +230,8 @@ export interface IFormAddOffice {
     taxcode: string;
     bankAccountVND: string;
     bankAccountUSD: string;
-    bankName: string;
-    bankAddress: string;
+    bankAddress_Local: string;
+    bankAddress_En: string;
     code: string;
     swiftCode: string;
     shortName: string;
@@ -228,6 +239,8 @@ export interface IFormAddOffice {
     datetimeCreated: string;
     userModified: string;
     datetimeModified: string;
+    company: string;
     active: boolean;
+
 
 }

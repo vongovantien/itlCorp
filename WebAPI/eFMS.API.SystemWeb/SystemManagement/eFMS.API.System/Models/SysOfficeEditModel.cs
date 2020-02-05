@@ -25,7 +25,10 @@ namespace eFMS.API.System.Models
         public string BankAccountUsd { get; set; }
         public string BankName { get; set; }
         public string BankAddress { get; set; }
-        public string BankAccountName { get; set; }
+        public string BankAccountNameVn { get; set; }
+        public string BankAccountNameEn { get; set; }
+        public string BankAddressLocal { get; set; }
+        public string BankAddressEn { get; set; }
         public byte[] Logo { get; set; }
    
         public string UserCreated { get; set; }

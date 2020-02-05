@@ -35,8 +35,7 @@ export class OfficeAddNewComponent extends AppPage {
             const body: IOfficeAdd = {
                 branchNameEn: this.formAdd.branchNameEn.value,
                 branchNameVn: this.formAdd.branchNameVn.value,
-                bankAccountName: this.formAdd.bankAccountName.value,
-                buid: this.formAdd.selectedCompany.value,
+                buid: this.formAdd.company.value,
                 addressVn: this.formAdd.addressVn.value,
                 addressEn: this.formAdd.addressEn.value,
                 tel: this.formAdd.tel.value,
@@ -44,9 +43,11 @@ export class OfficeAddNewComponent extends AppPage {
                 email: this.formAdd.email.value,
                 taxcode: this.formAdd.taxcode.value,
                 bankAccountVnd: this.formAdd.bankAccountVND.value,
-                bankAccountUsd: '',
-                bankName: this.formAdd.bankName.value,
-                bankAddress: this.formAdd.bankAddress.value,
+                bankAccountUsd: this.formAdd.bankAccountUSD.value,
+                bankAccountNameVn: this.formAdd.bankAccountName_VN.value,
+                bankAccountNameEn: this.formAdd.bankAccountName_EN.value,
+                bankAddressLocal: this.formAdd.bankAddress_Local.value,
+                bankAddressEn: this.formAdd.bankAddress_En.value,
                 code: this.formAdd.code.value,
                 swiftCode: this.formAdd.swiftCode.value,
                 shortName: this.formAdd.shortName.value,
@@ -77,7 +78,9 @@ export class OfficeAddNewComponent extends AppPage {
 interface IOfficeAdd {
     branchNameVn: string;
     branchNameEn: string;
-    bankAccountName: string;
+    bankAccountNameVn: string;
+    bankAccountNameEn: string;
+    bankAddressEn: string;
     buid: string;
     addressVn: string;
     addressEn: string;
@@ -87,8 +90,7 @@ interface IOfficeAdd {
     taxcode: string;
     bankAccountVnd: string;
     bankAccountUsd: string;
-    bankName: string;
-    bankAddress: string;
+    bankAddressLocal: string;
     code: string;
     swiftCode: string;
     shortName: string;

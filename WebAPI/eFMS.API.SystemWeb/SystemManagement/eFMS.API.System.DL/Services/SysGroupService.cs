@@ -26,7 +26,7 @@ namespace eFMS.API.System.DL.Services
             ICatDepartmentService deptService,
             ICurrentUser currUser) : base(repository, mapper)
         {
-            SetChildren<SysUserGroup>("Id", "GroupId");
+            SetChildren<SysUserLevel>("Id", "GroupId");
             departmentRepository = departmentRepo;
             departmentService = deptService;
             currentUser = currUser;
