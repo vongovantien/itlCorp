@@ -61,7 +61,6 @@
     <Compile Remove="Models\OpsStageAssigned.cs" />
     <Compile Remove="Models\OpsTransaction.cs" />
     <Compile Remove="Models\SetEcusconnection.cs" />
-    <Compile Remove="Models\SysAuthorization.cs" />
     <Compile Remove="Models\SysAuthorizationDetail.cs" />
     <Compile Remove="Models\SysMenuPermissionInstruction.cs" />
     <Compile Remove="Models\SysPermissionGeneral.cs" />

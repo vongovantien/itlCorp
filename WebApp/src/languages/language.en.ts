@@ -94,7 +94,8 @@ export const language = {
                 { name: "Permission", route_child: "permission", display: true },
                 { name: "Department", route_child: "department", display: true },
                 { name: "Company", route_child: "company", display: true },
-                { name: "Office", route_child: "office", display: true }
+                { name: "Office", route_child: "office", display: true },
+                { name: "Authorization", route_child: "authorization", display: true }
             ]
         },
 
