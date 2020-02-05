@@ -1,10 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.API.System.DL.ViewModels
 {
-    public partial class SysMenu
+    public class MenuModel
     {
+        public MenuModel()
+        {
+            SubMenus = new List<MenuModel>();
+        }
         public string Id { get; set; }
         public string ParentId { get; set; }
         public string NameVn { get; set; }
@@ -17,8 +20,6 @@ namespace eFMS.API.System.Service.Models
         public string Route { get; set; }
         public bool? DisplayChild { get; set; }
         public bool? Display { get; set; }
-        public int? OrderNumber { get; set; }
-        public bool? Active { get; set; }
-        public DateTime? InactiveOn { get; set; }
+        public List<MenuModel> SubMenus { get; set; }
     }
 }

@@ -447,11 +447,18 @@ export class CatalogueRepo {
 
 
     getListSaleManDetail(body?: any) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/Query`, body).pipe(
-            map((res: any) => {
-                return res;
-            })
-        );
+        if (!!body) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/Query`, body).pipe(
+                map((res: any) => {
+                    return res;
+                })
+            );
+        } else {
+            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
+                map((data: any) => data)
+            );
+        }
+
 
     }
 

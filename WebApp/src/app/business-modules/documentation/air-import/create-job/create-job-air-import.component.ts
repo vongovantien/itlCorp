@@ -135,11 +135,16 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
     }
 
     showImportPopup() {
-        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirImport;
+
         this.formImportJobDetailPopup.getShippments();
         this.formImportJobDetailPopup.selected = -1;
         this.formImportJobDetailPopup.selectedShipment = null;
         this.formImportJobDetailPopup.show();
+    }
+
+    ngAfterViewInit() {
+        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirImport;
+
     }
 
     importJob(body: any) {

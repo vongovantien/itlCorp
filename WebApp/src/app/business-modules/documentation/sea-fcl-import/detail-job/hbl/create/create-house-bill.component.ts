@@ -103,6 +103,7 @@ export class CreateHouseBillComponent extends AppForm {
         this.formHouseBill.notifyPartyDescription.setValue("SAM AS CONSIGNEE");
 
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
+        this.formHouseBill.type = 'SFI';
         this._cd.detectChanges();
 
     }
