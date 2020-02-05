@@ -572,12 +572,12 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnName("BankAccount_VND")
                     .HasMaxLength(500);
 
-                entity.Property(e => e.BankAddressLocal)
-                    .HasColumnName("BankAddress_Local")
+                entity.Property(e => e.BankAddressEn)
+                    .HasColumnName("BankAddress_EN")
                     .HasMaxLength(4000);
 
-                entity.Property(e => e.BankAddressUsd)
-                    .HasColumnName("BankAddress_USD")
+                entity.Property(e => e.BankAddressLocal)
+                    .HasColumnName("BankAddress_Local")
                     .HasMaxLength(4000);
 
                 entity.Property(e => e.BankName).HasMaxLength(4000);
@@ -974,11 +974,13 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
-                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
@@ -1005,7 +1007,7 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DatetimeModified)
                     .HasColumnType("datetime")
@@ -1045,13 +1047,15 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ActionName)
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
-                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.MenuId)
                     .HasColumnName("MenuID")

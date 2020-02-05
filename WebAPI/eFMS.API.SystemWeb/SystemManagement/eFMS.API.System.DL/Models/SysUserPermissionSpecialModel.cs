@@ -7,5 +7,6 @@ namespace eFMS.API.System.DL.Models
 {
     public class SysUserPermissionSpecialModel: SysUserPermissionSpecial
     {
+        public string MenuName { get; set; }
     }
 }

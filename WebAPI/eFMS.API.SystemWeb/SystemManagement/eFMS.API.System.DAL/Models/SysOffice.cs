@@ -25,7 +25,7 @@ namespace eFMS.API.System.Service.Models
         public string BankAccountNameEn { get; set; }
         public string BankName { get; set; }
         public string BankAddressLocal { get; set; }
-        public string BankAddressUsd { get; set; }
+        public string BankAddressEn { get; set; }
         public bool Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public byte[] Logo { get; set; }

@@ -7,13 +7,45 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace eFMS.API.System.DL.Services
 {
     public class SysUserPermissionService : RepositoryBase<SysUserPermission, SysUserPermissionModel>, ISysUserPermissionService
     {
-        public SysUserPermissionService(IContextBase<SysUserPermission> repository, IMapper mapper) : base(repository, mapper)
+        private ISysUserPermissionGeneralService userPermissionGeneralService;
+        private ISysUserPermissionSpecialService userPermissionSpecialService;
+        private IContextBase<SysUser> userRepository;
+        private IContextBase<SysEmployee> employeeRepository;
+        private IContextBase<SysOffice> officeRepository;
+        private IContextBase<SysPermissionSample> permissionSampleRepository;
+        public SysUserPermissionService(IContextBase<SysUserPermission> repository, IMapper mapper,
+            ISysUserPermissionGeneralService userPermissionGeneral,
+            ISysUserPermissionSpecialService userPermissionSpecial,
+            IContextBase<SysUser> userRepo,
+            IContextBase<SysEmployee> employeeRepo,
+            IContextBase<SysOffice> officeRepo,
+            IContextBase<SysPermissionSample> permissionSampleRepo) : base(repository, mapper)
         {
+            userPermissionGeneralService = userPermissionGeneral;
+            userPermissionSpecialService = userPermissionSpecial;
+            userRepository = userRepo;
+            employeeRepository = employeeRepo;
+            officeRepository = officeRepo;
+            permissionSampleRepository = permissionSampleRepo;
+        }
+
+        public SysUserPermissionModel GetBy(string userId, Guid officeId)
+        {
+            var permission = Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault();
+            var employeeId = userRepository.Get(x => x.Id == userId)?.FirstOrDefault()?.EmployeeId;
+            permission.UserTitle = employeeId == null ? null : employeeRepository.Get(x => x.Id == employeeId)?.FirstOrDefault()?.Title;
+            permission.OfficeName = officeRepository.Get(x => x.Id == officeId)?.FirstOrDefault()?.BranchNameEn;
+            permission.PermissionName = permissionSampleRepository.Get(x => x.Id == permission.PermissionSampleId)?.FirstOrDefault()?.Name;
+            if (permission == null) return permission;
+            permission.SysUserPermissionGenerals = userPermissionGeneralService.GetBy(permission.Id);
+            permission.SysUserPermissionSpecials = userPermissionSpecialService.GetBy(permission.Id);
+            return permission;
         }
     }
 }

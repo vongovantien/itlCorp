@@ -9,5 +9,6 @@ namespace eFMS.API.System.DL.IService
 {
     public interface ISysUserPermissionService : IRepositoryBase<SysUserPermission, SysUserPermissionModel>
     {
+        SysUserPermissionModel GetBy(string userId, Guid officeId);
     }
 }
