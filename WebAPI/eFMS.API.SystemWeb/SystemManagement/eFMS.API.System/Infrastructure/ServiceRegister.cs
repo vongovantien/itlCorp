@@ -51,7 +51,11 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysPermissionSampleGeneralService, SysPermissionSampleGeneralService>();
             services.AddTransient<ISysPermissionSampleSpecialService, SysPermissionSampleSpecialService>();
             services.AddTransient<ISysRoleService, SysRoleService>();
+            services.AddTransient<ISysAuthorizationService, SysAuthorizationService>();
             services.AddTransient<ISysMenuService, SysMenuService>();
+            services.AddTransient<ISysUserPermissionService, SysUserPermissionService>();
+            services.AddTransient<ISysUserPermissionGeneralService, SysUserPermissionGeneralService>();
+            services.AddTransient<ISysUserPermissionSpecialService, SysUserPermissionSpecialService>();
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)

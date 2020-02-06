@@ -209,10 +209,10 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
                 if (!!value.startDate) {
-                    this.minDateETA = value.startDate; // * Update min date
+                    // this.minDateETA = value.startDate; // * Update min date
 
                     this.isSubmitted = false;
-                    this.resetFormControl(this.formGroup.controls["eta"]);
+                    // this.resetFormControl(this.formGroup.controls["eta"]);
                     // * serviceDate hadn't value
 
                     if (!this.formGroup.controls["serviceDate"].value || !this.formGroup.controls["serviceDate"].value.startDate) {

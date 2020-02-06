@@ -53,4 +53,12 @@ export class NumericDirective {
             e.preventDefault();
         }
     }
+
+    @HostListener('paste', ['$event'])
+    onPaste(event: ClipboardEvent) {
+        event.preventDefault();
+        const pastedInput: string = event.clipboardData.getData('text/plain');
+        document.execCommand('insertText', false, (Math.abs(+pastedInput)).toString());
+    }
+
 }

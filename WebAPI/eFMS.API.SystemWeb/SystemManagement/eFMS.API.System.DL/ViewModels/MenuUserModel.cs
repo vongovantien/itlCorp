@@ -2,11 +2,11 @@
 
 namespace eFMS.API.System.DL.ViewModels
 {
-    public class MenuModel
+    public class MenuUserModel
     {
-        public MenuModel()
+        public MenuUserModel()
         {
-            SubMenus = new List<MenuModel>();
+            SubMenus = new List<MenuUserModel>();
         }
         public string Id { get; set; }
         public string ParentId { get; set; }
@@ -20,6 +20,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string Route { get; set; }
         public bool? DisplayChild { get; set; }
         public bool? Display { get; set; }
-        public List<MenuModel> SubMenus { get; set; }
+        public int? OrderNumber { get; set; }
+        public List<MenuUserModel> SubMenus { get; set; }
     }
 }
