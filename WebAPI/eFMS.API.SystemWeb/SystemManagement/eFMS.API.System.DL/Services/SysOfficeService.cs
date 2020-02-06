@@ -207,17 +207,5 @@ namespace eFMS.API.System.DL.Services
 
             return result;
         }
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }

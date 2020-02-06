@@ -11,5 +11,6 @@ namespace eFMS.API.System.DL.IService
     public interface ISysUserPermissionSpecialService : IRepositoryBase<SysUserPermissionSpecial, SysUserPermissionSpecialModel>
     {
         List<SysUserPermissionSpecialViewModel> GetBy(Guid id);
+        List<SysUserPermissionSpecialViewModel> GetUserGeneralSpecialDefault(Guid id);
     }
 }
