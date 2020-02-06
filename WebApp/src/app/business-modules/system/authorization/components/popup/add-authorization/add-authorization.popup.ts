@@ -61,9 +61,9 @@ export class AuthorizationAddPopupComponent extends PopupBase {
                     Validators.maxLength(50)
                 ])],
             personInCharge: [],
-            authorizedPerson: [null,Validators.required],
-            authorizationService: [null,Validators.required],
-            effectiveDate: [null,Validators.required],
+            authorizedPerson: [null, Validators.required],
+            authorizationService: [null, Validators.required],
+            effectiveDate: [null, Validators.required],
             expirationDate: [null],
             authorizationNote: [''],
             authorizationActive: []
@@ -104,12 +104,11 @@ export class AuthorizationAddPopupComponent extends PopupBase {
 
     saveAuthorization() {
         [this.personInCharge].forEach((control: AbstractControl) => this.setError(control));
-        console.log(this.formAuthorization);
         this.isSubmited = true;
         if (this.formAuthorization.valid) {
             const _authorization: Authorization = {
                 id: this.authorization.id,
-                userId: this.personInCharge.value ? (this.personInCharge.value.length > 0 ? this.personInCharge.value[0].id : '') : '',
+                userId: this.personInChargeActive[0].id,
                 assignTo: this.authorizedPerson.value ? (this.authorizedPerson.value.length > 0 ? this.authorizedPerson.value[0].id : '') : '',
                 name: this.authorizationName.value,
                 services: this.authorizedPerson.value ? (this.authorizedPerson.value.length > 0 ? this.authorizationService.value[0].id : '') : '',
@@ -164,18 +163,15 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     }
 
     getDetail() {
-        console.log(this.authorization)
         let indexPIC = this.personInChargeList.findIndex(x => x.id == this.authorization.userId);
         if (indexPIC > -1) {
             this.personInChargeActive = [this.personInChargeList[indexPIC]];
         }
-        console.log(this.personInChargeActive)
 
         let indexAP = this.authorizedPersonList.findIndex(x => x.id == this.authorization.assignTo);
         if (indexAP > -1) {
             this.authorizedPersonActive = [this.authorizedPersonList[indexAP]];
         }
-        console.log(this.authorizedPersonActive)
 
         this.formAuthorization.setValue({
             authorizationName: this.authorization.name,

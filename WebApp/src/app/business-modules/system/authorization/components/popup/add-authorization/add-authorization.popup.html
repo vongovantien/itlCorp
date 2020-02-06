@@ -34,7 +34,7 @@
                                 <label class="form-control-label">
                                     Person In Charge
                                 </label>
-                                <ng-select formControlName="personInCharge" [allowClear]="true"
+                                <ng-select formControlName="personInCharge" [active]="personInChargeActive || []" [allowClear]="true" [disabled]="true"
                                     [items]="personInChargeList">
                                 </ng-select>
                             </div>

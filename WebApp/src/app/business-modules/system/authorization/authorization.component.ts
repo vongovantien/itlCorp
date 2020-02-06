@@ -3,12 +3,13 @@ import { Component, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { NgProgress } from "@ngx-progressbar/core";
 import { SystemRepo } from "@repositories";
-import { SortService } from "@services";
+import { SortService, BaseService } from "@services";
 import { ToastrService } from "ngx-toastr";
 import { catchError, finalize, map } from "rxjs/operators";
 import { Authorization } from "src/app/shared/models/system/authorization";
 import { ConfirmPopupComponent } from "@common";
 import { AuthorizationAddPopupComponent } from "./components/popup/add-authorization/add-authorization.popup";
+import { User } from "@models";
 
 @Component({
   selector: 'app-authorization',
@@ -22,12 +23,14 @@ export class AuthorizationComponent extends AppList {
 
   authorizations: Authorization[] = [];
   selectedAuthorization: Authorization;
-
+  userLogged: User;
+  
   constructor(private _router: Router,
     private _systemRepo: SystemRepo,
     private _sortService: SortService,
     private _progressService: NgProgress,
-    private _toastService: ToastrService) {
+    private _toastService: ToastrService,
+    private _baseService: BaseService,) {
     super();
     this._progressRef = this._progressService.ref();
     this.requestList = this.searchAuthorization;
@@ -104,8 +107,18 @@ export class AuthorizationComponent extends AppList {
   }
 
   openPopupAddAuthorization() {
+    this.userLogged = this._baseService.getUserLogin() || 'admin';
+
     this.authorizationAddPopupComponent.action = 'create';
     this.authorizationAddPopupComponent.authorizationActive.setValue(true);
+
+    this.authorizationAddPopupComponent.getUsers();
+    let indexPIC = this.authorizationAddPopupComponent.personInChargeList.findIndex(x => x.id == this.userLogged.id);
+    if (indexPIC > -1) {
+      this.authorizationAddPopupComponent.personInChargeActive = [this.authorizationAddPopupComponent.personInChargeList[indexPIC]];
+    }
+    console.log(this.authorizationAddPopupComponent.personInChargeActive)
+
     this.authorizationAddPopupComponent.show();
   }
 
@@ -115,24 +128,24 @@ export class AuthorizationComponent extends AppList {
 
   showDetailAuthorization(authorization) {
     this._systemRepo.getAuthorizationById(authorization.id).subscribe(
-        (res: any) => {
-            console.log(res)
-            if (res.id !== 0) {
-                var _authorization = new Authorization(res);
-                this.authorizationAddPopupComponent.action = "update";
-                this.authorizationAddPopupComponent.activeServices = this.authorizationAddPopupComponent.getCurrentActiveService(_authorization.services);
-                this.authorizationAddPopupComponent.authorization = _authorization;
-                this.authorizationAddPopupComponent.getDetail();
-                this.authorizationAddPopupComponent.show();
-            } else {
-                this._toastService.error("Not found data");
-            }
-        },
+      (res: any) => {
+        console.log(res)
+        if (res.id !== 0) {
+          var _authorization = new Authorization(res);
+          this.authorizationAddPopupComponent.action = "update";
+          this.authorizationAddPopupComponent.activeServices = this.authorizationAddPopupComponent.getCurrentActiveService(_authorization.services);
+          this.authorizationAddPopupComponent.authorization = _authorization;
+          this.authorizationAddPopupComponent.getDetail();
+          this.authorizationAddPopupComponent.show();
+        } else {
+          this._toastService.error("Not found data");
+        }
+      },
     );
-}
+  }
 
-showConfirmDelete(data: any) {
+  showConfirmDelete(data: any) {
     this.selectedAuthorization = data;
     this.confirmDeletePopup.show();
-}
+  }
 }
