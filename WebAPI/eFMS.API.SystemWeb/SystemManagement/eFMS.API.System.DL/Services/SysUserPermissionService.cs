@@ -77,5 +77,10 @@ namespace eFMS.API.System.DL.Services
             result.SysUserPermissionSpecials = userPermissionSpecialService.GetUserGeneralSpecialDefault(permissionSampleId);
             return result;
         }
+
+        public HandleState Add(List<SysUserPermissionEditModel> list)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
