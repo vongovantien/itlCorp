@@ -153,6 +153,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     setSelectedDisplayFields(data: any[]) {
         if (data.length > 0) {
             this.SelectedDisplayFields = data;
+            this.searchKeys.push(...data);
         }
     }
 
