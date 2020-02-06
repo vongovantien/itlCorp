@@ -63,7 +63,7 @@ namespace eFMS.API.System.DL.Services
             {
                 try
                 {
-                    users.ForEach(x => { x.GroupId = 11; x.DatetimeCreated = x.DatetimeModified = DateTime.Now; x.UserCreated = x.UserModified = currentUser.UserID; }) ;
+                    users.ForEach(x => { x.GroupId = 11; x.DatetimeCreated = x.DatetimeModified = DateTime.Now; x.UserCreated = x.UserModified = "samuel.an"; }) ;
                     var hsUser = DataContext.Add(users);
                     trans.Commit();
                     return hsUser;
