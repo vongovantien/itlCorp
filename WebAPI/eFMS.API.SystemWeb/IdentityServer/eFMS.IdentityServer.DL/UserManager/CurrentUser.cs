@@ -12,12 +12,12 @@ namespace eFMS.IdentityServer.DL.UserManager
     public class CurrentUser : ICurrentUser
     {
         readonly ISysEmployeeService employeeService;
+        private IHttpContextAccessor httpContext;
+        private readonly IEnumerable<Claim> currentUser;
         public CurrentUser(ISysEmployeeService empService)
         {
             employeeService = empService;
         }
-        private IHttpContextAccessor httpContext;
-        private readonly IEnumerable<Claim> currentUser;
         public CurrentUser(IHttpContextAccessor contextAccessor)
         {
             httpContext = contextAccessor;
@@ -28,5 +28,10 @@ namespace eFMS.IdentityServer.DL.UserManager
         public string UserName => currentUser.FirstOrDefault(x => x.Type == "userName").Value;
 
         public EmployeeModel CurrentEmployee => employeeService.First(x => x.Id == EmployeeID);
+
+        public Guid CompanyID => new Guid(currentUser.FirstOrDefault(x => x.Type == "companyId").Value);
+        public Guid OfficeID => new Guid(currentUser.FirstOrDefault(x => x.Type == "officeId").Value);
+        public int DepartmentId => Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "departmentId").Value);
+        public short GroupId => Convert.ToInt16(currentUser.FirstOrDefault(x => x.Type == "groupId").Value);
     }
 }

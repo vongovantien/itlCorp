@@ -11,5 +11,9 @@ namespace eFMS.IdentityServer.DL.UserManager
         string EmployeeID { get; }
         string UserName { get; }
         EmployeeModel CurrentEmployee { get; }
+        Guid CompanyID { get; }
+        Guid OfficeID { get; }
+        int DepartmentId { get; }
+        short GroupId { get; }
     }
 }
