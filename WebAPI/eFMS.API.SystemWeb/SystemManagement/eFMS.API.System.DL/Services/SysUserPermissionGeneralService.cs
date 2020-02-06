@@ -82,54 +82,5 @@ namespace eFMS.API.System.DL.Services
             }
             return results;
         }
-
-        public List<SysUserPermissionGeneralViewModel> GetUserGeneralPermissionDefault(Guid id)
-        {
-            List<SysUserPermissionGeneralViewModel> results = new List<SysUserPermissionGeneralViewModel>();
-            var menus = menuRepository.Get().ToList();
-            var modules = menus.Where(x => x.ParentId == null).OrderBy(x => x.NameEn);
-            var permissionDetails = permissionSampleGeneralRepository.Get(x => x.PermissionId == id).ToList();
-            if (modules == null) return results;
-            foreach (var module in modules)
-            {
-                var item = new SysUserPermissionGeneralViewModel
-                {
-                    ModuleName = module.NameEn,
-                    ModuleID = module.Id,
-                    UserPermissionId = id
-                };
-                var functions = menus.Where(x => x.ParentId == module.Id);
-                List<SysUserPermissionGeneralModel> listPerDetails = null;
-                if (functions != null)
-                {
-                    listPerDetails = new List<SysUserPermissionGeneralModel>();
-                    foreach (var function in functions)
-                    {
-                        var detail = permissionDetails.FirstOrDefault(x => x.MenuId == function.Id);
-                        if (detail != null)
-                        {
-                            var perDetail = new SysUserPermissionGeneralModel
-                            {
-                                MenuId = function.Id,
-                                MenuName = function.NameEn,
-                                UserPermissionId = id
-                            };
-                            perDetail.Id = Guid.NewGuid();
-                            perDetail.Access = detail.Access;
-                            perDetail.Detail = detail.Delete;
-                            perDetail.Write = detail.Write;
-                            perDetail.Delete = detail.Delete;
-                            perDetail.List = detail.List;
-                            perDetail.Import = detail.Import;
-                            perDetail.Export = detail.Export;
-                            listPerDetails.Add(perDetail);
-                        }
-                    }
-                }
-                item.SysUserPermissionGenerals = listPerDetails;
-                results.Add(item);
-            }
-            return results;
-        }
     }
 }
