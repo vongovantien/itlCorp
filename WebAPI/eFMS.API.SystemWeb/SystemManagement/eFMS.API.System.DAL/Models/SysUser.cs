@@ -5,12 +5,6 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysUser
     {
-        public SysUser()
-        {
-            SysAuthorizationAssignToNavigation = new HashSet<SysAuthorization>();
-            SysAuthorizationUser = new HashSet<SysAuthorization>();
-        }
-
         public string Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
@@ -28,8 +22,5 @@ namespace eFMS.API.System.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string WorkingStatus { get; set; }
-
-        public virtual ICollection<SysAuthorization> SysAuthorizationAssignToNavigation { get; set; }
-        public virtual ICollection<SysAuthorization> SysAuthorizationUser { get; set; }
     }
 }
