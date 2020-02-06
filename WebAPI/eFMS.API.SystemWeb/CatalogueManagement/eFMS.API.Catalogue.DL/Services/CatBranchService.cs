@@ -31,15 +31,15 @@ namespace eFMS.API.Catalogue.DL.Services
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             List<CatBranchModel> results = new List<CatBranchModel>();
 
-            //var lstBranch = DataContext.Get();
+            var lstBranch = DataContext.Get();
             var lstOfficeCompany = from b in dc.SysOffice
                                    join bu in dc.SysCompany on b.Buid equals bu.Id into bu2
                                    from bu in bu2.DefaultIfEmpty()
-                                   select new {b, AbbrCompany = bu.BunameAbbr };
+                                   select new { b, AbbrCompany = bu.BunameAbbr };
 
             foreach (var item in lstOfficeCompany)
             {
-                
+
                 var officeCompany = mapper.Map<CatBranchModel>(item.b);
                 officeCompany.AbbrCompany = item.AbbrCompany;
                 results.Add(officeCompany);

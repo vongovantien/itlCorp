@@ -32,7 +32,7 @@ namespace eFMS.API.System.DL.Services
             
             var menus = DataContext.Get(x => x.Id != null);
             var userMenus = menus.Join(permissionMenus, x => x.Id, y => y.MenuId, (x, y) => x).ToList();
-            var data = mapper.Map<List<MenuUserModel>>(menus);
+            var data = mapper.Map<List<MenuUserModel>>(userMenus);
             return FlatToHierarchy(data, null);
         }
         public List<MenuUserModel> FlatToHierarchy(List<MenuUserModel> data, string parentId = null)
