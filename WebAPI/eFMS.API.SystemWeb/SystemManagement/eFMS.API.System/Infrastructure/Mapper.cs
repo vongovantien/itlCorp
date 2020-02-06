@@ -23,6 +23,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysPermissionSample, SysPermissionSampleModel>();
             CreateMap<SysPermissionSampleGeneral, SysPermissionSampleGeneralModel>();
             CreateMap<SysPermissionSampleSpecial, SysPermissionSampleSpecialModel>();
+            CreateMap<SysAuthorization, SysAuthorizationModel>();
 
             //map view model to entity model
             CreateMap<SysOfficeEditModel, SysOfficeModel>();
