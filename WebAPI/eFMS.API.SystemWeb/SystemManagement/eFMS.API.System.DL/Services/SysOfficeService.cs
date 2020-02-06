@@ -47,10 +47,8 @@ namespace eFMS.API.System.DL.Services
 
         public IQueryable<SysOffice> GetOffices()
         {
-            //var lstSysOffice = RedisCacheHelper.GetObject<List<SysOffice>>(cache, Templates.SysBranch.NameCaching.ListName);
             var lstSysOffice = DataContext.Get();
             lstSysOffice = DataContext.Get();
-            //IQueryable<SysOffice> data = null;
 
             List<SysOfficeModel> resultData = new List<SysOfficeModel>();
 
@@ -84,7 +82,7 @@ namespace eFMS.API.System.DL.Services
                 rowsCount = 0;
                 return null;
             }
-            rowsCount = list.ToList().Count;
+            rowsCount = list.Count;
             if (size > 1)
             {
                 if (page < 1)
@@ -207,17 +205,5 @@ namespace eFMS.API.System.DL.Services
 
             return result;
         }
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }

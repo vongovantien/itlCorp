@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
+using eFMS.API.System.DL.Models;
+using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,14 +26,18 @@ namespace eFMS.API.System.Controllers
     public class SysUserPermissionController : ControllerBase
     {
         private readonly ISysUserPermissionService userPermissionService;
+        private readonly IStringLocalizer stringLocalizer;
 
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="userPermission"></param>
-        public SysUserPermissionController(ISysUserPermissionService userPermission)
+        /// <param name="localizer"></param>
+        public SysUserPermissionController(ISysUserPermissionService userPermission,
+            IStringLocalizer<LanguageSub> localizer)
         {
             userPermissionService = userPermission;
+            stringLocalizer = localizer;
         }
         /// <summary>
         /// Get by user and office
@@ -40,6 +50,53 @@ namespace eFMS.API.System.Controllers
         public IActionResult GetBy(string userId, Guid officeId)
         {
             var result = userPermissionService.GetBy(userId, officeId);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get detail of permission by user permission id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetBy(Guid id)
+        {
+            var result = userPermissionService.Get(id);
+            return Ok(result);
+        }
+
+        [HttpPost("Add")]
+        public IActionResult Add(List<SysUserPermissionEditModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = userPermissionService.Add(list);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value};
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            var hs = userPermissionService.Delete(id);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
     }

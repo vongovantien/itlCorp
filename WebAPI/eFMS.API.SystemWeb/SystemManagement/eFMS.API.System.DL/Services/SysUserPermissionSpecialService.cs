@@ -16,13 +16,16 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly IContextBase<SysMenu> menuRepository;
         private readonly IContextBase<SysPermissionSpecialAction> specialActionRepository;
+        private readonly IContextBase<SysPermissionSampleSpecialModel> userPermissionSpecialRepository;
         public SysUserPermissionSpecialService(IContextBase<SysUserPermissionSpecial> repository, 
             IMapper mapper,
             IContextBase<SysPermissionSpecialAction> specialActionRepo,
-            IContextBase<SysMenu> menuRepo) : base(repository, mapper)
+            IContextBase<SysMenu> menuRepo,
+            IContextBase<SysPermissionSampleSpecialModel> userPermissionSpecialRepo) : base(repository, mapper)
         {
             specialActionRepository = specialActionRepo;
             menuRepository = menuRepo;
+            userPermissionSpecialRepository = userPermissionSpecialRepo;
         }
 
         public List<SysUserPermissionSpecialViewModel> GetBy(Guid id)

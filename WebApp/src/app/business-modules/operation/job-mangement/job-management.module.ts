@@ -10,6 +10,7 @@ import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { JobManagementCreateJobComponent } from './create/create-job.component';
 import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';
+import { JobManagementFormCreateComponent } from './components/form-create/form-create-job.component';
 
 
 const routing: Routes = [
@@ -55,7 +56,8 @@ const LIB = [
     declarations: [
         JobManagementComponent,
         JobManagementCreateJobComponent,
-        JobManagementFormSearchComponent
+        JobManagementFormSearchComponent,
+        JobManagementFormCreateComponent
     ],
     providers: [
     ],

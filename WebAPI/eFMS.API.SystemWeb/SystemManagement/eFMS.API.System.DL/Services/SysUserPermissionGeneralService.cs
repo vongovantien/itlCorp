@@ -16,10 +16,13 @@ namespace eFMS.API.System.DL.Services
     public class SysUserPermissionGeneralService : RepositoryBase<SysUserPermissionGeneral, SysUserPermissionGeneralModel>, ISysUserPermissionGeneralService
     {
         private readonly IContextBase<SysMenu> menuRepository;
+        private readonly IContextBase<SysPermissionSampleGeneral> permissionSampleGeneralRepository;
         public SysUserPermissionGeneralService(IContextBase<SysUserPermissionGeneral> repository, IMapper mapper,
-            IContextBase<SysMenu> menuRepo) : base(repository, mapper)
+            IContextBase<SysMenu> menuRepo,
+            IContextBase<SysPermissionSampleGeneral> permissionSampleGeneralRepo) : base(repository, mapper)
         {
             menuRepository = menuRepo;
+            permissionSampleGeneralRepository = permissionSampleGeneralRepo;
         }
 
         public List<SysUserPermissionGeneralViewModel> GetBy(Guid id)

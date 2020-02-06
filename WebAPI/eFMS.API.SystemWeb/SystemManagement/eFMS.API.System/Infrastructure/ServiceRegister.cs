@@ -45,7 +45,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
             services.AddTransient<ISysGroupService, SysGroupService>();
             services.AddTransient<ISysImageService, SysImageService>();
-            services.AddTransient<ISysUserGroupService, SysUserGroupService>();
+            services.AddTransient<ISysUserLevelService, SysUserLevelService>();
             services.AddTransient<ISysEmployeeService, SysEmployeeService>();
             services.AddTransient<ISysPermissionSampleService, SysPermissionSampleService>();
             services.AddTransient<ISysPermissionSampleGeneralService, SysPermissionSampleGeneralService>();

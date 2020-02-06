@@ -20,7 +20,9 @@ export class OfficeDetailsComponent extends AppPage {
         id: '',
         branchNameVn: '',
         branchNameEn: '',
-        bankAccountName: '',
+        bankAccountName_VN: '',
+        bankAccountName_EN: '',
+
         buid: '',
         addressVn: '',
         addressEn: '',
@@ -30,8 +32,7 @@ export class OfficeDetailsComponent extends AppPage {
         taxcode: '',
         bankAccountVND: '',
         bankAccountUSD: '',
-        bankName: '',
-        bankAddress: '',
+        bankAddress_Local: '',
         code: '',
         swiftCode: '',
         shortName: '',
@@ -39,7 +40,9 @@ export class OfficeDetailsComponent extends AppPage {
         datetimeCreated: '',
         userModified: '',
         datetimeModified: '',
-        active: true
+        active: true,
+        company: '',
+        bankAddress_En: ''
     };
     officeId: string = '';
 
@@ -83,17 +86,19 @@ export class OfficeDetailsComponent extends AppPage {
                 branchNameVn: this.formAdd.branchNameVn.value,
                 shortName: this.formAdd.shortName.value,
                 addressEn: this.formAdd.addressEn.value,
-                buid: this.formAdd.selectedCompany.value,
+                buid: this.formAdd.company.value,
                 addressVn: this.formAdd.addressVn.value,
                 taxcode: this.formAdd.taxcode.value,
                 tel: this.formAdd.tel.value,
                 fax: this.formAdd.fax.value,
                 email: this.formAdd.email.value,
                 bankAccountVnd: this.formAdd.bankAccountVND.value,
-                bankName: this.formAdd.bankName.value,
-                bankAccountName: this.formAdd.bankAccountName.value,
-                active: this.formAdd.active.value.value,
-                bankAddress: this.formAdd.bankAddress.value,
+                bankAccountUsd: this.formAdd.bankAccountUSD.value,
+                bankAccountNameVn: this.formAdd.bankAccountName_VN.value,
+                bankAccountNameEn: this.formAdd.bankAccountName_EN.value,
+                bankAddressLocal: this.formAdd.bankAddress_Local.value,
+                bankAddressEn: this.formAdd.bankAddress_En.value,
+                active: this.formAdd.active.value,
                 swiftCode: this.formAdd.swiftCode.value
 
             };
@@ -140,18 +145,22 @@ export class OfficeDetailsComponent extends AppPage {
                             this.formData.fax = res.data.fax;
                             this.formData.buid = res.data.buid;
                             this.formData.swiftCode = res.data.swiftCode;
-                            this.formData.bankAddress = res.data.bankAddress;
-                            this.formData.bankName = res.data.bankName;
+                            this.formData.bankAddress_Local = res.data.bankAddressLocal;
+                            this.formData.bankAddress_En = res.data.bankAddressEn;
                             this.formData.addressVn = res.data.addressVn;
                             this.formData.bankAccountVND = res.data.bankAccountVnd;
                             this.formData.bankAccountUSD = res.data.bankAccountUsd;
-                            this.formData.bankAccountName = res.data.bankAccountName;
+                            this.formData.bankAccountName_VN = res.data.bankAccountNameVn;
+                            this.formData.bankAccountName_EN = res.data.bankAccountNameEn;
+
                             this.formAdd.SelectedOffice = new Office(res.data);
                             console.log('office selected:', this.formAdd.SelectedOffice);
-
+                            this.formData.company = res.data.buid;
+                            this.formData.active = res.data.active;
                             setTimeout(() => {
-                                this.formAdd.selectedCompany = { field: 'id', value: res.data.buid };
+                                // this.formAdd.selectedCompany = { field: 'id', value: res.data.buid };
                                 this.formAdd.update(this.formData, res.data.active);
+
                             }, 300);
                         }
                     }

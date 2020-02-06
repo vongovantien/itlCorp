@@ -19,7 +19,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysOffice, SysOfficeModel>();
             CreateMap<SysGroup, SysGroupModel>();
             CreateMap<SysImage, SysImageModel>();
-            CreateMap<SysUserGroup, SysUserGroupModel>();
+            CreateMap<SysUserLevel, SysUserLevelModel>();
             CreateMap<SysPermissionSample, SysPermissionSampleModel>();
             CreateMap<SysPermissionSampleGeneral, SysPermissionSampleGeneralModel>();
             CreateMap<SysPermissionSampleSpecial, SysPermissionSampleSpecialModel>();
@@ -37,6 +37,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysPermissionSampleSpecialModel, SysPermissionSampleSpecial>();
             CreateMap<SysMenu, MenuUserModel>();
             CreateMap<SysUserPermission, SysUserPermissionModel>();
+            CreateMap<SysPermissionSample, SysUserPermissionModel>();
         }
     }
 }

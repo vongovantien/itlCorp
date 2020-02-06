@@ -33,7 +33,7 @@ namespace eFMS.API.System.Service.Models
         public virtual DbSet<SysRoleMenu> SysRoleMenu { get; set; }
         public virtual DbSet<SysRolePermission> SysRolePermission { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
-        public virtual DbSet<SysUserGroup> SysUserGroup { get; set; }
+        public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
         public virtual DbSet<SysUserPermission> SysUserPermission { get; set; }
         public virtual DbSet<SysUserPermissionGeneral> SysUserPermissionGeneral { get; set; }
         public virtual DbSet<SysUserPermissionSpecial> SysUserPermissionSpecial { get; set; }
@@ -890,6 +890,11 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.HasOne(d => d.Menu)
+                    .WithMany(p => p.SysRoleMenu)
+                    .HasForeignKey(d => d.MenuId)
+                    .HasConstraintName("FK_RoleMenu_Menu");
+
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.SysRoleMenu)
                     .HasForeignKey(d => d.RoleId)
@@ -979,9 +984,9 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<SysUserGroup>(entity =>
+            modelBuilder.Entity<SysUserLevel>(entity =>
             {
-                entity.ToTable("sysUserGroup");
+                entity.ToTable("sysUserLevel");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -1020,6 +1025,18 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Group)
+                    .WithMany(p => p.SysUserLevel)
+                    .HasForeignKey(d => d.GroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_sysUserLevel_sysGroup");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.SysUserLevel)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_sysUserLevel_sysUser");
             });
 
             modelBuilder.Entity<SysUserPermission>(entity =>
