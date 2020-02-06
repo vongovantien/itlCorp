@@ -21,6 +21,9 @@ export class ShareSystemAddUserComponent extends AppList {
     headers: CommonInterface.IHeaderTable[] = [];
     positions: CommonInterface.INg2Select[];
     usersLevels: UserLevel[] = [];
+    value: any = {};
+    userData: User[] = [];
+    employeeName: any[] = [];
 
     ngOnInit() {
         this.positions = [
@@ -36,7 +39,9 @@ export class ShareSystemAddUserComponent extends AppList {
         this.getUsers();
     }
 
-
+    public refreshValue(value: any): void {
+        this.value = value;
+    }
 
     getUsers() {
         this._systemRepo.getListSystemUser({})
@@ -44,12 +49,28 @@ export class ShareSystemAddUserComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        this.users = this.utility.prepareNg2SelectData(res, 'id', 'username');
+                        this.users = res;
                         console.log(this.users);
                     }
                 },
             );
     }
+
+    addNewLine() {
+        const obj = new UserLevel();
+        this.usersLevels.push(obj);
+    }
+
+    selectedUser(obj: any, index: number) {
+
+        this.employeeName[index] = this.users[index].employeeNameVn;
+
+
+
+    }
+
+
+
 
 
 

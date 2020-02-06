@@ -116,7 +116,7 @@ namespace eFMS.IdentityServer.DL.Services
                         employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
                         modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, false, employee);
                         //modelReturn = SetLoginReturnModel(user, employee);
-                        LogUserLogin(user, employee.WorkPlaceId);
+                        LogUserLogin(user, employee.CompanyId);
                         return 1;
                     }
                 }
@@ -129,7 +129,7 @@ namespace eFMS.IdentityServer.DL.Services
             {
                 employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
                 modelReturn = SetLoginReturnModel(user, employee);
-                LogUserLogin(user, employee.WorkPlaceId);
+                LogUserLogin(user, employee.CompanyId);
                 return 1;
             }
             else
@@ -145,7 +145,7 @@ namespace eFMS.IdentityServer.DL.Services
                 userName = user.Username,
                 email = employee?.Email,
                 idUser = user.Id,
-                workplaceId = employee?.WorkPlaceId,
+                workplaceId = employee?.CompanyId,
                 status = true,
                 message = "Login successfull !"
             };

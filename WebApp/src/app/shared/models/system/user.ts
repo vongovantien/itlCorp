@@ -21,6 +21,8 @@ export class User {
     userType: string = '';
     SysEmployeeModel: Employee = null;
     employeeNameEn: string = '';
+    employeeNameVn: string = '';
+
 
     constructor(data?: any) {
         let self = this;

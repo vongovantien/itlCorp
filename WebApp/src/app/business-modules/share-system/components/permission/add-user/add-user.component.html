@@ -1,35 +1,73 @@
-<div class="table-wrapper table-editable m--margin-top-20 m--margin-bottom-20">
-    <table class="table table-bordered dataTable-edit">
-        <thead app-table-header [headers]="headers">
-            <th class="m--w-90 first table-actions-col fixed-side">
-            </th>
-        </thead>
-        <tbody>
-            <ng-container>
-                <tr>
-                    <td class="table-actions-col fixed-side">
-                        <button class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
-                            title="Detail"><i class="la la-list"></i>
-                        </button>
-                    </td>
-                    <td>
-                        <div class="form-group">
-                            <ng-select [items]="users" placeholder="please select" [allowClear]="false">
-                            </ng-select>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan=1 class="fixed-side">
-                        <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add">
-                            <i class="fa fa-plus-circle fa-2x"></i>
-                        </a>
-                    </td>
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div class="m-form m--margin-bottom-10">
+            <div class="m--align-right">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Save
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+        <div class="table-wrapper table-editable m--margin-bottom-20">
+            <table class="table table-bordered dataTable-edit">
+                <thead app-table-header [headers]="headers">
+                    <th class="m--w-90 first table-actions-col fixed-side">
+                    </th>
+                </thead>
+                <tbody>
+                    <ng-container>
+                        <tr *ngFor="let item of usersLevels;let i = index; trackBy: trackByFn">
+                            <td class="table-actions-col fixed-side">
+                                <button
+                                    class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
+                                    title="Detail"><i class="la la-list"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <select [(ngModel)]="item.userId" (ngModelChange)="selectedUser(item,i)"
+                                    class="form-control border">
+                                    <option value="null" disabled>Please select</option>
+                                    <option *ngFor="let item of users" [value]="item.id">{{item.username}}</option>
+                                </select>
+                                <!-- <ng-select (selected)="selectedUser($event,i)" (data)="refreshValue($event)"
+                                    [items]="users" placeholder="Please Select" [allowClear]="false">
+                                </ng-select> -->
+                            </td>
+                            <td>
+                                <input class="form-control" [(ngModel)]="employeeNames[i]" disabled />
+                            </td>
+                            <td>
+                                <ng-select (data)="refreshValue($event)" [items]="positions" placeholder="Please Select"
+                                    [allowClear]="false">
+                                </ng-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan=1 class="fixed-side">
+                                <a (click)="addNewLine()" class="btn m-btn--icon m-btn--icon-only m--font-primary"
+                                    title="Add">
+                                    <i class="fa fa-plus-circle fa-2x"></i>
+                                </a>
+                            </td>
 
-                </tr>
-            </ng-container>
+                        </tr>
+                    </ng-container>
 
 
-        </tbody>
-    </table>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
