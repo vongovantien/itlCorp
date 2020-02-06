@@ -44,7 +44,7 @@
                         <div class="col-lg-6">
                             <div class="form-group"
                             [ngClass]="{ 'm-form__group has-danger': isSubmited && (authorizedPerson.errors | equalError: 'required') }">
-                                <label class="form-control-label">
+                                <label class="form-control-label" required>
                                     Authorized Person
                                 </label>
                                 <ng-select formControlName="authorizedPerson" [allowClear]="true"

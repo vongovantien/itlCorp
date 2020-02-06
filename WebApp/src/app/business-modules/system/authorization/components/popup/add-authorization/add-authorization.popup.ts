@@ -61,7 +61,7 @@ export class AuthorizationAddPopupComponent extends PopupBase {
                     Validators.maxLength(50)
                 ])],
             personInCharge: [],
-            authorizedPerson: [],
+            authorizedPerson: [null,Validators.required],
             authorizationService: [null,Validators.required],
             effectiveDate: [null,Validators.required],
             expirationDate: [null],
