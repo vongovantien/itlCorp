@@ -100,7 +100,7 @@ namespace eFMS.API.System.Controllers
         /// 
         [HttpPost]
         [Route("addUser")]
-        //[Authorize]
+        [Authorize]
         public IActionResult AddUser(List<SysUserLevelModel> users)
         {
             if (!ModelState.IsValid) return BadRequest();
