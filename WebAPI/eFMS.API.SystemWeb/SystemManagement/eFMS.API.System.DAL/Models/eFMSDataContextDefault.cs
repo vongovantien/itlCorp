@@ -592,11 +592,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Route)
                     .HasMaxLength(150)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Parent)
-                    .WithMany(p => p.InverseParent)
-                    .HasForeignKey(d => d.ParentId)
-                    .HasConstraintName("FK_sysMenu_sysParentMenu");
             });
 
             modelBuilder.Entity<SysOffice>(entity =>

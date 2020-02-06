@@ -1,5 +1,5 @@
 import { AppList } from "src/app/app.list";
-import { Component } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { NgProgress } from "@ngx-progressbar/core";
 import { SystemRepo } from "@repositories";
@@ -7,12 +7,16 @@ import { SortService } from "@services";
 import { ToastrService } from "ngx-toastr";
 import { catchError, finalize, map } from "rxjs/operators";
 import { Authorization } from "src/app/shared/models/system/authorization";
+import { ConfirmPopupComponent } from "@common";
+import { AuthorizationAddPopupComponent } from "./components/popup/add-authorization/add-authorization.popup";
 
 @Component({
   selector: 'app-authorization',
   templateUrl: './authorization.component.html',
 })
 export class AuthorizationComponent extends AppList {
+  @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+  @ViewChild(AuthorizationAddPopupComponent, { static: false }) authorizationAddPopupComponent: AuthorizationAddPopupComponent;
 
   headers: CommonInterface.IHeaderTable[];
 
@@ -75,4 +79,60 @@ export class AuthorizationComponent extends AppList {
   sortAuthorization(sort: string): void {
     this.authorizations = this._sortService.sort(this.authorizations, sort, this.order);
   }
+
+  onDeleteAuthorization() {
+    this.confirmDeletePopup.hide();
+    this.deleteAuthorization(this.selectedAuthorization.id);
+  }
+
+  deleteAuthorization(id: number) {
+    this._progressRef.start();
+    this._systemRepo.deleteAuthorization(id)
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+      ).subscribe(
+        (res: CommonInterface.IResult) => {
+          if (res.status) {
+            this._toastService.success(res.message, '');
+            this.searchAuthorization(this.dataSearch);
+          } else {
+            this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+          }
+        },
+      );
+  }
+
+  openPopupAddAuthorization() {
+    this.authorizationAddPopupComponent.action = 'create';
+    this.authorizationAddPopupComponent.authorizationActive.setValue(true);
+    this.authorizationAddPopupComponent.show();
+  }
+
+  onRequestAuthorization() {
+    this.searchAuthorization(this.dataSearch);
+  }
+
+  showDetailAuthorization(authorization) {
+    this._systemRepo.getAuthorizationById(authorization.id).subscribe(
+        (res: any) => {
+            console.log(res)
+            if (res.id !== 0) {
+                var _authorization = new Authorization(res);
+                this.authorizationAddPopupComponent.action = "update";
+                this.authorizationAddPopupComponent.activeServices = this.authorizationAddPopupComponent.getCurrentActiveService(_authorization.services);
+                this.authorizationAddPopupComponent.authorization = _authorization;
+                this.authorizationAddPopupComponent.getDetail();
+                this.authorizationAddPopupComponent.show();
+            } else {
+                this._toastService.error("Not found data");
+            }
+        },
+    );
+}
+
+showConfirmDelete(data: any) {
+    this.selectedAuthorization = data;
+    this.confirmDeletePopup.show();
+}
 }
