@@ -15,7 +15,10 @@ namespace eFMS.API.System.DL.Models
         public List<SysUserPermissionSpecialViewModel> SysUserPermissionSpecials { get; set; }
     }
     
-    public class SysUserPermissionEditModel: SysUserPermission
+    public class SysUserPermissionEditModel
     {
+        public Guid PermissionSampleId { get; set; }
+        public string UserId { get; set; }
+        public Guid OfficeId { get; set; }
     }
 }
