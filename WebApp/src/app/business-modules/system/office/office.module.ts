@@ -11,6 +11,7 @@ import { OfficeDetailsComponent } from './details/office-details.component';
 import { OfficeFormSearchComponent } from './components/form-search-office/form-search-office.component';
 import { OfficeFormAddComponent } from './components/form-add-office/form-add-office.component';
 import { PaginationModule, TabsModule } from 'ngx-bootstrap';
+import { ShareSystemModule } from 'src/app/business-modules/share-system/share-system.module';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -39,6 +40,7 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         TabsModule.forRoot(),
         ReactiveFormsModule,
+        ShareSystemModule,
         RouterModule.forChild(routing)
     ],
     exports: [],

@@ -13,9 +13,11 @@ namespace eFMS.API.Catalogue.Service.Models
         public int Id { get; set; }
         public string UserId { get; set; }
         public string AssignTo { get; set; }
+        public string Name { get; set; }
+        public string Services { get; set; }
         public string Description { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
