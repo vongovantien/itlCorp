@@ -216,14 +216,14 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState UpdateCSTransaction(CsTransactionEditModel model)
         {
-            if (model.CsMawbcontainers.Count > 0)
-            {
-                var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, model.Id, null);
-                if (checkDuplicateCont.Success == false)
-                {
-                    return checkDuplicateCont;
-                }
-            }
+            //if (model.CsMawbcontainers.Count > 0)
+            //{
+            //    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, model.Id, null);
+            //    if (checkDuplicateCont.Success == false)
+            //    {
+            //        return checkDuplicateCont;
+            //    }
+            //}
             var transaction = mapper.Map<CsTransaction>(model);
             transaction.DatetimeModified = DateTime.Now;
             if (transaction.IsLocked.HasValue)
