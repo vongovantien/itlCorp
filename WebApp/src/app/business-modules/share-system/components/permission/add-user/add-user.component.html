@@ -2,7 +2,8 @@
     <div class="m-portlet__body">
         <div class="m-form m--margin-bottom-10">
             <div class="m--align-right">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button (click)="saveUserLevel()" type="button"
+                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -34,13 +35,23 @@
                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                     title="Detail"><i class="la la-list"></i>
                                 </button>
+                                <button (click)="deleteUserLevel(i)" type="button"
+                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Remove">
+                                    <i class="la la-trash"></i>
+                                </button>
                             </td>
                             <td>
-                                <select [(ngModel)]="item.userId" (ngModelChange)="selectedUser(item,i)"
-                                    class="form-control border">
-                                    <option value="null" disabled>Please select</option>
-                                    <option *ngFor="let item of users" [value]="item.id">{{item.username}}</option>
-                                </select>
+                                <div class="form-group "
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && item.userId === null }">
+                                    <select [(ngModel)]="item.userId" (ngModelChange)="selectedUser(item,i)"
+                                        class="form-control border">
+                                        <option value="null" disabled>Please select</option>
+                                        <option *ngFor="let item of users" [ngValue]="item.id">{{item.username}}
+                                        </option>
+                                    </select>
+                                </div>
+
                                 <!-- <ng-select (selected)="selectedUser($event,i)" (data)="refreshValue($event)"
                                     [items]="users" placeholder="Please Select" [allowClear]="false">
                                 </ng-select> -->
@@ -49,9 +60,16 @@
                                 <input class="form-control" [(ngModel)]="employeeNames[i]" disabled />
                             </td>
                             <td>
-                                <ng-select (data)="refreshValue($event)" [items]="positions" placeholder="Please Select"
-                                    [allowClear]="false">
-                                </ng-select>
+                                <div class="form-group "
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && item.position === null }">
+                                    <select class="form-control border" [(ngModel)]="item.position">
+                                        <option value="null" disabled>Please select</option>
+                                        <option *ngFor="let item of positions" [ngValue]="item.id">{{item.text}}
+                                        </option>
+                                    </select>
+
+                                </div>
+
                             </td>
                         </tr>
                         <tr>
@@ -71,3 +89,5 @@
         </div>
     </div>
 </div>
+<confirm-popup [body]="'Are you sure want to delete this user level'" (onSubmit)="onDeleteUserLevel()">
+</confirm-popup>

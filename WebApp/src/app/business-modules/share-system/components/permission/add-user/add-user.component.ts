@@ -1,9 +1,11 @@
-import { Component } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { AppList } from "src/app/app.list";
 import { User } from "@models";
 import { SystemRepo } from "@repositories";
 import { catchError } from "rxjs/operators";
 import { UserLevel } from "src/app/shared/models/system/userlevel";
+import { ConfirmPopupComponent } from "@common";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
     selector: 'add-user',
@@ -12,8 +14,11 @@ import { UserLevel } from "src/app/shared/models/system/userlevel";
 
 export class ShareSystemAddUserComponent extends AppList {
 
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     constructor(
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        protected _toastService: ToastrService,
+
     ) {
         super();
     }
@@ -23,7 +28,10 @@ export class ShareSystemAddUserComponent extends AppList {
     usersLevels: UserLevel[] = [];
     value: any = {};
     userData: User[] = [];
-    employeeName: any[] = [];
+    employeeNames: any[] = [];
+    indexRemove: number = null;
+    isSubmitted: boolean = false;
+
 
     ngOnInit() {
         this.positions = [
@@ -58,17 +66,56 @@ export class ShareSystemAddUserComponent extends AppList {
 
     addNewLine() {
         const obj = new UserLevel();
+        if (this.usersLevels.length === 0) {
+            this.employeeNames = [];
+        }
         this.usersLevels.push(obj);
     }
 
     selectedUser(obj: any, index: number) {
-
-        this.employeeName[index] = this.users[index].employeeNameVn;
-
-
-
+        const objUser = this.users.find(x => x.id === obj.userId);
+        this.employeeNames[index] = objUser.employeeNameVn;
     }
 
+    deleteUserLevel(index: number) {
+        this.indexRemove = index;
+        this.confirmDeletePopup.show();
+    }
+
+    onDeleteUserLevel() {
+        this.usersLevels.splice(this.indexRemove, 1);
+        this.confirmDeletePopup.hide();
+    }
+
+
+    checkValidate() {
+        let valid: boolean = true;
+        for (const userlv of this.usersLevels) {
+            if (
+
+                userlv.userId === null
+                || userlv.position === null
+            ) {
+                valid = false;
+                break;
+            }
+        }
+
+        return valid;
+    }
+
+    saveUserLevel() {
+
+        if (!this.usersLevels.length) {
+            this._toastService.warning("Please add user Level");
+            return;
+        }
+        this.isSubmitted = true;
+        if (!this.checkValidate()) {
+            return;
+        }
+
+    }
 
 
 
