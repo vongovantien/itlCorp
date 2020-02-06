@@ -13,6 +13,7 @@ import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { ShareContainerImportComponent } from './components/container-import/container-import.component';
+
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import {
     ShareBussinessFormCreateSeaImportComponent,
@@ -53,7 +54,8 @@ import {
     ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
     ShareBussinessCdNoteDetailAirPopupComponent,
     ShareBussinessFilesAttachComponent,
-    ShareBusinessHousebillsInManifestComponent
+    ShareBusinessHousebillsInManifestComponent,
+
 } from './components';
 
 
@@ -102,7 +104,7 @@ const COMPONENTS = [
     ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
     ShareBussinessCdNoteDetailAirPopupComponent,
     ShareBussinessFilesAttachComponent,
-    ShareBusinessHousebillsInManifestComponent
+    ShareBusinessHousebillsInManifestComponent,
 ];
 
 

@@ -24,16 +24,21 @@ namespace eFMS.API.System.DL.Services
             permissionGeneralService = permissionGeneral;
         }
 
-        public List<MenuUserModel> GetMenus(string userId, Guid officeId)
+        List<MenuUserModel> ISysMenuService.GetMenus(string userId, Guid officeId)
         {
             var permissionId = userpermissionService.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
             if (permissionId == null) return new List<MenuUserModel>();
             var permissionMenus = permissionGeneralService.Get(x => x.UserPermissionId == permissionId && x.Access == true);
-            
+
             var menus = DataContext.Get(x => x.Id != null);
+            var parentMenus = DataContext.Get(x => x.ParentId == null).ToList();
             var userMenus = menus.Join(permissionMenus, x => x.Id, y => y.MenuId, (x, y) => x).ToList();
-            var data = mapper.Map<List<MenuUserModel>>(menus);
-            return FlatToHierarchy(data, null);
+            userMenus.AddRange(parentMenus);
+            var data = mapper.Map<List<MenuUserModel>>(userMenus);
+            var results = FlatToHierarchy(data, null);
+            if (results.Count > 0)
+                return results.Where(x => x.SubMenus.Count > 0).ToList();
+            return results;
         }
         public List<MenuUserModel> FlatToHierarchy(List<MenuUserModel> data, string parentId = null)
         {
