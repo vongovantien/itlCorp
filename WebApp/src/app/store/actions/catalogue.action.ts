@@ -110,7 +110,7 @@ export class GetCatalogueUnitFailAction implements Action {
 //#region Commodity
 export class GetCatalogueCommodityAction implements Action {
     readonly type = CatalogueActionTypes.GET_COMMODITY;
-    constructor(public payload: any) { }
+    constructor(public payload: any = { active: true }) { }
 }
 export class GetCatalogueCommoditySuccessAction implements Action {
     readonly type = CatalogueActionTypes.GET_COMMODITY_SUCCESS;

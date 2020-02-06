@@ -94,7 +94,8 @@ export const language = {
         { name: "Quyền", route_child: "permission", display: true },
         { name: "Bộ Phận", route_child: "department", display: true },
         { name: "Thông Tin Công Ty", route_child: "company", display: true },
-        { name: "Chi nhánh", route_child: "office", display: true }
+        { name: "Chi nhánh", route_child: "office", display: true },
+        { name: "Ủy quyền", route_child: "authorization", display: true }
       ]
     },
 

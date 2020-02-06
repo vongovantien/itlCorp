@@ -39,6 +39,10 @@ const routes: Routes = [
             name: 'Office'
         }
     },
+    {
+        path: 'authorization', loadChildren: () => import('./authorization/authorization.module').then(m => m.AuthorizationModule),
+        data: { name: 'Authorization' }
+    },
 ];
 
 @NgModule({
