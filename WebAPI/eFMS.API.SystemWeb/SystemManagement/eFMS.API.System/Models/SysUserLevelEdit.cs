@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.API.System.Models
 {
-    public partial class SysUserGroup
+    public class SysUserLevelEdit
     {
         public int Id { get; set; }
         public string UserId { get; set; }

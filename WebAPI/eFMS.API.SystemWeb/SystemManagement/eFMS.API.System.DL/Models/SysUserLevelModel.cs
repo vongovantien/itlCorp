@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.API.System.DL.Models
 {
-    public class SysUserGroupModel: SysUserGroup
+    public class SysUserLevelModel: SysUserLevel
     {
         public string GroupName { get; set; }
         public string UserName { get; set; }

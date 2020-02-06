@@ -139,68 +139,86 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmited && selectedCompany.value == null}">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmited && !company.value}">
                             <label class="form-control-label">
                                 Company <span class="m--font-danger">(*)</span>
                             </label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCompany"
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: company.value}"
                                 (itemSelected)="onSelectDataFormInfo($event)"
                                 [selectedDisplayFields]="configOffice.selectedDisplayFields"
-                                [dataSources]="configOffice.dataSource" [displayFields]="configOffice.displayFields"
-                                [height]="200">
+                                [dataSources]="configOffice.dataSource" (remove)="resetFormControl(company)"
+                                [displayFields]="configOffice.displayFields" [height]="200"
+                                placeholder="Select Company">
                             </app-combo-grid-virtual-scroll>
-                            <div class="form-control-feedback" *ngIf="isSubmited && selectedCompany.value == null  ">
+                            <div class="form-control-feedback" *ngIf="isSubmited && !company.value ">
                                 Company is required!
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label class="form-control-label">
                                 Bank Name
                             </label>
                             <input type="text" formControlName="bankName" class="form-control"
                                 placeholder="Please Enter Bank Name">
+                        </div> -->
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Bank Account No VND
+                            </label>
+                            <input type="text" formControlName="bankAccountVND" class="form-control"
+                                placeholder="Please Enter Bank Account No Vnd">
                         </div>
                     </div>
 
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
+
                         <div class="form-group">
-                            <label class="form-control-label">
-                                Bank Account Name
+                            <label class="form-control-label" for="">
+                                Bank Account No USD
                             </label>
-                            <input type="text" formControlName="bankAccountName" class="form-control"
-                                placeholder="Please Enter Bank Account Name">
+                            <input type="text" formControlName="bankAccountUSD" class="form-control"
+                                placeholder="Please Enter Bank Account No Usd">
                         </div>
 
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
+                            <label class="form-control-label">
+                                Bank Account Name VN
+                            </label>
+                            <input type="text" formControlName="bankAccountName_VN" class="form-control"
+                                placeholder="Please Enter Bank Account Name VN">
+                        </div>
+                        <!-- <div class="form-group">
                             <label class="form-control-label" for="">
                                 Bank Account No
                             </label>
                             <input type="text" formControlName="bankAccountVND" class="form-control"
                                 placeholder="Please Enter Bank Account No">
-                        </div>
+                        </div> -->
                     </div>
 
 
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Swift Code
+                            <label class="form-control-label">
+                                Bank Account Name EN
                             </label>
-                            <input type="text" formControlName="swiftCode" class="form-control"
-                                placeholder="Please Enter Bank Swift Code">
-
+                            <input type="text" formControlName="bankAccountName_EN" class="form-control"
+                                placeholder="Please Enter Bank Account Name EN">
                         </div>
+                        <!-- <div class="form-group">
+                     
+
+                        </div> -->
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4">
+                    <!-- <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Bank Address
@@ -217,6 +235,42 @@
                             <select formControlName="active" class="form-control">
                                 <option *ngFor="let status of status" [ngValue]="status">{{status.title}}</option>
                             </select>
+                        </div>
+                    </div> -->
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Bank Address Local(VND)
+                            </label>
+                            <input type="text" formControlName="bankAddress_Local" class="form-control"
+                                placeholder="Please Enter Bank Address Local">
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Bank Address EN
+                            </label>
+                            <input type="text" formControlName="bankAddress_En" class="form-control"
+                                placeholder="Please Enter Bank Address En">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Swift Code
+                            </label>
+                            <input type="text" formControlName="swiftCode" class="form-control"
+                                placeholder="Please Enter Bank Swift Code">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">Active</label>
+                            <div class="m-checkbox-inline">
+                                <app-switch [(toggle)]="active.value" (toggleChange)="active.setValue($event)">
+                                </app-switch>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -248,15 +302,13 @@
                     <div class="m-portlet__body">
                         <div class="table-wrapper table-scrollabler" id="group-list-table">
                             <table class="table table-striped table-brand table-hover dataTable">
-                                <thead app-table-header [headers]="headers"
-                                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                <thead app-table-header [headers]="headers">
                                     <th class="m--w-50 first">
                                     </th>
                                 </thead>
                                 <tbody class="tbody-group">
                                     <ng-container *ngIf="!isLoading && !!departments.length">
-                                        <tr class="text-center"
-                                            *ngFor="let department of departments; let i = index; trackBy: trackByFn">
+                                        <tr *ngFor="let department of departments; let i = index; trackBy: trackByFn">
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 100px">
                                                     <button type="button" title="Detail"

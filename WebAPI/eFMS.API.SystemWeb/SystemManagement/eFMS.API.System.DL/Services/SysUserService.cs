@@ -21,7 +21,7 @@ namespace eFMS.API.System.DL.Services
     public class SysUserService : RepositoryBase<SysUser, SysUserModel>, ISysUserService
     {
         private readonly IContextBase<SysEmployee> employeeRepository;
-        private readonly IContextBase<SysUserGroup> usergroupRepository;
+        private readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IDistributedCache cache;
         private readonly IStringLocalizer stringLocalizer;
         private readonly ISysEmployeeService sysEmployeeService;
@@ -30,10 +30,10 @@ namespace eFMS.API.System.DL.Services
 
         public SysUserService(IContextBase<SysUser> repository, IMapper mapper,
             IContextBase<SysEmployee> employeeRepo,
-            IContextBase<SysUserGroup> usergroupRepo, IDistributedCache distributedCache, IStringLocalizer<LanguageSub> localizer, ISysEmployeeService employeeService, ICurrentUser currUser) : base(repository, mapper)
+            IContextBase<SysUserLevel> userlevelRepo, IDistributedCache distributedCache, IStringLocalizer<LanguageSub> localizer, ISysEmployeeService employeeService, ICurrentUser currUser) : base(repository, mapper)
         {
             employeeRepository = employeeRepo;
-            usergroupRepository = usergroupRepo;
+            userlevelRepository = userlevelRepo;
             cache = distributedCache;
             stringLocalizer = localizer;
             sysEmployeeService = employeeService;
