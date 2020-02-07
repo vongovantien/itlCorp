@@ -1,15 +1,23 @@
 import { Component } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { SystemConstants } from 'src/constants/system.const';
+import { NgForm } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+
+import { SystemConstants } from 'src/constants/system.const';
 import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
 import { CookieService } from 'ngx-cookie-service';
 import crypto_js from 'crypto-js';
-import { NgForm } from '@angular/forms';
 import { authConfig } from '../shared/authenticate/authConfig';
 import { BaseService } from 'src/app/shared/services/base.service';
-import $ from 'jquery';
+
 import { RSAHelper } from 'src/helper/RSAHelper';
+import { SystemRepo } from '../shared/repositories/system.repo';
+import { Observable } from 'rxjs';
+import { Company } from '@models';
+import $ from 'jquery';
+import { tap, share } from 'rxjs/operators';
+import { HttpHeaders } from '@angular/common/http';
+
 
 @Component({
     selector: 'app-login',
@@ -23,15 +31,15 @@ export class LoginComponent {
 
     currenURL: string = ''; // * URL before redirect to login.
 
+    company$: Observable<Company[]>;
+
+    selectedCompanyId: any;
+
     ngAfterViewInit(): void {
         if (this.route.snapshot.paramMap.get("isEndSession")) {
             setTimeout(() => {
                 this.baseService.warningToast("Login again to continue, please !", "Expired Session");
             }, 50);
-            /**
-             * To remove modal element in case has a modal is opening in previous step 
-             */
-            $('.modal-backdrop').remove();
         }
 
         this.getLoginData();
@@ -44,6 +52,7 @@ export class LoginComponent {
         private route: ActivatedRoute,
         private oauthService: OAuthService,
         private cookieService: CookieService,
+        private _systemRepo: SystemRepo
     ) {
         this.oauthService.setStorage(localStorage);
         this.oauthService.setupAutomaticSilentRefresh();
@@ -57,6 +66,15 @@ export class LoginComponent {
 
 
     ngOnInit() {
+        // Load company list.
+        this.company$ = this._systemRepo.getListCompany().pipe(share());
+
+        this.company$.subscribe(
+            (companies: any) => {
+                this.selectedCompanyId = companies[0].id;
+            }
+        );
+
         if (this.baseService.checkLoginSession()) {
             this.setupLocalInfo();
             this.router.navigateByUrl('/');
@@ -64,34 +82,42 @@ export class LoginComponent {
     }
 
     async Login(form: NgForm) {
-        if (form.form.status !== "INVALID") {
-            this.baseService.spinnerShow();
-            this.currenURL = this.route.snapshot.paramMap.get("url") || 'home/dashboard';
+        if (form.form.status !== "INVALID" && !!this.selectedCompanyId) {
+            try {
+                this.baseService.spinnerShow();
+                this.currenURL = this.route.snapshot.paramMap.get("url") || 'home/dashboard';
 
-            await this.configureWithNewConfigApi();
-            const passwordEncoded = RSAHelper.serverEncode(this.password);
-            this.oauthService.fetchTokenUsingPasswordFlow(this.username, passwordEncoded) // * Request Access Token.
-                .then((resp: any) => {
-                    return this.oauthService.loadUserProfile();
-                }).then(() => {
-                    const userInfo: IUser = <any>this.oauthService.getIdentityClaims(); // * Get info User.
-                    if (!!userInfo) {
-                        localStorage.setItem("currently_userName", userInfo.preferred_username);
-                        // localStorage.setItem("currently_userEmail", userInfo['email']);
-                        this.setupLocalInfo();
-                        this.rememberMe();
+                await this.configureWithNewConfigApi();
+                const passwordEncoded = RSAHelper.serverEncode(this.password);
 
-                        // * CURRENT_URL: url before into auth guard.
-                        if (this.currenURL.includes("login")) {
-                            this.currenURL = "home/dashboard";
-                        }
-                        this.router.navigateByUrl(this.currenURL);
-                        this.baseService.spinnerHide();
-                        this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
-                    }
-                }).catch((err) => {
-                    this.baseService.spinnerHide();
+                const header: HttpHeaders = new HttpHeaders({
+                    companyId: this.selectedCompanyId
                 });
+                this.oauthService.fetchTokenUsingPasswordFlow(this.username, passwordEncoded, header) // * Request Access Token.
+                    .then((resp: any) => {
+                        return this.oauthService.loadUserProfile();
+                    }).then(() => {
+                        const userInfo: IUser = <any>this.oauthService.getIdentityClaims(); // * Get info User.
+                        if (!!userInfo) {
+                            localStorage.setItem("currently_userName", userInfo.preferred_username);
+                            // localStorage.setItem("currently_userEmail", userInfo['email']);
+                            this.setupLocalInfo();
+                            this.rememberMe();
+
+                            // * CURRENT_URL: url before into auth guard.
+                            if (this.currenURL.includes("login")) {
+                                this.currenURL = "home/dashboard";
+                            }
+                            this.router.navigateByUrl(this.currenURL);
+                            this.baseService.spinnerHide();
+                            this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
+                        }
+                    }).catch((err) => {
+                        this.baseService.spinnerHide();
+                    });
+            } catch (error) {
+                this.baseService.spinnerHide();
+            }
         }
     }
 

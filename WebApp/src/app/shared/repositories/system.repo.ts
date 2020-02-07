@@ -4,7 +4,7 @@ import { environment } from 'src/environments/environment';
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class SystemRepo {
     private VERSION: string = 'v1';
     constructor(private _api: ApiService) {
