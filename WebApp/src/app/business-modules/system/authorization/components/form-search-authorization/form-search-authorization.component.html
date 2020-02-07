@@ -7,8 +7,8 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Service</label>
-                                <ng-select formControlName="service"
-                                    [allowClear]="true" [items]="serviceList" (removed)="service.value = null">
+                                <ng-select formControlName="service" [allowClear]="true" [items]="serviceList"
+                                    (removed)="service.setValue(null)">
                                 </ng-select>
                             </div>
                         </div>
@@ -18,8 +18,7 @@
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true"
-                                        formControlName="effectiveDate" readonly />
+                                        name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -35,8 +34,8 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Person In Charge</label>
-                                <ng-select formControlName="personInCharge"
-                                    [allowClear]="true" [items]="personInChargeList">
+                                <ng-select formControlName="personInCharge" [allowClear]="true"
+                                    [items]="personInChargeList">
                                 </ng-select>
                             </div>
                         </div>
@@ -46,8 +45,7 @@
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true"
-                                        formControlName="expirationDate" readonly/>
+                                        name="daterange" [autoApply]="true" formControlName="expirationDate" readonly />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -64,16 +62,16 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Authorized Person</label>
-                                <ng-select formControlName="authorizedPerson"
-                                    [allowClear]="true" [items]="authorizedPersonList">
+                                <ng-select formControlName="authorizedPerson" [allowClear]="true"
+                                    [items]="authorizedPersonList">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Status</label>
-                                <ng-select formControlName="status"
-                                    [allowClear]="false" [items]="statusList" [active]="statusActive">
+                                <ng-select formControlName="status" [allowClear]="false" [items]="statusList"
+                                    [active]="statusActive">
                                 </ng-select>
                             </div>
                         </div>

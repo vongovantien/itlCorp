@@ -6,9 +6,10 @@ import { Routes, RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
-import { PaginationModule } from 'ngx-bootstrap';
+import { PaginationModule, ModalModule } from 'ngx-bootstrap';
 import { AuthorizationComponent } from './authorization.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { AuthorizationAddPopupComponent } from './components/popup/add-authorization/add-authorization.popup';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -37,11 +38,13 @@ const routing: Routes = [
         ReactiveFormsModule,
         RouterModule.forChild(routing),
         NgxDaterangepickerMd,
+        ModalModule.forRoot(),
     ],
     exports: [],
     declarations: [
         AuthorizationComponent,
-        AuthorizationFormSearchComponent
+        AuthorizationFormSearchComponent,
+        AuthorizationAddPopupComponent
     ],
     providers: [],
 })
