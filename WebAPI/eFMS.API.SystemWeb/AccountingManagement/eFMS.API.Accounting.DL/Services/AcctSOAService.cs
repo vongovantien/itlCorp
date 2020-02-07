@@ -1203,8 +1203,16 @@ namespace eFMS.API.Accounting.DL.Services
 
             query = chg =>
                    chg.CustomerID == criteria.CustomerID
-                && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH)
-                && (criteria.InSoa == true ? !string.IsNullOrEmpty(chg.SOANo) : string.IsNullOrEmpty(chg.SOANo));
+                && chg.IsOBH == criteria.IsOBH;
+
+            if(criteria.InSoa == true)
+            {
+                query = query.Or(chg => !string.IsNullOrEmpty(chg.SOANo));
+            }
+            else
+            {
+                query = query.And(chg => string.IsNullOrEmpty(chg.SOANo));
+            }
 
             if (string.IsNullOrEmpty(criteria.DateType) || criteria.DateType == "CreatedDate")
             {
