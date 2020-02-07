@@ -1,7 +1,8 @@
 <div class="department-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="openPopupAddAuthorization()">
                 <span>
                     <i class="la la-plus"></i>
                     <span>
@@ -31,12 +32,12 @@
                                             <div class="table-actions" style="width: 70px">
                                                 <button type="button" title="Detail"
                                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
-                                                    >
+                                                    (click)="showDetailAuthorization(authorization)">
                                                     <i class="la la-edit"></i>
                                                 </button>
                                                 <button type="button" [disabled]="authorization.active" title="Delete"
                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
-                                                    >
+                                                    (click)="showConfirmDelete(authorization)">
                                                     <i class="la la-trash"></i>
                                                 </button>
                                             </div>
@@ -87,5 +88,6 @@
     </div>
 </div>
 
-<!-- <confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteDepartment()">
-</confirm-popup> -->
+<confirm-popup [body]="'Are you sure you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteAuthorization()">
+</confirm-popup>
+<add-authorization-popup (onRequestAuthorization)="onRequestAuthorization()"></add-authorization-popup>
