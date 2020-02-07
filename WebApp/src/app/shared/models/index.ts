@@ -41,6 +41,8 @@ export * from './system/role';
 
 export * from './report/crystal.model';
 
+export * from './system/authorization'
+
 
 
 

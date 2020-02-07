@@ -6,10 +6,9 @@ import { SystemRepo } from "@repositories";
 import { SortService, BaseService } from "@services";
 import { ToastrService } from "ngx-toastr";
 import { catchError, finalize, map } from "rxjs/operators";
-import { Authorization } from "src/app/shared/models/system/authorization";
 import { ConfirmPopupComponent } from "@common";
 import { AuthorizationAddPopupComponent } from "./components/popup/add-authorization/add-authorization.popup";
-import { User } from "@models";
+import { User, Authorization } from "@models";
 
 @Component({
   selector: 'app-authorization',
@@ -52,7 +51,6 @@ export class AuthorizationComponent extends AppList {
   }
 
   onSearchAuthorization(data: any) {
-    console.log(data);
     this.page = 1; // reset page.
     this.searchAuthorization(data);
   }
@@ -112,12 +110,11 @@ export class AuthorizationComponent extends AppList {
     this.authorizationAddPopupComponent.action = 'create';
     this.authorizationAddPopupComponent.authorizationActive.setValue(true);
 
-    this.authorizationAddPopupComponent.getUsers();
+    //this.authorizationAddPopupComponent.getUsers();
     let indexPIC = this.authorizationAddPopupComponent.personInChargeList.findIndex(x => x.id == this.userLogged.id);
     if (indexPIC > -1) {
       this.authorizationAddPopupComponent.personInChargeActive = [this.authorizationAddPopupComponent.personInChargeList[indexPIC]];
     }
-    console.log(this.authorizationAddPopupComponent.personInChargeActive)
 
     this.authorizationAddPopupComponent.show();
   }
@@ -129,7 +126,6 @@ export class AuthorizationComponent extends AppList {
   showDetailAuthorization(authorization) {
     this._systemRepo.getAuthorizationById(authorization.id).subscribe(
       (res: any) => {
-        console.log(res)
         if (res.id !== 0) {
           var _authorization = new Authorization(res);
           this.authorizationAddPopupComponent.action = "update";

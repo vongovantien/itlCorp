@@ -112,5 +112,8 @@
   "MSG_STAGE_CODE_DUPLICATE": "Code {0} has been duplicated!|wrong",
   "MSG_STAGE_STATUS_EMPTY": "Status is not allow empty!|wrong",
   //------------end  : STAGE
-  "MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED":  "Item is active, not allow deleted"
+  "MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED": "Item is active, not allow deleted",
+
+  "MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE": "Expiration date must be greater than or equal to the effective date",
+  "MSG_ITEM_SIMILAR_AUTHORIZATION": "A similar authorization was created on the system with this time period. Please recheck or select another time period"
 }
