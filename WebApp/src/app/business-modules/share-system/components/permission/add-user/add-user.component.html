@@ -35,7 +35,7 @@
                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                     title="Detail"><i class="la la-list"></i>
                                 </button>
-                                <button (click)="deleteUserLevel(i)" type="button"
+                                <button (click)="deleteUserLevel(i,item.id)" type="button"
                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                     title="Remove">
                                     <i class="la la-trash"></i>
@@ -43,7 +43,7 @@
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && item.userId === null }">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.userId === null || item.isDup )   }">
                                     <select [(ngModel)]="item.userId" (ngModelChange)="selectedUser(item,i)"
                                         class="form-control border">
                                         <option value="null" disabled>Please select</option>
@@ -57,7 +57,7 @@
                                 </ng-select> -->
                             </td>
                             <td>
-                                <input class="form-control" [(ngModel)]="employeeNames[i]" disabled />
+                                <input class="form-control" [(ngModel)]="item.employeeNameVn" disabled />
                             </td>
                             <td>
                                 <div class="form-group "

@@ -52,6 +52,7 @@ namespace eFMS.API.System.DL.Services
         public SysUserPermissionModel GetBy(string userId, Guid officeId)
         {
             var permission = Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault();
+            if (permission == null) return permission;
             var employeeId = userRepository.Get(x => x.Id == userId)?.FirstOrDefault()?.EmployeeId;
             permission.UserTitle = employeeId == null ? null : employeeRepository.Get(x => x.Id == employeeId)?.FirstOrDefault()?.Title;
             permission.OfficeName = officeRepository.Get(x => x.Id == officeId)?.FirstOrDefault()?.BranchNameEn;

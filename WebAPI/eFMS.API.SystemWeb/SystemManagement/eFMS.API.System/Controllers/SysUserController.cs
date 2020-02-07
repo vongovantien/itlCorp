@@ -61,6 +61,8 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
+       
+
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(SysUserCriteria criteria)
@@ -218,7 +220,7 @@ namespace eFMS.API.System.Controllers
         /// <summary>
         /// reset password of user to default
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
 
         [HttpGet]
