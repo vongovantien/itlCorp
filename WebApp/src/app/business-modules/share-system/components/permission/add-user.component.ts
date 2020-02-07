@@ -7,6 +7,7 @@ import { UserLevel } from "src/app/shared/models/system/userlevel";
 import { ConfirmPopupComponent } from "@common";
 import { ToastrService } from "ngx-toastr";
 import { NgProgress } from "@ngx-progressbar/core";
+import { Router } from "@angular/router";
 
 @Component({
     selector: 'add-user',
@@ -22,6 +23,8 @@ export class ShareSystemAddUserComponent extends AppList {
         private _systemRepo: SystemRepo,
         protected _toastService: ToastrService,
         private _progressService: NgProgress,
+        private _router: Router,
+
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -240,5 +243,14 @@ export class ShareSystemAddUserComponent extends AppList {
                     }
                 },
             );
+    }
+
+    gotoUserPermission(id: number, type) {
+        type = this.type;
+        if (type === 'office') {
+            const officeId = this.object.id;
+            this._router.navigate([`home/system/office/${officeId}/${id}`]);
+
+        }
     }
 }

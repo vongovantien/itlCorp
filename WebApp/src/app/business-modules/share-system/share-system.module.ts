@@ -7,11 +7,30 @@ import { PipeModule } from "src/app/shared/pipes/pipe.module";
 import { SelectModule } from "ng2-select";
 import { EffectsModule } from "@ngrx/effects";
 import { effects } from "../system/company/store";
-import { CollapseModule } from "ngx-bootstrap";
-import { ShareSystemAddUserComponent } from "./components/permission/add-user/add-user.component";
+import { CollapseModule, TabsModule } from "ngx-bootstrap";
+import { ShareSystemAddUserComponent } from "./components/permission/add-user.component";
+import { ShareSystemDetailPermissionComponent } from "./components/permission/permission.component";
+import { PermissionFormCreateComponent } from "../system/permission/components/form-create-permission/form-create-permission.component";
+import { Routes, RouterModule } from "@angular/router";
+import { UserPermissionComponent } from "../system/office/components/user-permission/user-permission.component";
+
+// const routing: Routes = [
+//     {
+//         path: '', data: { name: "" },
+//         children: [
+//             {
+//                 path: ':id/:idUser', component: UserPermissionComponent, data: { name: "UserPermission" }
+//             }
+
+//         ]
+//     },
+// ];
 
 const COMPONENTS = [
-    ShareSystemAddUserComponent
+    ShareSystemAddUserComponent,
+    ShareSystemDetailPermissionComponent,
+    PermissionFormCreateComponent,
+
 ]
 @NgModule({
     declarations: [
@@ -25,8 +44,10 @@ const COMPONENTS = [
         DirectiveModule,
         PipeModule,
         SelectModule,
+        TabsModule.forRoot(),
         EffectsModule.forFeature(effects),
         CollapseModule.forRoot(),
+        // RouterModule.forChild(routing)
     ],
     exports: [
         ...COMPONENTS

@@ -75,6 +75,10 @@ export class OfficeDetailsComponent extends AppPage {
 
     }
 
+
+
+
+
     updateOffice() {
         this.formAdd.isSubmited = true;
         if (this.formAdd.formGroup.valid) {
