@@ -14,7 +14,7 @@ export const authConfig: AuthConfig = {
   clientId: 'eFMS',
   requireHttps: false,
   oidc: false,
-  logoutUrl: '/login',
+  logoutUrl: '#/login',
 
   sessionCheckIntervall: 2000,
   // set the scope for the permissions the client should request

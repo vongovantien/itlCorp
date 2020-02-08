@@ -23,5 +23,9 @@ namespace eFMS.API.System.DL.IService
         HandleState DeleteOffice(Guid id);
         IQueryable<SysOfficeViewModel> GetOfficeByCompany(Guid id);
 
+        List<SysOffice> GetOfficePermission(string username, Guid companyId);
+
+
+
     }
 }

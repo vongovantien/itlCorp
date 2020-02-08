@@ -161,6 +161,57 @@
                         </li> -->
                         <li class="m-nav__item topbar__lang">
                             <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
+                                <span class="m-nav__link-icon">
+                                    <i class="la la-building-o"></i>
+                                </span>
+                                <span class="m-nav__link-text" *ngIf="!!selectedOffice">
+                                    {{selectedOffice.branchNameEn}}
+                                </span>
+                            </a>
+                            <div class="dropdown-menu" style="min-width: 160px">
+                                <ul class="m-nav">
+                                    <li class="m-nav__item" *ngFor="let office of offices; let i=index; trackBy: i"
+                                        (click)="changeOffice(office)">
+                                        <a class="m-nav__link active">
+                                            <span class="m-nav__link-text">
+                                                {{office.branchNameEn}}
+                                            </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="m-nav__item topbar__lang">
+                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
+                                <!-- <span class="m-nav__link-badge m-badge m-badge--danger">3</span>
+                                <span class="m-nav__link-icon">
+                                    <i class="la la-group"></i>
+                                </span> -->
+                                <span class="m-nav__link-text">
+                                    ITL HAN
+                                </span>
+                            </a>
+                            <div class="dropdown-menu" style="min-width: 160px">
+                                <ul class="m-nav">
+                                    <li class="m-nav__item">
+                                        <a class="m-nav__link active" href="javascript:void(0)">
+                                            <span class="m-nav__link-text">
+                                                ITL HCM
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="m-nav__item">
+                                        <a class="m-nav__link" href="javascript:void(0)">
+                                            <span class="m-nav__link-text">
+                                                ITL HAN
+                                            </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="m-nav__item topbar__lang">
+                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
                                 <span class="m-topbar__userpic" *ngIf="active_flag">
                                     <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered"
                                         [src]="active_flag" />

@@ -168,7 +168,16 @@ namespace eFMS.API.System.Controllers
             ResultHandle hs = new ResultHandle { Data = offices , Status = true };
             return Ok(hs);
         }
-        
+
+        [HttpGet]
+        [Route("GetOfficePermission/{username}/{companyId}")]
+        public IActionResult GetOfficePermission(string username,Guid companyId)
+        {
+            var officesPermission = sysOfficeService.GetOfficePermission(username,companyId);
+            ResultHandle hs = new ResultHandle { Data = officesPermission, Status = true };
+            return Ok(hs);
+        }
+
         /// get office by id
         /// </summary>
         /// <param name="id">id of data that need to retrieve</param>

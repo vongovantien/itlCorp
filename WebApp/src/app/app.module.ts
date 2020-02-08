@@ -5,7 +5,7 @@ import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { StoreModule } from "@ngrx/store";
-import { EffectsModule } from "@ngrx/effects";
+
 
 import { HeaderComponent } from "./master-page/header/header.component";
 import { FooterComponent } from "./master-page/footer/footer.component";
@@ -20,22 +20,34 @@ import {
     PerfectScrollbarModule,
 } from "ngx-perfect-scrollbar";
 import { CookieService } from "ngx-cookie-service";
-import { OAuthModule } from "angular-oauth2-oidc";
+import { OAuthModule, AuthConfig } from "angular-oauth2-oidc";
 import { NgxSpinnerModule } from "ngx-spinner";
 import { HighchartsChartModule } from "highcharts-angular";
 import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
 import { NgProgressModule } from "@ngx-progressbar/core";
 import { ToastrModule } from "ngx-toastr";
+import { EffectsModule } from "@ngrx/effects";
+import { StoreDevtoolsModule } from "@ngrx/store-devtools";
+import { StoreRouterConnectingModule, RouterStateSerializer } from '@ngrx/router-store';
 
 import { GlobalState } from "./global-state";
 import { AuthInterceptor, DEFAULT_TIMEOUT } from "./auth.interceptor";
 import { AppRoutingModule } from "./app-routing.module";
-import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { environment } from "src/environments/environment";
 
-import { StoreRouterConnectingModule, RouterStateSerializer } from '@ngrx/router-store';
 import { reducers, CustomSerializer, effects } from "./store";
 
+const authConfig: AuthConfig = {
+    issuer: environment.HOST.INDENTITY_SERVER_URL,
+    redirectUri: window.location.origin + '/#/home',
+    clientId: 'eFMS',
+    requireHttps: false,
+    oidc: false,
+    logoutUrl: window.location.origin + '/#/login',
+    sessionCheckIntervall: 2000,
+    scope: 'openid profile offline_access efms_api',
+    sessionChecksEnabled: true,
+};
 
 @NgModule({
     declarations: [
@@ -87,6 +99,7 @@ import { reducers, CustomSerializer, effects } from "./store";
             useClass: AuthInterceptor,
             multi: true,
         },
+        { provide: AuthConfig, useValue: authConfig },
         {
             provide: RouterStateSerializer, useClass: CustomSerializer
         },
