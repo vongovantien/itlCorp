@@ -106,7 +106,6 @@ export class AuthorizationFormSearchComponent extends AppForm {
             endDate: this.expirationDate.value ? (this.expirationDate.value.startDate !== null ? formatDate(this.expirationDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
             active: this.status.value ? (this.status.value[0].id === 'active' ? true : false) : null
         };
-        console.log(body);
         this.onSearch.emit(body);
     }
 
@@ -118,6 +117,8 @@ export class AuthorizationFormSearchComponent extends AppForm {
         this.formSearch.reset();
         this.initDataInform();
         this.onSearch.emit(<any>{});
+        this.statusActive = [this.statusList[0]];
+        this.status.setValue(this.statusActive);
     }
 }
 

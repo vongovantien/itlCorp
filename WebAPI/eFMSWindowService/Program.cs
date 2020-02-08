@@ -36,7 +36,8 @@ namespace eFMSWindowService
             {
                 //new Service1(),
                 new UpdateExchangeRate(),
-                new UpdateCurrentStatusOfJobService()
+                new UpdateCurrentStatusOfJobService(),
+                new UpdateStatusAuthorization()
             };
             ServiceBase.Run(ServicesToRun);
 //#endif

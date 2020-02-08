@@ -3,10 +3,10 @@ import { Component, Output, EventEmitter, ViewChild } from "@angular/core";
 import { FormGroup, FormBuilder, AbstractControl, Validators } from "@angular/forms";
 import { SystemRepo, CatalogueRepo } from "@repositories";
 import { ToastrService } from "ngx-toastr";
-import { catchError } from "rxjs/operators";
-import { Authorization } from "src/app/shared/models/system/authorization";
+import { catchError, distinctUntilChanged, map } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { ConfirmPopupComponent } from "@common";
+import { Authorization } from "@models";
 @Component({
     selector: 'add-authorization-popup',
     templateUrl: './add-authorization.popup.html'
@@ -14,7 +14,8 @@ import { ConfirmPopupComponent } from "@common";
 
 export class AuthorizationAddPopupComponent extends PopupBase {
     @Output() onRequestAuthorization: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmUpdatePopup: ConfirmPopupComponent;
+    @ViewChild('confirmUpdatePopup', { static: false }) confirmUpdatePopup: ConfirmPopupComponent;
+    @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
 
     formAuthorization: FormGroup;
     authorization: Authorization = new Authorization();
@@ -38,6 +39,8 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     authorizedPersonActive: any[] = [];
     serviceList: any[] = [];
     activeServices: any = [];
+
+    minDateExpired: any = null;
 
     constructor(
         private _fb: FormBuilder,
@@ -77,6 +80,15 @@ export class AuthorizationAddPopupComponent extends PopupBase {
         this.expirationDate = this.formAuthorization.controls['expirationDate'];
         this.authorizationNote = this.formAuthorization.controls['authorizationNote'];
         this.authorizationActive = this.formAuthorization.controls['authorizationActive'];
+
+        this.formAuthorization.get("effectiveDate").valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                map((data: any) => data.startDate)
+            )
+            .subscribe((value: any) => {
+                this.minDateExpired = value; // * Update MinDate -> ExpiredDate.
+            });
     }
 
     getService() {
@@ -124,7 +136,6 @@ export class AuthorizationAddPopupComponent extends PopupBase {
                 servicesName: this.authorization.servicesName
             };
             this.authorizationToUpdate = _authorization;
-            console.log(_authorization);
             if (this.action == "create") {
                 this._systemRepo.addNewAuthorization(_authorization)
                     .pipe(catchError(this.catchError))
@@ -133,7 +144,7 @@ export class AuthorizationAddPopupComponent extends PopupBase {
                             if (res.status) {
                                 this._toastService.success(res.message);
                                 this.onRequestAuthorization.emit();
-                                this.closePopup();
+                                this.closeAuthorization();
                             } else {
                                 this._toastService.error(res.message);
                             }
@@ -154,12 +165,17 @@ export class AuthorizationAddPopupComponent extends PopupBase {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.onRequestAuthorization.emit();
-                        this.closePopup();
+                        this.closeAuthorization();
                     } else {
                         this._toastService.error(res.message);
                     }
                 }
             );
+    }
+
+    onCancelAuthorization() {
+        this.confirmCancelPopup.hide();
+        this.closeAuthorization();
     }
 
     getDetail() {
@@ -200,6 +216,10 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     }
 
     closePopup() {
+        this.confirmCancelPopup.show();
+    }
+
+    closeAuthorization() {
         this.hide();
         this.isSubmited = false;
         this.authorization = new Authorization();
