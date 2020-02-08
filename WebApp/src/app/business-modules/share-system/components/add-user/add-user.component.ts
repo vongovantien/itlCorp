@@ -245,11 +245,10 @@ export class ShareSystemAddUserComponent extends AppList {
             );
     }
 
-    gotoUserPermission(id: number, type) {
-        type = this.type;
-        if (type === 'office') {
+    gotoUserPermission(id: number) {
+        if (this.type === 'office') {
             const officeId = this.object.id;
-            this._router.navigate([`home/system/office/${officeId}/${id}`]);
+            this._router.navigate([`home/system/permission/${this.type}/${id}/${officeId}`]);
 
         }
     }

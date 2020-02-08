@@ -11,6 +11,7 @@ import { PermissionCreateComponent } from './add/add-permission.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { PermissionDetailComponent } from './detail/detail-permission.component';
 import { ShareSystemModule } from '../../share-system/share-system.module';
+import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
 
 const routing: Routes = [
     {
@@ -24,6 +25,9 @@ const routing: Routes = [
             },
             {
                 path: ':id', component: PermissionDetailComponent, data: { name: "Detail" }
+            },
+            {
+                path: ':type/:idu/:ido', component: ShareSystemDetailPermissionComponent, data: { name: "UserPermission" }
             }
         ]
     },

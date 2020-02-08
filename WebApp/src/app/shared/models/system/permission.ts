@@ -32,7 +32,10 @@ export class PermissionSample {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-
+    userId: string = '';
+    userTitle: string = '';
+    officeName: string = '';
+    permissionName: string = '';
     sysPermissionSampleGenerals: PermissionSampleGeneral[] = new Array<PermissionSampleGeneral>();
     sysPermissionSampleSpecials: PermissionSampleSpecial[] = new Array<PermissionSampleSpecial>();
 
@@ -54,10 +57,12 @@ export class PermissionSample {
     }
 }
 
+
 export class PermissionGeneral {
     permissionID: string = '';
     moduleName: string = '';
     moduleID: string = '';
+    userPermissionId: string = '';
 }
 
 export class PermissionSampleGeneral extends PermissionGeneral {

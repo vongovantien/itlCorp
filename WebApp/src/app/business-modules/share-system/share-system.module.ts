@@ -8,24 +8,9 @@ import { SelectModule } from "ng2-select";
 import { EffectsModule } from "@ngrx/effects";
 import { effects } from "../system/company/store";
 import { CollapseModule, TabsModule } from "ngx-bootstrap";
-import { ShareSystemAddUserComponent } from "./components/permission/add-user.component";
-import { ShareSystemDetailPermissionComponent } from "./components/permission/permission.component";
+import { ShareSystemAddUserComponent } from "./components/add-user/add-user.component";
+import { ShareSystemDetailPermissionComponent } from "./components/permission/permission-detail.component";
 import { PermissionFormCreateComponent } from "../system/permission/components/form-create-permission/form-create-permission.component";
-import { Routes, RouterModule } from "@angular/router";
-import { UserPermissionComponent } from "../system/office/components/user-permission/user-permission.component";
-
-// const routing: Routes = [
-//     {
-//         path: '', data: { name: "" },
-//         children: [
-//             {
-//                 path: ':id/:idUser', component: UserPermissionComponent, data: { name: "UserPermission" }
-//             }
-
-//         ]
-//     },
-// ];
-
 const COMPONENTS = [
     ShareSystemAddUserComponent,
     ShareSystemDetailPermissionComponent,
@@ -47,7 +32,6 @@ const COMPONENTS = [
         TabsModule.forRoot(),
         EffectsModule.forFeature(effects),
         CollapseModule.forRoot(),
-        // RouterModule.forChild(routing)
     ],
     exports: [
         ...COMPONENTS

@@ -77,7 +77,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         public IActionResult Add(SysUserModel model)
         {
             if (!ModelState.IsValid) return BadRequest();

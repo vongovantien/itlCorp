@@ -58,8 +58,8 @@ namespace eFMS.API.System.DL.Services
             permission.OfficeName = officeRepository.Get(x => x.Id == officeId)?.FirstOrDefault()?.BranchNameEn;
             permission.PermissionName = permissionSampleRepository.Get(x => x.Id == permission.PermissionSampleId)?.FirstOrDefault()?.Name;
             if (permission == null) return permission;
-            permission.SysUserPermissionGenerals = userPermissionGeneralService.GetBy(permission.Id);
-            permission.SysUserPermissionSpecials = userPermissionSpecialService.GetBy(permission.Id);
+            permission.SysPermissionSampleGenerals = userPermissionGeneralService.GetBy(permission.Id);
+            permission.SysPermissionSampleSpecials = userPermissionSpecialService.GetBy(permission.Id);
             return permission;
         }
 
@@ -71,8 +71,8 @@ namespace eFMS.API.System.DL.Services
             permission.OfficeName = officeRepository.Get(x => x.Id == permission.OfficeId)?.FirstOrDefault()?.BranchNameEn;
             permission.PermissionName = permissionSampleRepository.Get(x => x.Id == permission.PermissionSampleId)?.FirstOrDefault()?.Name;
             if (permission == null) return permission;
-            permission.SysUserPermissionGenerals = userPermissionGeneralService.GetBy(permission.Id);
-            permission.SysUserPermissionSpecials = userPermissionSpecialService.GetBy(permission.Id);
+            permission.SysPermissionSampleGenerals = userPermissionGeneralService.GetBy(permission.Id);
+            permission.SysPermissionSampleSpecials = userPermissionSpecialService.GetBy(permission.Id);
             return permission;
         }
         public HandleState Add(List<SysUserPermissionEditModel> list)

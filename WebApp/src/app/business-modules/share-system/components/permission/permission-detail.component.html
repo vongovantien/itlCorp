@@ -1,20 +1,24 @@
-<form-create-permission (onSubmit)="updatePermission($event)">
-    <div class="title">Detail/Edit Permission</div>
-    <div class="date-time p-3 font-14" *ngIf="!!permissionSample">
+<div class="m-content">
+
+    <div class="m-portlet">
         <div class="row">
-            <div class="col-6">
-                <span>Created: {{permissionSample.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span> <span
-                    class="text-success">{{permissionSample.userCreated}}</span>
+            <div class="col-3">
+                <label class="form-control"> User name: {{permissionSample.userId}}</label>
             </div>
-            <div class="col-6">
-                <span>Modified: {{permissionSample.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by </span> <span
-                    class="text-success">{{permissionSample.userModified}}</span>
+            <div class="col-3">
+                <label class="form-control"> Title: {{permissionSample.userTitle}}</label>
+            </div>
+            <div class="col-3">
+                <label class="form-control"> Office: {{permissionSample.officeName}}</label>
+            </div>
+            <div class="col-3">
+                <label class="form-control"> Permission Name: {{permissionSample.permissionName}}</label>
             </div>
         </div>
-    </div>
-</form-create-permission>
-<div class="m-content">
-    <div class="m-portlet">
+
+
+
+
         <div class="m-portlet__body">
             <tabset>
                 <tab heading="General Permission">
@@ -33,7 +37,7 @@
                         <div class="list-permission-group-module-wrapper" *ngIf="!!permissionSample">
                             <ul class="list-group list-module">
                                 <li class="list-group-item"
-                                    *ngFor="let permissionModulegroup of permissionSample.sysPermissionSampleGenerals; let i = index; trackBy: trackByFn">
+                                    *ngFor="let permissionModulegroup of  permissionSample.sysPermissionSampleGenerals; let i = index; trackBy: trackByFn">
                                     <span class="font-15 font-weight-bold">{{permissionModulegroup.moduleName}}</span>
                                     <ul class="list-group m--margin-top-10 list-permission">
                                         <li class="list-group-item col"
@@ -140,17 +144,15 @@
                     <div class="m--align-right">
                         <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="showConfirm()">
                         </app-default-button>
-                        <app-default-button [buttonSetting]="cancelButtonSetting" class="m--margin-left-10"
-                            (onClick)="gotoList()">
+                        <app-default-button [buttonSetting]="cancelButtonSetting" class="m--margin-left-10">
                         </app-default-button>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
 
-
-<confirm-popup [body]="'Do you want to save this permission ?'" [labelConfirm]="'Yes'"
-    (onSubmit)="onSavePermissionSample()" (onCancel)="gotoList()">
+<confirm-popup [body]="'Do you want to save this permission ?'" [labelConfirm]="'Yes'">
 </confirm-popup>

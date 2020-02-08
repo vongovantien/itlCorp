@@ -279,6 +279,14 @@ export class SystemRepo {
         );
     }
 
+    getUserPermission(userid: string, id, type: string) {
+        if (type === 'office') {
+            return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/GetBy`, { userId: userid, officeId: id }).pipe(
+                map((data: any) => data)
+            );
+        }
+    }
+
     getPermissionSample(id: string) {
         /* 
         * Create id = null
