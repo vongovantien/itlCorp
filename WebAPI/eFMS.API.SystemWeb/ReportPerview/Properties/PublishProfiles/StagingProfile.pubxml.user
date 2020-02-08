@@ -469,10 +469,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/28/2016 14:22:24</publishTime>
     </File>
     <File Include="bin/ReportPerview.dll">
-      <publishTime>12/27/2019 17:47:03</publishTime>
+      <publishTime>02/07/2020 10:06:54</publishTime>
     </File>
     <File Include="bin/ReportPerview.pdb">
-      <publishTime>12/27/2019 17:47:03</publishTime>
+      <publishTime>02/07/2020 10:06:54</publishTime>
     </File>
     <File Include="bin/Reports/AcsSettlementPaymentRequest.rpt">
       <publishTime>09/24/2019 09:35:32</publishTime>
@@ -512,6 +512,18 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="bin/Reports/AirImptArrivalOG.rpt">
       <publishTime>12/26/2019 09:00:49</publishTime>
+    </File>
+    <File Include="bin/Reports/AirImptAuthorisedLetter.rpt">
+      <publishTime>01/06/2020 14:16:50</publishTime>
+    </File>
+    <File Include="bin/Reports/AirImptAuthorisedLetter.ttx">
+      <publishTime>01/02/2020 16:02:22</publishTime>
+    </File>
+    <File Include="bin/Reports/AirImptAuthorisedLetter_Consign.rpt">
+      <publishTime>01/06/2020 14:17:14</publishTime>
+    </File>
+    <File Include="bin/Reports/AirImptAuthorisedLetter_Consign.ttx">
+      <publishTime>01/02/2020 16:02:22</publishTime>
     </File>
     <File Include="bin/Reports/AirShipperDebitNew.ttx">
       <publishTime>12/24/2019 17:52:50</publishTime>
@@ -643,7 +655,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/12/2019 17:58:40</publishTime>
     </File>
     <File Include="bin/Reports/SeaShippingInstructionNew.rpt">
-      <publishTime>02/12/2019 13:57:29</publishTime>
+      <publishTime>12/02/2019 13:57:29</publishTime>
     </File>
     <File Include="bin/Reports/SeaShippingInstructionNew.ttx">
       <publishTime>09/24/2019 09:35:32</publishTime>
@@ -676,16 +688,19 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/24/2019 09:35:32</publishTime>
     </File>
     <File Include="Reports/AirAttachedList.rpt">
-      <publishTime>12/26/2019 09:00:49</publishTime>
+      <publishTime>01/03/2020 14:36:36</publishTime>
     </File>
     <File Include="Reports/AirAttachedList.ttx">
-      <publishTime>12/26/2019 09:00:49</publishTime>
+      <publishTime>01/03/2020 14:36:36</publishTime>
     </File>
     <File Include="Reports/Aircargomanifest.rpt">
       <publishTime>12/26/2019 17:51:20</publishTime>
     </File>
     <File Include="Reports/Aircargomanifest.ttx">
       <publishTime>12/26/2019 17:48:31</publishTime>
+    </File>
+    <File Include="Reports/AirImpDocumentRelease.ttx">
+      <publishTime>12/28/2019 10:07:14</publishTime>
     </File>
     <File Include="Reports/AirImpProofofDelivery.rpt">
       <publishTime>12/27/2019 09:27:46</publishTime>
@@ -694,22 +709,34 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>12/27/2019 09:27:46</publishTime>
     </File>
     <File Include="Reports/AirImptArrival.rpt">
-      <publishTime>12/26/2019 09:00:49</publishTime>
+      <publishTime>01/04/2020 00:39:55</publishTime>
     </File>
     <File Include="Reports/AirImptArrival.ttx">
       <publishTime>12/26/2019 09:00:49</publishTime>
     </File>
     <File Include="Reports/AirImptArrivalOG.rpt">
-      <publishTime>12/26/2019 09:00:49</publishTime>
+      <publishTime>01/04/2020 00:39:55</publishTime>
+    </File>
+    <File Include="Reports/AirImptAuthorisedLetter.rpt">
+      <publishTime>01/06/2020 14:16:50</publishTime>
+    </File>
+    <File Include="Reports/AirImptAuthorisedLetter.ttx">
+      <publishTime>01/02/2020 16:02:22</publishTime>
+    </File>
+    <File Include="Reports/AirImptAuthorisedLetter_Consign.rpt">
+      <publishTime>01/06/2020 14:17:14</publishTime>
+    </File>
+    <File Include="Reports/AirImptAuthorisedLetter_Consign.ttx">
+      <publishTime>01/02/2020 16:02:22</publishTime>
     </File>
     <File Include="Reports/AirShipperDebitNew.ttx">
-      <publishTime>12/24/2019 17:52:50</publishTime>
+      <publishTime>01/11/2020 09:04:09</publishTime>
     </File>
     <File Include="Reports/AirShipperDebitNewVND.rpt">
-      <publishTime>12/24/2019 17:52:50</publishTime>
+      <publishTime>01/11/2020 09:04:09</publishTime>
     </File>
     <File Include="Reports/FormPLsheet.rpt">
-      <publishTime>11/12/2019 17:23:04</publishTime>
+      <publishTime>01/03/2020 14:36:36</publishTime>
     </File>
     <File Include="Reports/FormPLsheet.ttx">
       <publishTime>09/24/2019 09:35:32</publishTime>
@@ -724,10 +751,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>12/23/2019 18:03:01</publishTime>
     </File>
     <File Include="Reports/HouseAirwayBillLastestITL.rpt">
-      <publishTime>12/23/2019 18:03:01</publishTime>
+      <publishTime>01/03/2020 14:36:36</publishTime>
     </File>
     <File Include="Reports/HouseAirwayBillLastestITLFrame.rpt">
-      <publishTime>12/23/2019 18:03:01</publishTime>
+      <publishTime>01/03/2020 14:36:36</publishTime>
     </File>
     <File Include="Reports/LogisticsDebitNewDNTT.rpt">
       <publishTime>11/28/2019 18:29:03</publishTime>
@@ -772,7 +799,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/24/2019 09:35:32</publishTime>
     </File>
     <File Include="Reports/SeaDebitAgentsNew.ttx">
-      <publishTime>11/12/2019 17:23:04</publishTime>
+      <publishTime>12/11/2019 17:23:04</publishTime>
     </File>
     <File Include="Reports/SeaDebitAgentsNewVND.rpt">
       <publishTime>12/24/2019 17:52:50</publishTime>
@@ -784,34 +811,34 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/19/2019 11:03:11</publishTime>
     </File>
     <File Include="Reports/SeaHBillofLading.ttx">
-      <publishTime>02/12/2019 17:59:47</publishTime>
+      <publishTime>12/02/2019 17:59:47</publishTime>
     </File>
     <File Include="Reports/SeaHBillofLadingFBLFrame.rpt">
-      <publishTime>02/12/2019 17:59:47</publishTime>
+      <publishTime>12/02/2019 17:59:47</publishTime>
     </File>
     <File Include="Reports/SeaHBillofLadingITL.rpt">
-      <publishTime>02/12/2019 17:59:47</publishTime>
+      <publishTime>12/02/2019 17:59:47</publishTime>
     </File>
     <File Include="Reports/SeaHBillofLadingITLFrame.rpt">
-      <publishTime>02/12/2019 17:59:47</publishTime>
+      <publishTime>12/02/2019 17:59:47</publishTime>
     </File>
     <File Include="Reports/SeaHBillofLadingITLFrame.ttx">
       <publishTime>09/24/2019 09:35:32</publishTime>
     </File>
     <File Include="Reports/SeaHBillofLadingITLFrame_Kesco.rpt">
-      <publishTime>02/12/2019 17:59:47</publishTime>
+      <publishTime>12/02/2019 17:59:47</publishTime>
     </File>
     <File Include="Reports/SeaHBillofLadingITLFrame_SAMKIP.rpt">
-      <publishTime>11/12/2019 17:23:04</publishTime>
+      <publishTime>12/11/2019 17:23:04</publishTime>
     </File>
     <File Include="Reports/SeaHBillofLadingITL_KESCO.rpt">
-      <publishTime>02/12/2019 17:59:47</publishTime>
+      <publishTime>12/02/2019 17:59:47</publishTime>
     </File>
     <File Include="Reports/SeaHBillofLadingITL_Seko.rpt">
-      <publishTime>02/12/2019 17:59:47</publishTime>
+      <publishTime>12/02/2019 17:59:47</publishTime>
     </File>
     <File Include="Reports/SeaImportCargoManifest.rpt">
-      <publishTime>11/23/2019 09:55:15</publishTime>
+      <publishTime>01/16/2020 09:04:05</publishTime>
     </File>
     <File Include="Reports/SeaImportCargoManifest.ttx">
       <publishTime>11/22/2019 13:51:56</publishTime>
@@ -826,13 +853,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/19/2019 11:03:11</publishTime>
     </File>
     <File Include="Reports/SeaOnboardContainerList.rpt">
-      <publishTime>02/12/2019 17:58:40</publishTime>
+      <publishTime>12/02/2019 17:58:40</publishTime>
     </File>
     <File Include="Reports/SeaOnboardContainerList.ttx">
-      <publishTime>02/12/2019 17:58:40</publishTime>
+      <publishTime>12/02/2019 17:58:40</publishTime>
     </File>
     <File Include="Reports/SeaShippingInstructionNew.rpt">
-      <publishTime>02/12/2019 13:57:29</publishTime>
+      <publishTime>12/02/2019 13:57:29</publishTime>
     </File>
     <File Include="Reports/SeaShippingInstructionNew.ttx">
       <publishTime>09/24/2019 09:35:32</publishTime>

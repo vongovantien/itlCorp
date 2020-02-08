@@ -3,15 +3,16 @@ using System.Collections.Generic;
 
 namespace eFMS.IdentityServer.Service.Models
 {
-    public partial class SysUserRole
+    public partial class CatDepartment
     {
         public int Id { get; set; }
-        public string UserId { get; set; }
-        public short GroupId { get; set; }
-        public short RoleId { get; set; }
-        public byte Buid { get; set; }
-        public string BranchId { get; set; }
-        public short DepartmentId { get; set; }
+        public string Code { get; set; }
+        public string DeptName { get; set; }
+        public string DeptNameEn { get; set; }
+        public string DeptNameAbbr { get; set; }
+        public string Description { get; set; }
+        public Guid? BranchId { get; set; }
+        public string ManagerId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

@@ -661,5 +661,11 @@
             <param name="keywords"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.TerminologyController.GetA">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
     </members>
 </doc>

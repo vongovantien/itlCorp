@@ -10,6 +10,7 @@ using System.Text;
 using System.Linq;
 using ITL.NetCore.Common;
 using System.Diagnostics.Contracts;
+using eFMS.API.System.DL.ViewModels;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -80,7 +81,7 @@ namespace eFMS.API.System.DL.Services
             List<SysUserPermission> userPermissions = new List<SysUserPermission>();
             List<SysUserPermissionGeneral> permissionGenerals = null;
             List<SysUserPermissionSpecial> permissionSpecials = null;
-            foreach(var item in list)
+            foreach (var item in list)
             {
                 var userPermission = mapper.Map<SysUserPermission>(item);
                 userPermission.Id = Guid.NewGuid();
@@ -97,11 +98,11 @@ namespace eFMS.API.System.DL.Services
                     var hs = DataContext.Add(userPermissions);
                     if (hs.Success)
                     {
-                        if(permissionGenerals.Count > 0)
+                        if (permissionGenerals.Count > 0)
                         {
                             var hsGeneral = userPermissionGeneralRepository.Add(permissionGenerals);
                         }
-                        if(permissionSpecials.Count > 0)
+                        if (permissionSpecials.Count > 0)
                         {
                             var hsSpecial = userPermissionSpecialRepository.Add(permissionSpecials);
                         }

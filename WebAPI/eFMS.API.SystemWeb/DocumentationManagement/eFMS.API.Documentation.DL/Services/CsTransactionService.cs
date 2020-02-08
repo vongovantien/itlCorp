@@ -162,11 +162,11 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
             if (!string.IsNullOrEmpty(employeeId))
             {
-                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
-                if (branchOfUser != null)
-                {
-                    transaction.BranchId = (Guid)branchOfUser;
-                }
+                //var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
+                //if (branchOfUser != null)
+                //{
+                //    transaction.BranchId = (Guid)branchOfUser;
+                //}
             }
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -236,11 +236,11 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
             if (!string.IsNullOrEmpty(employeeId))
             {
-                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
-                if (branchOfUser != null)
-                {
-                    transaction.BranchId = (Guid)branchOfUser;
-                }
+                //var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
+                //if (branchOfUser != null)
+                //{
+                //    transaction.BranchId = (Guid)branchOfUser;
+                //}
             }
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {

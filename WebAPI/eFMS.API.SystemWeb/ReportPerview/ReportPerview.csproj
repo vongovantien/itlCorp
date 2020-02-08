@@ -347,7 +347,6 @@
     <Content Include="Reports\AirImptAuthorisedLetter.ttx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Reports\AirImptDocumentReleaseForm.rpt" />
     <Content Include="Reports\AirImpDocumentRelease.ttx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

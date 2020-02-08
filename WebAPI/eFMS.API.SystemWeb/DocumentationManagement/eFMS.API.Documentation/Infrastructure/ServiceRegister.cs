@@ -24,6 +24,7 @@ using System.Reflection;
 using System.IO;
 using System;
 using eFMS.API.Documentation.DL.Common;
+using Microsoft.AspNetCore.Authentication;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -37,7 +38,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-
+            
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ITerminologyService, TerminologyService>();
             services.AddTransient<ICsTransactionService, CsTransactionService>();
@@ -52,6 +53,8 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICsArrivalFrieghtChargeService, CsArrivalFrieghtChargeService>();
             services.AddTransient<ICsDimensionDetailService, CsDimensionDetailService>();
             services.AddSingleton<ISysImageService, SysImageService>();
+            services.AddTransient<IClaimsTransformation, ClaimsExtender>();
+            services.AddTransient<IClaimsExtender, ClaimsExtender>();
         }
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
         {
@@ -61,13 +64,31 @@ namespace eFMS.API.Shipment.Infrastructure
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddIdentityServerAuthentication(options =>
-            {
-                options.Authority = configuration["Authentication:Authority"];
-                options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
-                options.ApiName = configuration["Authentication:ApiName"];
-                options.ApiSecret = configuration["Authentication:ApiSecret"];
-            });
+                        //.AddIdentityServerAuthentication(options =>
+                        //{
+                        //    options.Authority = configuration["Authentication:Authority"];
+                        //    options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
+                        //    options.ApiName = configuration["Authentication:ApiName"];
+                        //    options.ApiSecret = configuration["Authentication:ApiSecret"];
+                        //});
+                        .AddJwtBearer(options =>
+                        {
+                            options.Authority = configuration["Authentication:Authority"];
+                            options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
+                            options.Audience = configuration["Authentication:ApiName"];
+                            options.SaveToken = true;
+                            options.Events = new JwtBearerEvents()
+                            {
+                                OnTokenValidated = async context =>
+                                {
+                                    try
+                                    {
+                                        var vPermissionEmail = context.HttpContext.RequestServices.GetService<IClaimsExtender>();
+                                    }
+                                    catch { }
+                                }
+                            };
+                        });
             return services;
         }
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)

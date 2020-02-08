@@ -13,6 +13,7 @@ namespace eFMS.IdentityServer.Service.Models
         public short ParentId { get; set; }
         public string ManagerId { get; set; }
         public string ShortName { get; set; }
+        public bool? IsSpecial { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
