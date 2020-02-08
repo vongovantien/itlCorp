@@ -7,7 +7,7 @@ namespace eFMS.API.System.Service.Models
     {
         public SysGroup()
         {
-            SysGroupRole = new HashSet<SysGroupRole>();
+            SysUserLevel = new HashSet<SysUserLevel>();
         }
 
         public short Id { get; set; }
@@ -27,6 +27,6 @@ namespace eFMS.API.System.Service.Models
         public DateTime? InactiveOn { get; set; }
 
         public virtual CatDepartment Department { get; set; }
-        public virtual ICollection<SysGroupRole> SysGroupRole { get; set; }
+        public virtual ICollection<SysUserLevel> SysUserLevel { get; set; }
     }
 }

@@ -60,7 +60,6 @@ namespace eFMS.IdentityServer
             {
                 List<Claim> list_Claim = new List<Claim>();
                 list_Claim.Add(new Claim("userId", modelReturn.idUser));
-                //list_Claim.Add(new Claim("workplaceId", modelReturn.workplaceId));
                 list_Claim.Add(new Claim("email", modelReturn.email));
                 list_Claim.Add(new Claim("companyId", modelReturn.companyId.ToString()));
                 list_Claim.Add(new Claim("officeId", modelReturn.officeId.ToString()));

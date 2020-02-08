@@ -2,6 +2,7 @@
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.Infrastructure.AttributeEx;
 using eFMS.IdentityServer.DL.IService;
+using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
@@ -17,10 +18,13 @@ namespace eFMS.API.Documentation.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ITerminologyService terminologyService;
-        public TerminologyController(IStringLocalizer<LanguageSub> localizer, ITerminologyService service)
+        ICurrentUser currentUser;
+        public TerminologyController(IStringLocalizer<LanguageSub> localizer, ITerminologyService service,
+            ICurrentUser currUser)
         {
             stringLocalizer = localizer;
             terminologyService = service;
+            currentUser = currUser;
         }
 
 
@@ -48,6 +52,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("Test")]
         public IActionResult GetA()
         {
+            var user = currentUser;
             return Ok();
         }
 

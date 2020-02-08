@@ -13,22 +13,22 @@ namespace eFMS.API.System.DL.Services
 {
     public class SysMenuService : RepositoryBase<SysMenu, SysMenuModel>, ISysMenuService
     {
-        private ISysUserPermissionService userpermissionService;
-        private ISysUserPermissionGeneralService permissionGeneralService;
+        private IContextBase<SysUserPermission> userpermissionRepository;
+        private IContextBase<SysUserPermissionGeneral> permissionGeneralRepository;
 
         public SysMenuService(IContextBase<SysMenu> repository, IMapper mapper,
-            ISysUserPermissionService userpermission,
-            ISysUserPermissionGeneralService permissionGeneral) : base(repository, mapper)
+            IContextBase<SysUserPermission> userpermissionRepo,
+            IContextBase<SysUserPermissionGeneral> permissionGeneralRepo) : base(repository, mapper)
         {
-            userpermissionService = userpermission;
-            permissionGeneralService = permissionGeneral;
+            userpermissionRepository = userpermissionRepo;
+            permissionGeneralRepository = permissionGeneralRepo;
         }
 
         List<MenuUserModel> ISysMenuService.GetMenus(string userId, Guid officeId)
         {
-            var permissionId = userpermissionService.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
+            var permissionId = userpermissionRepository.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
             if (permissionId == null) return new List<MenuUserModel>();
-            var permissionMenus = permissionGeneralService.Get(x => x.UserPermissionId == permissionId && x.Access == true);
+            var permissionMenus = permissionGeneralRepository.Get(x => x.UserPermissionId == permissionId && x.Access == true);
 
             var menus = DataContext.Get(x => x.Id != null);
             var parentMenus = DataContext.Get(x => x.ParentId == null).ToList();

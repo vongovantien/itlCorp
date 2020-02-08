@@ -164,7 +164,7 @@ namespace eFMS.IdentityServer.DL.Services
                 }
 
                 // Get danh sách level office của user.
-                var levelOffice = userLevelRepository.Get(lv => lv.UserId == user.Id && lv.OfficeId != null)?.FirstOrDefault();
+                var levelOffice = userLevelRepository.Get(lv => lv.UserId == user.Id && lv.CompanyId == companyId && lv.OfficeId != null)?.FirstOrDefault();
 
                 employee = employeeRepository.Get(x => x.Id == user.EmployeeId)?.FirstOrDefault();
                 modelReturn = SetLoginReturnModel(user, employee);

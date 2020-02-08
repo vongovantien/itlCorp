@@ -8,9 +8,7 @@ namespace eFMS.IdentityServer.DL.UserManager
     public interface ICurrentUser
     {
         string UserID { get; }
-        string EmployeeID { get; }
         string UserName { get; }
-        EmployeeModel CurrentEmployee { get; }
         Guid CompanyID { get; }
         Guid OfficeID { get; }
         int DepartmentId { get; }

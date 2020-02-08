@@ -8,7 +8,6 @@ namespace eFMS.API.System.Service.Models
         public SysMenu()
         {
             InverseParent = new HashSet<SysMenu>();
-            SysRoleMenu = new HashSet<SysRoleMenu>();
         }
 
         public string Id { get; set; }
@@ -29,6 +28,5 @@ namespace eFMS.API.System.Service.Models
 
         public virtual SysMenu Parent { get; set; }
         public virtual ICollection<SysMenu> InverseParent { get; set; }
-        public virtual ICollection<SysRoleMenu> SysRoleMenu { get; set; }
     }
 }
