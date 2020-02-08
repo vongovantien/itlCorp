@@ -50,6 +50,7 @@ namespace eFMS.API.Accounting.Service.Models
         public bool? IsLocked { get; set; }
         public DateTime? FlightDate { get; set; }
         public decimal? Hwconstant { get; set; }
+        public string Route { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
@@ -57,7 +58,6 @@ namespace eFMS.API.Accounting.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string IssuedBy { get; set; }
-        public string Route { get; set; }
 
         public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
