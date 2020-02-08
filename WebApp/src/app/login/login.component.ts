@@ -15,7 +15,7 @@ import { SystemRepo } from '../shared/repositories/system.repo';
 import { Observable } from 'rxjs';
 import { Company } from '@models';
 import $ from 'jquery';
-import { tap, share } from 'rxjs/operators';
+import { share } from 'rxjs/operators';
 import { HttpHeaders } from '@angular/common/http';
 
 
@@ -59,7 +59,7 @@ export class LoginComponent {
     }
 
     private async configureWithNewConfigApi() {
-        this.oauthService.configure(authConfig);
+        // this.oauthService.configure(authConfig);
         this.oauthService.tokenValidationHandler = new JwksValidationHandler();
         await this.oauthService.loadDiscoveryDocumentAndTryLogin();
     }
@@ -97,7 +97,7 @@ export class LoginComponent {
                     .then((resp: any) => {
                         return this.oauthService.loadUserProfile();
                     }).then(() => {
-                        const userInfo: IUser = <any>this.oauthService.getIdentityClaims(); // * Get info User.
+                        const userInfo: SystemInterface.IClaimUser = <any>this.oauthService.getIdentityClaims(); // * Get info User.
                         if (!!userInfo) {
                             localStorage.setItem("currently_userName", userInfo.preferred_username);
                             // localStorage.setItem("currently_userEmail", userInfo['email']);
@@ -192,13 +192,3 @@ export class LoginComponent {
 }
 
 
-interface IUser {
-    email: string;
-    employeeId: string;
-    id: string;
-    phone_number: string;
-    preferred_username: string;
-    sub: string;
-    userName: string;
-    workplaceId: string;
-}

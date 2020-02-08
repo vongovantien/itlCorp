@@ -351,5 +351,17 @@ export class SystemRepo {
         );
     }
 
+    getMenu(userId: string, officeId: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/Menu/GetMenus`, { userId: userId, officeId: officeId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getOfficePermission(username: string, companyId: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetOfficePermission/${username}/${companyId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 

@@ -1,6 +1,6 @@
-<button class="m-aside-left-close  m-aside-left-close--skin-dark " id="m_aside_left_close_btn">
+<!-- <button class="m-aside-left-close  m-aside-left-close--skin-dark " id="m_aside_left_close_btn">
     <i class="la la-close"></i>
-</button>
+</button> -->
 <div id="m_aside_left" (mouseenter)="mouseenter()" (mouseleave)="mouseleave()"
     class="m-grid__item	m-aside-left  m-aside-left--skin-dark ">
     <div id="m_ver_menu" class="m-aside-menu  m-aside-menu--skin-dark m-aside-menu--submenu-skin-dark "
@@ -13,7 +13,7 @@
                         <a href="javascript:;" class="m-menu__link m-menu__toggle" (click)="open_sub_menu(i)">
                             <i [class]="'m-menu__link-icon '+item.icon"></i>
                             <span class="m-menu__link-text">
-                                {{item.parent_name}}
+                                {{item.nameEn}}
                             </span>
                             <i class="m-menu__ver-arrow la la-angle-right"></i>
                         </a>
@@ -21,14 +21,14 @@
                             <span class="m-menu__arrow"></span>
                             <ul class="m-menu__subnav">
                                 <li class="m-menu__item m-menu__item" aria-haspopup="true"
-                                    *ngFor="let sub_item of item.childs;let k = index;" [id]="'children-'+i+'-'+k">
-                                    <a [routerLink]="item.route_parent+sub_item.route_child" class="m-menu__link "
-                                        *ngIf="sub_item.display" (click)="sub_menu_click(sub_item.name,i,k)">
+                                    *ngFor="let sub_item of item.subMenus;let k = index;" [id]="'children-'+i+'-'+k">
+                                    <a [routerLink]="item.route+sub_item.route" class="m-menu__link "
+                                        *ngIf="sub_item.display" (click)="sub_menu_click(sub_item.nameEn,i,k)">
                                         <i class="m-menu__link-bullet m-menu__link-bullet--dot">
                                             <span></span>
                                         </i>
                                         <span class="m-menu__link-text">
-                                            {{sub_item.name}}
+                                            {{sub_item.nameEn}}
                                         </span>
                                     </a>
                                 </li>

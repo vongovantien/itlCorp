@@ -1,6 +1,8 @@
 import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { language } from 'src/languages/language.en';
+import { SystemConstants } from 'src/constants/system.const';
+import { SystemRepo } from '@repositories';
+import { Menu } from '@models';
 
 @Component({
     selector: 'app-page-sidebar',
@@ -21,18 +23,33 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         children: ""
     };
 
-    Menu: IMenu[] = [];
-    // Menu: { parent_name: string; icon: string; route_parent: string; display_child: boolean; display: boolean, childs: { name: string; "route_child": string; display: boolean }[]; }[];
+    Menu: Menu[] = [];
+    userLogged: any;
 
-    constructor(private router: Router) {
+    constructor(
+        private router: Router,
+        private _systemRepo: SystemRepo
+    ) {
     }
 
     ngOnInit() {
-        this.Menu = language.Menu;
+        // this.Menu = language.Menu;
+        // TODO Menu tiếng anh - tiếng việt
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        if (!!this.userLogged) {
+            this._systemRepo.getMenu(this.userLogged.userName, this.userLogged.officeId)
+                .subscribe(
+                    (res: Menu[]) => {
+                        this.Menu = res.map((m: Menu) => new Menu(m));
+                        this.highLightMenu();
+                    }
+                );
+        }
     }
 
     ngAfterViewInit(): void {
-        this.highLightMenu();
+        // TODO khi nhấn back thì gọi lại fn HightlightMenu();
+        // this.highLightMenu();
     }
 
     highLightMenu() {
@@ -40,24 +57,26 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         let parentInd = null;
         let childInd = null;
         let child_name = null;
-
         for (let i = 0; i < this.Menu.length; i++) {
-            for (let j = 0; j < this.Menu[i].childs.length; j++) {
-
-                if (router.includes(this.Menu[i].childs[j].route_child)) {
-                    this.Page_Info.parent = this.Menu[i].parent_name;
-                    this.Page_Info.children = this.Menu[i].childs[j].name;
+            for (let j = 0; j < this.Menu[i].subMenus.length; j++) {
+                if (router.includes(this.Menu[i].subMenus[j].route)) {
+                    this.Page_Info.parent = this.Menu[i].nameEn;
+                    this.Page_Info.children = this.Menu[i].subMenus[j].nameEn;
                     this.Page_Information.emit(this.Page_Info);
+
                     this.open_sub_menu(i);
-                    this.Menu[i].display_child = true;
-                    parentInd = i; childInd = j; child_name = this.Menu[i].childs[j].name
+
+                    this.Menu[i].displayChild = true;
+                    parentInd = i;
+                    childInd = j;
+                    child_name = this.Menu[i].subMenus[j].nameEn;
                 }
             }
         }
         if (parentInd != null && childInd != null) {
             setTimeout(() => {
                 this.sub_menu_click(child_name, parentInd, childInd);
-            }, 400);
+            }, 100);
         }
     }
 
@@ -83,12 +102,13 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
          * If parent group is closing then open but close 
          */
         const parentMenu = document.getElementById('parent-' + index.toString());
-        if (parentMenu.classList.contains('m-menu__item--open')) {
-            parentMenu.classList.remove('m-menu__item--open');
-        } else {
-            parentMenu.classList.add('m-menu__item--open');
+        if (!!parentMenu) {
+            if (parentMenu.classList.contains('m-menu__item--open')) {
+                parentMenu.classList.remove('m-menu__item--open');
+            } else {
+                parentMenu.classList.add('m-menu__item--open');
+            }
         }
-
     }
 
     sub_menu_click(sub_menu_name: string, parrent_index: number, children_index: number) {
@@ -108,25 +128,18 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         current_parent.classList.add('m-menu__item--active');
         current_children.classList.add('m-menu__item--active');
 
+        // tslint:disable: prefer-for-of
         for (let i = 0; i < this.Menu.length; i++) {
-            for (let j = 0; j < this.Menu[i].childs.length; j++) {
-                if (this.Menu[i].childs[j].name == sub_menu_name) {
-                    this.Page_Info.parent = this.Menu[i].parent_name;
-                    this.Page_Info.children = this.Menu[i].childs[j].name;
+            for (let j = 0; j < this.Menu[i].subMenus.length; j++) {
+                if (this.Menu[i].subMenus[j].nameEn === sub_menu_name) {
+                    this.Page_Info.parent = this.Menu[i].nameEn;
+                    this.Page_Info.children = this.Menu[i].subMenus[j].nameEn;
                     this.Page_Information.emit(this.Page_Info);
                     break;
                 }
             }
         }
 
-    }
-
-    gotoJobManagement() {
-        this.router.navigate(['/home/operation/job-management', { action: "create_job" }]);
-        this.open_sub_menu(1);
-        setTimeout(() => {
-            this.sub_menu_click('Job Management', 1, 0);
-        }, 200);
     }
 
     mouseenter() {
@@ -145,19 +158,4 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         }
     }
 
-}
-
-interface IMenu {
-    parent_name: string;
-    icon: string;
-    route_parent: string;
-    display_child: boolean;
-    display: boolean;
-    childs: IChildMenu[];
-}
-
-interface IChildMenu {
-    name: string;
-    route_child: string;
-    display: boolean;
 }
