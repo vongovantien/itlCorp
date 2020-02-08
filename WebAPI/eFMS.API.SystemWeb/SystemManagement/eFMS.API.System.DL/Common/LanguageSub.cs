@@ -146,5 +146,8 @@ namespace eFMS.API.System.DL.Common
         //#endregion
 
         public static readonly string MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED = "MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED";
+
+        public static readonly string MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE = "MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE";
+        public static readonly string MSG_ITEM_SIMILAR_AUTHORIZATION = "MSG_ITEM_SIMILAR_AUTHORIZATION";
     }
 }

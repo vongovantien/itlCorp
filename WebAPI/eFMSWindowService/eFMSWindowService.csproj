@@ -105,6 +105,12 @@
     <Compile Include="UpdateExchangeRate.Designer.cs">
       <DependentUpon>UpdateExchangeRate.cs</DependentUpon>
     </Compile>
+    <Compile Include="UpdateStatusAuthorization.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UpdateStatusAuthorization.Designer.cs">
+      <DependentUpon>UpdateStatusAuthorization.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

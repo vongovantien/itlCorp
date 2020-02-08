@@ -7,7 +7,7 @@ namespace eFMS.API.Accounting.Service.Models
     {
         public SysUser()
         {
-            SysUserGroup = new HashSet<SysUserGroup>();
+            SysUserLevel = new HashSet<SysUserLevel>();
         }
 
         public string Id { get; set; }
@@ -28,6 +28,6 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? InactiveOn { get; set; }
         public string WorkingStatus { get; set; }
 
-        public virtual ICollection<SysUserGroup> SysUserGroup { get; set; }
+        public virtual ICollection<SysUserLevel> SysUserLevel { get; set; }
     }
 }

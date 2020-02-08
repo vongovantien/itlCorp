@@ -6,7 +6,7 @@ namespace eFMS.API.Accounting.Service.Models
     public partial class SysEmployee
     {
         public string Id { get; set; }
-        public Guid WorkPlaceId { get; set; }
+        public Guid CompanyId { get; set; }
         public string DepartmentId { get; set; }
         public string EmployeeNameVn { get; set; }
         public string EmployeeNameEn { get; set; }

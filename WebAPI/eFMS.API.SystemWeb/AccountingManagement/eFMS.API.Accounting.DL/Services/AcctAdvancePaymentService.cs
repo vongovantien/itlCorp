@@ -30,7 +30,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
         readonly IContextBase<AcctApproveAdvance> acctApproveAdvanceRepo;
-        readonly IContextBase<SysUserGroup> sysUserGroupRepo;
+        readonly IContextBase<SysUserLevel> sysUserLevelRepo;
         readonly IContextBase<CatDepartment> catDepartmentRepo;
         readonly IContextBase<SysGroup> sysGroupRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
@@ -48,7 +48,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CsTransactionDetail> csTransactionDetail,
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<AcctApproveAdvance> acctApproveAdvance,
-            IContextBase<SysUserGroup> sysUserGroup,
+            IContextBase<SysUserLevel> sysUserLevel,
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysGroup> sysGroup,
             IContextBase<SysOffice> sysOffice,
@@ -64,7 +64,7 @@ namespace eFMS.API.Accounting.DL.Services
             csTransactionDetailRepo = csTransactionDetail;
             sysEmployeeRepo = sysEmployee;
             acctApproveAdvanceRepo = acctApproveAdvance;
-            sysUserGroupRepo = sysUserGroup;
+            sysUserLevelRepo = sysUserLevel;
             catDepartmentRepo = catDepartment;
             sysGroupRepo = sysGroup;
             sysOfficeRepo = sysOffice;
@@ -1050,7 +1050,7 @@ namespace eFMS.API.Accounting.DL.Services
         private int? GetGroupIdOfUser(string userId)
         {
             //Lấy ra groupId của user
-            var grpIdOfUser = sysUserGroupRepo.Get(x => x.UserId == userId).FirstOrDefault()?.GroupId;
+            var grpIdOfUser = sysUserLevelRepo.Get(x => x.UserId == userId).FirstOrDefault()?.GroupId;
             return grpIdOfUser;
         }
 
@@ -1152,7 +1152,7 @@ namespace eFMS.API.Accounting.DL.Services
                     try
                     {
                         //Lấy ra brandId của user 
-                        var brandOfUser = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                        var brandOfUser = GetEmployeeByUserId(userCurrent)?.CompanyId;
                         if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
 
                         //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
@@ -1263,11 +1263,11 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             //Lấy ra brandId của user requester
-            var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.WorkPlaceId;
+            var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.CompanyId;
             if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
 
             //Lấy ra brandId của userId
-            var brandOfUserId = GetEmployeeByUserId(userId)?.WorkPlaceId;
+            var brandOfUserId = GetEmployeeByUserId(userId)?.CompanyId;
             if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
 
             //Trường hợp không có Leader
@@ -1467,11 +1467,11 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     //Lấy ra brandId của user requester
-                    var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.WorkPlaceId;
+                    var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.CompanyId;
                     if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
 
                     //Lấy ra brandId của userId
-                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.CompanyId;
                     if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
 
                     //Lấy ra dept code của userApprove dựa vào userApprove
@@ -1592,11 +1592,11 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     //Lấy ra brandId của user requester
-                    var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.WorkPlaceId;
+                    var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.CompanyId;
                     if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
 
                     //Lấy ra brandId của userId
-                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.WorkPlaceId;
+                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.CompanyId;
                     if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
 
                     //Lấy ra dept code của userApprove dựa vào userApprove
@@ -1729,7 +1729,7 @@ namespace eFMS.API.Accounting.DL.Services
             };
 
             //Lấy ra brandId của userId
-            var brandOfUserIReciver = GetEmployeeByUserId(userReciver)?.WorkPlaceId;
+            var brandOfUserIReciver = GetEmployeeByUserId(userReciver)?.CompanyId;
             //Lấy ra email của các User được ủy quyền của group của User Approve
             //var deptCodeOfUserReciver = GetInfoDeptOfUser(advance.Requester).Code;
             var deptCodeOfUserReciver = GetInfoDeptOfUser(userReciver, brandOfUserIReciver.ToString())?.Code;
@@ -2079,7 +2079,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var result = false;
             //Lấy ra brandId của user
-            var brandOfUserId = GetEmployeeByUserId(user)?.WorkPlaceId;
+            var brandOfUserId = GetEmployeeByUserId(user)?.CompanyId;
             //Lấy ra dept code của user dựa vào user
             var deptCodeOfUser = GetInfoDeptOfUser(user, brandOfUserId.ToString())?.Code;
             if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser != Constants.DEPT_CODE_ACCOUNTANT)
@@ -2093,7 +2093,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var result = false;
             //Lấy ra brandId của user
-            var brandOfUserId = GetEmployeeByUserId(user)?.WorkPlaceId;
+            var brandOfUserId = GetEmployeeByUserId(user)?.CompanyId;
             //Lấy ra dept code của user dựa vào user
             var deptCodeOfUser = GetInfoDeptOfUser(user, brandOfUserId.ToString())?.Code;
             if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser == Constants.DEPT_CODE_ACCOUNTANT)
