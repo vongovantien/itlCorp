@@ -39,7 +39,11 @@ namespace eFMS.API.Shipment
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthorize(Configuration);
+
+            services.AddMvcCore()
+                .AddAuthorization();
             services.AddAutoMapper();
+            services.AddCustomDbContext(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();

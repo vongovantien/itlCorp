@@ -15,10 +15,7 @@ namespace eFMS.IdentityServer.DL.UserManager
         readonly IUserPermissionService userPermissionService;
         readonly IHttpContextAccessor httpContext;
         readonly IEnumerable<Claim> currentUser;
-        //public CurrentUser(ISysEmployeeService empService)
-        //{
-        //    employeeService = empService;
-        //}
+
         public CurrentUser(IHttpContextAccessor contextAccessor,
             IUserPermissionService userPermission)
         {

@@ -21,12 +21,14 @@ using System.Collections.Generic;
 using eFMS.API.Shipment.Infrastructure.Filters;
 using eFMS.API.Common;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System;
 using eFMS.API.Documentation.DL.Common;
 using Microsoft.AspNetCore.Authentication;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.Services;
+using eFMS.IdentityServer.Service.Models;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -41,7 +43,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             
-            services.AddTransient<ICurrentUser, CurrentUser>();
+            //services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ITerminologyService, TerminologyService>();
             services.AddTransient<ICsTransactionService, CsTransactionService>();
             services.AddTransient<ICsTransactionDetailService, CsTransactionDetailService>();
@@ -57,7 +59,8 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddSingleton<ISysImageService, SysImageService>();
             services.AddTransient<IClaimsTransformation, ClaimsExtender>();
             services.AddTransient<IClaimsExtender, ClaimsExtender>();
-            services.AddTransient<IUserPermissionService, SysUserPermissionService>();
+
+            services.AddUserManager();
         }
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
         {
@@ -86,7 +89,7 @@ namespace eFMS.API.Shipment.Infrastructure
                                 {
                                     try
                                     {
-                                        var vPermissionEmail = context.HttpContext.RequestServices.GetService<IClaimsExtender>();
+                                        //var vPermissionEmail = context.HttpContext.RequestServices.GetService<IClaimsExtender>();
                                     }
                                     catch { }
                                 }
@@ -195,6 +198,26 @@ namespace eFMS.API.Shipment.Infrastructure
                             .AllowCredentials();
                     });
             });
+            return services;
+        }
+
+        public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration configuration)
+        {
+            //services.AddDbContext<DNTDataContext>(options => options.UseSqlServer(configuration["ConnectStrings:Default"]));
+            services.AddEntityFrameworkSqlServer()
+                .AddDbContext<eFMSDataContextDefault>((serviceProvider, options) =>
+                {
+                    options.UseSqlServer(configuration["ConnectionStrings:eFMSConnection"],
+                        sqlServerOptionsAction: sqlOptions =>
+                        {
+                            //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                            sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                        })
+                        .UseInternalServiceProvider(serviceProvider);
+                },
+                ServiceLifetime.Transient  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
+                );
+            Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
             return services;
         }
         //public static IServiceCollection AddCatelogueManagementApiServices(this IServiceCollection services)

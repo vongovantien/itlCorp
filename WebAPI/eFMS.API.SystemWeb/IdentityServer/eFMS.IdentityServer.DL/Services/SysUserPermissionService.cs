@@ -52,6 +52,7 @@ namespace eFMS.IdentityServer.DL.Services
                                     IsAllow = x.IsAllow
                                 }).ToList()
                         };
+                        results.Add(general);
                     }
                 }
             } 
