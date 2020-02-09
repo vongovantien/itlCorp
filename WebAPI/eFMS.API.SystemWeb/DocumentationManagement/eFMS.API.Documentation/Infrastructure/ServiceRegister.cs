@@ -25,6 +25,8 @@ using System.IO;
 using System;
 using eFMS.API.Documentation.DL.Common;
 using Microsoft.AspNetCore.Authentication;
+using eFMS.IdentityServer.DL.IService;
+using eFMS.IdentityServer.DL.Services;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -55,6 +57,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddSingleton<ISysImageService, SysImageService>();
             services.AddTransient<IClaimsTransformation, ClaimsExtender>();
             services.AddTransient<IClaimsExtender, ClaimsExtender>();
+            services.AddTransient<IUserPermissionService, SysUserPermissionService>();
         }
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
         {

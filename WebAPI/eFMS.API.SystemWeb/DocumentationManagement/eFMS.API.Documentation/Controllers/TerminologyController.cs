@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Common;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.Infrastructure.AttributeEx;
 using eFMS.IdentityServer.DL.IService;
