@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals.Configs;
+using eFMS.IdentityServer.Service.Configuration;
 using eFMS.IdentityServer.Service.Contexts;
 using eFMS.IdentityServer.Service.Models;
 using ITL.NetCore.Connection.EF;
@@ -10,9 +11,13 @@ namespace eFMS.API.System.Service.Contexts
     public class Base<T> : ContextBase<T>
         where T : class, new()
     {
-        public Base(IOptions<ConnectionString> connectStrings) : base()
+        //public Base(IOptions<ConnectionString> connectStrings) : base()
+        //{
+        //    ConfigDataContext<eFMSDataContext>(connectStrings.Value.eFMSConnection);
+        //}
+        public Base() : base()
         {
-            ConfigDataContext<eFMSDataContext>(connectStrings.Value.eFMSConnection);
+            ConfigDataContext<eFMSDataContext>(new AppConfiguration().GetConnectString());
         }
     }
 }

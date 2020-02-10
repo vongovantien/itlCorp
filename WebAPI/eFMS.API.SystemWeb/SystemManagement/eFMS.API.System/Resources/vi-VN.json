@@ -118,5 +118,8 @@
 
   "EF_DISPLAYNAME_CODE": "Mã code",
   //------------end  : Commodity
-  "MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED": "Item is active, not allow deleted"
+  "MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED": "Item is active, not allow deleted",
+
+  "MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE": "Expiration date phải lớn hơn hoặc bằng effective date",
+  "MSG_ITEM_SIMILAR_AUTHORIZATION": "Một ủy quyền tương tự đã được tạo trên hệ thống với khoảng thời gian này. Vui lòng kiểm tra lại hoặc chọn khoảng thời gian khác"
 }

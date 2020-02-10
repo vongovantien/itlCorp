@@ -92,7 +92,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         { id: 'CLL', text: 'CLL' }
     ];
     numberOBLs: CommonInterface.INg2Select[] = [
-        { id: 0, text: 'Zero (0)' },
+        { id: '0', text: 'Zero (0)' },
         { id: 1, text: 'One (1)' },
         { id: 2, text: 'Two (2)' },
         { id: 3, text: 'Three (3)' }
@@ -353,7 +353,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
             hbltype: !!data.hbltype ? [(this.billTypes || []).find(type => type.id === data.hbltype)] : null,
             freightPayment: !!data.freightPayment ? [(this.termTypes || []).find(type => type.id === data.freightPayment)] : null,
-            originBlnumber: !!data.originBlnumber ? [(this.numberOBLs || []).find(type => type.id === data.originBlnumber)] : null,
+            originBlnumber: data.originBlnumber !== null ? [(this.numberOBLs || []).find(type => +type.id === data.originBlnumber)] : null,
             wtorValpayment: !!data.wtorValpayment ? [(this.wts || []).find(type => type.id === data.wtorValpayment)] : null,
             otherPayment: !!data.otherPayment ? [(this.wts || []).find(type => type.id === data.otherPayment)] : null,
             currencyId: !!data.currencyId ? [{ id: data.currencyId, text: data.currencyId }] : null,

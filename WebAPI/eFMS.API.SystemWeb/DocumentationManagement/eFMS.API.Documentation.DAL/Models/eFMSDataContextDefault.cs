@@ -3408,18 +3408,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.AssignToNavigation)
-                    .WithMany(p => p.SysAuthorizationAssignToNavigation)
-                    .HasForeignKey(d => d.AssignTo)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysAuthorization_AssignedUser");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.SysAuthorizationUser)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysAuthorization_sysUser");
             });
 
             modelBuilder.Entity<SysAuthorizationDetail>(entity =>
@@ -3455,12 +3443,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.WorkPlaceId).HasColumnName("WorkPlaceID");
-
-                entity.HasOne(d => d.Authorization)
-                    .WithMany(p => p.SysAuthorizationDetail)
-                    .HasForeignKey(d => d.AuthorizationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysAuthorizationDetail_sysAuthorization");
             });
 
             modelBuilder.Entity<SysCompany>(entity =>
@@ -4140,6 +4122,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.ToTable("sysPermissionSpecialAction");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Action)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.MenuId)
                     .IsRequired()

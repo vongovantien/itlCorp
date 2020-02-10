@@ -3,19 +3,21 @@ using System.Collections.Generic;
 
 namespace eFMS.IdentityServer.Service.Models
 {
-    public partial class SysGroupRole
+    public partial class CatDepartment
     {
-        public short Id { get; set; }
-        public short GroupId { get; set; }
-        public short RoleId { get; set; }
+        public int Id { get; set; }
+        public string Code { get; set; }
+        public string DeptName { get; set; }
+        public string DeptNameEn { get; set; }
+        public string DeptNameAbbr { get; set; }
+        public string Description { get; set; }
+        public Guid? BranchId { get; set; }
+        public string ManagerId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public virtual SysGroup Group { get; set; }
-        public virtual SysRole Role { get; set; }
     }
 }

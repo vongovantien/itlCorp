@@ -151,7 +151,6 @@ export class HouseBill extends BaseModel {
     flightDateOrigin: string = null;
     finalPOD: string = null;
     poInvoiceNo: string = null;
-    issueHBLDate: string = null;
     parentId: string = null;
 
     constructor(object?: any) {

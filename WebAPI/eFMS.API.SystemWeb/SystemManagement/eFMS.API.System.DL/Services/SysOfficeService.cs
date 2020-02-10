@@ -23,12 +23,20 @@ namespace eFMS.API.System.DL.Services
         private readonly IDistributedCache cache;
         private readonly IContextBase<SysCompany> sysBuRepository;
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<SysUserLevel> sysLevelRepository;
 
-        public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysCompany> sysBuRepo, IDistributedCache distributedCache, ICurrentUser icurrentUser) : base(repository, mapper)
+        public SysOfficeService(
+            IContextBase<SysOffice> repository,
+            IMapper mapper,
+            IContextBase<SysCompany> sysBuRepo,
+            IDistributedCache distributedCache,
+            IContextBase<SysUserLevel> userLevelRepo,
+            ICurrentUser icurrentUser) : base(repository, mapper)
         {
             sysBuRepository = sysBuRepo;
             cache = distributedCache;
             currentUser = icurrentUser;
+            sysLevelRepository = userLevelRepo;
             SetChildren<CatDepartment>("Id", "BranchId");
         }
 
@@ -38,11 +46,11 @@ namespace eFMS.API.System.DL.Services
             {
                 return DataContext.Add(SysOffice);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new HandleState(ex.Message);
             }
-    
+
         }
 
         public IQueryable<SysOffice> GetOffices()
@@ -156,16 +164,17 @@ namespace eFMS.API.System.DL.Services
                 }
                 return hs;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new HandleState(ex.Message);
             }
-         
+
         }
 
         public HandleState DeleteOffice(Guid id)
         {
-            try {
+            try
+            {
                 ChangeTrackerHelper.currentUser = currentUser.UserID;
                 var hs = DataContext.Delete(x => x.Id == id);
                 if (hs.Success)
@@ -174,7 +183,7 @@ namespace eFMS.API.System.DL.Services
                 }
                 return hs;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new HandleState(ex.Message);
             }
@@ -204,6 +213,39 @@ namespace eFMS.API.System.DL.Services
             });
 
             return result;
+        }
+
+        public List<SysOffice> GetOfficePermission(string username, Guid companyId)
+        {
+            try
+            {
+                var hs = new HandleState();
+                List<SysOffice> results = null;
+
+                var sysLevel = sysLevelRepository?.Get(lv => lv.UserId == username && lv.CompanyId == companyId).Select(x =>x.OfficeId).ToList();
+                if (sysLevel == null)
+                {
+                    return null;
+                }
+                if (sysLevel.Count() > 0)
+                {
+                    // var sysOfficeLevel = sysLevel.Select(x => x.OfficeId).ToList();
+                    //foreach (var item in sysLevel)
+                    //{
+                    //    var sysOffice = DataContext.Get(o => sysLevel.Contains(o.Id))?.FirstOrDefault();
+                    //    results.Add(sysOffice);
+                    //}
+                    var sysOffice = DataContext.Get(o => sysLevel.Contains(o.Id)).ToList();
+                    results = sysOffice;
+                }
+
+                return results;
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+               
         }
     }
 }

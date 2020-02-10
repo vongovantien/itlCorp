@@ -67,6 +67,7 @@
     <Compile Remove="Models\DepartmentPartner.cs" />
     <Compile Remove="Models\ModeOfTransport.cs" />
     <Compile Remove="Models\UnitType.cs" />
+    <Compile Remove="ViewModels\UserPermissionViewModel.cs" />
     <Compile Remove="ViewModels\ysPermissionGeneralViewModel.cs" />
   </ItemGroup>
 

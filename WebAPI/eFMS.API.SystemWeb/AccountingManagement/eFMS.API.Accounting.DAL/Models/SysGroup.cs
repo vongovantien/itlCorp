@@ -7,7 +7,7 @@ namespace eFMS.API.Accounting.Service.Models
     {
         public SysGroup()
         {
-            SysUserGroup = new HashSet<SysUserGroup>();
+            SysUserLevel = new HashSet<SysUserLevel>();
         }
 
         public short Id { get; set; }
@@ -18,6 +18,7 @@ namespace eFMS.API.Accounting.Service.Models
         public short ParentId { get; set; }
         public string ManagerId { get; set; }
         public string ShortName { get; set; }
+        public bool? IsSpecial { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
@@ -26,6 +27,6 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? InactiveOn { get; set; }
 
         public virtual CatDepartment Department { get; set; }
-        public virtual ICollection<SysUserGroup> SysUserGroup { get; set; }
+        public virtual ICollection<SysUserLevel> SysUserLevel { get; set; }
     }
 }

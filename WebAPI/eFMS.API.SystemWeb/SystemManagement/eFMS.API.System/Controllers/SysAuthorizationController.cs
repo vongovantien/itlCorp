@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
+using System.Linq;
 
 namespace eFMS.API.System.Controllers
 {
@@ -95,6 +96,19 @@ namespace eFMS.API.System.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
+            if (CheckExistsDateRangeAuthorization(model))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_SIMILAR_AUTHORIZATION].Value });
+            }
+
+            if (model.EndDate != null)
+            {
+                if (model.StartDate.Date > model.EndDate.Value.Date)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE].Value });
+                }
+            }
+
             var hs = sysAuthorizationService.Insert(model);
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -118,7 +132,20 @@ namespace eFMS.API.System.Controllers
         public IActionResult Update(SysAuthorizationModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            
+
+            if (CheckExistsDateRangeAuthorization(model))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_SIMILAR_AUTHORIZATION].Value });
+            }
+
+            if (model.EndDate != null)
+            {
+                if (model.StartDate.Date > model.EndDate.Value.Date)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE].Value });
+                }
+            }
+
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
             if (model.Active == false)
@@ -154,13 +181,74 @@ namespace eFMS.API.System.Controllers
 
             var hs = sysAuthorizationService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Update);
-
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        private bool CheckExistsDateRangeAuthorization(SysAuthorizationModel model)
+        {
+            var result = false;
+            if (model.Id > 0)
+            {
+                SysAuthorizationModel authorizationCheckEndDate = null;
+                if (model.EndDate != null)
+                {
+                    authorizationCheckEndDate = sysAuthorizationService.Get(x => x.EndDate != null && x.Id != model.Id && x.Active == true)
+                        .Where(x =>
+                           x.UserId == model.UserId
+                        && x.AssignTo == model.AssignTo
+                        && x.Services == model.Services
+                        && model.StartDate.Date >= x.StartDate.Date && model.EndDate.Value.Date <= x.EndDate.Value.Date)
+                        .OrderByDescending(o => o.EndDate)
+                        .FirstOrDefault();
+                }
+                var authorizationCheckStartDate = sysAuthorizationService.Get(x => x.EndDate == null && x.Id != model.Id && x.Active == true)
+                        .Where(x =>
+                           x.UserId == model.UserId
+                        && x.AssignTo == model.AssignTo
+                        && x.Services == model.Services
+                        && model.StartDate.Date >= x.StartDate.Date)
+                        .OrderByDescending(o => o.StartDate)
+                        .FirstOrDefault();
+                if (authorizationCheckEndDate != null || authorizationCheckStartDate != null)
+                {
+                    result = true;
+                }
+            }
+            else
+            {
+                SysAuthorizationModel authorizationCheckEndDate = null;
+                if (model.EndDate != null)
+                {
+                    authorizationCheckEndDate = sysAuthorizationService.Get(x => x.EndDate != null && x.Active == true)
+                        .Where(x => 
+                           x.UserId == model.UserId
+                        && x.AssignTo == model.AssignTo
+                        && x.Services == model.Services
+                        && x.AssignTo == model.AssignTo
+                        && model.StartDate.Date >= x.StartDate.Date && model.EndDate.Value.Date <= x.EndDate.Value.Date)
+                        .OrderByDescending(o => o.EndDate)
+                        .FirstOrDefault();
+                }
+                var authorizationCheckStartDate = sysAuthorizationService.Get(x => x.EndDate == null && x.Active == true)
+                        .Where(x => 
+                           x.UserId == model.UserId
+                        && x.AssignTo == model.AssignTo
+                        && x.Services == model.Services
+                        && x.AssignTo == model.AssignTo
+                        && model.StartDate.Date >= x.StartDate.Date)
+                        .OrderByDescending(o => o.StartDate)
+                        .FirstOrDefault();
+                if (authorizationCheckEndDate != null || authorizationCheckStartDate != null)
+                {
+                    result = true;
+                }
+            }
+            return result;
         }
 
     }

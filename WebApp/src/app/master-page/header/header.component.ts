@@ -1,8 +1,10 @@
 import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SystemConstants } from 'src/constants/system.const';
-import { BaseService } from 'src/app/shared/services';
-import { User } from 'src/app/shared/models';
+import { User, Office } from 'src/app/shared/models';
+import { SystemRepo } from '@repositories';
+import { Observable, pipe } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-header',
@@ -16,15 +18,38 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     vietnam_flag = "assets/app/media/img/lang/vi.png";
     active_flag = "assets/app/media/img/lang/en.png";
 
-    currenUser: User;
+    currenUser: SystemInterface.IClaimUser;
+
+    offices: Office[];
+    selectedOffice: Office;
 
     constructor(
         private router: Router,
-        private _baseService: BaseService
+        private _systemRepo: SystemRepo
     ) { }
 
     ngOnInit() {
-        this.currenUser = this._baseService.getUserLogin();
+        this.currenUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        if (!!this.currenUser) {
+            this._systemRepo.getOfficePermission(this.currenUser.userName, this.currenUser.companyId)
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (!!res) {
+                            this.offices = res.data || [];
+                            this.selectedOffice = this.offices.find(o => o.id === this.currenUser.officeId);
+                            console.log(res);
+                        }
+                    }
+                );
+        }
+    }
+
+    changeOffice(office: Office) {
+        if (!!office) {
+            this.selectedOffice = office;
+            console.log("change office", this.selectedOffice);
+
+        }
     }
 
     getCurrentLangFromUrl() {

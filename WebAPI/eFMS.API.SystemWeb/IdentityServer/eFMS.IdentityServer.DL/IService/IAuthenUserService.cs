@@ -10,7 +10,7 @@ namespace eFMS.IdentityServer.DL.IService
 {
     public interface IAuthenUserService : IRepositoryBase<SysUser, UserModel>
     {
-        int Login(string username, string password, out LoginReturnModel modelReturn);
+        int Login(string username, string password, Guid companyId, out LoginReturnModel modelReturn);
 
         UserViewModel GetUserById(string id);
     }

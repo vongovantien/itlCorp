@@ -13,27 +13,32 @@ namespace eFMS.API.System.DL.Services
 {
     public class SysMenuService : RepositoryBase<SysMenu, SysMenuModel>, ISysMenuService
     {
-        private ISysUserPermissionService userpermissionService;
-        private ISysUserPermissionGeneralService permissionGeneralService;
+        private IContextBase<SysUserPermission> userpermissionRepository;
+        private IContextBase<SysUserPermissionGeneral> permissionGeneralRepository;
 
         public SysMenuService(IContextBase<SysMenu> repository, IMapper mapper,
-            ISysUserPermissionService userpermission,
-            ISysUserPermissionGeneralService permissionGeneral) : base(repository, mapper)
+            IContextBase<SysUserPermission> userpermissionRepo,
+            IContextBase<SysUserPermissionGeneral> permissionGeneralRepo) : base(repository, mapper)
         {
-            userpermissionService = userpermission;
-            permissionGeneralService = permissionGeneral;
+            userpermissionRepository = userpermissionRepo;
+            permissionGeneralRepository = permissionGeneralRepo;
         }
 
-        public List<MenuUserModel> GetMenus(string userId, Guid officeId)
+        List<MenuUserModel> ISysMenuService.GetMenus(string userId, Guid officeId)
         {
-            var permissionId = userpermissionService.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
+            var permissionId = userpermissionRepository.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
             if (permissionId == null) return new List<MenuUserModel>();
-            var permissionMenus = permissionGeneralService.Get(x => x.UserPermissionId == permissionId && x.Access == true);
-            
+            var permissionMenus = permissionGeneralRepository.Get(x => x.UserPermissionId == permissionId && x.Access == true);
+
             var menus = DataContext.Get(x => x.Id != null);
+            var parentMenus = DataContext.Get(x => x.ParentId == null).ToList();
             var userMenus = menus.Join(permissionMenus, x => x.Id, y => y.MenuId, (x, y) => x).ToList();
+            userMenus.AddRange(parentMenus);
             var data = mapper.Map<List<MenuUserModel>>(userMenus);
-            return FlatToHierarchy(data, null);
+            var results = FlatToHierarchy(data, null);
+            if (results.Count > 0)
+                return results.Where(x => x.SubMenus.Count > 0).ToList();
+            return results;
         }
         public List<MenuUserModel> FlatToHierarchy(List<MenuUserModel> data, string parentId = null)
         {

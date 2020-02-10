@@ -3,19 +3,15 @@ using System.Collections.Generic;
 
 namespace eFMS.IdentityServer.Service.Models
 {
-    public partial class SysUserGroup
+    public partial class SysUserPermission
     {
-        public int Id { get; set; }
-        public short GroupId { get; set; }
+        public Guid Id { get; set; }
+        public Guid PermissionSampleId { get; set; }
         public string UserId { get; set; }
+        public Guid OfficeId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Active { get; set; }
-        public DateTime? InactiveOn { get; set; }
-
-        public virtual SysGroup Group { get; set; }
-        public virtual SysUser User { get; set; }
     }
 }

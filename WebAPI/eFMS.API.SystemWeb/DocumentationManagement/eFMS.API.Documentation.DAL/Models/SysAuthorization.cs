@@ -5,11 +5,6 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class SysAuthorization
     {
-        public SysAuthorization()
-        {
-            SysAuthorizationDetail = new HashSet<SysAuthorizationDetail>();
-        }
-
         public int Id { get; set; }
         public string UserId { get; set; }
         public string AssignTo { get; set; }
@@ -24,9 +19,5 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public virtual SysUser AssignToNavigation { get; set; }
-        public virtual SysUser User { get; set; }
-        public virtual ICollection<SysAuthorizationDetail> SysAuthorizationDetail { get; set; }
     }
 }

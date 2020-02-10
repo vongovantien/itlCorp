@@ -12,21 +12,25 @@ namespace eFMS.IdentityServer.DL.UserManager
     public class CurrentUser : ICurrentUser
     {
         readonly ISysEmployeeService employeeService;
-        public CurrentUser(ISysEmployeeService empService)
-        {
-            employeeService = empService;
-        }
-        private IHttpContextAccessor httpContext;
-        private readonly IEnumerable<Claim> currentUser;
-        public CurrentUser(IHttpContextAccessor contextAccessor)
+        readonly IUserPermissionService userPermissionService;
+        readonly IHttpContextAccessor httpContext;
+        readonly IEnumerable<Claim> currentUser;
+
+        public CurrentUser(IHttpContextAccessor contextAccessor,
+            IUserPermissionService userPermission)
         {
             httpContext = contextAccessor;
             currentUser = httpContext.HttpContext.User.Claims;
+            userPermissionService = userPermission;
         }
-        public string UserID => currentUser.FirstOrDefault(x => x.Type == "id").Value;
-        public string EmployeeID => currentUser.FirstOrDefault(x => x.Type == "employeeId").Value;
-        public string UserName => currentUser.FirstOrDefault(x => x.Type == "userName").Value;
 
-        public EmployeeModel CurrentEmployee => employeeService.First(x => x.Id == EmployeeID);
+        public string UserID => currentUser.FirstOrDefault(x => x.Type == "id").Value;
+        public string UserName => currentUser.FirstOrDefault(x => x.Type == "userName").Value;
+        public Guid CompanyID => currentUser.FirstOrDefault(x => x.Type == "companyId").Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "companyId").Value) : Guid.Empty;
+        public Guid OfficeID => currentUser.FirstOrDefault(x => x.Type == "officeId").Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "officeId").Value) : Guid.Empty;
+        public int DepartmentId => currentUser.FirstOrDefault(x => x.Type == "departmentId").Value != null ? Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "departmentId").Value) : 0;
+        public short GroupId => (short)(currentUser.FirstOrDefault(x => x.Type == "groupId").Value != null ? Convert.ToInt16(currentUser.FirstOrDefault(x => x.Type == "groupId").Value) : 0);
+
+        public List<UserPermissionModel> UserPermissions => userPermissionService.Get(UserID, OfficeID);
     }
 }

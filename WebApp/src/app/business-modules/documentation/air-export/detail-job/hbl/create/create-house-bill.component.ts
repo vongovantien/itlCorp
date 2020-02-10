@@ -89,7 +89,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             issueHbldate: !!form.issueHbldate && !!form.issueHbldate.startDate ? formatDate(form.issueHbldate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightDate: !!form.flightDate && !!form.flightDate.startDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? form.originBlnumber[0].id : null,
+            originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? +form.originBlnumber[0].id : null,
             freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
             hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
             currencyId: !!form.currencyId && !!form.currencyId.length ? form.currencyId[0].id : null,

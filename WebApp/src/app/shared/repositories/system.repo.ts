@@ -4,7 +4,7 @@ import { environment } from 'src/environments/environment';
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class SystemRepo {
     private VERSION: string = 'v1';
     constructor(private _api: ApiService) {
@@ -378,6 +378,18 @@ export class SystemRepo {
 
     getAuthorizationById(id: number) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorization/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getMenu(userId: string, officeId: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/Menu/GetMenus`, { userId: userId, officeId: officeId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getOfficePermission(username: string, companyId: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetOfficePermission/${username}/${companyId}`).pipe(
             map((data: any) => data)
         );
     }

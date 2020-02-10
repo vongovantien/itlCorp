@@ -38,8 +38,11 @@ export * from './system/office';
 export * from './system/permission';
 export * from './system/permission';
 export * from './system/role';
+export * from './system/menu';
 
 export * from './report/crystal.model';
+
+export * from './system/authorization'
 
 
 

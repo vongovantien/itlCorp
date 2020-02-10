@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.IdentityServer.DL.Models
 {
-    public class SysEmployeeModel : SysEmployee
+    public class UserLevelModel: SysUserLevel
     {
     }
 }
