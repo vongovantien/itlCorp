@@ -61,8 +61,6 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
-       
-
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(SysUserCriteria criteria)
@@ -77,7 +75,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public IActionResult Add(SysUserModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -220,7 +218,7 @@ namespace eFMS.API.System.Controllers
         /// <summary>
         /// reset password of user to default
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
 
         [HttpGet]

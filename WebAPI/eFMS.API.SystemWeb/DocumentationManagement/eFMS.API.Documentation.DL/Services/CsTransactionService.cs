@@ -85,6 +85,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         #region -- INSERT & UPDATE --
+
         /// <summary>
         /// Create JobNo by Transaction Type
         /// </summary>
@@ -138,6 +139,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return GenerateID.GenerateJobID(shipment, countNumberJob);
         }
+
         public object AddCSTransaction(CsTransactionEditModel model)
         {
             var transaction = mapper.Map<CsTransaction>(model);
@@ -160,11 +162,11 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
             if (!string.IsNullOrEmpty(employeeId))
             {
-                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().CompanyId;
-                if (branchOfUser != null)
-                {
-                    transaction.BranchId = (Guid)branchOfUser;
-                }
+                //var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
+                //if (branchOfUser != null)
+                //{
+                //    transaction.BranchId = (Guid)branchOfUser;
+                //}
             }
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -211,6 +213,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
         }
+
         public HandleState UpdateCSTransaction(CsTransactionEditModel model)
         {
             //if (model.CsMawbcontainers.Count > 0)
@@ -233,11 +236,11 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
             if (!string.IsNullOrEmpty(employeeId))
             {
-                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().CompanyId;
-                if (branchOfUser != null)
-                {
-                    transaction.BranchId = (Guid)branchOfUser;
-                }
+                //var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
+                //if (branchOfUser != null)
+                //{
+                //    transaction.BranchId = (Guid)branchOfUser;
+                //}
             }
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -277,6 +280,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
         }
+
         #endregion -- INSERT & UPDATE --
 
         #region -- DELETE --
@@ -297,6 +301,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
+
         public HandleState DeleteCSTransaction(Guid jobId)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
@@ -396,6 +401,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
         #endregion -- DETAILS --
+
         #region -- LIST & PAGING --
         private IQueryable<CsTransactionModel> GetTransaction(string transactionType)
         {
@@ -474,6 +480,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             return query;
         }
+
         public List<CsTransactionModel> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount)
         {
             var results = new List<CsTransactionModel>();
@@ -501,6 +508,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results;
         }
+
         public IQueryable<CsTransactionModel> Query(CsTransactionCriteria criteria)
         {
             var transactionType = DataTypeEx.GetType(criteria.TransactionType);
@@ -543,6 +551,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results;
         }
+
         /// <summary>
         /// Query Inland Trucking
         /// </summary>
@@ -675,6 +684,7 @@ namespace eFMS.API.Documentation.DL.Services
             result = result.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
             return result;
         }
+
         /// <summary>
         /// Query Air Import
         /// </summary>
@@ -796,7 +806,7 @@ namespace eFMS.API.Documentation.DL.Services
             result = result.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
             return result;
         }
-        
+
         /// <summary>
         /// Query Sea Consol Export
         /// </summary>
@@ -983,6 +993,7 @@ namespace eFMS.API.Documentation.DL.Services
             result = result.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
             return result;
         }
+
         /// <summary>
         /// Query Sea FCL Import
         /// </summary>
@@ -1149,6 +1160,7 @@ namespace eFMS.API.Documentation.DL.Services
             result = result.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
             return result;
         }
+
         /// <summary>
         /// Query Sea LCL Export
         /// </summary>
@@ -1174,7 +1186,9 @@ namespace eFMS.API.Documentation.DL.Services
             var result = QuerySIF(criteria, listSearch);
             return result;
         }
+
         #endregion -- LIST & PAGING --
+
         public List<object> GetListTotalHB(Guid JobId)
         {
             List<object> returnList = new List<object>();
@@ -1504,6 +1518,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
             }
         }
+
         #region -- PREVIEW --
         public Crystal PreviewSIFFormPLsheet(Guid jobId, string currency)
         {
@@ -1822,6 +1837,7 @@ namespace eFMS.API.Documentation.DL.Services
             return shipmentType;
         }
         #endregion -- PREVIEW --
+
         public ResultHandle SyncHouseBills(Guid JobId, CsTransactionSyncHBLCriteria model)
         {
             try
@@ -1829,7 +1845,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var shipment = DataContext.Get(x => x.Id == JobId).FirstOrDefault();
                 if (shipment == null) return null;
 
-                if (shipment.TransactionType != Constants.AE_SHIPMENT && shipment.TransactionType != Constants.AI_SHIPMENT)
+                if (shipment.TransactionType != Constants.AE_SHIPMENT && shipment.TransactionType != Constants.AI_SHIPMENT )
                     return null;
                 // Lấy ds HBL
                 var housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();
@@ -1858,7 +1874,7 @@ namespace eFMS.API.Documentation.DL.Services
                         csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id);
                     }
 
-                    return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " SuccessFul", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                    return new ResultHandle { Status = true, Message ="Sync House Bill " + String.Join(", ",housebills.Select(s => s.Hwbno).Distinct()) + " SuccessFul", Data = housebills.Select(s => s.Hwbno).Distinct() };
                 }
             }
             catch (Exception ex)
@@ -1868,6 +1884,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
     }
+
+   
 }
 
 

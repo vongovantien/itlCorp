@@ -70,7 +70,7 @@ namespace eFMS.API.System.DL.Services
                 office.CompanyName = item.companyName;
                 resultData.Add(office);
             }
-            //RedisCacheHelper.SetObject(cache, Templates.SysBranch.NameCaching.ListName, resultData);
+            RedisCacheHelper.SetObject(cache, Templates.SysBranch.NameCaching.ListName, resultData);
 
             return resultData.AsQueryable();
 

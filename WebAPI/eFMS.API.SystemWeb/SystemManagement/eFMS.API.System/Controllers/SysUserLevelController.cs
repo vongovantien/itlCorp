@@ -8,7 +8,6 @@ using eFMS.API.Common.Globals;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
-using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using eFMS.API.System.Models;
@@ -100,8 +99,8 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         /// 
         [HttpPost]
-        [Route("AddUserToOffice")]
-        [Authorize]
+        [Route("addUser")]
+        //[Authorize]
         public IActionResult AddUser(List<SysUserLevelModel> users)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -147,6 +146,10 @@ namespace eFMS.API.System.Controllers
         public IActionResult Delete(int id)
         {
             var item = userLevelService.GetDetail(id);
+            if(item.Active == true)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
+            }
             item.Active = false;
             item.UserModified = currentUser.UserID;
             item.InactiveOn = DateTime.Now;
@@ -159,20 +162,6 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
-        }
-
-        /// <summary>
-        /// Query user level
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
-
-        [HttpPost]
-        [Route("Query")]
-        public IActionResult Get(SysUserLevelCriteria criteria)
-        {
-            var results = userLevelService.Query(criteria);
-            return Ok(results);
         }
     }
 }
