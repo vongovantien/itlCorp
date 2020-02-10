@@ -26,11 +26,10 @@ namespace eFMS.API.Shipment.Infrastructure
         {
             try
             {
-                //string userID = principal.FindFirstValue("id");
-                string userID = "admin";
-                Guid officeId = new Guid("2FDCA3AC-6C54-434F-9D71-12F8F50B857B");
+                string userID = principal.FindFirstValue("id");
+                
+                Guid officeId = new Guid(principal.Claims.Where(claim => claim.Type.Equals("officeId")).FirstOrDefault().Value);
                 List<Claim> lstClaim = new List<Claim>();
-                // var s = userPermissionService.Get();
                 var lstPermissions = _userpermissionService.GetPermission(userID, officeId);
                 if (lstPermissions != null)
                 {
