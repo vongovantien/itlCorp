@@ -7,6 +7,8 @@ import { tap, switchMap, catchError } from 'rxjs/operators';
 import { PermissionSample } from 'src/app/shared/models';
 import { AppPage } from 'src/app/app.base';
 import { ConfirmPopupComponent } from '@common';
+import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
+import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 
 @Component({
     selector: 'detail-permission',
@@ -28,6 +30,13 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
     userId: string = '';
 
     id: string = '';
+
+    cancelButtonSetting: ButtonModalSetting = {
+        typeButton: ButtonType.cancel
+    };
+    addButtonSetting: ButtonModalSetting = {
+        typeButton: ButtonType.add
+    };
 
     constructor(
         protected _systemRepo: SystemRepo,

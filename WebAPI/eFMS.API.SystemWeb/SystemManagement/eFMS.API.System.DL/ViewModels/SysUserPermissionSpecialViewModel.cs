@@ -20,7 +20,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string ModuleId { get; set; }
         public string MenuId { get; set; }
         public string MenuName { get; set; }
-        public List<UserPermissionSpecialAction> UserPermissionSpecialActions { get; set; }
+        public List<UserPermissionSpecialAction> PermissionSpecialActions { get; set; }
     }
     public class UserPermissionSpecialAction
     {

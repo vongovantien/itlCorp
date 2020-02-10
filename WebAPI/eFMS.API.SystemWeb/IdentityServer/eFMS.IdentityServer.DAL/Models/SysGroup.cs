@@ -5,6 +5,11 @@ namespace eFMS.IdentityServer.Service.Models
 {
     public partial class SysGroup
     {
+        public SysGroup()
+        {
+            SysGroupRole = new HashSet<SysGroupRole>();
+        }
+
         public short Id { get; set; }
         public string Code { get; set; }
         public string NameEn { get; set; }
@@ -20,5 +25,7 @@ namespace eFMS.IdentityServer.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
+
+        public virtual ICollection<SysGroupRole> SysGroupRole { get; set; }
     }
 }
