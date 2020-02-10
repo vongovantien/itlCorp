@@ -17,7 +17,10 @@
         </div>
     </form-create-permission>
 
-    <div class="m-content">
+
+    <detail-permission>
+    </detail-permission>
+    <!-- <div class="m-content">
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <tabset>
@@ -155,8 +158,8 @@
         </div>
     </div>
 
-</div>
+</div> -->
 
-<confirm-popup [body]="'Do you want to save this permission ?'" [labelConfirm]="'Yes'"
-    (onSubmit)="onSavePermissionSample()" (onCancel)="gotoList()">
-</confirm-popup>
+    <confirm-popup [body]="'Do you want to save this permission ?'" [labelConfirm]="'Yes'"
+        (onSubmit)="onSavePermissionSample()" (onCancel)="gotoList()">
+    </confirm-popup>

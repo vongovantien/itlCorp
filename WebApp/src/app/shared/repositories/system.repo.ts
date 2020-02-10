@@ -86,6 +86,12 @@ export class SystemRepo {
         );
     }
 
+    addUserToOffice(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel/AddUserToOffice`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getListCompany() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysCompany`).pipe(
             catchError((error) => throwError(error)),
@@ -273,6 +279,14 @@ export class SystemRepo {
         );
     }
 
+    getUserPermission(userid: string, id, type: string) {
+        if (type === 'office') {
+            return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/GetBy`, { userId: userid, officeId: id }).pipe(
+                map((data: any) => data)
+            );
+        }
+    }
+
     getPermissionSample(id: string) {
         /* 
         * Create id = null
@@ -326,6 +340,23 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+
+    queryUserLevels(body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUserLevel/Query`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
+    deleteUserLevel(id: number) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel/${id}`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
 
     addNewAuthorization(body: any) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorization/Add`, body).pipe(
