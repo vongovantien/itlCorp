@@ -180,6 +180,22 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("GetByDepartment/{id}")]
+        public IActionResult GetGroupBy(int id)
+        {
+            var offices = sysGroupService.GetGroupByDepartment(id);
+            return Ok(offices);
+        }
+
+        [HttpGet]
+        [Route("GetDepartmentGroupPermission/{username}/{officeId}")]
+        public IActionResult GetDepartmentGroupPermission(string username, Guid officeId)
+        {
+            var departmentGroups = sysGroupService.GetGroupDepartmentPermission(username,officeId);
+            return Ok(departmentGroups);
+        }
+
         private string CheckExistCode(string code, short id)
         {
             string message = string.Empty;

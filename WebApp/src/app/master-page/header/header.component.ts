@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { SystemConstants } from 'src/constants/system.const';
 import { User, Office } from 'src/app/shared/models';
 import { SystemRepo } from '@repositories';
-import { Observable, pipe } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, pipe, forkJoin } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-header',
@@ -23,6 +23,9 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     offices: Office[];
     selectedOffice: Office;
 
+    departmentGroups: IDepartmentGroup[] = [];
+    selectedDepartmentGroup: IDepartmentGroup;
+
     constructor(
         private router: Router,
         private _systemRepo: SystemRepo
@@ -31,24 +34,46 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     ngOnInit() {
         this.currenUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         if (!!this.currenUser) {
-            this._systemRepo.getOfficePermission(this.currenUser.userName, this.currenUser.companyId)
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (!!res) {
-                            this.offices = res.data || [];
+            forkJoin([
+                this._systemRepo.getOfficePermission(this.currenUser.userName, this.currenUser.companyId),
+                this._systemRepo.getDepartmentGroupPermission(this.currenUser.userName, this.currenUser.officeId)
+            ]).pipe(
+                tap((res: any) => {
+                    console.log(res[0]);
+                    this.offices = res[0] || [];
+                    if (!!this.offices.length) {
+                        if (this.offices.length === 1) {
+                            this.selectedOffice = this.offices[0];
+                        } else {
                             this.selectedOffice = this.offices.find(o => o.id === this.currenUser.officeId);
-                            console.log(res);
                         }
                     }
-                );
+                })
+            ).subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.departmentGroups = res[1];
+                        this.selectedDepartmentGroup = this.departmentGroups[0];
+                        console.log(res);
+                    }
+                }
+            );
         }
     }
 
     changeOffice(office: Office) {
         if (!!office) {
-            this.selectedOffice = office;
-            console.log("change office", this.selectedOffice);
+            if (this.selectedOffice.id !== office.id) {
+                this.selectedOffice = office;
+            }
+        }
+    }
 
+    changeDepartmentGroup(departmentGroup: IDepartmentGroup) {
+        if (!!departmentGroup) {
+            if (this.selectedDepartmentGroup.groupId !== departmentGroup.groupId) {
+                this.selectedDepartmentGroup = departmentGroup;
+            }
         }
     }
 
@@ -109,4 +134,12 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             leftMinimizeToggle.classList.add('m-brand__toggler--active');
         }
     }
+}
+
+interface IDepartmentGroup {
+    userId: string;
+    departmentId: number;
+    groupId: number;
+    departmentName: string;
+    groupName: string;
 }

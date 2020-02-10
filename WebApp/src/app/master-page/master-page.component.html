@@ -1,9 +1,9 @@
 <app-header id="m_header" class="m-grid__item m-header " m-minimize-offset="200" m-minimize-mobile-offset="200"
     [Page_Info]="Component_name"></app-header>
 <div class="m-grid__item m-grid__item--fluid m-grid m-grid--ver-desktop m-grid--desktop m-body">
-    <button class="m-aside-left-close  m-aside-left-close--skin-dark " id="m_aside_left_close_btn">
+    <!-- <button class="m-aside-left-close  m-aside-left-close--skin-dark " id="m_aside_left_close_btn">
         <i class="la la-close"></i>
-    </button>
+    </button> -->
     <app-page-sidebar id="m_aside_left" class="m-grid__item	m-aside-left  m-aside-left--skin-dark"
         (Page_Information)="MenuChanged($event)"></app-page-sidebar>
 
@@ -48,3 +48,42 @@
         </div>
     </div>
 </div>
+<!-- Logout modal -->
+
+<div class="modal fade" id="change-office-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Logout</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Do you want to change office?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions" data-dismiss="modal">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-check"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Change office -->

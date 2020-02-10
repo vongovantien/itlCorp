@@ -19,17 +19,21 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<CatDepartment> departmentRepository;
         private readonly ICatDepartmentService departmentService;
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<SysUserLevel> sysLevelRepository;
 
-        public SysGroupService(IContextBase<SysGroup> repository, 
+        public SysGroupService(IContextBase<SysGroup> repository,
             IMapper mapper,
             IContextBase<CatDepartment> departmentRepo,
             ICatDepartmentService deptService,
+            IContextBase<SysUserLevel> userLevelRepo,
             ICurrentUser currUser) : base(repository, mapper)
         {
             SetChildren<SysUserLevel>("Id", "GroupId");
             departmentRepository = departmentRepo;
             departmentService = deptService;
             currentUser = currUser;
+            sysLevelRepository = userLevelRepo;
+
         }
 
         public SysGroupModel GetById(short id)
@@ -37,7 +41,7 @@ namespace eFMS.API.System.DL.Services
             var group = DataContext.Get(x => x.Id == id).FirstOrDefault();
             if (group == null) return null;
             var result = mapper.Map<SysGroupModel>(group);
-            if(group.DepartmentId != null)
+            if (group.DepartmentId != null)
             {
                 var department = departmentService.GetDepartmentById((int)group.DepartmentId);
                 result.DepartmentName = department.DeptNameEn;
@@ -84,11 +88,11 @@ namespace eFMS.API.System.DL.Services
                                                || (x.NameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                || (x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                || (x.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                               //|| (x.DepartmentId == criteria.DepartmentId || criteria.DepartmentId == 0)
-                                               //|| (x.Id == criteria.Id || criteria.Id == 0)
+                                        //|| (x.DepartmentId == criteria.DepartmentId || criteria.DepartmentId == 0)
+                                        //|| (x.Id == criteria.Id || criteria.Id == 0)
                                         );
                 departments = departmentRepository.Get(x => (x.DeptNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-                if(departments.Count() == 0)
+                if (departments.Count() == 0)
                 {
                     departments = departmentRepository.Get();
                 }
@@ -113,6 +117,75 @@ namespace eFMS.API.System.DL.Services
                 DepartmentName = y.DeptNameEn
             }).OrderByDescending(x => x.DatetimeModified);
             return results;
+        }
+
+        public IQueryable<SysGroupModel> GetGroupByDepartment(int id)
+        {
+            try
+            {
+                IQueryable<SysGroupModel> results = null;
+
+                var group = DataContext.Get(x => x.DepartmentId == id);
+                var department = departmentService.GetDepartmentById(id);
+
+                results = group.Select(item => new SysGroupModel
+                {
+                    Id = item.Id,
+                    Code = item.Code,
+                    NameEn = item.NameEn, // Group name.
+                    NameVn = item.NameVn,
+                    DepartmentId = item.DepartmentId,
+                    DepartmentName = department.DeptNameEn,
+                    CompanyName = department.CompanyName,
+                    OfficeName = department.OfficeName,
+                });
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public IQueryable<CatDepartmentGroupCriteria> GetGroupDepartmentPermission(string username, Guid officeId)
+        {
+            try
+            {
+                IQueryable<CatDepartmentGroupCriteria> results = null;
+                // Các department user đc phân.
+                var currentUserDepartments = sysLevelRepository.Get(lv => lv.UserId == username && lv.OfficeId == officeId && lv != null)?.Select(l => l.DepartmentId).ToList();
+                if (currentUserDepartments.Count() > 0)
+                {
+                    // các groups user đc phân
+                    var currentUserGroups = sysLevelRepository.Get(lv => lv.UserId == username)?.Select(l => l.GroupId).ToList(); 
+                    if (currentUserGroups.Count() > 0)
+                    {
+                        var query = from lv in sysLevelRepository.Get(lv => lv.UserId == username)
+                                    join dp in departmentRepository.Get() on lv.DepartmentId equals dp.Id
+                                    join sg in DataContext.Get() on lv.GroupId equals sg.Id
+                                    select new CatDepartmentGroupCriteria
+                                    {
+                                        UserId = lv.UserId,
+                                        DepartmentId = (int)lv.DepartmentId,
+                                        DepartmentName = dp.DeptNameAbbr,
+                                        GroupId = lv.GroupId,
+                                        GroupName = sg.NameEn,
+                                    };
+                        results =  query;
+                    }
+                }
+                else // user k có department | group.
+                {
+                    return null;
+                }
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public override HandleState Add(SysGroupModel entity)
