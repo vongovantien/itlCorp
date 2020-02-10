@@ -1,6 +1,34 @@
+<div class="m-subheader">
+</div>
 <div class="m-content">
-
     <div class="m-portlet">
+        <div class="row m--padding-top-10">
+            <div class="col-6">
+                <h3 class="c-block-title m--margin-left-10">General Information</h3>
+            </div>
+            <div class="col-6">
+                <div class="m--align-right">
+                    <button type="button"
+                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span> Save </span>
+                        </span>
+                    </button>
+                    <button routerLink="/home/system/office" type="button"
+                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span> Cancel </span>
+                        </span>
+                    </button>
+                </div>
+
+
+
+            </div>
+
+        </div>
         <div class="row">
             <div class="col-3">
                 <label class="form-control"> User name: {{permissionSample.userId}}</label>
