@@ -39,11 +39,10 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IAcctAdvancePaymentService, AcctAdvancePaymentService>();
-            services.AddTransient<IAcctCDNoteServices, AcctCDNoteServices>();
             services.AddTransient<IAcctSettlementPaymentService, AcctSettlementPaymentService>();
             services.AddTransient<IAcctSOAService, AcctSOAService>();
 
-            services.AddTransient<ICurrentUser, CurrentUser>();
+            services.AddUserManager();
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)
