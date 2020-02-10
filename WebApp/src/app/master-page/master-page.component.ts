@@ -51,9 +51,15 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
             .then(
                 (res: any) => {
                     console.log(this.oauthService);
-                    this.oauthService.logOut(true);
-                    this.router.navigateByUrl("/login");
+                    this.oauthService.logOut(false);
+                    this.router.navigate(["login"]);
+
+                    // localStorage.removeItem("access_token");
                     // localStorage.clear();
+
+                },
+                (error: any) => {
+                    console.log(error + '');
                 }
             );
     }
