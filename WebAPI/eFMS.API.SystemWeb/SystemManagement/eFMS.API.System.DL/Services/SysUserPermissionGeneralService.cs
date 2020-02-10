@@ -77,7 +77,7 @@ namespace eFMS.API.System.DL.Services
                         listPerDetails.Add(perDetail);
                     }
                 }
-                item.SysPermissionGenerals = listPerDetails;
+                item.SysUserPermissionGenerals = listPerDetails;
                 results.Add(item);
             }
             return results;

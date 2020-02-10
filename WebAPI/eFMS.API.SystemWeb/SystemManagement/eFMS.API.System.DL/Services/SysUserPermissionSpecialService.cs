@@ -57,7 +57,7 @@ namespace eFMS.API.System.DL.Services
                         UserPermissionId = id,
                         ModuleId = item.Key
                     };
-                    perSpecial.PermissionSpecialActions = actions.Where(x => x.MenuId == actionInMenu.Key)
+                    perSpecial.UserPermissionSpecialActions = actions.Where(x => x.MenuId == actionInMenu.Key)
                         .Select(x => new UserPermissionSpecialAction
                         {
                             ModuleId = x.ModuleId,
@@ -67,7 +67,7 @@ namespace eFMS.API.System.DL.Services
                             IsAllow = false,
                             UserPermissionId = id
                         }).ToList();
-                    perSpecial.PermissionSpecialActions.ForEach(x => {
+                    perSpecial.UserPermissionSpecialActions.ForEach(x => {
                         var detail = specialPermissions.FirstOrDefault(y => y.ActionName == x.NameEn);
                         if (detail != null)
                         {
