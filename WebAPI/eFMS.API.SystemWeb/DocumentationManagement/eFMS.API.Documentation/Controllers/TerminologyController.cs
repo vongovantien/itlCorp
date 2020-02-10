@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
 using SystemManagementAPI.Infrastructure.Middlewares;
+using System.Linq;
+using eFMS.API.Documentation.Infrastructure.Common;
 
 namespace eFMS.API.Documentation.Controllers
 {
@@ -16,28 +18,22 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class TerminologyController : CustomBaseController//ControllerBase
+    public class TerminologyController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ITerminologyService terminologyService;
-        //public TerminologyController(IStringLocalizer<LanguageSub> localizer, ITerminologyService service,
-        //    ICurrentUser currUser)
-        //{
-        //    stringLocalizer = localizer;
-        //    terminologyService = service;
-        //    currentUser = currUser;
-        //}
-
-        public TerminologyController(ICurrentUser currentUser, IStringLocalizer<LanguageSub> localizer, ITerminologyService service, Menu menu = Menu.acctAP) : base(currentUser, menu)
+        ICurrentUser curUser;
+        public TerminologyController(ITerminologyService service,
+            ICurrentUser currentUser,
+            IStringLocalizer<LanguageSub> localizer)
         {
+            curUser = currentUser;
             stringLocalizer = localizer;
             terminologyService = service;
-            var s = currentUser;
         }
 
         [HttpGet]
         [Route("GetShipmentCommonData")]
-        [Authorize]
         public IActionResult Get()
         {
             var results = terminologyService.GetAllShipmentCommonData();
@@ -59,7 +55,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("Test")]
         public IActionResult GetA()
         {
-            // var user = currentUser;
+            curUser = PermissionEx.GetUserMenuPermission(curUser, Menu.acctAP);
             return Ok();
         }
 

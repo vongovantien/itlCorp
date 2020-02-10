@@ -22,7 +22,7 @@ namespace eFMS.API.Shipment.Infrastructure
             _userpermissionService = userpermissionService;
         }
 
-        Task<ClaimsPrincipal> IClaimsTransformation.TransformAsync(ClaimsPrincipal principal)
+        async Task<ClaimsPrincipal> IClaimsTransformation.TransformAsync(ClaimsPrincipal principal)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace eFMS.API.Shipment.Infrastructure
                 
                 Guid officeId = new Guid(principal.Claims.Where(claim => claim.Type.Equals("officeId")).FirstOrDefault().Value);
                 List<Claim> lstClaim = new List<Claim>();
-                var lstPermissions = _userpermissionService.GetPermission(userID, officeId);
+                var lstPermissions = await _userpermissionService.GetPermission(userID, officeId);
                 if (lstPermissions != null)
                 {
                     lstPermissions.ForEach(x => lstClaim.Add(new Claim(JwtClaimTypes.Role, x)));
@@ -41,7 +41,7 @@ namespace eFMS.API.Shipment.Infrastructure
                 string s = ex.Message;
             }
             //Add additional claims here.
-            return Task.FromResult(principal);
+            return await Task.FromResult(principal);
         }
     }
 }

@@ -70,13 +70,6 @@ namespace eFMS.API.Shipment.Infrastructure
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-                        //.AddIdentityServerAuthentication(options =>
-                        //{
-                        //    options.Authority = configuration["Authentication:Authority"];
-                        //    options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
-                        //    options.ApiName = configuration["Authentication:ApiName"];
-                        //    options.ApiSecret = configuration["Authentication:ApiSecret"];
-                        //});
                         .AddJwtBearer(options =>
                         {
                             options.Authority = configuration["Authentication:Authority"];

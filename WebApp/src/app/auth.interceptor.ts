@@ -21,23 +21,17 @@ export class AuthInterceptor implements HttpInterceptor {
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
         const timeoutValue = req.headers.get('timeout') || this.defaultTimeout;
-        let token;
-        const authHeader = localStorage.getItem('access_token');
-        if (!!authHeader) {
-            token = `Bearer ${authHeader}`;
-        }
 
+        const authHeader = `Bearer ${localStorage.getItem('access_token')}`;
         this.authReq = req.clone(req);
-
         if (environment.local) {
             if (!!this.authReq && (this.authReq.url.includes("44369") || this.authReq.url.includes("identityserver") || this.authReq.method !== 'GET')) {
-                this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', token), url: req.url }));
+                this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
             } else {
                 this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.delete('Authorization'), url: req.url }));
             }
         } else {
-            // this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', token), url: req.url }));
-            this.authReq = req;
+            this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
         }
         return next.handle(this.authReq).pipe(
             timeout(+timeoutValue),
