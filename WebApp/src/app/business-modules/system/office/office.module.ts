@@ -12,7 +12,6 @@ import { OfficeFormSearchComponent } from './components/form-search-office/form-
 import { OfficeFormAddComponent } from './components/form-add-office/form-add-office.component';
 import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { ShareSystemModule } from 'src/app/business-modules/share-system/share-system.module';
-import { UserPermissionComponent } from './components/user-permission/user-permission.component';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -46,7 +45,7 @@ const routing: Routes = [
         RouterModule.forChild(routing)
     ],
     exports: [],
-    declarations: [OfficeComponent, OfficeAddNewComponent, OfficeDetailsComponent, OfficeFormSearchComponent, OfficeFormAddComponent, UserPermissionComponent],
+    declarations: [OfficeComponent, OfficeAddNewComponent, OfficeDetailsComponent, OfficeFormSearchComponent, OfficeFormAddComponent],
     providers: [],
 })
 export class OfficeModule { }
