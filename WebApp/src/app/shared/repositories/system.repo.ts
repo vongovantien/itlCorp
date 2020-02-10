@@ -394,5 +394,11 @@ export class SystemRepo {
         );
     }
 
+    getDepartmentGroupPermission(username: string, officeId: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/GetDepartmentGroupPermission/${username}/${officeId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 

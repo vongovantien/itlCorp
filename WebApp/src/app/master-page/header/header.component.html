@@ -160,7 +160,7 @@
                             </div>
                         </li> -->
                         <li class="m-nav__item topbar__lang">
-                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
+                            <a class="m-nav__link m-dropdown__toggle pointer" data-toggle="dropdown">
                                 <span class="m-nav__link-icon">
                                     <i class="la la-building-o"></i>
                                 </span>
@@ -170,9 +170,9 @@
                             </a>
                             <div class="dropdown-menu" style="min-width: 160px">
                                 <ul class="m-nav">
-                                    <li class="m-nav__item" *ngFor="let office of offices; let i=index; trackBy: i"
+                                    <li class="m-nav__item pointer" *ngFor="let office of offices; let i = index"
                                         (click)="changeOffice(office)">
-                                        <a class="m-nav__link active">
+                                        <a class="m-nav__link" data-toggle="modal" data-target="#change-office-modal">
                                             <span class="m-nav__link-text">
                                                 {{office.branchNameEn}}
                                             </span>
@@ -182,28 +182,21 @@
                             </div>
                         </li>
                         <li class="m-nav__item topbar__lang">
-                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
-                                <!-- <span class="m-nav__link-badge m-badge m-badge--danger">3</span>
+                            <a class="m-nav__link m-dropdown__toggle pointer" data-toggle="dropdown">
                                 <span class="m-nav__link-icon">
-                                    <i class="la la-group"></i>
-                                </span> -->
-                                <span class="m-nav__link-text">
-                                    ITL HAN
+                                    <i class="la la-users"></i>
+                                </span>
+                                <span class="m-nav__link-text" *ngIf="!!selectedDepartmentGroup">
+                                    {{selectedDepartmentGroup.departmentName}} - {{selectedDepartmentGroup.groupName}}
                                 </span>
                             </a>
                             <div class="dropdown-menu" style="min-width: 160px">
                                 <ul class="m-nav">
-                                    <li class="m-nav__item">
-                                        <a class="m-nav__link active" href="javascript:void(0)">
+                                    <li class="m-nav__item pointer" *ngFor="let item of departmentGroups"
+                                        (click)="changeDepartmentGroup(item)">
+                                        <a class="m-nav__link active">
                                             <span class="m-nav__link-text">
-                                                ITL HCM
-                                            </span>
-                                        </a>
-                                    </li>
-                                    <li class="m-nav__item">
-                                        <a class="m-nav__link" href="javascript:void(0)">
-                                            <span class="m-nav__link-text">
-                                                ITL HAN
+                                                {{item.departmentName}} - {{item.groupName}}
                                             </span>
                                         </a>
                                     </li>

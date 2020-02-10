@@ -229,12 +229,6 @@ namespace eFMS.API.System.DL.Services
                 }
                 if (sysLevel.Count() > 0)
                 {
-                    // var sysOfficeLevel = sysLevel.Select(x => x.OfficeId).ToList();
-                    //foreach (var item in sysLevel)
-                    //{
-                    //    var sysOffice = DataContext.Get(o => sysLevel.Contains(o.Id))?.FirstOrDefault();
-                    //    results.Add(sysOffice);
-                    //}
                     var sysOffice = DataContext.Get(o => sysLevel.Contains(o.Id)).ToList();
                     results = sysOffice;
                 }
