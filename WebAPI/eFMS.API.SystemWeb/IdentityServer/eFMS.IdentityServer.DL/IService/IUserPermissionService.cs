@@ -9,5 +9,6 @@ namespace eFMS.IdentityServer.DL.IService
     public interface IUserPermissionService
     {
         List<UserPermissionModel> Get(string userId, Guid officeId);
+        List<string> GetPermission(string userId, Guid officeId);
     }
 }

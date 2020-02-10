@@ -58,7 +58,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICsDimensionDetailService, CsDimensionDetailService>();
             services.AddSingleton<ISysImageService, SysImageService>();
             services.AddTransient<IClaimsTransformation, ClaimsExtender>();
-            services.AddTransient<IClaimsExtender, ClaimsExtender>();
+            //services.AddTransient<IClaimsExtender, ClaimsExtender>();
 
             services.AddUserManager();
         }
@@ -89,7 +89,7 @@ namespace eFMS.API.Shipment.Infrastructure
                                 {
                                     try
                                     {
-                                        //var vPermissionEmail = context.HttpContext.RequestServices.GetService<IClaimsExtender>();
+                                        var permission = context.HttpContext.RequestServices.GetService<IClaimsTransformation>();
                                     }
                                     catch { }
                                 }
