@@ -363,6 +363,11 @@ namespace eFMS.IdentityServer.Service.Models
                 entity.Property(e => e.Website)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.SysRoleMenu)
+                    .HasForeignKey(d => d.RoleId)
+                    .HasConstraintName("FK_sysRoleMenu_sysRole");
             });
 
             modelBuilder.Entity<SysRole>(entity =>
@@ -396,6 +401,12 @@ namespace eFMS.IdentityServer.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.SysRolePermission)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_sysRolePermission_sysRole");
             });
 
             modelBuilder.Entity<SysUser>(entity =>

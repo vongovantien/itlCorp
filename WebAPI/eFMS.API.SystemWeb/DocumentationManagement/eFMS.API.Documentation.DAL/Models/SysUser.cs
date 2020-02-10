@@ -28,6 +28,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? InactiveOn { get; set; }
         public string WorkingStatus { get; set; }
 
-        public virtual ICollection<SysUserLevel> SysUserLevel { get; set; }
+       
     }
 }

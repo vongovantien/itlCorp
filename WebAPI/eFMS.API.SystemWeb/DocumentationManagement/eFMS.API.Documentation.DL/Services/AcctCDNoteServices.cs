@@ -1221,11 +1221,10 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
             if (!string.IsNullOrEmpty(employeeId))
             {
-                //var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.WorkPlaceId;
-                //if (branchOfUser != null)
-                //{
-                //    result = sysOfficeRepo.Get(x => x.Id == branchOfUser).FirstOrDefault();
-                //}
+                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.CompanyId;
+                if (branchOfUser != null)
+                {
+                    result = sysOfficeRepo.Get(x => x.Id == branchOfUser).FirstOrDefault();
             }
             return result;
         }
