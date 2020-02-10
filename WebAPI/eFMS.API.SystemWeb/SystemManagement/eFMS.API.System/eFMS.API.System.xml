@@ -514,6 +514,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.Update(eFMS.API.System.DL.Models.SysUserPermissionModel)">
+            <summary>
+            Update User Permission
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.System.Infrastructure.Common.CacheEntity">
             <summary>
             

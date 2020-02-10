@@ -397,11 +397,7 @@ namespace eFMS.IdentityServer.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.SysRolePermission)
-                    .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysRolePermission_sysRole");
+
             });
 
             modelBuilder.Entity<SysUser>(entity =>

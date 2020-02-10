@@ -60,11 +60,11 @@ namespace eFMS.API.System.DL.Services
         public IQueryable<SysUserLevel> Query(SysUserLevelCriteria criteria)
         {
             var userLevels = DataContext.Get();
-            userLevels = userLevels.Where(x => (x.CompanyId == criteria.CompanyId 
-                                         || x.OfficeId == criteria.OfficeId 
+            userLevels = userLevels.Where(x => (x.CompanyId == criteria.CompanyId
+                                         || x.OfficeId == criteria.OfficeId
                                          || x.GroupId == criteria.GroupId
            ));
-           return userLevels;
+            return userLevels;
 
         }
 
@@ -75,8 +75,24 @@ namespace eFMS.API.System.DL.Services
             {
                 try
                 {
-                    users.ForEach(x => { x.Active = true; x.GroupId = 11; x.DatetimeCreated = x.DatetimeModified = DateTime.Now; x.UserCreated = x.UserModified = currentUser.UserID; });
-                    var hsUser = DataContext.Add(users);
+                    var hsUser = new HandleState();
+                    foreach (var item in users)
+                    {
+                        if(item.Id != 0)
+                        {
+                            item.UserModified = currentUser.UserID;
+                            item.DatetimeModified = DateTime.Now;
+                            hsUser = DataContext.Update(item, x => x.Id == item.Id);
+                        }
+                        else
+                        {
+                            item.Active = true;
+                            item.GroupId = 11;
+                            item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                            item.UserCreated = item.UserModified = currentUser.UserID;
+                            hsUser = DataContext.Add(item,true);
+                        }
+                    }
                     trans.Commit();
                     return hsUser;
                 }

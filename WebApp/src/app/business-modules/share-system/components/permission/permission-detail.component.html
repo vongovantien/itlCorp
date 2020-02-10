@@ -1,53 +1,65 @@
-<div class="m-subheader">
-</div>
+<!-- <app-sub-header> </app-sub-header> -->
+
+
 <div class="m-content">
     <div class="m-portlet">
-        <div class="row m--padding-top-10">
-            <div class="col-6">
-                <h3 class="c-block-title m--margin-left-10">General Information</h3>
+        <div class="m-portlet__body">
+            <div class="row" *ngIf="type === 'office'">
+                <div class="col-md-6 d-flex align-items-center">
+                    <h3 class="c-block-title m--margin-left-10">User's Permission</h3>
+                </div>
+                <div class="col-md-6" *ngIf="!!permissionSample && !!permissionSample.id">
+                    <div class="form-actions m--align-right">
+                        <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="showConfirm()">
+                        </app-default-button>
+                        <app-default-button [buttonSetting]="cancelButtonSetting" (click)="backToDetail()"
+                            class="m--margin-left-10">
+                        </app-default-button>
+                    </div>
+                </div>
             </div>
-            <div class="col-6">
-                <div class="m--align-right">
-                    <button type="button"
-                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
-                        <span>
-                            <i class="la la-save"></i>
-                            <span> Save </span>
+            <hr>
+            <div class="form-group">
+                <div class="row" *ngIf=" !!permissionSample && !!permissionSample.id && type === 'office'">
+                    <div class="col-3">
+                        User name:
+                        <span class="text-success">
+                            {{permissionSample.userId }}
                         </span>
-                    </button>
-                    <button routerLink="/home/system/office" type="button"
-                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
-                        <span>
-                            <i class="la la-ban"></i>
-                            <span> Cancel </span>
-                        </span>
-                    </button>
+                    </div>
+                    <div class="col-3">
+                        Title: <span class="text-success"> {{permissionSample.userTitle}}</span>
+                    </div>
+                    <div class="col-3">
+                        Office: <span class="text-success">{{permissionSample.officeName}}</span>
+                    </div>
+                    <div class="col-3">
+
+                        Permission Name: <span class="text-success">{{permissionSample.permissionName}}</span>
+
+                    </div>
                 </div>
 
+            </div>
+            <div class="form-group">
+                <div class="row" *ngIf="!!permissionSample && !!permissionSample.id && type === 'office'">
+                    <div class="col-6">
+                        Created: {{permissionSample.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
+                            class="text-success">{{permissionSample.userCreated}}</span>
 
 
+                    </div>
+                    <div class="col-6">
+                        Modified: {{permissionSample.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
+                            class="text-success">{{permissionSample.userModified}} </span>
+
+
+                    </div>
+                </div>
             </div>
 
-        </div>
-        <div class="row">
-            <div class="col-3">
-                <label class="form-control"> User name: {{permissionSample.userId}}</label>
-            </div>
-            <div class="col-3">
-                <label class="form-control"> Title: {{permissionSample.userTitle}}</label>
-            </div>
-            <div class="col-3">
-                <label class="form-control"> Office: {{permissionSample.officeName}}</label>
-            </div>
-            <div class="col-3">
-                <label class="form-control"> Permission Name: {{permissionSample.permissionName}}</label>
-            </div>
-        </div>
 
 
-
-
-        <div class="m-portlet__body">
             <tabset>
                 <tab heading="General Permission">
                     <div class="general-wrapper">
@@ -172,7 +184,8 @@
                     <div class="m--align-right">
                         <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="showConfirm()">
                         </app-default-button>
-                        <app-default-button [buttonSetting]="cancelButtonSetting" class="m--margin-left-10">
+                        <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="backToDetail()"
+                            class="m--margin-left-10">
                         </app-default-button>
                     </div>
                 </div>
@@ -182,5 +195,8 @@
     </div>
 </div>
 
-<confirm-popup [body]="'Do you want to save this permission ?'" [labelConfirm]="'Yes'">
+
+
+<confirm-popup (onSubmit)="onSavePermissionSample()" [body]="'Do you want to save this permission ?'"
+    [labelConfirm]="'Yes'">
 </confirm-popup>

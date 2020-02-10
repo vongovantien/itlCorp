@@ -105,6 +105,27 @@ namespace eFMS.API.System.Controllers
         public IActionResult AddUser(List<SysUserLevelModel> users)
         {
             if (!ModelState.IsValid) return BadRequest();
+            SysUserLevelModel modelDupdatelidate = null;
+            var checkDupUser = users.GroupBy(x => x.UserId)
+                                .Where(t => t.Count() > 1)
+                                .Select(y => y.Key)
+                                .ToList();
+            if (checkDupUser.Count > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = "User existed on Office! Please Check higlight filed!!", Data = checkDupUser });
+            }
+            foreach (var item in users)
+            {
+                if (CheckExistUserLevelOnOffice(item))
+                {
+                    modelDupdatelidate = item;
+                    break;
+                };
+            }
+            if (modelDupdatelidate != null)
+            {
+                return Ok(new ResultHandle { Status = false, Message = "User existed on Office! Please Check higlight filed!!", Data = modelDupdatelidate });
+            }
             var hs = userLevelService.AddUser(users);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -113,6 +134,27 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        private bool CheckExistUserLevelOnOffice(SysUserLevelModel model)
+        {
+            bool isDuplicate = false;
+            if (model.Id == 0)
+            {
+         
+                if (userLevelService.Any(x => x.OfficeId == model.OfficeId && x.UserId == model.UserId))
+                {
+                    isDuplicate = true;
+                }
+            }
+            else
+            {
+                if (userLevelService.Any(x => x.OfficeId == model.OfficeId && x.UserId == model.UserId && x.GroupId == model.GroupId && x.Id != model.Id))
+                {
+                    isDuplicate = true;
+                }
+            }
+            return isDuplicate;
         }
 
         /// <summary>

@@ -10,5 +10,6 @@ namespace eFMS.API.System.DL.Models
         public string GroupName { get; set; }
         public string UserName { get; set; }
         public string EmployeeName { get; set; }
+        public bool isDup { get; set; }
     }
 }
