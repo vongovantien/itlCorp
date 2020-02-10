@@ -131,15 +131,21 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             this.totalDebit += this.formatNumberCurrency(_debit) + ' ' + currency + ' | ';
             this.balanceAmount += (_balance > 0 ? this.formatNumberCurrency(_balance) : '(' + this.formatNumberCurrency(Math.abs(_balance)) + ')') + ' ' + currency + ' | ';
         }
-
-        this.totalCredit = this.totalCredit === ' | ' ? '' : this.totalCredit.replace("| ", "");
-        this.totalDebit = this.totalDebit === ' | ' ? '' : this.totalDebit.replace("| ", "");
-        this.balanceAmount = this.balanceAmount === ' | ' ? '' : this.balanceAmount.replace("| ", "");
+        this.totalCredit += "]";
+        this.totalDebit += "]";
+        this.balanceAmount += "]";
+        this.totalCredit = this.totalCredit.replace("| ]", "").replace("]", "");
+        this.totalDebit = this.totalDebit.replace("| ]", "").replace("]", "");
+        this.balanceAmount = this.balanceAmount.replace("| ]", "").replace("]", "");
+        
+        // this.totalCredit = this.totalCredit === ' | ' ? '' : this.totalCredit.replace("| ", "");
+        // this.totalDebit = this.totalDebit === ' | ' ? '' : this.totalDebit.replace("| ", "");
+        // this.balanceAmount = this.balanceAmount === ' | ' ? '' : this.balanceAmount.replace("| ", "");
     }
 
     formatNumberCurrency(input: number) {
         return input.toLocaleString(
-            undefined, // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
+            'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
             { minimumFractionDigits: 3 }
         );
     }
