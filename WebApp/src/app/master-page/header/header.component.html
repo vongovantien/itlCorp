@@ -253,7 +253,7 @@
                                 </span>
                                 <span class="m-topbar__username"
                                     style="color: #3966b6; font-size: 14px; text-transform: capitalize; padding-left: 10px;">
-                                    {{currenUser.preferred_username}}
+                                    {{!!currenUser ? currenUser.preferred_username : null}}
                                 </span>
                             </a>
                         </li>

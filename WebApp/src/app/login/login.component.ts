@@ -75,10 +75,10 @@ export class LoginComponent {
             }
         );
 
-        if (this.baseService.checkLoginSession()) {
-            this.setupLocalInfo();
-            this.router.navigateByUrl('/');
-        }
+        // if (this.baseService.checkLoginSession()) {
+        //     this.setupLocalInfo();
+        //     this.router.navigateByUrl('/');
+        // }
     }
 
     async Login(form: NgForm) {
