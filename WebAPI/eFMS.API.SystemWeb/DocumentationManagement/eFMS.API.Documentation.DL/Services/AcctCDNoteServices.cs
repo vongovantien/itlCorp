@@ -1084,7 +1084,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (data.Etd != null)
                     {
                         charge.LoadingDate = data.Etd.Value;//ETD
-                    }                    
+                    }
                     charge.ATTN = string.Empty; //NOT USE
                     charge.FlightNo = data.Vessel?.ToUpper();//Flight No
                     charge.FlightDate = data.VesselDate; //Flight Date
@@ -1225,6 +1225,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (branchOfUser != null)
                 {
                     result = sysOfficeRepo.Get(x => x.Id == branchOfUser).FirstOrDefault();
+                }
             }
             return result;
         }

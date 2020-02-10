@@ -467,6 +467,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
