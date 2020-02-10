@@ -6,10 +6,12 @@ import { PermissionFormSearchComponent } from './components/form-search-permissi
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { PermissionFormCreateComponent } from './components/form-create-permission/form-create-permission.component';
+// import { PermissionFormCreateComponent } from './components/form-create-permission/form-create-permission.component';
 import { PermissionCreateComponent } from './add/add-permission.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { PermissionDetailComponent } from './detail/detail-permission.component';
+import { ShareSystemModule } from '../../share-system/share-system.module';
+import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
 
 const routing: Routes = [
     {
@@ -23,6 +25,9 @@ const routing: Routes = [
             },
             {
                 path: ':id', component: PermissionDetailComponent, data: { name: "Detail" }
+            },
+            {
+                path: ':type/:idu/:ido', component: ShareSystemDetailPermissionComponent, data: { name: "UserPermission" }
             }
         ]
     },
@@ -30,7 +35,7 @@ const routing: Routes = [
 
 const COMPONENTS = [
     PermissionFormSearchComponent,
-    PermissionFormCreateComponent
+    // PermissionFormCreateComponent
 ];
 
 @NgModule({
@@ -47,6 +52,7 @@ const COMPONENTS = [
         TabsModule.forRoot(),
         PaginationModule.forRoot(),
         ReactiveFormsModule,
+        ShareSystemModule,
         RouterModule.forChild(routing)
     ],
     exports: [],

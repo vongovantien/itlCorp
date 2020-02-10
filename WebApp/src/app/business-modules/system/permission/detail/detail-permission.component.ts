@@ -88,22 +88,22 @@ export class PermissionDetailComponent extends PermissionCreateComponent {
             );
     }
 
-    onSavePermissionSample() {
-        this.confirmPopup.hide();
+    // onSavePermissionSample() {
+    //     this.confirmPopup.hide();
 
-        this.formCreateComponent.isSubmitted = true;
-        if (this.formCreateComponent.formCreate.valid && !!this.formCreateComponent.role.value) {
-            const body: any = {
-                roleName: this.formCreateComponent.formCreate.value.permissionName,
-                name: this.formCreateComponent.formCreate.value.permissionName,
-                roleId: !!this.formCreateComponent.formCreate.value.role ? this.formCreateComponent.formCreate.value.role.id : null,
-                active: this.formCreateComponent.formCreate.value.status.value,
-                type: this.formCreateComponent.formCreate.value.type.value
+    //     this.formCreateComponent.isSubmitted = true;
+    //     if (this.formCreateComponent.formCreate.valid && !!this.formCreateComponent.role.value) {
+    //         const body: any = {
+    //             roleName: this.formCreateComponent.formCreate.value.permissionName,
+    //             name: this.formCreateComponent.formCreate.value.permissionName,
+    //             roleId: !!this.formCreateComponent.formCreate.value.role ? this.formCreateComponent.formCreate.value.role.id : null,
+    //             active: this.formCreateComponent.formCreate.value.status.value,
+    //             type: this.formCreateComponent.formCreate.value.type.value
 
-            };
-            this.updatePermission(body);
-        }
-    }
+    //         };
+    //         this.updatePermission(body);
+    //     }
+    // }
 
 
 
