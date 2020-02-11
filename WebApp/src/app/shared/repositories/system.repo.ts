@@ -400,5 +400,11 @@ export class SystemRepo {
         );
     }
 
+    getListCompanyPermissionLevel() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/GetCompanyPermissionLevel`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 

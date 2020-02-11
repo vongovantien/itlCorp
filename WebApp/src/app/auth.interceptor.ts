@@ -36,7 +36,7 @@ export class AuthInterceptor implements HttpInterceptor {
             }
         } else {
             this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', token || ''), url: req.url }));
-            //this.authReq = req;
+            // this.authReq = req;
         }
         return next.handle(this.authReq).pipe(
             timeout(+timeoutValue),

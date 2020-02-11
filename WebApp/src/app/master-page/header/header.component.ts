@@ -52,7 +52,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             ).subscribe(
                 (res: any) => {
                     if (!!res) {
-                        this.departmentGroups = res[1];
+                        this.departmentGroups = res[1] || [];
                         this.selectedDepartmentGroup = this.departmentGroups[0];
                         console.log(res);
                     }

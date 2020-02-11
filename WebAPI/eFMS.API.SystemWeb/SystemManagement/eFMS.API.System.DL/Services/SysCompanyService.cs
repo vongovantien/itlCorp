@@ -19,11 +19,18 @@ namespace eFMS.API.System.DL.Services
     public class SysCompanyService : RepositoryBase<SysCompany, SysCompanyModel>, ISysCompanyService
     {
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<SysUserLevel> sysLevelRepository;
+
         //private readonly ICurrentUser currentUser;
-        public SysCompanyService(IContextBase<SysCompany> repository, IMapper mapper, ICurrentUser icurrentUser) : base(repository, mapper)
+        public SysCompanyService(
+            IContextBase<SysCompany> repository, 
+            IMapper mapper,
+            IContextBase<SysUserLevel> userLevelRepo,
+            ICurrentUser icurrentUser) : base(repository, mapper)
         {
             currentUser = icurrentUser;
             //currentUser = user;
+            sysLevelRepository = userLevelRepo;
             SetChildren<SysCompany>("ID", "BUID");
         }
 
@@ -163,6 +170,32 @@ namespace eFMS.API.System.DL.Services
             {
                 var hs = new HandleState(ex);
                 return hs;
+            }
+        }
+
+        public List<SysCompanyModel> GetCompanyPermissionLevel()
+        {
+            List<SysCompanyModel> results = new List<SysCompanyModel>();
+            try
+            {
+                var companyIds = sysLevelRepository.Get(c => c.CompanyId != null).Select(c => c.CompanyId).ToList();
+                if(companyIds.Count() > 0)
+                {
+                    var companies = DataContext.Get(c => companyIds.Contains(c.Id)).ToList();
+
+                    foreach (var item in companies)
+                    {
+                        var c = mapper.Map<SysCompanyModel>(item);
+                        results.Add(c);
+                    }
+
+                }
+                return results;
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
     }

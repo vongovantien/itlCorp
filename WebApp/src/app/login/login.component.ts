@@ -67,7 +67,7 @@ export class LoginComponent {
 
     ngOnInit() {
         // Load company list.
-        this.company$ = this._systemRepo.getListCompany().pipe(share());
+        this.company$ = this._systemRepo.getListCompanyPermissionLevel().pipe(share());
 
         this.company$.subscribe(
             (companies: any) => {
