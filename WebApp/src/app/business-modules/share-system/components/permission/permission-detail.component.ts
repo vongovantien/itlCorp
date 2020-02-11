@@ -51,7 +51,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
     ) {
         super();
         // super(_systemRepo, _progressService, _toastService, _router);
-        // this._progressRef = this._progressService.ref();
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit(): void {
@@ -123,7 +123,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
     updatePermission(formDataCreate: { roleName: string; name: string; type: string; roleId: any; active: boolean }) {
         this.updatePermissionModel(formDataCreate);
-
+        this._progressRef.start();
         this._systemRepo.updatePermissionGeneral(this.permissionSample)
             .pipe(
                 catchError(this.catchError),
