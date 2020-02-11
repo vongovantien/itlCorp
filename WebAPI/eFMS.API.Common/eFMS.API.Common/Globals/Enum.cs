@@ -99,6 +99,15 @@
         Export = 6,
         Detail = 7
     }
+    public enum PermissionRange
+    {
+        Owner,
+        Group,
+        Department,
+        Office,
+        Company,
+        All
+    }
     public enum Menu
     {
         acct,

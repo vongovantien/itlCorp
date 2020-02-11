@@ -357,7 +357,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 totalDebit += (decimal)(charge.Total * charge.ExchangeRate);
                             }
                         }
-                        cdNote.Total = totalDebit - totalCredit;
+                        cdNote.Total = Math.Abs(totalDebit - totalCredit);
                         cdNote.soaNo = String.Join(", ", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
                         cdNote.total_charge = chargesOfCDNote.Count();
                         cdNote.UserCreated = sysUserRepo.Get(x => x.Id == cdNote.UserCreated).FirstOrDefault()?.Username;
@@ -1149,12 +1149,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 parameter.TotalCredit = (criteria.Currency == Constants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n}", _totalCredit);
             }
-
-            var _blAmount = (_totalDebit - _totalCredit);
-            parameter.BalanceAmount = (criteria.Currency == Constants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _blAmount) : String.Format("{0:n}", _blAmount);
+            
+            var _blAmount = _totalDebit - _totalCredit;
+            decimal _balanceAmount = Math.Abs(_blAmount);
+            parameter.BalanceAmount = (criteria.Currency == Constants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _balanceAmount) : String.Format("{0:n}", _balanceAmount);
 
             //Chuyển tiền Amount thành chữ
-            decimal _balanceAmount = Math.Abs(_blAmount);
             _balanceAmount = Math.Round(_balanceAmount, 3);
             var _inword = string.Empty;
             var _currency = criteria.Currency == Constants.CURRENCY_LOCAL && _balanceAmount >= 1 ?
@@ -1221,11 +1221,11 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
             if (!string.IsNullOrEmpty(employeeId))
             {
-                //var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.WorkPlaceId;
-                //if (branchOfUser != null)
-                //{
-                //    result = sysOfficeRepo.Get(x => x.Id == branchOfUser).FirstOrDefault();
-                //}
+                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.CompanyId;
+                if (branchOfUser != null && branchOfUser != Guid.Empty)
+                {
+                    result = sysOfficeRepo.Get(x => x.Id == branchOfUser).FirstOrDefault();
+                }
             }
             return result;
         }

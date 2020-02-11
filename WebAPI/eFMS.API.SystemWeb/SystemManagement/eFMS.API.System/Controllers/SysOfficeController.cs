@@ -166,7 +166,7 @@ namespace eFMS.API.System.Controllers
             var offices = sysOfficeService.GetOfficeByCompany(id);
 
             ResultHandle hs = new ResultHandle { Data = offices , Status = true };
-            return Ok(hs);
+            return Ok(offices);
         }
 
         [HttpGet]
@@ -174,8 +174,7 @@ namespace eFMS.API.System.Controllers
         public IActionResult GetOfficePermission(string username,Guid companyId)
         {
             var officesPermission = sysOfficeService.GetOfficePermission(username,companyId);
-            ResultHandle hs = new ResultHandle { Data = officesPermission, Status = true };
-            return Ok(hs);
+            return Ok(officesPermission);
         }
 
         /// get office by id

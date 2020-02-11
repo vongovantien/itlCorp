@@ -34,8 +34,8 @@
                                 <label class="form-control-label">
                                     Person In Charge
                                 </label>
-                                <ng-select formControlName="personInCharge" [active]="personInChargeActive || []" [allowClear]="true" [disabled]="true"
-                                    [items]="personInChargeList">
+                                <ng-select formControlName="personInCharge" [active]="personInChargeActive || []"
+                                    [allowClear]="true" [disabled]="true" [items]="personInChargeList">
                                 </ng-select>
                             </div>
                         </div>
@@ -43,7 +43,7 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmited && (authorizedPerson.errors | equalError: 'required') }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmited && (authorizedPerson.errors | equalError: 'required') }">
                                 <label class="form-control-label" required>
                                     Authorized Person
                                 </label>
@@ -75,14 +75,15 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmited && (!effectiveDate.value || !effectiveDate.value.startDate)}">
+                                [ngClass]="{'m-form__group has-danger': isSubmited && (!effectiveDate.value || !effectiveDate.value.startDate)}">
                                 <label class="form-control-label" required>
                                     Effective Date
                                 </label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly [minDate]="minDate"/>
+                                        name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly
+                                        [minDate]="minDate" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -103,7 +104,8 @@
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="expirationDate" readonly [minDate]="minDateExpired" />
+                                        name="daterange" [autoApply]="true" formControlName="expirationDate" readonly
+                                        [minDate]="minDateExpired" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -127,7 +129,7 @@
                             <div class="row">
                                 <label class="col-lg-4 col-form-label form-control-label"> Status </label>
                                 <div class="col-lg-8">
-                                    <app-switch [(toggle)]="authorizationActive.value" [disabled]="action==='create'"
+                                    <app-switch [toggle]="authorizationActive.value" [disabled]="action==='create'"
                                         (toggleChange)="authorizationActive.setValue($event)">
                                     </app-switch>
                                 </div>
@@ -137,7 +139,8 @@
                 </form>
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="saveAuthorization()" *ngIf="!(authorization && !authorization.active)">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="saveAuthorization()"
+                    *ngIf="!(authorization && !authorization.active)">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -159,7 +162,9 @@
     </div>
 </div>
 
-<confirm-popup #confirmUpdatePopup [body]="'Do you want to save the changes?'" [labelConfirm]="'Yes'" (onSubmit)="onUpdateAuthorization()">
+<confirm-popup #confirmUpdatePopup [body]="'Do you want to save the changes?'" [labelConfirm]="'Yes'"
+    (onSubmit)="onUpdateAuthorization()">
 </confirm-popup>
-<confirm-popup #confirmCancelPopup [body]="'Do you want to exit without saving?'" [labelConfirm]="'Yes'" (onSubmit)="onCancelAuthorization()">
+<confirm-popup #confirmCancelPopup [body]="'Do you want to exit without saving?'" [labelConfirm]="'Yes'"
+    (onSubmit)="onCancelAuthorization()">
 </confirm-popup>

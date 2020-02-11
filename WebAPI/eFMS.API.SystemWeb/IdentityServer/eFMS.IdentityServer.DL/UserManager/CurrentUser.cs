@@ -11,7 +11,6 @@ namespace eFMS.IdentityServer.DL.UserManager
 {
     public class CurrentUser : ICurrentUser
     {
-        readonly ISysEmployeeService employeeService;
         readonly IUserPermissionService userPermissionService;
         readonly IHttpContextAccessor httpContext;
         readonly IEnumerable<Claim> currentUser;
@@ -31,6 +30,21 @@ namespace eFMS.IdentityServer.DL.UserManager
         public int DepartmentId => currentUser.FirstOrDefault(x => x.Type == "departmentId").Value != null ? Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "departmentId").Value) : 0;
         public short GroupId => (short)(currentUser.FirstOrDefault(x => x.Type == "groupId").Value != null ? Convert.ToInt16(currentUser.FirstOrDefault(x => x.Type == "groupId").Value) : 0);
 
-        public List<UserPermissionModel> UserPermissions => userPermissionService.Get(UserID, OfficeID);
+        private List<UserPermissionModel> userPermissions;
+        public List<UserPermissionModel> UserPermissions
+        {
+            get
+            {
+                if (userPermissions == null)
+                {
+                    return userPermissions = userPermissionService.Get(UserID, OfficeID);
+                }
+                return userPermissions;
+            }
+        }
+
+        private UserPermissionModel userMenuPermission;
+
+        public UserPermissionModel UserMenuPermission { get => userMenuPermission; set => userMenuPermission = value; }
     }
 }

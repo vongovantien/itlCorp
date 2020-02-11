@@ -1318,6 +1318,7 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.StatusApproval = Constants.STATUS_APPROVAL_NEW;
                 settlement.UserCreated = settlement.UserModified = userCurrent;
                 settlement.DatetimeCreated = settlement.DatetimeModified = DateTime.Now;
+                settlement.Amount = CaculatorAmountSettlement(model);
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -1387,6 +1388,21 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
+        private decimal CaculatorAmountSettlement(CreateUpdateSettlementModel model)
+        {
+            decimal amount = 0;
+            if(model.ShipmentCharge.Count > 0)
+            {
+                foreach(var charge in model.ShipmentCharge)
+                {
+                    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+                    var rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, model.Settlement.SettlementCurrency);
+                    amount += charge.Total * rate;
+                }
+            }
+            return amount;
+        }
+
         public HandleState UpdateSettlementPayment(CreateUpdateSettlementModel model)
         {
             try
@@ -1409,6 +1425,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                 settlement.DatetimeModified = DateTime.Now;
                 settlement.UserModified = userCurrent;
+                settlement.Amount = CaculatorAmountSettlement(model);
+
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
                 if (model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED) && settlementCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
                 {

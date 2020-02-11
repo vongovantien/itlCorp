@@ -6,6 +6,7 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.IdentityServer.DL.Services
 {
@@ -59,7 +60,7 @@ namespace eFMS.IdentityServer.DL.Services
             } 
             return results;
         }
-        public List<string> GetPermission(string userId, Guid officeId)
+        public async Task<List<string>> GetPermission(string userId, Guid officeId)
         {
             List<string> results = new List<string>();
             var userPermissionId = userPermissionRepository.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
@@ -103,7 +104,7 @@ namespace eFMS.IdentityServer.DL.Services
                 {
                 }
             }
-            return results;
+            return await Task.FromResult(results);
         }
     }
 }
