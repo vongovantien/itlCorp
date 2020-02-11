@@ -61,10 +61,6 @@ export class ShareSystemAddUserComponent extends AppList {
         this.queryUserLevel();
     }
 
-    public refreshValue(value: any): void {
-        this.value = value;
-    }
-
     getUsers() {
         this._systemRepo.getListSystemUser({})
             .pipe(catchError(this.catchError))
@@ -82,17 +78,11 @@ export class ShareSystemAddUserComponent extends AppList {
     addNewLine() {
         this.isSubmitted = true;
         this.objUserLevel = new UserLevel();
-
-
         if (this.usersLevels.length === 0) {
             this.employeeNames = [];
         }
-
         this.usersLevels.push(this.objUserLevel);
-        console.log(this.objUserLevel);
     }
-
-
 
     selectedUser(obj: any, index: number) {
         this.isSubmitted = true;
@@ -113,7 +103,6 @@ export class ShareSystemAddUserComponent extends AppList {
             }
         }
 
-
         this.usersLevels.forEach(element => {
             if (result.length === 0) {
                 element.isDup = false;
@@ -128,12 +117,6 @@ export class ShareSystemAddUserComponent extends AppList {
 
             });
         });
-
-
-
-
-        console.log(this.usersLevels);
-
     }
 
     deleteUserLevel(index: number, id: number) {
@@ -173,7 +156,6 @@ export class ShareSystemAddUserComponent extends AppList {
 
     }
 
-
     checkValidate() {
         let valid: boolean = true;
         for (const userlv of this.usersLevels) {
@@ -192,18 +174,11 @@ export class ShareSystemAddUserComponent extends AppList {
         return valid;
     }
 
-
-
     saveUserLevel() {
         if (!this.usersLevels.length) {
             this._toastService.warning("Please add user Level");
             return;
         }
-
-
-        const checkDupAll = this.usersLevels.filter(x => x.isDup === true);
-        console.log(checkDupAll);
-
 
         this.isSubmitted = true;
         if (!this.checkValidate()) {
@@ -222,8 +197,6 @@ export class ShareSystemAddUserComponent extends AppList {
                 }
             });
 
-            console.log(this.usersLevels);
-
             this._systemRepo.addUserToOffice(this.usersLevels)
                 .pipe(
                     catchError(this.catchError),
@@ -232,12 +205,9 @@ export class ShareSystemAddUserComponent extends AppList {
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-
                             this._toastService.success(res.message, '');
                             this.queryUserLevel();
-
                         } else {
-                            console.log(res);
                             if (!!res.data) {
                                 this.usersLevels.forEach(item => {
                                     if (item.id === res.data.id) {
