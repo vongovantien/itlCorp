@@ -225,9 +225,12 @@ export class ShareSystemAddUserComponent extends AppList {
                                 });
                                 if (!!res.data[0]) {
                                     this.usersLevels.forEach(item => {
-                                        if (item.userId === res.data[0]) {
-                                            item.isDup = true;
-                                        }
+                                        res.data.forEach(element => {
+                                            if (item.userId === element) {
+                                                item.isDup = true;
+                                            }
+                                        });
+
                                     });
                                 }
                             }
