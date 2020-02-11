@@ -80,9 +80,10 @@ export class ShareSystemAddUserComponent extends AppList {
     }
 
     addNewLine() {
+        this.isSubmitted = true;
         this.objUserLevel = new UserLevel();
-        this.objUserLevel.isDup = false;
-        this.isSubmitted = false;
+
+
         if (this.usersLevels.length === 0) {
             this.employeeNames = [];
         }
@@ -94,19 +95,49 @@ export class ShareSystemAddUserComponent extends AppList {
 
 
     selectedUser(obj: any, index: number) {
-        const objUser = this.users.find(x => x.id === obj.userId);
+        this.isSubmitted = true;
         this.fillFullName();
-        this.userIds[index] = objUser.id;
-        console.log(this.userIds);
-        const valueArr = this.userIds.map(function (item) { return item; });
-        this.isDupUser = valueArr.some(function (item, idx) {
-            return valueArr.indexOf(item) !== idx;
+        this.userIds[index] = this.objUserLevel.userId;
+        const object = {};
+        const result = [];
+        this.usersLevels.forEach(function (item) {
+            if (!object[item.userId]) {
+                object[item.userId] = 0;
+            }
+            object[item.userId] += 1;
         });
+
+        for (const prop in object) {
+            if (object[prop] >= 2) {
+                result.push(prop);
+            }
+        }
+
+
+        this.usersLevels.forEach(element => {
+            if (result.length === 0) {
+                element.isDup = false;
+            }
+            result.forEach(item => {
+                if (element.userId === item) {
+                    element.isDup = true;
+                } else {
+                    element.isDup = false;
+                }
+
+
+            });
+        });
+
+
+
+
         console.log(this.usersLevels);
+
     }
 
     deleteUserLevel(index: number, id: number) {
-        if (id !== null) {
+        if (id !== null && id !== 0) {
             this.idUserLevel = id;
             this.confirmDeletePopup.show();
 
@@ -180,22 +211,19 @@ export class ShareSystemAddUserComponent extends AppList {
         }
         if (this.type === 'office') {
             this._progressRef.start();
-            this.usersLevels = this.usersLevels.filter(x => x.id === null);
             this.usersLevels.forEach(item => {
                 item.companyId = this.object.buid;
                 item.officeId = this.object.id;
-                item.id = 0;
-                item.groupId = 0;
+                if (item.id === null) {
+                    item.id = 0;
+                }
+                if (item.groupId === null) {
+                    item.groupId = 0;
+                }
             });
 
-
             console.log(this.usersLevels);
-            if (this.usersLevels.length === 0) {
-                this._progressRef.complete();
-                this._toastService.success('Data Added Success', '');
-                this.queryUserLevel();
-                return;
-            }
+
             this._systemRepo.addUserToOffice(this.usersLevels)
                 .pipe(
                     catchError(this.catchError),
@@ -209,10 +237,33 @@ export class ShareSystemAddUserComponent extends AppList {
                             this.queryUserLevel();
 
                         } else {
+                            console.log(res);
+                            if (!!res.data) {
+                                this.usersLevels.forEach(item => {
+                                    if (item.id === res.data.id) {
+                                        item.isDup = true;
+                                    }
+                                });
+                                if (!!res.data[0]) {
+                                    this.usersLevels.forEach(item => {
+                                        res.data.forEach(element => {
+                                            if (item.userId === element) {
+                                                item.isDup = true;
+                                            } else {
+                                                item.isDup = false;
+                                            }
+                                        });
+
+                                    });
+                                }
+                            }
                             this._toastService.error(res.message, '');
+
                         }
                     }
                 );
+
+
         }
     }
 
@@ -220,7 +271,7 @@ export class ShareSystemAddUserComponent extends AppList {
         this.usersLevels.forEach((item) => {
             const objUser = this.users.find(x => x.id === item.userId);
             item.employeeNameVn = objUser.employeeNameVn;
-            item.isDup = false;
+
         });
     }
 
@@ -248,7 +299,7 @@ export class ShareSystemAddUserComponent extends AppList {
     gotoUserPermission(id: number) {
         if (this.type === 'office') {
             const officeId = this.object.id;
-            this._router.navigate([`home/system/permission/${this.type}/${id}/${officeId}`]);
+            this._router.navigate([`home/system/permission/${this.type}/${officeId}/${id}`]);
 
         }
     }

@@ -11,6 +11,7 @@ using System.Linq;
 using ITL.NetCore.Common;
 using System.Diagnostics.Contracts;
 using eFMS.API.System.DL.ViewModels;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -27,6 +28,7 @@ namespace eFMS.API.System.DL.Services
         private IContextBase<SysPermissionSampleSpecial> permissionSampleSpecialRepository;
         private IContextBase<SysUserPermissionSpecial> userPermissionSpecialRepository;
         private IContextBase<SysUserPermissionGeneral> userPermissionGeneralRepository;
+        private readonly ICurrentUser currentUser;
 
         public SysUserPermissionService(IContextBase<SysUserPermission> repository, IMapper mapper,
             ISysUserPermissionGeneralService userPermissionGeneral,
@@ -37,7 +39,7 @@ namespace eFMS.API.System.DL.Services
             IContextBase<SysPermissionSample> permissionSampleRepo,
             IContextBase<SysPermissionSampleGeneral> permissionSampleGeneralRepo,
             IContextBase<SysUserPermissionSpecial> userPermissionSpecialRepo,
-            IContextBase<SysUserPermissionGeneral> userPermissionGeneralRepo) : base(repository, mapper)
+            IContextBase<SysUserPermissionGeneral> userPermissionGeneralRepo, ICurrentUser icurrentUser) : base(repository, mapper)
         {
             userPermissionGeneralService = userPermissionGeneral;
             userPermissionSpecialService = userPermissionSpecial;
@@ -48,18 +50,20 @@ namespace eFMS.API.System.DL.Services
             permissionSampleGeneralRepository = permissionSampleGeneralRepo;
             userPermissionSpecialRepository = userPermissionSpecialRepo;
             userPermissionGeneralRepository = userPermissionGeneralRepo;
+            currentUser = icurrentUser;
         }
 
         public SysUserPermissionModel GetBy(string userId, Guid officeId)
         {
             var permission = Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault();
+            if (permission == null) return permission;
             var employeeId = userRepository.Get(x => x.Id == userId)?.FirstOrDefault()?.EmployeeId;
             permission.UserTitle = employeeId == null ? null : employeeRepository.Get(x => x.Id == employeeId)?.FirstOrDefault()?.Title;
             permission.OfficeName = officeRepository.Get(x => x.Id == officeId)?.FirstOrDefault()?.BranchNameEn;
             permission.PermissionName = permissionSampleRepository.Get(x => x.Id == permission.PermissionSampleId)?.FirstOrDefault()?.Name;
             if (permission == null) return permission;
-            permission.SysUserPermissionGenerals = userPermissionGeneralService.GetBy(permission.Id);
-            permission.SysUserPermissionSpecials = userPermissionSpecialService.GetBy(permission.Id);
+            permission.SysPermissionSampleGenerals = userPermissionGeneralService.GetBy(permission.Id);
+            permission.SysPermissionSampleSpecials = userPermissionSpecialService.GetBy(permission.Id);
             return permission;
         }
 
@@ -71,8 +75,8 @@ namespace eFMS.API.System.DL.Services
             permission.OfficeName = officeRepository.Get(x => x.Id == permission.OfficeId)?.FirstOrDefault()?.BranchNameEn;
             permission.PermissionName = permissionSampleRepository.Get(x => x.Id == permission.PermissionSampleId)?.FirstOrDefault()?.Name;
             if (permission == null) return permission;
-            permission.SysUserPermissionGenerals = userPermissionGeneralService.GetBy(permission.Id);
-            permission.SysUserPermissionSpecials = userPermissionSpecialService.GetBy(permission.Id);
+            permission.SysPermissionSampleGenerals = userPermissionGeneralService.GetBy(permission.Id);
+            permission.SysPermissionSampleSpecials = userPermissionSpecialService.GetBy(permission.Id);
             return permission;
         }
         public HandleState Add(List<SysUserPermissionEditModel> list)
@@ -122,6 +126,58 @@ namespace eFMS.API.System.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+
+        public HandleState Update(SysUserPermissionModel entity)
+        {
+            var permission = mapper.Map<SysUserPermission>(entity);
+            permission.UserModified = currentUser.UserID;
+            permission.DatetimeModified = DateTime.Now;
+            var result = DataContext.Update(permission, x => x.Id == entity.Id, false);
+            if (result.Success)
+            {
+                foreach (var item in entity.SysPermissionSampleGenerals)
+                {
+                    var list = mapper.Map<List<SysUserPermissionGeneralModel>>(item.SysPermissionGenerals);
+                    foreach (var general in list)
+                    {
+                        general.UserModified = currentUser.UserID;
+                        userPermissionGeneralService.Update(general, x => x.Id == general.Id, false);
+                    }
+                }
+                foreach (var item in entity.SysPermissionSampleSpecials)
+                {
+                    foreach (var per in item.SysPermissionSpecials)
+                    {
+                        foreach (var s in per.PermissionSpecialActions)
+                        {
+                            if (s.Id == Guid.Empty)
+                            {
+                                var peritem = mapper.Map<SysUserPermissionSpecial>(s);
+                                peritem.Id = s.Id;
+                                peritem.IsAllow = s.IsAllow;
+                                peritem.MenuId = s.MenuId;
+                                peritem.ModuleId = s.ModuleId;
+                                peritem.ActionName = s.NameEn;
+                                peritem.UserPermissionId = entity.Id;
+                                userPermissionSpecialRepository.Add(peritem, false);
+                            }
+                            else
+                            {
+                                var peritem = userPermissionSpecialRepository.First(x => x.Id == s.Id);
+                                peritem.IsAllow = s.IsAllow;
+                                peritem.UserModified = currentUser.UserID;
+                                var t = userPermissionSpecialRepository.Update(peritem, x => x.Id == s.Id, false);
+                            }
+                        }
+                    }
+                }
+                DataContext.SubmitChanges();
+                userPermissionGeneralService.SubmitChanges();
+                userPermissionSpecialRepository.SubmitChanges();
+            }
+            return result;
         }
 
         private List<SysUserPermissionSpecial> GetPermissionSpecilaDefault(Guid permissionSampleId)

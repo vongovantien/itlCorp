@@ -36,6 +36,8 @@ export class PermissionSample {
     userTitle: string = '';
     officeName: string = '';
     permissionName: string = '';
+    officeId: string = '';
+    permissionSampleId: string = '';
     sysPermissionSampleGenerals: PermissionSampleGeneral[] = new Array<PermissionSampleGeneral>();
     sysPermissionSampleSpecials: PermissionSampleSpecial[] = new Array<PermissionSampleSpecial>();
 

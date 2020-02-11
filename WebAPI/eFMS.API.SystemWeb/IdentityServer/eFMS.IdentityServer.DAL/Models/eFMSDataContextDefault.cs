@@ -396,6 +396,8 @@ namespace eFMS.IdentityServer.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+
             });
 
             modelBuilder.Entity<SysUser>(entity =>

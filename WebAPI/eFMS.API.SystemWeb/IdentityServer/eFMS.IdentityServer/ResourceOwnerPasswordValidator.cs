@@ -42,10 +42,10 @@ namespace eFMS.IdentityServer
                     messageError = "Username or password incorrect !";
                     break;
                 case -3:
-                    messageError = "Username does not have company information !";
+                    messageError = "Not found company of this user name !";
                     break;
                 case -4:
-                    messageError = "Username does not have office information !";
+                    messageError = "Not found office of this user name !";
                     break;
                 default:
                     break;
