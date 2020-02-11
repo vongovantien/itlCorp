@@ -80,7 +80,9 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
                     this.permissionSample = new PermissionSample(res);
                     console.log(this.permissionSample);
+
                     if (this.type !== 'office') {
+
                         setTimeout(() => {
                             this.formCreateComponent.formCreate.setValue({
                                 permissionName: this.permissionSample.name,
@@ -88,7 +90,13 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                                 type: this.formCreateComponent.types.filter(type => type.value === this.permissionSample.type)[0],
                                 status: this.formCreateComponent.statuss.filter(status => status.value === this.permissionSample.active)[0],
                             });
+
                         }, 100);
+                    } else {
+                        if (this.permissionSample.id === "") {
+                            this._router.navigate([`home/system/office/${this.id}`]);
+                            this._toastService.error('This user does not have permission' || 'This user does not have permission', '');
+                        }
                     }
 
 

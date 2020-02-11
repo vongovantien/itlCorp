@@ -249,8 +249,7 @@ export class ShareSystemAddUserComponent extends AppList {
                                         res.data.forEach(element => {
                                             if (item.userId === element) {
                                                 item.isDup = true;
-                                            }
-                                            else {
+                                            } else {
                                                 item.isDup = false;
                                             }
                                         });
