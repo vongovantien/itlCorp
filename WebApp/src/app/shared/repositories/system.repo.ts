@@ -332,6 +332,13 @@ export class SystemRepo {
         );
     }
 
+
+    updateUsersPermission(body: any = {}) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getAuthorization(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorization/Paging`, body, {
             page: '' + page,

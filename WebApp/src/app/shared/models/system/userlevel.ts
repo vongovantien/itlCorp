@@ -9,4 +9,5 @@ export class UserLevel {
     position: string = null;
     employeeName: string = '';
     isDup: boolean = false;
+
 }
