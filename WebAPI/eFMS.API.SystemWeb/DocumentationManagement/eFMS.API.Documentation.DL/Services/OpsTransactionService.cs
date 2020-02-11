@@ -200,7 +200,36 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
-            var data = GetView().AsQueryable();
+            IQueryable<sp_GetOpsTransaction> data = null;
+            switch(criteria.RangeSearch)
+            {
+                case PermissionRange.All:
+                    data = GetView().AsQueryable();
+                    //trans.CurrentStatus <> 'Canceled' OR trans.CurrentStatus is null
+                    var data1 = DataContext.Get(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
+                    break;
+                case PermissionRange.Owner:
+                    data1 = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                                                && (x.BillingOpsId == currentUser.UserID || x.SalemanId == currentUser.UserID));
+                    break;
+                case PermissionRange.Group:
+                    data1 = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                                                && (x.GroupId == currentUser.GroupId));
+                    break;
+                case PermissionRange.Department:
+                    data1 = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                                                && (x.DepartmentId == currentUser.DepartmentId));
+                    break;
+                case PermissionRange.Office:
+                    data1 = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                                                && (x.OfficeId == currentUser.OfficeID));
+                    break;
+                case PermissionRange.Company:
+                    data1 = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                                                && (x.CompanyId == currentUser.CompanyID));
+                    break;
+            }
+            
             var datajoin = data;
             List<OpsTransactionModel> results = new List<OpsTransactionModel>();
             if (data == null)

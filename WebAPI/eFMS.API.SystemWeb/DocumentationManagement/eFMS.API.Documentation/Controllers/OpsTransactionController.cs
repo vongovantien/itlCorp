@@ -10,6 +10,8 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.Infrastructure.AttributeEx;
+using eFMS.API.Documentation.Infrastructure.Common;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -35,7 +37,7 @@ namespace eFMS.API.Documentation.Controllers
     public class OpsTransactionController : Controller
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICurrentUser currentUser;
+        private ICurrentUser currentUser;
         private readonly IOpsTransactionService transactionService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -85,8 +87,35 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="size">number items per page</param>
         /// <returns></returns>
         [HttpPost("Paging")]
+        [AuthorizeEx(Menu.acctAP, UserPermission.AllowAccess)]
         public IActionResult Paging(OpsTransactionCriteria criteria, int page, int size)
         {
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.acctAP);
+            if(currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.All))
+            {
+                criteria.RangeSearch = PermissionRange.All;
+            }
+            if(currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.Owner))
+            {
+                criteria.RangeSearch = PermissionRange.Owner;
+            }
+            if (currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.Group))
+            {
+                criteria.RangeSearch = PermissionRange.Group;
+            }
+            if (currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.Department))
+            {
+                criteria.RangeSearch = PermissionRange.Department;
+            }
+            if (currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.Office))
+            {
+                criteria.RangeSearch = PermissionRange.Office;
+            }
+            if (currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.Company))
+            {
+                criteria.RangeSearch = PermissionRange.Company;
+            }
+
             var data = transactionService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);

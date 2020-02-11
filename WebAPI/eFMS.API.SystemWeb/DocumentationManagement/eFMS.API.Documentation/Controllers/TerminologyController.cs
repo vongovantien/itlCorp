@@ -22,7 +22,7 @@ namespace eFMS.API.Documentation.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ITerminologyService terminologyService;
-        ICurrentUser curUser;
+        private ICurrentUser curUser;
         public TerminologyController(ITerminologyService service,
             ICurrentUser currentUser,
             IStringLocalizer<LanguageSub> localizer)

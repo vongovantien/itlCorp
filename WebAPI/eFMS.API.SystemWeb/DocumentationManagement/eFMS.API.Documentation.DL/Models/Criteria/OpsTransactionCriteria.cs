@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Common.Globals;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,5 +20,6 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string FieldOps { get; set; }
         public DateTime? ServiceDateFrom { get; set; }
         public DateTime? ServiceDateTo { get; set; }
+        public PermissionRange RangeSearch { get; set; }
     }
 }

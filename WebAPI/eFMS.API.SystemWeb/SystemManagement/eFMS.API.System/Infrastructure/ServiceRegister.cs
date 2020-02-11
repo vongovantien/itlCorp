@@ -38,6 +38,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.AddUserManager();
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ISysUserService, SysUserService>();
             services.AddTransient<ISysOfficeService, SysOfficeService>();
