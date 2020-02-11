@@ -63,6 +63,7 @@ namespace eFMS.API.System.DL.Services
             userLevels = userLevels.Where(x => (x.CompanyId == criteria.CompanyId
                                          || x.OfficeId == criteria.OfficeId
                                          || x.GroupId == criteria.GroupId
+                                         || x.DepartmentId == criteria.DepartmentId
            ));
             return userLevels;
 

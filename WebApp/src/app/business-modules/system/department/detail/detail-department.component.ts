@@ -25,8 +25,8 @@ export class DepartmentDetailComponent extends AppList {
     office: AbstractControl;
     company: AbstractControl;
     status: AbstractControl;
-    statusList: CommonInterface.ICommonTitleValue[] = [];
-    officeList: Office[];
+    officeList: any[] = [];
+    officeActive: any[] = [];
 
     isValidForm: boolean = false;
     isSubmited: boolean = false;
@@ -38,6 +38,7 @@ export class DepartmentDetailComponent extends AppList {
     userHeaders: CommonInterface.IHeaderTable[];
 
     groups: Group[] = [];
+    SelectedDepartment: any ;
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -57,7 +58,6 @@ export class DepartmentDetailComponent extends AppList {
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.departmentId = param.id;
-                this.getStatus();
                 this.initForm();
                 this.getDetail();
                 this.getGroupsByDeptId(this.departmentId);
@@ -110,7 +110,7 @@ export class DepartmentDetailComponent extends AppList {
                 ])
             ],
             company: [],
-            status: [this.statusList[0]]
+            status: []
         });
 
         this.departmentCode = this.formDetail.controls['departmentCode'];
@@ -131,15 +131,15 @@ export class DepartmentDetailComponent extends AppList {
                 deptName: this.nameLocal.value,
                 deptNameEn: this.nameEn.value,
                 deptNameAbbr: this.nameAbbr.value,
-                branchId: this.office.value.id,
-                officeName: this.office.value.branchNameEn,
+                branchId: this.officeActive[0].id,
+                officeName: this.officeActive[0].text,
                 companyName: '',
                 managerId: '',
                 userCreated: '',
                 datetimeCreated: '',
                 userModified: '',
                 datetimeModified: '',
-                active: this.status.value.value,
+                active: this.status.value,
                 inactiveOn: ''
             };
             this._progressRef.start();
@@ -164,26 +164,23 @@ export class DepartmentDetailComponent extends AppList {
         this._router.navigate(['home/system/department']);
     }
 
-    getStatus() {
-        this.statusList = [
-            { title: 'Active', value: true },
-            { title: 'Inactive', value: false }
-        ];
-    }
-
+   
     getDetail() {
         this._progressRef.start();
         this._systemRepo.getAllOffice()
             .pipe(
                 catchError(this.catchError),
                 tap(data => {
-                    this.officeList = data.map((item: any) => ({ id: item.id, code: item.code, branchname_En: item.branchNameEn }));
+                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));
                     console.log(this.officeList)
                 }),
                 switchMap(() => this._systemRepo.getDetailDepartment(this.departmentId).pipe(
                     catchError(this.catchError),
                     finalize(() => {
                         this._progressRef.complete();
+                    }),tap(data =>{
+                        this.SelectedDepartment = data;
+                        console.log(this.SelectedDepartment)                        
                     })
                 ))
             )
@@ -191,15 +188,23 @@ export class DepartmentDetailComponent extends AppList {
                 (res: any) => {
                     if (res.id !== 0) {
                         this.department = new Department(res);
+
+                        let index = this.officeList.findIndex(x => x.id == res.branchId);
+                        if (index > -1) {
+                            this.officeActive = [this.officeList[index]];
+                        }
+
                         this.formDetail.setValue({
                             departmentCode: res.code,
                             nameEn: res.deptNameEn,
                             nameLocal: res.deptName,
                             nameAbbr: res.deptNameAbbr,
-                            office: this.officeList.filter(i => i.id === res.branchId)[0] || [],
+                            office: this.officeActive,
                             company: res.companyName,
-                            status: this.statusList.filter(i => i.value === res.active)[0] || [],
+                            status: res.active,
                         });
+                        
+                       
                     } else {
                         //Reset 
                         this.formDetail.reset();
@@ -227,7 +232,7 @@ export class DepartmentDetailComponent extends AppList {
         this.groups = this._sortService.sort(this.groups, sort, this.order);
     }
 
-    gotoDetailGroup(id: number){
+    gotoDetailGroup(id: number) {
         this._router.navigate([`home/system/group/${id}`]);
     }
 }
