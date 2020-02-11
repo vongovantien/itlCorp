@@ -2,11 +2,13 @@ import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize, takeUntil, switchMap, tap } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, switchMap, tap, mergeMap } from 'rxjs/operators';
 import { IFormAddCompany, CompanyInformationFormAddComponent } from '../components/form-add-company/form-add-company.component';
 import { Company, Office } from 'src/app/shared/models';
 import { ToastrService } from 'ngx-toastr';
 import { AppList } from 'src/app/app.list';
+import { forkJoin } from 'rxjs';
+import isUUID from 'validator/lib/isUUID';
 
 @Component({
     selector: 'app-detail-company-info',
@@ -53,24 +55,28 @@ export class CompanyInformationDetailComponent extends AppList {
     ngOnInit(): void {
         this._activedRouter.params
             .pipe(
-                switchMap((param: Params) => this._systemRepo.getDetailCompany(param.id).pipe(
-                    catchError(this.catchError),
-                    tap((company: Company) => {
-                        this.isLoading = true;
-                        this.companyId = param.id;
-                        this.getDataDetail(company);
-                    }),
-                    switchMap(
-                        (company: Company) => this._systemRepo.getOfficeByCompany(company.id).pipe(
-                            catchError(this.catchError),
-                            finalize(() => this.isLoading = false)
-                        )
-                    )
-                )),
-            )
-            .subscribe((office: Office[]) => {
-                this.offices = (office || []).map(o => new Office(o));
-            });
+                tap(
+                    (param: Params) => {
+                        if (param.id && isUUID(param.id)) {
+                            this.companyId = param.id;
+                        } else { }
+                    }
+                ),
+                switchMap(
+                    (param: Params) => {
+                        return forkJoin([
+                            this._systemRepo.getDetailCompany(this.companyId),
+                            this._systemRepo.getOfficeByCompany(this.companyId)
+                        ]).pipe(
+                            tap((res: any[]) => { this.getDataDetail(res[0]); })
+                        );
+                    }
+                )).subscribe(
+                    (res: any) => {
+                        this.offices = (res[1] || []).map(o => new Office(o));
+                        console.log(this.offices);
+                    }
+                );
     }
 
 
