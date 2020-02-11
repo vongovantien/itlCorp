@@ -249,18 +249,18 @@ export class ShareSystemAddUserComponent extends AppList {
         if (this.type === 'office') {
             this.criteria.officeId = this.object.id;
             this.criteria.companyId = this.object.buid;
+            this.criteria.type = this.type;
         }
         this._systemRepo.queryUserLevels(this.criteria).pipe(catchError(this.catchError))
             .subscribe(
                 (data: any) => {
                     if (!!data) {
-                        this.usersLevels = [];
                         this.usersLevels = data;
-                        this.usersLevels = this.usersLevels.filter(x => x.active === true);
-                        setTimeout(() => {
-                            this.fillFullName();
+                        // this.usersLevels = this.usersLevels.filter(x => x.active === true);
+                        // setTimeout(() => {
+                        //     this.fillFullName();
 
-                        }, 300);
+                        // }, 300);
                     }
                 },
             );

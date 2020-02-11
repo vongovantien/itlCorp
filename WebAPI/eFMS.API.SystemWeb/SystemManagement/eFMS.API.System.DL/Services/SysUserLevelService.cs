@@ -60,10 +60,18 @@ namespace eFMS.API.System.DL.Services
         public IQueryable<SysUserLevel> Query(SysUserLevelCriteria criteria)
         {
             var userLevels = DataContext.Get();
-            userLevels = userLevels.Where(x => (x.CompanyId == criteria.CompanyId
-                                         || x.OfficeId == criteria.OfficeId
-                                         || x.GroupId == criteria.GroupId
-           ));
+            if(criteria.Type == "office")
+            {
+                userLevels = userLevels.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId);
+            }
+            else if(criteria.Type == "company")
+            {
+                userLevels = userLevels.Where(x => x.CompanyId == criteria.CompanyId);
+            }
+            else if(criteria.Type == "department")
+            {
+                userLevels = userLevels.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId);
+            };
             return userLevels;
 
         }
