@@ -9,6 +9,7 @@ using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -99,5 +100,30 @@ namespace eFMS.API.System.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// Update User Permission
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("Update")]
+        [Authorize]
+        public IActionResult Update(SysUserPermissionModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var hs = userPermissionService.Update(model);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return Ok(result);
+            }
+            return Ok(result);
+        }
+
     }
 }

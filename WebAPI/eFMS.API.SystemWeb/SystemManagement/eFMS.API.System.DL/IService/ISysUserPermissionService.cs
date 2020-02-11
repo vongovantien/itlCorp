@@ -15,5 +15,6 @@ namespace eFMS.API.System.DL.IService
         SysUserPermissionModel Get(Guid id);
         HandleState Add(List<SysUserPermissionEditModel> list);
         HandleState Delete(Guid id);
+        HandleState Update(SysUserPermissionModel entity);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -56,6 +57,17 @@ namespace eFMS.API.System.DL.Services
             return mapper.Map<SysUserLevelModel>(data);
         }
 
+        public IQueryable<SysUserLevel> Query(SysUserLevelCriteria criteria)
+        {
+            var userLevels = DataContext.Get();
+            userLevels = userLevels.Where(x => (x.CompanyId == criteria.CompanyId
+                                         || x.OfficeId == criteria.OfficeId
+                                         || x.GroupId == criteria.GroupId
+           ));
+            return userLevels;
+
+        }
+
         #region Add User 
         public HandleState AddUser(List<SysUserLevelModel> users)
         {
@@ -63,8 +75,24 @@ namespace eFMS.API.System.DL.Services
             {
                 try
                 {
-                    users.ForEach(x => { x.GroupId = 11; x.DatetimeCreated = x.DatetimeModified = DateTime.Now; x.UserCreated = x.UserModified = "samuel.an"; }) ;
-                    var hsUser = DataContext.Add(users);
+                    var hsUser = new HandleState();
+                    foreach (var item in users)
+                    {
+                        if(item.Id != 0)
+                        {
+                            item.UserModified = currentUser.UserID;
+                            item.DatetimeModified = DateTime.Now;
+                            hsUser = DataContext.Update(item, x => x.Id == item.Id);
+                        }
+                        else
+                        {
+                            item.Active = true;
+                            item.GroupId = 11;
+                            item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                            item.UserCreated = item.UserModified = currentUser.UserID;
+                            hsUser = DataContext.Add(item,true);
+                        }
+                    }
                     trans.Commit();
                     return hsUser;
                 }

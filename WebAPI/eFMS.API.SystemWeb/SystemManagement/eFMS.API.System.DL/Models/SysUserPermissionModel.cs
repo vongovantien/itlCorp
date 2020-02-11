@@ -11,8 +11,8 @@ namespace eFMS.API.System.DL.Models
         public string PermissionName { get; set; }
         public string UserTitle { get; set; }
         public string OfficeName { get; set; }
-        public List<SysUserPermissionGeneralViewModel> SysUserPermissionGenerals { get; set; }
-        public List<SysUserPermissionSpecialViewModel> SysUserPermissionSpecials { get; set; }
+        public List<SysUserPermissionGeneralViewModel> SysPermissionSampleGenerals { get; set; }
+        public List<SysUserPermissionSpecialViewModel> SysPermissionSampleSpecials { get; set; }
     }
     
     public class SysUserPermissionEditModel
