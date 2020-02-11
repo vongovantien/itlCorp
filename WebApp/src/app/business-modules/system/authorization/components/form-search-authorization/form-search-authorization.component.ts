@@ -70,7 +70,7 @@ export class AuthorizationFormSearchComponent extends AppForm {
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        this.serviceList = res.map(x => ({ "text": x.displayName, "id": x.value })).filter(item => item.id !== 'CL');
+                        this.serviceList = res.map(x => ({ "text": x.displayName, "id": x.value }));
                     }
                 },
             );
