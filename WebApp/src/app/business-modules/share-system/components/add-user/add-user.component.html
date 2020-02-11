@@ -44,7 +44,7 @@
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.userId === null || item.isDup )   }">
-                                    <select [(ngModel)]="item.userId" (ngModelChange)="selectedUser(item,i)"
+                                    <select [(ngModel)]="item.userId" (change)="selectedUser(item,i)"
                                         class="form-control border">
                                         <option value="null" disabled>Please select</option>
                                         <option *ngFor="let item of users" [ngValue]="item.id">{{item.username}}

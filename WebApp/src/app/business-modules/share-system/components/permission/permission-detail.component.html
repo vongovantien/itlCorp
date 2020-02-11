@@ -1,6 +1,20 @@
 <!-- <app-sub-header> </app-sub-header> -->
 
-
+<form-create-permission (onSubmit)="updatePermission($event)" *ngIf="type !== 'office'">
+    <div class="title">Detail/Edit Permission</div>
+    <div class="date-time p-3 font-14" *ngIf="!!permissionSample">
+        <div class="row">
+            <div class="col-6">
+                <span>Created: {{permissionSample.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span> <span
+                    class="text-success">{{permissionSample.userCreated}}</span>
+            </div>
+            <div class="col-6">
+                <span>Modified: {{permissionSample.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by </span> <span
+                    class="text-success">{{permissionSample.userModified}}</span>
+            </div>
+        </div>
+    </div>
+</form-create-permission>
 <div class="m-content">
     <div class="m-portlet">
         <div class="m-portlet__body">

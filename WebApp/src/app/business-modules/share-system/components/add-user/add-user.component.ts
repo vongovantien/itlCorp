@@ -80,7 +80,7 @@ export class ShareSystemAddUserComponent extends AppList {
     }
 
     addNewLine() {
-
+        this.isSubmitted = true;
         this.objUserLevel = new UserLevel();
 
 
@@ -95,24 +95,45 @@ export class ShareSystemAddUserComponent extends AppList {
 
 
     selectedUser(obj: any, index: number) {
-
+        this.isSubmitted = true;
         this.fillFullName();
         this.userIds[index] = this.objUserLevel.userId;
+        const object = {};
+        const result = [];
+        this.usersLevels.forEach(function (item) {
+            if (!object[item.userId]) {
+                object[item.userId] = 0;
+            }
+            object[item.userId] += 1;
+        });
 
-        // console.log(this.userIds);
-        // const valueArr = this.userIds.map(function (item) { return item; });
-        // this.isDupUser = valueArr.some(function (item, idx) {
-        //     return valueArr.indexOf(item) !== idx;
-        // });
-        // if (this.isDupUser) {
-        //     this.usersLevels.forEach((item, i) => {
-        //         if (i === index) {
-        //             item.isDup = true;
-        //         }
-        //     });
-        // }
-        console.log(this.isDupUser);
+        for (const prop in object) {
+            if (object[prop] >= 2) {
+                result.push(prop);
+            }
+        }
+
+
+        this.usersLevels.forEach(element => {
+            if (result.length === 0) {
+                element.isDup = false;
+            }
+            result.forEach(item => {
+                if (element.userId === item) {
+                    element.isDup = true;
+                } else {
+                    element.isDup = false;
+                }
+
+
+            });
+        });
+
+
+
+
         console.log(this.usersLevels);
+
     }
 
     deleteUserLevel(index: number, id: number) {
@@ -229,6 +250,9 @@ export class ShareSystemAddUserComponent extends AppList {
                                             if (item.userId === element) {
                                                 item.isDup = true;
                                             }
+                                            else {
+                                                item.isDup = false;
+                                            }
                                         });
 
                                     });
@@ -248,7 +272,7 @@ export class ShareSystemAddUserComponent extends AppList {
         this.usersLevels.forEach((item) => {
             const objUser = this.users.find(x => x.id === item.userId);
             item.employeeNameVn = objUser.employeeNameVn;
-            item.isDup = false;
+
         });
     }
 

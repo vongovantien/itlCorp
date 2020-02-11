@@ -24,7 +24,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
     levelPermissions: string[];
 
-    permissionSample: any;
+    permissionSample: PermissionSample;
 
 
     type: string = '';
@@ -80,6 +80,16 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
                     this.permissionSample = new PermissionSample(res);
                     console.log(this.permissionSample);
+                    if (this.type !== 'office') {
+                        setTimeout(() => {
+                            this.formCreateComponent.formCreate.setValue({
+                                permissionName: this.permissionSample.name,
+                                role: this.formCreateComponent.roles.filter(role => role.id === this.permissionSample.roleId)[0],
+                                type: this.formCreateComponent.types.filter(type => type.value === this.permissionSample.type)[0],
+                                status: this.formCreateComponent.statuss.filter(status => status.value === this.permissionSample.active)[0],
+                            });
+                        }, 100);
+                    }
 
 
                 }
