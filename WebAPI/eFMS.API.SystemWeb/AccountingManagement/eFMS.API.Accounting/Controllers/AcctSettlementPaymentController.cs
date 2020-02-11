@@ -422,6 +422,18 @@ namespace eFMS.API.Accounting.Controllers
                 return Ok(_result);
             }
 
+            //Check exist thông tin Manager, Accountant của User requester
+            AcctApproveSettlementModel settlementAppr = new AcctApproveSettlementModel
+            {
+                Requester = model.Settlement.Requester
+            };
+            var isExistsManager = acctSettlementPaymentService.CheckExistsInfoManagerOfRequester(settlementAppr);
+            if (!isExistsManager.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = isExistsManager.Exception.Message };
+                return BadRequest(_result);
+            }
+
             if (string.IsNullOrEmpty(model.Settlement.SettlementNo))//Insert Settlement Payment
             {
                 model.Settlement.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;

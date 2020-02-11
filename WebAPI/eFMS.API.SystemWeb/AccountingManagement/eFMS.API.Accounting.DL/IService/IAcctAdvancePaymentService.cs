@@ -40,6 +40,8 @@ namespace eFMS.API.Accounting.DL.IService
 
         Crystal Preview(AcctAdvancePaymentModel advance);
 
+        HandleState CheckExistsInfoManagerOfRequester(AcctApproveAdvanceModel approve);
+
         HandleState InsertOrUpdateApprovalAdvance(AcctApproveAdvanceModel approve);
 
         HandleState UpdateApproval(Guid addvanceId);
