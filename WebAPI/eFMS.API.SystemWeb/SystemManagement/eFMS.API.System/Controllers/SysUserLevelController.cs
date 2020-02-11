@@ -112,7 +112,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupUser.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = "User existed on Office! Please Check higlight filed!!", Data = checkDupUser });
+                return Ok(new ResultHandle { Status = false, Message = "User existed on Office! Please Check hightlight filed!!", Data = checkDupUser });
             }
             foreach (var item in users)
             {
