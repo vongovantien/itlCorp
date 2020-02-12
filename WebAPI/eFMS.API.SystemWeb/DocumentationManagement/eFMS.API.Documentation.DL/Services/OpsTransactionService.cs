@@ -42,6 +42,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysAuthorization> authorizationRepository;
         private readonly ICsMawbcontainerService mawbcontainerService;
 
+
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
             ICurrentUser user, 
@@ -179,6 +180,9 @@ namespace eFMS.API.Documentation.DL.Services
                     page = 1;
                 }
                 data = data.Skip((page - 1) * size).Take(size);
+
+                var customers = partnerRepository.Get(x => x.PartnerGroup.Contains("CUSTOMER"));
+                var ports = placeRepository.Get(x => x.PlaceTypeId == "Port");
             }
             var results = new OpsTransactionResult
             {
@@ -204,45 +208,40 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
             IQueryable<OpsTransaction> data = null;
-            IQueryable<OpsTransaction> authorizedData = null;
             List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID 
                                                                  && x.EndDate.Value >= DateTime.Now.Date
                                                                  && x.Services.Contains("CL")
                                                                  )?.Select(x => x.UserId).ToList();
-            if(authorizeUserIds.Count > 0)
-            {
-                //authorizedData = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                //                              && (authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
-                //authorizedData = DataContext.Get(x => authorizeUserIds.Any(au => au == x.BillingOpsId));
-                //authorizedData = DataContext.Get(x => authorizeUserIds.Contains(x.BillingOpsId));
-            }
             switch (criteria.RangeSearch)
             {
                 case PermissionRange.All:
-                    //data = GetView().AsQueryable();
-                    //trans.CurrentStatus <> 'Canceled' OR trans.CurrentStatus is null
                     data = DataContext.Get(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
                     break;
                 case PermissionRange.Owner:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && (x.BillingOpsId == currentUser.UserID || x.SalemanId == currentUser.UserID
-                                                 || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
+                                                 || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)
+                                                 || authorizeUserIds.Contains(x.UserCreated)));
                     break;
                 case PermissionRange.Group:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.GroupId == currentUser.GroupId || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
+                                                && ((x.GroupId == currentUser.GroupId && x.OfficeId == currentUser.OfficeID) || authorizeUserIds.Contains(x.BillingOpsId) 
+                                                || authorizeUserIds.Contains(x.SalemanId) || authorizeUserIds.Contains(x.UserCreated)));
                     break;
                 case PermissionRange.Department:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.DepartmentId == currentUser.DepartmentId || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
+                                                && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID) || authorizeUserIds.Contains(x.BillingOpsId) 
+                                                || authorizeUserIds.Contains(x.SalemanId) || authorizeUserIds.Contains(x.UserCreated)));
                     break;
                 case PermissionRange.Office:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.OfficeId == currentUser.OfficeID || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
+                                                && (x.OfficeId == currentUser.OfficeID || authorizeUserIds.Contains(x.BillingOpsId) 
+                                                || authorizeUserIds.Contains(x.SalemanId) || authorizeUserIds.Contains(x.UserCreated)));
                     break;
                 case PermissionRange.Company:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
+                                                && (x.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(x.BillingOpsId) 
+                                                || authorizeUserIds.Contains(x.SalemanId) || authorizeUserIds.Contains(x.UserCreated)));
                     break;
             }
             if (data == null)
