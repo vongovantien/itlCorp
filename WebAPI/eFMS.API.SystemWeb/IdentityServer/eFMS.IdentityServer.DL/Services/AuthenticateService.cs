@@ -146,6 +146,9 @@ namespace eFMS.IdentityServer.DL.Services
                 modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, true, null);
                 modelReturn.companyId = companyId;
                 modelReturn.officeId = levelOffice.OfficeId;
+                modelReturn.departmentId = (int)levelOffice.DepartmentId;
+                modelReturn.groupId = levelOffice.GroupId;
+
                 LogUserLogin(user, modelReturn.companyId);
                 return 1;
             }
@@ -170,6 +173,9 @@ namespace eFMS.IdentityServer.DL.Services
                 modelReturn = SetLoginReturnModel(user, employee);
                 modelReturn.companyId = companyId;
                 modelReturn.officeId = levelOffice.OfficeId;
+                modelReturn.departmentId = (int)levelOffice.DepartmentId;
+                modelReturn.groupId = levelOffice.GroupId;
+
                 LogUserLogin(user, companyId);
                 return 1;
             }
