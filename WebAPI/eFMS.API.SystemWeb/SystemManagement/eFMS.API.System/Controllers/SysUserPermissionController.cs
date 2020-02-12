@@ -9,6 +9,8 @@ using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
+using eFMS.IdentityServer.DL.IService;
+using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -28,6 +30,7 @@ namespace eFMS.API.System.Controllers
     {
         private readonly ISysUserPermissionService userPermissionService;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly ICurrentUser currentUser;
 
         /// <summary>
         /// constructor
@@ -35,10 +38,12 @@ namespace eFMS.API.System.Controllers
         /// <param name="userPermission"></param>
         /// <param name="localizer"></param>
         public SysUserPermissionController(ISysUserPermissionService userPermission,
-            IStringLocalizer<LanguageSub> localizer)
+            IStringLocalizer<LanguageSub> localizer,
+            ICurrentUser currUser)
         {
             userPermissionService = userPermission;
             stringLocalizer = localizer;
+            currentUser = currUser;
         }
         /// <summary>
         /// Get by user and office
@@ -52,6 +57,20 @@ namespace eFMS.API.System.Controllers
         {
             var result = userPermissionService.GetBy(userId, officeId);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// get permission by current user + menu
+        /// </summary>
+        /// <param name="menuId"></param>
+        /// <returns></returns>
+        [HttpGet("Permissions/{menuId}")]
+        [Authorize]
+        public IActionResult Permissions(string menuId)
+        {
+            var result = userPermissionService.GetPermission(currentUser.UserID, currentUser.OfficeID, menuId);
+            if (result == null) return Forbid();
+            else return Ok(result);
         }
 
         /// <summary>
@@ -121,7 +140,7 @@ namespace eFMS.API.System.Controllers
             if (!hs.Success)
             {
                 return Ok(result);
-            }
+    }
             return Ok(result);
         }
 

@@ -1,24 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
 using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.Infrastructure.AttributeEx;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -35,7 +31,7 @@ namespace eFMS.API.Documentation.Controllers
     public class OpsTransactionController : Controller
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICurrentUser currentUser;
+        private ICurrentUser currentUser;
         private readonly IOpsTransactionService transactionService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -71,12 +67,18 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Detail)]
         public IActionResult Get(Guid id)
         {
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
+            if (result.Status)
+            {
+                return Ok(result.Data);
+            }
             return Ok(result);
         }
-
+        
         /// <summary>
         /// get and paging the list of countries by conditions
         /// </summary>
@@ -85,8 +87,10 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="size">number items per page</param>
         /// <returns></returns>
         [HttpPost("Paging")]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.AllowAccess)]
         public IActionResult Paging(OpsTransactionCriteria criteria, int page, int size)
         {
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var data = transactionService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
@@ -97,11 +101,14 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="model">object to add</param>
         /// <returns></returns>
-        [Authorize]
         [HttpPost]
         [Route("Add")]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Add)]
         public IActionResult Add(OpsTransactionModel model)
         {
+            if (!ModelState.IsValid) return BadRequest();
+
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {
@@ -123,19 +130,19 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="model">object to update</param>
         /// <returns></returns>
-        [Authorize]
         [HttpPut]
-        [Route("Update")]       
+        [Route("Update")]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Update)]
         public IActionResult Update(OpsTransactionModel model)
         {
+            if (!ModelState.IsValid) return BadRequest();
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
 
-            model.DatetimeModified = DateTime.Now;
-            model.UserModified = currentUser.UserID;
             var hs = transactionService.Update(model);//.Update(model,x=>x.Id==model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -157,6 +164,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Delete(Guid id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             if (transactionService.CheckAllowDelete(id) == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });

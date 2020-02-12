@@ -36,6 +36,9 @@ namespace eFMS.IdentityServer
             var messageError = String.Empty;
             Claim companyClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("companyId")).FirstOrDefault();
             Claim officeClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("officeId")).FirstOrDefault();
+            Claim departmentclaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("departmentId")).FirstOrDefault();
+            Claim groupClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("groupId")).FirstOrDefault();
+
 
             var subjectId = context.Subject.GetSubjectId();
             var user = authenUserService.GetUserById(subjectId);
@@ -52,7 +55,9 @@ namespace eFMS.IdentityServer
                     new Claim("userName", user.Username),
                     new Claim("employeeId", employee.Id),
                     companyClaim,
-                    officeClaim
+                    officeClaim,
+                    departmentclaim,
+                    groupClaim
                 };
 
             context.IssuedClaims = claims;

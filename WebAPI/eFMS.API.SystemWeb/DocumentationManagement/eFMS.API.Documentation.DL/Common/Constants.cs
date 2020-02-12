@@ -57,5 +57,13 @@ namespace eFMS.API.Documentation.DL.Common
         public const string CODE_ITL = "ITL7939";
 
         public static readonly string CURRENT_STATUS_CANCELED = "Canceled";
+
+
+        public const string PERMISSION_RANGE_ALL = "All";
+        public const string PERMISSION_RANGE_OWNER = "Owner";
+        public const string PERMISSION_RANGE_GROUP = "Group";
+        public const string PERMISSION_RANGE_DEPARTMENT = "Department";
+        public const string PERMISSION_RANGE_OFFICE = "Office";
+        public const string PERMISSION_RANGE_COMPANY = "Company";
     }
 }

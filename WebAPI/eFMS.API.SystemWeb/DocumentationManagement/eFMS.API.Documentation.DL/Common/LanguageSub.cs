@@ -83,5 +83,6 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_PERSON_IN_CHARGE_REQUIRED = "MSG_PERSON_IN_CHARGE_REQUIRED";
 
         public static readonly string MSG_NOT_EXIST_SHIPMENT = "MSG_NOT_EXIST_SHIPMENT";
+        public static readonly string DO_NOT_HAVE_PERMISSION = "DO_NOT_HAVE_PERMISSION";
     }
 }
