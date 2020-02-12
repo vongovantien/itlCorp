@@ -83,10 +83,9 @@ export class ShareSystemAddUserComponent extends AppList {
         if (this.usersLevels.length === 0) {
             this.employeeNames = [];
 
-        this.usersLevels.push(new UserLevel());
-        console.log(this.usersLevels);
-    }
-        this.usersLevels.push(this.objUserLevel);
+            this.usersLevels.push(new UserLevel());
+            console.log(this.usersLevels);
+        }
     }
 
     selectedUser(obj: any, index: number) {
@@ -235,10 +234,10 @@ export class ShareSystemAddUserComponent extends AppList {
             });
             console.log(this.usersLevels);
         }
-        
-        if (this.type === 'department'){
+
+        if (this.type === 'department') {
             console.log(this.object);
-       }
+        }
     }
 
     // fillFullName() {
