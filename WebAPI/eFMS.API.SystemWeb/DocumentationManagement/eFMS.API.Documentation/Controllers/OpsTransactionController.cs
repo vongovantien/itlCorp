@@ -87,35 +87,31 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="size">number items per page</param>
         /// <returns></returns>
         [HttpPost("Paging")]
-        [AuthorizeEx(Menu.acctAP, UserPermission.AllowAccess)]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.AllowAccess)]
         public IActionResult Paging(OpsTransactionCriteria criteria, int page, int size)
         {
-            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.acctAP);
-            if(currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.All))
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
+            switch (currentUser.UserMenuPermission.List)
             {
-                criteria.RangeSearch = PermissionRange.All;
+                case Constants.PERMISSION_RANGE_ALL:
+                    criteria.RangeSearch = PermissionRange.All;
+                    break;
+                case Constants.PERMISSION_RANGE_OWNER:
+                    criteria.RangeSearch = PermissionRange.Owner;
+                    break;
+                case Constants.PERMISSION_RANGE_GROUP:
+                    criteria.RangeSearch = PermissionRange.Group;
+                    break;
+                case Constants.PERMISSION_RANGE_DEPARTMENT:
+                    criteria.RangeSearch = PermissionRange.Department;
+                    break;
+                case Constants.PERMISSION_RANGE_OFFICE:
+                    criteria.RangeSearch = PermissionRange.Office;
+                    break;
+                case Constants.PERMISSION_RANGE_COMPANY:
+                    criteria.RangeSearch = PermissionRange.Company;
+                    break;
             }
-            if(currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.Owner))
-            {
-                criteria.RangeSearch = PermissionRange.Owner;
-            }
-            if (currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.Group))
-            {
-                criteria.RangeSearch = PermissionRange.Group;
-            }
-            if (currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.Department))
-            {
-                criteria.RangeSearch = PermissionRange.Department;
-            }
-            if (currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.Office))
-            {
-                criteria.RangeSearch = PermissionRange.Office;
-            }
-            if (currentUser.UserMenuPermission.List == string.Format("{0}", PermissionRange.Company))
-            {
-                criteria.RangeSearch = PermissionRange.Company;
-            }
-
             var data = transactionService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);

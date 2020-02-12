@@ -39,6 +39,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CustomsDeclaration> customDeclarationRepository;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepository;
         private readonly IContextBase<CsMawbcontainer> csMawbcontainerRepository;
+        private readonly IContextBase<SysAuthorization> authorizationRepository;
         private readonly ICsMawbcontainerService mawbcontainerService;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
@@ -55,7 +56,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CustomsDeclaration> customDeclarationRepo,
             IContextBase<AcctCdnote> acctCdNoteRepo,
             IContextBase<CsMawbcontainer> csMawbcontainerRepo,
-            ICsMawbcontainerService containerService) : base(repository, mapper)
+            ICsMawbcontainerService containerService, 
+            IContextBase<SysAuthorization> authorizationRepo) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -74,6 +76,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctCdNoteRepository = acctCdNoteRepo;
             csMawbcontainerRepository = csMawbcontainerRepo;
             mawbcontainerService = containerService;
+            authorizationRepository = authorizationRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -200,42 +203,54 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
-            IQueryable<sp_GetOpsTransaction> data = null;
-            switch(criteria.RangeSearch)
+            IQueryable<OpsTransaction> data = null;
+            IQueryable<OpsTransaction> authorizedData = null;
+            List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID 
+                                                                 && x.EndDate.Value >= DateTime.Now.Date
+                                                                 && x.Services.Contains("CL")
+                                                                 )?.Select(x => x.UserId).ToList();
+            if(authorizeUserIds.Count > 0)
+            {
+                //authorizedData = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                //                              && (authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
+                //authorizedData = DataContext.Get(x => authorizeUserIds.Any(au => au == x.BillingOpsId));
+                //authorizedData = DataContext.Get(x => authorizeUserIds.Contains(x.BillingOpsId));
+            }
+            switch (criteria.RangeSearch)
             {
                 case PermissionRange.All:
-                    data = GetView().AsQueryable();
+                    //data = GetView().AsQueryable();
                     //trans.CurrentStatus <> 'Canceled' OR trans.CurrentStatus is null
-                    var data1 = DataContext.Get(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
+                    data = DataContext.Get(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
                     break;
                 case PermissionRange.Owner:
-                    data1 = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.BillingOpsId == currentUser.UserID || x.SalemanId == currentUser.UserID));
+                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                                                && (x.BillingOpsId == currentUser.UserID || x.SalemanId == currentUser.UserID
+                                                 || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Group:
-                    data1 = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.GroupId == currentUser.GroupId));
+                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                                                && (x.GroupId == currentUser.GroupId || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Department:
-                    data1 = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.DepartmentId == currentUser.DepartmentId));
+                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                                                && (x.DepartmentId == currentUser.DepartmentId || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Office:
-                    data1 = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.OfficeId == currentUser.OfficeID));
+                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                                                && (x.OfficeId == currentUser.OfficeID || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Company:
-                    data1 = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.CompanyId == currentUser.CompanyID));
+                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                                                && (x.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)));
                     break;
             }
-            
-            var datajoin = data;
-            List<OpsTransactionModel> results = new List<OpsTransactionModel>();
             if (data == null)
                 return null;
 
-            if(criteria.ClearanceNo != null)
+            IQueryable<OpsTransaction> datajoin = data;
+            List<OpsTransactionModel> results = new List<OpsTransactionModel>();
+            if (criteria.ClearanceNo != null)
             {
                 var listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
                 if(listCustomsDeclaration.Count() > 0)
@@ -259,7 +274,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if(listDebit.Count() > 0)
                 {
                     datajoin = from acctnote in listDebit
-                               join datas in data on acctnote.JobId equals datas.ID
+                               join datas in data on acctnote.JobId equals datas.Id
                                select datas;
                     if (datajoin.Count() > 1)
                     {
@@ -284,12 +299,12 @@ namespace eFMS.API.Documentation.DL.Services
             if (criteria.All == null)
             {
                 datajoin = datajoin.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                && (x.HWBNO ?? "").IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                && (x.MBLNO ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                && (x.Hwbno ?? "").IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                && (x.Mblno ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                && (x.CustomerID == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                                && (x.FieldOpsID == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
+                                && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                                && (x.FieldOpsId == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
                                 && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
                                 && ((x.ServiceDate ?? null) >= criteria.ServiceDateFrom || criteria.ServiceDateFrom == null)
                                 && ((x.ServiceDate ?? null) <= criteria.ServiceDateTo || criteria.ServiceDateTo == null)
@@ -298,12 +313,12 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 datajoin = datajoin.Where(x => (x.JobNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.HWBNO ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.MBLNO ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.Hwbno ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.Mblno ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ProductService ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ServiceMode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.CustomerID == criteria.All || string.IsNullOrEmpty(criteria.All))
-                                   || (x.FieldOpsID == criteria.All || string.IsNullOrEmpty(criteria.All))
+                                   || (x.CustomerId == criteria.All || string.IsNullOrEmpty(criteria.All))
+                                   || (x.FieldOpsId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.ShipmentMode == criteria.All || string.IsNullOrEmpty(criteria.All))
                                && ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
                                ).OrderByDescending(x => x.DatetimeModified);
