@@ -10,5 +10,6 @@ namespace eFMS.API.System.DL.Models.Criteria
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public string Type { get; set; }
     }
 }

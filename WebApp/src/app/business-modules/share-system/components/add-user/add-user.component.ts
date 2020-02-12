@@ -61,10 +61,6 @@ export class ShareSystemAddUserComponent extends AppList {
         this.queryUserLevel();
     }
 
-    public refreshValue(value: any): void {
-        this.value = value;
-    }
-
     getUsers() {
         this._systemRepo.getListSystemUser({ active: true })
             .pipe(catchError(this.catchError))
@@ -84,9 +80,13 @@ export class ShareSystemAddUserComponent extends AppList {
         // if (this.usersLevels.length === 0) {
         //     this.employeeNames = [];
         // }
+        if (this.usersLevels.length === 0) {
+            this.employeeNames = [];
 
         this.usersLevels.push(new UserLevel());
         console.log(this.usersLevels);
+    }
+        this.usersLevels.push(this.objUserLevel);
     }
 
     selectedUser(obj: any, index: number) {
@@ -205,7 +205,6 @@ export class ShareSystemAddUserComponent extends AppList {
                             this._toastService.success(res.message, '');
                             this.queryUserLevel();
                         } else {
-                            console.log(res);
                             if (!!res.data) {
                                 this.usersLevels.forEach(item => {
                                     if (item.id === res.data.id) {
@@ -253,6 +252,7 @@ export class ShareSystemAddUserComponent extends AppList {
         if (this.type === 'office') {
             this.criteria.officeId = this.object.id;
             this.criteria.companyId = this.object.buid;
+            this.criteria.type = this.type;
         }
         if (this.type === 'company') {
             this.criteria.companyId = this.object.id;

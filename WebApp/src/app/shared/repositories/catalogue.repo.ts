@@ -241,6 +241,7 @@ export class CatalogueRepo {
             );
     }
 
+
     getListBranch() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBranch/GetListBranch`)
             .pipe(

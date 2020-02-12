@@ -12,6 +12,7 @@ import { UserAddNewComponent } from './addnew/user.addnew.component';
 import { FormAddUserComponent } from './components/form-add-user/form-add-user.component';
 import { UserDetailsComponent } from './details/user-details.component';
 import { UserManagementImportComponent } from './import/user-management-import.component';
+import { AddRoleUserComponent } from './components/add-role-user/add-role-user.component';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -45,7 +46,7 @@ const routing: Routes = [
         RouterModule.forChild(routing)
     ],
     exports: [],
-    declarations: [UserManagementComponent, UserFormSearchComponent, FormAddUserComponent, UserAddNewComponent, UserDetailsComponent, UserManagementImportComponent],
+    declarations: [UserManagementComponent, UserFormSearchComponent, FormAddUserComponent, UserAddNewComponent, UserDetailsComponent, UserManagementImportComponent, AddRoleUserComponent],
     providers: [],
 })
 export class UserManagementModule { }

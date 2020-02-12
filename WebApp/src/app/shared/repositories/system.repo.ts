@@ -363,6 +363,14 @@ export class SystemRepo {
         );
     }
 
+    getListOffices() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetAll`)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+
     deleteUserLevel(id: number) {
         return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel/${id}`)
             .pipe(

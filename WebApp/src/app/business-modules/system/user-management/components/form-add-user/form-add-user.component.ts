@@ -83,7 +83,7 @@ export class FormAddUserComponent extends AppList {
                 ])],
             phone: [],
             description: [],
-            ldap: []
+            ldap: [true]
 
 
         });
