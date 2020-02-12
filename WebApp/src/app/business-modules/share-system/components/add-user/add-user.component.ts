@@ -85,10 +85,10 @@ export class ShareSystemAddUserComponent extends AppList {
         this.userLevelTemp = cloneDeep(this.usersLevels);
     }
 
-    selectedUser(userLevel: UserLevel, username: string) {
+    selectedUser(userLevel: UserLevel, id: string) {
         this.isSubmitted = true;
 
-        const user: User = this.users.find(u => u.username === username);
+        const user: User = this.users.find(u => u.id === id);
         if (!!user) {
             userLevel.employeeName = user.employeeNameVn;
         }
