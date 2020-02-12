@@ -7,7 +7,6 @@ namespace eFMS.API.System.Service.Models
     {
         public SysCompany()
         {
-            SysOffice = new HashSet<SysOffice>();
         }
 
         public Guid Id { get; set; }
@@ -43,7 +42,5 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public virtual ICollection<SysOffice> SysOffice { get; set; }
     }
 }

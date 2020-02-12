@@ -27,6 +27,8 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<SysPermissionSampleGeneral> permissioSampleGeneralRepository;
         private readonly ISysPermissionSampleSpecialService permissionSampleSpecialService;
         private readonly IContextBase<SysPermissionSampleSpecial> permissioSampleSpecialRepository;
+        private readonly ISysUserPermissionService userPermissionRepository;
+
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
 
@@ -38,6 +40,7 @@ namespace eFMS.API.System.DL.Services
             ISysPermissionSampleSpecialService perSampleSpecialService,
             IContextBase<SysPermissionSampleSpecial> permissioSampleSpecialRepo,
             IStringLocalizer<LanguageSub> localizer,
+            ISysUserPermissionService userPermissionRepo,
             ICurrentUser currUser) : base(repository, mapper)
         {
             roleRepository = roleRepo;
@@ -47,6 +50,7 @@ namespace eFMS.API.System.DL.Services
             permissioSampleSpecialRepository = permissioSampleSpecialRepo;
             stringLocalizer = localizer;
             currentUser = currUser;
+            userPermissionRepository =  userPermissionRepo;
         }
 
         public SysPermissionSampleModel GetBy(Guid? id)
@@ -68,6 +72,7 @@ namespace eFMS.API.System.DL.Services
             data = DataContext.Get(x => (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.RoleId == criteria.RoleId || criteria.RoleId == null)
                                 && (x.Active == criteria.Active || criteria.Active == null)
+
                             ).OrderByDescending(x => x.DatetimeModified);
             if (data == null) return null;
             var roles = roleRepository.Get().OrderByDescending(x => x.DatetimeModified);

@@ -18,6 +18,7 @@ namespace eFMS.API.System.DL.IService
         SysPermissionSampleModel GetBy(Guid? id);
         HandleState Update(SysPermissionSampleModel entity);
         HandleState Delete(Guid id);
+
         List<eFMS.API.System.DL.Common.CommonData> GetLevelPermissions();
     }
 }

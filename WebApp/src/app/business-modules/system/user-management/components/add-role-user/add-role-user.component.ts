@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Company, Office } from '@models';
+import { Component, Input } from '@angular/core';
+import { Company, Office, PermissionSample } from '@models';
 import { SystemRepo } from '@repositories';
 import { finalize, catchError } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
@@ -11,17 +11,14 @@ import { AppList } from 'src/app/app.list';
 })
 
 export class AddRoleUserComponent extends AppList {
+    @Input() userId: string = '';
+
     companies: Company[] = [];
+    listRoles: PermissionSample[] = [];
     offices: Office[] = [];
-    listRoles: any[] = [];
-
-    roles: CommonInterface.ICommonTitleValue[] = [
-        { title: 'Customer Service', value: 'Customer Service' },
-        { title: 'Field OPS', value: 'Field OPS' },
-        { title: 'Accountant', value: 'Accountant' },
-        { title: 'Admin', value: 'Admin' },
-    ];
-
+    roles: any[] = [];
+    selectedIdOffice: string = '';
+    officeData: Office[] = [];
     constructor(
         private _systemRepo: SystemRepo,
 
@@ -29,9 +26,27 @@ export class AddRoleUserComponent extends AppList {
         super();
     }
     ngOnInit() {
-
+        this.headers = [
+            { title: 'Role Name', field: 'name', },
+            { title: 'Company', field: '' },
+            { title: 'Office', field: 'officeId' },
+        ];
+        this.getDataCombobox();
         this.getCompanies();
         this.getOffices();
+        this.getPermissionsByUserId();
+    }
+
+    getDataCombobox() {
+        this._systemRepo.getComboboxPermission()
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
+            ).subscribe(
+                (res: any) => {
+                    this.roles = res;
+                },
+            );
     }
 
     getCompanies() {
@@ -42,8 +57,8 @@ export class AddRoleUserComponent extends AppList {
             ).subscribe(
                 (res: any) => {
                     this.companies = res;
-                    this.companies = this.companies.filter(x => x.active === true);
                     console.log(this.companies);
+
                 },
             );
     }
@@ -56,10 +71,43 @@ export class AddRoleUserComponent extends AppList {
             ).subscribe(
                 (res: any) => {
                     this.offices = res;
-                    this.offices = this.offices.filter(x => x.active === true);
+                    this.officeData = res;
                     console.log(this.offices);
                 },
             );
     }
+
+    getPermissionsByUserId() {
+        this._systemRepo.getListPermissionsByUserId(this.userId).pipe(
+            catchError(this.catchError),
+            finalize(() => { this.isLoading = false; }),
+        ).subscribe(
+            (res: any) => {
+                this.listRoles = res;
+                console.log(this.listRoles);
+            },
+        );
+    }
+
+    selectedCompany(id: string) {
+        const obj = this.officeData.filter(x => x.buid === id);
+        this.offices = obj;
+        this.listRoles.forEach(element => {
+
+            element.buid = id;
+
+
+        });
+    }
+
+
+    addNewLine() {
+        this.listRoles.push(new PermissionSample());
+        console.log(this.listRoles);
+
+    }
+
+
+
 
 }

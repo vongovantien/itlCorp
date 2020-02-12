@@ -68,6 +68,7 @@ export class ShareSystemAddUserComponent extends AppList {
                 (res: any) => {
                     if (!!res) {
                         this.users = res;
+                        console.log(this.users);
                         // this.users = this.users.filter(x => x.active === true);
                     }
                 },

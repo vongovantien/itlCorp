@@ -184,7 +184,7 @@
     </form>
     <tabset *ngIf="isDetail">
         <tab heading="Role">
-            <add-role-user></add-role-user>
+            <add-role-user [userId]="SelectedUser.id"></add-role-user>
         </tab>
         <tab heading="Group">
 

@@ -67,6 +67,19 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get an existed item by user id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetByUserId")]
+        public IActionResult GetByUserId(string id)
+        {
+            var data = userPermissionService.GetByUserId(id);
+            return Ok(data);
+        }
+
+
         [HttpPost("Add")]
         public IActionResult Add(List<SysUserPermissionEditModel> list)
         {

@@ -185,7 +185,7 @@ namespace eFMS.API.System.Controllers
             if (model.Id == 0)
             {
          
-                if (userLevelService.Any(x => x.OfficeId == model.OfficeId && x.UserId == model.UserId))
+                if (userLevelService.Any(x => x.OfficeId == model.OfficeId && x.UserId == model.UserId && x.GroupId == 11))
                 {
                     isDuplicate = true;
                 }

@@ -57,22 +57,41 @@ namespace eFMS.API.System.DL.Services
             return mapper.Map<SysUserLevelModel>(data);
         }
 
-        public IQueryable<SysUserLevel> Query(SysUserLevelCriteria criteria)
+        public IQueryable<SysUserLevelModel> Query(SysUserLevelCriteria criteria)
         {
             var userLevels = DataContext.Get();
-            if(criteria.Type == "office")
+            var users = userRepository.Get();
+            var employess = employeeRepository.Get();
+            var results = userLevels.Join(users, x => x.UserId, y => y.Id, (x, y) => new { User = y, UserLevel = x })
+                        .Join(employess, x => x.User.EmployeeId, y => y.Id, (x, y) => new { User = x, Employee = y })
+                        .Select(x => new SysUserLevelModel
+                        {
+                            Id = x.User.UserLevel.Id,
+                            UserId = x.User.UserLevel.UserId,
+                            GroupId = x.User.UserLevel.GroupId,
+                            EmployeeName = x.Employee.EmployeeNameVn,
+                            Active = x.User.UserLevel.Active,
+                            CompanyId = x.User.UserLevel.CompanyId,
+                            OfficeId = x.User.UserLevel.OfficeId,
+                            DatetimeCreated = x.User.UserLevel.DatetimeCreated,
+                            DatetimeModified = x.User.UserLevel.DatetimeModified,
+                            UserCreated = x.User.UserLevel.UserCreated,
+                            UserModified = x.User.UserLevel.UserModified
+                        });
+
+            if (criteria.Type == "office")
             {
-                userLevels = userLevels.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId);
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId);
             }
             else if(criteria.Type == "company")
             {
-                userLevels = userLevels.Where(x => x.CompanyId == criteria.CompanyId);
+                results = results.Where(x => x.CompanyId == criteria.CompanyId);
             }
             else if(criteria.Type == "department")
             {
-                userLevels = userLevels.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId);
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId);
             };
-            return userLevels;
+            return results;
 
         }
 

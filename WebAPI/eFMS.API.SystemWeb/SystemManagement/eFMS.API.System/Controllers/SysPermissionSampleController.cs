@@ -64,6 +64,18 @@ namespace eFMS.API.System.Controllers
             return Ok(results);
         }
 
+      
+        /// <summary>
+        /// get data combobox
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetDataCombobox")]
+        public IActionResult GetDataCombobox()
+        {
+            var data = permissionGeneralService.Get().Select(x => new { x.Id, x.Name });
+            return Ok(data);
+        }
+
         /// <summary>
         /// get an existed item by id
         /// </summary>

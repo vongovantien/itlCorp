@@ -22,6 +22,8 @@ namespace eFMS.API.System.DL.Services
         private IContextBase<SysUser> userRepository;
         private IContextBase<SysEmployee> employeeRepository;
         private IContextBase<SysOffice> officeRepository;
+        private IContextBase<SysCompany> companyRepository;
+
         private IContextBase<SysPermissionSample> permissionSampleRepository;
 
         private IContextBase<SysPermissionSampleGeneral> permissionSampleGeneralRepository;
@@ -39,7 +41,7 @@ namespace eFMS.API.System.DL.Services
             IContextBase<SysPermissionSample> permissionSampleRepo,
             IContextBase<SysPermissionSampleGeneral> permissionSampleGeneralRepo,
             IContextBase<SysUserPermissionSpecial> userPermissionSpecialRepo,
-            IContextBase<SysUserPermissionGeneral> userPermissionGeneralRepo, ICurrentUser icurrentUser) : base(repository, mapper)
+            IContextBase<SysUserPermissionGeneral> userPermissionGeneralRepo, ICurrentUser icurrentUser, IContextBase<SysCompany> companyRepo) : base(repository, mapper)
         {
             userPermissionGeneralService = userPermissionGeneral;
             userPermissionSpecialService = userPermissionSpecial;
@@ -51,6 +53,29 @@ namespace eFMS.API.System.DL.Services
             userPermissionSpecialRepository = userPermissionSpecialRepo;
             userPermissionGeneralRepository = userPermissionGeneralRepo;
             currentUser = icurrentUser;
+            companyRepository = companyRepo;
+        }
+
+        public IQueryable<SysUserPermissionModel> GetByUserId(string id)
+        {
+            var dataOffice = officeRepository.Get();
+            var dataCompany= companyRepository.Get();
+            var data = DataContext.Get();
+            var permissionSample = permissionSampleRepository.Get();
+            var results = from d in data
+                           join p in permissionSample on d.PermissionSampleId equals p.Id
+                           join o in dataOffice on d.OfficeId equals o.Id 
+                           join c in dataCompany on o.Buid equals c.Id
+                           select new SysUserPermissionModel
+                           {
+                               Id = d.Id,
+                               Name = p.Name,
+                               OfficeId = d.OfficeId,
+                               PermissionSampleId = d.PermissionSampleId,
+                               Buid = c.Id
+                           };
+
+            return results;
         }
 
         public SysUserPermissionModel GetBy(string userId, Guid officeId)

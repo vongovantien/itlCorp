@@ -41,11 +41,10 @@
                                 </button>
                             </td>
                             <td>
-                                <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.roleId === null || item.isDup )   }">
-                                    <select [(ngModel)]="item.userId" class="form-control border">
+                                <div class="form-group">
+                                    <select [(ngModel)]="item.permissionSampleId" class="form-control border">
                                         <option value="null" disabled>Please select</option>
-                                        <option *ngFor="let item of roles" [ngValue]="item.value">{{item.title}}
+                                        <option *ngFor="let item of roles" [ngValue]="item.id">{{item.name}}
                                         </option>
                                     </select>
                                 </div>
@@ -53,7 +52,8 @@
                             </td>
                             <td>
                                 <div class="form-group ">
-                                    <select class="form-control border">
+                                    <select [(ngModel)]="item.buid" (ngModelChange)="selectedCompany($event)"
+                                        class="form-control border">
                                         <option value="null" disabled>Please select</option>
                                         <option *ngFor="let item of companies" [ngValue]="item.id">{{item.bunameVn}}
                                         </option>
@@ -64,7 +64,7 @@
                             <td>
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && item.officeId === null }">
-                                    <select class="form-control border" [(ngModel)]="item.position">
+                                    <select class="form-control border" [(ngModel)]="item.officeId">
                                         <option value="null" disabled>Please select</option>
                                         <option *ngFor="let item of offices" [ngValue]="item.id">{{item.branchNameVn}}
                                         </option>
@@ -75,7 +75,12 @@
                             </td>
                         </tr>
                         <tr>
-
+                            <td colspan=1 class="fixed-side">
+                                <a (click)="addNewLine()" class="btn m-btn--icon m-btn--icon-only m--font-primary"
+                                    title="Add">
+                                    <i class="fa fa-plus-circle fa-2x"></i>
+                                </a>
+                            </td>
 
                         </tr>
                     </ng-container>

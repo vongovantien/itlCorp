@@ -7,7 +7,7 @@ namespace eFMS.API.System.Service.Models
     {
         public SysOffice()
         {
-            CatDepartment = new HashSet<CatDepartment>();
+          
         }
 
         public Guid Id { get; set; }
@@ -41,7 +41,5 @@ namespace eFMS.API.System.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
 
-        public virtual SysCompany Bu { get; set; }
-        public virtual ICollection<CatDepartment> CatDepartment { get; set; }
     }
 }

@@ -294,6 +294,12 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.System.Controllers.SysPermissionGeneralController.GetDataCombobox">
+            <summary>
+            get data combobox
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.System.Controllers.SysPermissionGeneralController.Get(System.Nullable{System.Guid})">
             <summary>
             get an existed item by id
@@ -503,6 +509,13 @@
         <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.GetBy(System.Guid)">
             <summary>
             get detail of permission by user permission id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.GetByUserId(System.String)">
+            <summary>
+            get an existed item by user id
             </summary>
             <param name="id"></param>
             <returns></returns>

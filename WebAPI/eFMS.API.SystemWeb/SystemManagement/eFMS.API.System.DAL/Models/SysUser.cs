@@ -7,7 +7,6 @@ namespace eFMS.API.System.Service.Models
     {
         public SysUser()
         {
-            SysUserLevel = new HashSet<SysUserLevel>();
         }
 
         public string Id { get; set; }
@@ -27,7 +26,5 @@ namespace eFMS.API.System.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string WorkingStatus { get; set; }
-
-        public virtual ICollection<SysUserLevel> SysUserLevel { get; set; }
     }
 }

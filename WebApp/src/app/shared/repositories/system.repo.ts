@@ -107,6 +107,24 @@ export class SystemRepo {
         );
     }
 
+    getComboboxPermission() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysPermissionGeneral/GetDataCombobox`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
+    getListPermissionsByUserId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUserPermission/GetByUserId`, id).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
     getListSystemUser(body: any = {}) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser`).pipe(
             catchError((error) => throwError(error)),
