@@ -1,5 +1,7 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.IdentityServer.DL.UserManager;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace eFMS.API.Documentation.DL.Common
@@ -41,6 +43,45 @@ namespace eFMS.API.Documentation.DL.Common
                     break;
             }
             return result;
+        }
+        public static int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser, List<string> authorizeUserIds)
+        {
+            int code = 0;
+            switch (permissionRange)
+            {
+                case PermissionRange.Owner:
+                    if (model.BillingOpsId != currentUser.UserID && !authorizeUserIds.Any(x => x == model.BillingOpsId))
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                        && !authorizeUserIds.Contains(model.BillingOpsId))
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if (model.DepartmentId != currentUser.DepartmentId && !authorizeUserIds.Contains(model.BillingOpsId))
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if (model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.BillingOpsId))
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (model.CompanyId != currentUser.CompanyID && !authorizeUserIds.Contains(model.BillingOpsId))
+                    {
+                        code = 403;
+                    }
+                    break;
+            }
+            return code;
         }
     }
 }

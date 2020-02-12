@@ -1,4 +1,5 @@
-﻿using eFMS.API.Common.Globals;
+﻿using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
@@ -15,7 +16,7 @@ namespace eFMS.API.Documentation.DL.IService
     {
         IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria);
         OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount);
-        OpsTransactionModel GetDetails(Guid id);
+        ResultHandle GetDetails(Guid id);
         bool CheckAllowDelete(Guid jobId);
         Crystal PreviewCDNOte(AcctCDNoteDetailsModel model);
         HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);

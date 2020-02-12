@@ -35,6 +35,9 @@ namespace eFMS.API.Shipment.Infrastructure.Common
                 case 400:
                     message = hs.Exception.Message;
                     break;
+                case 403:
+                    message = LanguageSub.DO_NOT_HAVE_PERMISSION;
+                    break;
 
             }
             return message;

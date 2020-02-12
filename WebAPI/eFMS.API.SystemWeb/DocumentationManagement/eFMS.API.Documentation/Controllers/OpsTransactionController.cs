@@ -67,9 +67,15 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Detail)]
         public IActionResult Get(Guid id)
         {
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
+            if (result.Status)
+            {
+                return Ok(result.Data);
+            }
             return Ok(result);
         }
         
@@ -95,7 +101,6 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="model">object to add</param>
         /// <returns></returns>
-        [Authorize]
         [HttpPost]
         [Route("Add")]
         [AuthorizeEx(Menu.opsJobManagement, UserPermission.Add)]
@@ -125,19 +130,19 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="model">object to update</param>
         /// <returns></returns>
-        [Authorize]
         [HttpPut]
-        [Route("Update")]       
+        [Route("Update")]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Update)]
         public IActionResult Update(OpsTransactionModel model)
         {
+            if (!ModelState.IsValid) return BadRequest();
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
 
-            model.DatetimeModified = DateTime.Now;
-            model.UserModified = currentUser.UserID;
             var hs = transactionService.Update(model);//.Update(model,x=>x.Id==model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -159,6 +164,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Delete(Guid id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             if (transactionService.CheckAllowDelete(id) == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
