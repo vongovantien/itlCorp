@@ -18,7 +18,7 @@ export class PermissionCreateComponent extends AppForm {
     @ViewChild(PermissionFormCreateComponent, { static: false }) formCreateComponent: PermissionFormCreateComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
 
-    permissionSample: PermissionSample;
+    permissionSample: PermissionSample = new PermissionSample();
 
     levelPermissions: string[];
     data: boolean = false;

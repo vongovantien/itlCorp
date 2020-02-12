@@ -2,8 +2,7 @@
     <div class="m-portlet__body">
         <div class="m-form m--margin-bottom-10">
             <div class="m--align-right">
-                <button (click)="saveUserLevel()" type="button"
-                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -29,13 +28,13 @@
                 </thead>
                 <tbody>
                     <ng-container>
-                        <tr *ngFor="let item of usersLevels;let i = index; trackBy: trackByFn">
+                        <tr *ngFor="let item of listRoles;let i = index; trackBy: trackByFn">
                             <td class="table-actions-col fixed-side">
-                                <button (click)="gotoUserPermission(item.userId)"
+                                <button
                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                     title="Detail"><i class="la la-list"></i>
                                 </button>
-                                <button (click)="deleteUserLevel(i,item.id)" type="button"
+                                <button type="button"
                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                     title="Remove">
                                     <i class="la la-trash"></i>
@@ -43,28 +42,31 @@
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.userId === null || item.isDup )   }">
-                                    <select [(ngModel)]="item.userId" (change)="selectedUser(item,i)"
-                                        class="form-control border">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.roleId === null || item.isDup )   }">
+                                    <select [(ngModel)]="item.userId" class="form-control border">
                                         <option value="null" disabled>Please select</option>
-                                        <option *ngFor="let item of users" [ngValue]="item.id">{{item.username}}
+                                        <option *ngFor="let item of roles" [ngValue]="item.value">{{item.title}}
                                         </option>
                                     </select>
                                 </div>
 
-                                <!-- <ng-select (selected)="selectedUser($event,i)" (data)="refreshValue($event)"
-                                    [items]="users" placeholder="Please Select" [allowClear]="false">
-                                </ng-select> -->
                             </td>
                             <td>
-                                <input class="form-control" [(ngModel)]="item.userId" disabled />
+                                <div class="form-group ">
+                                    <select class="form-control border">
+                                        <option value="null" disabled>Please select</option>
+                                        <option *ngFor="let item of companies" [ngValue]="item.id">{{item.bunameVn}}
+                                        </option>
+                                    </select>
+
+                                </div>
                             </td>
                             <td>
-                                <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && item.position === null }">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && item.officeId === null }">
                                     <select class="form-control border" [(ngModel)]="item.position">
                                         <option value="null" disabled>Please select</option>
-                                        <option *ngFor="let item of positions" [ngValue]="item.id">{{item.text}}
+                                        <option *ngFor="let item of offices" [ngValue]="item.id">{{item.branchNameVn}}
                                         </option>
                                     </select>
 
@@ -73,12 +75,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan=1 class="fixed-side">
-                                <a (click)="addNewLine()" class="btn m-btn--icon m-btn--icon-only m--font-primary"
-                                    title="Add">
-                                    <i class="fa fa-plus-circle fa-2x"></i>
-                                </a>
-                            </td>
+
 
                         </tr>
                     </ng-container>
@@ -89,5 +86,3 @@
         </div>
     </div>
 </div>
-<confirm-popup [body]="'Are you sure want to delete this user level'" (onSubmit)="onDeleteUserLevel()">
-</confirm-popup>

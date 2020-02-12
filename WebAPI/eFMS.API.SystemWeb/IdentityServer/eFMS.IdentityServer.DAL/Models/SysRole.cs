@@ -5,6 +5,8 @@ namespace eFMS.IdentityServer.Service.Models
 {
     public partial class SysRole
     {
+ 
+
         public short Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
@@ -15,5 +17,6 @@ namespace eFMS.IdentityServer.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
+
     }
 }

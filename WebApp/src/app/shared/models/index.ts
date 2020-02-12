@@ -42,7 +42,7 @@ export * from './system/menu';
 
 export * from './report/crystal.model';
 
-export * from './system/authorization'
+export * from './system/authorization';
 
 
 

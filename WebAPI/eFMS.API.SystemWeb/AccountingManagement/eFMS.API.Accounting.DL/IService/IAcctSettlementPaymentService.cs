@@ -40,6 +40,8 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState UpdateSettlementPayment(CreateUpdateSettlementModel model);
 
+        HandleState CheckExistsInfoManagerOfRequester(AcctApproveSettlementModel settlement);
+
         HandleState InsertOrUpdateApprovalSettlement(AcctApproveSettlementModel settlement);
 
         HandleState UpdateApproval(Guid settlementId);

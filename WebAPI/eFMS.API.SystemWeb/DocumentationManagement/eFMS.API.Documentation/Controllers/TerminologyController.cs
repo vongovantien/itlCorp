@@ -2,15 +2,10 @@
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.Infrastructure.AttributeEx;
-using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using System;
 using SystemManagementAPI.Infrastructure.Middlewares;
-using System.Linq;
-using eFMS.API.Documentation.Infrastructure.Common;
 
 namespace eFMS.API.Documentation.Controllers
 {

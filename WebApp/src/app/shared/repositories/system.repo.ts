@@ -92,6 +92,12 @@ export class SystemRepo {
         );
     }
 
+    addUserToDepartment(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel/AddUserToDepartment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getListCompany() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysCompany`).pipe(
             catchError((error) => throwError(error)),
@@ -227,7 +233,7 @@ export class SystemRepo {
 
     getOfficeByCompany(id: string) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetByCompany/${id}`).pipe(
-            map((data: CommonInterface.IResult) => data.data)
+            map((data: CommonInterface.IResult) => data)
         );
     }
 
@@ -332,6 +338,13 @@ export class SystemRepo {
         );
     }
 
+
+    updateUsersPermission(body: any = {}) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getAuthorization(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorization/Paging`, body, {
             page: '' + page,
@@ -348,6 +361,14 @@ export class SystemRepo {
                 return data;
             })
         );
+    }
+
+    getListOffices() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetAll`)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
     }
 
     deleteUserLevel(id: number) {
@@ -396,6 +417,12 @@ export class SystemRepo {
 
     getDepartmentGroupPermission(username: string, officeId: string) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/GetDepartmentGroupPermission/${username}/${officeId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListCompanyPermissionLevel() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/GetCompanyPermissionLevel`).pipe(
             map((data: any) => data)
         );
     }

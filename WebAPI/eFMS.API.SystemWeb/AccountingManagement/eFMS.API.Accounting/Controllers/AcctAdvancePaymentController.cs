@@ -362,6 +362,18 @@ namespace eFMS.API.Accounting.Controllers
                 //}
             }
 
+            //Check exist thông tin Manager, Accountant của User requester
+            AcctApproveAdvanceModel advanceAppr = new AcctApproveAdvanceModel
+            {
+                Requester = model.Requester
+            };
+            var isExistsManager = acctAdvancePaymentService.CheckExistsInfoManagerOfRequester(advanceAppr);
+            if (!isExistsManager.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = isExistsManager.Exception.Message };
+                return BadRequest(_result);
+            }
+
             HandleState hs;
             if (string.IsNullOrEmpty(model.AdvanceNo))//Insert Advance Payment
             {

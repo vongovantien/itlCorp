@@ -1,10 +1,13 @@
-import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
-import { SystemConstants } from 'src/constants/system.const';
-import { User, Office } from 'src/app/shared/models';
+import { Store } from '@ngrx/store';
 import { SystemRepo } from '@repositories';
-import { Observable, pipe, forkJoin } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { IAppState, getClaimUserOfficeState, getClaimUserDepartGrouptate } from '@store';
+
+import { SystemConstants } from 'src/constants/system.const';
+import { Office } from 'src/app/shared/models';
+import { forkJoin } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-header',
@@ -13,6 +16,9 @@ import { map, tap } from 'rxjs/operators';
 export class HeaderComponent implements OnInit, AfterViewInit {
 
     @Input() Page_Info: String;
+    @Output() officeChange: EventEmitter<Office> = new EventEmitter<Office>();
+    @Output() groupDepartmentChange: EventEmitter<SystemInterface.IDepartmentGroup> = new EventEmitter<SystemInterface.IDepartmentGroup>();
+
 
     english_flag = "assets/app/media/img/lang/en.png";
     vietnam_flag = "assets/app/media/img/lang/vi.png";
@@ -23,15 +29,35 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     offices: Office[];
     selectedOffice: Office;
 
-    departmentGroups: IDepartmentGroup[] = [];
-    selectedDepartmentGroup: IDepartmentGroup;
+    departmentGroups: SystemInterface.IDepartmentGroup[] = [];
+    selectedDepartmentGroup: SystemInterface.IDepartmentGroup;
 
     constructor(
         private router: Router,
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        private _store: Store<IAppState>
     ) { }
 
     ngOnInit() {
+        this._store.select(getClaimUserOfficeState)
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.selectedOffice = this.offices.find(o => o.id === res);
+                    }
+                }
+            );
+
+        this._store.select(getClaimUserDepartGrouptate)
+            .subscribe(
+                (res: any) => {
+                    if (!!res && res.departmentId && res.groupId) {
+                        console.log("depart-group in redux", res);
+                        this.selectedDepartmentGroup = this.departmentGroups.find(d => d.departmentId === res.departmentId && d.groupId === res.groupId);
+                    }
+                }
+            );
+
         this.currenUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         if (!!this.currenUser) {
             forkJoin([
@@ -39,7 +65,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                 this._systemRepo.getDepartmentGroupPermission(this.currenUser.userName, this.currenUser.officeId)
             ]).pipe(
                 tap((res: any) => {
-                    console.log(res[0]);
                     this.offices = res[0] || [];
                     if (!!this.offices.length) {
                         if (this.offices.length === 1) {
@@ -52,9 +77,14 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             ).subscribe(
                 (res: any) => {
                     if (!!res) {
-                        this.departmentGroups = res[1];
-                        this.selectedDepartmentGroup = this.departmentGroups[0];
-                        console.log(res);
+                        this.departmentGroups = res[1] || [];
+                        if (!!this.departmentGroups.length) {
+                            if (this.departmentGroups.length === 1) {
+                                this.selectedDepartmentGroup = this.departmentGroups[0];
+                            } else {
+                                this.selectedDepartmentGroup = this.departmentGroups.find(d => d.departmentId === this.currenUser.departmentId && d.groupId === this.currenUser.groupId);
+                            }
+                        }
                     }
                 }
             );
@@ -63,17 +93,13 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     changeOffice(office: Office) {
         if (!!office) {
-            if (this.selectedOffice.id !== office.id) {
-                this.selectedOffice = office;
-            }
+            this.officeChange.emit(office);
         }
     }
 
-    changeDepartmentGroup(departmentGroup: IDepartmentGroup) {
+    changeDepartmentGroup(departmentGroup: SystemInterface.IDepartmentGroup) {
         if (!!departmentGroup) {
-            if (this.selectedDepartmentGroup.groupId !== departmentGroup.groupId) {
-                this.selectedDepartmentGroup = departmentGroup;
-            }
+            this.groupDepartmentChange.emit(departmentGroup);
         }
     }
 
@@ -136,10 +162,4 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     }
 }
 
-interface IDepartmentGroup {
-    userId: string;
-    departmentId: number;
-    groupId: number;
-    departmentName: string;
-    groupName: string;
-}
+

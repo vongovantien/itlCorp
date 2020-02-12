@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo } from '@repositories';
 import { Menu } from '@models';
+import { Store } from '@ngrx/store';
+import { IAppState, getClaimUserOfficeState } from '@store';
 
 @Component({
     selector: 'app-page-sidebar',
@@ -24,20 +26,34 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     };
 
     Menu: Menu[] = [];
-    userLogged: any;
+    userLogged: SystemInterface.IClaimUser;
 
     constructor(
         private router: Router,
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        private _store: Store<IAppState>
     ) {
     }
 
     ngOnInit() {
-        // this.Menu = language.Menu;
         // TODO Menu tiếng anh - tiếng việt
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this.getMenu(this.userLogged.officeId);
+
+        this._store.select(getClaimUserOfficeState)
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.getMenu(res);
+                    }
+                }
+            );
+
+    }
+
+    getMenu(officeId: string) {
         if (!!this.userLogged) {
-            this._systemRepo.getMenu(this.userLogged.userName, this.userLogged.officeId)
+            this._systemRepo.getMenu(this.userLogged.userName, officeId)
                 .subscribe(
                     (res: Menu[]) => {
                         this.Menu = res.map((m: Menu) => new Menu(m));
@@ -49,7 +65,6 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit(): void {
         // TODO khi nhấn back thì gọi lại fn HightlightMenu();
-        // this.highLightMenu();
     }
 
     highLightMenu() {

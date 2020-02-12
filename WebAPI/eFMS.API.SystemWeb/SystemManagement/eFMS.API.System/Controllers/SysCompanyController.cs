@@ -151,16 +151,11 @@ namespace eFMS.API.System.Controllers
         }
 
         [HttpGet]
-        [Route("Test/Image")]
-        public List<object> GetImages()
+        [Route("GetCompanyPermissionLevel")]
+        public List<SysCompanyModel> GetImages()
         {
-            List<object> listData = new List<object> {
-                new { url = "https://i.froala.com/assets/photo1.jpg", thumb = "https://i.froala.com/assets/thumbs/photo1.jpg"},
-                new { url = "https://i.froala.com/assets/photo1.jpg", thumb = "https://i.froala.com/assets/thumbs/photo1.jpg"},
-            };
-            return listData;
+            var companyLevel = sysCompanyService.GetCompanyPermissionLevel();
+            return companyLevel;
         }
-
-        
     }
 }

@@ -1126,6 +1126,46 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
+        public HandleState CheckExistsInfoManagerOfRequester(AcctApproveAdvanceModel approve)
+        {
+            var userCurrent = currentUser.UserID;
+
+            var acctApprove = mapper.Map<AcctApproveAdvance>(approve);
+            //Lấy ra brandId của user 
+            var brandOfUser = currentUser.OfficeID;//GetEmployeeByUserId(userCurrent)?.CompanyId;
+            if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
+
+            //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
+            acctApprove.Leader = GetLeaderIdOfUser(userCurrent);
+            acctApprove.Manager = GetManagerIdOfUser(userCurrent, brandOfUser.ToString());
+            if (string.IsNullOrEmpty(acctApprove.Manager)) return new HandleState("Not found department manager of user");
+            acctApprove.Accountant = GetAccountantId(brandOfUser.ToString());
+            if (string.IsNullOrEmpty(acctApprove.Accountant)) return new HandleState("Not found accountant manager");
+            acctApprove.Buhead = GetBUHeadId(brandOfUser.ToString());
+
+            var emailLeaderOrManager = string.Empty;
+            var userLeaderOrManager = string.Empty;
+            //Lấy ra Leader của User & Manager Dept của User Requester
+            if (string.IsNullOrEmpty(acctApprove.Leader))
+            {
+                userLeaderOrManager = acctApprove.Manager;
+                //Lấy ra employeeId của managerIdOfUser
+                var employeeIdOfUserManager = GetEmployeeIdOfUser(userLeaderOrManager);
+                //Lấy ra email của Manager
+                emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserManager)?.Email;
+            }
+            else
+            {
+                userLeaderOrManager = acctApprove.Leader;
+                //Lấy ra employeeId của managerIdOfUser
+                var employeeIdOfUserLeader = GetEmployeeIdOfUser(userLeaderOrManager);
+                //Lấy ra email của Leader (hiện tại chưa có nên gán rỗng)
+                emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserLeader)?.Email;
+            }
+
+            if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not found Leader or Manager");
+            return new HandleState();
+        }
 
         //Insert Or Update AcctApproveAdvance by AdvanceNo
         public HandleState InsertOrUpdateApprovalAdvance(AcctApproveAdvanceModel approve)
@@ -1152,7 +1192,7 @@ namespace eFMS.API.Accounting.DL.Services
                     try
                     {
                         //Lấy ra brandId của user 
-                        var brandOfUser = GetEmployeeByUserId(userCurrent)?.CompanyId;
+                        var brandOfUser = currentUser.OfficeID;//GetEmployeeByUserId(userCurrent)?.CompanyId;
                         if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
 
                         //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
@@ -1162,25 +1202,6 @@ namespace eFMS.API.Accounting.DL.Services
                         acctApprove.Accountant = GetAccountantId(brandOfUser.ToString());
                         if (string.IsNullOrEmpty(acctApprove.Accountant)) return new HandleState("Not found accountant manager");
                         acctApprove.Buhead = GetBUHeadId(brandOfUser.ToString());//Lấy ra BuHead dựa vào Brand của userCurrent
-
-                        var checkExistsApproveByAdvanceNo = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == acctApprove.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
-                        if (checkExistsApproveByAdvanceNo == null) //Insert AcctApproveAdvance
-                        {
-                            acctApprove.Id = Guid.NewGuid();
-                            acctApprove.RequesterAprDate = DateTime.Now;
-                            acctApprove.UserCreated = acctApprove.UserModified = userCurrent;
-                            acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
-                            acctApprove.IsDeputy = false;
-                            var hsAddApproveAdvance = acctApproveAdvanceRepo.Add(acctApprove);
-                        }
-                        else //Update AcctApproveAdvance by AdvanceNo
-                        {
-                            checkExistsApproveByAdvanceNo.RequesterAprDate = DateTime.Now;
-                            checkExistsApproveByAdvanceNo.UserModified = userCurrent;
-                            checkExistsApproveByAdvanceNo.DateModified = DateTime.Now;
-                            var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(checkExistsApproveByAdvanceNo, x => x.Id == checkExistsApproveByAdvanceNo.Id);
-                        }
-                        trans.Commit();
 
                         var emailLeaderOrManager = string.Empty;
                         var userLeaderOrManager = string.Empty;
@@ -1207,6 +1228,28 @@ namespace eFMS.API.Accounting.DL.Services
 
                         var sendMailResult = SendMailSuggestApproval(acctApprove.AdvanceNo, userLeaderOrManager, emailLeaderOrManager);
 
+                        if (sendMailResult)
+                        {
+                            var checkExistsApproveByAdvanceNo = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == acctApprove.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+                            if (checkExistsApproveByAdvanceNo == null) //Insert AcctApproveAdvance
+                            {
+                                acctApprove.Id = Guid.NewGuid();
+                                acctApprove.RequesterAprDate = DateTime.Now;
+                                acctApprove.UserCreated = acctApprove.UserModified = userCurrent;
+                                acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
+                                acctApprove.IsDeputy = false;
+                                var hsAddApproveAdvance = acctApproveAdvanceRepo.Add(acctApprove);
+                            }
+                            else //Update AcctApproveAdvance by AdvanceNo
+                            {
+                                checkExistsApproveByAdvanceNo.RequesterAprDate = DateTime.Now;
+                                checkExistsApproveByAdvanceNo.UserModified = userCurrent;
+                                checkExistsApproveByAdvanceNo.DateModified = DateTime.Now;
+                                var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(checkExistsApproveByAdvanceNo, x => x.Id == checkExistsApproveByAdvanceNo.Id);
+                            }
+                            trans.Commit();
+                        }
+                                                
                         return !sendMailResult ? new HandleState("Send mail suggest approval failed") : new HandleState();
                     }
                     catch (Exception ex)
@@ -1267,7 +1310,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
 
             //Lấy ra brandId của userId
-            var brandOfUserId = GetEmployeeByUserId(userId)?.CompanyId;
+            var brandOfUserId = currentUser.OfficeID;//GetEmployeeByUserId(userId)?.CompanyId;
             if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
 
             //Trường hợp không có Leader
@@ -1471,7 +1514,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
 
                     //Lấy ra brandId của userId
-                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.CompanyId;
+                    var brandOfUserId = currentUser.OfficeID;//GetEmployeeByUserId(userCurrent)?.CompanyId;
                     if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
 
                     //Lấy ra dept code của userApprove dựa vào userApprove
@@ -1596,7 +1639,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
 
                     //Lấy ra brandId của userId
-                    var brandOfUserId = GetEmployeeByUserId(userCurrent)?.CompanyId;
+                    var brandOfUserId = currentUser.OfficeID;//GetEmployeeByUserId(userCurrent)?.CompanyId;
                     if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
 
                     //Lấy ra dept code của userApprove dựa vào userApprove

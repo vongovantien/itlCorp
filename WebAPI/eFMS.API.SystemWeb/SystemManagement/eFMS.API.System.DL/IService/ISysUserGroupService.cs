@@ -1,4 +1,5 @@
 ﻿using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -14,5 +15,7 @@ namespace eFMS.API.System.DL.IService
         IQueryable<SysUserLevelModel> GetByLevel(short LevelId);
         SysUserLevelModel GetDetail(int id);
         HandleState AddUser(List<SysUserLevelModel> users);
+        IQueryable<SysUserLevel> Query(SysUserLevelCriteria criteria);
+
     }
 }

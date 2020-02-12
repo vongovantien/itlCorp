@@ -194,7 +194,8 @@
                                 <ul class="m-nav">
                                     <li class="m-nav__item pointer" *ngFor="let item of departmentGroups"
                                         (click)="changeDepartmentGroup(item)">
-                                        <a class="m-nav__link active">
+                                        <a class="m-nav__link active" data-toggle="modal"
+                                            data-target="#change-group-modal">
                                             <span class="m-nav__link-text">
                                                 {{item.departmentName}} - {{item.groupName}}
                                             </span>

@@ -34,7 +34,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     labelColoader: string = 'Shipping Line/Co-Loader';
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'id', label: 'Partner ID' },
+        { field: 'accountNo', label: 'Partner ID' },
         { field: 'shortName', label: 'Name ABBR' },
         { field: 'partnerNameEn', label: 'Name EN' },
         { field: 'taxCode', label: 'Tax Code' }

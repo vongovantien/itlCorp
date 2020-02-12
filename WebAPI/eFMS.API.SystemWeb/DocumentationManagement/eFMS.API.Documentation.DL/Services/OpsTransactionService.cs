@@ -81,6 +81,11 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public override HandleState Add(OpsTransactionModel model)
         {
+            var permissionRange = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID
+                                                                 && x.EndDate.Value >= DateTime.Now.Date
+                                                                 && x.Services.Contains("CL")
+                                                                 )?.Select(x => x.UserId).ToList();
             model.Id = Guid.NewGuid();
             model.DatetimeCreated = DateTime.Now;
             model.UserCreated = currentUser.UserID;
@@ -158,8 +163,10 @@ namespace eFMS.API.Documentation.DL.Services
 
         public OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount)
         {
+            criteria.RangeSearch = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.List);
             var data = Query(criteria);
             rowsCount = data.Count();
+            var cur = currentUser;
             var totalProcessing = data.Count(x => x.CurrentStatus == TermData.Processing);
             var totalfinish = data.Count(x => x.CurrentStatus == TermData.Finish);
             var totalOverdued = data.Count(x => x.CurrentStatus == TermData.Overdue);
@@ -208,6 +215,7 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
             IQueryable<OpsTransaction> data = null;
+            //get data by current user permission
             List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID 
                                                                  && x.EndDate.Value >= DateTime.Now.Date
                                                                  && x.Services.Contains("CL")
@@ -325,11 +333,11 @@ namespace eFMS.API.Documentation.DL.Services
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
             return results.AsQueryable();
         }
-        private List<sp_GetOpsTransaction> GetView()
-        {
-            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetOpsTransaction>(null);
-            return list;
-        }
+        //private List<sp_GetOpsTransaction> GetView()
+        //{
+        //    var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetOpsTransaction>(null);
+        //    return list;
+        //}
 
         public Crystal PreviewCDNOte(AcctCDNoteDetailsModel model)
         {

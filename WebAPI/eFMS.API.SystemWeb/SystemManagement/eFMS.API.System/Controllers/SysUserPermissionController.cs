@@ -119,5 +119,30 @@ namespace eFMS.API.System.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// Update User Permission
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("Update")]
+        [Authorize]
+        public IActionResult Update(SysUserPermissionModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var hs = userPermissionService.Update(model);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return Ok(result);
+    }
+            return Ok(result);
+        }
+
     }
 }

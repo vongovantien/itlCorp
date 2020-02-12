@@ -1,26 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
 using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Infrastructure.AttributeEx;
-using eFMS.API.Documentation.Infrastructure.Common;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -78,7 +72,7 @@ namespace eFMS.API.Documentation.Controllers
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
             return Ok(result);
         }
-
+        
         /// <summary>
         /// get and paging the list of countries by conditions
         /// </summary>
@@ -91,27 +85,6 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Paging(OpsTransactionCriteria criteria, int page, int size)
         {
             currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
-            switch (currentUser.UserMenuPermission.List)
-            {
-                case Constants.PERMISSION_RANGE_ALL:
-                    criteria.RangeSearch = PermissionRange.All;
-                    break;
-                case Constants.PERMISSION_RANGE_OWNER:
-                    criteria.RangeSearch = PermissionRange.Owner;
-                    break;
-                case Constants.PERMISSION_RANGE_GROUP:
-                    criteria.RangeSearch = PermissionRange.Group;
-                    break;
-                case Constants.PERMISSION_RANGE_DEPARTMENT:
-                    criteria.RangeSearch = PermissionRange.Department;
-                    break;
-                case Constants.PERMISSION_RANGE_OFFICE:
-                    criteria.RangeSearch = PermissionRange.Office;
-                    break;
-                case Constants.PERMISSION_RANGE_COMPANY:
-                    criteria.RangeSearch = PermissionRange.Company;
-                    break;
-            }
             var data = transactionService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
@@ -125,8 +98,12 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         [HttpPost]
         [Route("Add")]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Add)]
         public IActionResult Add(OpsTransactionModel model)
         {
+            if (!ModelState.IsValid) return BadRequest();
+
+            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {

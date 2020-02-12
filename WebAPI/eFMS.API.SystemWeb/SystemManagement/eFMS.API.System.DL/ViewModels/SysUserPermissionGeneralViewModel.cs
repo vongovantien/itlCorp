@@ -10,6 +10,6 @@ namespace eFMS.API.System.DL.ViewModels
         public Guid UserPermissionId { get; set; }
         public string ModuleName { get; set; }
         public string ModuleID { get; set; }
-        public List<SysUserPermissionGeneralModel> SysUserPermissionGenerals { get; set; }
+        public List<SysUserPermissionGeneralModel> SysPermissionGenerals { get; set; }
     }
 }

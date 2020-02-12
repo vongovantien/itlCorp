@@ -402,7 +402,7 @@
             <summary>
             reset password of user to default
             </summary>
-            <param name="model"></param>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.System.Controllers.SysUserController.DownloadExcel">
@@ -473,6 +473,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.Get(eFMS.API.System.DL.Models.Criteria.SysUserLevelCriteria)">
+            <summary>
+            Query user level
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.System.Controllers.SysUserPermissionController">
             <summary>
             Controller Department
@@ -512,6 +519,13 @@
             delete
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.Update(eFMS.API.System.DL.Models.SysUserPermissionModel)">
+            <summary>
+            Update User Permission
+            </summary>
+            <param name="model"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.System.Infrastructure.Common.CacheEntity">
