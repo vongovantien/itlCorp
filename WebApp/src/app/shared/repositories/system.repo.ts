@@ -92,6 +92,12 @@ export class SystemRepo {
         );
     }
 
+    addUserToDepartment(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel/AddUserToDepartment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getListCompany() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysCompany`).pipe(
             catchError((error) => throwError(error)),

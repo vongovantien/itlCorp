@@ -236,6 +236,10 @@ export class ShareSystemAddUserComponent extends AppList {
             });
             console.log(this.usersLevels);
         }
+        
+        if (this.type === 'department'){
+            console.log(this.object);
+       }
     }
 
     // fillFullName() {
@@ -254,6 +258,11 @@ export class ShareSystemAddUserComponent extends AppList {
             this.criteria.companyId = this.object.id;
         }
         // TODO another type.
+
+        if (this.type === 'department') {
+            this.criteria.departmentId = this.object.id;
+            this.criteria.officeId = this.object.branchId;
+        }
         this._systemRepo.queryUserLevels(this.criteria).pipe(catchError(this.catchError))
             .subscribe(
                 (data: any) => {

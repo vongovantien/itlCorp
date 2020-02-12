@@ -10,6 +10,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { PaginationModule } from 'ngx-bootstrap';
+import { ShareSystemModule } from '../../share-system/share-system.module';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -36,7 +37,8 @@ const routing: Routes = [
         FormsModule,
         PaginationModule.forRoot(),
         ReactiveFormsModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        ShareSystemModule
     ],
     exports: [],
     declarations: [

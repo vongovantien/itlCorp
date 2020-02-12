@@ -279,5 +279,62 @@ namespace eFMS.API.System.Controllers
             var results = userLevelService.Query(criteria);
             return Ok(results);
         }
+
+        [HttpPost]
+        [Route("AddUserToDepartment")]
+        [Authorize]
+        public IActionResult AddUserToDepartment(List<SysUserLevelModel> users)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            SysUserLevelModel modelDupdatelidate = null;
+            var checkDupUser = users.GroupBy(x => x.UserId)
+                                .Where(t => t.Count() > 1)
+                                .Select(y => y.Key)
+                                .ToList();
+            if (checkDupUser.Count > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = "User existed on Department! Please Check hightlight filed!!", Data = checkDupUser });
+            }
+            foreach (var item in users)
+            {
+                if (CheckExistUserLevelOnDepartment(item))
+                {
+                    modelDupdatelidate = item;
+                    break;
+                };
+            }
+            if (modelDupdatelidate != null)
+            {
+                return Ok(new ResultHandle { Status = false, Message = "User existed on Department! Please Check higlight filed!!", Data = modelDupdatelidate });
+            }
+            var hs = userLevelService.AddUser(users);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        private bool CheckExistUserLevelOnDepartment(SysUserLevelModel model)
+        {
+            bool isDuplicate = false;
+            if (model.Id == 0)
+            {
+                if (userLevelService.Any(x => x.DepartmentId == model.DepartmentId && x.GroupId == 1 && x.UserId == model.UserId))
+                {
+                    isDuplicate = true;
+                }
+            }
+            else
+            {
+                if (userLevelService.Any(x => x.DepartmentId == model.DepartmentId && x.UserId == model.UserId && x.GroupId == model.GroupId && x.Id != model.Id))
+                {
+                    isDuplicate = true;
+                }
+            }
+            return isDuplicate;
+        }
     }
 }

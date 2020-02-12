@@ -78,10 +78,12 @@
                                     Office
                                     <span class="text-danger">*</span>
                                 </label>
-                                <select formControlName="office" class="form-control">
-                                    <option *ngFor="let office of officeList" [ngValue]="office">{{office.branchname_En}}
+                                <!-- <select formControlName="office" class="form-control">
+                                    <option *ngFor="let office of officeList" [ngValue]="office">{{office.text}}
                                     </option>
-                                </select>
+                                </select> -->
+                                <ng-select formControlName="office" [allowClear]="true" [items]="officeList">
+                                </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (office.errors | equalError: 'required') || (office.errors | equalError: 'required') && office.dirty">
                                     Office is required!
@@ -93,10 +95,14 @@
                                 <label class="form-control-label">
                                     Status
                                 </label>
-                                <select formControlName="status" class="form-control">
+                                <!-- <select formControlName="status" class="form-control">
                                     <option *ngFor="let status of statusList" [ngValue]="status">{{status.title}}
                                     </option>
-                                </select>
+                                </select> -->
+                                <div>
+                                    <app-switch [toggle]="status.value" (toggleChange)="status.setValue($event)">
+                                    </app-switch>
+                                </div>
                             </div>
                         </div>
                     </div>

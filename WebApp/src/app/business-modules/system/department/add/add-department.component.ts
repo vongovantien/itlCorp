@@ -21,8 +21,7 @@ export class DepartmentAddNewComponent extends AppPage {
     nameAbbr: AbstractControl;
     office: AbstractControl;
     status: AbstractControl;
-    statusList: CommonInterface.ICommonTitleValue[] = [];
-    officeList: CommonInterface.ICommonTitleValue[] = [];
+    officeList: any[] = [];
 
     isValidForm: boolean = false;
     isSubmited: boolean = false;
@@ -71,7 +70,7 @@ export class DepartmentAddNewComponent extends AppPage {
                     Validators.required
                 ])
             ],
-            status: [this.statusList[0]]
+            status: []
         });
 
         this.departmentCode = this.formAdd.controls['departmentCode'];
@@ -80,10 +79,11 @@ export class DepartmentAddNewComponent extends AppPage {
         this.nameAbbr = this.formAdd.controls['nameAbbr'];
         this.office = this.formAdd.controls['office'];
         this.status = this.formAdd.controls['status'];
+
+        this.status.setValue(true);
     }
 
     initDataInform() {
-        this.getStatus();
         this.getOffices();
     }
 
@@ -96,18 +96,17 @@ export class DepartmentAddNewComponent extends AppPage {
                 deptName: this.nameLocal.value,
                 deptNameEn: this.nameEn.value,
                 deptNameAbbr: this.nameAbbr.value,
-                branchId: this.office.value.id,
-                officeName: this.office.value.branchNameEn,
+                branchId: this.office.value[0].id,
+                officeName: this.office.value[0].text,
                 companyName: '',
                 managerId: '',
                 userCreated: '',
                 datetimeCreated: '',
                 userModified: '',
                 datetimeModified: '',
-                active: this.status.value.value,
+                active: this.status.value,
                 inactiveOn: ''
             };
-            //console.log(dept);
             this._progressRef.start();
             //Add new Department
             this._systemRepo.addNewDepartment(dept)
@@ -125,13 +124,6 @@ export class DepartmentAddNewComponent extends AppPage {
         }
     }
 
-    getStatus() {
-        this.statusList = [
-            { title: 'Active', value: true },
-            { title: 'Inactive', value: false }
-        ];
-    }
-
     getOffices() {
         this._systemRepo.getAllOffice()
             .pipe(
@@ -140,7 +132,7 @@ export class DepartmentAddNewComponent extends AppPage {
             )
             .subscribe(
                 (data: any) => {
-                    this.officeList = data.map((item: any) => ({ id: item.id, code: item.code, branchname_En: item.branchNameEn }));
+                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));
                     console.log(this.officeList)
                 },
             );
