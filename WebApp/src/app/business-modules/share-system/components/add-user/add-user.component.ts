@@ -1,13 +1,16 @@
 import { Component, ViewChild, Input } from "@angular/core";
-import { AppList } from "src/app/app.list";
-import { User } from "@models";
-import { SystemRepo } from "@repositories";
-import { catchError, finalize } from "rxjs/operators";
-import { UserLevel } from "src/app/shared/models/system/userlevel";
-import { ConfirmPopupComponent } from "@common";
-import { ToastrService } from "ngx-toastr";
-import { NgProgress } from "@ngx-progressbar/core";
 import { Router } from "@angular/router";
+import { SystemRepo } from "@repositories";
+import { ConfirmPopupComponent } from "@common";
+import { NgProgress } from "@ngx-progressbar/core";
+import { ToastrService } from "ngx-toastr";
+
+import { AppList } from "src/app/app.list";
+import { UserLevel } from "src/app/shared/models/system/userlevel";
+
+import { catchError, finalize } from "rxjs/operators";
+import { User } from "@models";
+import cloneDeep from "lodash/cloneDeep";
 
 @Component({
     selector: 'form-user-level',
@@ -15,25 +18,24 @@ import { Router } from "@angular/router";
 })
 
 export class ShareSystemAddUserComponent extends AppList {
+
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @Input() object: any = {};
     @Input() type: string = null;
 
-    users: any[] = [];
+    users: User[] = [];
     headers: CommonInterface.IHeaderTable[] = [];
     positions: CommonInterface.INg2Select[];
     usersLevels: UserLevel[] = [];
+    userLevelTemp: UserLevel[] = [];
 
-    value: any = {};
-    userData: User[] = [];
-    employeeNames: any[] = [];
+
     indexRemove: number = null;
-    isSubmitted: boolean = false;
-    isDupUser: boolean = false;
-    // userIds: any[] = [];
-    criteria: any = {};
-    // objUserLevel: UserLevel = new UserLevel();
     idUserLevel: number = null;
+
+    criteria: any = {}; // * search model.
+
+    isSubmitted: boolean = false;
 
     constructor(
         private _systemRepo: SystemRepo,
@@ -53,9 +55,9 @@ export class ShareSystemAddUserComponent extends AppList {
             { id: 'Assistant', text: 'Assistant' },
         ];
         this.headers = [
-            { title: 'User Name', field: 'username', },
-            { title: 'Full Name', field: 'employeeNameVn' },
-            { title: 'Position', field: 'Position' },
+            { title: 'User Name', field: 'username', required: true },
+            { title: 'Full Name', field: 'employeeNameVn', required: true },
+            { title: 'Position', field: 'Position', required: true },
         ];
         this.getUsers();
         this.queryUserLevel();
@@ -68,35 +70,33 @@ export class ShareSystemAddUserComponent extends AppList {
                 (res: any) => {
                     if (!!res) {
                         this.users = res;
-                        // this.users = this.users.filter(x => x.active === true);
                     }
                 },
             );
     }
 
     addNewLine() {
-        // this.isSubmitted = true;
-        // this.objUserLevel = new UserLevel();
-        // if (this.usersLevels.length === 0) {
-        //     this.employeeNames = [];
-        // }
-        if (this.usersLevels.length === 0) {
-            this.employeeNames = [];
-
-            this.usersLevels.push(new UserLevel());
-            console.log(this.usersLevels);
-        }
+        this.isSubmitted = true;
+        // this.usersLevels.push(new UserLevel());
+        this.userLevelTemp.push(new UserLevel());
     }
 
-    selectedUser(obj: any, index: number) {
+    cancelSave() {
+        this.userLevelTemp = cloneDeep(this.usersLevels);
+    }
+
+    selectedUser(userLevel: UserLevel, username: string) {
         this.isSubmitted = true;
-        // this.fillFullName();
-        // this.userIds[index] = this.objUserLevel.userId;
+
+        const user: User = this.users.find(u => u.username === username);
+        if (!!user) {
+            userLevel.employeeName = user.employeeNameVn;
+        }
 
         const object = {};
-        const result = [];
+        const userId: string[] = [];
 
-        this.usersLevels.forEach(function (item) {
+        this.userLevelTemp.forEach(function (item) {
             if (!object[item.userId]) {
                 object[item.userId] = 0;
             }
@@ -105,15 +105,18 @@ export class ShareSystemAddUserComponent extends AppList {
 
         for (const prop in object) {
             if (object[prop] >= 2) {
-                result.push(prop);
+                userId.push(prop);
             }
         }
 
-        this.usersLevels.forEach(element => {
-            if (result.length === 0) {
-                element.isDup = false;
-            }
-            result.forEach(item => {
+        if (userId.length > 0) {
+            this.checkDup(this.userLevelTemp, userId);
+        }
+    }
+
+    checkDup(userLevel: UserLevel[], userId: string[]) {
+        userLevel.forEach(element => {
+            userId.forEach(item => {
                 if (element.userId === item) {
                     element.isDup = true;
                 } else {
@@ -121,7 +124,6 @@ export class ShareSystemAddUserComponent extends AppList {
                 }
             });
         });
-        console.log(this.usersLevels);
     }
 
     deleteUserLevel(index: number, id: number) {
@@ -131,8 +133,7 @@ export class ShareSystemAddUserComponent extends AppList {
 
         } else {
             this.indexRemove = index;
-            this.usersLevels.splice(this.indexRemove, 1);
-            // this.userIds.splice(this.indexRemove, 1);
+            this.userLevelTemp.splice(this.indexRemove, 1);
         }
     }
 
@@ -160,7 +161,7 @@ export class ShareSystemAddUserComponent extends AppList {
 
     checkValidate() {
         let valid: boolean = true;
-        for (const userlv of this.usersLevels) {
+        for (const userlv of this.userLevelTemp) {
             if (
                 userlv.userId === null
                 || userlv.position === null
@@ -174,116 +175,192 @@ export class ShareSystemAddUserComponent extends AppList {
     }
 
     saveUserLevel() {
+        this.usersLevels = cloneDeep(this.userLevelTemp);
         if (!this.usersLevels.length) {
             this._toastService.warning("Please add user Level");
             return;
         }
-        // const checkDupAll = this.usersLevels.filter(x => x.isDup === true);
-        // console.log(checkDupAll);
+        console.log(this.usersLevels);
 
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;
         }
-        if (this.type === 'office') {
-            this.usersLevels.forEach(item => {
-                item.companyId = this.object.buid;
-                item.officeId = this.object.id;
-            });
-
-            console.log(this.usersLevels);
-            this._progressRef.start();
-            this._systemRepo.addUserToOffice(this.usersLevels)
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
-                )
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this._toastService.success(res.message, '');
-                            this.queryUserLevel();
-                        } else {
-                            if (!!res.data) {
-                                this.usersLevels.forEach(item => {
-                                    if (item.id === res.data.id) {
-                                        item.isDup = true;
-                                    }
-                                });
-                                if (!!res.data[0]) {
-                                    this.usersLevels.forEach(item => {
-                                        res.data.forEach(element => {
-                                            if (item.userId === element) {
-                                                item.isDup = true;
-                                            } else {
-                                                item.isDup = false;
-                                            }
-                                        });
-
-                                    });
-                                }
-                            }
-                            this._toastService.error(res.message, '');
-                        }
-                    }
-                );
-        }
         if (this.type === 'company') {
             this.usersLevels.forEach(item => {
                 item.companyId = this.object.id;
             });
-            console.log(this.usersLevels);
+            this.addUserToCompany(this.usersLevels);
         }
+        if (this.type === 'office') {
+            this.usersLevels.forEach(item => {
+                item.companyId = this.object.buid;
+                item.officeId = this.object.id;
 
+            });
+            this.addUserToOffice(this.usersLevels);
+
+        }
         if (this.type === 'department') {
-            console.log(this.object);
+            this.usersLevels.forEach(item => {
+                item.companyId = this.object.companyId;
+                item.officeId = this.object.branchId;
+                item.departmentId = this.object.id;
+            });
+            this.addUserToDepartment(this.usersLevels);
+        }
+        if (this.type === 'group') {
+            this.usersLevels.forEach(item => {
+                item.companyId = this.object.companyId;
+                item.officeId = this.object.officeId;
+                item.departmentId = this.object.departmentId;
+                item.groupId = this.object.id;
+            });
+            this.addUserToGroup(this.usersLevels);
         }
     }
 
-    // fillFullName() {
-    //     this.usersLevels.forEach((item) => {
-    //         const objUser = this.users.find(x => x.id === item.userId);
-    //         item.employeeNameVn = objUser.employeeNameVn;
-    //     });
-    // }
-
     queryUserLevel() {
+        if (this.type === 'company') {
+            this.criteria.companyId = this.object.id;
+            this.criteria.type = this.type;
+        }
         if (this.type === 'office') {
             this.criteria.officeId = this.object.id;
             this.criteria.companyId = this.object.buid;
             this.criteria.type = this.type;
         }
-        if (this.type === 'company') {
-            this.criteria.companyId = this.object.id;
-        }
-        // TODO another type.
-
         if (this.type === 'department') {
+            this.criteria.companyId = this.object.companyId;
             this.criteria.departmentId = this.object.id;
             this.criteria.officeId = this.object.branchId;
+            this.criteria.type = this.type;
+        }
+
+        if (this.type === 'group') {
+            this.criteria.companyId = this.object.companyId;
+            this.criteria.officeId = this.object.officeId;
+            this.criteria.departmentId = this.object.departmentId;
+            this.criteria.groupId = this.object.id;
+            this.criteria.type = this.type;
         }
         this._systemRepo.queryUserLevels(this.criteria).pipe(catchError(this.catchError))
             .subscribe(
                 (data: any) => {
                     if (!!data) {
-                        this.usersLevels = data.map(lv => new UserLevel(lv));
-                        console.log(this.usersLevels);
-
-                        // this.usersLevels = [];
-                        // this.usersLevels = data;
-                        // this.usersLevels = this.usersLevels.filter(x => x.active === true);
-                        // setTimeout(() => {
-                        //     this.fillFullName();
-                        // }, 300);
+                        this.usersLevels = data.map((lv: UserLevel) => new UserLevel(lv));
+                        this.userLevelTemp = cloneDeep(this.usersLevels);
                     }
                 },
             );
     }
 
-    gotoUserPermission(id: number) {
-        if (this.type === 'office') {
-            const officeId = this.object.id;
-            this._router.navigate([`home/system/permission/${this.type}/${officeId}/${id}`]);
+    gotoUserPermission(id: string) {
+        switch (this.type) {
+            case 'company':
+            case 'office':
+            case 'department':
+            case 'group':
+                this._router.navigate([`home/system/permission/${this.type}/${this.object.id}/${id}`]);
+                break;
+            default:
+                break;
         }
     }
+
+    addUserToCompany(userLevel: UserLevel[]) {
+        this._progressRef.start();
+        this._systemRepo.addUserToCompany(userLevel)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.queryUserLevel();
+                    } else {
+                        this._toastService.error(res.message);
+                        if (!!res.data && !!res.data.length) {
+                            this.checkDup(this.usersLevels, res.data);
+                        }
+                    }
+                }
+            );
+    }
+
+    addUserToOffice(userLevel: UserLevel[]) {
+        this._progressRef.start();
+        this._systemRepo.addUserToOffice(userLevel)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.queryUserLevel();
+                    } else {
+                        if (!!res.data) {
+                            this._toastService.error(res.message);
+                            if (!!res.data && !!res.data.length) {
+                                this.checkDup(this.usersLevels, res.data);
+                            }
+                        }
+                    }
+                }
+            );
+    }
+
+    addUserToDepartment(userLevel: UserLevel[]) {
+        this._progressRef.start();
+        this._systemRepo.addUserToDepartment(userLevel)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.queryUserLevel();
+                    } else {
+                        if (!!res.data) {
+                            this._toastService.error(res.message);
+                            if (!!res.data && !!res.data.length) {
+                                this.checkDup(this.usersLevels, res.data);
+                            }
+                        }
+                    }
+                }
+            );
+    }
+
+    addUserToGroup(userLevel: UserLevel[]) {
+        this._progressRef.start();
+        this._systemRepo.addUserToGroupLevel(userLevel)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.queryUserLevel();
+                    } else {
+                        if (!!res.data) {
+                            this._toastService.error(res.message);
+                            if (!!res.data && !!res.data.length) {
+                                this.checkDup(this.usersLevels, res.data);
+                            }
+                        }
+                    }
+                }
+            );
+    }
 }
+
+

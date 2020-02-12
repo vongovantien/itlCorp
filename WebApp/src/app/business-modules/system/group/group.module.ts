@@ -10,6 +10,7 @@ import { AddGroupComponent } from './add/add-group/add-group.component';
 import { GroupDetailComponent } from './detail/detail-group/detail-group.component';
 import { FormSearchGroupComponent } from './components/form-search-group/form-search-group.component';
 import { FormUserGroupComponent } from './components/form-user-group/form-user-group.component';
+import { ShareSystemModule } from '../../share-system/share-system.module';
 
 
 const routing: Routes = [
@@ -48,7 +49,8 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         ReactiveFormsModule,
         PerfectScrollbarModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        ShareSystemModule
     ],
     exports: [],
     providers: [],

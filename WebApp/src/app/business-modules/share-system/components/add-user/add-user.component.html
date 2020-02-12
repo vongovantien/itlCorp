@@ -1,24 +1,10 @@
 <div class="m-portlet">
     <div class="m-portlet__body">
         <div class="m-form m--margin-bottom-10">
-            <div class="m--align-right">
-                <button (click)="saveUserLevel()" type="button"
-                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Save
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            Cancel
-                        </span>
-                    </span>
-                </button>
+            <div class="m--align-right c-button-actions">
+                <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveUserLevel()">
+                </app-default-button>
+                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="cancelSave()"></app-default-button>
             </div>
         </div>
         <div class="table-wrapper table-editable m--margin-bottom-20">
@@ -29,7 +15,7 @@
                 </thead>
                 <tbody>
                     <ng-container>
-                        <tr *ngFor="let item of usersLevels;let i = index; trackBy: trackByFn">
+                        <tr *ngFor="let item of userLevelTemp;let i = index; trackBy: trackByFn">
                             <td class="table-actions-col fixed-side">
                                 <button (click)="gotoUserPermission(item.userId)"
                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
@@ -43,35 +29,31 @@
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.userId === null || item.isDup )   }">
-                                    <select [(ngModel)]="item.userId" (change)="selectedUser(item,i)"
-                                        class="form-control border">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && (item.userId === null || item.isDup )}">
+                                    <select [(ngModel)]="item.userId" class="form-control"
+                                        (ngModelChange)="selectedUser(item,$event)">
                                         <option value="null" disabled>Please select</option>
-                                        <option *ngFor="let item of users" [ngValue]="item.id">{{item.username}}
+                                        <option *ngFor="let user of users" [ngValue]="user.id">
+                                            {{user.username}}
                                         </option>
                                     </select>
                                 </div>
-
-                                <!-- <ng-select (selected)="selectedUser($event,i)" (data)="refreshValue($event)"
-                                    [items]="users" placeholder="Please Select" [allowClear]="false">
-                                </ng-select> -->
                             </td>
-                            <td>
-                                <input class="form-control" [(ngModel)]="item.userId" disabled />
+                            <td class="disabled">
+                                <input class="form-control" [(ngModel)]="item.employeeName" readonly />
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && item.position === null }">
-                                    <select class="form-control border" [(ngModel)]="item.position">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && !item.position}">
+                                    <select class="form-control" [(ngModel)]="item.position">
                                         <option value="null" disabled>Please select</option>
                                         <option *ngFor="let item of positions" [ngValue]="item.id">{{item.text}}
                                         </option>
                                     </select>
-
                                 </div>
-
                             </td>
                         </tr>
+                        <tr app-table-none-record *ngIf="!userLevelTemp.length"></tr>
                         <tr>
                             <td colspan=1 class="fixed-side">
                                 <a (click)="addNewLine()" class="btn m-btn--icon m-btn--icon-only m--font-primary"
@@ -79,15 +61,13 @@
                                     <i class="fa fa-plus-circle fa-2x"></i>
                                 </a>
                             </td>
-
                         </tr>
                     </ng-container>
-
-
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
 <confirm-popup [body]="'Are you sure want to delete this user level'" (onSubmit)="onDeleteUserLevel()">
 </confirm-popup>

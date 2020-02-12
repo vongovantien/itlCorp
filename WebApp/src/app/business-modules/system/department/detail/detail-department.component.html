@@ -140,8 +140,8 @@
                                     </option>
                                 </select> -->
                                 <div>
-                                    <app-switch [toggle]="status.value"
-                                        (toggleChange)="status.setValue($event)"></app-switch>
+                                    <app-switch [toggle]="status.value" (toggleChange)="status.setValue($event)">
+                                    </app-switch>
                                 </div>
                             </div>
                         </div>
@@ -160,70 +160,54 @@
             </div>
         </div>
     </div>
+</div>
 
-    <div>
-        <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
-            <li class="nav-item m-tabs__item">
-                <a class="nav-link m-tabs__link active" data-toggle="tab" href="#groups-tab" role="tab">
-                    Group
-                </a>
-            </li>
-            <li class="nav-item m-tabs__item">
-                <a class="nav-link m-tabs__link" data-toggle="tab" href="#users-tab" role="tab">
-                    User
-                </a>
-            </li>
-        </ul>
-        <div class="tab-content job-tab-content" id="jobTabContent">
-            <div class="tab-pane fade show active" id="groups-tab" role="tabpanel" aria-labelledby="">
-                <div class="m-portlet">
-                    <div class="m-form">
-                        <div class="m-portlet__body">
-                            <div class="table-wrapper table-scrollabler" id="group-list-table">
-                                <table class="table table-striped table-brand table-hover dataTable">
-                                    <thead app-table-header [headers]="grpHeaders"
-                                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                                        <th class="m--w-50 first">
-                                        </th>
-                                    </thead>
-                                    <tbody class="tbody-group">
-                                        <ng-container *ngIf="!!groups.length">
-                                            <tr *ngFor="let group of groups; let i = index; trackBy: trackByFn">
-                                                <td class="table-actions-col">
-                                                    <div class="table-actions">
-                                                        <button type="button" title="Detail"
-                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
-                                                            (click)="gotoDetailGroup(group.id)">
-                                                            <i class="la la-edit"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                                <td class="text-underline text-primary pointer">
-                                                    <a (click)="gotoDetailGroup(group.id)">{{group.code}}</a>
-                                                </td>
-                                                <td>{{group.nameEn}}</td>
-                                                <td>{{group.nameVn}}</td>
-                                                <td>{{group.shortName}}</td>
-                                                <td [ngClass]="group.active ? 'text-success' : 'text-danger'">
-                                                    {{group.active ? 'Active' : 'Inactive'}}</td>
-                                            </tr>
-                                        </ng-container>
-                                        <tr *ngIf="!groups.length" app-table-none-record
-                                            [colspan]="grpHeaders.length + 1">
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                        </div>
-                    </div>
+<div class="m-content">
+    <div class="m-portlet__body">
+        <tabset class="custom-class-tab">
+            <tab heading="Group">
+                <div class="table-wrapper table-scrollabler" id="group-list-table">
+                    <table class="table table-striped table-brand table-hover dataTable">
+                        <thead app-table-header [headers]="grpHeaders"
+                            (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                            <th class="m--w-50 first">
+                            </th>
+                        </thead>
+                        <tbody class="tbody-group">
+                            <ng-container *ngIf="!!groups.length">
+                                <tr *ngFor="let group of groups; let i = index; trackBy: trackByFn">
+                                    <td class="table-actions-col">
+                                        <div class="table-actions">
+                                            <button type="button" title="Detail"
+                                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
+                                                (click)="gotoDetailGroup(group.id)">
+                                                <i class="la la-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="text-underline text-primary pointer">
+                                        <a (click)="gotoDetailGroup(group.id)">{{group.code}}</a>
+                                    </td>
+                                    <td>{{group.nameEn}}</td>
+                                    <td>{{group.nameVn}}</td>
+                                    <td>{{group.shortName}}</td>
+                                    <td [ngClass]="group.active ? 'text-success' : 'text-danger'">
+                                        {{group.active ? 'Active' : 'Inactive'}}</td>
+                                </tr>
+                            </ng-container>
+                            <tr *ngIf="!groups.length" app-table-none-record [colspan]="grpHeaders.length + 1">
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-            <div class="tab-pane fade" id="users-tab" role="tabpanel" aria-labelledby="">   
-                <ng-container *ngIf="!!SelectedDepartment">
-                    <add-user [object]="SelectedDepartment" [type]="'department'"></add-user>               
-                </ng-container>
-            </div>
-        </div>
+            </tab>
+            <tab heading="User">
+                <div class="bg-white">
+                    <ng-container *ngIf="!!SelectedDepartment">
+                        <form-user-level [object]="SelectedDepartment" [type]="'department'"></form-user-level>
+                    </ng-container>
+                </div>
+            </tab>
+        </tabset>
     </div>
 </div>

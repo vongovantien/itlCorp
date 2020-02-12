@@ -161,69 +161,17 @@
 </div>
 
 <div class="m-content">
-    <div class="float-right">
-        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="addUserToGroup()">
-            <span>
-                <i class="la la-plus"></i>
-                <span>
-                    add new
-                </span>
-            </span>
-        </button>
-    </div>
-
-    <tabset class="customClass">
-        <tab heading="User">
-            <div class="m-portlet">
-                <div class="m-portlet__body">
-                    <div class="table-wrapper table-scrollabler" id="user-list-table">
-                        <table class="table table-striped table-brand table-hover dataTable">
-                            <thead app-table-header [headers]="userHeaders">
-                                <th class="m--w-50 first">
-                                </th>
-                            </thead>
-                            <tbody class="tbody-group">
-                                <ng-container *ngIf="!!users">
-                                    <tr *ngFor="let user of users; let i = index; trackBy: trackByFn">
-                                        <td class="table-actions-col" style="width: 70px">
-                                            <div class="table-actions">
-                                                <button type="button" title="Detail" (click)="viewUserGroup(user)"
-                                                    class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer">
-                                                    <i class="la la-edit"></i>
-                                                </button>
-                                                <button type="button"
-                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                    title="Remove" (click)="confirmDelete(user)"
-                                                    [disabled]="user.active">
-                                                    <i class="la la-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td class="text-underline text-primary pointer">
-                                            <a (click)="viewUserGroup(user)">{{ user.userName }}</a>
-                                        </td>
-                                        <td>{{ user.employeeName }}</td>
-                                        <td>Position</td>
-                                        <td>Permission</td>
-                                        <td>Level permission</td>
-                                        <td [ngClass]="!user.active ?'text-danger':'text-success'">
-                                            {{ user.active ? 'Active' : 'Inactive' }}</td>
-                                    </tr>
-                                </ng-container>
-                                <tr *ngIf=" !users" app-table-none-record [colspan]="userHeaders.length + 1">
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+    <div class="m-portlet__body">
+        <tabset class="custom-class-tab">
+            <tab heading="User">
+                <div class="bg-white">
+                    <ng-container *ngIf="!!group">
+                        <form-user-level type="group" [object]="group"></form-user-level>
+                    </ng-container>
                 </div>
-            </div>
-        </tab>
-    </tabset>
+            </tab>
+        </tabset>
+    </div>
 </div>
-<form-user-group [title]="'Add New User'" [userGroup]="userGroup" (isSaved)="saveSuccess($event)">
-</form-user-group>
-<!--begin::confirm-delete-modal-->
 <confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteGroup()">
 </confirm-popup>
-<!--end::confirm-delete-modal-->

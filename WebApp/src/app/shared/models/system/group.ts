@@ -4,6 +4,8 @@ export class Group {
     nameEn: string = '';
     nameVn: string = '';
     departmentId: number = 0;
+    companyId: string = null;
+    officeId: string = null;
     parentId: number = 0;
     managerId: string = '';
     shortName: string = '';

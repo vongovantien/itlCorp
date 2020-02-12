@@ -45,7 +45,7 @@
     </form-add-company>
     <div class="m-content">
         <div class="m-portlet__body">
-            <tabset class="customClass">
+            <tabset class="custom-class-tab">
                 <tab heading="Office" id="tab1">
                     <div class="p-3 bg-white">
                         <perfect-scrollbar style="max-height: 900px">
@@ -88,11 +88,9 @@
                     </div>
                 </tab>
                 <tab heading="User">
-                    <div class="p-3 bg-white">
-                        <ng-container *ngIf="!!company">
-                            <form-user-level type="company" [object]="company"></form-user-level>
-                        </ng-container>
-                    </div>
+                    <ng-container *ngIf="!!company">
+                        <form-user-level type="company" [object]="company"></form-user-level>
+                    </ng-container>
                 </tab>
             </tabset>
         </div>
