@@ -227,7 +227,7 @@ export class SystemRepo {
 
     getOfficeByCompany(id: string) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetByCompany/${id}`).pipe(
-            map((data: CommonInterface.IResult) => data.data)
+            map((data: CommonInterface.IResult) => data)
         );
     }
 

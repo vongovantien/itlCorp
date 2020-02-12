@@ -89,15 +89,9 @@
                 </tab>
                 <tab heading="User">
                     <div class="p-3 bg-white">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem est corporis beatae fuga atque
-                        eos, unde optio officia libero doloremque. Corporis cupiditate similique perspiciatis
-                        voluptates. Illo voluptate ab consequuntur voluptatibus voluptates ut nulla quo animi ad
-                        quisquam? Placeat est quidem commodi obcaecati ad dicta dolorum quo perferendis praesentium
-                        tenetur. Est voluptas autem nisi at, quia suscipit pariatur eum earum accusamus, omnis quis
-                        in illum! Dicta ratione architecto voluptates, officiis dignissimos corrupti distinctio
-                        molestiae cumque, aliquam doloremque magni accusamus quaerat reprehenderit beatae, culpa
-                        vitae rem blanditiis voluptatibus eos error laudantium a eveniet? Rem libero voluptatem
-                        eligendi molestias sint in provident facere.
+                        <ng-container *ngIf="!!company">
+                            <form-user-level type="company" [object]="company"></form-user-level>
+                        </ng-container>
                     </div>
                 </tab>
             </tabset>

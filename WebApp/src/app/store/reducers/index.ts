@@ -3,6 +3,7 @@ import { Params, RouterStateSnapshot, Data } from '@angular/router';
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 import { spinnerReducer, ISpinnerState } from './spinner.reducer';
 import { catalogueReducer, ICatalogueState } from './catalogue.reducer';
+import { IClaimUserState, claimUserReducer } from './claim.reducer';
 
 
 export interface IRouterStateUrl {
@@ -16,12 +17,14 @@ export interface IAppState {
     routerReducer: fromRouter.RouterReducerState<IRouterStateUrl>;
     // spinnerReducer: ISpinnerState;
     catalogueReducer: ICatalogueState;
+    claimReducer: IClaimUserState;
 }
 
 export const reducers: ActionReducerMap<IAppState> = {
     routerReducer: fromRouter.routerReducer,
     // spinnerReducer: spinnerReducer,
-    catalogueReducer: catalogueReducer
+    catalogueReducer: catalogueReducer,
+    claimReducer: claimUserReducer
 };
 
 // * Custom Serializer
@@ -46,7 +49,7 @@ export class CustomSerializer implements fromRouter.RouterStateSerializer<IRoute
 
 export const routerState = createFeatureSelector<fromRouter.RouterReducerState<IRouterStateUrl>>('routerReducer');
 export const catalogueState = createFeatureSelector<any>('catalogueReducer');
-
+export const claimUserState = createFeatureSelector<any>('claimReducer');
 
 export const getRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state);
 export const getQueryParamsRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.queryParams);
@@ -80,4 +83,12 @@ export const getCatalogueCountryLoadingState = createSelector(catalogueState, (s
 export const getCatalogueCurrencyState = createSelector(catalogueState, (state: ICatalogueState) => state && state.currencies);
 export const getCatalogueCurrencyLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
+// * SPINNER
 export const isSpinnerShowing = createSelector(spinnerReducer, (state: ISpinnerState) => state.show);
+
+// * CLAIM USER
+export const getClaimUserState = createSelector(claimUserState, (state: IClaimUserState) => state);
+export const getClaimUserOfficeState = createSelector(claimUserState, (state: IClaimUserState) => state && state.officeId);
+export const getClaimUserDepartGrouptate = createSelector(claimUserState, (state: IClaimUserState) => state && { departmentId: state.departmentId, groupId: state.groupId });
+
+

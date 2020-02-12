@@ -7,16 +7,16 @@ import { SystemConstants } from 'src/constants/system.const';
 import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
 import { CookieService } from 'ngx-cookie-service';
 import crypto_js from 'crypto-js';
-import { authConfig } from '../shared/authenticate/authConfig';
 import { BaseService } from 'src/app/shared/services/base.service';
 
 import { RSAHelper } from 'src/helper/RSAHelper';
 import { SystemRepo } from '../shared/repositories/system.repo';
 import { Observable } from 'rxjs';
 import { Company } from '@models';
-import $ from 'jquery';
 import { share } from 'rxjs/operators';
 import { HttpHeaders } from '@angular/common/http';
+import { Store } from '@ngrx/store';
+import { IAppState } from '../store/reducers';
 
 
 @Component({
@@ -52,7 +52,7 @@ export class LoginComponent {
         private route: ActivatedRoute,
         private oauthService: OAuthService,
         private cookieService: CookieService,
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
     ) {
         this.oauthService.setStorage(localStorage);
         this.oauthService.setupAutomaticSilentRefresh();
@@ -100,7 +100,6 @@ export class LoginComponent {
                         const userInfo: SystemInterface.IClaimUser = <any>this.oauthService.getIdentityClaims(); // * Get info User.
                         if (!!userInfo) {
                             localStorage.setItem("currently_userName", userInfo.preferred_username);
-                            // localStorage.setItem("currently_userEmail", userInfo['email']);
                             this.setupLocalInfo();
                             this.rememberMe();
 

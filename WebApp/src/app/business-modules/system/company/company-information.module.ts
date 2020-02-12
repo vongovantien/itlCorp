@@ -17,6 +17,7 @@ import { CompanyInformationFormAddComponent } from './components/form-add-compan
 import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
+import { ShareSystemModule } from '../../share-system/share-system.module';
 
 
 const routing: Routes = [
@@ -62,6 +63,8 @@ const routing: Routes = [
         // * STORE
         StoreModule.forFeature('company', reducers),
         EffectsModule.forFeature(effects),
+
+        ShareSystemModule
 
     ],
     exports: [],

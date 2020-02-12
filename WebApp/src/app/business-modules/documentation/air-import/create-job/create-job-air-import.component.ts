@@ -77,6 +77,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         [this.formCreateComponent.shipmentType,
         this.formCreateComponent.packageType,
         this.formCreateComponent.commodity,
+        this.formCreateComponent.mbltype,
         this.formCreateComponent.paymentTerm].forEach((control: AbstractControl) => this.setError(control));
 
         let valid: boolean = true;

@@ -157,7 +157,5 @@ namespace eFMS.API.System.Controllers
             var companyLevel = sysCompanyService.GetCompanyPermissionLevel();
             return companyLevel;
         }
-
-        
     }
 }

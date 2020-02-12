@@ -2,9 +2,15 @@ import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef } from '
 import { PageSidebarComponent } from './page-sidebar/page-sidebar.component';
 import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { BaseService } from 'src/app/shared/services/base.service';
 import { HttpClient } from '@angular/common/http';
+import { Store } from '@ngrx/store';
+import { Office } from '@models';
+
+import { BaseService } from 'src/app/shared/services/base.service';
 import { environment } from 'src/environments/environment';
+import { IAppState } from '../store/reducers';
+import { ChangeOfficeClaimUserAction, ChangeDepartGroupClaimUserAction } from '@store';
+import { SystemConstants } from 'src/constants/system.const';
 
 
 @Component({
@@ -17,6 +23,9 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
     Page_Info = {};
     Component_name: "no-name";
 
+    selectedOffice: Office;
+    selectedDepartGroup: SystemInterface.IDepartmentGroup;
+
 
     ngAfterViewInit(): void {
         this.Page_Info = this.Page_side_bar.Page_Info;
@@ -28,10 +37,10 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
         private cdRef: ChangeDetectorRef,
         private oauthService: OAuthService,
         private http: HttpClient,
+        private _store: Store<IAppState>
     ) { }
 
     ngOnInit() {
-
         this.cdRef.detectChanges();
         setInterval(() => {
             const remainingMinutes: number = this.baseServices.remainingExpireTimeToken();
@@ -50,17 +59,47 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
         this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
             .then(
                 (res: any) => {
-                    console.log(this.oauthService);
                     this.oauthService.logOut(false);
                     this.router.navigate(["login"]);
-
-                    // localStorage.removeItem("access_token");
-                    // localStorage.clear();
-
                 },
                 (error: any) => {
                     console.log(error + '');
                 }
             );
+    }
+
+    officeChange(office: any) {
+        if (office) {
+            this.selectedOffice = office;
+        }
+    }
+
+    groupDepartmentChange(groupDepartment: SystemInterface.IDepartmentGroup) {
+        if (groupDepartment) {
+            this.selectedDepartGroup = groupDepartment;
+        }
+    }
+
+    submitChangeOffice() {
+        const userInfoCurrent: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        userInfoCurrent.officeId = this.selectedOffice.id;
+
+        // * Update LocalStorage
+        localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfoCurrent));
+
+        // * Dispatch action change office to header.
+        this._store.dispatch(new ChangeOfficeClaimUserAction(this.selectedOffice.id));
+    }
+
+    submitChangedDepartGroup() {
+        const userInfoCurrent: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        userInfoCurrent.departmentId = this.selectedDepartGroup.departmentId;
+        userInfoCurrent.groupId = this.selectedDepartGroup.groupId;
+
+        // * Update LocalStorage
+        localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfoCurrent));
+
+        // * Dispatch action change office to header.
+        this._store.dispatch(new ChangeDepartGroupClaimUserAction({ departmentId: this.selectedDepartGroup.departmentId, groupId: this.selectedDepartGroup.groupId }));
     }
 }

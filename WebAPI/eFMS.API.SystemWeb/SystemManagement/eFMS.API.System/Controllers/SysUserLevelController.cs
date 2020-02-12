@@ -136,6 +136,49 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
+
+        [HttpPost]
+        [Route("AddUserToCompany")]
+        [Authorize]
+        public IActionResult AddUserToCompany(List<SysUserLevelModel> users)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            SysUserLevelModel modelDupdatelidate = null;
+
+            var checkDupUser = users.GroupBy(x => x.UserId)
+                                .Where(t => t.Count() > 1)
+                                .Select(y => y.Key)
+                                .ToList();
+            if (checkDupUser.Count > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = "", Data = checkDupUser });
+            }
+            foreach (var item in users)
+            {
+                if (CheckExistUserLevelOnComnpany(item))
+                {
+                    modelDupdatelidate = item;
+                    break;
+                };
+            }
+            if (modelDupdatelidate != null)
+            {
+                return Ok(new ResultHandle { Status = false, Message = "User existed on company!", Data = modelDupdatelidate });
+            }
+
+            var hs = userLevelService.AddUser(users);
+
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         private bool CheckExistUserLevelOnOffice(SysUserLevelModel model)
         {
             bool isDuplicate = false;
@@ -150,6 +193,26 @@ namespace eFMS.API.System.Controllers
             else
             {
                 if (userLevelService.Any(x => x.OfficeId == model.OfficeId && x.UserId == model.UserId && x.GroupId == model.GroupId && x.Id != model.Id))
+                {
+                    isDuplicate = true;
+                }
+            }
+            return isDuplicate;
+        }
+
+        private bool CheckExistUserLevelOnComnpany(SysUserLevelModel model)
+        {
+            bool isDuplicate = false;
+            if (model.Id == 0)
+            {
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId && x.UserId == model.UserId && x.GroupId == 11))
+                {
+                    isDuplicate = true;
+                }
+            }
+            else
+            {
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId && x.UserId == model.UserId && x.GroupId == model.GroupId && x.Id != model.Id))
                 {
                     isDuplicate = true;
                 }
