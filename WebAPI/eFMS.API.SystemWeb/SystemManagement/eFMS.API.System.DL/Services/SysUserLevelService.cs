@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
@@ -120,7 +121,7 @@ namespace eFMS.API.System.DL.Services
                         else
                         {
                             item.Active = true;
-                            item.GroupId = item.GroupId == 0 ? (short)11 : item.GroupId;
+                            item.GroupId = item.GroupId == 0 ? Constants.SpecialGroup : item.GroupId;
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                             item.UserCreated = item.UserModified = currentUser.UserID;
                             hsUser = DataContext.Add(item,true);

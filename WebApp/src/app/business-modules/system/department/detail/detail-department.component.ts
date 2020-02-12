@@ -130,8 +130,8 @@ export class DepartmentDetailComponent extends AppList {
                 deptName: this.nameLocal.value,
                 deptNameEn: this.nameEn.value,
                 deptNameAbbr: this.nameAbbr.value,
-                branchId: this.officeActive[0].id,
-                officeName: this.officeActive[0].text,
+                branchId: this.office.value[0].id,
+                officeName: this.office.value[0].text,
                 companyName: '',
                 managerId: '',
                 userCreated: '',
@@ -179,8 +179,7 @@ export class DepartmentDetailComponent extends AppList {
                     finalize(() => {
                         this._progressRef.complete();
                     }),tap(data =>{
-                        this.SelectedDepartment = data;
-                        console.log(this.SelectedDepartment)                        
+                        this.SelectedDepartment = data;                                                
                     })
                 ))
             )

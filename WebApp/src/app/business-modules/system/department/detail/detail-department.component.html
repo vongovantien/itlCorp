@@ -221,7 +221,7 @@
             </div>
             <div class="tab-pane fade" id="users-tab" role="tabpanel" aria-labelledby="">   
                 <ng-container *ngIf="!!SelectedDepartment">
-                    <add-user [object]="SelectedDepartment" [type]="'department'"></add-user>               
+                    <form-user-level [object]="SelectedDepartment" [type]="'department'"></form-user-level>               
                 </ng-container>
             </div>
         </div>

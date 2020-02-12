@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -11,7 +10,6 @@ using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
-using eFMS.API.System.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -112,7 +110,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupUser.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = "User existed on Office! Please Check hightlight field!!", Data = checkDupUser });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "office"].Value, Data = checkDupUser });
             }
             foreach (var item in users)
             {
@@ -124,7 +122,7 @@ namespace eFMS.API.System.Controllers
             }
             if (modelDupdatelidate != null)
             {
-                return Ok(new ResultHandle { Status = false, Message = "User existed on Office! Please Check higlight field!!", Data = modelDupdatelidate });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "office"].Value, Data = modelDupdatelidate });
             }
             var hs = userLevelService.AddUser(users);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -156,7 +154,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupUser.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = "User existed on Company! Please Check hightlight field!!", Data = checkDupUser });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "company"].Value, Data = checkDupUser });
             }
             foreach (var item in users)
             {
@@ -168,7 +166,7 @@ namespace eFMS.API.System.Controllers
             }
             if (modelDupdatelidate != null)
             {
-                return Ok(new ResultHandle { Status = false, Message = "User existed on company! Please Check hightlight field!!", Data = modelDupdatelidate });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "company"].Value, Data = modelDupdatelidate });
             }
 
             var hs = userLevelService.AddUser(users);
@@ -188,15 +186,22 @@ namespace eFMS.API.System.Controllers
             bool isDuplicate = false;
             if (model.Id == 0)
             {
-         
-                if (userLevelService.Any(x => x.OfficeId == model.OfficeId && x.UserId == model.UserId && x.GroupId == 11))
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId
+                                            && x.OfficeId == model.OfficeId
+                                            && x.UserId == model.UserId
+                                            && x.GroupId == Constants.SpecialGroup))
                 {
                     isDuplicate = true;
                 }
             }
             else
             {
-                if (userLevelService.Any(x => x.OfficeId == model.OfficeId && x.UserId == model.UserId && x.GroupId == 11 && x.GroupId == model.GroupId && x.Id != model.Id))
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId
+                                            && x.OfficeId == model.OfficeId
+                                            && x.UserId == model.UserId
+                                            && x.GroupId == Constants.SpecialGroup
+                                            && x.GroupId == model.GroupId
+                                            && x.Id != model.Id))
                 {
                     isDuplicate = true;
                 }
@@ -209,14 +214,20 @@ namespace eFMS.API.System.Controllers
             bool isDuplicate = false;
             if (model.Id == 0)
             {
-                if (userLevelService.Any(x => x.CompanyId == model.CompanyId && x.UserId == model.UserId && x.GroupId == 11))
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId
+                                            && x.UserId == model.UserId
+                                            && x.GroupId == Constants.SpecialGroup))
                 {
                     isDuplicate = true;
                 }
             }
             else
             {
-                if (userLevelService.Any(x => x.CompanyId == model.CompanyId && x.UserId == model.UserId && x.GroupId == 11 && x.GroupId == model.GroupId && x.Id != model.Id))
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId
+                                            && x.UserId == model.UserId
+                                            && x.GroupId == Constants.SpecialGroup
+                                            && x.GroupId == model.GroupId
+                                            && x.Id != model.Id))
                 {
                     isDuplicate = true;
                 }
@@ -303,7 +314,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupUser.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = "User existed on Department! Please Check hightlight field!!", Data = checkDupUser });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "department"].Value, Data = checkDupUser });
             }
             foreach (var item in users)
             {
@@ -315,7 +326,7 @@ namespace eFMS.API.System.Controllers
             }
             if (modelDupdatelidate != null)
             {
-                return Ok(new ResultHandle { Status = false, Message = "User existed on Department! Please Check higlight field!!", Data = modelDupdatelidate });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "department"].Value, Data = modelDupdatelidate });
             }
             var hs = userLevelService.AddUser(users);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -332,14 +343,24 @@ namespace eFMS.API.System.Controllers
             bool isDuplicate = false;
             if (model.Id == 0)
             {
-                if (userLevelService.Any(x => x.DepartmentId == model.DepartmentId && x.GroupId == 11 && x.UserId == model.UserId))
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId
+                                            && x.OfficeId == model.OfficeId
+                                            && x.DepartmentId == model.DepartmentId
+                                            && x.GroupId == Constants.SpecialGroup
+                                            && x.UserId == model.UserId))
                 {
                     isDuplicate = true;
                 }
             }
             else
             {
-                if (userLevelService.Any(x => x.DepartmentId == model.DepartmentId && x.UserId == model.UserId && x.GroupId == 11 && x.GroupId == model.GroupId && x.Id != model.Id))
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId
+                                            && x.OfficeId == model.OfficeId
+                                            && x.DepartmentId == model.DepartmentId
+                                            && x.UserId == model.UserId
+                                            && x.GroupId == Constants.SpecialGroup
+                                            && x.GroupId == model.GroupId
+                                            && x.Id != model.Id))
                 {
                     isDuplicate = true;
                 }
@@ -365,7 +386,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupUser.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = "User existed on Group! Please Check hightlight field!!", Data = checkDupUser });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "group"].Value, Data = checkDupUser });
             }
             foreach (var item in users)
             {
@@ -377,7 +398,7 @@ namespace eFMS.API.System.Controllers
             }
             if (modelDupdatelidate != null)
             {
-                return Ok(new ResultHandle { Status = false, Message = "User existed on Group! Please Check higlight field!!", Data = modelDupdatelidate });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "group"].Value, Data = modelDupdatelidate });
             }
             var hs = userLevelService.AddUser(users);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -394,14 +415,24 @@ namespace eFMS.API.System.Controllers
             bool isDuplicate = false;
             if (model.Id == 0)
             {
-                if (userLevelService.Any(x => x.DepartmentId == model.DepartmentId && x.UserId == model.UserId && x.GroupId == 11))
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId
+                                            && x.OfficeId == model.OfficeId
+                                            && x.DepartmentId == model.DepartmentId
+                                            && x.UserId == model.UserId
+                                            && x.GroupId != Constants.SpecialGroup))
                 {
                     isDuplicate = true;
                 }
             }
             else
             {
-                if (userLevelService.Any(x => x.DepartmentId == model.DepartmentId && x.UserId == model.UserId && x.GroupId == 11 && x.GroupId == model.GroupId && x.Id != model.Id))
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId
+                                            && x.OfficeId == model.OfficeId
+                                            && x.DepartmentId == model.DepartmentId
+                                            && x.UserId == model.UserId
+                                            && x.GroupId != Constants.SpecialGroup
+                                            && x.GroupId == model.GroupId
+                                            && x.Id != model.Id))
                 {
                     isDuplicate = true;
                 }

@@ -26,6 +26,7 @@ namespace eFMS.API.System.DL.Services
             sysCompanyRepo = sysCompany;
             //Id is primarykey of table CatDepartment, DepartmentId is forgekey of table SysGroup       
             SetChildren<SysGroup>("Id", "DepartmentId");
+            SetChildren<SysUserLevel>("Id", "DepartmentId");
             currentUser = user;
         }
 
