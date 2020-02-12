@@ -6,7 +6,6 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize, tap, switchMap } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Department } from 'src/app/shared/models/system/department';
-import { Office } from 'src/app/shared/models/system/office';
 import { Group } from 'src/app/shared/models/system/group';
 import { SortService } from 'src/app/shared/services';
 import { AppList } from 'src/app/app.list';
@@ -140,7 +139,8 @@ export class DepartmentDetailComponent extends AppList {
                 userModified: '',
                 datetimeModified: '',
                 active: this.status.value,
-                inactiveOn: ''
+                inactiveOn: '',
+                companyId: null
             };
             this._progressRef.start();
             //Update Info Department

@@ -7,6 +7,7 @@ export class Department {
     branchId: string = '';
     officeName: string = '';
     companyName: string = '';
+    companyId: string = null;
     managerId: string = '';
     userCreated: string = '';
     datetimeCreated: string = '';

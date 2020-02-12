@@ -453,11 +453,18 @@
         </member>
         <member name="M:eFMS.API.System.Controllers.SysUserLevelController.AddUser(System.Collections.Generic.List{eFMS.API.System.DL.Models.SysUserLevelModel})">
             <summary>
-            
+            add user to office
             </summary>
             <param name="users"></param>
             <returns></returns>
             
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.AddUserToCompany(System.Collections.Generic.List{eFMS.API.System.DL.Models.SysUserLevelModel})">
+            <summary>
+            add user to company
+            </summary>
+            <param name="users"></param>
+            <returns></returns>
         </member>
         <member name="M:eFMS.API.System.Controllers.SysUserLevelController.Update(eFMS.API.System.DL.Models.SysUserLevelModel)">
             <summary>
@@ -478,6 +485,20 @@
             Query user level
             </summary>
             <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.AddUserToDepartment(System.Collections.Generic.List{eFMS.API.System.DL.Models.SysUserLevelModel})">
+            <summary>
+            add user to department
+            </summary>
+            <param name="users"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.AddUserToGroup(System.Collections.Generic.List{eFMS.API.System.DL.Models.SysUserLevelModel})">
+            <summary>
+            add user to group
+            </summary>
+            <param name="users"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.System.Controllers.SysUserPermissionController">

@@ -59,20 +59,45 @@ namespace eFMS.API.System.DL.Services
 
         public IQueryable<SysUserLevel> Query(SysUserLevelCriteria criteria)
         {
-            var userLevels = DataContext.Get();
-            if(criteria.Type == "office")
+            var userLevels = DataContext.Get(x => x.Active == true);
+            var users = userRepository.Get();
+            var employess = employeeRepository.Get();
+            var results = userLevels.Join(users, x => x.UserId, y => y.Id, (x, y) => new { User = y, UserLevel = x })
+                        .Join(employess, x => x.User.EmployeeId, y => y.Id, (x, y) => new { User = x, Employee = y })
+                        .Select(x => new SysUserLevelModel
+                        {
+                            Id = x.User.UserLevel.Id,
+                            UserId = x.User.UserLevel.UserId,
+                            GroupId = x.User.UserLevel.GroupId,
+                            EmployeeName = x.Employee.EmployeeNameVn,
+                            Active = x.User.UserLevel.Active,
+                            CompanyId = x.User.UserLevel.CompanyId,
+                            OfficeId = x.User.UserLevel.OfficeId,
+                            DepartmentId = x.User.UserLevel.DepartmentId,
+                            DatetimeCreated = x.User.UserLevel.DatetimeCreated,
+                            DatetimeModified = x.User.UserLevel.DatetimeModified,
+                            UserCreated = x.User.UserLevel.UserCreated,
+                            UserModified = x.User.UserLevel.UserModified,
+                            Position = x.User.UserLevel.Position
+                        });
+            if (criteria.Type == "office")
             {
-                userLevels = userLevels.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId);
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId);
             }
             else if(criteria.Type == "company")
             {
-                userLevels = userLevels.Where(x => x.CompanyId == criteria.CompanyId);
+                results = results.Where(x => x.CompanyId == criteria.CompanyId);
             }
             else if(criteria.Type == "department")
             {
-                userLevels = userLevels.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId);
-            };
-            return userLevels;
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId);
+            }
+            else if(criteria.Type == "group")
+            {
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId && x.GroupId == criteria.GroupId);
+            }
+
+            return results;
 
         }
 
@@ -95,7 +120,7 @@ namespace eFMS.API.System.DL.Services
                         else
                         {
                             item.Active = true;
-                            item.GroupId = 11;
+                            item.GroupId = item.GroupId == 0 ? (short)11 : item.GroupId;
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                             item.UserCreated = item.UserModified = currentUser.UserID;
                             hsUser = DataContext.Add(item,true);

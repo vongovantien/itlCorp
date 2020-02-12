@@ -5,11 +5,6 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysGroup
     {
-        public SysGroup()
-        {
-            SysUserLevel = new HashSet<SysUserLevel>();
-        }
-
         public short Id { get; set; }
         public string Code { get; set; }
         public string NameEn { get; set; }
@@ -24,9 +19,6 @@ namespace eFMS.API.System.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
-        public DateTime? InactiveOn { get; set; }
-
-        public virtual CatDepartment Department { get; set; }
-        public virtual ICollection<SysUserLevel> SysUserLevel { get; set; }
+        public DateTime? InactiveOn { get; set; }        
     }
 }

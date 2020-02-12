@@ -105,7 +105,8 @@ export class DepartmentAddNewComponent extends AppPage {
                 userModified: '',
                 datetimeModified: '',
                 active: this.status.value,
-                inactiveOn: ''
+                inactiveOn: '',
+                companyId: null
             };
             this._progressRef.start();
             //Add new Department
