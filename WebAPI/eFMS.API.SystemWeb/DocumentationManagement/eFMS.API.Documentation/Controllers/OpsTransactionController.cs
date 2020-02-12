@@ -72,11 +72,11 @@ namespace eFMS.API.Documentation.Controllers
         {
             currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
-            if (result.Status)
+            if (result.Status == true)
             {
                 return Ok(result.Data);
             }
-            return Ok(result);
+            return Forbid();
         }
         
         /// <summary>
