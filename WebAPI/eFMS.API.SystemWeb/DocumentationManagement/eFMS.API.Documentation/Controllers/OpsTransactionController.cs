@@ -28,23 +28,35 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class OpsTransactionController : Controller
+    [Authorize]
+    public class OpsTransactionController : CustomAuthcontroller
     {
         private readonly IStringLocalizer stringLocalizer;
         private ICurrentUser currentUser;
         private readonly IOpsTransactionService transactionService;
         private readonly IHostingEnvironment _hostingEnvironment;
-
+        
+        //public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, ICurrentUser user, IOpsTransactionService service, IHostingEnvironment hostingEnvironment)
+        //{
+        //    stringLocalizer = localizer;
+        //    currentUser = user;
+        //    transactionService = service;
+        //    _hostingEnvironment = hostingEnvironment;
+        //}
+        
         /// <summary>
-        /// constructor
+        /// 
         /// </summary>
-        /// <param name="localizer">inject IStringLocalizer</param>
-        /// <param name="user">inject ICurrentUser</param>
-        /// <param name="service">inject IOpsTransactionService</param>
-        public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, ICurrentUser user, IOpsTransactionService service, IHostingEnvironment hostingEnvironment)
+        /// <param name="localizer"></param>
+        /// <param name="service"></param>
+        /// <param name="hostingEnvironment"></param>
+        /// <param name="curUser"></param>
+        /// <param name="menu"></param>
+        public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, IOpsTransactionService service, IHostingEnvironment hostingEnvironment,
+            ICurrentUser curUser, Menu menu = Menu.opsJobManagement) : base(curUser, menu)
         {
             stringLocalizer = localizer;
-            currentUser = user;
+            currentUser = curUser;
             transactionService = service;
             _hostingEnvironment = hostingEnvironment;
         }
@@ -70,7 +82,6 @@ namespace eFMS.API.Documentation.Controllers
         [AuthorizeEx(Menu.opsJobManagement, UserPermission.Detail)]
         public IActionResult Get(Guid id)
         {
-            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
             if (result.Status == true)
             {
@@ -90,7 +101,6 @@ namespace eFMS.API.Documentation.Controllers
         [AuthorizeEx(Menu.opsJobManagement, UserPermission.AllowAccess)]
         public IActionResult Paging(OpsTransactionCriteria criteria, int page, int size)
         {
-            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var data = transactionService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
@@ -107,8 +117,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Add(OpsTransactionModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-
-            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
+            
             var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {
@@ -136,7 +145,6 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Update(OpsTransactionModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {
@@ -164,7 +172,6 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Delete(Guid id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
-            currentUser = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
             if (transactionService.CheckAllowDelete(id) == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
