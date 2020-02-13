@@ -24,7 +24,7 @@
                     <ng-container>
                         <tr *ngFor="let item of listRoles;let i = index; trackBy: trackByFn">
                             <td class="table-actions-col fixed-side">
-                                <button (click)="gotoUserPermission(item.id)"
+                                <button (click)="gotoUserPermission(item.id)" *ngIf="!!item.id"
                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                     title="Detail"><i class="la la-list"></i>
                                 </button>
@@ -35,8 +35,10 @@
                                 </button>
                             </td>
                             <td>
-                                <div class="form-group">
-                                    <select [(ngModel)]="item.permissionSampleId" class="form-control border">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  &&( item.permissionSampleId === null || item.isDup) }">
+                                    <select [(ngModel)]="item.permissionSampleId" (ngModelChange)="selectedRole($event)"
+                                        class="form-control border">
                                         <option value="null" disabled>Please select</option>
                                         <option *ngFor="let item of roles" [ngValue]="item.id">{{item.name}}
                                         </option>
@@ -45,7 +47,8 @@
 
                             </td>
                             <td>
-                                <div class="form-group ">
+                                <div class="form-group "
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.officeId === null && item.buid === null   || item.isDup) }">
                                     <select [(ngModel)]="item.buid" (ngModelChange)="selectedCompany($event,item)"
                                         class="form-control border">
                                         <option value="null" disabled>Please select</option>
@@ -57,8 +60,9 @@
                             </td>
                             <td>
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && item.officeId === null }">
-                                    <select class="form-control border" [(ngModel)]="item.officeId">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.officeId === null || item.isDup)  }">
+                                    <select class="form-control border" (ngModelChange)="selectedOffice()"
+                                        [(ngModel)]="item.officeId">
                                         <option value="null" disabled>Please select</option>
                                         <option *ngFor="let it of item.offices" [ngValue]="it.id">
                                             {{it.branchNameVn}}

@@ -26,6 +26,7 @@ export class AddRoleUserComponent extends AppList {
     officeData: Office[] = [];
 
     idRole: string = '';
+    isSubmitted: boolean = false;
     constructor(
         private _systemRepo: SystemRepo,
         protected _toastService: ToastrService,
@@ -43,7 +44,6 @@ export class AddRoleUserComponent extends AppList {
         ];
         this.getDataCombobox();
         this.getCompanies();
-        // this.getOffices();
         this.getPermissionsByUserId();
     }
 
@@ -113,6 +113,16 @@ export class AddRoleUserComponent extends AppList {
     selectedCompany(id: string, item: any) {
         item.offices = cloneDeep(this.officeData.filter(x => x.buid === id));
         console.log(this.offices);
+        this.checkDupAll();
+    }
+
+    selectedRole(id: string) {
+        console.log(id);
+        this.checkDupAll();
+    }
+
+    selectedOffice() {
+        this.checkDupAll();
     }
 
     addNewLine() {
@@ -123,7 +133,6 @@ export class AddRoleUserComponent extends AppList {
 
         console.log(this.listRoles);
     }
-
 
     deleteRole(index: number, id: string) {
         if (id !== "" && id !== null) {
@@ -157,8 +166,12 @@ export class AddRoleUserComponent extends AppList {
     }
 
     saveRole() {
+        this.isSubmitted = true;
         if (!this.listRoles.length) {
             this._toastService.warning("Please add role");
+            return;
+        }
+        if (!this.checkValidate()) {
             return;
         }
         this.listRoles.forEach(item => {
@@ -187,6 +200,17 @@ export class AddRoleUserComponent extends AppList {
                             this._toastService.error(res.message);
                             if (!!res.data && !!res.data.length) {
                                 console.log(res.data);
+                                res.data.forEach(item => {
+                                    this.listRoles.forEach(element => {
+                                        if (item.officeId === element.officeId
+                                            && item.permissionSampleId === element.permissionSampleId
+                                        ) {
+                                            element.isDup = true;
+                                        } else {
+                                            element.isDup = false;
+                                        }
+                                    });
+                                });
                             }
                         }
                     }
@@ -194,12 +218,136 @@ export class AddRoleUserComponent extends AppList {
             );
     }
 
+    checkValidate() {
+        let valid: boolean = true;
+        for (const userlv of this.listRoles) {
+            if (
+                userlv.permissionSampleId === null
+                || userlv.officeId === null
+            ) {
+                valid = false;
+                break;
+            }
+        }
+        return valid;
+    }
+
+    checkDup(roles: PermissionSample[], id: string[], idOffice: string[]) {
+        roles.forEach(element => {
+            id.forEach(item => {
+                if (element.permissionSampleId === item) {
+                    element.isDup = true;
+                } else {
+                    element.isDup = false;
+                }
+            });
+            idOffice.forEach(item => {
+                if (element.officeId === item) {
+                    element.isDup = true;
+                } else {
+                    element.isDup = false;
+                }
+            });
+        });
+        console.log(roles);
+    }
+
+    checkDupAll() {
+        const object = {};
+        const objectOffice = {};
+
+        const id: string[] = [];
+        const idOffice: string[] = [];
+
+        this.listRoles.forEach(function (item) {
+            if (!object[item.permissionSampleId]) {
+                object[item.permissionSampleId] = 0;
+
+            }
+            object[item.permissionSampleId] += 1;
+
+        });
+
+        this.listRoles.forEach(function (item) {
+            item.offices.forEach(office => {
+                if (!objectOffice[office.id]) {
+                    objectOffice[office.id] = 0;
+
+                }
+                objectOffice[office.id] += 1;
+            });
+
+        });
+
+        for (const prop in objectOffice) {
+            if (objectOffice[prop] >= 2) {
+                idOffice.push(prop);
+            }
+        }
+
+        for (const prop in object) {
+            if (object[prop] >= 2) {
+                id.push(prop);
+            }
+        }
+
+
+        if (id.length > 0 && idOffice.length > 0) {
+            // this.checkDup(this.listRoles, id, idOffice);
+            console.log(idOffice);
+            console.log(id);
+            // id.forEach(item => {
+            //     this.listRoles.forEach(itemr => {
+            //         if (item === itemr.permissionSampleId) {
+            //             itemr.isDup = true;
+            //         }
+            //         else {
+            //             itemr.isDup = false;
+
+            //         }
+            //     });
+            // });
+
+            const a = this.checkOffice(idOffice);
+            console.log(a);
+
+            id.forEach(item => {
+                this.listRoles.forEach((element, i) => {
+                    if (item === element.permissionSampleId
+                    ) {
+                        element.isDup = true;
+                    } else {
+                        element.isDup = false;
+                    }
+                });
+            });
+
+
+
+
+
+        } else {
+            this.listRoles.forEach(element => {
+                element.isDup = false;
+            });
+        }
+    }
+
+    checkOffice(idOffice: any) {
+        const item_as_string = JSON.stringify(idOffice);
+        let contains: boolean = false;
+        this.listRoles.forEach(element => {
+            contains = element.offices.some(function (ele) {
+                return JSON.stringify(ele.id).indexOf(item_as_string);
+            });
+
+
+        });
+        return contains;
+    }
+
     gotoUserPermission(id: string) {
         const type = 'user';
         this._router.navigate([`home/system/permission/${type}/${id}`]);
     }
-
-
-
-
 }
