@@ -61,12 +61,12 @@
                         <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !grossWeight}">
                             <label required>Total Gross Weight(KGS): </label>
                             <input type="number" class="form-control" [(ngModel)]="grossWeight" min="0" numeric
-                                decimals="2">
+                                [decimals]="digitDecimal">
                         </div>
                         <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !totalCBM }">
                             <label required>Total CBM: </label>
                             <input type="number" class="form-control" [(ngModel)]="totalCBM" min="0" numeric
-                                decimals="2">
+                                [decimals]="digitDecimal">
                         </div>
                         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                             (click)="openContainerListPopup()" [disabled]="isLocked | async">

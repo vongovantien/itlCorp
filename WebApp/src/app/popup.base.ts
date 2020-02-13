@@ -25,7 +25,6 @@ export abstract class PopupBase extends AppPage {
     requestSort: any = null;
 
     isSubmitted: boolean = false;
-    digitDecimal: number = 3;
 
     constructor() {
         super();

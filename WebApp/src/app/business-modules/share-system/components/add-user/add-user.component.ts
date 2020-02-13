@@ -87,14 +87,13 @@ export class ShareSystemAddUserComponent extends AppList {
 
     selectedUser(userLevel: UserLevel, id: string) {
         this.isSubmitted = true;
+        const object = {};
+        const userId: string[] = [];
 
         const user: User = this.users.find(u => u.id === id);
         if (!!user) {
             userLevel.employeeName = user.employeeNameVn;
         }
-
-        const object = {};
-        const userId: string[] = [];
 
         this.userLevelTemp.forEach(function (item) {
             if (!object[item.userId]) {
@@ -110,7 +109,9 @@ export class ShareSystemAddUserComponent extends AppList {
         }
 
         if (userId.length > 0) {
-            this.checkDup(this.userLevelTemp, userId);
+            this.userLevelTemp = this.checkDup(this.userLevelTemp, userId);
+        } else {
+            this.userLevelTemp.forEach(i => i.isDup = false);
         }
     }
 
@@ -124,6 +125,7 @@ export class ShareSystemAddUserComponent extends AppList {
                 }
             });
         });
+        return userLevel;
     }
 
     deleteUserLevel(index: number, id: number) {
