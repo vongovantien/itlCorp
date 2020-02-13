@@ -73,21 +73,30 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(results);
         }
 
+
+        /// <summary>
+        /// check permission of user to view a shipment
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("CheckPermission/{id}")]
+        public IActionResult CheckDetailPermission(Guid id)
+        {
+            var result = transactionService.CheckDetailPermission(id);
+            if (result == 403) return Ok(false);
+            return Ok(true);
+        }
+
         /// <summary>
         /// get data detail by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Detail)]
         public IActionResult Get(Guid id)
         {
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
-            if (result.Status == true)
-            {
-                return Ok(result.Data);
-            }
-            return Forbid();
+            return Ok(result);
         }
         
         /// <summary>
