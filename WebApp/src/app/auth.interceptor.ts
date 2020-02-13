@@ -41,58 +41,47 @@ export class AuthInterceptor implements HttpInterceptor {
         return next.handle(this.authReq).pipe(
             timeout(+timeoutValue),
             catchError((error: HttpErrorResponse) => {
-
+                let message: string = '';
                 switch (error.status) {
+                    case 400:
+                        console.log(error);
+                        message = this.detectError(error);
+                        break;
                     case 401:
-                        // window.location.href = '#/login';
+                        window.location.href = '#/login';
+                        break;
+                    case 403:
+                        // TODO redirect to forbidden page.
                         break;
                 }
-                let message: string = '';
-
-                if (!!error.error) {
-                    if (!!error.error.error) {
-
-                        if (error.error.error === 'invalid_grant') {
-                            message = error.error.error_description;
-                        } else {
-                            message = error.error.error.Message;
-                        }
-                    } else if (!!error.error.message) {
-                        message = `${error.error.message}`;
-                    } else {
-                        message = `Something wrong!`;
-                    }
-                } else {
-                    message = `Something wrong!`;
-                }
-
-                if (error instanceof TimeoutError) {
-                    message = error.message;
-                }
-                // if (error.error instanceof ErrorEvent) {
-                //     errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-                //     title = error.statusText;
-                // } else if (error.error != null) {
-                //     if (!!error.error.error) {
-                //         errorMessage = `${error.error.error.Message}`;
-                //     } else
-                //         if (!!error.error.message) {
-                //             errorMessage = `${error.error.message}`;
-                //         } else if (error.error.error_description) {
-                //             errorMessage = `${error.error.error_description}`;
-                //         } else if (error.error.error.Message) {
-                //             errorMessage = `${error.error.error.Message}`;
-                //         } else {
-                //             errorMessage = `Something wrong!`;
-                //         }
-                //     title = error.statusText;
-                // } else {
-                //     errorMessage = ` ${error.message}`;
-                //     title = error.statusText;
+                // if (error instanceof TimeoutError) {
+                //     message = error.message;
                 // }
-                this._toastService.error(message);
+                this._toastService.error(message, error.statusText);
                 return throwError(error);
             })
         );
     }
+
+    detectError(error: HttpErrorResponse): string {
+        let message: string = '';
+        if (!!error.error) {
+            if (!!error.error.error) {
+                if (error.error.error === 'invalid_grant') {
+                    message = error.error.error_description;
+                } else {
+                    message = error.error.error.Message;
+                }
+            } else if (!!error.error.message) {
+                message = `${error.error.message}`;
+            } else {
+                message = `Something wrong!`;
+            }
+        } else {
+            message = `Something wrong!`;
+        }
+        return message;
+    }
 }
+
+

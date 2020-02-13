@@ -523,9 +523,9 @@
         </member>
         <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.Permissions(System.String)">
             <summary>
-            get permission by current user + menu
+            get permission by current user + route
             </summary>
-            <param name="menuId"></param>
+            <param name="route"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.GetBy(System.Guid)">
