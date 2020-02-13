@@ -11,8 +11,8 @@ namespace eFMS.API.System.DL.Models
         public string idUser { get; set; }
         public Guid? companyId { get; set; }
         public Guid? officeId { get; set; }
-        public int departmentId { get; set; }
-        public int groupId { get; set; }
+        public int? departmentId { get; set; }
+        public int? groupId { get; set; }
         public string email { get; set; }
         public string token { get; set; }
         public bool status { get; set; }
