@@ -6,7 +6,6 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize, tap, switchMap } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Department } from 'src/app/shared/models/system/department';
-import { Office } from 'src/app/shared/models/system/office';
 import { Group } from 'src/app/shared/models/system/group';
 import { SortService } from 'src/app/shared/services';
 import { AppList } from 'src/app/app.list';
@@ -131,8 +130,8 @@ export class DepartmentDetailComponent extends AppList {
                 deptName: this.nameLocal.value,
                 deptNameEn: this.nameEn.value,
                 deptNameAbbr: this.nameAbbr.value,
-                branchId: this.officeActive[0].id,
-                officeName: this.officeActive[0].text,
+                branchId: this.office.value[0].id,
+                officeName: this.office.value[0].text,
                 companyName: '',
                 managerId: '',
                 userCreated: '',
@@ -140,7 +139,8 @@ export class DepartmentDetailComponent extends AppList {
                 userModified: '',
                 datetimeModified: '',
                 active: this.status.value,
-                inactiveOn: ''
+                inactiveOn: '',
+                companyId: null
             };
             this._progressRef.start();
             //Update Info Department
@@ -179,8 +179,7 @@ export class DepartmentDetailComponent extends AppList {
                     finalize(() => {
                         this._progressRef.complete();
                     }),tap(data =>{
-                        this.SelectedDepartment = data;
-                        console.log(this.SelectedDepartment)                        
+                        this.SelectedDepartment = data;                                                
                     })
                 ))
             )

@@ -19,7 +19,7 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<CatDepartment> departmentRepository;
         private readonly ICatDepartmentService departmentService;
         private readonly ICurrentUser currentUser;
-        private readonly IContextBase<SysUserLevel> sysLevelRepository;
+        private readonly IContextBase<SysUserLevel> sysLevelRepository; 
 
         public SysGroupService(IContextBase<SysGroup> repository,
             IMapper mapper,
@@ -47,6 +47,8 @@ namespace eFMS.API.System.DL.Services
                 result.DepartmentName = department.DeptNameEn;
                 result.CompanyName = department.CompanyName;
                 result.OfficeName = department.OfficeName;
+                result.CompanyId = department.CompanyId;
+                result.OfficeId = department.BranchId;
             }
             return result;
         }
@@ -98,6 +100,7 @@ namespace eFMS.API.System.DL.Services
                 }
             }
             if (groups == null) return null;
+            groups = groups.Where(x => x.IsSpecial == false || x.IsSpecial == null);
             var results = groups.Join(departments, x => x.DepartmentId, y => y.Id, (x, y) => new SysGroupModel
             {
                 Id = x.Id,

@@ -38,6 +38,7 @@ namespace eFMS.API.System.DL.Services
             currentUser = icurrentUser;
             sysLevelRepository = userLevelRepo;
             SetChildren<CatDepartment>("Id", "BranchId");
+            SetChildren<SysUserLevel>("Id", "OfficeId");
         }
 
         public HandleState AddOffice(SysOfficeModel SysOffice)

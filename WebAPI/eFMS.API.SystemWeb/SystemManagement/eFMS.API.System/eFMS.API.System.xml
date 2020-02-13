@@ -459,11 +459,18 @@
         </member>
         <member name="M:eFMS.API.System.Controllers.SysUserLevelController.AddUser(System.Collections.Generic.List{eFMS.API.System.DL.Models.SysUserLevelModel})">
             <summary>
-            
+            add user to office
             </summary>
             <param name="users"></param>
             <returns></returns>
             
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.AddUserToCompany(System.Collections.Generic.List{eFMS.API.System.DL.Models.SysUserLevelModel})">
+            <summary>
+            add user to company
+            </summary>
+            <param name="users"></param>
+            <returns></returns>
         </member>
         <member name="M:eFMS.API.System.Controllers.SysUserLevelController.Update(eFMS.API.System.DL.Models.SysUserLevelModel)">
             <summary>
@@ -486,12 +493,26 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.AddUserToDepartment(System.Collections.Generic.List{eFMS.API.System.DL.Models.SysUserLevelModel})">
+            <summary>
+            add user to department
+            </summary>
+            <param name="users"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.AddUserToGroup(System.Collections.Generic.List{eFMS.API.System.DL.Models.SysUserLevelModel})">
+            <summary>
+            add user to group
+            </summary>
+            <param name="users"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.System.Controllers.SysUserPermissionController">
             <summary>
             Controller Department
             </summary>
         </member>
-        <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.#ctor(eFMS.API.System.DL.IService.ISysUserPermissionService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.LanguageSub})">
+        <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.#ctor(eFMS.API.System.DL.IService.ISysUserPermissionService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.LanguageSub},eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             constructor
             </summary>
@@ -504,6 +525,13 @@
             </summary>
             <param name="userId"></param>
             <param name="officeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.Permissions(System.String)">
+            <summary>
+            get permission by current user + menu
+            </summary>
+            <param name="menuId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.GetBy(System.Guid)">

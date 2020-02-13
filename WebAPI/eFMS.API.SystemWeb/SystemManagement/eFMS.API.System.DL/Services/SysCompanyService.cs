@@ -32,6 +32,8 @@ namespace eFMS.API.System.DL.Services
             //currentUser = user;
             sysLevelRepository = userLevelRepo;
             SetChildren<SysCompany>("ID", "BUID");
+            SetChildren<SysOffice>("Id", "BuId");
+            SetChildren<SysUserLevel>("Id", "CompanyId");
         }
 
         public IQueryable<SysCompanyModel> GetAll()

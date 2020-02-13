@@ -5,11 +5,6 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class CatDepartment
     {
-        public CatDepartment()
-        {
-            
-        }
-
         public int Id { get; set; }
         public string Code { get; set; }
         public string DeptName { get; set; }

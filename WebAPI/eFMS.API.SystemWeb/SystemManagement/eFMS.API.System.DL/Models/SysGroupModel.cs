@@ -24,5 +24,7 @@ namespace eFMS.API.System.DL.Models
         public string DepartmentName { get; set; }
         public string CompanyName { get; set; }
         public string OfficeName { get; set; }
+        public Guid? CompanyId { get; set; }
+        public Guid? OfficeId { get; set; }
     }
 }

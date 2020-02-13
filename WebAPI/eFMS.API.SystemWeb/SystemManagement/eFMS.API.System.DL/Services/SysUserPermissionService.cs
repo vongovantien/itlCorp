@@ -11,6 +11,7 @@ using System.Linq;
 using ITL.NetCore.Common;
 using System.Diagnostics.Contracts;
 using eFMS.API.System.DL.ViewModels;
+using eFMS.IdentityServer.DL.Models;
 using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.System.DL.Services
@@ -286,6 +287,31 @@ namespace eFMS.API.System.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public UserPermissionModel GetPermission(string userId, Guid officeId, string menuId)
+        {
+            var userPermissionId = DataContext.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
+            if (userPermissionId == null) return null;
+            var generalPermission = userPermissionGeneralRepository.Get(x => x.MenuId == menuId && x.UserPermissionId == userPermissionId)?.FirstOrDefault();
+            if (generalPermission == null) return null;
+            var specialPermissions = userPermissionSpecialRepository.Get(x => x.MenuId == menuId && x.UserPermissionId == userPermissionId).ToList();
+            var result = new UserPermissionModel
+            {
+                MenuId = menuId,
+                Access = generalPermission.Access,
+                Detail = generalPermission.Detail,
+                Write = generalPermission.Write,
+                Delete = generalPermission.Delete,
+                List = generalPermission.List,
+                Import = generalPermission.Import,
+                Export = generalPermission.Export,
+                SpecialActions = specialPermissions?.Select(x => new SpecialAction {
+                    Action = x.ActionName,
+                    IsAllow = x.IsAllow
+                }).ToList()
+            };
+            return result;
         }
     }
 }

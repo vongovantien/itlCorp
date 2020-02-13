@@ -326,7 +326,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                         this.formGroup.controls["serviceDate"].setValue(value);
                     }
                 } else {
-                    this.formGroup.controls["serviceDate"].setValue(null);
+                    // this.formGroup.controls["serviceDate"].setValue(null);
                 }
             });
     }

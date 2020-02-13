@@ -2,7 +2,6 @@
     <form [formGroup]="formGroup">
         <div class="m-portlet">
             <ng-content></ng-content>
-
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-lg-4">
@@ -156,13 +155,6 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <!-- <div class="form-group">
-                            <label class="form-control-label">
-                                Bank Name
-                            </label>
-                            <input type="text" formControlName="bankName" class="form-control"
-                                placeholder="Please Enter Bank Name">
-                        </div> -->
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Bank Account No VND
@@ -171,7 +163,6 @@
                                 placeholder="Please Enter Bank Account No Vnd">
                         </div>
                     </div>
-
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
@@ -183,7 +174,6 @@
                             <input type="text" formControlName="bankAccountUSD" class="form-control"
                                 placeholder="Please Enter Bank Account No Usd">
                         </div>
-
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
@@ -193,16 +183,8 @@
                             <input type="text" formControlName="bankAccountName_VN" class="form-control"
                                 placeholder="Please Enter Bank Account Name VN">
                         </div>
-                        <!-- <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Bank Account No
-                            </label>
-                            <input type="text" formControlName="bankAccountVND" class="form-control"
-                                placeholder="Please Enter Bank Account No">
-                        </div> -->
+
                     </div>
-
-
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label">
@@ -211,32 +193,9 @@
                             <input type="text" formControlName="bankAccountName_EN" class="form-control"
                                 placeholder="Please Enter Bank Account Name EN">
                         </div>
-                        <!-- <div class="form-group">
-                     
-
-                        </div> -->
                     </div>
                 </div>
                 <div class="row">
-                    <!-- <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Bank Address
-                            </label>
-                            <input type="text" formControlName="bankAddress" class="form-control"
-                                placeholder="Please Enter Bank Address">
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label">
-                                Status
-                            </label>
-                            <select formControlName="active" class="form-control">
-                                <option *ngFor="let status of status" [ngValue]="status">{{status.title}}</option>
-                            </select>
-                        </div>
-                    </div> -->
                     <div class="col-lg-12">
                         <div class="form-group">
                             <label class="form-control-label">
@@ -283,109 +242,64 @@
                         Modified: {{SelectedOffice.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
                             class="text-success">{{SelectedOffice.userModified}}</span>
                     </div>
-
                 </div>
-
-
-
             </div>
-
-
         </div>
-
     </form>
-    <tabset #staticTabs *ngIf="isDetail">
 
-        <tab heading="Department">
-            <div class="m-portlet">
-                <div class="m-form">
-                    <div class="m-portlet__body">
-                        <div class="table-wrapper table-scrollabler" id="group-list-table">
-                            <table class="table table-striped table-brand table-hover dataTable">
-                                <thead app-table-header [headers]="headers">
-                                    <th class="m--w-50 first">
-                                    </th>
-                                </thead>
-                                <tbody class="tbody-group">
-                                    <ng-container *ngIf="!isLoading && !!departments.length">
-                                        <tr *ngFor="let department of departments; let i = index; trackBy: trackByFn">
-                                            <td class="table-actions-col">
-                                                <div class="table-actions" style="width: 100px">
-                                                    <button type="button" title="Detail"
-                                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
-                                                        (click)="gotoDetailDepartment(department.id)">
-                                                        <i class="la la-edit"></i>
-                                                    </button>
-                                                    <!-- <ng-container>
-                                                                                            <a title="Delete" class="pointer" (click)="showDeletePopup(office)">
-                                                                                                <i class="la la-trash text-danger"></i>
-                                                                                            </a>
-                                                                                        </ng-container> -->
-                                                    <!-- <span [class.m--margin-left-20]="!office.status">
-                                                                                            <a title="Detail" class="pointer" [routerLink]="office.id">
-                                                                                                <i class="la la-file-text-o"></i>
-                                                                                            </a>
-                                                                                        </span> -->
-                                                </div>
-                                            </td>
-                                            <td>{{department.code}}</td>
-                                            <td>{{department.deptNameEn}}</td>
-                                            <td>{{department.deptName}}</td>
-                                            <td>{{department.deptNameAbbr}}</td>
-                                            <td>{{department.officeName}}</td>
-                                            <td [ngClass]="department.active ? 'text-success' : 'text-danger'">
-                                                {{department.active ? 'Active' : 'Inactive'}}</td>
+</div>
 
-
+<div class="m-content">
+    <div class="m-portlet__body">
+        <tabset #staticTabs *ngIf="isDetail" class="custom-class-tab">
+            <tab heading="Department">
+                <div class="m-portlet">
+                    <div class="m-form">
+                        <div class="m-portlet__body">
+                            <div class="table-wrapper table-scrollabler" id="group-list-table">
+                                <table class="table table-striped table-brand table-hover dataTable">
+                                    <thead app-table-header [headers]="headers">
+                                        <th class="m--w-50 first">
+                                        </th>
+                                    </thead>
+                                    <tbody class="tbody-group">
+                                        <ng-container *ngIf="!isLoading && !!departments.length">
+                                            <tr
+                                                *ngFor="let department of departments; let i = index; trackBy: trackByFn">
+                                                <td class="table-actions-col">
+                                                    <div class="table-actions" style="width: 100px">
+                                                        <button type="button" title="Detail"
+                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
+                                                            (click)="gotoDetailDepartment(department.id)">
+                                                            <i class="la la-edit"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td>{{department.code}}</td>
+                                                <td>{{department.deptNameEn}}</td>
+                                                <td>{{department.deptName}}</td>
+                                                <td>{{department.deptNameAbbr}}</td>
+                                                <td>{{department.officeName}}</td>
+                                                <td [ngClass]="department.active ? 'text-success' : 'text-danger'">
+                                                    {{department.active ? 'Active' : 'Inactive'}}</td>
+                                            </tr>
+                                        </ng-container>
+                                        <tr *ngIf="!isLoading && !departments.length" app-table-none-record
+                                            [colspan]="headers.length + 1">
                                         </tr>
-                                    </ng-container>
-                                    <tr *ngIf="!isLoading && !departments.length" app-table-none-record
-                                        [colspan]="headers.length + 1">
-                                    </tr>
-                                    <tr *ngIf="isLoading" app-table-row-loading></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="pagination-nav ">
-                            <!-- <div class="row">
-                                                    <div *ngIf="!!departments.length" class="col-sm-6">
-                                                        <div class="tatable__pager-size">
-                                                            <div class="select-box">
-                                                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                                                    (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
-                                                                    <ng-container
-                                                                        *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                                                        <option [ngValue]="item">{{item}} line / screen</option>
-                                                                    </ng-container>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                                                        <div class="float-right">
-                                                            <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                                                [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                                                [(ngModel)]="page">
-                                                            </pagination>
-                                                        </div>
-                                                    </div>
-                                                </div> -->
+                                        <tr *ngIf="isLoading" app-table-row-loading></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-        </tab>
-        <tab heading="User">
-            <div class="m-portlet">
-                <div class="m-form">
-                    <div class="m-portlet__body">
-                        <form-user-level [object]="SelectedOffice" [type]="'office'"></form-user-level>
-                    </div>
-                </div>
-            </div>
-
-        </tab>
-    </tabset>
-
+            </tab>
+            <tab heading="User">
+                <ng-container *ngIf="!!SelectedOffice">
+                    <form-user-level [object]="SelectedOffice" [type]="'office'"></form-user-level>
+                </ng-container>
+            </tab>
+        </tabset>
+    </div>
 </div>

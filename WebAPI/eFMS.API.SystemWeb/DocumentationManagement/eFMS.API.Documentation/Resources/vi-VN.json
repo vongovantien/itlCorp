@@ -58,5 +58,6 @@
   "MSG_SERVICE_TYPE_REQUIRED": "Service Type không được để trống!",
   "MSG_PERSON_IN_CHARGE_REQUIRED": "Person In Charge không được để trống!",
 
-  "MSG_NOT_EXIST_SHIPMENT": "Những lô hàng này không tồn tại trên hệ thống: "
+  "MSG_NOT_EXIST_SHIPMENT": "Những lô hàng này không tồn tại trên hệ thống: ",
+  "DO_NOT_HAVE_PERMISSION": "Do not have permission" //403
 }

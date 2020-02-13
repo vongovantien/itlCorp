@@ -132,10 +132,10 @@
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice === null || (!!charge.unitPrice && charge.unitPrice < 0)}">
-                                    <input type="number" class="form-control" [(ngModel)]="charge.unitPrice"
+                                    <input type="text" class="form-control" [(ngModel)]="charge.unitPrice"
                                         (ngModelChange)="onChangeUnitPrice($event, charge)" placeholder="Unit Price"
                                         [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null"
-                                        numeric decimals="3">
+                                        autoFormatCurrency numeric [decimals]="5">
                                 </div>
                             </td>
                             <td>

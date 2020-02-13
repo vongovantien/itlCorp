@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize, takeUntil, switchMap, tap, mergeMap } from 'rxjs/operators';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { IFormAddCompany, CompanyInformationFormAddComponent } from '../components/form-add-company/form-add-company.component';
 import { Company, Office } from 'src/app/shared/models';
 import { ToastrService } from 'ngx-toastr';
@@ -74,11 +74,9 @@ export class CompanyInformationDetailComponent extends AppList {
                 )).subscribe(
                     (res: any) => {
                         this.offices = (res[1] || []).map(o => new Office(o));
-                        console.log(this.offices);
                     }
                 );
     }
-
 
     getDataDetail(company: Company) {
         this.company = new Company(company);

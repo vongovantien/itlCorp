@@ -467,6 +467,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
@@ -3056,6 +3058,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.ContainerDescription).HasMaxLength(200);
 
                 entity.Property(e => e.CurrentStatus)
@@ -3075,6 +3079,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
                 entity.Property(e => e.FieldOpsId)
                     .HasColumnName("FieldOpsID")
                     .HasMaxLength(200);
@@ -3082,6 +3088,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.FinishDate).HasColumnType("datetime");
 
                 entity.Property(e => e.FlightVessel).HasMaxLength(200);
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
@@ -3102,6 +3110,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("MBLNO")
                     .HasMaxLength(200)
                     .IsUnicode(false);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PackageTypeId).HasColumnName("PackageTypeID");
 

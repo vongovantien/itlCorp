@@ -11,5 +11,6 @@ namespace eFMS.IdentityServer.DL.IService
     {
         List<UserPermissionModel> Get(string userId, Guid officeId);
         Task<List<string>> GetPermission(string userId, Guid officeId);
+
     }
 }

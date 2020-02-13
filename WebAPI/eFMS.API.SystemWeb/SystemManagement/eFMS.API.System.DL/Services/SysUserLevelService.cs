@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
@@ -59,7 +60,7 @@ namespace eFMS.API.System.DL.Services
 
         public IQueryable<SysUserLevelModel> Query(SysUserLevelCriteria criteria)
         {
-            var userLevels = DataContext.Get();
+            var userLevels = DataContext.Get(x => x.Active == true);
             var users = userRepository.Get();
             var employess = employeeRepository.Get();
             var results = userLevels.Join(users, x => x.UserId, y => y.Id, (x, y) => new { User = y, UserLevel = x })
@@ -73,12 +74,13 @@ namespace eFMS.API.System.DL.Services
                             Active = x.User.UserLevel.Active,
                             CompanyId = x.User.UserLevel.CompanyId,
                             OfficeId = x.User.UserLevel.OfficeId,
+                            DepartmentId = x.User.UserLevel.DepartmentId,
                             DatetimeCreated = x.User.UserLevel.DatetimeCreated,
                             DatetimeModified = x.User.UserLevel.DatetimeModified,
                             UserCreated = x.User.UserLevel.UserCreated,
-                            UserModified = x.User.UserLevel.UserModified
+                            UserModified = x.User.UserLevel.UserModified,
+                            Position = x.User.UserLevel.Position
                         });
-
             if (criteria.Type == "office")
             {
                 results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId);
@@ -90,7 +92,12 @@ namespace eFMS.API.System.DL.Services
             else if(criteria.Type == "department")
             {
                 results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId);
-            };
+            }
+            else if(criteria.Type == "group")
+            {
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId && x.GroupId == criteria.GroupId);
+            }
+
             return results;
 
         }
@@ -114,7 +121,7 @@ namespace eFMS.API.System.DL.Services
                         else
                         {
                             item.Active = true;
-                            item.GroupId = 11;
+                            item.GroupId = item.GroupId == 0 ? Constants.SpecialGroup : item.GroupId;
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                             item.UserCreated = item.UserModified = currentUser.UserID;
                             hsUser = DataContext.Add(item,true);

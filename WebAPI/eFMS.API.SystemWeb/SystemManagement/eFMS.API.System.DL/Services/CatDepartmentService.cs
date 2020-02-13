@@ -26,6 +26,7 @@ namespace eFMS.API.System.DL.Services
             sysCompanyRepo = sysCompany;
             //Id is primarykey of table CatDepartment, DepartmentId is forgekey of table SysGroup       
             SetChildren<SysGroup>("Id", "DepartmentId");
+            SetChildren<SysUserLevel>("Id", "DepartmentId");
             currentUser = user;
         }
 
@@ -124,6 +125,7 @@ namespace eFMS.API.System.DL.Services
                 var off = sysOfficeRepo.Get(x => x.Id == dept.BranchId).FirstOrDefault();
                 var com = sysCompanyRepo.Get(x => off != null && x.Id == off.Buid).FirstOrDefault();
                 data = mapper.Map<CatDepartmentModel>(dept);
+                data.CompanyId = off != null ? off.Buid : Guid.Empty;
                 data.OfficeName = off != null ? off.BranchNameEn : "";
                 data.CompanyName = com != null ? com.BunameEn : "";
             }

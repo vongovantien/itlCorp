@@ -1,24 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
 using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.Infrastructure.AttributeEx;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -32,23 +28,35 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class OpsTransactionController : Controller
+    [Authorize]
+    public class OpsTransactionController : CustomAuthcontroller
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICurrentUser currentUser;
+        private ICurrentUser currentUser;
         private readonly IOpsTransactionService transactionService;
         private readonly IHostingEnvironment _hostingEnvironment;
-
+        
+        //public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, ICurrentUser user, IOpsTransactionService service, IHostingEnvironment hostingEnvironment)
+        //{
+        //    stringLocalizer = localizer;
+        //    currentUser = user;
+        //    transactionService = service;
+        //    _hostingEnvironment = hostingEnvironment;
+        //}
+        
         /// <summary>
-        /// constructor
+        /// 
         /// </summary>
-        /// <param name="localizer">inject IStringLocalizer</param>
-        /// <param name="user">inject ICurrentUser</param>
-        /// <param name="service">inject IOpsTransactionService</param>
-        public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, ICurrentUser user, IOpsTransactionService service, IHostingEnvironment hostingEnvironment)
+        /// <param name="localizer"></param>
+        /// <param name="service"></param>
+        /// <param name="hostingEnvironment"></param>
+        /// <param name="curUser"></param>
+        /// <param name="menu"></param>
+        public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, IOpsTransactionService service, IHostingEnvironment hostingEnvironment,
+            ICurrentUser curUser, Menu menu = Menu.opsJobManagement) : base(curUser, menu)
         {
             stringLocalizer = localizer;
-            currentUser = user;
+            currentUser = curUser;
             transactionService = service;
             _hostingEnvironment = hostingEnvironment;
         }
@@ -71,12 +79,17 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Detail)]
         public IActionResult Get(Guid id)
         {
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
-            return Ok(result);
+            if (result.Status == true)
+            {
+                return Ok(result.Data);
+            }
+            return Forbid();
         }
-
+        
         /// <summary>
         /// get and paging the list of countries by conditions
         /// </summary>
@@ -85,6 +98,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="size">number items per page</param>
         /// <returns></returns>
         [HttpPost("Paging")]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.AllowAccess)]
         public IActionResult Paging(OpsTransactionCriteria criteria, int page, int size)
         {
             var data = transactionService.Paging(criteria, page, size, out int rowCount);
@@ -97,11 +111,13 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="model">object to add</param>
         /// <returns></returns>
-        [Authorize]
         [HttpPost]
         [Route("Add")]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Add)]
         public IActionResult Add(OpsTransactionModel model)
         {
+            if (!ModelState.IsValid) return BadRequest();
+            
             var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {
@@ -123,19 +139,18 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="model">object to update</param>
         /// <returns></returns>
-        [Authorize]
         [HttpPut]
-        [Route("Update")]       
+        [Route("Update")]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Update)]
         public IActionResult Update(OpsTransactionModel model)
         {
+            if (!ModelState.IsValid) return BadRequest();
             var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
 
-            model.DatetimeModified = DateTime.Now;
-            model.UserModified = currentUser.UserID;
             var hs = transactionService.Update(model);//.Update(model,x=>x.Id==model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

@@ -91,9 +91,7 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
-
-  
+                    .IsUnicode(false);                
             });
 
             modelBuilder.Entity<CatPlace>(entity =>
@@ -476,8 +474,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-   
             });
 
             modelBuilder.Entity<SysImage>(entity =>
@@ -544,11 +540,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Route)
                     .HasMaxLength(150)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Parent)
-                    .WithMany(p => p.InverseParent)
-                    .HasForeignKey(d => d.ParentId)
-                    .HasConstraintName("FK_sysMenu_sysParentMenu");
             });
 
             modelBuilder.Entity<SysOffice>(entity =>
@@ -649,8 +640,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Website)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-     
             });
 
             modelBuilder.Entity<SysPermissionSample>(entity =>

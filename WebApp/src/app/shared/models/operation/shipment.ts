@@ -18,7 +18,7 @@ export class Shipment {
     invoiceNo: string = '';
     jobNo: string = '';
     mblno: string = '';
-    modifiedDate: string = '';
+    datetimeModified: string = '';
     packageTypeId: string = '';
     pod: string = '';
     podName: string = '';
