@@ -36,14 +36,6 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IOpsTransactionService transactionService;
         private readonly IHostingEnvironment _hostingEnvironment;
         
-        //public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, ICurrentUser user, IOpsTransactionService service, IHostingEnvironment hostingEnvironment)
-        //{
-        //    stringLocalizer = localizer;
-        //    currentUser = user;
-        //    transactionService = service;
-        //    _hostingEnvironment = hostingEnvironment;
-        //}
-        
         /// <summary>
         /// 
         /// </summary>

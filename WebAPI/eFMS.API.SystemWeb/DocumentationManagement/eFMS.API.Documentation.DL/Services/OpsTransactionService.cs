@@ -203,7 +203,7 @@ namespace eFMS.API.Documentation.DL.Services
             return detail;
         }
 
-        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, List<string> authorizeUserIds, OpsTransactionModel details)
+        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, List<string> authorizeUserIds, OpsTransactionModel detail)
         {
             bool result = false;
             switch (permissionRangeWrite)
@@ -212,7 +212,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result = true;
                     break;
                 case PermissionRange.Owner:
-                    if (details.BillingOpsId == currentUser.UserID || authorizeUserIds.Contains(details.BillingOpsId))
+                    if (detail.BillingOpsId == currentUser.UserID || authorizeUserIds.Contains(detail.BillingOpsId))
                     {
                         result = true;
                     }
@@ -222,8 +222,8 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Group:
-                    if ((details.GroupId == currentUser.GroupId && details.DepartmentId == currentUser.DepartmentId && details.OfficeId == currentUser.OfficeID && details.CompanyId == currentUser.CompanyID)
-                        || authorizeUserIds.Contains(details.BillingOpsId))
+                    if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(detail.BillingOpsId))
                     {
                         result = true;
                     }
@@ -233,7 +233,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Department:
-                    if ((details.DepartmentId == currentUser.DepartmentId && details.OfficeId == currentUser.OfficeID && details.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(details.BillingOpsId))
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.BillingOpsId))
                     {
                         result = true;
                     }
@@ -243,7 +243,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Office:
-                    if ((details.OfficeId == currentUser.OfficeID && details.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(details.BillingOpsId))
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.BillingOpsId))
                     {
                         result = true;
                     }
@@ -253,7 +253,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Company:
-                    if (details.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(details.BillingOpsId))
+                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.BillingOpsId))
                     {
                         result = true;
                     }
