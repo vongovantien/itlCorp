@@ -30,7 +30,7 @@ namespace eFMS.IdentityServer.DL.UserManager
         //public int DepartmentId => currentUser.FirstOrDefault(x => x.Type == "departmentId").Value != null ? Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "departmentId").Value) : 0;
         //public short GroupId => (short)(currentUser.FirstOrDefault(x => x.Type == "groupId").Value != null ? Convert.ToInt16(currentUser.FirstOrDefault(x => x.Type == "groupId").Value) : 0);
         private short groupId;
-        public short GroupId
+        public short? GroupId
         {
             get
             {
@@ -42,7 +42,7 @@ namespace eFMS.IdentityServer.DL.UserManager
             }
         }
         private int departmentId;
-        public int DepartmentId
+        public int? DepartmentId
         {
             get
             {
