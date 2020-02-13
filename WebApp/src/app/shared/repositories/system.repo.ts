@@ -98,6 +98,18 @@ export class SystemRepo {
         );
     }
 
+    addUserToCompany(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel/AddUserToCompany`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addUserToGroupLevel(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel/AddUserToGroup`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getListCompany() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysCompany`).pipe(
             catchError((error) => throwError(error)),

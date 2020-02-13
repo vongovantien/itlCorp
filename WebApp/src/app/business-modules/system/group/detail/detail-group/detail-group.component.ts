@@ -19,7 +19,6 @@ import { PreviousRouteService } from 'src/app/shared/services/previous-route';
     styleUrls: ['./detail-group.component.scss']
 })
 export class GroupDetailComponent extends AppForm implements OnInit {
-    @ViewChild(FormUserGroupComponent, { static: false }) usergroupPopup: FormUserGroupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     formGroup: FormGroup;
@@ -38,7 +37,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
     companyName: AbstractControl;
     active: AbstractControl;
     group: Group = null;
-    users: any[] = null;
     userHeaders: CommonInterface.IHeaderTable[];
     userGroup: UserGroup = new UserGroup();
     allUsers: any[] = null;
@@ -65,7 +63,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
             if (param.id) {
                 this.groupId = Number(param.id);
                 this.getGroupDetail(this.groupId);
-                this.getUsersInGroup(this.groupId);
                 this.userHeaders = [
                     { title: 'User Name', field: 'userName', sortable: true },
                     { title: 'Full Name', field: 'employeeName', sortable: true },
@@ -76,16 +73,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
                 ];
             }
         });
-    }
-    getUsersInGroup(groupId: number) {
-        this._systemRepo.getUsersInGroup(groupId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (res: any) => {
-                    this.users = res;
-                });
     }
 
     getGroupDetail(groupId: number) {
@@ -228,35 +215,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
             );
     }
 
-    addUserToGroup() {
-        this.userGroup.groupId = this.groupId;
-        this.usergroupPopup.title = "Add New User";
-        this.usergroupPopup.users = this.allUsers.filter(x => x.active === true);
-        this.usergroupPopup.formGroup.reset();
-        this.usergroupPopup.show();
-    }
-
-    viewUserGroup(item: UserGroup) {
-        this._systemRepo.getUserGroupDetail(item.id)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.userGroup = res;
-                    this.usergroupPopup.title = "Edit/ View User";
-                    this.usergroupPopup.users = this.allUsers;
-                    this.usergroupPopup.setValueFormGroup(this.userGroup);
-                    this.usergroupPopup.show();
-                },
-            );
-    }
-
-    saveSuccess(isSuccess: boolean) {
-        if (isSuccess) {
-            this.getUsersInGroup(this.groupId);
-            this.usergroupPopup.hide();
-        }
-    }
-
     confirmDelete(item) {
         this.userGroup = item;
         this.confirmDeletePopup.show();
@@ -277,7 +235,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.getUsersInGroup(this.groupId);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }

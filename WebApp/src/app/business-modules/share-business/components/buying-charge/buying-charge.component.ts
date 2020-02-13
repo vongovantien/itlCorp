@@ -383,6 +383,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 charge.invoiceDate = null;
             }
 
+            charge.unitPrice = +charge.unitPrice;
+
             // Update HBL ID,Type
             if (!!this.hbl && !!this.hbl.id) {
                 charge.hblid = this.hbl.id;

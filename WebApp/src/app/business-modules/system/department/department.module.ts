@@ -9,7 +9,7 @@ import { DepartmentDetailComponent } from './detail/detail-department.component'
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
-import { PaginationModule } from 'ngx-bootstrap';
+import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { ShareSystemModule } from '../../share-system/share-system.module';
 const routing: Routes = [
     {
@@ -38,7 +38,8 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         ReactiveFormsModule,
         RouterModule.forChild(routing),
-        ShareSystemModule
+        ShareSystemModule,
+        TabsModule.forRoot()
     ],
     exports: [],
     declarations: [
