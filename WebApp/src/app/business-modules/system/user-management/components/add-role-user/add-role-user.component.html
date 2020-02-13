@@ -2,14 +2,8 @@
     <div class="m-portlet__body">
         <div class="m-form m--margin-bottom-10">
             <div class="m--align-right">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Save
-                        </span>
-                    </span>
-                </button>
+                <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveRole()">
+                </app-default-button>
                 <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-ban"></i>
@@ -30,11 +24,11 @@
                     <ng-container>
                         <tr *ngFor="let item of listRoles;let i = index; trackBy: trackByFn">
                             <td class="table-actions-col fixed-side">
-                                <button
+                                <button (click)="gotoUserPermission(item.id)"
                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                     title="Detail"><i class="la la-list"></i>
                                 </button>
-                                <button type="button"
+                                <button (click)="deleteRole(i,item.id)" type="button"
                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                     title="Remove">
                                     <i class="la la-trash"></i>
@@ -52,7 +46,7 @@
                             </td>
                             <td>
                                 <div class="form-group ">
-                                    <select [(ngModel)]="item.buid" (ngModelChange)="selectedCompany($event)"
+                                    <select [(ngModel)]="item.buid" (ngModelChange)="selectedCompany($event,item)"
                                         class="form-control border">
                                         <option value="null" disabled>Please select</option>
                                         <option *ngFor="let item of companies" [ngValue]="item.id">{{item.bunameVn}}
@@ -66,7 +60,8 @@
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && item.officeId === null }">
                                     <select class="form-control border" [(ngModel)]="item.officeId">
                                         <option value="null" disabled>Please select</option>
-                                        <option *ngFor="let item of offices" [ngValue]="item.id">{{item.branchNameVn}}
+                                        <option *ngFor="let it of item.offices" [ngValue]="it.id">
+                                            {{it.branchNameVn}}
                                         </option>
                                     </select>
 
@@ -74,6 +69,7 @@
 
                             </td>
                         </tr>
+                        <tr app-table-none-record *ngIf="!listRoles.length"></tr>
                         <tr>
                             <td colspan=1 class="fixed-side">
                                 <a (click)="addNewLine()" class="btn m-btn--icon m-btn--icon-only m--font-primary"
@@ -91,3 +87,6 @@
         </div>
     </div>
 </div>
+
+<confirm-popup [body]="'Are you sure want to delete this user level'" (onSubmit)="onDeleteRole()">
+</confirm-popup>

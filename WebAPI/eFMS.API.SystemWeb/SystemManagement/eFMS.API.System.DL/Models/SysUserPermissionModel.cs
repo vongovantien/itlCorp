@@ -19,6 +19,7 @@ namespace eFMS.API.System.DL.Models
     
     public class SysUserPermissionEditModel
     {
+        public Guid? Id { get; set; }
         public Guid PermissionSampleId { get; set; }
         public string UserId { get; set; }
         public Guid OfficeId { get; set; }

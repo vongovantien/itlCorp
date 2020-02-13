@@ -42,6 +42,9 @@ namespace eFMS.API.Catalogue.Infrastructure
 
             CreateMap<UserPermissionSpecialAction, SysUserPermissionSpecial>();
 
+            CreateMap<SysUserPermissionEditModel, SysUserPermission>();
+
+
         }
     }
 }

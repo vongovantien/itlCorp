@@ -103,10 +103,18 @@ namespace eFMS.API.System.Controllers
         public IActionResult Add(List<SysUserPermissionEditModel> list)
         {
             if (!ModelState.IsValid) return BadRequest();
+            var checkDupRole = list.GroupBy(x => new { x.UserId, x.PermissionSampleId, x.OfficeId })
+                                .Where(t => t.Count() > 1)
+                                .Select(y => y.Key)
+                                .ToList();
+            if (checkDupRole.Count > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_ROLE_ON_USER, "role"].Value, Data = checkDupRole });
+            }
+
             var hs = userPermissionService.Add(list);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value};
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -153,7 +161,7 @@ namespace eFMS.API.System.Controllers
             if (!hs.Success)
             {
                 return Ok(result);
-    }
+            }
             return Ok(result);
         }
 

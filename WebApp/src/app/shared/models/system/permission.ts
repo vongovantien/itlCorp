@@ -1,4 +1,5 @@
 import { BaseModel } from "../base.model";
+import { Office } from "./office";
 
 export class Permission extends BaseModel {
     name: string = 'OPS Permission HCm';
@@ -42,6 +43,8 @@ export class PermissionSample {
     sysPermissionSampleGenerals: PermissionSampleGeneral[] = new Array<PermissionSampleGeneral>();
     sysPermissionSampleSpecials: PermissionSampleSpecial[] = new Array<PermissionSampleSpecial>();
 
+    // custom
+    offices: Office[] = [];
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
