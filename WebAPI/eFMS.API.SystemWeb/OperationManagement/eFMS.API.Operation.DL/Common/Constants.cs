@@ -9,7 +9,7 @@ namespace eFMS.API.Operation.DL.Common
         public string Value { get; set; }
         public string DisplayName { get; set; }
     }
-    public static class Constants
+    public static class OperationConstants
     {
         public static readonly string InSchedule = "InSchedule";
         public static readonly string Processing = "Processing";

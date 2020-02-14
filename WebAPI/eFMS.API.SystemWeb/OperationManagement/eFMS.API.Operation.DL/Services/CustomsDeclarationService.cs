@@ -24,6 +24,7 @@ using eFMS.API.Operation.Service.ViewModels;
 using System.Data.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.Caching;
+using eFMS.API.Infrastructure.Extensions;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -96,7 +97,7 @@ namespace eFMS.API.Operation.DL.Services
                         if (itemExisted == null && clearanceNo != null && countDuplicated < 2)
                         {
                             var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
-                            newClearance.Source = Constants.FromEcus;
+                            newClearance.Source = OperationConstants.FromEcus;
                             lists.Add(newClearance);
                         }
                     }
@@ -230,7 +231,7 @@ namespace eFMS.API.Operation.DL.Services
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
                                                                                     && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
                                                                                     && (x.DatetimeCreated <= criteria.ToImportDate || criteria.ToImportDate == null);
-            var data = GetCustomClearanceViewList(string.Empty);
+            
             if (criteria.ImPorted == true)
             {
                 query = query.And(x => x.JobNo != null);

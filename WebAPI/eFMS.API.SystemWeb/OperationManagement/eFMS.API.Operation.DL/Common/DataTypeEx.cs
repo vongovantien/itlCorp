@@ -12,22 +12,22 @@ namespace eFMS.API.Operation.DL.Common
             switch (stageEnum)
             {
                 case StageEnum.InSchedule:
-                    result = Constants.InSchedule;
+                    result = OperationConstants.InSchedule;
                     break;
                 case StageEnum.Processing:
-                    result = Constants.Processing;
+                    result = OperationConstants.Processing;
                     break;
                 case StageEnum.Pending:
-                    result = Constants.Pending;
+                    result = OperationConstants.Pending;
                     break;
                 case StageEnum.Done:
-                    result = Constants.Done;
+                    result = OperationConstants.Done;
                     break;
                 case StageEnum.Overdue:
-                    result = Constants.Overdue;
+                    result = OperationConstants.Overdue;
                     break;
                 case StageEnum.Deleted:
-                    result = Constants.Deleted;
+                    result = OperationConstants.Deleted;
                     break;
             }
             return result;

@@ -58,7 +58,6 @@ namespace eFMS.API.Operation.Infrastructure
             services.AddTransient<IOpsStageAssignedService, OpsStageAssignedService>();
             services.AddTransient<IEcusConnectionService, EcusConnectionService>();
             services.AddTransient<ICustomsDeclarationService, CustomsDeclarationService>();
-            services.AddTransient<IOpsTransactionService, OpsTransactionSevice>();
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)

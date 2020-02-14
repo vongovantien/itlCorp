@@ -48,7 +48,7 @@ namespace eFMS.API.Operation.DL.Services
         {
             var assignedItem = mapper.Map<OpsStageAssigned>(model);
             assignedItem.Id = Guid.NewGuid();
-            assignedItem.Status = Constants.InSchedule;
+            assignedItem.Status = OperationConstants.InSchedule;
             assignedItem.RealPersonInCharge = assignedItem.MainPersonInCharge;
             assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
             //assignedItem.UserCreated = currentUser.UserID;
@@ -81,7 +81,7 @@ namespace eFMS.API.Operation.DL.Services
                     assignedItem.Id = Guid.NewGuid();
                     assignedItem.JobId = jobId;
                     assignedItem.Deadline = item.Deadline ?? null;
-                    assignedItem.Status = Constants.InSchedule;
+                    assignedItem.Status = OperationConstants.InSchedule;
                     assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
                     assignedItem.UserCreated = currentUser.UserID;
                     DataContext.Add(assignedItem, false);
@@ -163,45 +163,45 @@ namespace eFMS.API.Operation.DL.Services
             var jobCsTransaction = csTransactionReporsitory.First(x => x.Id == model.JobId);
             if (job == null)
             {
-                if (jobCsTransaction.CurrentStatus != Constants.Deleted && jobCsTransaction.CurrentStatus != Constants.Finish)
+                if (jobCsTransaction.CurrentStatus != OperationConstants.Deleted && jobCsTransaction.CurrentStatus != OperationConstants.Finish)
                 {
                     if (assigned.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
                     {
-                        jobCsTransaction.CurrentStatus = Constants.Overdue;
+                        jobCsTransaction.CurrentStatus = OperationConstants.Overdue;
                     }
                     if (assigned.Status.Contains(DataTypeEx.GetStageStatus(StageEnum.Done)))
                     {
                         var others = stageAssigneds.Where(x => x.Id != model.Id);
-                        if (others.All(x => x.Status.Contains(Constants.Done)))
+                        if (others.All(x => x.Status.Contains(OperationConstants.Done)))
                         {
-                            jobCsTransaction.CurrentStatus = Constants.Finish;
+                            jobCsTransaction.CurrentStatus = OperationConstants.Finish;
                         }
                     }
-                    if (jobCsTransaction.CurrentStatus?.Trim() == Constants.InSchedule && assigned.Status.Trim() == Constants.Processing)
+                    if (jobCsTransaction.CurrentStatus?.Trim() == OperationConstants.InSchedule && assigned.Status.Trim() == OperationConstants.Processing)
                     {
-                        jobCsTransaction.CurrentStatus = Constants.Processing;
+                        jobCsTransaction.CurrentStatus = OperationConstants.Processing;
                     }
                 }
             }
             else
             {
-                if (job.CurrentStatus != Constants.Deleted && job.CurrentStatus != Constants.Finish)
+                if (job.CurrentStatus != OperationConstants.Deleted && job.CurrentStatus != OperationConstants.Finish)
                 {
                     if (assigned.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
                     {
-                        job.CurrentStatus = Constants.Overdue;
+                        job.CurrentStatus = OperationConstants.Overdue;
                     }
                     if (assigned.Status.Contains(DataTypeEx.GetStageStatus(StageEnum.Done)))
                     {
                         var others = stageAssigneds.Where(x => x.Id != model.Id);
-                        if (others.All(x => x.Status.Contains(Constants.Done)))
+                        if (others.All(x => x.Status.Contains(OperationConstants.Done)))
                         {
-                            job.CurrentStatus = Constants.Finish;
+                            job.CurrentStatus = OperationConstants.Finish;
                         }
                     }
-                    if (job.CurrentStatus?.Trim() == Constants.InSchedule && assigned.Status.Trim() == Constants.Processing)
+                    if (job.CurrentStatus?.Trim() == OperationConstants.InSchedule && assigned.Status.Trim() == OperationConstants.Processing)
                     {
-                        job.CurrentStatus = Constants.Processing;
+                        job.CurrentStatus = OperationConstants.Processing;
                     }
                 }
             }
