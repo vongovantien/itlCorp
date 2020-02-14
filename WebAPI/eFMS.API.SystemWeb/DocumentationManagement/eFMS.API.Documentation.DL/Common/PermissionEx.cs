@@ -50,7 +50,7 @@ namespace eFMS.API.Documentation.DL.Common
             switch (permissionRange)
             {
                 case PermissionRange.Owner:
-                    if (model.BillingOpsId != currentUser.UserID && !authorizeUserIds.Any(x => x == model.BillingOpsId))
+                    if (model.BillingOpsId != currentUser.UserID && !authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 403;
                     }

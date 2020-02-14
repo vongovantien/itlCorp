@@ -564,6 +564,13 @@
             <param name="criteria">search conditions</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.CheckDetailPermission(System.Guid)">
+            <summary>
+            check permission of user to view a shipment
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Get(System.Guid)">
             <summary>
             get data detail by id

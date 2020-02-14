@@ -16,7 +16,9 @@ namespace eFMS.API.Documentation.DL.IService
     {
         IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria);
         OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount);
-        ResultHandle GetDetails(Guid id);
+        //OpsTransactionModel GetBy(Guid id);
+        int CheckDetailPermission(Guid id);
+        OpsTransaction GetDetails(Guid id);
         bool CheckAllowDelete(Guid jobId);
         Crystal PreviewCDNOte(AcctCDNoteDetailsModel model);
         HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
