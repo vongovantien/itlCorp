@@ -36,6 +36,7 @@ import { AppRoutingModule } from "./app-routing.module";
 import { environment } from "src/environments/environment";
 
 import { reducers, CustomSerializer, effects } from "./store";
+import { MenuResolveGuard } from "./menu.resolve";
 
 const authConfig: AuthConfig = {
     issuer: environment.HOST.INDENTITY_SERVER_URL,
@@ -104,6 +105,8 @@ const authConfig: AuthConfig = {
             provide: RouterStateSerializer, useClass: CustomSerializer
         },
         { provide: DEFAULT_TIMEOUT, useValue: !environment.production ? 100000 : 30000 },
+        MenuResolveGuard
+
     ],
 
     bootstrap: [AppComponent],

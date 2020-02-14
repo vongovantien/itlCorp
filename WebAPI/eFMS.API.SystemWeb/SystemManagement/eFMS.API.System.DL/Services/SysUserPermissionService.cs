@@ -26,11 +26,12 @@ namespace eFMS.API.System.DL.Services
         private IContextBase<SysCompany> companyRepository;
 
         private IContextBase<SysPermissionSample> permissionSampleRepository;
-
         private IContextBase<SysPermissionSampleGeneral> permissionSampleGeneralRepository;
         private IContextBase<SysPermissionSampleSpecial> permissionSampleSpecialRepository;
         private IContextBase<SysUserPermissionSpecial> userPermissionSpecialRepository;
         private IContextBase<SysUserPermissionGeneral> userPermissionGeneralRepository;
+        private IContextBase<SysMenu> sysMenuRepository;
+
         private readonly ICurrentUser currentUser;
 
         public SysUserPermissionService(IContextBase<SysUserPermission> repository, IMapper mapper,
@@ -42,7 +43,8 @@ namespace eFMS.API.System.DL.Services
             IContextBase<SysPermissionSample> permissionSampleRepo,
             IContextBase<SysPermissionSampleGeneral> permissionSampleGeneralRepo,
             IContextBase<SysUserPermissionSpecial> userPermissionSpecialRepo,
-            IContextBase<SysUserPermissionGeneral> userPermissionGeneralRepo, ICurrentUser icurrentUser, IContextBase<SysCompany> companyRepo, IContextBase<SysPermissionSampleSpecial> permissionSampleSpecialRepo) : base(repository, mapper)
+            IContextBase<SysUserPermissionGeneral> userPermissionGeneralRepo, ICurrentUser icurrentUser, IContextBase<SysCompany> companyRepo, IContextBase<SysPermissionSampleSpecial> permissionSampleSpecialRepo, IContextBase<SysMenu> sysMenuRepo) : base(repository, mapper)
+
         {
             userPermissionGeneralService = userPermissionGeneral;
             userPermissionSpecialService = userPermissionSpecial;
@@ -56,6 +58,8 @@ namespace eFMS.API.System.DL.Services
             currentUser = icurrentUser;
             companyRepository = companyRepo;
             permissionSampleSpecialRepository = permissionSampleSpecialRepo;
+            sysMenuRepository = sysMenuRepo;
+
         }
 
         public IQueryable<SysUserPermissionModel> GetByUserId(string id)
@@ -78,6 +82,7 @@ namespace eFMS.API.System.DL.Services
                           };
 
             return results;
+
         }
 
         public SysUserPermissionModel GetBy(string userId, Guid officeId)
@@ -122,8 +127,8 @@ namespace eFMS.API.System.DL.Services
                 userPermission.UserCreated = userPermission.UserModified = "admin";
                 userPermission.DatetimeCreated = userPermission.DatetimeModified = DateTime.Now;
                 userPermissions.Add(userPermission);
-                permissionGenerals = GetPermissionGeneralDefault(item.PermissionSampleId,userPermission.Id);
-                permissionSpecials = GetPermissionSpecilaDefault(item.PermissionSampleId,userPermission.Id);
+                permissionGenerals = GetPermissionGeneralDefault(item.PermissionSampleId, userPermission.Id);
+                permissionSpecials = GetPermissionSpecilaDefault(item.PermissionSampleId, userPermission.Id);
             }
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -134,7 +139,7 @@ namespace eFMS.API.System.DL.Services
                     var checkExisted = data.Where(d => userPermissions.Any(u => d.Id == u.Id));
                     foreach (var item in userPermissions)
                     {
-                        if (checkExisted.Where(x=>x.Id == item.Id).Select(t=>t.Id).FirstOrDefault() != Guid.Empty)
+                        if (checkExisted.Where(x => x.Id == item.Id).Select(t => t.Id).FirstOrDefault() != Guid.Empty)
                         {
                             hs = DataContext.Update(item, x => x.Id == item.Id);
                         }
@@ -250,7 +255,7 @@ namespace eFMS.API.System.DL.Services
             return permissionSpecials;
         }
 
-        private List<SysUserPermissionGeneral> GetPermissionGeneralDefault(Guid permissionSampleId,Guid userPermissionId)
+        private List<SysUserPermissionGeneral> GetPermissionGeneralDefault(Guid permissionSampleId, Guid userPermissionId)
         {
             List<SysUserPermissionGeneral> permissionGenerals = null;
             var generalDefaults = permissionSampleGeneralRepository.Get(x => x.PermissionId == permissionSampleId);
@@ -310,30 +315,45 @@ namespace eFMS.API.System.DL.Services
             }
         }
 
-        public UserPermissionModel GetPermission(string userId, Guid officeId, string menuId)
+        public UserPermissionModel GetPermission(string userId, Guid officeId, string route)
         {
-            var userPermissionId = DataContext.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
-            if (userPermissionId == null) return null;
-            var generalPermission = userPermissionGeneralRepository.Get(x => x.MenuId == menuId && x.UserPermissionId == userPermissionId)?.FirstOrDefault();
-            if (generalPermission == null) return null;
-            var specialPermissions = userPermissionSpecialRepository.Get(x => x.MenuId == menuId && x.UserPermissionId == userPermissionId).ToList();
-            var result = new UserPermissionModel
+            var menu = sysMenuRepository.Get(m => m.Route == route).ToList();
+            if (menu.Count() == 0)
             {
-                MenuId = menuId,
-                Access = generalPermission.Access,
-                Detail = generalPermission.Detail,
-                Write = generalPermission.Write,
-                Delete = generalPermission.Delete,
-                List = generalPermission.List,
-                Import = generalPermission.Import,
-                Export = generalPermission.Export,
-                SpecialActions = specialPermissions?.Select(x => new SpecialAction
+                return new UserPermissionModel
                 {
-                    Action = x.ActionName,
-                    IsAllow = x.IsAllow
-                }).ToList()
-            };
-            return result;
+                    Access = false
+                };
+            }
+            else
+            {
+                string menuId = menu.Select(m => m.Id).First();
+
+                var userPermissionId = DataContext.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
+                if (userPermissionId == null) return null;
+                var generalPermission = userPermissionGeneralRepository.Get(x => x.MenuId == menuId && x.UserPermissionId == userPermissionId)?.FirstOrDefault();
+                if (generalPermission == null) return null;
+                var specialPermissions = userPermissionSpecialRepository.Get(x => x.MenuId == menuId && x.UserPermissionId == userPermissionId).ToList();
+                var result = new UserPermissionModel
+                {
+                    MenuId = menuId,
+                    Access = generalPermission.Access,
+                    Detail = generalPermission.Detail,
+                    Write = generalPermission.Write,
+                    Delete = generalPermission.Delete,
+                    List = generalPermission.List,
+                    Import = generalPermission.Import,
+                    Export = generalPermission.Export,
+                    SpecialActions = specialPermissions?.Select(x => new SpecialAction
+                    {
+                        Action = x.ActionName,
+                        IsAllow = x.IsAllow
+                    }).ToList()
+                };
+                return result;
+            }
+
+
         }
     }
 }

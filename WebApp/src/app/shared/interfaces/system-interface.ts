@@ -20,4 +20,17 @@ namespace SystemInterface {
         departmentName: string;
         groupName: string;
     }
+
+    export interface IUserPermission {
+        menuId: string;
+        access: boolean;
+        detail: string;
+        write: string;
+        delete: string;
+        list: string;
+        import: boolean;
+        export: boolean;
+        speacialActions: any[];
+        [name: string]: any;
+    }
 }

@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Common;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,5 +28,6 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string ColoaderId { get; set; }
         public string AgentId { get; set; }
         public string UserCreated { get; set; }
+        public PermissionRange RangeSearch { get; set; }
     }
 }

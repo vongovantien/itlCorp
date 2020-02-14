@@ -483,5 +483,13 @@ export class SystemRepo {
         );
     }
 
+    getUserPermissionByMenu(menuId: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/Permissions/${menuId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
+
 }
 

@@ -35,6 +35,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCountry> countryRepository;
         readonly ICsDimensionDetailService dimensionDetailService;
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<SysAuthorization> authorizationRepository;
+
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
             IContextBase<CsTransaction> csTransaction,
@@ -49,7 +51,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCountry> countryRepo,
             IContextBase<CsTransactionDetail> csTransactiondetail,
             ICsMawbcontainerService contService, ICurrentUser user,
-            ICsDimensionDetailService dimensionService) : base(repository, mapper)
+            ICsDimensionDetailService dimensionService,
+            IContextBase<SysAuthorization> authorizationRepo) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -65,6 +68,7 @@ namespace eFMS.API.Documentation.DL.Services
             currentUser = user;
             countryRepository = countryRepo;
             dimensionDetailService = dimensionService;
+            authorizationRepository = authorizationRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -215,24 +219,24 @@ namespace eFMS.API.Documentation.DL.Services
                 int count = 0;
                 if (hblNos != null && hblNos.Count() > 0)
                 {
-                    foreach(var hbl in hblNos)
+                    foreach (var hbl in hblNos)
                     {
                         string _hbl = hbl;
                         _hbl = _hbl.Substring(Constants.CODE_ITL.Length, _hbl.Length - Constants.CODE_ITL.Length);
                         Int32.TryParse(_hbl, out count);
-                        if(count > 0)
+                        if (count > 0)
                         {
                             break;
                         }
                     }
                 }
                 //Reset về 0
-                if(count == 9999)
+                if (count == 9999)
                 {
                     count = 0;
                 }
                 hblNo = GenerateID.GenerateHBLNo(count);
-            }                       
+            }
             return hblNo;
         }
 
@@ -408,7 +412,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (criteria.TypeFCL == "Export")
                 {
                     query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
-                 &&  ((x.tran.Mawb?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0 )
+                 && ((x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
@@ -520,9 +524,9 @@ namespace eFMS.API.Documentation.DL.Services
                           ParentId = detail.ParentId,
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            if(res.Count() > 0)
+            if (res.Count() > 0)
             {
-                results = res.Where(x=>x.ParentId == null).OrderByDescending(o => o.DatetimeModified).ToList();
+                results = res.Where(x => x.ParentId == null).OrderByDescending(o => o.DatetimeModified).ToList();
             }
             results.ForEach(fe =>
             {
@@ -532,10 +536,149 @@ namespace eFMS.API.Documentation.DL.Services
             return results;
         }
 
+        private ICurrentUser GetUserMenuPermissionTransaction(TransactionTypeEnum transactionTypeEnum)
+        {
+            ICurrentUser _user = null;
+            switch (transactionTypeEnum)
+            {
+                case TransactionTypeEnum.InlandTrucking:
+                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docInlandTrucking);
+                    break;
+                case TransactionTypeEnum.AirExport:
+                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docAirExport);
+                    break;
+                case TransactionTypeEnum.AirImport:
+                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docAirImport);
+                    break;
+                case TransactionTypeEnum.SeaConsolExport:
+                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaConsolExport);
+                    break;
+                case TransactionTypeEnum.SeaConsolImport:
+                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaConsolImport);
+                    break;
+                case TransactionTypeEnum.SeaFCLExport:
+                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLExport);
+                    break;
+                case TransactionTypeEnum.SeaFCLImport:
+                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);
+                    break;
+                case TransactionTypeEnum.SeaLCLExport:
+                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaLCLExport);
+                    break;
+                case TransactionTypeEnum.SeaLCLImport:
+                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaLCLImport);
+                    break;
+                default:
+                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);//Set default
+                    break;
+            }
+            return _user;
+        }
+
+        private IQueryable<CsTransactionDetail> GetHouseBill(string transactionType, TransactionTypeEnum transactionTypeEnum)
+        {
+            ICurrentUser _user = GetUserMenuPermissionTransaction(transactionTypeEnum);
+            PermissionRange rangeSearch = PermissionEx.GetPermissionRange(_user.UserMenuPermission.List);
+            var houseBills = csTransactionDetailRepo.Get();
+
+            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
+                                                                 && x.AssignTo == currentUser.UserID
+                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
+                                                                 && x.Services.Contains(transactionType)
+                                                                 )?.Select(x => x.UserId).ToList();
+
+            switch (rangeSearch)
+            {
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    houseBills = houseBills.Where(x => x.SaleManId == currentUser.UserID
+                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
+                                                || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Group:
+                    houseBills = houseBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
+                                                || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Department:
+                    houseBills = houseBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
+                                                || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Office:
+                    houseBills = houseBills.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
+                                                || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Company:
+                    houseBills = houseBills.Where(x => x.CompanyId == currentUser.CompanyID
+                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
+                                                || x.UserCreated == currentUser.UserID);
+                    break;
+            }
+            if (houseBills == null)
+                return null;
+            return houseBills;
+        }
+
         public IQueryable<CsTransactionDetailModel> GetListHouseBillAscHBL(CsTransactionDetailCriteria criteria)
         {
-            var res = from detail in DataContext.Get()
-                      join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
+            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
+            var houseBills = GetHouseBill(transactionType, criteria.TransactionType);
+            var query = from detail in houseBills
+                        join surcharge in surchareRepository.Get() on detail.Id equals surcharge.Hblid into surchargeTrans
+                        from surcharge in surchargeTrans.DefaultIfEmpty()
+                        select new { detail, surcharge };
+
+            if (criteria.All == null)
+            {
+                query = query.Where(x =>
+                        x.detail.JobId == criteria.JobId
+                    &&
+                        (x.detail.Hwbno ?? "").IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    &&
+                        ((x.detail.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                    &&
+                        ((x.detail.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
+                    &&
+                    (
+                        (x.surcharge.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.surcharge.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    )
+                    &&
+                    (
+                        (x.surcharge.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.surcharge.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    )
+                );
+            }
+            else
+            {
+                query = query.Where(x =>
+                        x.detail.JobId == criteria.JobId
+                    ||
+                        (x.detail.Hwbno ?? "").IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    ||
+                        ((x.detail.CustomerId ?? "") == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                    ||
+                        ((x.detail.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
+                    ||
+                    (
+                        (x.surcharge.CreditNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.surcharge.DebitNo ?? "").IndexOf(criteria.CreditDebitNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    )
+                    ||
+                    (
+                        (x.surcharge.Soano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.surcharge.PaySoano ?? "").IndexOf(criteria.SoaNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    )
+                );
+            }
+            var houseBillData = query.Select(s => s.detail).GroupBy(g => g.Id).Select(s => s.FirstOrDefault());
+            var res = from detail in houseBillData//DataContext.Get()
+                      //join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                       join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                       from cus in customers.DefaultIfEmpty()
                       join shipper in catPartnerRepo.Get() on detail.ShipperId equals shipper.Id into shippers
@@ -548,7 +691,7 @@ namespace eFMS.API.Documentation.DL.Services
                       from notify in notifys.DefaultIfEmpty()
                       join port in catPlaceRepo.Get() on detail.Pod equals port.Id into portDetail
                       from pod in portDetail.DefaultIfEmpty()
-                      where detail.JobId == criteria.JobId
+                          //where detail.JobId == criteria.JobId
                       select new CsTransactionDetailModel
                       {
                           Id = detail.Id,
@@ -798,7 +941,7 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
 
         }
-        
+
         #region --- PREVIEW ---
         public Crystal Preview(CsTransactionDetailModel model)
         {
@@ -949,7 +1092,7 @@ namespace eFMS.API.Documentation.DL.Services
             var listDocument = new List<AirDocumentReleaseReport>();
             Crystal result = null;
             var _currentUser = currentUser.UserName;
-           // var _currentUser = string.Empty;
+            // var _currentUser = string.Empty;
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
@@ -1316,9 +1459,10 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = null;
             var data = GetById(housbillId);
             var authorizeLetters = new List<AirImptAuthorisedLetterReport>();
-            if(data != null)
+            if (data != null)
             {
-                var authorizeLetter = new AirImptAuthorisedLetterReport {
+                var authorizeLetter = new AirImptAuthorisedLetterReport
+                {
                     HWBNO = data.Hwbno?.ToUpper(),
                     DONo = data.DeliveryOrderNo?.ToUpper(),
                     Consignee = data.ConsigneeDescription?.ToUpper(),

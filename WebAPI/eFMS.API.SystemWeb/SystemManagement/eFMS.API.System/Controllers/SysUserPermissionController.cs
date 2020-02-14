@@ -60,15 +60,15 @@ namespace eFMS.API.System.Controllers
         }
 
         /// <summary>
-        /// get permission by current user + menu
+        /// get permission by current user + route
         /// </summary>
-        /// <param name="menuId"></param>
+        /// <param name="route"></param>
         /// <returns></returns>
-        [HttpGet("Permissions/{menuId}")]
+        [HttpGet("Permissions/{route}")]
         [Authorize]
-        public IActionResult Permissions(string menuId)
+        public IActionResult Permissions(string route)
         {
-            var result = userPermissionService.GetPermission(currentUser.UserID, currentUser.OfficeID, menuId);
+            var result = userPermissionService.GetPermission(currentUser.UserID, currentUser.OfficeID, route);
             if (result == null) return Forbid();
             else return Ok(result);
         }

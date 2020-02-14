@@ -10,15 +10,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eFMS.API.Documentation.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class CustomAuthcontroller : ControllerBase
     {
-        private ICurrentUser currentUser;
+        private readonly ICurrentUser currentUser;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="curUser"></param>
+        /// <param name="menu"></param>
         public CustomAuthcontroller(ICurrentUser curUser, Menu menu = Menu.acctAP)
         {
             currentUser = curUser;
             if (curUser.UserPermissions.Count > 0)
             {
-                curUser.UserMenuPermission = curUser.UserPermissions.Where(x => x.MenuId == menu.ToString()).FirstOrDefault();
+                curUser.UserMenuPermission = curUser.UserPermissions.FirstOrDefault(x => x.MenuId == menu.ToString());
             }
         }
     }

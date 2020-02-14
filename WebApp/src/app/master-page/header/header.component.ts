@@ -82,7 +82,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                             if (this.departmentGroups.length === 1) {
                                 this.selectedDepartmentGroup = this.departmentGroups[0];
                             } else {
-                                this.selectedDepartmentGroup = this.departmentGroups.find(d => d.departmentId === this.currenUser.departmentId && d.groupId === this.currenUser.groupId);
+                                this.selectedDepartmentGroup = this.departmentGroups.find(d => d.departmentId === +this.currenUser.departmentId && d.groupId === +this.currenUser.groupId);
                             }
                         }
                     }

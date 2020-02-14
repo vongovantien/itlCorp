@@ -5,6 +5,7 @@ import { MasterPageComponent } from './master-page/master-page.component';
 import { NotfoundPageComponent } from './notfound-page/notfound-page.component';
 import { AuthGuardService } from 'src/app/shared/services/auth-guard.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { MenuResolveGuard } from './menu.resolve';
 
 const routes: Routes = [
     {
@@ -29,6 +30,9 @@ const routes: Routes = [
         data: {
             name: "Home",
         },
+        resolve: {
+            checkMenu: MenuResolveGuard
+        },
         children: [
             {
                 path: '',
@@ -36,7 +40,7 @@ const routes: Routes = [
             },
             {
                 path: 'dashboard',
-                component: DashboardComponent
+                component: DashboardComponent,
             },
             {
                 path: 'system',
@@ -71,7 +75,8 @@ const routes: Routes = [
                 loadChildren: () => import('./business-modules/operation/operation.module').then(m => m.OperationModule),
                 data: {
                     name: "Logistics",
-                }
+                },
+
             },
             {
                 path: 'report',
@@ -93,9 +98,10 @@ const routes: Routes = [
                 data: {
                     name: "Design Zone",
                 }
-            }
-        ]
+            },
 
+        ],
+        runGuardsAndResolvers: "always"
     },
     /**
      * PAGE NOT FOUND 
@@ -109,6 +115,7 @@ const routes: Routes = [
         redirectTo: 'page-not-found',
         pathMatch: 'full'
     }
+
 ];
 
 @NgModule({

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.API.Common", "eFMS.API
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.API.Provider", "eFMS.API.Provider\eFMS.API.Provider.csproj", "{0673939A-507A-48F4-B9CA-D1E0A8C8E146}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eFMS.API.Infrastructure", "eFMS.API.Infrastructure\eFMS.API.Infrastructure.csproj", "{B319F156-1070-43B3-BBF1-D181BA6BBE13}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0673939A-507A-48F4-B9CA-D1E0A8C8E146}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0673939A-507A-48F4-B9CA-D1E0A8C8E146}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0673939A-507A-48F4-B9CA-D1E0A8C8E146}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B319F156-1070-43B3-BBF1-D181BA6BBE13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B319F156-1070-43B3-BBF1-D181BA6BBE13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B319F156-1070-43B3-BBF1-D181BA6BBE13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B319F156-1070-43B3-BBF1-D181BA6BBE13}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,8 +11,8 @@ namespace eFMS.IdentityServer.DL.UserManager
         string UserName { get; }
         Guid CompanyID { get; }
         Guid OfficeID { get; }
-        int DepartmentId { get; }
-        short GroupId { get; }
+        int? DepartmentId { get; }
+        short? GroupId { get; }
         List<UserPermissionModel> UserPermissions { get; }
         UserPermissionModel UserMenuPermission { get; set; }
     }

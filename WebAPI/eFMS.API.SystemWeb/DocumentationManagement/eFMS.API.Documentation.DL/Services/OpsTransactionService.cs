@@ -89,6 +89,10 @@ namespace eFMS.API.Documentation.DL.Services
             model.DatetimeModified = model.DatetimeCreated;
             model.UserModified = model.UserCreated;
             model.CurrentStatus = "InSchedule";
+            model.GroupId = currentUser.GroupId;
+            model.DepartmentId = currentUser.DepartmentId;
+            model.OfficeId = currentUser.OfficeID;
+            model.CompanyId = currentUser.CompanyID;
             var dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
             if(dayStatus > 0)
             {
@@ -142,9 +146,16 @@ namespace eFMS.API.Documentation.DL.Services
                 opsStageAssignedRepository.Delete(x => x.Id == item.Id, false);
             }
         }
-        ResultHandle IOpsTransactionService.GetDetails(Guid id)
+
+        public int CheckDetailPermission(Guid id)
         {
-            Contract.Ensures(Contract.Result<ResultHandle>() != null);
+            var detail = GetBy(id);
+            var permissionRange = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+            return code;
+        }
+        private OpsTransactionModel GetBy(Guid id)
+        {
             var details = Get(x => x.Id == id).FirstOrDefault();
 
             if (details != null)
@@ -155,13 +166,103 @@ namespace eFMS.API.Documentation.DL.Services
                 var supplier = partnerRepository.Get(x => x.Id == details.SupplierId).FirstOrDefault();
                 details.SupplierName = supplier?.PartnerNameEn;
             }
-            var permissionRange = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = details.BillingOpsId, UserCreated = details.UserCreated, CompanyId = details.CompanyId, OfficeId = details.OfficeId, DepartmentId = details.DepartmentId, GroupId = details.GroupId }, permissionRange);
-            ResultHandle result = null;
-            if (code == 403)
-                result = new ResultHandle { Status = false, Data = details };
-            else
-                result = new ResultHandle { Status = true, Data = details };
+            return details;
+        }
+        OpsTransaction IOpsTransactionService.GetDetails(Guid id)
+        {
+            var detail = GetBy(id);
+            if (detail == null) return null;
+            List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID
+                                                                 && (x.Active == true)
+                                                                 && (x.EndDate.Value >= DateTime.Now.Date || x.EndDate == null)
+                                                                 && x.Services.Contains("CL")
+                                                                 )?.Select(x => x.UserId).ToList();
+            var permissionRangeWrite = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            var permissionRangeDelete = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+            detail.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail),
+                AllowDelete = GetPermissionDetail(permissionRangeDelete, authorizeUserIds, detail)
+            };
+            var specialActions = currentUser.UserMenuPermission.SpecialActions;
+            if (specialActions.Count > 0)
+            {
+                if(specialActions.Any(x => x.Action.Contains("Lock")))
+                {
+                    detail.Permission.AllowLock = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("Add Charge")))
+                {
+                    detail.Permission.AllowAddCharge = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("Update Charge")))
+                {
+                    detail.Permission.AllowUpdateCharge = true;
+                }
+            }
+            return detail;
+        }
+
+        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, List<string> authorizeUserIds, OpsTransactionModel detail)
+        {
+            bool result = false;
+            switch (permissionRangeWrite)
+            {
+                case PermissionRange.All:
+                    result = true;
+                    break;
+                case PermissionRange.Owner:
+                    if (detail.BillingOpsId == currentUser.UserID || authorizeUserIds.Contains(detail.BillingOpsId))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(detail.BillingOpsId))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.BillingOpsId))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.BillingOpsId))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.BillingOpsId))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+            }
             return result;
         }
 
@@ -225,15 +326,14 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
-        public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
+        private IQueryable<OpsTransaction> QueryByPermission(PermissionRange range)
         {
             IQueryable<OpsTransaction> data = null;
-            //get data by current user permission
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID 
-                                                                 && x.EndDate.Value >= DateTime.Now.Date
+            List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID
+                                                                 && (x.EndDate.Value >= DateTime.Now.Date || x.EndDate == null)
                                                                  && x.Services.Contains("CL")
                                                                  )?.Select(x => x.UserId).ToList();
-            switch (criteria.RangeSearch)
+            switch (range)
             {
                 case PermissionRange.All:
                     data = DataContext.Get(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
@@ -247,35 +347,42 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Group:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && ((x.GroupId == currentUser.GroupId && x.OfficeId == currentUser.OfficeID) || authorizeUserIds.Contains(x.BillingOpsId) 
-                                                || authorizeUserIds.Contains(x.SalemanId) 
+                                                && ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                                || authorizeUserIds.Contains(x.BillingOpsId)
+                                                || authorizeUserIds.Contains(x.SalemanId)
                                                 || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Department:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID) || authorizeUserIds.Contains(x.BillingOpsId) 
+                                                && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                                || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId) || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Office:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.OfficeId == currentUser.OfficeID || authorizeUserIds.Contains(x.BillingOpsId) 
+                                                && ((x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                                || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId) || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Company:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(x.BillingOpsId) 
+                                                && (x.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId) || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID));
                     break;
             }
+            return data;
+        }
+        public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
+        {
+            var data = QueryByPermission(criteria.RangeSearch);
             if (data == null)
                 return null;
-
-            IQueryable<OpsTransaction> datajoin = data;
             List<OpsTransactionModel> results = new List<OpsTransactionModel>();
+            IQueryable<OpsTransaction> datajoin = data;
             if (criteria.ClearanceNo != null)
             {
                 var listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
@@ -313,8 +420,6 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
             }
-
-
             if (criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
             {
                 int year = DateTime.Now.Year -2;
@@ -352,11 +457,6 @@ namespace eFMS.API.Documentation.DL.Services
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
             return results.AsQueryable();
         }
-        //private List<sp_GetOpsTransaction> GetView()
-        //{
-        //    var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetOpsTransaction>(null);
-        //    return list;
-        //}
 
         public Crystal PreviewCDNOte(AcctCDNoteDetailsModel model)
         {
