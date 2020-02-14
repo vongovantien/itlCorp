@@ -1,4 +1,6 @@
+
 import { Container } from "./container.model";
+import { PermissionShipment } from "./permissionShipment";
 
 
 export class OpsTransaction {
@@ -45,6 +47,7 @@ export class OpsTransaction {
         containerDescription: string = '';
         commodityGroupId: string = '';
         isLocked: boolean = false;
+        permission: PermissionShipment;
 
         constructor(object?: any) {
                 const self = this;

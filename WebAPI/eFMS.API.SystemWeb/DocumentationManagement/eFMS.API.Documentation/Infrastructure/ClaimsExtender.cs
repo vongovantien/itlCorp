@@ -3,14 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using eFMS.API.Common.Globals;
-using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.IService;
 using IdentityModel;
-using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
