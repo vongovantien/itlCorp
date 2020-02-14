@@ -70,8 +70,9 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                         console.log(param.type);
                         this.type = param.type;
                         this.userId = param.idu;
+                        console.log('userid here', this.userId);
                         this.id = param.ido;
-                        this.idUserPermission = param.idp;
+                        this.idUserPermission = param.ido;
                     }
                 }),
                 switchMap(() =>
@@ -214,6 +215,8 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
     backToDetail() {
         if (this.type === 'office') {
             this._router.navigate([`home/system/office/${this.id}`]);
+        } else if (this.type === 'user') {
+            this._router.navigate([`home/system/user-management/${this.userId}`]);
         }
     }
 

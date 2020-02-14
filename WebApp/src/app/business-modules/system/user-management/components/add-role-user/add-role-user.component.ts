@@ -379,7 +379,7 @@ export class AddRoleUserComponent extends AppList {
 
     gotoUserPermission(id: string) {
         const type = 'user';
-        this._router.navigate([`home/system/permission/${type}/${id}`]);
+        this._router.navigate([`home/system/permission/${type}/${id}/${this.userId}`]);
     }
 
 }
