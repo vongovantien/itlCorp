@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, OnInit } from '@angular/core';
+import { Component, ViewEncapsulation, OnInit, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 
@@ -22,6 +22,8 @@ import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAct
     encapsulation: ViewEncapsulation.None
 })
 export class ShareBussinessFormCreateSeaImportComponent extends AppForm implements OnInit {
+
+    @Input() service: string = 'fcl';
 
     ladingTypes: CommonInterface.INg2Select[] = [
         { id: 'Copy', text: 'Copy' },
@@ -168,9 +170,9 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
             flightVesselName: [],
             voyNo: [],
             pono: [],
-            mawb: ['', Validators.required],
+            mawb: [],
             // * select
-            mbltype: [null, Validators.required],
+            mbltype: [null],
             shipmentType: [null, Validators.required],
             typeOfService: [null, Validators.required],
             personIncharge: [],
@@ -243,6 +245,13 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         this._documentRepo.getShipmentDataCommon().subscribe(
             (commonData: any) => {
                 this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
+
+                // * Set default service type.
+                if (this.service === 'fcl') {
+                    this.typeOfService.setValue([this.serviceTypes[0] || []]);
+                } else {
+                    this.typeOfService.setValue([this.serviceTypes[1] || []]);
+                }
             }
         );
     }

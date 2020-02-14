@@ -27,7 +27,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
 
     mblid: string = null;
     hblid: string = null;
-    description: string = null;
+    description: string = 'AS PER BILL OF LADING';
     commodities: string = null;
     containerDetail: string = '';
 

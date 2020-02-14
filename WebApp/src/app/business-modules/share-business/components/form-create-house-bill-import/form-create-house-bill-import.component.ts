@@ -10,14 +10,14 @@ import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, takeUntil, skip, catchError } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, catchError } from 'rxjs/operators';
 
 import * as fromShare from './../../store';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { User, CsTransactionDetail, PortIndex } from 'src/app/shared/models';
 import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
+
 @Component({
     selector: 'form-create-house-bill-import',
     templateUrl: './form-create-house-bill-import.component.html'
@@ -170,9 +170,11 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 }
             );
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: any) => {
                     this.shipmentDetail = res;
+
                     this.mtBill.setValue(this.shipmentDetail.mawb);
                     this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
                     this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
@@ -180,6 +182,8 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                     this.issueHBLDate.setValue(new Date());
                     this.pol.setValue(this.shipmentDetail.pol);
                     this.pod.setValue(this.shipmentDetail.pod);
+                    this.localVessel.setValue(this.shipmentDetail.flightVesselName);
+                    this.localVoyNo.setValue(this.shipmentDetail.voyNo);
 
                     if (this.shipmentDetail.eta != null) {
 

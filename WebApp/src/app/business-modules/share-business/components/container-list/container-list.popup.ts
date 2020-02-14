@@ -50,12 +50,14 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     selectedIndexContainer: number = -1;
 
+    defaultWeightUnit: Unit = null;
+
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IContainerState>,
         protected cdRef: ChangeDetectorRef,
         protected _sortService: SortService,
-        protected _toastService: ToastrService
+        protected _toastService: ToastrService,
     ) {
         super();
 
@@ -91,7 +93,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
             { title: 'Container No', field: 'containerNo', sortable: true, },
             { title: 'Seal No', field: 'sealNo', sortable: true, },
             { title: 'Mark No', field: 'markNo', sortable: true, },
-            { title: 'Commodity', field: 'commodityId', sortable: true, },
+            { title: 'Commodity', field: 'commodityId', sortable: true, width: 200 },
             { title: 'Description', field: 'description', sortable: true, },
             { title: 'N.W', field: 'nw', sortable: true, },
             { title: 'Unit', field: 'unitOfMeasureId', sortable: true, },
@@ -101,7 +103,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
     addNewContainer() {
         this.isSubmitted = false;
         this.isDuplicateContPakage = false;
-        this.initContainers = [...this.initContainers, new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' })];
+        this.initContainers = [...this.initContainers, new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: this.defaultWeightUnit.id, unitOfMeasureName: this.defaultWeightUnit.unitNameEn })];
         // this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
     }
 
@@ -145,6 +147,11 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
                     this.containerUnits = res[0];
                     this.packageUnits = res[1];
                     this.weightUnits = res[2];
+
+                    const kgs: Unit = this.weightUnits.find(w => w.code === 'kgs');
+                    if (!!kgs) {
+                        this.defaultWeightUnit = kgs;
+                    }
                     this.commodities = res[3];
                 }
             );

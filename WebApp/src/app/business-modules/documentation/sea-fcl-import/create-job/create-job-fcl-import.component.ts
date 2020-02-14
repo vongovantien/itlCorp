@@ -124,6 +124,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
     }
 
     checkValidateForm() {
+        this.setError(this.formCreateComponent.mbltype);
         let valid: boolean = true;
         if (!this.formCreateComponent.formCreate.valid || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)) {
             valid = false;

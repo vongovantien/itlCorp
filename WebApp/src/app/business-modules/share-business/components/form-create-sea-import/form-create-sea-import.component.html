@@ -53,14 +53,13 @@
                     <div class="col-md-4">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (mawb.dirty && !mawb.valid) || (isSubmitted && !mawb.valid)}">
-                            <label required>MBL No</label>
+                            <label>MBL No</label>
                             <input type="text" class="form-control" formControlName="mawb">
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (mbltype.dirty && !mbltype.valid) || (isSubmitted && !mbltype.valid)}">
-                            <label required>MBL Type</label>
+                        <div class="form-group">
+                            <label>MBL Type</label>
                             <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
                                 formControlName="mbltype" (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
                             </ng-select>
