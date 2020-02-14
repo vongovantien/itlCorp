@@ -55,6 +55,7 @@ import {
     ShareBussinessCdNoteDetailAirPopupComponent,
     ShareBussinessFilesAttachComponent,
     ShareBusinessHousebillsInManifestComponent,
+    ShareBusinessArrivalNoteAirComponent,
 
 } from './components';
 
@@ -105,6 +106,7 @@ const COMPONENTS = [
     ShareBussinessCdNoteDetailAirPopupComponent,
     ShareBussinessFilesAttachComponent,
     ShareBusinessHousebillsInManifestComponent,
+    ShareBusinessArrivalNoteAirComponent
 ];
 
 

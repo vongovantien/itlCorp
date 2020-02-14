@@ -542,6 +542,18 @@
             <param name="hblId">Id of Housebill</param>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CustomAuthcontroller">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CustomAuthcontroller.#ctor(eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Common.Globals.Menu)">
+            <summary>
+            constructor
+            </summary>
+            <param name="curUser"></param>
+            <param name="menu"></param>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">
             <summary>
             A base class for an MVC controller without view support.

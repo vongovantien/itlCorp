@@ -52,6 +52,9 @@ export * from './cd-note-air/detail-cd-note/detail-cd-note.popup';
 export * from './files-attach/files-attach.component';
 export * from './manifest/housebill-in-manifest/housebills-in-manifest.component';
 
+export * from './arrival-note-air/arrival-note-air.component';
+
+
 // TODO export components from shareBussiness.
 
 

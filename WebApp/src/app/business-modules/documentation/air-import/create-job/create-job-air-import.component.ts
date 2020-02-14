@@ -45,6 +45,11 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
 
     ngOnInit() {
         this._store.dispatch(new fromShareBusiness.TransactionGetDetailSuccessAction({}));
+    }
+
+    ngAfterViewInit(): void {
+        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirImport;
+
         this.formImportJobDetailPopup.service = 'air';
     }
 
@@ -96,7 +101,6 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         }
 
         const modelAdd = this.onSubmitData();
-        console.log(this.formCreateComponent.dimensionDetails);
         modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
         if (this.isImport === true) {
@@ -129,9 +133,6 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         this.isImport = true;
         this.formCreateComponent.isUpdate = true;
         this.formCreateComponent.formGroup.controls['jobNo'].setValue(null);
-        console.log('selected job:');
-        console.log(this.selectedJob);
-        // this.formCreateComponent.formGroup.controls['flightVesselName'].setValue(null);
         this._store.dispatch(new fromShareBusiness.GetDimensionAction(selectedData.id));
     }
 
@@ -141,11 +142,6 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         this.formImportJobDetailPopup.selected = -1;
         this.formImportJobDetailPopup.selectedShipment = null;
         this.formImportJobDetailPopup.show();
-    }
-
-    ngAfterViewInit() {
-        this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirImport;
-
     }
 
     importJob(body: any) {

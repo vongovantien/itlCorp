@@ -171,13 +171,14 @@
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.nw && container.nw < 0}">
                                             <input type="number" class="form-control" [(ngModel)]="container.nw"
-                                                name="nw" min="0" step=".10" numeric decimals="digitDecimal">
+                                                name="nw" min="0" step=".10" numeric [decimals]="digitDecimal">
                                         </div>
                                     </td>
 
                                     <td>
                                         <div class="form-group">
-                                            <input type="text" class="form-control" [value]="defaultWeightUnit.code"
+                                            <input type="text" class="form-control"
+                                                [value]="!!defaultWeightUnit ? defaultWeightUnit.code : 'kgs'"
                                                 name="unitOfMeasureId" readonly disabled>
                                         </div>
                                     </td>

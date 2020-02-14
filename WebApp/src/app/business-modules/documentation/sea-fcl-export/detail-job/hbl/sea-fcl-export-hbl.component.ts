@@ -262,4 +262,10 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
                 },
             );
     }
+
+    duplicateConfirm() {
+        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], {
+            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
+        });
+    }
 }

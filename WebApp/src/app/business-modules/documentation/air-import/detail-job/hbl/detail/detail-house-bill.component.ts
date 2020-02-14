@@ -6,7 +6,7 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { ReportPreviewComponent } from '@common';
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent } from '@share-bussiness';
+import { ShareBusinessDeliveryOrderComponent, ShareBusinessArrivalNoteAirComponent } from '@share-bussiness';
 
 import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
@@ -28,7 +28,7 @@ enum HBL_TAB {
 })
 export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent implements OnInit {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
-    @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
+    @ViewChild(ShareBusinessArrivalNoteAirComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteAirComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     hblId: string;
 

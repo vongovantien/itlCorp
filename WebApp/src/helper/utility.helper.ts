@@ -15,7 +15,7 @@ export class UtilityHelper {
         } else {
             total = quantity * unitPrice + Math.abs(vat);
         }
-        total = Number(total.toFixed(2));
+        total = Number(total.toFixed(3));
         return total;
     }
 
