@@ -27,6 +27,7 @@ export class AddRoleUserComponent extends AppList {
 
     idRole: string = '';
     isSubmitted: boolean = false;
+    idOffice: string = '';
     constructor(
         private _systemRepo: SystemRepo,
         protected _toastService: ToastrService,
@@ -94,7 +95,6 @@ export class AddRoleUserComponent extends AppList {
         ).subscribe(
             (res: any) => {
                 this.officeData = res;
-                console.log("office", this.officeData);
                 this.listRoles.forEach(i => {
                     i.offices = res;
                 });
@@ -112,25 +112,41 @@ export class AddRoleUserComponent extends AppList {
 
     selectedCompany(id: string, item: any) {
         item.offices = cloneDeep(this.officeData.filter(x => x.buid === id));
-        console.log(this.offices);
+        item.buid = id;
+        item.officeId = null;
         this.checkDupAll();
     }
 
-    selectedRole(id: string) {
+    selectedRole(item: any, id: string) {
         console.log(id);
+        item.permissionSampleId = id;
         this.checkDupAll();
     }
 
-    selectedOffice() {
+    selectedOffice(item: PermissionSample, id: string) {
+        console.log(id);
+        item.officeId = id;
         this.checkDupAll();
+    }
+
+    checkOffice(id: string) {
+        let dupOffice: boolean = false;
+        this.idOffice = id;
+        for (const role of this.listRoles) {
+            if (
+                role.officeId === this.idOffice
+            ) {
+                dupOffice = true;
+                break;
+            }
+        }
+        return dupOffice;
     }
 
     addNewLine() {
         const psm = new PermissionSample();
         psm.offices = this.officeData;
-
         this.listRoles.push(psm);
-
         console.log(this.listRoles);
     }
 
@@ -141,6 +157,7 @@ export class AddRoleUserComponent extends AppList {
 
         } else {
             this.listRoles.splice(index, 1);
+            this.checkDupAll();
         }
     }
 
@@ -254,10 +271,22 @@ export class AddRoleUserComponent extends AppList {
 
     checkDupAll() {
         const object = {};
-        const objectOffice = {};
+        const objecto = {};
+        const objectc = {};
 
         const id: string[] = [];
-        const idOffice: string[] = [];
+        const ido: string[] = [];
+        const idc: string[] = [];
+
+        const officeArr: string[] = [];
+        const companyArr: string[] = [];
+
+        this.listRoles.forEach(element => {
+
+            officeArr.push(element.officeId);
+            companyArr.push(element.buid);
+
+        });
 
         this.listRoles.forEach(function (item) {
             if (!object[item.permissionSampleId]) {
@@ -265,25 +294,7 @@ export class AddRoleUserComponent extends AppList {
 
             }
             object[item.permissionSampleId] += 1;
-
         });
-
-        this.listRoles.forEach(function (item) {
-            item.offices.forEach(office => {
-                if (!objectOffice[office.id]) {
-                    objectOffice[office.id] = 0;
-
-                }
-                objectOffice[office.id] += 1;
-            });
-
-        });
-
-        for (const prop in objectOffice) {
-            if (objectOffice[prop] >= 2) {
-                idOffice.push(prop);
-            }
-        }
 
         for (const prop in object) {
             if (object[prop] >= 2) {
@@ -291,29 +302,38 @@ export class AddRoleUserComponent extends AppList {
             }
         }
 
+        officeArr.forEach(function (item) {
+            if (!objecto[item]) {
+                objecto[item] = 0;
 
-        if (id.length > 0 && idOffice.length > 0) {
-            // this.checkDup(this.listRoles, id, idOffice);
-            console.log(idOffice);
-            console.log(id);
-            // id.forEach(item => {
-            //     this.listRoles.forEach(itemr => {
-            //         if (item === itemr.permissionSampleId) {
-            //             itemr.isDup = true;
-            //         }
-            //         else {
-            //             itemr.isDup = false;
+            }
+            objecto[item] += 1;
+        });
 
-            //         }
-            //     });
-            // });
+        for (const prop in objecto) {
+            if (objecto[prop] >= 2) {
+                ido.push(prop);
+            }
+        }
+        companyArr.forEach(function (item) {
+            if (!objectc[item]) {
+                objectc[item] = 0;
 
-            const a = this.checkOffice(idOffice);
-            console.log(a);
+            }
+            objectc[item] += 1;
+        });
 
+        for (const prop in objectc) {
+            if (objectc[prop] >= 2) {
+                idc.push(prop);
+            }
+        }
+
+        if (id.length > 0) {
             id.forEach(item => {
-                this.listRoles.forEach((element, i) => {
-                    if (item === element.permissionSampleId
+                this.listRoles.forEach((element) => {
+
+                    if (element.permissionSampleId === item && ido.includes(element.officeId) && idc.includes(element.buid)
                     ) {
                         element.isDup = true;
                     } else {
@@ -321,11 +341,28 @@ export class AddRoleUserComponent extends AppList {
                     }
                 });
             });
+            let count = 0;
+            this.listRoles.forEach(element => {
+                if (element.isDup) {
+                    count++;
+                }
+                if (count === 1) {
+                    element.isDup = false;
+                }
+            });
 
-
-
-
-
+            if (count > 1) {
+                id.forEach(item => {
+                    this.listRoles.forEach((element) => {
+                        if (element.permissionSampleId === item && ido.includes(element.officeId) && idc.includes(element.buid)
+                        ) {
+                            element.isDup = true;
+                        } else {
+                            element.isDup = false;
+                        }
+                    });
+                });
+            }
         } else {
             this.listRoles.forEach(element => {
                 element.isDup = false;
@@ -333,21 +370,9 @@ export class AddRoleUserComponent extends AppList {
         }
     }
 
-    checkOffice(idOffice: any) {
-        const item_as_string = JSON.stringify(idOffice);
-        let contains: boolean = false;
-        this.listRoles.forEach(element => {
-            contains = element.offices.some(function (ele) {
-                return JSON.stringify(ele.id).indexOf(item_as_string);
-            });
-
-
-        });
-        return contains;
-    }
-
     gotoUserPermission(id: string) {
         const type = 'user';
         this._router.navigate([`home/system/permission/${type}/${id}`]);
     }
+
 }

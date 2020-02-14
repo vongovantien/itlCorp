@@ -20,17 +20,30 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<SysEmployee> employeeRepository;
         private readonly IContextBase<SysUser> userRepository;
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<SysGroup> groupRepository;
+        private readonly IContextBase<SysOffice> officeRepository;
+        private readonly IContextBase<CatDepartment> departmentRepository;
+        private readonly IContextBase<SysCompany> companyRepository;
+
 
         public SysUserLevelService(IContextBase<SysUserLevel> repository,
             IMapper mapper,
             IContextBase<SysEmployee> employeeRepo,
-            IContextBase<SysUser> userRepo, ICurrentUser user
+            IContextBase<SysUser> userRepo, ICurrentUser user,
+            IContextBase<SysGroup> groupRepo,
+            IContextBase<SysOffice> officeRepo,
+            IContextBase<CatDepartment> departmentRepo,
+            IContextBase<SysCompany> companyRepo
+
             ) : base(repository, mapper)
         {
             employeeRepository = employeeRepo;
             userRepository = userRepo;
             currentUser = user;
-
+            groupRepository = groupRepo;
+            officeRepository = officeRepo;
+            departmentRepository = departmentRepo;
+            companyRepository = companyRepo;
         }
 
         public IQueryable<SysUserLevelModel> GetByLevel(short groupId)
@@ -56,6 +69,30 @@ namespace eFMS.API.System.DL.Services
         {
             var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
             return mapper.Map<SysUserLevelModel>(data);
+        }
+
+        public IQueryable<SysUserLevelModel> GetByUserId(string id)
+        {
+            var data = DataContext.Get(x => x.UserId == id);
+            var groups = groupRepository.Get();
+            var offices = officeRepository.Get();
+            var companies = companyRepository.Get();
+            var departments = departmentRepository.Get();
+            var results = from d in data
+                          join g in groups on d.DepartmentId equals g.Id
+                          join o in offices on d.OfficeId equals o.Id
+                          join c in companies on d.CompanyId equals c.Id
+                          join depart in departments on d.DepartmentId equals depart.Id
+                          select new SysUserLevelModel
+                          {
+                              GroupName = g.NameVn,
+                              CompanyName = c.BunameVn, 
+                              OfficeName = o.BranchNameVn, 
+                              DepartmentName = depart.DeptName, 
+                              Position = d.Position
+                          };
+
+            return results;
         }
 
         public IQueryable<SysUserLevelModel> Query(SysUserLevelCriteria criteria)
@@ -85,15 +122,15 @@ namespace eFMS.API.System.DL.Services
             {
                 results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId);
             }
-            else if(criteria.Type == "company")
+            else if (criteria.Type == "company")
             {
                 results = results.Where(x => x.CompanyId == criteria.CompanyId);
             }
-            else if(criteria.Type == "department")
+            else if (criteria.Type == "department")
             {
                 results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId);
             }
-            else if(criteria.Type == "group")
+            else if (criteria.Type == "group")
             {
                 results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId && x.GroupId == criteria.GroupId);
             }
@@ -112,7 +149,7 @@ namespace eFMS.API.System.DL.Services
                     var hsUser = new HandleState();
                     foreach (var item in users)
                     {
-                        if(item.Id != 0)
+                        if (item.Id != 0)
                         {
                             item.UserModified = currentUser.UserID;
                             item.DatetimeModified = DateTime.Now;
@@ -124,7 +161,7 @@ namespace eFMS.API.System.DL.Services
                             item.GroupId = item.GroupId == 0 ? Constants.SpecialGroup : item.GroupId;
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                             item.UserCreated = item.UserModified = currentUser.UserID;
-                            hsUser = DataContext.Add(item,true);
+                            hsUser = DataContext.Add(item, true);
                         }
                     }
                     trans.Commit();

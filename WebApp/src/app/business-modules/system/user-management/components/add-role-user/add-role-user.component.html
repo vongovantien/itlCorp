@@ -37,8 +37,8 @@
                             <td>
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  &&( item.permissionSampleId === null || item.isDup) }">
-                                    <select [(ngModel)]="item.permissionSampleId" (ngModelChange)="selectedRole($event)"
-                                        class="form-control border">
+                                    <select [(ngModel)]="item.permissionSampleId"
+                                        (ngModelChange)="selectedRole(item,$event)" class="form-control border">
                                         <option value="null" disabled>Please select</option>
                                         <option *ngFor="let item of roles" [ngValue]="item.id">{{item.name}}
                                         </option>
@@ -48,7 +48,7 @@
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.officeId === null && item.buid === null   || item.isDup) }">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && (item.buid === null  || item.isDup) }">
                                     <select [(ngModel)]="item.buid" (ngModelChange)="selectedCompany($event,item)"
                                         class="form-control border">
                                         <option value="null" disabled>Please select</option>
@@ -61,7 +61,7 @@
                             <td>
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.officeId === null || item.isDup)  }">
-                                    <select class="form-control border" (ngModelChange)="selectedOffice()"
+                                    <select class="form-control border" (ngModelChange)="selectedOffice(item,$event)"
                                         [(ngModel)]="item.officeId">
                                         <option value="null" disabled>Please select</option>
                                         <option *ngFor="let it of item.offices" [ngValue]="it.id">

@@ -16,6 +16,8 @@ namespace eFMS.API.System.DL.IService
         SysUserLevelModel GetDetail(int id);
         HandleState AddUser(List<SysUserLevelModel> users);
         IQueryable<SysUserLevelModel> Query(SysUserLevelCriteria criteria);
+        IQueryable<SysUserLevelModel> GetByUserId(string id);
+
 
     }
 }

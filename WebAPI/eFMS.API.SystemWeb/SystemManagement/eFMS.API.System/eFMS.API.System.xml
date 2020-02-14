@@ -450,6 +450,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.GetByUserId(System.String)">
+            <summary>
+            get by userid
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.System.Controllers.SysUserLevelController.Add(eFMS.API.System.DL.Models.SysUserLevelModel)">
             <summary>
             

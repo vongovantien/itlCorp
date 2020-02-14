@@ -87,7 +87,7 @@ export class ShareSystemAddUserComponent extends AppList {
 
     selectedUser(userLevel: UserLevel, id: string) {
         this.isSubmitted = true;
-
+        userLevel.userId = id;
         const user: User = this.users.find(u => u.id === id);
         if (!!user) {
             userLevel.employeeName = user.employeeNameVn;
@@ -108,9 +108,13 @@ export class ShareSystemAddUserComponent extends AppList {
                 userId.push(prop);
             }
         }
-
+        console.log(userId);
         if (userId.length > 0) {
             this.checkDup(this.userLevelTemp, userId);
+        } else {
+            this.userLevelTemp.forEach(element => {
+                element.isDup = false;
+            });
         }
     }
 
