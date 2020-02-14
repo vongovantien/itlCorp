@@ -25,6 +25,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     minDate: any = moment();
     ngUnsubscribe: Subject<any> = new Subject();
     keyword: string = '';
+    digitDecimal: number = 5;
 
     utility: UtilityHelper = new UtilityHelper();
 

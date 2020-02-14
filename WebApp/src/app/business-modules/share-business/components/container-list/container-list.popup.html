@@ -89,7 +89,7 @@
                                         <div class=" form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.gw && container.gw < 0}">
                                             <input type="number" class="form-control" [(ngModel)]="container.gw"
-                                                name="gw" min="0" step=".10" numeric decimals="2">
+                                                name="gw" min="0" step=".10" numeric [decimals]="digitDecimal">
                                         </div>
                                     </td>
                                     <td>
@@ -97,14 +97,14 @@
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.chargeAbleWeight && container.chargeAbleWeight < 0}">
                                             <input type="number" class="form-control"
                                                 [(ngModel)]="container.chargeAbleWeight" name="chargeAbleWeight" min="0"
-                                                step=".10" numeric decimals="2">
+                                                step=".10" numeric [decimals]="digitDecimal">
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.cbm && container.cbm < 0}">
                                             <input type="number" class="form-control" [(ngModel)]="container.cbm"
-                                                name="cbm" min="0" step=".10" numeric decimals="2">
+                                                name="cbm" min="0" step=".10" numeric [decimals]="digitDecimal">
                                         </div>
                                     </td>
                                     <td>
@@ -171,7 +171,7 @@
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.nw && container.nw < 0}">
                                             <input type="number" class="form-control" [(ngModel)]="container.nw"
-                                                name="nw" min="0" step=".10" numeric decimals="2">
+                                                name="nw" min="0" step=".10" numeric decimals="digitDecimal">
                                         </div>
                                     </td>
 
