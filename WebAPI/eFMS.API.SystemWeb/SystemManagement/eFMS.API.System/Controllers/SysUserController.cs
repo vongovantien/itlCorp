@@ -127,7 +127,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPut]
-        //[Authorize]
+        [Authorize]
         public IActionResult Update(SysUserModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -178,8 +178,7 @@ namespace eFMS.API.System.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(string id)
         {
             var item = sysUserService.Get(x => x.Id == id).FirstOrDefault();
