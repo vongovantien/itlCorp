@@ -4,7 +4,7 @@
             <div class="m--align-right">
                 <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveRole()">
                 </app-default-button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                <button (click)="cancelSave()" type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
