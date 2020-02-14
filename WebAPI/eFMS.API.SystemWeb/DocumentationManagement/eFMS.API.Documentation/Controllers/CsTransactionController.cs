@@ -420,7 +420,8 @@ namespace eFMS.API.Documentation.Controllers
                 message = stringLocalizer[LanguageSub.MSG_ETA_REQUIRED].Value;
             }
 
-            message = string.IsNullOrEmpty(model.Mbltype) ? stringLocalizer[LanguageSub.MSG_MBL_TYPE_REQUIRED].Value : message;
+            // change request 14/2/19.
+            // message = string.IsNullOrEmpty(model.Mbltype) ? stringLocalizer[LanguageSub.MSG_MBL_TYPE_REQUIRED].Value : message;
 
             message = string.IsNullOrEmpty(model.ShipmentType) ? stringLocalizer[LanguageSub.MSG_SHIPMENT_TYPE_REQUIRED].Value : message;
 
