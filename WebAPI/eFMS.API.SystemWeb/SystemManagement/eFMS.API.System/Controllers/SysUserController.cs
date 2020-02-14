@@ -224,6 +224,7 @@ namespace eFMS.API.System.Controllers
 
         [HttpGet]
         [Route("ResetPassword")]
+        [Authorize]
         public IActionResult ResetPassword(string id)
         {
             var item = sysUserService.Get(x => x.Id == id).FirstOrDefault();
