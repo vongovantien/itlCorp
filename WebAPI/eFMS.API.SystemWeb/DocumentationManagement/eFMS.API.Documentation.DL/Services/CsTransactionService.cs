@@ -2019,7 +2019,7 @@ namespace eFMS.API.Documentation.DL.Services
                         csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id);
                     }
 
-                    return new ResultHandle { Status = true, Message ="Sync House Bill " + String.Join(", ",housebills.Select(s => s.Hwbno).Distinct()) + " SuccessFul", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                    return new ResultHandle { Status = true, Message ="Sync House Bill " + String.Join(", ",housebills.Select(s => s.Hwbno).Distinct()) + " successfully", Data = housebills.Select(s => s.Hwbno).Distinct() };
                 }
             }
             catch (Exception ex)
