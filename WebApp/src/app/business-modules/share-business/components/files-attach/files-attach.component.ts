@@ -55,7 +55,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-                            this._toastService.success("Upload file Success !");
+                            this._toastService.success("Upload file successfully !");
                             if (!!this.jobId) {
                                 this.getFileShipment(this.jobId);
                             }
@@ -76,7 +76,6 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                 (res: IShipmentAttachFile[] = []) => {
                     this.files = res;
                     this.files.forEach(f => f.extension = f.name.split("/").pop().split('.').pop());
-                    console.log(this.files);
                 }
             );
     }

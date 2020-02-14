@@ -212,7 +212,7 @@
                                 <div class="form-group">
                                     <label>Package Qty</label>
                                     <input type="number" class="form-control" formControlName="packageQty"
-                                        placeholder="Package Quantity" integer>
+                                        placeholder="Package Quantity" integer autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -231,14 +231,14 @@
                                 <div class="form-group">
                                     <label>GW (KGS)</label>
                                     <input type="number" class="form-control" formControlName="grossWeight"
-                                        placeholder="Gross weight" numeric [decimals]="digitDecimal">
+                                        placeholder="Gross weight" numeric [decimals]="digitDecimal" autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>CW (KGS)</label>
                                     <input type="number" class="form-control" formControlName="chargeWeight" numeric
-                                        [decimals]="digitDecimal">
+                                        [decimals]="digitDecimal" autoFormatCurrency>
                                 </div>
                             </div>
                         </div>
@@ -249,14 +249,14 @@
                                 <div class="form-group">
                                     <label>CBM</label>
                                     <input type="number" class="form-control" formControlName="cbm" numeric
-                                        [decimals]="digitDecimal">
+                                        [decimals]="digitDecimal" autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="form-group">
                                     <label>HW</label>
                                     <input type="number" class="form-control" formControlName="hw" numeric
-                                        [decimals]="digitDecimal">
+                                        [decimals]="digitDecimal" autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-md-2 pointer d-flex align-items-end jusify-content-center">

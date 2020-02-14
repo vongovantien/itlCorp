@@ -1,10 +1,21 @@
-import { Directive, ElementRef, HostListener } from '@angular/core';
+import { Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[integer]'
 })
 export class IntergerInputDirective {
-    constructor(private el: ElementRef) {
+    constructor(
+        private el: ElementRef,
+        private renderer: Renderer2) {
+    }
+
+    ngOnInit(): void {
+        if (!this.el.nativeElement.getAttribute('min')) {
+            this.renderer.setAttribute(this.el.nativeElement, 'min', '0');
+        }
+        if (!this.el.nativeElement.getAttribute('step')) {
+            this.renderer.setAttribute(this.el.nativeElement, 'step', 'any');
+        }
     }
 
     // tslint:disable: deprecation
