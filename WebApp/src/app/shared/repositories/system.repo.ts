@@ -119,6 +119,15 @@ export class SystemRepo {
         );
     }
 
+    getListUserLevelByUserId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUserLevel/GetByUserId`, { id: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
     getComboboxPermission() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysPermissionGeneral/GetDataCombobox`).pipe(
             catchError((error) => throwError(error)),

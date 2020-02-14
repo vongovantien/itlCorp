@@ -187,7 +187,26 @@
             <add-role-user [userId]="SelectedUser.id"></add-role-user>
         </tab>
         <tab heading="Group">
+            <div class="table-wrapper table-scrollabler" id="department-list-table">
+                <table class="table table-striped table-brand table-hover dataTable">
+                    <thead app-table-header [headers]="headersuslv">
 
+                    </thead>
+                    <tbody class="tbody-group">
+                        <ng-container *ngIf="!!this.userLevels.length">
+                            <tr *ngFor="let lv of this.userLevels; let i = index; trackBy: trackByFn">
+                                <td>{{lv.groupName}}</td>
+                                <td>{{lv.companyName}}</td>
+                                <td>{{lv.officeName}}</td>
+                                <td>{{lv.departmentName}}</td>
+                                <td>{{lv.position}}</td>
+                            </tr>
+                        </ng-container>
+                        <tr *ngIf="!this.userLevels.length" app-table-none-record [colspan]="headersuslv.length + 1">
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </tab>
     </tabset>
 </div>

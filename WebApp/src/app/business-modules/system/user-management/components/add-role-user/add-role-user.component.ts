@@ -9,7 +9,6 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
 
-
 @Component({
     selector: 'add-role-user',
     templateUrl: 'add-role-user.component.html'
@@ -24,10 +23,11 @@ export class AddRoleUserComponent extends AppList {
     offices: Office[] = [];
     roles: any[] = [];
     officeData: Office[] = [];
-
     idRole: string = '';
     isSubmitted: boolean = false;
     idOffice: string = '';
+    listRolesTemp: PermissionSample[] = [];
+
     constructor(
         private _systemRepo: SystemRepo,
         protected _toastService: ToastrService,
@@ -86,6 +86,10 @@ export class AddRoleUserComponent extends AppList {
             );
     }
 
+    cancelSave() {
+        this.listRoles = this.listRoles.filter(x => !!x.id);
+    }
+
     getPermissionsByUserId() {
         this._systemRepo.getListPermissionsByUserId(this.userId).pipe(
             catchError(this.catchError),
@@ -94,18 +98,21 @@ export class AddRoleUserComponent extends AppList {
             switchMap((listRole: any) => this._systemRepo.getListOffices())
         ).subscribe(
             (res: any) => {
-                this.officeData = res;
-                this.listRoles.forEach(i => {
-                    i.offices = res;
-                });
-                this.listRoles.forEach(item => {
-                    item.offices.forEach(i => {
-                        if (item.buid === i.buid) {
-                            item.offices = this.officeData.filter(x => x.buid === item.buid);
-                        }
+                if (!!res) {
+                    this.officeData = res;
+                    this.listRoles.forEach(i => {
+                        i.offices = res;
                     });
-                });
-                console.log(this.listRoles);
+                    this.listRoles.forEach(item => {
+                        item.offices.forEach(i => {
+                            if (item.buid === i.buid) {
+                                item.offices = this.officeData.filter(x => x.buid === item.buid);
+                            }
+                        });
+                    });
+                    console.log(this.listRoles);
+                    this.listRolesTemp = this.listRoles;
+                }
             },
         );
     }

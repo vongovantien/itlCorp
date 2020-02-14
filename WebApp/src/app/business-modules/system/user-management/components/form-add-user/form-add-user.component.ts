@@ -5,6 +5,7 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
+import { UserLevel } from 'src/app/shared/models/system/userlevel';
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html'
@@ -26,6 +27,8 @@ export class FormAddUserComponent extends AppList {
     phone: AbstractControl;
     description: AbstractControl;
     ldap: AbstractControl;
+    userLevels: UserLevel[] = [];
+    headersuslv: CommonInterface.IHeaderTable[];
 
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
@@ -104,7 +107,17 @@ export class FormAddUserComponent extends AppList {
 
     ngOnInit() {
         this.initForm();
+        this.headersuslv = [
+            { title: 'Group Name', field: 'groupName' },
+            { title: 'Company', field: 'companyName' },
+            { title: 'Office', field: 'officeName' },
+            { title: 'Department', field: 'departmentName' },
+            { title: 'Position', field: 'position' },
+        ];
+
     }
+
+
 
     resetPassword(id: string) {
         this.isLoading = true;
@@ -123,6 +136,8 @@ export class FormAddUserComponent extends AppList {
                 },
             );
     }
+
+
 
 
 
