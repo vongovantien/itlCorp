@@ -124,7 +124,7 @@ namespace eFMS.API.System.DL.Services
                 {
                     userPermission.Id = Guid.NewGuid();
                 }
-                userPermission.UserCreated = userPermission.UserModified = "admin";
+                userPermission.UserCreated = userPermission.UserModified = currentUser.UserID;
                 userPermission.DatetimeCreated = userPermission.DatetimeModified = DateTime.Now;
                 userPermissions.Add(userPermission);
                 permissionGenerals = GetPermissionGeneralDefault(item.PermissionSampleId, userPermission.Id);
@@ -246,7 +246,7 @@ namespace eFMS.API.System.DL.Services
                         MenuId = special.MenuId,
                         ActionName = special.ActionName,
                         IsAllow = special.IsAllow,
-                        UserModified = "admin",
+                        UserModified = currentUser.UserID,
                         DatetimeModified = DateTime.Now
                     };
                     permissionSpecials.Add(userSpecial);
@@ -276,7 +276,7 @@ namespace eFMS.API.System.DL.Services
                         Import = general.Import,
                         Export = general.Export,
                         DatetimeModified = DateTime.Now,
-                        UserModified = "admin"
+                        UserModified = currentUser.UserID
                     };
                     permissionGenerals.Add(userGeneral);
                 }
