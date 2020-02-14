@@ -137,6 +137,10 @@ namespace eFMS.API.Documentation.Service.Models
         public string AttachList { get; set; }
         public string Route { get; set; }
         public string PoinvoiceNo { get; set; }
+        public short? GroupId { get; set; }
+        public int? DepartmentId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
 
         public virtual CsTransaction Job { get; set; }
     }

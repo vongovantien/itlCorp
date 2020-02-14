@@ -2390,6 +2390,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Commodity).HasMaxLength(1600);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.CurrentStatus)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2401,6 +2403,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DatetimeModified)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
                 entity.Property(e => e.DesOfGoods).HasMaxLength(1600);
 
@@ -2417,6 +2421,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.FlightVesselName).HasMaxLength(4000);
 
                 entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.Hw)
                     .HasColumnName("HW")
@@ -2450,6 +2456,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Notes).HasMaxLength(4000);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PackageContainer).HasMaxLength(1600);
 
@@ -2547,6 +2555,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Commodity).HasMaxLength(1600);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.ConsigneeDescription).HasMaxLength(500);
 
                 entity.Property(e => e.ConsigneeId)
@@ -2589,6 +2599,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DeliveryOrderPrintedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.DeliveryPlace).HasMaxLength(500);
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
                 entity.Property(e => e.DesOfGoods).HasMaxLength(1600);
 
@@ -2674,6 +2686,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
                 entity.Property(e => e.HandingInformation).HasMaxLength(250);
 
                 entity.Property(e => e.Hbltype)
@@ -2741,6 +2755,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.OceanVessel).HasMaxLength(500);
 
                 entity.Property(e => e.OceanVoyNo).HasMaxLength(800);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.OnBoardStatus).HasMaxLength(4000);
 

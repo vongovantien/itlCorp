@@ -104,6 +104,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [Authorize]
         public IActionResult Paging(CsTransactionCriteria criteria, int page, int size)
         {
             var data = csTransactionService.Paging(criteria, page, size, out int rowCount);

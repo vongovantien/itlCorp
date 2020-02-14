@@ -18,5 +18,10 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public DateTime? ToDate { get; set; }
         public Guid? Id { get; set; }
         public TransactionTypeEnum TransactionType { get; set; }
+
+        public string CustomerId { get; set; }
+        public string SaleManId { get; set; }
+        public string CreditDebitNo { get; set; }
+        public string SoaNo { get; set; }
     }
 }
