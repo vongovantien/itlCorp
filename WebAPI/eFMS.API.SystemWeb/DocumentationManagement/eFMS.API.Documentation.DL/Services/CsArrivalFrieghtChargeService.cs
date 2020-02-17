@@ -400,11 +400,11 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new SeaArrivalNotesReportParams();
             parameter.No = string.Empty;
             parameter.ShipperName = string.Empty;
-            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
-            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
+            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
             parameter.MAWB = houserBill != null ? houserBill.Mawb?.ToUpper() : string.Empty;
             parameter.Contact = _currentUser;
             parameter.DecimalNo = 0;
@@ -412,7 +412,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             result = new Crystal
             {
-                ReportName = criteria.Currency == Constants.CURRENCY_LOCAL ? "SeaArrivalNotes.rpt" : "SeaArrivalNotesOG.rpt",
+                ReportName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? "SeaArrivalNotes.rpt" : "SeaArrivalNotesOG.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
@@ -533,11 +533,11 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new AirImptArrivalReportParams();
             parameter.No = string.Empty;
             parameter.MAWB = houseBill != null ? houseBill.Mawb?.ToUpper() : string.Empty;
-            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
-            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
+            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
             parameter.AccountInfo = string.Empty;
             parameter.Contact = _currentUser;
             parameter.DecimalNo = 0;
@@ -545,7 +545,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             result = new Crystal
             {
-                ReportName = criteria.Currency == Constants.CURRENCY_LOCAL ? "AirImptArrival.rpt" : "AirImptArrivalOG.rpt",
+                ReportName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? "AirImptArrival.rpt" : "AirImptArrivalOG.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
@@ -653,11 +653,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 Consignee = "s",
                 No = "s",
-                CompanyName = Constants.COMPANY_NAME,
+                CompanyName = DocumentConstants.COMPANY_NAME,
                 CompanyDescription = "Company Description",
-                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
-                CompanyAddress2 = Constants.COMPANY_CONTACT,
-                Website = Constants.COMPANY_WEBSITE,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
+                Website = DocumentConstants.COMPANY_WEBSITE,
                 MAWB = detail.Mawb?.ToUpper(),
                 Contact = currentUser.UserName,
                 DecimalNo = 2

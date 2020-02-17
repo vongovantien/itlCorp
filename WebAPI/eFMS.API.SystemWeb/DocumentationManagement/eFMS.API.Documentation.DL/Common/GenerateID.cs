@@ -52,7 +52,7 @@ namespace eFMS.API.Documentation.DL.Common
         {
             number = number + 1;
             var currentDate = DateTime.Now;
-            return Constants.CODE_ITL + String.Format("{0:0000}", number);
+            return DocumentConstants.CODE_ITL + String.Format("{0:0000}", number);
         }
     }
 }

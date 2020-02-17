@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Common
 {
-    public static class Constants
+    public static class DocumentConstants
     {
         public static readonly string LG_SHIPMENT = "LG";// Custom Logistic
         public static readonly string SEF_SHIPMENT = "SEF"; //Sea FCL Export

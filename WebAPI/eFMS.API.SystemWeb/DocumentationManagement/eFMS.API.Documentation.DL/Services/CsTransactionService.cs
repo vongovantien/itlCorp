@@ -102,31 +102,31 @@ namespace eFMS.API.Documentation.DL.Services
             switch (typeEnum)
             {
                 case TransactionTypeEnum.InlandTrucking:
-                    shipment = Constants.IT_SHIPMENT;
+                    shipment = DocumentConstants.IT_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirExport:
-                    shipment = Constants.AE_SHIPMENT;
+                    shipment = DocumentConstants.AE_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirImport:
-                    shipment = Constants.AI_SHIPMENT;
+                    shipment = DocumentConstants.AI_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaConsolExport:
-                    shipment = Constants.SEC_SHIPMENT;
+                    shipment = DocumentConstants.SEC_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaConsolImport:
-                    shipment = Constants.SIC_SHIPMENT;
+                    shipment = DocumentConstants.SIC_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaFCLExport:
-                    shipment = Constants.SEF_SHIPMENT;
+                    shipment = DocumentConstants.SEF_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaFCLImport:
-                    shipment = Constants.SIF_SHIPMENT;
+                    shipment = DocumentConstants.SIF_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaLCLExport:
-                    shipment = Constants.SEL_SHIPMENT;
+                    shipment = DocumentConstants.SEL_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaLCLImport:
-                    shipment = Constants.SIL_SHIPMENT;
+                    shipment = DocumentConstants.SIL_SHIPMENT;
                     break;
                 default:
                     break;
@@ -1276,17 +1276,17 @@ namespace eFMS.API.Documentation.DL.Services
                     var UsdToVnd = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                     var rate = exchangeRate == null ? 1 : exchangeRate.Rate;
                     var usdToVndRate = UsdToVnd == null ? 1 : UsdToVnd.Rate;
-                    if (c.Type.ToLower() == Constants.CHARGE_BUY_TYPE.ToLower())
+                    if (c.Type.ToLower() == DocumentConstants.CHARGE_BUY_TYPE.ToLower())
                     {
                         totalBuying += c.Total * rate;
                         totalBuyingUSD += (totalBuying / usdToVndRate);
                     }
-                    if (c.Type.ToLower() == Constants.CHARGE_SELL_TYPE.ToLower())
+                    if (c.Type.ToLower() == DocumentConstants.CHARGE_SELL_TYPE.ToLower())
                     {
                         totalSelling += c.Total * rate;
                         totalSellingUSD += (totalSelling / usdToVndRate);
                     }
-                    if (c.Type.ToLower() == Constants.CHARGE_OBH_TYPE.ToLower())
+                    if (c.Type.ToLower() == DocumentConstants.CHARGE_OBH_TYPE.ToLower())
                     {
                         totalobh += c.Total * rate;
                         totalobhUSD += (totalobh / usdToVndRate);
@@ -1353,7 +1353,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         if (csTransactionDetailRepo.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
                         {
-                            generatePrefixHouse = Constants.SEF_HBL
+                            generatePrefixHouse = DocumentConstants.SEF_HBL
                                 + GenerateID.GeneratePrefixHousbillNo();
                         }
                         foreach (var item in detailTrans)
@@ -1493,7 +1493,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     if (csTransactionDetailRepo.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
                     {
-                        generatePrefixHouse = Constants.SEF_HBL
+                        generatePrefixHouse = DocumentConstants.SEF_HBL
                             + GenerateID.GeneratePrefixHousbillNo();
                     }
                     foreach (var item in detailTrans)
@@ -1658,17 +1658,17 @@ namespace eFMS.API.Documentation.DL.Services
                         decimal saleProfitIncludeVAT = 0;
                         decimal saleProfitNonVAT = 0;
                         string partnerName = string.Empty;
-                        if (surcharge.Type == Constants.CHARGE_OBH_TYPE)
+                        if (surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                         {
                             isOBH = true;
                             partnerName = surcharge.PayerName;
                         }
-                        if (surcharge.Type == Constants.CHARGE_BUY_TYPE)
+                        if (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                         {
                             cost = surcharge.Total;
                             costNonVat = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
                         }
-                        if (surcharge.Type == Constants.CHARGE_SELL_TYPE)
+                        if (surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                         {
                             revenue = surcharge.Total;
                             revenueNonVat = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
@@ -1679,7 +1679,7 @@ namespace eFMS.API.Documentation.DL.Services
                         //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
                         var exchargeDateSurcharge = surcharge.ExchangeDate == null ? DateTime.Now : surcharge.ExchangeDate;
                         //Exchange Rate theo Currency truyền vào
-                        var exchangeRate = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == surcharge.CurrencyId && x.CurrencyToId == Constants.CURRENCY_USD && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        var exchangeRate = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == surcharge.CurrencyId && x.CurrencyToId == DocumentConstants.CURRENCY_USD && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                         decimal _exchangeRateUSD;
                         if ((exchangeRate != null && exchangeRate.Rate != 0))
                         {
@@ -1727,14 +1727,14 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.VATAmount = 0; //NOT USE
                         charge.Cost = cost; //Phí chi của charge
                         charge.Revenue = revenue; //Phí thu của charge
-                        charge.Exchange = currency == Constants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : 0; //Exchange phí của charge về USD
+                        charge.Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : 0; //Exchange phí của charge về USD
                         charge.VNDExchange = surcharge.ExchangeRate ?? 0;
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.DatePaid = DateTime.Now; //NOT USE
                         charge.Docs = surcharge.InvoiceNo; //InvoiceNo of charge
                         charge.Notes = surcharge.Notes;
                         charge.InputData = string.Empty; //Gán rỗng
-                        charge.SalesProfit = currency == Constants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : (surcharge.ExchangeRate ?? 0) * saleProfitNonVAT; //Non VAT
+                        charge.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : (surcharge.ExchangeRate ?? 0) * saleProfitNonVAT; //Non VAT
                         charge.Quantity = surcharge.Quantity;
                         charge.UnitPrice = surcharge.UnitPrice ?? 0;
                         charge.Unit = unitCode;
@@ -1836,11 +1836,11 @@ namespace eFMS.API.Documentation.DL.Services
 
             var parameter = new FormPLsheetReportParameter();
             parameter.Contact = _currentUser;//Get user name login
-            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
-            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
+            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
             parameter.CurrDecimalNo = 2;
             parameter.DecimalNo = 2;
             parameter.HBLList = _hblNoList?.ToUpper();
@@ -1907,7 +1907,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var shipment = DataContext.Get(x => x.Id == JobId).FirstOrDefault();
                 if (shipment == null) return null;
 
-                if (shipment.TransactionType != Constants.AE_SHIPMENT && shipment.TransactionType != Constants.AI_SHIPMENT )
+                if (shipment.TransactionType != DocumentConstants.AE_SHIPMENT && shipment.TransactionType != DocumentConstants.AI_SHIPMENT )
                     return null;
                 // Lấy ds HBL
                 var housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();

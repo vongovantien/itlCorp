@@ -76,9 +76,9 @@ namespace eFMS.API.Documentation.DL.Services
             var units = unitRepository.Get();
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = Constants.COMPANY_NAME,
-                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
-                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
+                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = "itl company",
                 Contact = model.IssuedUserName,
                 Tel = string.Empty,
@@ -143,9 +143,9 @@ namespace eFMS.API.Documentation.DL.Services
             var shippingInstructions = new List<OnBoardContainerReportResult>();
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = Constants.COMPANY_NAME,
-                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
-                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
+                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = "itl company",
                 Contact = model.IssuedUserName,
                 Tel = string.Empty,

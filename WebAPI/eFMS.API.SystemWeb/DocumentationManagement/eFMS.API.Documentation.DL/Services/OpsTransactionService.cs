@@ -103,7 +103,7 @@ namespace eFMS.API.Documentation.DL.Services
                 model.CurrentStatus = TermData.Processing;
             }
             int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-            model.JobNo = GenerateID.GenerateOPSJobID(Constants.OPS_SHIPMENT, countNumberJob);
+            model.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
             var entity = mapper.Map<OpsTransaction>(model);
             return DataContext.Add(entity);
         }
@@ -556,7 +556,7 @@ namespace eFMS.API.Documentation.DL.Services
                     model.OpsTransaction.UserModified = currentUser.UserID;
                     model.OpsTransaction.ProductService = productService;
                     int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-                    model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(Constants.OPS_SHIPMENT, countNumberJob);
+                    model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
                     var dayStatus = (int)(model.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
                     if (dayStatus > 0)
                     {
@@ -584,7 +584,7 @@ namespace eFMS.API.Documentation.DL.Services
                     clearance.DatetimeCreated = DateTime.Now;
                     clearance.DatetimeModified = DateTime.Now;
                     clearance.UserCreated = model.CustomsDeclaration.UserModified = currentUser.UserID;
-                    clearance.Source = Constants.CLEARANCE_FROM_EFMS;
+                    clearance.Source = DocumentConstants.CLEARANCE_FROM_EFMS;
                     clearance.JobNo = model.OpsTransaction.JobNo;
                     customDeclarationRepository.Add(clearance, false);
                 }
@@ -638,7 +638,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.OpsTransaction.DatetimeModified = DateTime.Now;
                         item.OpsTransaction.UserModified = currentUser.UserID;
                         int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-                        item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(Constants.OPS_SHIPMENT, (countNumberJob + i));
+                        item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, (countNumberJob + i));
                         var dayStatus = (int)(item.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
                         if (dayStatus > 0)
                         {
@@ -772,16 +772,16 @@ namespace eFMS.API.Documentation.DL.Services
                     decimal revenue = 0;
                     decimal saleProfit = 0;
                     string partnerName = string.Empty;
-                    if (item.Type == Constants.CHARGE_OBH_TYPE)
+                    if (item.Type == DocumentConstants.CHARGE_OBH_TYPE)
                     {
                         isOBH = true;
                         partnerName = item.PayerName;
                     }
-                    if(item.Type == Constants.CHARGE_BUY_TYPE)
+                    if(item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                     {
                         cost = item.Total;
                     }
-                    if(item.Type == Constants.CHARGE_SELL_TYPE)
+                    if(item.Type == DocumentConstants.CHARGE_SELL_TYPE)
                     {
                         revenue = item.Total;
                     }

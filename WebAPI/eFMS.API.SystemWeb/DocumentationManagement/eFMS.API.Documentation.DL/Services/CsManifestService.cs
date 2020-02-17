@@ -155,11 +155,11 @@ namespace eFMS.API.Documentation.DL.Services
                 Agent = "Agent",
                 QtyPacks = string.Empty,
                 TotalShipments = "1",
-                CompanyName = Constants.COMPANY_NAME,
+                CompanyName = DocumentConstants.COMPANY_NAME,
                 CompanyDescription = "CompanyDescription",
-                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
-                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
-                Website = Constants.COMPANY_WEBSITE,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
+                Website = DocumentConstants.COMPANY_WEBSITE,
                 Contact = currentUser.UserID
             };
             var manifests = new List<SeaFCLExportCargoManifest>();
@@ -285,10 +285,10 @@ namespace eFMS.API.Documentation.DL.Services
                 SumCarton = string.Empty,
                 MBL = transaction.Mawb,
                 LCL = "FCL",
-                CompanyName = Constants.COMPANY_NAME,
-                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
-                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
-                Website = Constants.COMPANY_WEBSITE,
+                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
+                Website = DocumentConstants.COMPANY_WEBSITE,
                 Contact = currentUser.UserID
             };
             result = new Crystal
@@ -348,7 +348,7 @@ namespace eFMS.API.Documentation.DL.Services
                 PortLading = model.PolName?.ToUpper() ?? string.Empty,
                 PortUnlading = model.PodName?.ToUpper() ?? string.Empty,
                 FlightDate = transaction.FlightDate == null?string.Empty: transaction.FlightDate.Value.ToString("MMM dd, yyyy"),
-                Shipper = Constants.COMPANY_NAME + "\n" + Constants.COMPANY_ADDRESS1,
+                Shipper = DocumentConstants.COMPANY_NAME + "\n" + DocumentConstants.COMPANY_ADDRESS1,
                 Consignee = transaction.AgentName?.ToUpper() ?? string.Empty,
                 Contact = currentUser.UserName
             };

@@ -152,7 +152,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var houseBill in houseBills)
                 {
                     listCharges = Query(houseBill.Id, null);
-                    listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == Constants.CHARGE_OBH_TYPE) || x.PaymentObjectId == partnerId)).ToList();
+                    listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == DocumentConstants.CHARGE_OBH_TYPE) || x.PaymentObjectId == partnerId)).ToList();
                     if (!string.IsNullOrEmpty(cdNoteCode))
                     {
                         listCharges = listCharges.Where(x => (x.CreditNo == cdNoteCode || x.DebitNo == cdNoteCode)).ToList();
@@ -160,7 +160,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         listCharges = listCharges.Where(x =>
-                            x.Type == Constants.CHARGE_OBH_TYPE ?
+                            x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
                             (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo)  ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
@@ -186,7 +186,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var houseBill = opsTransRepository.Get(x => x.Id == id).FirstOrDefault();
                 listCharges = Query(houseBill.Hblid, null);
-                listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == Constants.CHARGE_OBH_TYPE) || x.PaymentObjectId == partnerId)).ToList();
+                listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == DocumentConstants.CHARGE_OBH_TYPE) || x.PaymentObjectId == partnerId)).ToList();
                 if (!string.IsNullOrEmpty(cdNoteCode))
                 {
                     listCharges = listCharges.Where(x => (x.CreditNo == cdNoteCode || x.DebitNo == cdNoteCode)).ToList();
@@ -194,7 +194,7 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     listCharges = listCharges.Where(x =>
-                            x.Type == Constants.CHARGE_OBH_TYPE ?
+                            x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
                             (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
@@ -249,7 +249,7 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.Unit = item.UnitNameEn;
                 charge.NameEn = item.ChargeNameEn;
                 charge.ExchangeRate = item.RateToLocal;
-                if(charge.Type == Constants.CHARGE_BUY_TYPE)
+                if(charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
                     charge.DebitCharge = catChargeRepository.Get(c => c.Id == charge.ChargeId).FirstOrDefault()?.DebitCharge;
                 }
@@ -315,12 +315,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 decimal totalLocal = item.Total * item.RateToLocal;
                 decimal totalUSD = item.Total * item.RateToUSD;
-                if (item.Type == Constants.CHARGE_BUY_TYPE)
+                if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
                     result.HouseBillTotalCharge.TotalBuyingLocal = result.HouseBillTotalCharge.TotalBuyingLocal + totalLocal;
                     result.HouseBillTotalCharge.TotalBuyingUSD = result.HouseBillTotalCharge.TotalBuyingUSD + totalUSD;
                 }
-                else if (item.Type == Constants.CHARGE_SELL_TYPE)
+                else if (item.Type == DocumentConstants.CHARGE_SELL_TYPE)
                 {
                     result.HouseBillTotalCharge.TotalSellingLocal = result.HouseBillTotalCharge.TotalSellingLocal + totalLocal;
                     result.HouseBillTotalCharge.TotalSellingUSD = result.HouseBillTotalCharge.TotalSellingUSD + totalUSD;

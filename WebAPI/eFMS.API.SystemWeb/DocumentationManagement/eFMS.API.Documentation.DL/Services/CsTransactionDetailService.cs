@@ -212,7 +212,7 @@ namespace eFMS.API.Documentation.DL.Services
             var transactionType = DataTypeEx.GetType(transactionTypeEnum);
             if (transactionType == TermData.AirImport || transactionType == TermData.AirExport)
             {
-                var hblNos = Get(x => x.Hwbno.Contains(Constants.CODE_ITL)).ToArray()
+                var hblNos = Get(x => x.Hwbno.Contains(DocumentConstants.CODE_ITL)).ToArray()
                     .OrderByDescending(o => o.DatetimeCreated)
                     .ThenByDescending(o => o.Hwbno)
                     .Select(s => s.Hwbno);
@@ -222,7 +222,7 @@ namespace eFMS.API.Documentation.DL.Services
                     foreach (var hbl in hblNos)
                     {
                         string _hbl = hbl;
-                        _hbl = _hbl.Substring(Constants.CODE_ITL.Length, _hbl.Length - Constants.CODE_ITL.Length);
+                        _hbl = _hbl.Substring(DocumentConstants.CODE_ITL.Length, _hbl.Length - DocumentConstants.CODE_ITL.Length);
                         Int32.TryParse(_hbl, out count);
                         if (count > 0)
                         {
@@ -978,11 +978,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var parameter = new ProofOfDeliveryReportParams();
-            parameter.CompanyName = Constants.COMPANY_NAME;
-            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
+            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
-            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
             parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
             parameter.CurrDecimalNo = 0; //set 0 temporary
@@ -1033,11 +1033,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var parameter = new ProofOfDeliveryReportParams();
-            parameter.CompanyName = Constants.COMPANY_NAME;
-            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
+            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
-            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
             parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
             parameter.CurrDecimalNo = 0; //set 0 temporary
@@ -1082,11 +1082,11 @@ namespace eFMS.API.Documentation.DL.Services
 
             var parameter = new AirDocumentReleaseReportParams();
             parameter.MAWB = data?.Mawb?.ToUpper();
-            parameter.CompanyName = Constants.COMPANY_NAME;
-            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
+            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
-            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
             parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
 
@@ -1208,25 +1208,25 @@ namespace eFMS.API.Documentation.DL.Services
             string _reportName = string.Empty;
             switch (reportType)
             {
-                case Constants.HBLOFLANDING_ITL:
+                case DocumentConstants.HBLOFLANDING_ITL:
                     _reportName = "SeaHBillofLadingITL.rpt";
                     break;
-                case Constants.HBLOFLANDING_ITL_FRAME:
+                case DocumentConstants.HBLOFLANDING_ITL_FRAME:
                     _reportName = "SeaHBillofLadingITLFrame.rpt";
                     break;
-                case Constants.HBLOFLANDING_FBL_FRAME:
+                case DocumentConstants.HBLOFLANDING_FBL_FRAME:
                     _reportName = "SeaHBillofLadingFBLFrame.rpt";
                     break;
-                case Constants.HBLOFLANDING_ITL_KESCO:
+                case DocumentConstants.HBLOFLANDING_ITL_KESCO:
                     _reportName = "SeaHBillofLadingITL_KESCO.rpt";
                     break;
-                case Constants.HBLOFLANDING_ITL_FRAME_KESCO:
+                case DocumentConstants.HBLOFLANDING_ITL_FRAME_KESCO:
                     _reportName = "SeaHBillofLadingITLFrame_Kesco.rpt";
                     break;
-                case Constants.HBLOFLANDING_ITL_SEKO:
+                case DocumentConstants.HBLOFLANDING_ITL_SEKO:
                     _reportName = "SeaHBillofLadingITL_Seko.rpt";
                     break;
-                case Constants.HBLOFLANDING_ITL_FRAME_SAMKIP:
+                case DocumentConstants.HBLOFLANDING_ITL_FRAME_SAMKIP:
                     _reportName = "SeaHBillofLadingITLFrame_SAMKIP.rpt";
                     break;
             }
@@ -1244,9 +1244,9 @@ namespace eFMS.API.Documentation.DL.Services
             result.AddDataSource(housebills);
             result.AddSubReport("Freightcharges", freightCharges);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            if (reportType == Constants.HBLOFLANDING_ITL
-                || reportType == Constants.HBLOFLANDING_ITL_FRAME
-                || reportType == Constants.HBLOFLANDING_ITL_SEKO)
+            if (reportType == DocumentConstants.HBLOFLANDING_ITL
+                || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME
+                || reportType == DocumentConstants.HBLOFLANDING_ITL_SEKO)
             {
                 var parameter = new SeaHBillofLadingReportParams1()
                 {
@@ -1257,9 +1257,9 @@ namespace eFMS.API.Documentation.DL.Services
                 result.SetParameter(parameter);
             }
 
-            if (reportType == Constants.HBLOFLANDING_ITL_KESCO
-                || reportType == Constants.HBLOFLANDING_ITL_FRAME_KESCO
-                || reportType == Constants.HBLOFLANDING_ITL_FRAME_SAMKIP)
+            if (reportType == DocumentConstants.HBLOFLANDING_ITL_KESCO
+                || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_KESCO
+                || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_SAMKIP)
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {
@@ -1374,10 +1374,10 @@ namespace eFMS.API.Documentation.DL.Services
             string _reportName = string.Empty;
             switch (reportType)
             {
-                case Constants.HOUSEAIRWAYBILLLASTEST_ITL:
+                case DocumentConstants.HOUSEAIRWAYBILLLASTEST_ITL:
                     _reportName = "HouseAirwayBillLastestITL.rpt";
                     break;
-                case Constants.HOUSEAIRWAYBILLLASTEST_ITL_FRAME:
+                case DocumentConstants.HOUSEAIRWAYBILLLASTEST_ITL_FRAME:
                     _reportName = "HouseAirwayBillLastestITLFrame.rpt";
                     break;
             }
@@ -1449,10 +1449,10 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = Constants.COMPANY_NAME,
-                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
-                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
-                Website = Constants.COMPANY_WEBSITE,
+                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
+                Website = DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
             result = new Crystal
@@ -1496,10 +1496,10 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = Constants.COMPANY_NAME,
-                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
-                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
-                Website = Constants.COMPANY_WEBSITE,
+                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
+                Website = DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
             result = new Crystal
