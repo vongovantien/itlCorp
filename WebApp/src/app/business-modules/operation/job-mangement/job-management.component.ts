@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Shipment, CustomDeclaration } from 'src/app/shared/models';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-job-mangement',
@@ -32,7 +33,8 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
         private _toastService: ToastrService,
-        private _operationRepo: OperationRepo
+        private _operationRepo: OperationRepo,
+        private _router: Router
     ) {
         super();
         this.requestSort = this.sortShipment;
@@ -128,7 +130,21 @@ export class JobManagementComponent extends AppList implements OnInit {
             );
 
     }
-
+    showDetail(id) {
+        this._documentRepo.checkViewDetailPermission(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this._router.navigate(['/home/operation/job-edit/', id]);
+                    } else {
+                        this._toastService.error("You don't have permission to view detail");
+                    }
+                },
+            );
+    }
     sortShipment() {
         if (!!this.shipments.length) {
             this.shipments = this.sortService.sort(this.shipments, this.sort, this.order);

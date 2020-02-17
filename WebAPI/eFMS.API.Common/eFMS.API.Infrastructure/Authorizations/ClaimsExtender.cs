@@ -1,14 +1,14 @@
-﻿using System;
+﻿using eFMS.IdentityServer.DL.IService;
+using Microsoft.AspNetCore.Authentication;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using eFMS.IdentityServer.DL.IService;
+using System.Linq;
 using IdentityModel;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace eFMS.API.Shipment.Infrastructure
+namespace eFMS.API.Infrastructure.Authorizations
 {
     public class ClaimsExtender : IClaimsTransformation
     {
@@ -23,7 +23,7 @@ namespace eFMS.API.Shipment.Infrastructure
             try
             {
                 string userID = principal.FindFirstValue("id");
-                
+
                 Guid officeId = new Guid(principal.Claims.Where(claim => claim.Type.Equals("officeId")).FirstOrDefault().Value);
                 List<Claim> lstClaim = new List<Claim>();
                 var lstPermissions = await _userpermissionService.GetPermission(userID, officeId);
@@ -33,7 +33,8 @@ namespace eFMS.API.Shipment.Infrastructure
                 }
                 principal.AddIdentity(new ClaimsIdentity(lstClaim, JwtBearerDefaults.AuthenticationScheme, "name", "role"));
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 string s = ex.Message;
             }
             //Add additional claims here.

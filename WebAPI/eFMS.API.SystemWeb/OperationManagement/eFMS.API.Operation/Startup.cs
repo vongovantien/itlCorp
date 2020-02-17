@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using static eFMS.API.Provider.Infrasture.Settings;
+using eFMS.API.Infrastructure;
 
 namespace eFMS.API.Operation
 {
@@ -47,6 +48,7 @@ namespace eFMS.API.Operation
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             ServiceRegister.Register(services, Configuration);
+            IdentityServiceRegister.IdentityRegister(services);
             services.AddCrossOrigin();
             services.AddApiVersioning(config =>
             {
