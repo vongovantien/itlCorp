@@ -3,6 +3,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -26,5 +27,6 @@ namespace eFMS.API.Documentation.DL.IService
         List<object> GetListTotalHB(Guid JobId);
         Crystal PreviewSIFFormPLsheet(Guid jobId, string currency);
         ResultHandle SyncHouseBills(Guid JobId,CsTransactionSyncHBLCriteria model);
+        ICurrentUser GetUserMenuPermissionTransaction(string transactionType);
     }
 }

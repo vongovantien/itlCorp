@@ -95,5 +95,47 @@ namespace eFMS.API.Documentation.DL.Common
             }
             return result;
         }
+
+        public static TransactionTypeEnum GetEnumType(string type)
+        {
+            TransactionTypeEnum result = 0;
+            if(type == TermData.InlandTrucking)
+            {
+                result = TransactionTypeEnum.InlandTrucking;
+            }
+            else if(type == TermData.AirExport)
+            {
+                result = TransactionTypeEnum.AirExport;
+            }
+            else if(type == TermData.AirImport)
+            {
+                result = TransactionTypeEnum.AirImport;
+            }
+            else if (type == TermData.SeaConsolExport)
+            {
+                result = TransactionTypeEnum.SeaConsolExport;
+            }
+            else if (type == TermData.SeaConsolImport)
+            {
+                result = TransactionTypeEnum.SeaConsolImport;
+            }
+            else if(type == TermData.SeaFCLExport)
+            {
+                result = TransactionTypeEnum.SeaFCLExport;
+            }
+            else if(type == TermData.SeaFCLImport)
+            {
+                result = TransactionTypeEnum.SeaFCLImport;
+            }
+            else if (type == TermData.SeaLCLExport)
+            {
+                result = TransactionTypeEnum.SeaLCLExport;
+            }
+            else if(type == TermData.SeaLCLImport)
+            {
+                result = TransactionTypeEnum.SeaLCLImport;
+            }
+            return result;
+        }
     }
 }

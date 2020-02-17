@@ -36,6 +36,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsDimensionDetailService dimensionDetailService;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysAuthorization> authorizationRepository;
+        private readonly ICsTransactionService transactionService;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -52,7 +53,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransactionDetail> csTransactiondetail,
             ICsMawbcontainerService contService, ICurrentUser user,
             ICsDimensionDetailService dimensionService,
-            IContextBase<SysAuthorization> authorizationRepo) : base(repository, mapper)
+            IContextBase<SysAuthorization> authorizationRepo,
+            ICsTransactionService transService) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -69,6 +71,7 @@ namespace eFMS.API.Documentation.DL.Services
             countryRepository = countryRepo;
             dimensionDetailService = dimensionService;
             authorizationRepository = authorizationRepo;
+            transactionService = transService;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -399,19 +402,23 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- LIST & PAGING HOUSEBILLS --
         public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
         {
-            var query = (from detail in DataContext.Get()
+            var shipment = csTransactionRepo.Get(x => x.Id == criteria.JobId).FirstOrDefault();
+            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
+            var houseBills = GetHouseBill(shipment.TransactionType);
+
+            var query = (from detail in houseBills//DataContext.Get()
                          join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                          join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                          from cus in customers.DefaultIfEmpty()
                          join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id.ToString() into salemans
                          from sale in salemans.DefaultIfEmpty()
                          select new { detail, tran, cus, sale });
-            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
+            //var transactionType = DataTypeEx.GetType(criteria.TransactionType);
             if (criteria.All == null)
             {
                 if (criteria.TypeFCL == "Export")
                 {
-                    query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
+                    query = query.Where(x => x.detail.JobId == criteria.JobId //|| criteria.JobId == null
                  && ((x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -423,7 +430,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
+                    query = query.Where(x => x.detail.JobId == criteria.JobId //|| criteria.JobId == null
                                          && ((x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                          && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                          && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -534,52 +541,13 @@ namespace eFMS.API.Documentation.DL.Services
                                                                         .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + " x" + ' ' + GetUnitNameById(s.PackageTypeId)) : string.Empty));
             });
             return results;
-        }
+        }     
 
-        private ICurrentUser GetUserMenuPermissionTransaction(TransactionTypeEnum transactionTypeEnum)
+        public IQueryable<CsTransactionDetail> GetHouseBill(string transactionType)
         {
-            ICurrentUser _user = null;
-            switch (transactionTypeEnum)
-            {
-                case TransactionTypeEnum.InlandTrucking:
-                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docInlandTrucking);
-                    break;
-                case TransactionTypeEnum.AirExport:
-                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docAirExport);
-                    break;
-                case TransactionTypeEnum.AirImport:
-                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docAirImport);
-                    break;
-                case TransactionTypeEnum.SeaConsolExport:
-                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaConsolExport);
-                    break;
-                case TransactionTypeEnum.SeaConsolImport:
-                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaConsolImport);
-                    break;
-                case TransactionTypeEnum.SeaFCLExport:
-                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLExport);
-                    break;
-                case TransactionTypeEnum.SeaFCLImport:
-                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);
-                    break;
-                case TransactionTypeEnum.SeaLCLExport:
-                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaLCLExport);
-                    break;
-                case TransactionTypeEnum.SeaLCLImport:
-                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaLCLImport);
-                    break;
-                default:
-                    _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);//Set default
-                    break;
-            }
-            return _user;
-        }
-
-        private IQueryable<CsTransactionDetail> GetHouseBill(string transactionType, TransactionTypeEnum transactionTypeEnum)
-        {
-            ICurrentUser _user = GetUserMenuPermissionTransaction(transactionTypeEnum);
+            ICurrentUser _user = transactionService.GetUserMenuPermissionTransaction(transactionType);
             PermissionRange rangeSearch = PermissionEx.GetPermissionRange(_user.UserMenuPermission.List);
-            var houseBills = csTransactionDetailRepo.Get();
+            var houseBills = DataContext.Get();
 
             List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
                                                                  && x.AssignTo == currentUser.UserID
@@ -630,8 +598,8 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<CsTransactionDetailModel> GetListHouseBillAscHBL(CsTransactionDetailCriteria criteria)
         {
             var transactionType = DataTypeEx.GetType(criteria.TransactionType);
-            var houseBills = GetHouseBill(transactionType, criteria.TransactionType);
-            var query = from detail in houseBills
+            var houseBills = GetHouseBill(transactionType);
+            var query = from detail in houseBills.Where(x => x.ParentId == null)
                         join surcharge in surchareRepository.Get() on detail.Id equals surcharge.Hblid into surchargeTrans
                         from surcharge in surchargeTrans.DefaultIfEmpty()
                         select new { detail, surcharge };
@@ -787,7 +755,9 @@ namespace eFMS.API.Documentation.DL.Services
 
         public object GetGoodSummaryOfAllHBLByJobId(Guid JobId)
         {
-            var houserbills = DataContext.Get(x => x.JobId == JobId);
+            var shipment = csTransactionRepo.Get(x => x.Id == JobId).FirstOrDefault();
+            var houseBills = GetHouseBill(shipment.TransactionType);
+            var houserbills = houseBills.Where(x => x.JobId == JobId && x.ParentId == null); ;//DataContext.Get(x => x.JobId == JobId);
             decimal? totalGW = 0;
             decimal? totalNW = 0;
             decimal? totalCW = 0;

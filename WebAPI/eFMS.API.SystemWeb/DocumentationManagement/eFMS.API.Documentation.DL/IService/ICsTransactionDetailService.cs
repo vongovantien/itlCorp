@@ -3,6 +3,7 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -22,6 +23,9 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState DeleteTransactionDetail(Guid hbId);
         //CsTransactionDetailReport GetReportBy(Guid jobId);
         List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria);
+        
+        IQueryable<CsTransactionDetail> GetHouseBill(string transactionType);
+
         IQueryable<CsTransactionDetailModel> GetListHouseBillAscHBL(CsTransactionDetailCriteria criteria);
         List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount);
         object GetGoodSummaryOfAllHBLByJobId(Guid jobId);

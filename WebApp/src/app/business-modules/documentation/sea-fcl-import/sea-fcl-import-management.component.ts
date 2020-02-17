@@ -39,6 +39,9 @@ export class SeaFCLImportManagementComponent extends AppList {
 
     _fromDate: Date = this.createMoment().startOf('month').toDate();
     _toDate: Date = this.createMoment().endOf('month').toDate();
+
+    jobIdSelected: string = null;
+
     constructor(
         private _router: Router,
         private _documentationRepo: DocumentationRepo,
@@ -112,7 +115,8 @@ export class SeaFCLImportManagementComponent extends AppList {
         this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
-    showHblList(jobId: string, index: number) {
+    getListHouseBill(jobId: string, index: number) {
+        this.jobIdSelected = jobId;
         if (this.tmpIndex === index) {
             this.housebills = this.tmpHouseBills;
         } else {
@@ -142,6 +146,7 @@ export class SeaFCLImportManagementComponent extends AppList {
         data.transactionType = this.transactionService;
         this.dataSearch = data;
         this.requestSearchShipment();
+        this.loadListHouseBillExpanding();
     }
 
     onResetMasterBills($event: any) {
@@ -151,6 +156,7 @@ export class SeaFCLImportManagementComponent extends AppList {
         $event.toDate = this._toDate;
         this.dataSearch = $event;
         this.requestSearchShipment();
+        this.loadListHouseBillExpanding();
     }
 
     sortMasterBills(sort: string): void {
@@ -199,5 +205,12 @@ export class SeaFCLImportManagementComponent extends AppList {
                     }
                 },
             );
+    }
+
+    loadListHouseBillExpanding(){ 
+        this.tmpIndex = -1; 
+        if(this.jobIdSelected !== null){
+            this.getListHouseBill(this.jobIdSelected,-2);
+        }         
     }
 }

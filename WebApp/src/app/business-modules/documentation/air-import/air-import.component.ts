@@ -34,6 +34,8 @@ export class AirImportComponent extends AppList {
     _fromDate: Date = this.createMoment().startOf('month').toDate();
     _toDate: Date = this.createMoment().endOf('month').toDate();
     
+    jobIdSelected: string = null;
+
     constructor(
         private _router: Router,
         private _toastService: ToastrService,
@@ -105,8 +107,9 @@ export class AirImportComponent extends AppList {
         this.houseBills = this._sortService.sort(this.houseBills, sortField, order);
     }
 
-    getListHouseBill(jobId: any, index: number) {
-        if (this.tmpIndex === index) {
+    getListHouseBill(jobId: any, index: number) { 
+        this.jobIdSelected = jobId;
+        if (this.tmpIndex === index) {            
             this.houseBills = this.tmpHouseBills;
         } else {
             this._progressRef.start();
@@ -125,16 +128,18 @@ export class AirImportComponent extends AppList {
     onSearchShipment($event: any) {
         $event.transactionType = this.transactionService;
         this.dataSearch = $event;
-        this.requestSearchShipment();
+        this.requestSearchShipment();        
+        this.loadListHouseBillExpanding();      
     }
 
-    onResetShipment($event: any){
+    onResetShipment($event: any){              
         this.page = 1;
         $event.transactionType = this.transactionService;
         $event.fromDate = this._fromDate;
         $event.toDate = this._toDate;
         this.dataSearch = $event;
         this.requestSearchShipment();
+        this.loadListHouseBillExpanding(); 
     }
 
     requestSearchShipment() {
@@ -179,5 +184,11 @@ export class AirImportComponent extends AppList {
     gotoCreateJob() {
         this._router.navigate(['home/documentation/air-import/new']);
     }
-
+    
+    loadListHouseBillExpanding(){ 
+        this.tmpIndex = -1; 
+        if(this.jobIdSelected !== null){
+            this.getListHouseBill(this.jobIdSelected,-2);
+        }         
+    }
 }
