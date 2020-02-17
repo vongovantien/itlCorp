@@ -15,17 +15,19 @@
                 </div>
             </div>
             <div class="col-md-8" *ngIf="!(isLocked | async)">
-                <div class="m--align-right">
-                    <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="saveOBHSurCharge()">
-                        <span>
-                            <i class="la la-save"></i>
+                <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
+                    <div class="m--align-right">
+                        <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="saveOBHSurCharge()">
                             <span>
-                                save
+                                <i class="la la-save"></i>
+                                <span>
+                                    save
+                                </span>
                             </span>
-                        </span>
-                    </button>
-                </div>
+                        </button>
+                    </div>
+                </ng-container>
             </div>
         </div>
         <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
@@ -39,8 +41,8 @@
                     <ng-container *ngIf="!!charges.length">
                         <tr *ngFor="let charge of charges  | filter: keyword: ['receiverName','payerName','chargeNameEn','invoiceNo','notes','invoiceNo','seriesNo','soano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
                             class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''">
-                            <td class="table-actions-col fixed-side">
-                                <div class="table-actions" *ngIf="!(isLocked | async)">
+                            <td class="table-actions-col fixed-side" *ngIf="!(isLocked | async)">
+                                <div class="table-actions" *ngIf="(permissionShipments | async).allowUpdateCharge">
                                     <button (click)="duplicate(i,'OBH')"
                                         class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                         title="Duplicate"><i class="la la-copy"></i>
@@ -289,12 +291,14 @@
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
                     </tr>
                     <tr *ngIf="!(isLocked | async)">
-                        <td colspan=1 class="fixed-side">
-                            <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"
-                                (click)="addCharge('OBH')">
-                                <i class="fa fa-plus-circle fa-2x"></i>
-                            </a>
-                        </td>
+                        <ng-container *ngIf="(permissionShipments | async).allowAddCharge">
+                            <td colspan=1 class="fixed-side">
+                                <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"
+                                    (click)="addCharge('OBH')">
+                                    <i class="fa fa-plus-circle fa-2x"></i>
+                                </a>
+                            </td>
+                        </ng-container>
                     </tr>
                 </tbody>
             </table>

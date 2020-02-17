@@ -170,7 +170,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             .subscribe(
                 (containers: any) => {
                     this.lstMasterContainers = containers || [];
-                    console.log(this.lstMasterContainers);
                 }
             );
     }
@@ -320,7 +319,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 finalize(() => this._progressRef.complete())
             ).subscribe(
                 (response: any) => {
-                    this.opsTransaction = response;
+                    this.opsTransaction = new OpsTransaction(response);
+                    console.log(response);
+                    console.log(this.opsTransaction);
+
                     if (this.opsTransaction != null) {
                         this.getListContainersOfJob();
                         if (this.opsTransaction != null) {

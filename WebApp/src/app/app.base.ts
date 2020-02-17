@@ -8,6 +8,7 @@ import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.
 import { ButtonType } from "./shared/enums/type-button.enum";
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil, skip } from "rxjs/operators";
 import moment from "moment/moment";
+import { PermissionShipment } from "./shared/models/document/permissionShipment";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
@@ -32,6 +33,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     isLoading: boolean | any = false;
     isCheckAll: boolean = false;
     isLocked: boolean | any = false;
+    permissionShipments: Observable<PermissionShipment>;
 
     _isShowAutoComplete = new BehaviorSubject<boolean>(false);
     $isShowAutoComplete: Observable<boolean> = this._isShowAutoComplete.asObservable();
