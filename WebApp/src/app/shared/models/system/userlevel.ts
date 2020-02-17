@@ -10,6 +10,10 @@ export class UserLevel {
     employeeNameVn: string = '';
     isDup: boolean = false;
     active: boolean = true;
+    groupName: string = null;
+    companyName: string = null;
+    departmentName: string = null;
+    officeName: string = null;
 
     constructor(data?: any) {
         let self = this;

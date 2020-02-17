@@ -152,5 +152,8 @@ namespace eFMS.API.System.DL.Common
 
         public static readonly string MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL = "MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL";
         public static readonly string MSG_ITEM_EXISTED_USER_ON_USER_LEVEL = "MSG_ITEM_EXISTED_USER_ON_USER_LEVEL";
+
+        public static readonly string MSG_ITEM_DUPLICATE_ROLE_ON_USER = "MSG_ITEM_DUPLICATE_ROLE_ON_USER";
+
     }
 }

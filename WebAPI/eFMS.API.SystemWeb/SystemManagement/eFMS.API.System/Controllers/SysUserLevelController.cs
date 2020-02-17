@@ -70,6 +70,20 @@ namespace eFMS.API.System.Controllers
         }
 
         /// <summary>
+        /// get by userid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetByUserId")]
+        public IActionResult GetByUserId(string  id)
+        {
+            var result = userLevelService.GetByUserId(id);
+            return Ok(result);
+        }
+
+
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="model"></param>

@@ -28,7 +28,8 @@ const routing: Routes = [
             },
             {
                 path: ':type/:ido/:idu', component: ShareSystemDetailPermissionComponent, data: { name: "UserPermission" }
-            }
+            },
+
         ]
     },
 ];

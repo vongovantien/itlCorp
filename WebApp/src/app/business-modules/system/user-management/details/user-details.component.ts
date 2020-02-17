@@ -8,6 +8,7 @@ import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { IAddUser } from '../addnew/user.addnew.component';
 import { User } from 'src/app/shared/models';
+import { UserLevel } from 'src/app/shared/models/system/userlevel';
 
 @Component({
     selector: 'app-user-details',
@@ -24,6 +25,7 @@ export class UserDetailsComponent extends AppPage {
         active: false,
     };
     userId: string = '';
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _router: Router,
@@ -41,6 +43,7 @@ export class UserDetailsComponent extends AppPage {
             if (param.id) {
                 this.userId = param.id;
                 this.getDetailUser(this.userId);
+                this.getListUserLevelByUserId();
             } else {
                 this._router.navigate(["home/system/office"]);
             }
@@ -85,6 +88,7 @@ export class UserDetailsComponent extends AppPage {
 
     }
 
+
     getDetailUser(id: string) {
         this._progressRef.start();
         this._systemRepo.getDetailUser(id)
@@ -120,6 +124,21 @@ export class UserDetailsComponent extends AppPage {
                 },
             );
 
+    }
+
+    getListUserLevelByUserId() {
+        this._systemRepo.getListUserLevelByUserId(this.userId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
+            ).subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.formAdd.userLevels = res;
+                        console.log('group', this.formAdd.userLevels);
+                    }
+                },
+            );
     }
 
 }

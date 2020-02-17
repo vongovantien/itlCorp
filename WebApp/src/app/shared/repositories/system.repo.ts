@@ -119,6 +119,33 @@ export class SystemRepo {
         );
     }
 
+    getListUserLevelByUserId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUserLevel/GetByUserId`, { id: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
+    getComboboxPermission() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysPermissionGeneral/GetDataCombobox`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
+    getListPermissionsByUserId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUserPermission/GetByUserId`, { id: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
     getListSystemUser(body: any = {}) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser`).pipe(
             catchError((error) => throwError(error)),
@@ -297,9 +324,13 @@ export class SystemRepo {
         );
     }
 
-    getUserPermission(userid: string, id, type: string) {
+    getUserPermission(userid: string, id: string, type: string) {
         if (type === 'office') {
             return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/GetBy`, { userId: userid, officeId: id }).pipe(
+                map((data: any) => data)
+            );
+        } else if (type === 'user') {
+            return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/${id}`).pipe(
                 map((data: any) => data)
             );
         }
@@ -388,6 +419,19 @@ export class SystemRepo {
             .pipe(
                 map((data: any) => data)
             );
+    }
+
+    deleteRole(id: string) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/${id}`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    addRoleToUser(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/Add`, body).pipe(
+            map((data: any) => data)
+        );
     }
 
 

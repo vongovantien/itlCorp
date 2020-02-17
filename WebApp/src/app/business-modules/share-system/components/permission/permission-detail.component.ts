@@ -33,6 +33,8 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
     id: string = '';
 
+    idUserPermission: string = '';
+
     cancelButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.cancel
     };
@@ -68,11 +70,16 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                         console.log(param.type);
                         this.type = param.type;
                         this.userId = param.idu;
+                        console.log('userid here', this.userId);
                         this.id = param.ido;
+                        this.idUserPermission = param.ido;
                     }
                 }),
-                switchMap(() => this.type === 'office' ? this._systemRepo.getUserPermission(this.userId, this.id, 'office') : this._systemRepo.getPermissionSample(this.permissionId)
-                    .pipe(catchError(this.catchError))
+                switchMap(() =>
+                    this.type === 'office' ? this._systemRepo.getUserPermission(this.userId, this.id, 'office')
+                        : this.type === 'user' ? this._systemRepo.getUserPermission(null, this.idUserPermission, 'user')
+                            : this._systemRepo.getPermissionSample(this.permissionId)
+                                .pipe(catchError(this.catchError))
                 )
             )
             .subscribe(
@@ -81,7 +88,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                     this.permissionSample = new PermissionSample(res);
                     console.log(this.permissionSample);
 
-                    if (this.type !== 'office') {
+                    if (this.type !== 'office' && this.type !== 'user') {
 
                         setTimeout(() => {
                             this.formCreateComponent.formCreate.setValue({
@@ -105,6 +112,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
     }
 
     updateUsersPermission() {
+        this._progressRef.start();
         this._systemRepo.updateUsersPermission(this.permissionSample)
             .pipe(
                 catchError(this.catchError),
@@ -116,12 +124,26 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                         this._toastService.success(res.message);
 
                         // * get detail
-                        this._systemRepo.getUserPermission(this.userId, this.id, 'office')
-                            .subscribe(
-                                (res: any) => {
-                                    this.permissionSample = new PermissionSample(res);
-                                }
-                            )
+                        if (this.type === 'office') {
+                            this._systemRepo.getUserPermission(this.userId, this.id, this.type)
+                                .subscribe(
+                                    (result: any) => {
+                                        if (!!result) {
+                                            this.permissionSample = new PermissionSample(result);
+                                        }
+                                    }
+                                );
+                        } else if (this.type === 'user') {
+                            this._systemRepo.getUserPermission(null, this.idUserPermission, this.type)
+                                .subscribe(
+                                    (result: any) => {
+                                        if (!!result) {
+                                            this.permissionSample = new PermissionSample(result);
+                                        }
+                                    }
+                                );
+                        }
+
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -158,7 +180,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
     onSavePermissionSample() {
         this.confirmPopup.hide();
-        if (this.type === 'office') {
+        if (this.type === 'office' || this.type === 'user') {
             this.updateUsersPermission();
         } else {
             this.formCreateComponent.isSubmitted = true;
@@ -193,6 +215,8 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
     backToDetail() {
         if (this.type === 'office') {
             this._router.navigate([`home/system/office/${this.id}`]);
+        } else if (this.type === 'user') {
+            this._router.navigate([`home/system/user-management/${this.userId}`]);
         }
     }
 

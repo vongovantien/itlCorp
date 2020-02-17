@@ -6,6 +6,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace eFMS.API.System.DL.IService
@@ -19,5 +20,7 @@ namespace eFMS.API.System.DL.IService
         HandleState Delete(Guid id);
         UserPermissionModel GetPermission(string userId, Guid officeId, string route);
         HandleState Update(SysUserPermissionModel entity);
+        IQueryable<SysUserPermissionModel> GetByUserId(string id);
+
     }
 }

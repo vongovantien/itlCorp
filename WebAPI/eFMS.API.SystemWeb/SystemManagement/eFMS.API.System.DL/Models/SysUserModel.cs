@@ -4,6 +4,8 @@ namespace eFMS.API.System.DL.Models
 {
     public class SysUserModel : SysUser
     {
+        public string EmployeeNameVn { get; set; }
+
         public SysEmployeeModel SysEmployeeModel { get; set; }
     }
 }

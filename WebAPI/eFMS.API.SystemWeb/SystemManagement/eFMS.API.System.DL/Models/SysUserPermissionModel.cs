@@ -11,12 +11,15 @@ namespace eFMS.API.System.DL.Models
         public string PermissionName { get; set; }
         public string UserTitle { get; set; }
         public string OfficeName { get; set; }
+        public string Name { get; set; }
+        public Guid Buid { get; set; }
         public List<SysUserPermissionGeneralViewModel> SysPermissionSampleGenerals { get; set; }
         public List<SysUserPermissionSpecialViewModel> SysPermissionSampleSpecials { get; set; }
     }
     
     public class SysUserPermissionEditModel
     {
+        public Guid? Id { get; set; }
         public Guid PermissionSampleId { get; set; }
         public string UserId { get; set; }
         public Guid OfficeId { get; set; }

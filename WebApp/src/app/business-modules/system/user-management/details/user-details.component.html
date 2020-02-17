@@ -7,13 +7,9 @@
             </div>
             <div class="col-6">
                 <div class="m--align-right">
-                    <button (click)="updateUser()" type="button"
-                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
-                        <span>
-                            <i class="la la-save"></i>
-                            <span> Save </span>
-                        </span>
-                    </button>
+
+                    <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="updateUser()">
+                    </app-default-button>
                     <button routerLink="/home/system/user-management" type="button"
                         class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
@@ -21,6 +17,7 @@
                             <span> Cancel </span>
                         </span>
                     </button>
+
                 </div>
             </div>
 

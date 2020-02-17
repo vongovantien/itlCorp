@@ -107,7 +107,7 @@ export class ShareSystemAddUserComponent extends AppList {
                 userId.push(prop);
             }
         }
-
+        console.log(userId);
         if (userId.length > 0) {
             this.userLevelTemp = this.checkDup(this.userLevelTemp, userId);
         } else {
