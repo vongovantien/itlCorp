@@ -40,6 +40,10 @@ namespace eFMS.API.Operation.Service.Models
         public short? CommodityGroupId { get; set; }
         public string LockedLog { get; set; }
         public bool? IsLocked { get; set; }
+        public short? GroupId { get; set; }
+        public int? DepartmentId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeCreated { get; set; }
