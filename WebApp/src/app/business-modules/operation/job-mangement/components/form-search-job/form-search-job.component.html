@@ -98,8 +98,9 @@
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                        [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" formControlName="serviceDate"
-                                        name="daterange" placeholder="From date - to date" readonly />
+                                        [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true"
+                                        formControlName="serviceDate" name="daterange" placeholder="From date - to date"
+                                        readonly />
                                 </div>
                             </div>
                         </div>
@@ -118,7 +119,7 @@
                             </a>
                         </div>
                         <div class="col-lg-6 m--align-right">
-                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                            <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                                 (click)="searchShipment()">
                                 <span>
                                     <i class="la la-search"></i>

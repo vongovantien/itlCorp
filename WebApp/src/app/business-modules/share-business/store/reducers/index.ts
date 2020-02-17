@@ -42,6 +42,7 @@ export const getTransactionDetailCsTransactionState = createSelector(shareBussin
 export const getTransactionListShipment = createSelector(shareBussinessState, (state: IShareBussinessState) => state.transaction.cstransactions);
 export const getTransationLoading = createSelector(shareBussinessState, (state: IShareBussinessState) => state.transaction.isLoading);
 export const getTransactionLocked = createSelector(shareBussinessState, (state: IShareBussinessState) => state.transaction.cstransaction.isLocked);
+export const getTransactionPermission = createSelector(shareBussinessState, (state: IShareBussinessState) => state.transaction.cstransaction.permission);
 
 export const getHBLSState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.houseBill.hbls);
 export const getDetailHBlState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.houseBill && state.houseBill.hbl);

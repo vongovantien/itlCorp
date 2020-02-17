@@ -58,9 +58,10 @@
                                         <h3 class="alert-block__title">Job Information</h3>
                                     </div>
                                     <div class="m-portlet__body" id="edit-ops-job-form">
-                                        <div class="form-actions m--align-right">
-                                            <button type="submit" appLoadingButton [state]="opsTransaction.isLocked"
-                                                class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                        <div class="form-actions m--align-right" *ngIf="!opsTransaction.isLocked">
+                                            <button type="submit"
+                                                class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                                *ngIf="opsTransaction.permission.allowUpdate">
                                                 <span>
                                                     <i class="la la la-save"></i>
                                                     <span>
@@ -590,10 +591,10 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-8">
-                                                    <div class="text-right">
-                                                        <div class="m--margin-bottom-15 m--margin-top-25">
-                                                            <button type="button" appLoadingButton
-                                                                [state]="opsTransaction.isLocked"
+                                                    <div class="text-right" *ngIf="!opsTransaction.isLocked">
+                                                        <div class="m--margin-bottom-15 m--margin-top-25"
+                                                            *ngIf="opsTransaction.permission.allowUpdate">
+                                                            <button type="button"
                                                                 class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                                                 (click)="showListContainer()">
                                                                 <span>

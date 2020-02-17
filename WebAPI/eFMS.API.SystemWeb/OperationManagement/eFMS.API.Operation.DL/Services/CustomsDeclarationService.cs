@@ -977,5 +977,27 @@ namespace eFMS.API.Operation.DL.Services
             var data = mapper.Map<List<CustomsDeclarationModel>>(query);
             return data;
         }
+
+        public HandleState Update(CustomsDeclarationModel model)
+        {
+            var permissionRange = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            int code = 200;
+            switch (permissionRange)
+            {
+                case PermissionRange.Owner:
+                    if (model.UserCreated != currentUser.UserID)
+                    {
+                        code = 403;
+                    }
+                    break;
+                default:
+                    code = 200;
+                    break;
+            }
+            if (code == 403) return new HandleState(403);
+            model.DatetimeModified = DateTime.Now;
+            model.UserModified = currentUser.UserID;
+            throw new NotImplementedException();
+        }
     }
 }

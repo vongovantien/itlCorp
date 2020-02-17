@@ -6,6 +6,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.NoSql;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Operation.DL.Common;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
@@ -29,6 +30,7 @@ namespace eFMS.API.Operation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
+    [Authorize]
     public class CustomsDeclarationController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
@@ -106,7 +108,7 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="pageNumber">page to retrieve data</param>
         /// <param name="pageSize">number items per page</param>
         /// <returns></returns>
-        [HttpPost("Paging")]
+        [AuthorizeEx(Menu.opsCustomClearance, UserPermission.List)]
         public IActionResult Paging(CustomsDeclarationCriteria criteria, int pageNumber, int pageSize)
         {
             var data = customsDeclarationService.Paging(criteria, pageNumber, pageSize, out int totalItems);
@@ -158,9 +160,7 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
-            model.DatetimeModified = DateTime.Now;
-            model.UserModified = currentUser.UserID;
-            var hs = customsDeclarationService.Update(model, x => x.Id == model.Id);
+            var hs = customsDeclarationService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

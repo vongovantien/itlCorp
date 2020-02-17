@@ -5,6 +5,7 @@ namespace eFMS.API.Operation.Service.Models
 {
     public partial class CsTransaction
     {
+
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
         public string JobNo { get; set; }
@@ -53,5 +54,9 @@ namespace eFMS.API.Operation.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string IssuedBy { get; set; }
+        public short? GroupId { get; set; }
+        public int? DepartmentId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }
