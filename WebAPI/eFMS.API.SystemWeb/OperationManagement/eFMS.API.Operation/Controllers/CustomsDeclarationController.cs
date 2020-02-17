@@ -108,7 +108,8 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="pageNumber">page to retrieve data</param>
         /// <param name="pageSize">number items per page</param>
         /// <returns></returns>
-        [AuthorizeEx(Menu.opsCustomClearance, UserPermission.List)]
+        [HttpPost("Paging")]
+        [AuthorizeEx(Menu.opsCustomClearance, UserPermission.AllowAccess)]
         public IActionResult Paging(CustomsDeclarationCriteria criteria, int pageNumber, int pageSize)
         {
             var data = customsDeclarationService.Paging(criteria, pageNumber, pageSize, out int totalItems);
@@ -181,6 +182,7 @@ namespace eFMS.API.Operation.Controllers
         public IActionResult Delete(int id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
+
             var hs = customsDeclarationService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -261,7 +263,10 @@ namespace eFMS.API.Operation.Controllers
         [HttpGet("GetById/{id}")]
         public IActionResult GetById(int id)
         {
-            var results = customsDeclarationService.GetById(id);
+            var statusCode = customsDeclarationService.CheckDetailPermission(id);
+            if (statusCode == 403) return Forbid();
+
+            var results = customsDeclarationService.GetDetail(id);
             return Ok(results);
         }
 
@@ -275,6 +280,7 @@ namespace eFMS.API.Operation.Controllers
         [Route("DeleteMultiple")]
         public IActionResult DeleteMultiple(List<CustomsDeclarationModel> customs)
         {
+            // TODO Validate list item was selected.
             var hs = customsDeclarationService.DeleteMultiple(customs);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
