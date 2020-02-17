@@ -93,9 +93,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetPartners")]
+        [Authorize]
         public List<CatPartner> GetPartners(Guid Id, bool IsHouseBillID)
         {
-
             return csShipmentSurchargeService.GetAllParner(Id, IsHouseBillID);
         }
 
@@ -119,6 +119,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="jobId"></param>
         /// <returns></returns>
         [HttpGet("GetshipmentProfit")]
+        [Authorize]
         public IActionResult GetshipmentProfit(Guid jobId)
         {
             var result = csShipmentSurchargeService.GetShipmentTotalProfit(jobId);
@@ -252,6 +253,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="jobId"></param>
         /// <returns></returns>
         [HttpGet("GetShipmentTotalProfit")]
+        [Authorize]
         public IActionResult GetShipmentTotalProfit(Guid jobId)
         {
             var result = csShipmentSurchargeService.GetShipmentTotalProfit(jobId);

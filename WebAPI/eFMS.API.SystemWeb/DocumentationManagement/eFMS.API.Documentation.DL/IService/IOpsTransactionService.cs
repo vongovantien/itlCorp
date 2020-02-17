@@ -19,13 +19,13 @@ namespace eFMS.API.Documentation.DL.IService
         //OpsTransactionModel GetBy(Guid id);
         int CheckDetailPermission(Guid id);
         OpsTransaction GetDetails(Guid id);
-        bool CheckAllowDelete(Guid jobId);
-        Crystal PreviewCDNOte(AcctCDNoteDetailsModel model);
+        bool CheckAllowDelete(Guid jobId);        
         HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
         HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
         HandleState SoftDeleteJob(Guid id);
         string CheckExist(OpsTransactionModel model);
         Crystal PreviewFormPLsheet(Guid id, string currency);
         HandleState Update(OpsTransactionModel model);
+        IQueryable<OpsTransaction> QueryByPermission(PermissionRange range);
     }
 }

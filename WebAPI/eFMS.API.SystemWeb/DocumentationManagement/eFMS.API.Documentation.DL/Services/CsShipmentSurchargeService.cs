@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -31,6 +32,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly IContextBase<CatCharge> catChargeRepository;
         private readonly ICurrentUser currentUser;
+        private readonly ICsTransactionDetailService transactionDetailService;
+        //private readonly IOpsTransactionService opsTransactionService;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
@@ -39,7 +42,10 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCurrencyExchange> currentExchangeRateRepo,
             IContextBase<CatCharge> catChargeRepo,
             IContextBase<CsTransaction> csTransactionRepo,
-            ICurrentUser currUser) : base(repository, mapper)
+            ICurrentUser currUser,
+            ICsTransactionDetailService transDetailService
+            //IOpsTransactionService opsTransService
+            ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             tranDetailRepository = tranDetailRepo;
@@ -49,6 +55,8 @@ namespace eFMS.API.Documentation.DL.Services
             csTransactionRepository = csTransactionRepo;
             currentUser = currUser;
             catChargeRepository = catChargeRepo;
+            transactionDetailService = transDetailService;
+            //opsTransactionService = opsTransService;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -82,7 +90,10 @@ namespace eFMS.API.Documentation.DL.Services
                 List<CatPartner> listPartners = new List<CatPartner>();
                 if (isHouseBillID == false)
                 {
-                    var houseBills = tranDetailRepository.Get(x => x.JobId == id);
+                    //var houseBills = tranDetailRepository.Get(x => x.JobId == id);
+                    var csShipment = csTransactionRepository.Get(x => x.Id == id)?.FirstOrDefault();
+                    var houseBillPermission = transactionDetailService.GetHouseBill(csShipment.TransactionType);
+                    var houseBills = houseBillPermission.Where(x => x.JobId == id && x.ParentId == null);
                     foreach (var housebill in houseBills)
                     {
                         List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
@@ -106,6 +117,9 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     var hblid = opsTransRepository.Get(x => x.Id == id).FirstOrDefault()?.Hblid;
+                    //PermissionRange rangeSearch = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.List);
+                    //var shipments = opsTransactionService.QueryByPermission(rangeSearch);
+                    //var hblid = shipments.Where(x => x.Id == id).FirstOrDefault()?.Hblid;
                     List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
 
                     listCharges = Query(hblid.Value, null);
@@ -420,10 +434,13 @@ namespace eFMS.API.Documentation.DL.Services
             opsShipments = opsTransRepository.Get(x => x.Id == jobId);
             if (opsShipments.Count() == 0)
             {
-                csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
+                csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();                
                 if (csShipment != null)
                 {
-                    hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
+                    var houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
+                    //hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
+                    //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
+                    hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
                                     new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
                 }
             }

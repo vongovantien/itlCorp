@@ -326,7 +326,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
-        private IQueryable<OpsTransaction> QueryByPermission(PermissionRange range)
+        public IQueryable<OpsTransaction> QueryByPermission(PermissionRange range)
         {
             IQueryable<OpsTransaction> data = null;
             List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID
@@ -457,48 +457,7 @@ namespace eFMS.API.Documentation.DL.Services
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
             return results.AsQueryable();
         }
-
-        public Crystal PreviewCDNOte(AcctCDNoteDetailsModel model)
-        {
-            if (model == null)
-            {
-                return null;
-            }
-            Crystal result = null;
-            var parameter = new AcctSOAReportParams
-            {
-                DBTitle = "DB title",
-                DebitNo = model.CDNote.Code,
-                TotalDebit = model.TotalDebit?.ToString(),
-                TotalCredit = model.TotalCredit?.ToString(),
-                DueToTitle = "",
-                DueTo = "",
-                DueToCredit = "",
-                SayWordAll = "",
-                CompanyName = "",
-                CompanyDescription="",
-                CompanyAddress1 = "",
-                CompanyAddress2 = "",
-                Website = "efms.itlvn.com",
-                IbanCode = "",
-                AccountName = "",
-                BankName = "",
-                SwiftAccs = "",
-                AccsUSD = "",
-                AccsVND = "",
-                BankAddress = "",
-                Paymentterms = "",
-                DecimalNo = null,
-                CurrDecimal = null,
-                IssueInv = "",
-                InvoiceInfo = "",
-                Contact = "",
-
-
-            };
-            return result;
-        }
-
+        
         private string SetProductServiceShipment(OpsTransactionClearanceModel model)
         {
             string productService = string.Empty;
