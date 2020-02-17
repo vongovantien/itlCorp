@@ -70,10 +70,15 @@
                                                             (click)="showCustomClearance(item.jobNo, i)">
                                                             <i class="la la-angle-up"></i>
                                                         </button>
-                                                        <button type="button"
+                                                        <!-- <button type="button"
                                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                             [routerLink]="['/home/operation/job-edit/' + item.id]"
                                                             title="Edit">
+                                                            <i class="la la-edit"></i>
+                                                        </button> -->
+                                                        <button type="button"
+                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            (click)="showDetail(item.id)" title="Edit">
                                                             <i class="la la-edit"></i>
                                                         </button>
                                                         <button type="button" *ngIf="item.isLocked"
@@ -88,7 +93,8 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <a [routerLink]="['/home/operation/job-edit/' + item.id]">{{ item.jobNo }}
+                                                    <a href="javascript:void(0)"
+                                                        (click)="showDetail(item.id)">{{ item.jobNo }}
                                                     </a>
                                                 </td>
                                                 <td>

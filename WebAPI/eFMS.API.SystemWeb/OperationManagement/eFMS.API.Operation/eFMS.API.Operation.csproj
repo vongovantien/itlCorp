@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\OpsTransactionController.cs" />
     <Compile Remove="Controllers\SysEmployeesController.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
     <Compile Remove="Resources\LanguageSub.cs" />
@@ -65,6 +66,9 @@
   <ItemGroup>
     <Reference Include="eFMS.API.Common">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.API.Infrastructure">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Operation.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Operation.DL.dll</HintPath>

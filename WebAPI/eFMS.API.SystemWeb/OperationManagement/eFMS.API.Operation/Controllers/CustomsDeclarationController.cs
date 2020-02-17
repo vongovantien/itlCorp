@@ -33,7 +33,6 @@ namespace eFMS.API.Operation.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICustomsDeclarationService customsDeclarationService;
-        private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
 
         /// <summary>
@@ -46,7 +45,6 @@ namespace eFMS.API.Operation.Controllers
         {
             stringLocalizer = localizer;
             customsDeclarationService = service;
-            cache = distributedCache;
             currentUser = user;
         }
 
@@ -134,7 +132,7 @@ namespace eFMS.API.Operation.Controllers
             model.DatetimeCreated = DateTime.Now;
             model.DatetimeModified = DateTime.Now;
             model.UserCreated = model.UserModified = currentUser.UserID;
-            model.Source = Constants.FromEFMS;
+            model.Source = OperationConstants.FromEFMS;
             var hs = customsDeclarationService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -142,7 +140,6 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(result);
             }
-            cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
             return Ok(result);
         }
 
@@ -170,7 +167,6 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(result);
             }
-            cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
             return Ok(result);
         }
 
@@ -192,7 +188,6 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(result);
             }
-            cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
             return Ok(result);
         }
 
@@ -205,10 +200,6 @@ namespace eFMS.API.Operation.Controllers
         public IActionResult ImportClearancesFromEcus()
         {
             var hs = customsDeclarationService.ImportClearancesFromEcus();
-            if (hs.Success)
-            {
-                cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
-            }
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -239,10 +230,6 @@ namespace eFMS.API.Operation.Controllers
         public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             var result = customsDeclarationService.UpdateJobToClearances(clearances);
-            if (result.Success)
-            {
-                cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
-            }
             return Ok(result);
         }
 
@@ -295,7 +282,6 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(result);
             }
-            cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
             return Ok(result);
         }
 
@@ -367,7 +353,7 @@ namespace eFMS.API.Operation.Controllers
                         ImportCountryCode = worksheet.Cells[row, 20].Value?.ToString(),
                         ExportCountryCode = worksheet.Cells[row, 21].Value?.ToString(),
 
-                        Source = Constants.FromEFMS,
+                        Source = OperationConstants.FromEFMS,
                         DatetimeModified = DateTime.Now,
                         UserModified = currentUser.UserID,
                         DatetimeCreated = DateTime.Now,

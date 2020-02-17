@@ -27,6 +27,7 @@
   <ItemGroup>
     <Compile Remove="Infrastructure\ErrorHandler\ErrorMessages.cs" />
     <Compile Remove="Infrastructure\ErrorHandler\IErrorHandler.cs" />
+    <Compile Remove="Services\OpsTransactionSevice.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +42,9 @@
   <ItemGroup>
     <Reference Include="eFMS.API.Common">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.API.Infrastructure">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Operation.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Operation.Service.dll</HintPath>
