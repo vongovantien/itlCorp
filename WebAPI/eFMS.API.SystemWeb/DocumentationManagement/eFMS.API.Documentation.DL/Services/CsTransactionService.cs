@@ -368,7 +368,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
                 ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
                 var permissionRange = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
-                int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange, job.TransactionType);
+                int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange);
                 if (code == 403) return new HandleState(403);
 
                 if (job == null)
@@ -414,7 +414,7 @@ namespace eFMS.API.Documentation.DL.Services
             var detail = GetById(id);
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
             var permissionRange = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = detail.PersonIncharge, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange, detail.TransactionType);
+            int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = detail.PersonIncharge, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
             return code;
         }
 
@@ -425,7 +425,13 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
                                                                  && x.Services.Contains(transactionType)
                                                                  )?.Select(x => x.UserId).ToList();
-            int code = PermissionEx.GetPermissionToUpdateShipmentDocument(model, permissionRange, currentUser, authorizeUserIds);
+            int code = PermissionEx.GetPermissionToUpdateShipmentDocumentation(model, permissionRange, currentUser, authorizeUserIds);
+            return code;
+        }
+
+        private int GetPermissionToDelete(ModelUpdate model, PermissionRange permissionRange)
+        {
+            int code = PermissionEx.GetPermissionToDeleteShipmentDocumentation(model, permissionRange, currentUser);
             return code;
         }
 

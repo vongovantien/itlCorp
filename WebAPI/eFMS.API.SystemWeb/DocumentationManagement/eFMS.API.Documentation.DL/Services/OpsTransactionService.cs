@@ -316,7 +316,7 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 var permissionRange = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Delete);
-                int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+                int code = GetPermissionToDelete(new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
                 if (code == 403) return false;
             }
             var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null));
@@ -652,7 +652,7 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 var permissionRange = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Delete);
-                int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = job.BillingOpsId, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange);
+                int code = GetPermissionToDelete(new ModelUpdate { BillingOpsId = job.BillingOpsId, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange);
                 if (code == 403) return new HandleState(403);
                 job.CurrentStatus = TermData.Canceled;
                 job.DatetimeModified = DateTime.Now;
@@ -852,6 +852,12 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  && x.Services.Contains("CL")
                                                                  )?.Select(x => x.UserId).ToList();
             int code = PermissionEx.GetPermissionToUpdate(model, permissionRange, currentUser, authorizeUserIds);
+            return code;
+        }
+
+        private int GetPermissionToDelete(ModelUpdate model, PermissionRange permissionRange)
+        {
+            int code = PermissionEx.GetPermissionToDelete(model, permissionRange, currentUser);
             return code;
         }
     }
