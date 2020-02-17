@@ -433,14 +433,17 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
                                                                  && x.Services.Contains(detail.TransactionType)
                                                                  )?.Select(x => x.UserId).ToList();
-            var permissionRangeWrite = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            var permissionRangeDelete = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
+
+            var permissionRangeWrite = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            var permissionRangeDelete = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
             detail.Permission = new PermissionAllowBase
             {
                 AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail),
                 AllowDelete = GetPermissionDetail(permissionRangeDelete, authorizeUserIds, detail)
             };
-            var specialActions = currentUser.UserMenuPermission.SpecialActions;
+            var specialActions = _currentUser.UserMenuPermission.SpecialActions;
             if (specialActions.Count > 0)
             {
                 if (specialActions.Any(x => x.Action.Contains("Lock")))
