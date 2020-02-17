@@ -33,6 +33,9 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
     id: string = '';
 
+    ids: string = '';
+
+
     idUserPermission: string = '';
 
     cancelButtonSetting: ButtonModalSetting = {
@@ -72,11 +75,12 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                         this.userId = param.idu;
                         console.log('userid here', this.userId);
                         this.id = param.ido;
+                        this.ids = param.ids;
                         this.idUserPermission = param.ido;
                     }
                 }),
                 switchMap(() =>
-                    this.type === 'office' ? this._systemRepo.getUserPermission(this.userId, this.id, 'office')
+                    this.type === 'office' || this.type === 'group' || this.type === 'department' || this.type === 'company' ? this._systemRepo.getUserPermission(this.userId, this.id, 'office')
                         : this.type === 'user' ? this._systemRepo.getUserPermission(null, this.idUserPermission, 'user')
                             : this._systemRepo.getPermissionSample(this.permissionId)
                                 .pipe(catchError(this.catchError))
@@ -84,27 +88,31 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
             )
             .subscribe(
                 (res: any) => {
+                    if (!!res) {
+                        this.permissionSample = new PermissionSample(res);
+                        console.log(this.permissionSample);
 
-                    this.permissionSample = new PermissionSample(res);
-                    console.log(this.permissionSample);
+                        if (this.type !== 'office' && this.type !== 'user') {
 
-                    if (this.type !== 'office' && this.type !== 'user') {
+                            setTimeout(() => {
+                                this.formCreateComponent.formCreate.setValue({
+                                    permissionName: this.permissionSample.name,
+                                    role: this.formCreateComponent.roles.filter(role => role.id === this.permissionSample.roleId)[0],
+                                    type: this.formCreateComponent.types.filter(type => type.value === this.permissionSample.type)[0],
+                                    status: this.formCreateComponent.statuss.filter(status => status.value === this.permissionSample.active)[0],
+                                });
 
-                        setTimeout(() => {
-                            this.formCreateComponent.formCreate.setValue({
-                                permissionName: this.permissionSample.name,
-                                role: this.formCreateComponent.roles.filter(role => role.id === this.permissionSample.roleId)[0],
-                                type: this.formCreateComponent.types.filter(type => type.value === this.permissionSample.type)[0],
-                                status: this.formCreateComponent.statuss.filter(status => status.value === this.permissionSample.active)[0],
-                            });
-
-                        }, 100);
-                    } else {
-                        if (this.permissionSample.id === "") {
-                            this._router.navigate([`home/system/office/${this.id}`]);
-                            this._toastService.error('This user does not have permission' || 'This user does not have permission', '');
+                            }, 100);
                         }
+
+
+                    } else {
+                        this.permissionSample = new PermissionSample();
                     }
+                    // if (this.permissionSample.id === "" && this.type === 'office') {
+                    //     this._router.navigate([`home/system/office/${this.id}`]);
+                    //     this._toastService.error('This user does not have permission' || 'This user does not have permission', '');
+                    // }
 
 
                 }
@@ -124,7 +132,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                         this._toastService.success(res.message);
 
                         // * get detail
-                        if (this.type === 'office') {
+                        if (this.type === 'office' || this.type === 'group' || this.type === 'department' || this.type === 'company') {
                             this._systemRepo.getUserPermission(this.userId, this.id, this.type)
                                 .subscribe(
                                     (result: any) => {
@@ -180,7 +188,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
     onSavePermissionSample() {
         this.confirmPopup.hide();
-        if (this.type === 'office' || this.type === 'user') {
+        if (this.type === 'office' || this.type === 'user' || this.type === 'deparment' || this.type === 'company') {
             this.updateUsersPermission();
         } else {
             this.formCreateComponent.isSubmitted = true;
@@ -217,6 +225,13 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
             this._router.navigate([`home/system/office/${this.id}`]);
         } else if (this.type === 'user') {
             this._router.navigate([`home/system/user-management/${this.userId}`]);
+        } else if (this.type === 'group') {
+            this._router.navigate([`home/system/group/${this.ids}`]);
+        } else if (this.type === 'department') {
+            this._router.navigate([`home/system/department/${this.ids}`]);
+        } else {
+            this._router.navigate([`home/system/company/${this.ids}`]);
+
         }
     }
 
