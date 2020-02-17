@@ -231,7 +231,12 @@ namespace eFMS.API.Operation.DL.Services
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
                                                                                     && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
                                                                                     && (x.DatetimeCreated <= criteria.ToImportDate || criteria.ToImportDate == null);
-            
+            var rangeSearch = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.List);
+            switch (rangeSearch)
+            {
+                case PermissionRange.Owner:
+                    break;
+            }
             if (criteria.ImPorted == true)
             {
                 query = query.And(x => x.JobNo != null);
