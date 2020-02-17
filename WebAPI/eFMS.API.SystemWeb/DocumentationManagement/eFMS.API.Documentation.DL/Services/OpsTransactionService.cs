@@ -150,7 +150,7 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetBy(id);
-            var permissionRange = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+            var permissionRange = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Detail);
             int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
             return code;
         }
@@ -168,7 +168,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return details;
         }
-        OpsTransaction IOpsTransactionService.GetDetails(Guid id)
+        public OpsTransactionModel GetDetails(Guid id)
         {
             var detail = GetBy(id);
             if (detail == null) return null;
@@ -326,10 +326,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
-        private IQueryable<OpsTransaction> QueryByPermission(PermissionRange range)
+        public IQueryable<OpsTransaction> QueryByPermission(PermissionRange range)
         {
             IQueryable<OpsTransaction> data = null;
             List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID
+                                                                 && x.Active == true
                                                                  && (x.EndDate.Value >= DateTime.Now.Date || x.EndDate == null)
                                                                  && x.Services.Contains("CL")
                                                                  )?.Select(x => x.UserId).ToList();
@@ -457,48 +458,7 @@ namespace eFMS.API.Documentation.DL.Services
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
             return results.AsQueryable();
         }
-
-        public Crystal PreviewCDNOte(AcctCDNoteDetailsModel model)
-        {
-            if (model == null)
-            {
-                return null;
-            }
-            Crystal result = null;
-            var parameter = new AcctSOAReportParams
-            {
-                DBTitle = "DB title",
-                DebitNo = model.CDNote.Code,
-                TotalDebit = model.TotalDebit?.ToString(),
-                TotalCredit = model.TotalCredit?.ToString(),
-                DueToTitle = "",
-                DueTo = "",
-                DueToCredit = "",
-                SayWordAll = "",
-                CompanyName = "",
-                CompanyDescription="",
-                CompanyAddress1 = "",
-                CompanyAddress2 = "",
-                Website = "efms.itlvn.com",
-                IbanCode = "",
-                AccountName = "",
-                BankName = "",
-                SwiftAccs = "",
-                AccsUSD = "",
-                AccsVND = "",
-                BankAddress = "",
-                Paymentterms = "",
-                DecimalNo = null,
-                CurrDecimal = null,
-                IssueInv = "",
-                InvoiceInfo = "",
-                Contact = "",
-
-
-            };
-            return result;
-        }
-
+        
         private string SetProductServiceShipment(OpsTransactionClearanceModel model)
         {
             string productService = string.Empty;
@@ -887,7 +847,8 @@ namespace eFMS.API.Documentation.DL.Services
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange)
         {
             List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID
-                                                                 && x.EndDate.Value >= DateTime.Now.Date
+                                                                 && x.Active == true
+                                                                 && (x.EndDate.Value >= DateTime.Now.Date || x.EndDate == null)
                                                                  && x.Services.Contains("CL")
                                                                  )?.Select(x => x.UserId).ToList();
             int code = PermissionEx.GetPermissionToUpdate(model, permissionRange, currentUser, authorizeUserIds);

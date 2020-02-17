@@ -118,6 +118,8 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.Commodity).HasMaxLength(1600);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.CurrentStatus)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -129,6 +131,8 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.DatetimeModified)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
                 entity.Property(e => e.DesOfGoods).HasMaxLength(1600);
 
@@ -145,6 +149,8 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.FlightVesselName).HasMaxLength(4000);
 
                 entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.Hw)
                     .HasColumnName("HW")
@@ -178,6 +184,8 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Notes).HasMaxLength(4000);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PackageContainer).HasMaxLength(1600);
 
@@ -275,6 +283,8 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.Commodity).HasMaxLength(1600);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.ConsigneeDescription).HasMaxLength(500);
 
                 entity.Property(e => e.ConsigneeId)
@@ -317,6 +327,8 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.DeliveryOrderPrintedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.DeliveryPlace).HasMaxLength(500);
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
                 entity.Property(e => e.DesOfGoods).HasMaxLength(1600);
 
@@ -402,6 +414,8 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
                 entity.Property(e => e.HandingInformation).HasMaxLength(250);
 
                 entity.Property(e => e.Hbltype)
@@ -469,6 +483,8 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.OceanVessel).HasMaxLength(500);
 
                 entity.Property(e => e.OceanVoyNo).HasMaxLength(800);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.OnBoardStatus).HasMaxLength(4000);
 
@@ -620,6 +636,8 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.ConvertTime).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeCreated)
@@ -629,6 +647,8 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.DatetimeModified)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
                 entity.Property(e => e.DocumentType)
                     .HasMaxLength(50)
@@ -645,6 +665,8 @@ namespace eFMS.API.Operation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.Hblid)
                     .HasColumnName("HBLID")
@@ -669,6 +691,8 @@ namespace eFMS.API.Operation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PartnerTaxCode)
                     .HasMaxLength(50)
@@ -780,6 +804,8 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.ContainerDescription).HasMaxLength(200);
 
                 entity.Property(e => e.CurrentStatus)
@@ -799,6 +825,8 @@ namespace eFMS.API.Operation.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
                 entity.Property(e => e.FieldOpsId)
                     .HasColumnName("FieldOpsID")
                     .HasMaxLength(200);
@@ -806,6 +834,8 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.FinishDate).HasColumnType("datetime");
 
                 entity.Property(e => e.FlightVessel).HasMaxLength(200);
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
@@ -826,6 +856,8 @@ namespace eFMS.API.Operation.Service.Models
                     .HasColumnName("MBLNO")
                     .HasMaxLength(200)
                     .IsUnicode(false);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PackageTypeId).HasColumnName("PackageTypeID");
 
@@ -1024,8 +1056,6 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.WorkPlaceId).HasColumnName("WorkPlaceID");
             });
 
             modelBuilder.Entity<SysUser>(entity =>

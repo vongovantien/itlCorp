@@ -23,5 +23,6 @@ namespace eFMS.API.Operation.DL.IService
         List<CustomClearanceImportModel> CheckValidImport(List<CustomClearanceImportModel> list);
         HandleState Import(List<CustomsDeclarationModel> data);
         List<CustomsDeclarationModel> GetCustomsShipmentNotLocked();
+        HandleState Update(CustomsDeclarationModel model);
     }
 }

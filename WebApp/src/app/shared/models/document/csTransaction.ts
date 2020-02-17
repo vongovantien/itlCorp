@@ -2,6 +2,7 @@ import { Container } from "src/app/shared/models/document/container.model";
 import { CsTransactionDetail } from "src/app/shared/models/document/csTransactionDetail";
 import { TransactionTypeEnum } from "../../enums/transaction-type.enum";
 import { DIM } from "./dimension";
+import { PermissionShipment } from "./permissionShipment";
 
 export class CsTransaction {
     id: string = "00000000-0000-0000-0000-000000000000";
@@ -76,6 +77,8 @@ export class CsTransaction {
     dimensionDetails: DIM[] = [];
     issuedBy: string = null;
     route: string = null;
+
+    permission: PermissionShipment = new PermissionShipment();
 
     constructor(object?: any) {
         const self = this;

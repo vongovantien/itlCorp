@@ -88,6 +88,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             );
 
         this.isLocked = this._store.select(fromStore.getTransactionLocked);
+        this.permissionShipments = this._store.select(fromStore.getTransactionPermission);
     }
 
     getSurcharge() {
