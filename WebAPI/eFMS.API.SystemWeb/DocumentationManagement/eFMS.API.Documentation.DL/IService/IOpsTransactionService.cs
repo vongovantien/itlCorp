@@ -18,7 +18,7 @@ namespace eFMS.API.Documentation.DL.IService
         OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount);
         //OpsTransactionModel GetBy(Guid id);
         int CheckDetailPermission(Guid id);
-        OpsTransaction GetDetails(Guid id);
+        OpsTransactionModel GetDetails(Guid id);
         bool CheckAllowDelete(Guid jobId);        
         HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
         HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
