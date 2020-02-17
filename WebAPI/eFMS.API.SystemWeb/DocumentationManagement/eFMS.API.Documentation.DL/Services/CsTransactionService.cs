@@ -366,6 +366,11 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
+                ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
+                var permissionRange = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+                int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange, job.TransactionType);
+                if (code == 403) return new HandleState(403);
+
                 if (job == null)
                 {
                     hs = new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
