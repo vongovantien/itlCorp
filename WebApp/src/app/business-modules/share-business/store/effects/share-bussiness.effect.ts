@@ -11,6 +11,7 @@ import {
     TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction, TransactionLoadListSuccessAction, TransactionLoadListFailAction, GetListHBLSuccessAction, GetListHBLFailAction, DimensionActionTypes, GetDimensionSuccessAction, GetDimensionFailAction
 } from "../actions";
 import { ITransactionProfit } from "../reducers";
+import { CsTransaction } from "@models";
 
 @Injectable()
 export class ShareBussinessEffects {
@@ -36,14 +37,14 @@ export class ShareBussinessEffects {
         );
 
     @Effect()
-    getDetailSeaFCLImportEffect$: Observable<Action> = this.actions$.
+    getDetailShipmentEffect$: Observable<Action> = this.actions$.
         pipe(
             ofType<TransactionActions>(TransactionActionTypes.GET_DETAIL),
             map((payload: any) => payload.payload),
             mergeMap(
                 (id: string) => this._documentRepo.getDetailTransaction(id)
                     .pipe(
-                        map((data: any) => new TransactionGetDetailSuccessAction(data)),
+                        map((data: any) => new TransactionGetDetailSuccessAction(new CsTransaction(data))),
                         catchError(err => of(new TransactionGetDetailFailAction(err)))
                     )
             )
