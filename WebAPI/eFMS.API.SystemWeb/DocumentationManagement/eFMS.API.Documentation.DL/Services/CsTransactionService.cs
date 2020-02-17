@@ -405,54 +405,11 @@ namespace eFMS.API.Documentation.DL.Services
         }
         #endregion -- DETAILS --
 
-        #region -- LIST & PAGING --
-        public ICurrentUser GetUserMenuPermissionTransaction(string transactionType)
-        {
-            ICurrentUser _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);//Set default
-
-            if (transactionType == TermData.InlandTrucking)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docInlandTrucking);
-            }
-            else if (transactionType == TermData.AirExport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docAirExport);
-            }
-            else if (transactionType == TermData.AirImport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docAirImport);
-            }
-            else if (transactionType == TermData.SeaConsolExport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaConsolExport);
-            }
-            else if (transactionType == TermData.SeaConsolImport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaConsolImport);
-            }
-            else if (transactionType == TermData.SeaFCLExport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLExport);
-            }
-            else if (transactionType == TermData.SeaFCLImport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);
-            }
-            else if (transactionType == TermData.SeaLCLExport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaLCLExport);
-            }
-            else if (transactionType == TermData.SeaLCLImport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaLCLImport);
-            }
-
-            return _user;
-        }
+        #region -- LIST & PAGING --       
 
         private IQueryable<CsTransactionModel> GetTransaction(string transactionType)
         {
-            ICurrentUser _user = GetUserMenuPermissionTransaction(transactionType);
+            ICurrentUser _user = PermissionEx.GetUserMenuPermissionTransaction(transactionType, currentUser);
 
             PermissionRange rangeSearch = PermissionEx.GetPermissionRange(_user.UserMenuPermission.List);
 

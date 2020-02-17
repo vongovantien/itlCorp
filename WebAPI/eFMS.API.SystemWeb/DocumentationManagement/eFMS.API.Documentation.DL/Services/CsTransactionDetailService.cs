@@ -36,7 +36,6 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsDimensionDetailService dimensionDetailService;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysAuthorization> authorizationRepository;
-        private readonly ICsTransactionService transactionService;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -53,8 +52,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransactionDetail> csTransactiondetail,
             ICsMawbcontainerService contService, ICurrentUser user,
             ICsDimensionDetailService dimensionService,
-            IContextBase<SysAuthorization> authorizationRepo,
-            ICsTransactionService transService) : base(repository, mapper)
+            IContextBase<SysAuthorization> authorizationRepo) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -71,7 +69,6 @@ namespace eFMS.API.Documentation.DL.Services
             countryRepository = countryRepo;
             dimensionDetailService = dimensionService;
             authorizationRepository = authorizationRepo;
-            transactionService = transService;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -545,7 +542,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public IQueryable<CsTransactionDetail> GetHouseBill(string transactionType)
         {
-            ICurrentUser _user = transactionService.GetUserMenuPermissionTransaction(transactionType);
+            ICurrentUser _user = PermissionEx.GetUserMenuPermissionTransaction(transactionType, currentUser);
             PermissionRange rangeSearch = PermissionEx.GetPermissionRange(_user.UserMenuPermission.List);
             var houseBills = DataContext.Get();
 

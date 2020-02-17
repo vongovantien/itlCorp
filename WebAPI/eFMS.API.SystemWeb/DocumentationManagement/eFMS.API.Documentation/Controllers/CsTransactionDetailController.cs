@@ -192,6 +192,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpPost("QueryData")]
+        [Authorize]
         public IActionResult QueryData(CsTransactionDetailCriteria criteria)
         {
             var data = csTransactionDetailService.Query(criteria);
@@ -199,6 +200,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpPost("GetListHouseBillAscHBL")]
+        [Authorize]
         public IActionResult GetListHouseBillAscHBL(CsTransactionDetailCriteria criteria)
         {
             var data = csTransactionDetailService.GetListHouseBillAscHBL(criteria);
@@ -207,6 +209,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost]
         [Route("Paging")]
+        [Authorize]
         public IActionResult Paging(CsTransactionDetailCriteria criteria, int page, int size)
         {
             var data = csTransactionDetailService.Paging(criteria, page, size, out int rowCount);

@@ -90,6 +90,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Query")]
+        [Authorize]
         public IActionResult Query(CsTransactionCriteria criteria)
         {
             return Ok(csTransactionService.Query(criteria));
