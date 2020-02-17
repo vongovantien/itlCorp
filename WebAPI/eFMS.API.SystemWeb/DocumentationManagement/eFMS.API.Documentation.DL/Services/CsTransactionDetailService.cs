@@ -36,6 +36,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsDimensionDetailService dimensionDetailService;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysAuthorization> authorizationRepository;
+        private readonly ICsTransactionService transactionService;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -52,7 +53,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransactionDetail> csTransactiondetail,
             ICsMawbcontainerService contService, ICurrentUser user,
             ICsDimensionDetailService dimensionService,
-            IContextBase<SysAuthorization> authorizationRepo) : base(repository, mapper)
+            IContextBase<SysAuthorization> authorizationRepo,
+            ICsTransactionService transService) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -69,6 +71,7 @@ namespace eFMS.API.Documentation.DL.Services
             countryRepository = countryRepo;
             dimensionDetailService = dimensionService;
             authorizationRepository = authorizationRepo;
+            transactionService = transService;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -538,55 +541,11 @@ namespace eFMS.API.Documentation.DL.Services
                                                                         .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + " x" + ' ' + GetUnitNameById(s.PackageTypeId)) : string.Empty));
             });
             return results;
-        }
+        }     
 
-        private ICurrentUser GetUserMenuPermissionTransaction(string transactionType)
+        public IQueryable<CsTransactionDetail> GetHouseBill(string transactionType)
         {
-            ICurrentUser _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);//Set default
-
-            if (transactionType == TermData.InlandTrucking)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docInlandTrucking);
-            }
-            else if (transactionType == TermData.AirExport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docAirExport);
-            }
-            else if (transactionType == TermData.AirImport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docAirImport);
-            }
-            else if (transactionType == TermData.SeaConsolExport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaConsolExport);
-            }
-            else if (transactionType == TermData.SeaConsolImport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaConsolImport);
-            }
-            else if (transactionType == TermData.SeaFCLExport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLExport);
-            }
-            else if (transactionType == TermData.SeaFCLImport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);
-            }
-            else if (transactionType == TermData.SeaLCLExport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaLCLExport);
-            }
-            else if (transactionType == TermData.SeaLCLImport)
-            {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaLCLImport);
-            }
-
-            return _user;
-        }
-
-        private IQueryable<CsTransactionDetail> GetHouseBill(string transactionType)
-        {
-            ICurrentUser _user = GetUserMenuPermissionTransaction(transactionType);
+            ICurrentUser _user = transactionService.GetUserMenuPermissionTransaction(transactionType);
             PermissionRange rangeSearch = PermissionEx.GetPermissionRange(_user.UserMenuPermission.List);
             var houseBills = DataContext.Get();
 
