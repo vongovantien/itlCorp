@@ -42,12 +42,14 @@ export class OpsTransaction {
         agentName: string = null;
         podName: string = null;
         polName: string = null;
-        packageTypeId: null;
+        packageTypeId: number = null;
         csMawbcontainers: Container[] = null;
         containerDescription: string = '';
         commodityGroupId: string = '';
         isLocked: boolean = false;
-        permission: PermissionShipment;
+
+        permission: PermissionShipment = new PermissionShipment();
+
 
         constructor(object?: any) {
                 const self = this;

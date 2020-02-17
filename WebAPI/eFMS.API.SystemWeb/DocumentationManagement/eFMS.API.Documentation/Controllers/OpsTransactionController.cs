@@ -75,7 +75,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult CheckDetailPermission(Guid id)
         {
             var result = transactionService.CheckDetailPermission(id);
-            if (result == 403) return Ok(false);
+            if (result == 403) return Forbid();
             return Ok(true);
         }
 
@@ -87,6 +87,9 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet]
         public IActionResult Get(Guid id)
         {
+            var statusCode = transactionService.CheckDetailPermission(id);
+            if (statusCode == 403) return Forbid();
+
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
             return Ok(result);
         }
