@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Diagnostics.Contracts;
+using eFMS.API.Infrastructure.Models;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -172,11 +173,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = GetBy(id);
             if (detail == null) return null;
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID
-                                                                 && (x.Active == true)
-                                                                 && (x.EndDate.Value >= DateTime.Now.Date || x.EndDate == null)
-                                                                 && x.Services.Contains("CL")
-                                                                 )?.Select(x => x.UserId).ToList();
+            List<string> authorizeUserIds = GetAuthorizedShipment();
             var permissionRangeWrite = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Write);
             var permissionRangeDelete = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Delete);
             detail.Permission = new PermissionAllowBase
@@ -329,10 +326,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<OpsTransaction> QueryByPermission(PermissionRange range)
         {
             IQueryable<OpsTransaction> data = null;
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID
-                                                                 && (x.EndDate.Value >= DateTime.Now.Date || x.EndDate == null)
-                                                                 && x.Services.Contains("CL")
-                                                                 )?.Select(x => x.UserId).ToList();
+            List<string> authorizeUserIds = GetAuthorizedShipment();
             switch (range)
             {
                 case PermissionRange.All:
@@ -886,12 +880,18 @@ namespace eFMS.API.Documentation.DL.Services
         }
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange)
         {
+            List<string> authorizeUserIds = GetAuthorizedShipment();
+            int code = PermissionEx.GetPermissionItemOpsToUpdate(model, permissionRange, currentUser, authorizeUserIds);
+            return code;
+        }
+        private List<string> GetAuthorizedShipment()
+        {
             List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID
-                                                                 && x.EndDate.Value >= DateTime.Now.Date
+                                                                 && (x.Active == true)
+                                                                 && (x.EndDate.Value >= DateTime.Now.Date || x.EndDate == null)
                                                                  && x.Services.Contains("CL")
                                                                  )?.Select(x => x.UserId).ToList();
-            int code = PermissionEx.GetPermissionToUpdate(model, permissionRange, currentUser, authorizeUserIds);
-            return code;
+            return authorizeUserIds;
         }
     }
 }

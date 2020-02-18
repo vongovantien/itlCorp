@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace eFMS.API.Infrastructure
+namespace eFMS.API.Infrastructure.Models
 {
-    public class ModelUpdate
+    public class BaseUpdateModel
     {
         public string UserCreated { get; set; }
-        public string BillingOpsId { get; set; }
         public short? GroupId { get; set; }
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }

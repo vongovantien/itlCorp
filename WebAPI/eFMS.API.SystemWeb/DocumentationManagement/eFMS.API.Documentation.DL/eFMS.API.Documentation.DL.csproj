@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\PermissionAllowBase.cs" />
     <Compile Remove="Models\ReportResults\OCLContainerReportResult.cs" />
   </ItemGroup>
 
@@ -39,6 +40,9 @@
     </Reference>
     <Reference Include="eFMS.API.Documentation.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Documentation.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.API.Infrastructure">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.IdentityServer.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>

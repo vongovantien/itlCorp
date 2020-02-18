@@ -109,6 +109,7 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="pageSize">number items per page</param>
         /// <returns></returns>
         [AuthorizeEx(Menu.opsCustomClearance, UserPermission.List)]
+        [HttpPost("Paging")]
         public IActionResult Paging(CustomsDeclarationCriteria criteria, int pageNumber, int pageSize)
         {
             var data = customsDeclarationService.Paging(criteria, pageNumber, pageSize, out int totalItems);

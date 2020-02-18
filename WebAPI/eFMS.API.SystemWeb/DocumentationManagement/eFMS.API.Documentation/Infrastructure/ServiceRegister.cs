@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Authentication;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.Services;
 using eFMS.IdentityServer.Service.Models;
+using eFMS.API.Infrastructure.Authorizations;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -43,7 +44,6 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             
-            //services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ITerminologyService, TerminologyService>();
             services.AddTransient<ICsTransactionService, CsTransactionService>();
             services.AddTransient<ICsTransactionDetailService, CsTransactionDetailService>();
@@ -57,8 +57,6 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICsArrivalFrieghtChargeService, CsArrivalFrieghtChargeService>();
             services.AddTransient<ICsDimensionDetailService, CsDimensionDetailService>();
             services.AddSingleton<ISysImageService, SysImageService>();
-            services.AddTransient<IClaimsTransformation, ClaimsExtender>();
-            //services.AddTransient<IClaimsExtender, ClaimsExtender>();
 
             services.AddUserManager();
         }

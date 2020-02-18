@@ -44,9 +44,9 @@ namespace eFMS.API.Documentation.DL.Common
             }
             return result;
         }
-        public static int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser, List<string> authorizeUserIds)
+        public static int GetPermissionItemOpsToUpdate(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser, List<string> authorizeUserIds)
         {
-            int code = 0;
+            int code = 200;
             switch (permissionRange)
             {
                 case PermissionRange.Owner:
@@ -56,14 +56,14 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Group:
-                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID)
                         && !authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && !authorizeUserIds.Contains(model.BillingOpsId))
+                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 403;
                     }
