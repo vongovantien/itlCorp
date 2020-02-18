@@ -342,7 +342,7 @@ namespace eFMS.API.System.DL.Services
                 List = generalPermission.List,
                 Import = generalPermission.Import,
                 Export = generalPermission.Export,
-                AllowAdd = generalPermission.Write == "None"?false: true,
+                //AllowAdd = generalPermission.Write == "None"?false: true,
                 SpecialActions = specialPermissions?.Select(x => new SpecialAction
                 {
                     Action = x.ActionName,
