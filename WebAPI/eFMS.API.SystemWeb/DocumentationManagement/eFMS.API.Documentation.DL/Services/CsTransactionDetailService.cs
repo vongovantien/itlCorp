@@ -75,7 +75,8 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState AddTransactionDetail(CsTransactionDetailModel model)
         {
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-           
+            if (permissionRangeWrite == PermissionRange.None) return new HandleState(403);
+
             if (model.CsMawbcontainers?.Count > 0)
             {
                 var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, model.Id);
