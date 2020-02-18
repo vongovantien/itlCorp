@@ -15,6 +15,7 @@ using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Infrastructure.Models;
+using eFMS.API.Infrastructure.Extensions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -367,7 +368,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = GetById(id);
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
-            var permissionRange = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
+            var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
             int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = detail.SaleManId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange, detail.TransactionType);
             return code;
         }
@@ -383,8 +384,8 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  )?.Select(x => x.UserId).ToList();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
-            var permissionRangeWrite = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            var permissionRangeDelete = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
             detail.Permission = new PermissionAllowBase
             {
                 AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
@@ -665,7 +666,7 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<CsTransactionDetail> GetHouseBill(string transactionType)
         {
             ICurrentUser _user = PermissionEx.GetUserMenuPermissionTransaction(transactionType, currentUser);
-            PermissionRange rangeSearch = PermissionEx.GetPermissionRange(_user.UserMenuPermission.List);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             var houseBills = DataContext.Get();
 
             List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true

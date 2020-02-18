@@ -1,4 +1,5 @@
 ﻿using eFMS.IdentityServer.DL.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using eFMS.IdentityServer.Service.Models;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,6 @@ namespace eFMS.IdentityServer.DL.IService
     {
         List<UserPermissionModel> Get(string userId, Guid officeId);
         Task<List<string>> GetPermission(string userId, Guid officeId);
-
+        List<string> GetAuthorizedIds(string transactionType, ICurrentUser currentUser);
     }
 }

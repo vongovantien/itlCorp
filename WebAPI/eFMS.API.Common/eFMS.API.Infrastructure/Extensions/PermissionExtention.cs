@@ -22,8 +22,8 @@ namespace eFMS.API.Infrastructure.Extensions
             PermissionRange result = PermissionRange.All;
             switch (permissionRange)
             {
-                case Constants.PERMISSION_RANGE_ALL:
-                    result = PermissionRange.All;
+                case Constants.PERMISSION_RANGE_NONE:
+                    result = PermissionRange.None;
                     break;
                 case Constants.PERMISSION_RANGE_OWNER:
                     result = PermissionRange.Owner;
@@ -48,6 +48,9 @@ namespace eFMS.API.Infrastructure.Extensions
             int code = 200;
             switch (permissionRange)
             {
+                case PermissionRange.None:
+                    code = 403;
+                    break;
                 case PermissionRange.Owner:
                     if (model.UserCreated != currentUser.UserID)
                     {
@@ -55,7 +58,7 @@ namespace eFMS.API.Infrastructure.Extensions
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID && model.CompanyId != currentUser.CompanyID)
+                    if (model.GroupId != currentUser.GroupId && model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID)
                     {
                         code = 403;
                     }

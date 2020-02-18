@@ -5,11 +5,6 @@ namespace eFMS.IdentityServer.Service.Models
 {
     public partial class SysGroup
     {
-        public SysGroup()
-        {
-          
-        }
-
         public short Id { get; set; }
         public string Code { get; set; }
         public string NameEn { get; set; }

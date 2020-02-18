@@ -1,5 +1,8 @@
 ﻿using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Infrastructure.Models;
+using eFMS.IdentityServer.DL.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,42 +11,6 @@ namespace eFMS.API.Documentation.DL.Common
 {
     public static class PermissionEx
     {
-        public static ICurrentUser GetUserMenuPermission(ICurrentUser curUser, Menu menu = Menu.acctAP)
-        {
-
-            if (curUser.UserPermissions.Count > 0)
-            {
-                curUser.UserMenuPermission = curUser.UserPermissions.Where(x => x.MenuId == menu.ToString()).FirstOrDefault();
-            }
-            return curUser;
-        }
-
-        public static PermissionRange GetPermissionRange(string permissionRange)
-        {
-            PermissionRange result = PermissionRange.All;
-            switch (permissionRange)
-            {
-                case Constants.PERMISSION_RANGE_ALL:
-                    result = PermissionRange.All;
-                    break;
-                case Constants.PERMISSION_RANGE_OWNER:
-                    result = PermissionRange.Owner;
-                    break;
-                case Constants.PERMISSION_RANGE_GROUP:
-                    result = PermissionRange.Group;
-                    break;
-                case Constants.PERMISSION_RANGE_DEPARTMENT:
-                    result = PermissionRange.Department;
-                    break;
-                case Constants.PERMISSION_RANGE_OFFICE:
-                    result = PermissionRange.Office;
-                    break;
-                case Constants.PERMISSION_RANGE_COMPANY:
-                    result = PermissionRange.Company;
-                    break;
-            }
-            return result;
-        }
         public static int GetPermissionItemOpsToUpdate(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser, List<string> authorizeUserIds)
         {
             int code = 200;
@@ -89,6 +56,9 @@ namespace eFMS.API.Documentation.DL.Common
             int code = 0;
             switch (permissionRange)
             {
+                case PermissionRange.None:
+                    code = 403;
+                    break;
                 case PermissionRange.Owner:
                     if (model.BillingOpsId != currentUser.UserID)
                     {
@@ -168,6 +138,9 @@ namespace eFMS.API.Documentation.DL.Common
             int code = 0;
             switch (permissionRange)
             {
+                case PermissionRange.None:
+                    code = 403;
+                    break;
                 case PermissionRange.Owner:
                     if (model.PersonInCharge != currentUser.UserID)
                     {
@@ -246,46 +219,66 @@ namespace eFMS.API.Documentation.DL.Common
 
         public static ICurrentUser GetUserMenuPermissionTransaction(string transactionType, ICurrentUser currentUser)
         {
-            ICurrentUser _user = GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);//Set default
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);//Set default
 
             if (transactionType == TermData.InlandTrucking)
             {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docInlandTrucking);
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docInlandTrucking);
             }
             else if (transactionType == TermData.AirExport)
             {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docAirExport);
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docAirExport);
             }
             else if (transactionType == TermData.AirImport)
             {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docAirImport);
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docAirImport);
             }
             else if (transactionType == TermData.SeaConsolExport)
             {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaConsolExport);
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docSeaConsolExport);
             }
             else if (transactionType == TermData.SeaConsolImport)
             {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaConsolImport);
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docSeaConsolImport);
             }
             else if (transactionType == TermData.SeaFCLExport)
             {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLExport);
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docSeaFCLExport);
             }
             else if (transactionType == TermData.SeaFCLImport)
             {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);
             }
             else if (transactionType == TermData.SeaLCLExport)
             {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaLCLExport);
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docSeaLCLExport);
             }
             else if (transactionType == TermData.SeaLCLImport)
             {
-                _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.docSeaLCLImport);
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docSeaLCLImport);
             }
 
             return _user;
+        }
+
+        public static PermissionAllowBase GetSpecialActions(PermissionAllowBase detailPermission, List<SpecialAction> specialActions)
+        {
+            if (specialActions.Count > 0)
+            {
+                if (specialActions.Any(x => x.Action.Contains("Lock")))
+                {
+                    detailPermission.AllowLock = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("Add Charge")))
+                {
+                    detailPermission.AllowAddCharge = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("Update Charge")))
+                {
+                    detailPermission.AllowUpdateCharge = true;
+                }
+            }
+            return detailPermission;
         }
     }
 }

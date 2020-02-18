@@ -325,33 +325,31 @@ namespace eFMS.API.System.DL.Services
                     Access = false
                 };
             }
-            else
-            {
-                string menuId = menu.Select(m => m.Id).First();
+            string menuId = menu.Select(m => m.Id).First();
 
-                var userPermissionId = DataContext.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
-                if (userPermissionId == null) return null;
-                var generalPermission = userPermissionGeneralRepository.Get(x => x.MenuId == menuId && x.UserPermissionId == userPermissionId)?.FirstOrDefault();
-                if (generalPermission == null) return null;
-                var specialPermissions = userPermissionSpecialRepository.Get(x => x.MenuId == menuId && x.UserPermissionId == userPermissionId).ToList();
-                var result = new UserPermissionModel
+            var userPermissionId = DataContext.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
+            if (userPermissionId == null) return null;
+            var generalPermission = userPermissionGeneralRepository.Get(x => x.MenuId == menuId && x.UserPermissionId == userPermissionId)?.FirstOrDefault();
+            if (generalPermission == null) return null;
+            var specialPermissions = userPermissionSpecialRepository.Get(x => x.MenuId == menuId && x.UserPermissionId == userPermissionId).ToList();
+            var result = new UserPermissionModel
+            {
+                MenuId = menuId,
+                Access = generalPermission.Access,
+                Detail = generalPermission.Detail,
+                Write = generalPermission.Write,
+                Delete = generalPermission.Delete,
+                List = generalPermission.List,
+                Import = generalPermission.Import,
+                Export = generalPermission.Export,
+                AllowAdd = generalPermission.Write == "None"?false: true,
+                SpecialActions = specialPermissions?.Select(x => new SpecialAction
                 {
-                    MenuId = menuId,
-                    Access = generalPermission.Access,
-                    Detail = generalPermission.Detail,
-                    Write = generalPermission.Write,
-                    Delete = generalPermission.Delete,
-                    List = generalPermission.List,
-                    Import = generalPermission.Import,
-                    Export = generalPermission.Export,
-                    SpecialActions = specialPermissions?.Select(x => new SpecialAction
-                    {
-                        Action = x.ActionName,
-                        IsAllow = x.IsAllow
-                    }).ToList()
-                };
-                return result;
-            }
+                    Action = x.ActionName,
+                    IsAllow = x.IsAllow
+                }).ToList()
+            };
+            return result;
 
 
         }

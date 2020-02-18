@@ -50,7 +50,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("Test")]
         public IActionResult GetA()
         {
-            curUser = PermissionEx.GetUserMenuPermission(curUser, Menu.acctAP);
+            curUser = PermissionExtention.GetUserMenuPermission(curUser, Menu.acctAP);
             return Ok();
         }
 

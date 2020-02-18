@@ -101,6 +101,7 @@
     }
     public enum PermissionRange
     {
+        None,
         Owner,
         Group,
         Department,
@@ -157,6 +158,7 @@
         settingTariff,
         settingUnlock,
         sys,
+        sysAuthorize,
         sysCompany,
         sysDepartment,
         sysGroup,

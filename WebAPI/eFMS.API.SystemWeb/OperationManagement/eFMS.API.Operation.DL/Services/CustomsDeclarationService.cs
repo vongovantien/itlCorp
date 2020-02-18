@@ -241,7 +241,7 @@ namespace eFMS.API.Operation.DL.Services
             {
                 query = query.And(x => x.JobNo == null);
             }
-
+            
             // Query with Permission Range.
             switch (rangeSearch)
             {
