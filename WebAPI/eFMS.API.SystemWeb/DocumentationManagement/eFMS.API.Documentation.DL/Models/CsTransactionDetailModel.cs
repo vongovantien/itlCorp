@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Infrastructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

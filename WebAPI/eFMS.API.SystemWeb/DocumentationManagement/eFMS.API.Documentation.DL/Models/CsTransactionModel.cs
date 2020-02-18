@@ -1,5 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Common;
-using eFMS.API.Documentation.Service.Models;
+﻿using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Infrastructure.Models;
 using System;
 
 namespace eFMS.API.Documentation.DL.Models

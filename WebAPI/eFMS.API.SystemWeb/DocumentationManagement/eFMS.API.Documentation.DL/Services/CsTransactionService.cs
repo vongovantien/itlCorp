@@ -16,6 +16,7 @@ using eFMS.API.Common;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Infrastructure.Models;
 
 namespace eFMS.API.Documentation.DL.Services
 {

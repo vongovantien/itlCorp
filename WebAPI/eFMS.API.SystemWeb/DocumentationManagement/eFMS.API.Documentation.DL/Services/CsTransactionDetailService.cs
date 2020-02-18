@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using eFMS.API.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
@@ -11,11 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using eFMS.API.Documentation.Service.Contexts;
-using eFMS.API.Common.NoSql;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.Infrastructure.Models;
 
 namespace eFMS.API.Documentation.DL.Services
 {
