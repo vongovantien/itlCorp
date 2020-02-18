@@ -650,7 +650,7 @@ namespace eFMS.API.Documentation.DL.Services
                 job.CurrentStatus = TermData.Canceled;
                 job.DatetimeModified = DateTime.Now;
                 job.UserModified = currentUser.UserID;
-                result = DataContext.Update(job, x => x.Id == id, false);
+                result = DataContext.Update(job, x => x.Id == id,false);
                 if (result.Success)
                 {
                     var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo);

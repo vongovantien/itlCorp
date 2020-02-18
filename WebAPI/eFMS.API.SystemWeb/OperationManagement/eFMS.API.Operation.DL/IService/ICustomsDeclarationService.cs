@@ -24,5 +24,7 @@ namespace eFMS.API.Operation.DL.IService
         HandleState Import(List<CustomsDeclarationModel> data);
         List<CustomsDeclarationModel> GetCustomsShipmentNotLocked();
         HandleState Update(CustomsDeclarationModel model);
+        int CheckDetailPermission(int id);
+        CustomsDeclarationModel GetDetail(int id);
     }
 }

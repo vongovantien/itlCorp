@@ -26,6 +26,7 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import * as fromShareBussiness from './../../share-business/store';
 import * as dataHelper from 'src/helper/data.helper';
 import _groupBy from 'lodash/groupBy';
+import { OPSTransactionGetDetailSuccessAction } from '../store';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -344,7 +345,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                             hbl.id = this.opsTransaction.hblid;
 
                             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
-                            this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(this.opsTransaction));
+                            this._store.dispatch(new OPSTransactionGetDetailSuccessAction(this.opsTransaction));
                             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.opsTransaction.hblid));
 
                             this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));

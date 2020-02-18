@@ -41,8 +41,8 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<OpsTransaction> opsTransactionRepo;
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
 
-        public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, 
-            ICacheServiceBase<CustomsDeclaration> cacheService, 
+        public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository,
+            ICacheServiceBase<CustomsDeclaration> cacheService,
             IMapper mapper,
             IEcusConnectionService ecusCconnection
             , ICatPartnerApiService catPartner
@@ -82,7 +82,7 @@ namespace eFMS.API.Operation.DL.Services
             foreach (var item in connections)
             {
                 var clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
-               if (clearanceEcus == null)
+                if (clearanceEcus == null)
                 {
                     continue;
                 }
@@ -107,7 +107,7 @@ namespace eFMS.API.Operation.DL.Services
             {
                 if (lists.Count > 0)
                 {
-                    foreach(var item in lists)
+                    foreach (var item in lists)
                     {
                         DataContext.Add(item, false);
                     }
@@ -136,7 +136,7 @@ namespace eFMS.API.Operation.DL.Services
                 type = ClearanceConstants.Import_Type_Value;
             }
             var serviceType = GetServiceType(clearance, out string cargoType);
-            var route = clearance.PLUONG!= null?GetRouteType(clearance.PLUONG): string.Empty;
+            var route = clearance.PLUONG != null ? GetRouteType(clearance.PLUONG) : string.Empty;
             var partnerTaxCode = clearance.MA_DV;
             if (clearance.MA_DV != null)
             {
@@ -224,19 +224,16 @@ namespace eFMS.API.Operation.DL.Services
 
         public List<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount)
         {
+            ICurrentUser _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var rangeSearch = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.List);
+
             Expression<Func<CustomsDeclaration, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                                                                     && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
                                                                                     && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
-                                                                                    && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
-                                                                                    && (x.DatetimeCreated <= criteria.ToImportDate || criteria.ToImportDate == null);
-            var rangeSearch = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.List);
-            switch (rangeSearch)
-            {
-                case PermissionRange.Owner:
-                    break;
-            }
+                                                                                    && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null);
+
             if (criteria.ImPorted == true)
             {
                 query = query.And(x => x.JobNo != null);
@@ -245,7 +242,31 @@ namespace eFMS.API.Operation.DL.Services
             {
                 query = query.And(x => x.JobNo == null);
             }
+
+            // Query with Permission Range.
+            switch (rangeSearch)
+            {
+                case PermissionRange.Owner:
+                    query = query.And(x => x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Group:
+                    query = query.And(x => x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Department:
+                    query = query.And(x => x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Office:
+                    query = query.And(x => x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Company:
+                    query = query.And(x => x.CompanyId == currentUser.CompanyID);
+                    break;
+                default:
+                    break;
+            }
+
             Expression<Func<CustomsDeclaration, object>> orderByProperty = x => x.DatetimeModified;
+
             var list = DataContext.Paging(query, page, size, orderByProperty, false, out rowsCount);
             var results = new List<CustomsDeclarationModel>();
             if (rowsCount == 0) return results;
@@ -266,7 +287,7 @@ namespace eFMS.API.Operation.DL.Services
                 replaceString = replaceString.Replace("ismultiple", "");
                 replaceString = replaceString.Replace(" ", "");
                 clearanceNoArray = replaceString.Split(',');
-                if(keySearch == "ismultiple")
+                if (keySearch == "ismultiple")
                 {
                     keySearch = String.Empty;
                 }
@@ -280,8 +301,8 @@ namespace eFMS.API.Operation.DL.Services
             && (keySearch != null && keySearch.Contains("ismultiple") ? clearanceNoArray.Contains(x.ClearanceNo.ToLower()) :
             x.ClearanceNo.Contains(keySearch) || (x.Hblid != null && x.Hblid.ToLower().Contains(keySearch))
             || (x.ExportCountryCode != null && x.ExportCountryCode.ToLower().Contains(keySearch)) || (x.ImportCountryCode != null && x.ImportCountryCode.ToLower().Contains(keySearch)) || (x.CommodityCode != null && x.CommodityCode.ToLower().Contains(keySearch))
-            || (x.Note != null && x.Note.ToLower().Contains(keySearch))|| (x.FirstClearanceNo != null && x.FirstClearanceNo.ToLower().Contains(keySearch)) || (x.QtyCont != null && x.QtyCont.ToString().Contains(keySearch)) || string.IsNullOrEmpty(keySearch));
-            
+            || (x.Note != null && x.Note.ToLower().Contains(keySearch)) || (x.FirstClearanceNo != null && x.FirstClearanceNo.ToLower().Contains(keySearch)) || (x.QtyCont != null && x.QtyCont.ToString().Contains(keySearch)) || string.IsNullOrEmpty(keySearch));
+
             var data = Get().Where(query);
             if (Imported == true)
             {
@@ -314,7 +335,7 @@ namespace eFMS.API.Operation.DL.Services
             var customerCache = catPartnerApi.GetPartners().Result;
             var countries = countryCache != null ? countryCache.ToList() : new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
             var portIndexs = portCache != null ? portCache.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList() : new List<Provider.Models.CatPlaceApiModel>();
-            var customers = customerCache != null ? customerCache.Where(x => x.PartnerGroup.IndexOf(GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER), StringComparison.OrdinalIgnoreCase) > -1).ToList() : new List<Provider.Models.CatPartnerApiModel>(); 
+            var customers = customerCache != null ? customerCache.Where(x => x.PartnerGroup.IndexOf(GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER), StringComparison.OrdinalIgnoreCase) > -1).ToList() : new List<Provider.Models.CatPartnerApiModel>();
             foreach (var item in list)
             {
                 var clearance = mapper.Map<CustomsDeclarationModel>(item);
@@ -370,11 +391,15 @@ namespace eFMS.API.Operation.DL.Services
         }
         public CustomsDeclaration GetById(int id)
         {
-            var result = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            return result;
+            var detail = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            return detail;
+          
         }
         public IQueryable<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria)
         {
+
+
+
             Func<CustomsDeclarationModel, bool> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                                                                        && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
                                                                                        && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
@@ -394,12 +419,12 @@ namespace eFMS.API.Operation.DL.Services
             return results?.AsQueryable();
         }
 
-        public List<CustomsDeclarationModel> GetCustomDeclaration(string customNo, string taxCode, bool? ImPorted, int pageNumber, int  pageSize, out int rowsCount)
+        public List<CustomsDeclarationModel> GetCustomDeclaration(string customNo, string taxCode, bool? ImPorted, int pageNumber, int pageSize, out int rowsCount)
         {
             Func<CustomsDeclarationModel, bool> query = x => x.PartnerTaxCode == taxCode && (x.ClearanceNo == customNo || string.IsNullOrEmpty(customNo));
 
             Expression<Func<CustomsDeclarationModel, object>> orderByProperty = x => x.DatetimeModified;
-            List <CustomsDeclarationModel> returnList = null;
+            List<CustomsDeclarationModel> returnList = null;
             var results = Get().Where(query);
             rowsCount = results.Count();
             if (rowsCount == 0) return returnList;
@@ -436,7 +461,7 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
-                foreach(var item in customs)
+                foreach (var item in customs)
                 {
                     var hs = Delete(x => x.Id == item.Id, false);
                 }
@@ -580,7 +605,7 @@ namespace eFMS.API.Operation.DL.Services
 
                     //Check input character special, number
                     Regex pattern = new Regex(@"^[a-zA-Z0-9 ./_-]*$");
-                    if(!pattern.IsMatch(_mbl))
+                    if (!pattern.IsMatch(_mbl))
                     {
                         item.Mblid = stringLocalizer[LanguageSub.MSG_CUSTOM_INVALID_CHARACTER_SPECIAL];
                         item.IsValid = false;
@@ -658,7 +683,7 @@ namespace eFMS.API.Operation.DL.Services
                     {
                         var valueConvert = Convert.ToDecimal(_grossWeight);
                         if (valueConvert < 0)
-                        {                           
+                        {
                             item.GrossWeightStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
                             item.IsValid = false;
                             item.GrossWeightValid = false;
@@ -687,7 +712,7 @@ namespace eFMS.API.Operation.DL.Services
                     {
                         var valueConvert = Convert.ToDecimal(_netWeight);
                         if (valueConvert < 0)
-                        {                            
+                        {
                             item.NetWeightStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
                             item.IsValid = false;
                             item.NetWeightValid = false;
@@ -716,7 +741,7 @@ namespace eFMS.API.Operation.DL.Services
                     {
                         var valueConvert = Convert.ToDecimal(_cbm);
                         if (valueConvert < 0)
-                        {                            
+                        {
                             item.CbmStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
                             item.IsValid = false;
                             item.CbmValid = false;
@@ -745,7 +770,7 @@ namespace eFMS.API.Operation.DL.Services
                     {
                         var valueConvert = Convert.ToInt32(_qtyCont);
                         if (valueConvert < 0)
-                        {                          
+                        {
                             item.QtyContStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
                             item.IsValid = false;
                             item.QtyContValid = false;
@@ -774,7 +799,7 @@ namespace eFMS.API.Operation.DL.Services
                     {
                         var valueConvert = Convert.ToInt32(_pcs);
                         if (valueConvert < 0)
-                        {                           
+                        {
                             item.PcsStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
                             item.IsValid = false;
                             item.PcsValid = false;
@@ -967,7 +992,7 @@ namespace eFMS.API.Operation.DL.Services
                                      //from osa in osa2.DefaultIfEmpty()
                                      where osa.MainPersonInCharge == userCurrent
                                      select ops;
-            
+
             //Join theo số HBL
             var query = from cus in customs
                         join ope in shipmentsOperation on cus.Hblid equals ope.Hwbno into ope2
@@ -998,6 +1023,124 @@ namespace eFMS.API.Operation.DL.Services
             model.DatetimeModified = DateTime.Now;
             model.UserModified = currentUser.UserID;
             throw new NotImplementedException();
+        }
+
+        public int CheckDetailPermission(int id)
+        {
+            int code = 0;
+            var detail = GetById(id);
+
+            ICurrentUser _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var permissionRange = PermissionEx.GetPermissionRange(_user.UserMenuPermission.Detail);
+
+            switch (permissionRange)
+            {
+                case PermissionRange.Owner:
+                    if (detail.UserCreated != currentUser.UserID)
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if (detail.GroupId != currentUser.GroupId
+                        && detail.DepartmentId != currentUser.DepartmentId
+                        && detail.OfficeId != currentUser.OfficeID
+                        && detail.CompanyId != currentUser.CompanyID
+                        )
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if (detail.DepartmentId != currentUser.DepartmentId
+                       && detail.OfficeId != currentUser.OfficeID
+                       && detail.CompanyId != currentUser.CompanyID
+                       )
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if (detail.OfficeId != currentUser.OfficeID
+                       && detail.CompanyId != currentUser.CompanyID
+                       )
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (detail.CompanyId != currentUser.CompanyID)
+                    {
+                        code = 403;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return code;
+        }
+
+        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, CustomsDeclarationModel detail)
+        {
+            bool result = false;
+
+            switch (permissionRangeWrite)
+            {
+                case PermissionRange.All:
+                    result = true;
+                    break;
+                case PermissionRange.Owner:
+                    if (detail.UserCreated == currentUser.UserID)
+                    {
+                        result = true;
+                    }                   
+                    break;
+                case PermissionRange.Group:
+                    if (detail.GroupId == currentUser.GroupId 
+                        && detail.DepartmentId == currentUser.DepartmentId 
+                        && detail.OfficeId == currentUser.OfficeID 
+                        && detail.CompanyId == currentUser.CompanyID
+                        )
+                    {
+                        result = true;
+                    }                   
+                    break;
+                case PermissionRange.Department:
+                    if (detail.DepartmentId == currentUser.DepartmentId 
+                        && detail.OfficeId == currentUser.OfficeID 
+                        && detail.CompanyId == currentUser.CompanyID)
+                    {
+                        result = true;
+                    }                    
+                    break;
+                case PermissionRange.Office:
+                    if (detail.OfficeId == currentUser.OfficeID 
+                        && detail.CompanyId == currentUser.CompanyID)
+                    {
+                        result = true;
+                    }                    
+                    break;
+                case PermissionRange.Company:
+                    if (detail.CompanyId == currentUser.CompanyID)
+                    {
+                        result = true;
+                    }                    
+                    break;
+            }
+            return result;
+        }
+
+        public CustomsDeclarationModel GetDetail(int id)
+        {
+            CustomsDeclarationModel detail = Get(x => x.Id == id).FirstOrDefault();
+            ICurrentUser _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var permissionRangeWrite = PermissionEx.GetPermissionRange(_user.UserMenuPermission.Write);
+
+            detail.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = GetPermissionDetail(permissionRangeWrite, detail),
+            };
+            return detail;
         }
     }
 }

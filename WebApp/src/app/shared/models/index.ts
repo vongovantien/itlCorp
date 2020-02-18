@@ -1,10 +1,10 @@
+
 export * from './base.model';
 
 export * from './operation/stage';
 export * from './operation/surcharge';
 export * from './operation/custom-declaration';
 export * from './operation/shipment';
-
 export * from './catalogue/partner.model';
 export * from './catalogue/catCurrency.model';
 export * from './catalogue/catCharge.model';
@@ -29,6 +29,7 @@ export * from './document/arrival-freight-charge';
 export * from './document/delivery-order';
 export * from './document/house-bill';
 export * from './document/dimension';
+export * from './document/OpsTransaction.model';
 
 export * from './tool-setting/tariff';
 
