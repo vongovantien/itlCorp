@@ -353,6 +353,7 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.POLName = pol?.NameEn;
                     detail.PODName = pod?.NameEn;
                     detail.ShipmentEta = shipment.Eta;
+                    detail.TransactionType = shipment.TransactionType;
                     return detail;
                 }
             }
@@ -361,7 +362,129 @@ namespace eFMS.API.Documentation.DL.Services
 
             }
             return null;
+        }
 
+        public int CheckDetailPermission(Guid id)
+        {
+            var detail = GetById(id);
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
+            var permissionRange = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
+            int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = detail.SaleManId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange, detail.TransactionType);
+            return code;
+        }
+
+        public CsTransactionDetailModel GetDetails(Guid id)
+        {
+            var detail = GetById(id);
+            if (detail == null) return null;
+            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
+                                                                 && x.AssignTo == currentUser.UserID
+                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
+                                                                 && x.Services.Contains(detail.TransactionType)
+                                                                 )?.Select(x => x.UserId).ToList();
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
+
+            var permissionRangeWrite = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            var permissionRangeDelete = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+            detail.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
+            };
+            var specialActions = _currentUser.UserMenuPermission.SpecialActions;
+            if (specialActions.Count > 0)
+            {
+                if (specialActions.Any(x => x.Action.Contains("Lock")))
+                {
+                    detail.Permission.AllowLock = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("Add Charge")))
+                {
+                    detail.Permission.AllowAddCharge = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("Update Charge")))
+                {
+                    detail.Permission.AllowUpdateCharge = true;
+                }
+            }
+            return detail;
+        }
+
+
+
+        private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
+        {
+            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
+                                                                 && x.AssignTo == currentUser.UserID
+                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
+                                                                 && x.Services.Contains(transactionType)
+                                                                 )?.Select(x => x.UserId).ToList();
+            int code = PermissionEx.GetPermissionToUpdateHblDocument(model, permissionRange, currentUser, authorizeUserIds);
+            return code;
+        }
+
+
+
+        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, List<string> authorizeUserIds, CsTransactionDetailModel detail)
+        {
+            bool result = false;
+            switch (permissionRangeWrite)
+            {
+                case PermissionRange.All:
+                    result = true;
+                    break;
+                case PermissionRange.Owner:
+                    if (detail.SaleManId == currentUser.UserID || authorizeUserIds.Contains(detail.SaleManId))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(detail.SaleManId))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.SaleManId))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.SaleManId))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.SaleManId))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+            }
+            return result;
         }
 
         public CsTransactionDetailModel GetSeparateByHblid(Guid hbId)

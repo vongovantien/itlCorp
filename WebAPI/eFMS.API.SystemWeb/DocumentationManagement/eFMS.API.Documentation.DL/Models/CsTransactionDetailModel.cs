@@ -28,5 +28,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string Packages { get; set; }
         public string Containers { get; set; }
         public DateTime? ShipmentEta { get; set; }
+        public string TransactionType { get; set; }
+        public PermissionAllowBase Permission { get; set; }
     }
 }

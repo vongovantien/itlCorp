@@ -50,10 +50,14 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpGet]
         [Route("GetById")]
+        [Authorize]
         public IActionResult GetById(Guid Id)
         {
+            var statusCode = csTransactionDetailService.CheckDetailPermission(Id);
+            if (statusCode == 403) return Forbid();
+
             CsMawbcontainerCriteria criteriaMaw = new CsMawbcontainerCriteria { Hblid = Id };
-            var hbl = csTransactionDetailService.GetById(Id);
+            var hbl = csTransactionDetailService.GetDetails(Id);
             var resultMaw = containerService.Query(criteriaMaw).ToList();
             if(resultMaw.Count() > 0) {
                 hbl.CsMawbcontainers = resultMaw;

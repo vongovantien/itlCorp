@@ -33,6 +33,9 @@ namespace eFMS.API.Documentation.DL.IService
         //CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId);
         Crystal Preview(CsTransactionDetailModel model);
 
+        int CheckDetailPermission(Guid id);
+
+
         //CsTransactionDetailModel GetById(CsTransactionDetailCriteria csTransactionDetailCriteria);
         CsTransactionDetailModel GetById(Guid Id);
         CsTransactionDetailModel GetSeparateByHblid(Guid hbId);
@@ -49,5 +52,7 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewAirAttachList(Guid hblId);
         Crystal PreviewAirImptAuthorisedLetter(Guid housbillId);
         Crystal PreviewAirImptAuthorisedLetterConsign(Guid housbillId);
+
+        CsTransactionDetailModel GetDetails(Guid id);
     }
 }
