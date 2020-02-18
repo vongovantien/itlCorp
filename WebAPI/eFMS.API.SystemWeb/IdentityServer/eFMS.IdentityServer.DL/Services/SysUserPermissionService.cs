@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using eFMS.IdentityServer.Service.Models;
 using ITL.NetCore.Connection.EF;
 using System;
@@ -15,15 +16,18 @@ namespace eFMS.IdentityServer.DL.Services
         readonly IContextBase<SysUserPermission> userPermissionRepository;
         readonly IContextBase<SysUserPermissionGeneral> permissionGeneralRepository;
         readonly IContextBase<SysUserPermissionSpecial> permissionSpecialRepository;
+        readonly IContextBase<SysAuthorization> authorizationRepository;
         
         public SysUserPermissionService(IContextBase<SysUserPermission> userPermissionRepo,
             IContextBase<SysUserPermissionGeneral> permissionGeneralRepo,
-            IContextBase<SysUserPermissionSpecial> permissionSpecialRepo
+            IContextBase<SysUserPermissionSpecial> permissionSpecialRepo,
+            IContextBase<SysAuthorization> authorizeRepo
             )
         {
             userPermissionRepository = userPermissionRepo;
             permissionGeneralRepository = permissionGeneralRepo;
             permissionSpecialRepository = permissionSpecialRepo;
+            authorizationRepository = authorizeRepo;
         }
 
         public List<UserPermissionModel> Get(string userId, Guid officeId)
@@ -47,6 +51,7 @@ namespace eFMS.IdentityServer.DL.Services
                             List = item.List,
                             Import = item.Import,
                             Export = item.Export,
+                            AllowAdd = item.Write == "None"?false: true,
                             SpecialActions = permissionSpecialRepository.Get(x => x.UserPermissionId == userPermissionId && x.MenuId == item.MenuId)?
                                 .Select(x => new SpecialAction
                                 {
@@ -60,6 +65,17 @@ namespace eFMS.IdentityServer.DL.Services
             } 
             return results;
         }
+
+        public List<string> GetAuthorizedIds(string transactionType, ICurrentUser currentUser)
+        {
+            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
+                                                                    && x.AssignTo == currentUser.UserID
+                                                                    && (x.EndDate ?? DateTime.Now.Date) >= DateTime.Now.Date
+                                                                    && x.Services.Contains(transactionType)
+                                                                    )?.Select(x => x.UserId).ToList();
+            return authorizeUserIds;
+        }
+
         public async Task<List<string>> GetPermission(string userId, Guid officeId)
         {
             List<string> results = new List<string>();

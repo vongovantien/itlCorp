@@ -27,7 +27,8 @@ namespace eFMS.IdentityServer.DL.UserManager
                     AddTransient<IUserPermissionService, SysUserPermissionService>()
                     .AddTransient<IContextBase<SysUserPermission>, Base<SysUserPermission>>()
                     .AddTransient<IContextBase<SysUserPermissionGeneral>, Base<SysUserPermissionGeneral>>()
-                    .AddTransient<IContextBase<SysUserPermissionSpecial>, Base<SysUserPermissionSpecial>>();
+                    .AddTransient<IContextBase<SysUserPermissionSpecial>, Base<SysUserPermissionSpecial>>()
+                    .AddTransient<IContextBase<SysAuthorization>, Base<SysAuthorization>>();
 
         }
     }

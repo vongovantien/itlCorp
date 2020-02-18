@@ -70,7 +70,7 @@ namespace eFMS.API.System.Controllers
         {
             var result = userPermissionService.GetPermission(currentUser.UserID, currentUser.OfficeID, route);
             if (result == null) return Forbid();
-            else return Ok(result);
+            return Ok(result);
         }
 
         /// <summary>

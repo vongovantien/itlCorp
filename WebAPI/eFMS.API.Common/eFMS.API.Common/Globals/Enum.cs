@@ -158,6 +158,7 @@
         settingTariff,
         settingUnlock,
         sys,
+        sysAuthorize,
         sysCompany,
         sysDepartment,
         sysGroup,

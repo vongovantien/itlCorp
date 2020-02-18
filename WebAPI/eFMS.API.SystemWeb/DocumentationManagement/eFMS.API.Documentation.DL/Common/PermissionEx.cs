@@ -138,6 +138,9 @@ namespace eFMS.API.Documentation.DL.Common
             int code = 0;
             switch (permissionRange)
             {
+                case PermissionRange.None:
+                    code = 403;
+                    break;
                 case PermissionRange.Owner:
                     if (model.PersonInCharge != currentUser.UserID)
                     {

@@ -17,6 +17,7 @@ using System.Linq;
 using eFMS.API.Infrastructure.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.Models;
+using eFMS.IdentityServer.DL.IService;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -38,9 +39,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CustomsDeclaration> customDeclarationRepository;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepository;
         private readonly IContextBase<CsMawbcontainer> csMawbcontainerRepository;
-        private readonly IContextBase<SysAuthorization> authorizationRepository;
         private readonly ICsMawbcontainerService mawbcontainerService;
-
+        readonly IUserPermissionService permissionService;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
@@ -57,7 +57,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctCdnote> acctCdNoteRepo,
             IContextBase<CsMawbcontainer> csMawbcontainerRepo,
             ICsMawbcontainerService containerService, 
-            IContextBase<SysAuthorization> authorizationRepo) : base(repository, mapper)
+            IUserPermissionService perService) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -76,7 +76,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctCdNoteRepository = acctCdNoteRepo;
             csMawbcontainerRepository = csMawbcontainerRepo;
             mawbcontainerService = containerService;
-            authorizationRepository = authorizationRepo;
+            permissionService = perService;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -171,7 +171,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = GetBy(id);
             if (detail == null) return null;
-            List<string> authorizeUserIds = GetAuthorizedShipment();
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds("CL", currentUser);
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             var permissionRangeDelete = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
             detail.Permission = new PermissionAllowBase
@@ -297,7 +297,9 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
-                int code = GetPermissionToDelete(new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+                //int code = GetPermissionToDelete(new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+                var model = new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId };
+                int code = PermissionEx.GetPermissionToDelete(model, permissionRange, currentUser);
                 if (code == 403) return false;
             }
             var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null));
@@ -310,7 +312,7 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<OpsTransaction> QueryByPermission(PermissionRange range)
         {
             IQueryable<OpsTransaction> data = null;
-            List<string> authorizeUserIds = GetAuthorizedShipment();
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds("CL", currentUser);
             switch (range)
             {
                 case PermissionRange.All:
@@ -621,6 +623,8 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState SoftDeleteJob(Guid id)
         {
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None) return new HandleState(403);
             var result = new HandleState();
             var job = DataContext.First(x => x.Id == id && x.CurrentStatus != TermData.Canceled);
             if (job == null)
@@ -629,8 +633,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
-                int code = GetPermissionToDelete(new ModelUpdate { BillingOpsId = job.BillingOpsId, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange);
+                var model = new ModelUpdate { BillingOpsId = job.BillingOpsId, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId };
+                int code = PermissionEx.GetPermissionToDelete(model, permissionRange, currentUser);
                 if (code == 403) return new HandleState(403);
                 job.CurrentStatus = TermData.Canceled;
                 job.DatetimeModified = DateTime.Now;
@@ -825,23 +829,8 @@ namespace eFMS.API.Documentation.DL.Services
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange)
         {
             if (permissionRange == PermissionRange.None) return 403;
-            List<string> authorizeUserIds = GetAuthorizedShipment();
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds("CL", currentUser);
             int code = PermissionEx.GetPermissionItemOpsToUpdate(model, permissionRange, currentUser, authorizeUserIds);
-            return code;
-        }
-        private List<string> GetAuthorizedShipment()
-        {
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.AssignTo == currentUser.UserID
-                                                                 && x.Active == true
-                                                                 && (x.EndDate.Value >= DateTime.Now.Date || x.EndDate == null)
-                                                                 && x.Services.Contains("CL")
-                                                                 )?.Select(x => x.UserId).ToList();
-            return authorizeUserIds;
-        }
-
-        private int GetPermissionToDelete(ModelUpdate model, PermissionRange permissionRange)
-        {
-            int code = PermissionEx.GetPermissionToDelete(model, permissionRange, currentUser);
             return code;
         }
     }
