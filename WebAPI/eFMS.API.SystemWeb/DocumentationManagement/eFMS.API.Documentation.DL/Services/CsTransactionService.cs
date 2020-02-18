@@ -18,6 +18,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Infrastructure.Models;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.IService;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -42,7 +43,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsDimensionDetailService dimensionDetailService;
         readonly IContextBase<CsDimensionDetail> dimensionDetailRepository;
         readonly IStringLocalizer stringLocalizer;
-        private readonly IContextBase<SysAuthorization> authorizationRepository;
+        readonly IUserPermissionService permissionService;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -65,7 +66,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICsArrivalFrieghtChargeService arrivalFrieghtChargeService,
             ICsDimensionDetailService dimensionService,
             IContextBase<CsDimensionDetail> dimensionDetailRepo,
-            IContextBase<SysAuthorization> authorizationRepo) : base(repository, mapper)
+            IUserPermissionService perService) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -86,7 +87,7 @@ namespace eFMS.API.Documentation.DL.Services
             csArrivalFrieghtChargeService = arrivalFrieghtChargeService;
             dimensionDetailService = dimensionService;
             dimensionDetailRepository = dimensionDetailRepo;
-            authorizationRepository = authorizationRepo;
+            permissionService = perService;
         }
 
         #region -- INSERT & UPDATE --
@@ -422,11 +423,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
         {
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
-                                                                 && x.AssignTo == currentUser.UserID
-                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
-                                                                 && x.Services.Contains(transactionType)
-                                                                 )?.Select(x => x.UserId).ToList();
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds(transactionType, currentUser);
             int code = PermissionEx.GetPermissionToUpdateShipmentDocumentation(model, permissionRange, currentUser, authorizeUserIds);
             return code;
         }
@@ -441,11 +438,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = GetById(id);
             if (detail == null) return null;
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
-                                                                 && x.AssignTo == currentUser.UserID
-                                                                 && (x.EndDate ?? DateTime.Now.Date) >= DateTime.Now.Date
-                                                                 && x.Services.Contains(detail.TransactionType)
-                                                                 )?.Select(x => x.UserId).ToList();
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds(detail.TransactionType, currentUser);
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
@@ -533,12 +526,7 @@ namespace eFMS.API.Documentation.DL.Services
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
 
             var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled);
-
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
-                                                                 && x.AssignTo == currentUser.UserID
-                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
-                                                                 && x.Services.Contains(transactionType)
-                                                                 )?.Select(x => x.UserId).ToList();
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds(transactionType, currentUser);
             switch (rangeSearch)
             {
                 case PermissionRange.All:

@@ -58,7 +58,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICsDimensionDetailService, CsDimensionDetailService>();
             services.AddSingleton<ISysImageService, SysImageService>();
 
-            services.AddUserManager();
+            //services.AddUserManager();
         }
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
         {

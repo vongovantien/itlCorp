@@ -48,6 +48,9 @@ namespace eFMS.API.Infrastructure.Extensions
             int code = 200;
             switch (permissionRange)
             {
+                case PermissionRange.None:
+                    code = 403;
+                    break;
                 case PermissionRange.Owner:
                     if (model.UserCreated != currentUser.UserID)
                     {
