@@ -1,6 +1,8 @@
 ﻿using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Infrastructure.Models;
+using eFMS.IdentityServer.DL.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +56,9 @@ namespace eFMS.API.Documentation.DL.Common
             int code = 0;
             switch (permissionRange)
             {
+                case PermissionRange.None:
+                    code = 403;
+                    break;
                 case PermissionRange.Owner:
                     if (model.BillingOpsId != currentUser.UserID)
                     {
@@ -251,6 +256,26 @@ namespace eFMS.API.Documentation.DL.Common
             }
 
             return _user;
+        }
+
+        public static PermissionAllowBase GetSpecialActions(PermissionAllowBase detailPermission, List<SpecialAction> specialActions)
+        {
+            if (specialActions.Count > 0)
+            {
+                if (specialActions.Any(x => x.Action.Contains("Lock")))
+                {
+                    detailPermission.AllowLock = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("Add Charge")))
+                {
+                    detailPermission.AllowAddCharge = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("Update Charge")))
+                {
+                    detailPermission.AllowUpdateCharge = true;
+                }
+            }
+            return detailPermission;
         }
     }
 }

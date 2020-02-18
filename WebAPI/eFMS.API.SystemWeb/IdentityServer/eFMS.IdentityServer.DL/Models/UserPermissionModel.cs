@@ -18,6 +18,7 @@ namespace eFMS.IdentityServer.DL.Models
         public string List { get; set; }
         public bool? Import { get; set; }
         public bool? Export { get; set; }
+        public bool AllowAdd { get; set; }
         public List<SpecialAction> SpecialActions { get; set; }
     }
     public class SpecialAction{

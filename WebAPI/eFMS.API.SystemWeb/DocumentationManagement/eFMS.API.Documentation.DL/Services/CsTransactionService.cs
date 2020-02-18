@@ -456,21 +456,7 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowDelete = GetPermissionDetail(permissionRangeDelete, authorizeUserIds, detail)
             };
             var specialActions = _currentUser.UserMenuPermission.SpecialActions;
-            if (specialActions.Count > 0)
-            {
-                if (specialActions.Any(x => x.Action.Contains("Lock")))
-                {
-                    detail.Permission.AllowLock = true;
-                }
-                if (specialActions.Any(x => x.Action.Contains("Add Charge")))
-                {
-                    detail.Permission.AllowAddCharge = true;
-                }
-                if (specialActions.Any(x => x.Action.Contains("Update Charge")))
-                {
-                    detail.Permission.AllowUpdateCharge = true;
-                }
-            }
+            detail.Permission = PermissionEx.GetSpecialActions(detail.Permission, specialActions);
             return detail;
         }
 
