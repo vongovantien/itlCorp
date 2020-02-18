@@ -110,7 +110,6 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [HttpPost("Paging")]
         [AuthorizeEx(Menu.opsCustomClearance, UserPermission.AllowAccess)]
-        [HttpPost("Paging")]
         public IActionResult Paging(CustomsDeclarationCriteria criteria, int pageNumber, int pageSize)
         {
             var data = customsDeclarationService.Paging(criteria, pageNumber, pageSize, out int totalItems);
@@ -126,6 +125,7 @@ namespace eFMS.API.Operation.Controllers
         [Authorize]
         [HttpPost]
         [Route("Add")]
+        [AuthorizeEx(Menu.opsCustomClearance, UserPermission.Add)]
         public IActionResult AddNew(CustomsDeclarationModel model)
         {
             var existedMessage = CheckExist(model, model.Id);
@@ -139,7 +139,7 @@ namespace eFMS.API.Operation.Controllers
             model.Source = OperationConstants.FromEFMS;
             var hs = customsDeclarationService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -155,6 +155,7 @@ namespace eFMS.API.Operation.Controllers
         [Authorize]
         [HttpPut]
         [Route("Update")]
+        [AuthorizeEx(Menu.opsCustomClearance, UserPermission.Update)]
         public IActionResult Update(CustomsDeclarationModel model)
         {
             var existedMessage = CheckExist(model, model.Id);
@@ -262,6 +263,8 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="id">id that want to retrieve custom declarations</param>
         /// <returns></returns>
         [HttpGet("GetById/{id}")]
+        [Authorize]
+        [AuthorizeEx(Menu.opsCustomClearance, UserPermission.Detail)]
         public IActionResult GetById(int id)
         {
             var statusCode = customsDeclarationService.CheckDetailPermission(id);
@@ -274,22 +277,37 @@ namespace eFMS.API.Operation.Controllers
         /// <summary>
         /// delete multiple custom clearance
         /// </summary>
+        /// <param name="listCustom"></param>
         /// <param name="customs">list of clearances selected</param>
         /// <returns></returns>
         [Authorize]
         [HttpPut]
         [Route("DeleteMultiple")]
-        public IActionResult DeleteMultiple(List<CustomsDeclarationModel> customs)
+        public IActionResult DeleteMultiple(List<CustomsDeclarationModel> listCustom)
         {
-            // TODO Validate list item was selected.
-            var hs = customsDeclarationService.DeleteMultiple(customs);
-            var message = HandleError.GetMessage(hs, Crud.Delete);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
+            foreach (var item in listCustom)
             {
-                return BadRequest(result);
+                if (item.JobNo != null)
+                {
+                    return BadRequest();
+                }
             }
-            return Ok(result);
+
+            var hs = customsDeclarationService.DeleteMultiple(listCustom);
+            ResultHandle result;
+            if (hs.Success)
+            {
+                var message = HandleError.GetMessage(hs, Crud.Delete);
+                result = new ResultHandle { Status = hs.Success,  Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
+            else
+            {
+                var message = HandleError.GetMessage(hs, Crud.Delete);
+                result = new ResultHandle { Status = hs.Success, Message = message };
+                return BadRequest(result);
+
+            }
         }
 
         /// <summary>

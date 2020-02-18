@@ -1,30 +1,29 @@
 ﻿using AutoMapper;
-using eFMS.API.Operation.Service.Contexts;
-using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
 using eFMS.API.Operation.DL.Common;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.DL.Models.Ecus;
-using eFMS.API.Operation.Service.Models;
-using eFMS.API.Provider.Services.IService;
-using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Common;
-using ITL.NetCore.Connection.BL;
-using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using eFMS.API.Operation.Service.ViewModels;
 using System.Data.Common;
-using ITL.NetCore.Connection;
+using eFMS.API.Operation.Service.Models;
+using ITL.NetCore.Connection.BL;
+using eFMS.API.Provider.Services.IService;
+using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Connection.EF;
 using ITL.NetCore.Connection.Caching;
+using ITL.NetCore.Common;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Operation.Service.ViewModels;
+using eFMS.API.Operation.Service.Contexts;
+using ITL.NetCore.Connection;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -224,8 +223,8 @@ namespace eFMS.API.Operation.DL.Services
 
         public List<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount)
         {
-            ICurrentUser _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
-            var rangeSearch = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.List);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
 
             Expression<Func<CustomsDeclaration, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                                                                     && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
@@ -393,7 +392,7 @@ namespace eFMS.API.Operation.DL.Services
         {
             var detail = DataContext.Get(x => x.Id == id).FirstOrDefault();
             return detail;
-          
+
         }
         public IQueryable<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria)
         {
@@ -459,21 +458,87 @@ namespace eFMS.API.Operation.DL.Services
         public HandleState DeleteMultiple(List<CustomsDeclarationModel> customs)
         {
             var result = new HandleState();
-            try
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+
+            switch (permissionRangeDelete)
             {
-                foreach (var item in customs)
-                {
-                    var hs = Delete(x => x.Id == item.Id, false);
-                }
-                DataContext.SubmitChanges();
-                ClearCache();
-                Get();
+                case PermissionRange.Owner:
+                    if (customs.Any(x => x.UserCreated != currentUser.UserID))
+                    {
+                        var ItemForbidDelete = customs.Where(i => i.UserCreated != currentUser.UserID);
+                        return new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid");
+                    }
+                    else
+                    {
+                        result = deleteMultipleModel(customs);
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if (customs.Any(x => x.GroupId != currentUser.GroupId
+                                     && x.DepartmentId != currentUser.DepartmentId
+                                     && x.OfficeId != currentUser.OfficeID
+                                     && x.CompanyId != currentUser.CompanyID)
+                       )
+                    {
+                        var ItemForbidDelete = customs.Where(x => x.GroupId != currentUser.GroupId
+                                     && x.DepartmentId != currentUser.DepartmentId
+                                     && x.OfficeId != currentUser.OfficeID
+                                     && x.CompanyId != currentUser.CompanyID);
+                        return new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid");
+                    }
+                    else
+                    {
+                        result = deleteMultipleModel(customs);
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if (customs.Any(x => x.DepartmentId != currentUser.DepartmentId
+                                                         && x.OfficeId != currentUser.OfficeID
+                                                         && x.CompanyId != currentUser.CompanyID)
+                                           )
+                    {
+                        var ItemForbidDelete = customs.Where(x => x.DepartmentId != currentUser.DepartmentId
+                                     && x.OfficeId != currentUser.OfficeID
+                                     && x.CompanyId != currentUser.CompanyID);
+                        return new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid");
+                    }
+                    else
+                    {
+                        result = deleteMultipleModel(customs);
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if (customs.Any(x => x.OfficeId != currentUser.OfficeID && x.CompanyId != currentUser.CompanyID))
+                    {
+                        var ItemForbidDelete = customs.Where(x => x.OfficeId != currentUser.OfficeID && x.CompanyId != currentUser.CompanyID);
+                        return new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid");
+                    }
+                    else
+                    {
+                        result = deleteMultipleModel(customs);
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (customs.Any(x => x.CompanyId != currentUser.CompanyID))
+                    {
+                        var ItemForbidDelete = customs.Where(x => x.CompanyId != currentUser.CompanyID);
+                        return new HandleState(new {Message = "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid" });
+                    }
+                    else
+                    {
+                        result = deleteMultipleModel(customs);
+                    }
+                    break;
+                case PermissionRange.All:
+                    result = deleteMultipleModel(customs);
+                    break;
+                default:
+                    break;
             }
-            catch (Exception ex)
-            {
-                result = new HandleState(ex.Message);
-            }
+
             return result;
+
         }
 
         public List<CustomClearanceImportModel> CheckValidImport(List<CustomClearanceImportModel> list)
@@ -1005,7 +1070,7 @@ namespace eFMS.API.Operation.DL.Services
 
         public HandleState Update(CustomsDeclarationModel model)
         {
-            var permissionRange = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             int code = 200;
             switch (permissionRange)
             {
@@ -1030,8 +1095,8 @@ namespace eFMS.API.Operation.DL.Services
             int code = 0;
             var detail = GetById(id);
 
-            ICurrentUser _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
-            var permissionRange = PermissionEx.GetPermissionRange(_user.UserMenuPermission.Detail);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
 
             switch (permissionRange)
             {
@@ -1080,11 +1145,11 @@ namespace eFMS.API.Operation.DL.Services
             return code;
         }
 
-        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, CustomsDeclarationModel detail)
+        private bool GetPermissionDetail(PermissionRange permissionRange, CustomsDeclarationModel detail)
         {
             bool result = false;
 
-            switch (permissionRangeWrite)
+            switch (permissionRange)
             {
                 case PermissionRange.All:
                     result = true;
@@ -1093,38 +1158,38 @@ namespace eFMS.API.Operation.DL.Services
                     if (detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
-                    }                   
+                    }
                     break;
                 case PermissionRange.Group:
-                    if (detail.GroupId == currentUser.GroupId 
-                        && detail.DepartmentId == currentUser.DepartmentId 
-                        && detail.OfficeId == currentUser.OfficeID 
+                    if (detail.GroupId == currentUser.GroupId
+                        && detail.DepartmentId == currentUser.DepartmentId
+                        && detail.OfficeId == currentUser.OfficeID
                         && detail.CompanyId == currentUser.CompanyID
                         )
                     {
                         result = true;
-                    }                   
+                    }
                     break;
                 case PermissionRange.Department:
-                    if (detail.DepartmentId == currentUser.DepartmentId 
-                        && detail.OfficeId == currentUser.OfficeID 
+                    if (detail.DepartmentId == currentUser.DepartmentId
+                        && detail.OfficeId == currentUser.OfficeID
                         && detail.CompanyId == currentUser.CompanyID)
                     {
                         result = true;
-                    }                    
+                    }
                     break;
                 case PermissionRange.Office:
-                    if (detail.OfficeId == currentUser.OfficeID 
+                    if (detail.OfficeId == currentUser.OfficeID
                         && detail.CompanyId == currentUser.CompanyID)
                     {
                         result = true;
-                    }                    
+                    }
                     break;
                 case PermissionRange.Company:
                     if (detail.CompanyId == currentUser.CompanyID)
                     {
                         result = true;
-                    }                    
+                    }
                     break;
             }
             return result;
@@ -1133,14 +1198,35 @@ namespace eFMS.API.Operation.DL.Services
         public CustomsDeclarationModel GetDetail(int id)
         {
             CustomsDeclarationModel detail = Get(x => x.Id == id).FirstOrDefault();
-            ICurrentUser _user = PermissionEx.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
-            var permissionRangeWrite = PermissionEx.GetPermissionRange(_user.UserMenuPermission.Write);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
 
             detail.Permission = new PermissionAllowBase
             {
                 AllowUpdate = GetPermissionDetail(permissionRangeWrite, detail),
             };
             return detail;
+        }
+
+        private HandleState deleteMultipleModel(List<CustomsDeclarationModel> customs)
+        {
+            var result = new HandleState();
+
+            try
+            {
+                foreach (var item in customs)
+                {
+                    var hs = Delete(x => x.Id == item.Id, false);
+                }
+                DataContext.SubmitChanges();
+                ClearCache();
+                Get();
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
+            }
+            return result;
         }
     }
 }
