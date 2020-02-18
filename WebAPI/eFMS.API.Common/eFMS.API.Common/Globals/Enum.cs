@@ -101,6 +101,7 @@
     }
     public enum PermissionRange
     {
+        None,
         Owner,
         Group,
         Department,

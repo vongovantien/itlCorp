@@ -17,6 +17,7 @@ using Microsoft.Extensions.Localization;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Infrastructure.Models;
+using eFMS.API.Infrastructure.Extensions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -368,7 +369,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
                 ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
-                var permissionRange = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+                var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
                 int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange);
                 if (code == 403) return new HandleState(403);
 
@@ -414,7 +415,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = GetById(id);
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
-            var permissionRange = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
+            var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
             int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = detail.PersonIncharge, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
             return code;
         }
@@ -442,13 +443,13 @@ namespace eFMS.API.Documentation.DL.Services
             if (detail == null) return null;
             List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
                                                                  && x.AssignTo == currentUser.UserID
-                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
+                                                                 && (x.EndDate ?? DateTime.Now.Date) >= DateTime.Now.Date
                                                                  && x.Services.Contains(detail.TransactionType)
                                                                  )?.Select(x => x.UserId).ToList();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
-            var permissionRangeWrite = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            var permissionRangeDelete = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
             detail.Permission = new PermissionAllowBase
             {
                 AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail),
@@ -543,7 +544,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             ICurrentUser _user = PermissionEx.GetUserMenuPermissionTransaction(transactionType, currentUser);
 
-            PermissionRange rangeSearch = PermissionEx.GetPermissionRange(_user.UserMenuPermission.List);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
 
             var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled);
 
