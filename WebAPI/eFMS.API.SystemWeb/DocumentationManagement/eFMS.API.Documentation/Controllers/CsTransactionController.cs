@@ -115,6 +115,19 @@ namespace eFMS.API.Documentation.Controllers
         #endregion -- LIST & PAGING --
 
         /// <summary>
+        /// check permission of user to view a shipment
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("CheckPermission/{id}")]
+        public IActionResult CheckDetailPermission(Guid id)
+        {
+            var result = csTransactionService.CheckDetailPermission(id);
+            if (result == 403) return Forbid();
+            return Ok(true);
+        }
+
+        /// <summary>
         /// get transaction by id
         /// </summary>
         /// <param name="id">id that want to retrieve transaction</param>
@@ -122,7 +135,10 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
-            var data = csTransactionService.GetById(id);
+            var statusCode = csTransactionService.CheckDetailPermission(id);
+            if (statusCode == 403) return Forbid();
+
+            var data = csTransactionService.GetDetails(id);//csTransactionService.GetById(id);
             return Ok(data);
         }
 

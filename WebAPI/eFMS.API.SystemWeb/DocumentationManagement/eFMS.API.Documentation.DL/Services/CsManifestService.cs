@@ -221,7 +221,7 @@ namespace eFMS.API.Documentation.DL.Services
             var manifests = new List<ManifestFCLImportReport>();
 
             var containers = new List<SeaImportCargoManifestContainer>();
-            var transaction = csTransactionService.GetById(model.JobId);
+            var transaction = csTransactionService.GetDetails(model.JobId);//csTransactionService.GetById(model.JobId);
             var units = unitRepository.Get().ToList();
             var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
             model.PolName = model.Pol != null? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn: null;
@@ -312,7 +312,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             }
             Crystal result = new Crystal();
-            var transaction = csTransactionService.GetById(model.JobId);
+            var transaction = csTransactionService.GetDetails(model.JobId);//csTransactionService.GetById(model.JobId);
             var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
             model.PolName = model.Pol != null ? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn : null;
             model.PodName = model.Pol != null ? ports.Where(x => x.Id == model.Pod)?.FirstOrDefault()?.NameEn : null;

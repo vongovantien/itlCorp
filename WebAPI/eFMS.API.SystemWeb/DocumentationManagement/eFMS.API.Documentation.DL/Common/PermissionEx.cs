@@ -84,6 +84,124 @@ namespace eFMS.API.Documentation.DL.Common
             return code;
         }
 
+        public static int GetPermissionToDelete(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser)
+        {
+            int code = 0;
+            switch (permissionRange)
+            {
+                case PermissionRange.Owner:
+                    if (model.BillingOpsId != currentUser.UserID)
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if (model.DepartmentId != currentUser.DepartmentId)
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if (model.OfficeId != currentUser.OfficeID)
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (model.CompanyId != currentUser.CompanyID)
+                    {
+                        code = 403;
+                    }
+                    break;
+            }
+            return code;
+        }
+
+        public static int GetPermissionToUpdateShipmentDocumentation(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser, List<string> authorizeUserIds)
+        {
+            int code = 0;
+            switch (permissionRange)
+            {
+                case PermissionRange.Owner:
+                    if (model.PersonInCharge != currentUser.UserID && !authorizeUserIds.Contains(model.PersonInCharge))
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                        && !authorizeUserIds.Contains(model.PersonInCharge))
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if (model.DepartmentId != currentUser.DepartmentId && !authorizeUserIds.Contains(model.PersonInCharge))
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if (model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.PersonInCharge))
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (model.CompanyId != currentUser.CompanyID && !authorizeUserIds.Contains(model.PersonInCharge))
+                    {
+                        code = 403;
+                    }
+                    break;
+            }
+            return code;
+        }
+
+        public static int GetPermissionToDeleteShipmentDocumentation(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser)
+        {
+            int code = 0;
+            switch (permissionRange)
+            {
+                case PermissionRange.Owner:
+                    if (model.PersonInCharge != currentUser.UserID)
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if (model.DepartmentId != currentUser.DepartmentId)
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if (model.OfficeId != currentUser.OfficeID)
+                    {
+                        code = 403;
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (model.CompanyId != currentUser.CompanyID)
+                    {
+                        code = 403;
+                    }
+                    break;
+            }
+            return code;
+        }
+
         public static ICurrentUser GetUserMenuPermissionTransaction(string transactionType, ICurrentUser currentUser)
         {
             ICurrentUser _user = GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);//Set default

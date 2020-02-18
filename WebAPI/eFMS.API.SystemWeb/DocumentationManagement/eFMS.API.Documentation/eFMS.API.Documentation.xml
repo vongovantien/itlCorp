@@ -428,6 +428,13 @@
             <param name="size">number items per page</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckDetailPermission(System.Guid)">
+            <summary>
+            check permission of user to view a shipment
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Get(System.Guid)">
             <summary>
             get transaction by id

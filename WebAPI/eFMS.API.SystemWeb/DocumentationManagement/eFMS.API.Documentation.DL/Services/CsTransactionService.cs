@@ -366,6 +366,11 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
+                ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
+                var permissionRange = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+                int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange);
+                if (code == 403) return new HandleState(403);
+
                 if (job == null)
                 {
                     hs = new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
@@ -388,7 +393,7 @@ namespace eFMS.API.Documentation.DL.Services
         #endregion -- DELETE --
 
         #region -- DETAILS --
-        public CsTransactionModel GetById(Guid id)
+        private CsTransactionModel GetById(Guid id)
         {
             var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
             if (data == null) return null;
@@ -402,6 +407,133 @@ namespace eFMS.API.Documentation.DL.Services
                 if (result.DeliveryPlace != null) result.PlaceDeliveryName = catPlaceRepo.Get(x => x.Id == result.DeliveryPlace)?.FirstOrDefault().NameEn;
                 return result;
             }
+        }
+
+        public int CheckDetailPermission(Guid id)
+        {
+            var detail = GetById(id);
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
+            var permissionRange = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
+            int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = detail.PersonIncharge, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+            return code;
+        }
+
+        private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
+        {
+            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
+                                                                 && x.AssignTo == currentUser.UserID
+                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
+                                                                 && x.Services.Contains(transactionType)
+                                                                 )?.Select(x => x.UserId).ToList();
+            int code = PermissionEx.GetPermissionToUpdateShipmentDocumentation(model, permissionRange, currentUser, authorizeUserIds);
+            return code;
+        }
+
+        private int GetPermissionToDelete(ModelUpdate model, PermissionRange permissionRange)
+        {
+            int code = PermissionEx.GetPermissionToDeleteShipmentDocumentation(model, permissionRange, currentUser);
+            return code;
+        }
+
+        public CsTransactionModel GetDetails(Guid id)
+        {
+            var detail = GetById(id);
+            if (detail == null) return null;
+            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
+                                                                 && x.AssignTo == currentUser.UserID
+                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
+                                                                 && x.Services.Contains(detail.TransactionType)
+                                                                 )?.Select(x => x.UserId).ToList();
+
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
+
+            var permissionRangeWrite = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            var permissionRangeDelete = PermissionEx.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+            detail.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail),
+                AllowDelete = GetPermissionDetail(permissionRangeDelete, authorizeUserIds, detail)
+            };
+            var specialActions = _currentUser.UserMenuPermission.SpecialActions;
+            if (specialActions.Count > 0)
+            {
+                if (specialActions.Any(x => x.Action.Contains("Lock")))
+                {
+                    detail.Permission.AllowLock = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("Add Charge")))
+                {
+                    detail.Permission.AllowAddCharge = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("Update Charge")))
+                {
+                    detail.Permission.AllowUpdateCharge = true;
+                }
+            }
+            return detail;
+        }
+
+        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, List<string> authorizeUserIds, CsTransactionModel detail)
+        {
+            bool result = false;
+            switch (permissionRangeWrite)
+            {
+                case PermissionRange.All:
+                    result = true;
+                    break;
+                case PermissionRange.Owner:
+                    if (detail.PersonIncharge == currentUser.UserID || authorizeUserIds.Contains(detail.PersonIncharge))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(detail.PersonIncharge))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.PersonIncharge))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.PersonIncharge))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.PersonIncharge))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+            }
+            return result;
         }
         #endregion -- DETAILS --
 

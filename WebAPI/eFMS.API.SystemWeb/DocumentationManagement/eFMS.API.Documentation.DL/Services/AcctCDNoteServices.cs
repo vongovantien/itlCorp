@@ -36,6 +36,8 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysEmployee> sysEmployeeRepo;
         IContextBase<SysOffice> sysOfficeRepo;
         ICsShipmentSurchargeService surchargeService;
+        ICsTransactionDetailService transactionDetailService;
+        //IOpsTransactionService opsTransactionService;
 
         public AcctCDNoteServices(IStringLocalizer<LanguageSub> localizer,
             IContextBase<AcctCdnote> repository, IMapper mapper, ICurrentUser user,
@@ -54,7 +56,10 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> sysUser,
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<SysOffice> sysOffice,
-            ICsShipmentSurchargeService surcharge) : base(repository, mapper)
+            ICsShipmentSurchargeService surcharge,
+            ICsTransactionDetailService transDetailService
+            //IOpsTransactionService opsTransService
+            ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -74,6 +79,8 @@ namespace eFMS.API.Documentation.DL.Services
             sysEmployeeRepo = sysEmployee;
             sysOfficeRepo = sysOffice;
             surchargeService = surcharge;
+            transactionDetailService = transDetailService;
+            //opsTransactionService = opsTransService;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -287,7 +294,11 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (IsShipmentOperation == false)
                 {
-                    List<CsTransactionDetail> housebills = trandetailRepositoty.Get(x => x.JobId == id).ToList();
+                    //List<CsTransactionDetail> housebills = trandetailRepositoty.Get(x => x.JobId == id).ToList();
+                    var csShipment = cstransRepository.Get(x => x.Id == id)?.FirstOrDefault();
+                    var houseBillPermission = transactionDetailService.GetHouseBill(csShipment.TransactionType);
+                    List<CsTransactionDetail> housebills = houseBillPermission.Where(x => x.JobId == id && x.ParentId == null).ToList();
+                    
                     List<CsShipmentSurchargeDetailsModel> _listCharges = new List<CsShipmentSurchargeDetailsModel>();
                     foreach (var housebill in housebills)
                     {
@@ -315,6 +326,10 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     var hblid = opstransRepository.Get(x => x.Id == id).FirstOrDefault()?.Hblid;
+                    //PermissionRange rangeSearch = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.List);
+                    //var shipments = opsTransactionService.QueryByPermission(rangeSearch);
+                    //var hblid = shipments.Where(x => x.Id == id).FirstOrDefault()?.Hblid;
+                    
                     listCharges = Query(hblid.Value);
 
                     foreach (var c in listCharges)

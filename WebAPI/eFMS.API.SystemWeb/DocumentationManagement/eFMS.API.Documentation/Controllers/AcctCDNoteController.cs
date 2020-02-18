@@ -98,6 +98,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpGet]
         [Route("Get")]
+        [Authorize]
         public List<object> Get(Guid Id,bool IsShipmentOperation)
         {
              return cdNoteServices.GroupCDNoteByPartner(Id, IsShipmentOperation);
