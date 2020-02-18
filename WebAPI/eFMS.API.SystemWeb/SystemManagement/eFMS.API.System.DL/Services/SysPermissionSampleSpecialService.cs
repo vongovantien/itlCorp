@@ -58,6 +58,7 @@ namespace eFMS.API.System.DL.Services
                     };
                     perSpecial.PermissionSpecialActions = actions.Where(x => x.MenuId == actionInMenu.Key)
                         .Select(x => new PermissionSpecialAction {
+                            // Id = x.Id,
                             ModuleId = x.ModuleId,
                             MenuId = x.MenuId,
                             NameEn = x.NameEn,
