@@ -48,6 +48,7 @@
         #endregion
 
         public static readonly string MSG_STAGE_ASSIGNED_EXISTED = "MSG_STAGE_ASSIGNED_EXISTED";
+        public static readonly string DO_NOT_HAVE_PERMISSION = "DO_NOT_HAVE_PERMISSION";
 
         #region user
 
