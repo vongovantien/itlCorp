@@ -208,32 +208,32 @@ namespace eFMS.API.Documentation.DL.Common
             switch (permissionRange)
             {
                 case PermissionRange.Owner:
-                    if (model.SaleManId != currentUser.UserID && !authorizeUserIds.Contains(model.SaleManId))
+                    if (model.SaleManId != currentUser.UserID && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Group:
                     if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
-                        && !authorizeUserIds.Contains(model.SaleManId))
+                        && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && !authorizeUserIds.Contains(model.SaleManId))
+                    if (model.DepartmentId != currentUser.DepartmentId && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.SaleManId))
+                    if (model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Company:
-                    if (model.CompanyId != currentUser.CompanyID && !authorizeUserIds.Contains(model.SaleManId))
+                    if (model.CompanyId != currentUser.CompanyID && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
                     {
                         code = 403;
                     }
