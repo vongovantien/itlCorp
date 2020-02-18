@@ -147,6 +147,11 @@ namespace eFMS.API.Documentation.DL.Services
 
         public object AddCSTransaction(CsTransactionEditModel model)
         {
+            var job = DataContext.First(x => x.Id == model.Id && x.CurrentStatus != TermData.Canceled);
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
+            var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403);
+
             var transaction = mapper.Map<CsTransaction>(model);
             transaction.Id = Guid.NewGuid();
             if (model.CsMawbcontainers != null)
@@ -221,6 +226,12 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState UpdateCSTransaction(CsTransactionEditModel model)
         {
+            var job = DataContext.First(x => x.Id == model.Id && x.CurrentStatus != TermData.Canceled);
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
+            var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange, job.TransactionType);
+            if (code == 403) return new HandleState(403);
+
             //if (model.CsMawbcontainers.Count > 0)
             //{
             //    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, model.Id, null);
@@ -422,12 +433,19 @@ namespace eFMS.API.Documentation.DL.Services
 
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
         {
+            int code = 0;
+            if (permissionRange == PermissionRange.None)
+            {
+                code = 403;
+                return code;
+            }
+                
             List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
                                                                  && x.AssignTo == currentUser.UserID
                                                                  && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
                                                                  && x.Services.Contains(transactionType)
                                                                  )?.Select(x => x.UserId).ToList();
-            int code = PermissionEx.GetPermissionToUpdateShipmentDocumentation(model, permissionRange, currentUser, authorizeUserIds);
+            code = PermissionEx.GetPermissionToUpdateShipmentDocumentation(model, permissionRange, currentUser, authorizeUserIds);
             return code;
         }
 
@@ -555,6 +573,9 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  )?.Select(x => x.UserId).ToList();
             switch (rangeSearch)
             {
+                case PermissionRange.None:
+                    masterBills = null;
+                    break;
                 case PermissionRange.All:
                     break;
                 case PermissionRange.Owner:
