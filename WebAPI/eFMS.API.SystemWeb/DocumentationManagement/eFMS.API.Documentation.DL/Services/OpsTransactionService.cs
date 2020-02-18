@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using eFMS.API.Infrastructure.Models;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.Models;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -79,6 +80,8 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public override HandleState Add(OpsTransactionModel model)
         {
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403);
             model.Id = Guid.NewGuid();
             model.DatetimeCreated = DateTime.Now;
             model.UserCreated = currentUser.UserID;
@@ -177,21 +180,7 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowDelete = GetPermissionDetail(permissionRangeDelete, authorizeUserIds, detail)
             };
             var specialActions = currentUser.UserMenuPermission.SpecialActions;
-            if (specialActions.Count > 0)
-            {
-                if(specialActions.Any(x => x.Action.Contains("Lock")))
-                {
-                    detail.Permission.AllowLock = true;
-                }
-                if (specialActions.Any(x => x.Action.Contains("Add Charge")))
-                {
-                    detail.Permission.AllowAddCharge = true;
-                }
-                if (specialActions.Any(x => x.Action.Contains("Update Charge")))
-                {
-                    detail.Permission.AllowUpdateCharge = true;
-                }
-            }
+            detail.Permission = PermissionEx.GetSpecialActions(detail.Permission, specialActions);
             return detail;
         }
 
@@ -367,6 +356,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
+            if (criteria.RangeSearch == PermissionRange.None) return null;
             var data = QueryByPermission(criteria.RangeSearch);
             if (data == null)
                 return null;
@@ -834,6 +824,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange)
         {
+            if (permissionRange == PermissionRange.None) return 403;
             List<string> authorizeUserIds = GetAuthorizedShipment();
             int code = PermissionEx.GetPermissionItemOpsToUpdate(model, permissionRange, currentUser, authorizeUserIds);
             return code;
