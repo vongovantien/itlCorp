@@ -1,6 +1,6 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
 using eFMS.IdentityServer.DL.IService;
-using eFMS.IdentityServer.DL.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.IdentityServer.Service.Models;
 using ITL.NetCore.Connection.EF;

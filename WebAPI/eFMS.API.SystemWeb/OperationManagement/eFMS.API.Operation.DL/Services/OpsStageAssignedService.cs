@@ -7,15 +7,11 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using eFMS.API.Provider.Models;
 using ITL.NetCore.Common;
-using eFMS.API.Operation.Service.Contexts;
 using eFMS.API.Operation.DL.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.NoSql;
-using System.Linq.Expressions;
 
 namespace eFMS.API.Operation.DL.Services
 {

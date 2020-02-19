@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eFMS.API.Common
+﻿namespace eFMS.API.Common
 {
     public class Settings
     {

@@ -203,7 +203,7 @@ namespace eFMS.API.System.Controllers
                 if (userLevelService.Any(x => x.CompanyId == model.CompanyId
                                             && x.OfficeId == model.OfficeId
                                             && x.UserId == model.UserId
-                                            && x.GroupId == Constants.SpecialGroup))
+                                            && x.GroupId == SystemConstants.SpecialGroup))
                 {
                     isDuplicate = true;
                 }
@@ -213,7 +213,7 @@ namespace eFMS.API.System.Controllers
                 if (userLevelService.Any(x => x.CompanyId == model.CompanyId
                                             && x.OfficeId == model.OfficeId
                                             && x.UserId == model.UserId
-                                            && x.GroupId == Constants.SpecialGroup
+                                            && x.GroupId == SystemConstants.SpecialGroup
                                             && x.GroupId == model.GroupId
                                             && x.Id != model.Id))
                 {
@@ -230,7 +230,7 @@ namespace eFMS.API.System.Controllers
             {
                 if (userLevelService.Any(x => x.CompanyId == model.CompanyId
                                             && x.UserId == model.UserId
-                                            && x.GroupId == Constants.SpecialGroup))
+                                            && x.GroupId == SystemConstants.SpecialGroup))
                 {
                     isDuplicate = true;
                 }
@@ -239,7 +239,7 @@ namespace eFMS.API.System.Controllers
             {
                 if (userLevelService.Any(x => x.CompanyId == model.CompanyId
                                             && x.UserId == model.UserId
-                                            && x.GroupId == Constants.SpecialGroup
+                                            && x.GroupId == SystemConstants.SpecialGroup
                                             && x.GroupId == model.GroupId
                                             && x.Id != model.Id))
                 {
@@ -360,7 +360,7 @@ namespace eFMS.API.System.Controllers
                 if (userLevelService.Any(x => x.CompanyId == model.CompanyId
                                             && x.OfficeId == model.OfficeId
                                             && x.DepartmentId == model.DepartmentId
-                                            && x.GroupId == Constants.SpecialGroup
+                                            && x.GroupId == SystemConstants.SpecialGroup
                                             && x.UserId == model.UserId))
                 {
                     isDuplicate = true;
@@ -372,7 +372,7 @@ namespace eFMS.API.System.Controllers
                                             && x.OfficeId == model.OfficeId
                                             && x.DepartmentId == model.DepartmentId
                                             && x.UserId == model.UserId
-                                            && x.GroupId == Constants.SpecialGroup
+                                            && x.GroupId == SystemConstants.SpecialGroup
                                             && x.GroupId == model.GroupId
                                             && x.Id != model.Id))
                 {
@@ -433,7 +433,7 @@ namespace eFMS.API.System.Controllers
                                             && x.OfficeId == model.OfficeId
                                             && x.DepartmentId == model.DepartmentId
                                             && x.UserId == model.UserId
-                                            && x.GroupId != Constants.SpecialGroup))
+                                            && x.GroupId != SystemConstants.SpecialGroup))
                 {
                     isDuplicate = true;
                 }
@@ -444,7 +444,7 @@ namespace eFMS.API.System.Controllers
                                             && x.OfficeId == model.OfficeId
                                             && x.DepartmentId == model.DepartmentId
                                             && x.UserId == model.UserId
-                                            && x.GroupId != Constants.SpecialGroup
+                                            && x.GroupId != SystemConstants.SpecialGroup
                                             && x.GroupId == model.GroupId
                                             && x.Id != model.Id))
                 {

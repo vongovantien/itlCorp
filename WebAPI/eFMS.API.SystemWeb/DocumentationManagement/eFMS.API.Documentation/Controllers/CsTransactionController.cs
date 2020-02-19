@@ -120,6 +120,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("CheckPermission/{id}")]
+        [Authorize]
         public IActionResult CheckDetailPermission(Guid id)
         {
             var result = csTransactionService.CheckDetailPermission(id);
@@ -133,6 +134,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id">id that want to retrieve transaction</param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult Get(Guid id)
         {
             var statusCode = csTransactionService.CheckDetailPermission(id);

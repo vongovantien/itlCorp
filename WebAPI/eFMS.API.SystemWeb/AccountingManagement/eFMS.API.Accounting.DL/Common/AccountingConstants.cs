@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Accounting.DL.Common
 {
-    public static class Constants
+    public static class AccountingConstants
     {
         public static readonly string SEF_SHIPMENT = "SEF";
         public static readonly string SEF_HBL = "HBL";

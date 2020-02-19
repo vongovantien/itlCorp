@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Text;
 
 namespace eFMS.API.Common.Helpers
 {

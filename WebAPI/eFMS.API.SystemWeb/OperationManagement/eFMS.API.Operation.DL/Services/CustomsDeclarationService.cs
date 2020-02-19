@@ -24,7 +24,7 @@ using eFMS.API.Common.Helpers;
 using eFMS.API.Operation.Service.ViewModels;
 using eFMS.API.Operation.Service.Contexts;
 using ITL.NetCore.Connection;
-using eFMS.API.Infrastructure.Models;
+using eFMS.API.Common.Models;
 
 namespace eFMS.API.Operation.DL.Services
 {

@@ -1,8 +1,6 @@
 ﻿using eFMS.API.Common.Globals;
 using MongoDB.Driver;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Common.NoSql
 {

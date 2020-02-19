@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace eFMS.IdentityServer.DL.Models
+namespace eFMS.API.Common.Models
 {
     public class UserPermissionModel
     {
@@ -21,7 +21,8 @@ namespace eFMS.IdentityServer.DL.Models
         public bool AllowAdd { get; set; }
         public List<SpecialAction> SpecialActions { get; set; }
     }
-    public class SpecialAction{
+    public class SpecialAction
+    {
         public string Action { get; set; }
         public bool? IsAllow { get; set; }
     }

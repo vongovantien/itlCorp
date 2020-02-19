@@ -1,4 +1,4 @@
-﻿using eFMS.API.Infrastructure.Models;
+﻿using eFMS.API.Common.Models;
 using eFMS.API.Operation.Service.Models;
 
 namespace eFMS.API.Operation.DL.Models

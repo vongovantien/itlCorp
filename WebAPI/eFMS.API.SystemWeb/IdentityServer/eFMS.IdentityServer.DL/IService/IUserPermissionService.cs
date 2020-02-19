@@ -1,4 +1,5 @@
-﻿using eFMS.IdentityServer.DL.Models;
+﻿using eFMS.API.Common.Models;
+using eFMS.IdentityServer.DL.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.IdentityServer.Service.Models;
 using System;
