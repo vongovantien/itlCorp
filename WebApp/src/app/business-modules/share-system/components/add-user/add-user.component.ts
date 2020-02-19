@@ -49,11 +49,20 @@ export class ShareSystemAddUserComponent extends AppList {
 
     }
     ngOnInit() {
-        this.positions = [
-            { id: 'Manager-Leader', text: 'Manager-Leader' },
-            { id: 'Deputy', text: 'Deputy' },
-            { id: 'Assistant', text: 'Assistant' },
-        ];
+        if (this.type === 'group') {
+            this.positions = [
+                { id: 'Manager-Leader', text: 'Manager-Leader' },
+                { id: 'Deputy', text: 'Deputy' },
+                { id: 'Staff', text: 'Staff' },
+            ];
+        } else {
+            this.positions = [
+                { id: 'Manager-Leader', text: 'Manager-Leader' },
+                { id: 'Deputy', text: 'Deputy' },
+                { id: 'Assistant', text: 'Assistant' },
+            ];
+        }
+
         this.headers = [
             { title: 'User Name', field: 'username', required: true },
             { title: 'Full Name', field: 'employeeNameVn', required: true },
