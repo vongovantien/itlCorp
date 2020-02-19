@@ -4,32 +4,9 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                routerLink="/home/operation/custom-clearance/new">
-                <span>
-                    <i class="la la-plus"></i>
-                    <span>
-                        add new
-                    </span>
-                </span>
-            </button>
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
-                <span>
-                    <i class="la la-upload"></i>
-                    <span>
-                        export
-                    </span>
-                </span>
-            </button>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                routerLink="/home/operation/custom-clearance/import">
-                <span>
-                    <i class="la la-download"></i>
-                    <span>
-                        import
-                    </span>
-                </span>
-            </button>
+            <app-permission-button title="add new" (click)="gotoCreateCD()"></app-permission-button>
+            <app-permission-button title="Export" (click)="export()" type="export"></app-permission-button>
+            <app-permission-button title="Import" (click)="import()" type="import"></app-permission-button>
         </div>
     </div>
 </div>

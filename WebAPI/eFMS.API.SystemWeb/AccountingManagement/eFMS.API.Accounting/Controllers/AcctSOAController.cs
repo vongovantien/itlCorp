@@ -148,7 +148,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
             if (string.IsNullOrEmpty(currencyLocal))
-                currencyLocal = Constants.CURRENCY_LOCAL;
+                currencyLocal = AccountingConstants.CURRENCY_LOCAL;
             var results = acctSOAService.GetDetailBySoaNoAndCurrencyLocal(soaNo, currencyLocal);//acctSOAService.GetBySoaNoAndCurrencyLocal(soaNo, currencyLocal);
             return Ok(results);
         }
@@ -237,7 +237,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetDataExportSOABySOANo(string soaNo, string currencyLocal)
         {
             if (string.IsNullOrEmpty(currencyLocal))
-                currencyLocal = Constants.CURRENCY_LOCAL;
+                currencyLocal = AccountingConstants.CURRENCY_LOCAL;
             var data = acctSOAService.GetDataExportSOABySOANo(soaNo, currencyLocal);
             return Ok(data);
         }
@@ -252,7 +252,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult ExportDetailSOA(ExportDetailSOACriteria criteria)
         {
             if (string.IsNullOrEmpty(criteria.currencyLocal))
-                criteria.currencyLocal = Constants.CURRENCY_LOCAL;
+                criteria.currencyLocal = AccountingConstants.CURRENCY_LOCAL;
             var data = acctSOAService.GetDataExportSOABySOANo(criteria.soaNo, criteria.currencyLocal);
             return Ok(data);
         }
@@ -266,7 +266,7 @@ namespace eFMS.API.Accounting.Controllers
         public ChargeShipmentResult ListChargeShipment(ChargeShipmentCriteria criteria)
         {
             if (string.IsNullOrEmpty(criteria.CurrencyLocal))
-                criteria.CurrencyLocal = Constants.CURRENCY_LOCAL;
+                criteria.CurrencyLocal = AccountingConstants.CURRENCY_LOCAL;
             var data = acctSOAService.GetListChargeShipment(criteria);
             return data;
         }

@@ -6,17 +6,20 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgProgressComponent } from '@ngx-progressbar/core';
+import { NgProgressComponent, NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
 import { ToastrService } from 'ngx-toastr';
+import { OperationRepo } from '@repositories';
+import { finalize } from 'rxjs/operators';
+import { AppPage } from 'src/app/app.base';
 declare var $: any;
 
 @Component({
     selector: 'app-custom-clearance-import',
     templateUrl: './custom-clearance-import.component.html',
 })
-export class CustomClearanceImportComponent implements OnInit {
+export class CustomClearanceImportComponent extends AppPage implements OnInit {
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];
@@ -32,31 +35,37 @@ export class CustomClearanceImportComponent implements OnInit {
         private baseService: BaseService,
         private api_menu: API_MENU,
         private sortService: SortService,
-        private toastr: ToastrService) { }
+        private toastr: ToastrService,
+        private _operationRepo: OperationRepo,
+        private _progressService: NgProgress) {
+        super();
+        this._progressRef = this._progressService.ref();
+    }
 
     ngOnInit() {
         this.pager.totalItems = 0;
     }
 
     chooseFile(file: Event) {
-        if (file.target['files'] == null) return;
+        if (file.target['files'] == null) { return; }
         this.progressBar.start();
         /**/
         this.resetBeforeSelecedFile();
         /**/
-        this.baseService.uploadfile(this.api_menu.Operation.CustomClearance.uploadExel, file.target['files'], "uploadedFile")
+        this._operationRepo.upLoadClearanceFile(file.target['files'])
+            .pipe(
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            )
             .subscribe((response: any) => {
-                console.log(response);
                 this.data = response.data;
                 this.pager.totalItems = this.data.length;
                 this.totalValidRows = response.totalValidRows;
                 this.totalRows = this.data.length;
                 this.pagingData(this.data);
                 this.progressBar.complete();
-                console.log(this.data);
-            }, err => {
-                this.progressBar.complete();
-                this.baseService.handleError(err);
+            }, () => {
             });
     }
 

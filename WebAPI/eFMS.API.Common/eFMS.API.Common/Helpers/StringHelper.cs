@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eFMS.API.Common.Helpers
+﻿namespace eFMS.API.Common.Helpers
 {
     public static class StringHelper
     {
@@ -15,8 +11,7 @@ namespace eFMS.API.Common.Helpers
             }
             return str;
         }
-        private static readonly string[] VietnameseSigns = new string[]
-        {
+        private static readonly string[] VietnameseSigns = {
 
             "aAeEoOuUiIdDyY",
 

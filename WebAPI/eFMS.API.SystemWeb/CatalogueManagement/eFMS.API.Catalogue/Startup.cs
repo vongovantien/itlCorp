@@ -2,6 +2,7 @@
 using eFMS.API.Catalogue.Infrastructure;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
+using eFMS.API.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -46,6 +47,8 @@ namespace eFMS.API.Catalogue
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             ServiceRegister.Register(services, Configuration);
+
+            IdentityServiceRegister.IdentityRegister(services);
             services.AddCrossOrigin();
             services.AddApiVersioning(config =>
             {

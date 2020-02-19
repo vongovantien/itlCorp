@@ -1,20 +1,13 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="gotoCreateJob()">
-            <span>
-                <i class="la la-plus"></i>
-                <span>
-                    create new job
-                </span>
-            </span>
-        </button>
+        <app-permission-button title="create new job" (click)="gotoCreateJob()"></app-permission-button>
     </div>
 </app-sub-header>
 
 <div class="m-content">
 
-    <form-search-sea [transaction]="transactionService" (onSearch)="onSearchShipment($event)" (onReset)="onResetShipment($event)"></form-search-sea>
+    <form-search-sea [transaction]="transactionService" (onSearch)="onSearchShipment($event)"
+        (onReset)="onResetShipment($event)"></form-search-sea>
 
     <div class="m-portlet">
         <div class="m-portlet__body">

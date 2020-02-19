@@ -11,7 +11,6 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -158,7 +157,7 @@ namespace eFMS.API.System.DL.Services
                         else
                         {
                             item.Active = true;
-                            item.GroupId = item.GroupId == 0 ? Constants.SpecialGroup : item.GroupId;
+                            item.GroupId = item.GroupId == 0 ? SystemConstants.SpecialGroup : item.GroupId;
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                             item.UserCreated = item.UserModified = currentUser.UserID;
                             hsUser = DataContext.Add(item, true);

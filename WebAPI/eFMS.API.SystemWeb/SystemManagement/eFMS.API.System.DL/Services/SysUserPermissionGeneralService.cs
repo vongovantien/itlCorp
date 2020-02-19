@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
@@ -64,10 +65,10 @@ namespace eFMS.API.System.DL.Services
                         else
                         {
                             perDetail.Access = false;
-                            perDetail.Detail = Constants.Owner;
-                            perDetail.Write = Constants.Owner;
-                            perDetail.Delete = Constants.Owner;
-                            perDetail.List = Constants.Owner;
+                            perDetail.Detail = Constants.PERMISSION_RANGE_OWNER;
+                            perDetail.Write = Constants.PERMISSION_RANGE_OWNER;
+                            perDetail.Delete = Constants.PERMISSION_RANGE_OWNER;
+                            perDetail.List = Constants.PERMISSION_RANGE_OWNER;
                             perDetail.Import = false;
                             perDetail.Export = false;
                         }

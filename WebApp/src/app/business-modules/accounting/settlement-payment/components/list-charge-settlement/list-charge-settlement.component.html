@@ -126,7 +126,7 @@
                                             </span>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td [class.text-underline]="!surcharge.isFromShipment">
                                         <a (click)="updateChargeWithJob(surcharge,i)" class="pointer">
                                             {{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}
                                         </a>

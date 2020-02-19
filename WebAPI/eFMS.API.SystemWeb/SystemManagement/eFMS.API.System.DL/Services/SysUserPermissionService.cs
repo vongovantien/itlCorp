@@ -6,13 +6,11 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using ITL.NetCore.Common;
 using System.Diagnostics.Contracts;
-using eFMS.API.System.DL.ViewModels;
-using eFMS.IdentityServer.DL.Models;
 using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.Common.Models;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -342,7 +340,7 @@ namespace eFMS.API.System.DL.Services
                 List = generalPermission.List,
                 Import = generalPermission.Import,
                 Export = generalPermission.Export,
-                //AllowAdd = generalPermission.Write == "None"?false: true,
+                AllowAdd = generalPermission.Write == "None"?false: true,
                 SpecialActions = specialPermissions?.Select(x => new SpecialAction
                 {
                     Action = x.ActionName,

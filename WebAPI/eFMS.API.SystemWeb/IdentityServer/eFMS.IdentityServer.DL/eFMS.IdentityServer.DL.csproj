@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Compile Remove="Models\SysEmployeeModel.cs" />
+    <Compile Remove="Models\UserPermissionModel.cs" />
   </ItemGroup>
 
   <ItemGroup>

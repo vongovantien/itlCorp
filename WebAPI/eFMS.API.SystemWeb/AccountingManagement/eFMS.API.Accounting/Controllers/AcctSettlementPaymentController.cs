@@ -277,7 +277,7 @@ namespace eFMS.API.Accounting.Controllers
                         ChargeID = item.ChargeId,
                         TypeCharge = item.Type,
                         HBLID = item.Hblid,
-                        Partner = item.Type.Equals(Constants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
+                        Partner = item.Type.Equals(AccountingConstants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
                         ContNo = item.ContNo,
@@ -341,7 +341,7 @@ namespace eFMS.API.Accounting.Controllers
                         ChargeID = item.ChargeId,
                         TypeCharge = item.Type,
                         HBLID = item.Hblid,
-                        Partner = item.Type.Equals(Constants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
+                        Partner = item.Type.Equals(AccountingConstants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
                         ContNo = item.ContNo,
@@ -399,7 +399,7 @@ namespace eFMS.API.Accounting.Controllers
                         ChargeID = item.ChargeId,
                         TypeCharge = item.Type,
                         HBLID = item.Hblid,
-                        Partner = item.Type.Equals(Constants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
+                        Partner = item.Type.Equals(AccountingConstants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
                         ContNo = item.ContNo,
@@ -436,17 +436,17 @@ namespace eFMS.API.Accounting.Controllers
 
             if (string.IsNullOrEmpty(model.Settlement.SettlementNo))//Insert Settlement Payment
             {
-                model.Settlement.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
+                model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctSettlementPaymentService.AddSettlementPayment(model);
             }
             else //Update Settlement Payment
             {
-                if (!model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                if (!model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_NEW) && !model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the settlement payment status is New or Deny" };
                     return Ok(_result);
                 }
-                model.Settlement.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
+                model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
             }
 

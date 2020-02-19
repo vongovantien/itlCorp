@@ -188,12 +188,12 @@ namespace eFMS.API.Accounting.DL.Services
                             !string.IsNullOrEmpty(criteria.Requester) ?
                             (
                                     set.Requester == criteria.Requester
-                                || (apr.Manager == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED))
-                                || (apr.Accountant == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED && set.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))
-                                || (apr.ManagerApr == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED))
-                                || (apr.AccountantApr == criteria.Requester && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED && set.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))
-                                || (isManagerDeputy && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED))
-                                || (isAccountantDeputy && (set.StatusApproval != Constants.STATUS_APPROVAL_NEW && set.StatusApproval != Constants.STATUS_APPROVAL_DENIED && set.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL))
+                                || (apr.Manager == criteria.Requester && (set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
+                                || (apr.Accountant == criteria.Requester && (set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
+                                || (apr.ManagerApr == criteria.Requester && (set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
+                                || (apr.AccountantApr == criteria.Requester && (set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
+                                || (isManagerDeputy && (set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
+                                || (isAccountantDeputy && (set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
                             )
                             :
                                 true
@@ -382,8 +382,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
                 if (settlement == null) return new HandleState("Not found Settlement Payment");
-                if (   !settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) 
-                    && !settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                if (   !settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_NEW) 
+                    && !settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
                     return new HandleState("Not allow delete. Settlements are awaiting approval.");
                 }
@@ -647,9 +647,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     Vatrate = sur.Vatrate,
                                     Total = sur.Total != null ? sur.Total : 0,
                                     PayerId = sur.PayerId,
-                                    Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
-                                    OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
+                                    OBHPartnerName = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
                                     InvoiceNo = sur.InvoiceNo,
                                     SeriesNo = sur.SeriesNo,
                                     InvoiceDate = sur.InvoiceDate,
@@ -698,9 +698,9 @@ namespace eFMS.API.Accounting.DL.Services
                                    Vatrate = sur.Vatrate,
                                    Total = sur.Total != null ? sur.Total : 0,
                                    PayerId = sur.PayerId,
-                                   Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                   Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                    PaymentObjectId = sur.PaymentObjectId,
-                                   OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
+                                   OBHPartnerName = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
                                    InvoiceNo = sur.InvoiceNo,
                                    SeriesNo = sur.SeriesNo,
                                    InvoiceDate = sur.InvoiceDate,
@@ -808,9 +808,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     Vatrate = sur.Vatrate,
                                     Total = sur.Total != null ? sur.Total : 0,
                                     PayerId = sur.PayerId,
-                                    Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
-                                    OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
+                                    OBHPartnerName = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
                                     InvoiceNo = sur.InvoiceNo,
                                     SeriesNo = sur.SeriesNo,
                                     InvoiceDate = sur.InvoiceDate,
@@ -855,9 +855,9 @@ namespace eFMS.API.Accounting.DL.Services
                                    Vatrate = sur.Vatrate,
                                    Total = sur.Total != null ? sur.Total : 0,
                                    PayerId = sur.PayerId,
-                                   Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                   Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                    PaymentObjectId = sur.PaymentObjectId,
-                                   OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
+                                   OBHPartnerName = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
                                    InvoiceNo = sur.InvoiceNo,
                                    SeriesNo = sur.SeriesNo,
                                    InvoiceDate = sur.InvoiceDate,
@@ -884,7 +884,7 @@ namespace eFMS.API.Accounting.DL.Services
                        join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
                        from ad in ad2.DefaultIfEmpty()
                        where
-                            ad.StatusApproval == Constants.STATUS_APPROVAL_DONE
+                            ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
                        && req.JobId == jobId
                        && req.Mbl == mbl
                        && req.Hbl == hbl
@@ -966,7 +966,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid //into opst2
                                 //from opst in opst2.DefaultIfEmpty()
                                 where
-                                        settle.StatusApproval == Constants.STATUS_APPROVAL_DONE
+                                        settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
                                      && opst.JobNo == jobId
                                      && opst.Hwbno == hbl
                                      && opst.Mblno == mbl
@@ -988,7 +988,7 @@ namespace eFMS.API.Accounting.DL.Services
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
                                from cst in cst2.DefaultIfEmpty()
                                where
-                                       settle.StatusApproval == Constants.STATUS_APPROVAL_DONE
+                                       settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
                                     && cst.JobNo == jobId
                                     && cstd.Hwbno == hbl
                                     && cst.Mawb == mbl
@@ -1083,8 +1083,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     ChargeName = cc.ChargeNameEn,
                                     TotalAmount = sur.Total != null ? sur.Total : 0,
                                     SettlementCurrency = sur.CurrencyId,
-                                    OBHPartner = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
-                                    Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
+                                    OBHPartner = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
+                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1108,8 +1108,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    ChargeName = cc.ChargeNameEn,
                                    TotalAmount = sur.Total != null ? sur.Total : 0,
                                    SettlementCurrency = sur.CurrencyId,
-                                   OBHPartner = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
-                                   Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
+                                   OBHPartner = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
+                                   Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
                                };
             var data = dataOperation.Union(dataDocument);
             return data;
@@ -1124,13 +1124,13 @@ namespace eFMS.API.Accounting.DL.Services
                 .Get(x =>
                         x.IsFromShipment == true
                     //&& (x.Type == Constants.TYPE_CHARGE_BUY || (x.PayerId != null && x.CreditNo != null))
-                    && (x.Type == Constants.TYPE_CHARGE_BUY || (x.PayerId == criteria.partnerId && x.CreditNo != null))
+                    && (x.Type == AccountingConstants.TYPE_CHARGE_BUY || (x.PayerId == criteria.partnerId && x.CreditNo != null))
                 );
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();
             var payer = catPartnerRepo.Get();
             var payee = catPartnerRepo.Get();
-            var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
+            var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
 
@@ -1248,7 +1248,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
                                x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
-                            && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
+                            && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
                             && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
                             && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
                             && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
@@ -1280,7 +1280,7 @@ namespace eFMS.API.Accounting.DL.Services
                                x.Id != criteria.SurchargeID
                             && x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
-                            && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
+                            && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
                             && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
                             && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
                             && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
@@ -1315,7 +1315,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
                 settlement.Id = model.Settlement.Id = Guid.NewGuid();
                 settlement.SettlementNo = model.Settlement.SettlementNo = CreateSettlementNo();
-                settlement.StatusApproval = Constants.STATUS_APPROVAL_NEW;
+                settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_NEW;
                 settlement.UserCreated = settlement.UserModified = userCurrent;
                 settlement.DatetimeCreated = settlement.DatetimeModified = DateTime.Now;
                 settlement.Amount = CaculatorAmountSettlement(model);
@@ -1415,7 +1415,7 @@ namespace eFMS.API.Accounting.DL.Services
                 if (settlementCurrent == null) return new HandleState("Not found settlement payment");
 
                 //Get Advance current from Database
-                if (!settlementCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !settlementCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                if (!settlementCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_NEW) && !settlementCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
                     return new HandleState("Only allowed to edit the advance payment status is New or Deny");
                 }
@@ -1428,9 +1428,9 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.Amount = CaculatorAmountSettlement(model);
 
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
-                if (model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED) && settlementCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                if (model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED) && settlementCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
-                    settlement.StatusApproval = Constants.STATUS_APPROVAL_NEW;
+                    settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_NEW;
                 }
                 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -1564,7 +1564,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Chỉ lấy ra các charge có status advance là done
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
-            var advance = acctAdvancePaymentRepo.Get(x => x.StatusApproval == Constants.STATUS_APPROVAL_DONE);
+            var advance = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
             var request = acctAdvanceRequestRepo.Get(x => x.JobId == JobId && x.Mbl == MBL && x.Hbl == HBL);
             var query = from adv in advance
                         join req in request on adv.AdvanceNo equals req.AdvanceNo into req1
@@ -1584,7 +1584,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var advRequest = acctAdvanceRequestRepo.Get();
             var advPayment = acctAdvancePaymentRepo.Get();
-            var settlement = DataContext.Get(x => x.StatusApproval == Constants.STATUS_APPROVAL_DONE);
+            var settlement = DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
             var settleApprove = acctApproveSettlementRepo.Get(x => x.IsDeputy == false);
 
             var customer = catPartnerRepo.Get();
@@ -1615,7 +1615,7 @@ namespace eFMS.API.Accounting.DL.Services
                        select new AscSettlementPaymentRequestReportParams
                        {
                            JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
-                           AdvDate = (!string.IsNullOrEmpty(advance.StatusApproval) && advance.StatusApproval == Constants.STATUS_APPROVAL_DONE ? advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : string.Empty),
+                           AdvDate = (!string.IsNullOrEmpty(advance.StatusApproval) && advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE ? advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : string.Empty),
                            SettlementNo = settlementNo,
                            Customer = cus.PartnerNameVn != null ? cus.PartnerNameVn.ToUpper() : string.Empty,
                            Consignee = cnee.PartnerNameVn != null ? cnee.PartnerNameVn.ToUpper() : string.Empty,
@@ -1759,10 +1759,10 @@ namespace eFMS.API.Accounting.DL.Services
                 parameter.StlAscDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.AccountantAprDate.HasValue ? infoSettleAprove.AccountantAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
                 parameter.StlBODSignDate = infoSettleAprove != null && infoSettleAprove.BuheadAprDate.HasValue ? infoSettleAprove.BuheadAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
 
-                parameter.CompanyName = Constants.COMPANY_NAME;
-                parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
-                parameter.CompanyAddress2 = Constants.COMPANY_CONTACT;
-                parameter.Website = Constants.COMPANY_WEBSITE;
+                parameter.CompanyName = AccountingConstants.COMPANY_NAME;
+                parameter.CompanyAddress1 = AccountingConstants.COMPANY_ADDRESS1;
+                parameter.CompanyAddress2 = AccountingConstants.COMPANY_CONTACT;
+                parameter.Website = AccountingConstants.COMPANY_WEBSITE;
                 parameter.Contact = currentUser.UserID;//Get user login
 
                 //Lấy ra tổng Advance Amount của các charge thuộc Settlement
@@ -1780,7 +1780,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var _inword = string.Empty;
                 if (_amount > 0)
                 {
-                    var _currency = settlement.SettlementCurrency == Constants.CURRENCY_LOCAL ?
+                    var _currency = settlement.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ?
                                (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                             :
                             settlement.SettlementCurrency;
@@ -1857,10 +1857,10 @@ namespace eFMS.API.Accounting.DL.Services
                 if (!string.IsNullOrEmpty(settlement.SettlementNo))
                 {
                     var settle = DataContext.Get(x => x.SettlementNo == settlement.SettlementNo).FirstOrDefault();
-                    if (settle.StatusApproval != Constants.STATUS_APPROVAL_NEW 
-                        && settle.StatusApproval != Constants.STATUS_APPROVAL_DENIED 
-                        && settle.StatusApproval != Constants.STATUS_APPROVAL_DONE
-                        && settle.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL)
+                    if (settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW 
+                        && settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED 
+                        && settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE
+                        && settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
                     {
                         return new HandleState("Awaiting approval");
                     }
@@ -1995,14 +1995,14 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         if (userCurrent == GetLeaderIdOfUser(settlement.Requester))
                         {
-                            if (   settlement.StatusApproval == Constants.STATUS_APPROVAL_LEADERAPPROVED
-                                || settlement.StatusApproval == Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED
-                                || settlement.StatusApproval == Constants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
-                                || settlement.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            if (   settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED
+                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED
+                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
                                 return new HandleState("Leader approved");
                             }
-                            settlement.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
+                            settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED;
                             approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
 
                             //Lấy email của Department Manager
@@ -2012,13 +2012,13 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || CheckDeputyManagerByUser(userCurrent))
                         {
-                            if (   settlement.StatusApproval == Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED
-                                || settlement.StatusApproval == Constants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
-                                || settlement.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            if (   settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED
+                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
                                 return new HandleState("Manager department approved");
                             }
-                            settlement.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
+                            settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
                             approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
                             approve.ManagerApr = userCurrent;
 
@@ -2029,11 +2029,11 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || CheckDeputyAccountantByUser(userCurrent))
                         {
-                            if (settlement.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
                                 return new HandleState("Chief accountant approved");
                             }
-                            settlement.StatusApproval = Constants.STATUS_APPROVAL_DONE;
+                            settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
                             approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
                             approve.AccountantApr = userCurrent;
                             approve.BuheadApr = approve.Buhead;
@@ -2118,7 +2118,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                     if (approve != null && settlement != null)
                     {
-                        if (settlement.StatusApproval == Constants.STATUS_APPROVAL_DENIED)
+                        if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DENIED)
                         {
                             return new HandleState("Settlement payment denied");
                         }
@@ -2133,7 +2133,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             //Cho phép User Manager thực hiện deny khi user Manager đã Approved, 
                             //nếu Chief Accountant đã Approved thì User Manager ko được phép deny
-                            if (settlement.StatusApproval == Constants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || settlement.StatusApproval == Constants.STATUS_APPROVAL_DONE)
+                            if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
                                 return new HandleState("Not allow deny. Advance payment has been approved");
                             }
@@ -2161,7 +2161,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
 
                         //Cập nhật lại advance status của Settlement Payment
-                        settlement.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
+                        settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
                         settlement.UserModified = userCurrent;
                         settlement.DatetimeModified = DateTime.Now;
                         var hsUpdateSettle = DataContext.Update(settlement, x => x.Id == settlement.Id);
@@ -2479,7 +2479,7 @@ namespace eFMS.API.Accounting.DL.Services
                         join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
                         from ad in ad2.DefaultIfEmpty()
                         where
-                               ad.StatusApproval == Constants.STATUS_APPROVAL_DONE
+                               ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
                             && req.JobId == JobId
                             && req.Mbl == MBL
                             && req.Hbl == HBL
@@ -2539,7 +2539,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetAccountantId(string idBranch)
         {
-            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == Constants.DEPT_CODE_ACCOUNTANT).FirstOrDefault()?.ManagerId;
+            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == AccountingConstants.DEPT_CODE_ACCOUNTANT).FirstOrDefault()?.ManagerId;
             return accountantManagerId;
         }
 
@@ -2576,9 +2576,9 @@ namespace eFMS.API.Accounting.DL.Services
         private List<string> GetListUserDeputyByDept(string dept, string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
             Dictionary<string, string> listUsers = new Dictionary<string, string> {
-                 { "william.hiep", Constants.DEPT_CODE_OPS },//User ủy quyền cho dept OPS
-                 { "linda.linh", Constants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "christina.my", Constants.DEPT_CODE_ACCOUNTANT }//User ủy quyền cho dept Accountant
+                 { "william.hiep", AccountingConstants.DEPT_CODE_OPS },//User ủy quyền cho dept OPS
+                 { "linda.linh", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
+                 { "christina.my", AccountingConstants.DEPT_CODE_ACCOUNTANT }//User ủy quyền cho dept Accountant
             };
             var list = listUsers.ToList();
             var deputy = listUsers.Where(x => x.Value == dept).Select(x => x.Key).ToList();
@@ -2639,7 +2639,7 @@ namespace eFMS.API.Accounting.DL.Services
                         result = new HandleState();
                         //Check group CSManager đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
+                        if (settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
@@ -2658,14 +2658,14 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
-                        && settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
+                        && settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                         && acctApprove.ManagerAprDate != null
                         && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                     {
                         result = new HandleState();
                         //Check group Accountant đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DONE)
+                        if (settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DONE)
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
@@ -2701,7 +2701,7 @@ namespace eFMS.API.Accounting.DL.Services
                         result = new HandleState();
                         //Check group Leader đã được approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_LEADERAPPROVED)
+                        if (settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED)
                             && acctApprove.LeaderAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.Leader))
                         {
@@ -2731,13 +2731,13 @@ namespace eFMS.API.Accounting.DL.Services
 
                     //Check group Leader đã được approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Leader)
-                        && settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_LEADERAPPROVED)
+                        && settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED)
                         && acctApprove.LeaderAprDate != null)
                     {
                         result = new HandleState();
                         //Check group Manager Department đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
+                        if (settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
@@ -2757,14 +2757,14 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
-                        && settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
+                        && settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                         && acctApprove.ManagerAprDate != null
                         && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                     {
                         result = new HandleState();
                         //Check group Accountant đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DONE)
+                        if (settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DONE)
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
@@ -3058,7 +3058,7 @@ namespace eFMS.API.Accounting.DL.Services
             else if (userCurrent == approveSettlement.Manager || userCurrent == approveSettlement.ManagerApr || isDeputyManage) //Dept Manager
             {
                 isApproved = true;
-                var isDeptWaitingApprove = DataContext.Get(x => x.SettlementNo == approveSettlement.SettlementNo && (x.StatusApproval != Constants.STATUS_APPROVAL_NEW && x.StatusApproval != Constants.STATUS_APPROVAL_DENIED)).Any();
+                var isDeptWaitingApprove = DataContext.Get(x => x.SettlementNo == approveSettlement.SettlementNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)).Any();
                 if (string.IsNullOrEmpty(approveSettlement.ManagerApr) && approveSettlement.ManagerAprDate == null && isDeptWaitingApprove)
                 {
                     isApproved = false;
@@ -3067,7 +3067,7 @@ namespace eFMS.API.Accounting.DL.Services
             else if (userCurrent == approveSettlement.Accountant || userCurrent == approveSettlement.AccountantApr || isDeputyAccoutant) //Accountant Manager
             {
                 isApproved = true;
-                var isDeptWaitingApprove = DataContext.Get(x => x.SettlementNo == approveSettlement.SettlementNo && (x.StatusApproval != Constants.STATUS_APPROVAL_NEW && x.StatusApproval != Constants.STATUS_APPROVAL_DENIED && x.StatusApproval != Constants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any();
+                var isDeptWaitingApprove = DataContext.Get(x => x.SettlementNo == approveSettlement.SettlementNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any();
                 if (string.IsNullOrEmpty(approveSettlement.AccountantApr) && approveSettlement.AccountantAprDate == null && isDeptWaitingApprove)
                 {
                     isApproved = false;
@@ -3099,9 +3099,9 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     string log = string.Empty;
                     var logs = item.LockedLog!= null? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList(): new List<string>();
-                    if (item.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
+                    if (item.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)
                     {
-                        item.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
+                        item.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
                         log = item.SettlementNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
                         item.LockedLog = item.LockedLog + log + ";";
                         item.UserModified = currentUser.UserName;
@@ -3156,9 +3156,9 @@ namespace eFMS.API.Accounting.DL.Services
                     foreach (var item in settlePayments)
                     {
                         var settle = DataContext.Get(x => x.Id == item.Id)?.FirstOrDefault();
-                        if (settle.StatusApproval != Constants.STATUS_APPROVAL_DENIED)
+                        if (settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)
                         {
-                            settle.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
+                            settle.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
                             settle.UserModified = currentUser.UserName;
                             settle.DatetimeModified = DateTime.Now;
                             var log = item.SettlementNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
@@ -3196,7 +3196,7 @@ namespace eFMS.API.Accounting.DL.Services
             var brandOfUserId = GetEmployeeByUserId(user)?.CompanyId;
             //Lấy ra dept code của user dựa vào user
             var deptCodeOfUser = GetInfoDeptOfUser(user, brandOfUserId.ToString())?.Code;
-            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser != Constants.DEPT_CODE_ACCOUNTANT)
+            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser != AccountingConstants.DEPT_CODE_ACCOUNTANT)
             {
                 result = GetListUserDeputyByDept(deptCodeOfUser).Contains(user) ? true : false;
             }
@@ -3210,7 +3210,7 @@ namespace eFMS.API.Accounting.DL.Services
             var brandOfUserId = GetEmployeeByUserId(user)?.CompanyId;
             //Lấy ra dept code của user dựa vào user
             var deptCodeOfUser = GetInfoDeptOfUser(user, brandOfUserId.ToString())?.Code;
-            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser == Constants.DEPT_CODE_ACCOUNTANT)
+            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser == AccountingConstants.DEPT_CODE_ACCOUNTANT)
             {
                 result = GetListUserDeputyByDept(deptCodeOfUser).Contains(user) ? true : false;
             }

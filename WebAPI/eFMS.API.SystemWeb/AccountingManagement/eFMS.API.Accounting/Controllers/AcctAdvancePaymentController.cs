@@ -128,7 +128,7 @@ namespace eFMS.API.Accounting.Controllers
             if (model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
-                if (model.PaymentMethod.Equals(Constants.PAYMENT_METHOD_CASH))
+                if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
                 {
                     var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
                     if (totalAmount > 100000000)
@@ -253,7 +253,7 @@ namespace eFMS.API.Accounting.Controllers
             if (model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
-                if (model.PaymentMethod.Equals(Constants.PAYMENT_METHOD_CASH))
+                if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
                 {
                     var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
                     if (totalAmount > 100000000)
@@ -333,7 +333,7 @@ namespace eFMS.API.Accounting.Controllers
             if (model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
-                if (model.PaymentMethod.Equals(Constants.PAYMENT_METHOD_CASH))
+                if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
                 {
                     var totalAmount = model.AdvanceRequests.Select(s => s.Amount).Sum();
                     if (totalAmount > 100000000)
@@ -377,18 +377,18 @@ namespace eFMS.API.Accounting.Controllers
             HandleState hs;
             if (string.IsNullOrEmpty(model.AdvanceNo))//Insert Advance Payment
             {
-                model.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
+                model.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctAdvancePaymentService.AddAdvancePayment(model);
             }
             else //Update Advance Payment
             {
-                if (!model.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                if (!model.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
                     return BadRequest(_result);
                 }
 
-                model.StatusApproval = Constants.STATUS_APPROVAL_REQUESTAPPROVAL;
+                model.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
             }
 

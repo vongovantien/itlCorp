@@ -14,10 +14,9 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using eFMS.API.Infrastructure.Models;
 using eFMS.API.Infrastructure.Extensions;
-using eFMS.IdentityServer.DL.Models;
 using eFMS.IdentityServer.DL.IService;
+using eFMS.API.Common.Models;
 
 namespace eFMS.API.Documentation.DL.Services
 {

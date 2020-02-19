@@ -20,9 +20,9 @@ const routing: Routes = [
                 path: '', component: JobManagementComponent
             },
             {
-                path: "job-create",
+                path: "new",
                 component: JobManagementCreateJobComponent,
-                data: { name: "Create", }
+                data: { name: "New", }
             },
             {
                 path: "job-edit",

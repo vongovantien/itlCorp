@@ -4,7 +4,6 @@ using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.DL.Models.Ecus;
-using eFMS.API.Operation.Service.Contexts;
 using eFMS.API.Operation.Service.Models;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
@@ -13,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace eFMS.API.Operation.DL.Services
 {

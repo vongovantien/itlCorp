@@ -81,7 +81,7 @@ namespace eFMS.API.System.Controllers
         public IActionResult Add(SysUserModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            model.Password = Constants.Password;
+            model.Password = SystemConstants.Password;
             model.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
             var existedMessage = CheckExistCode(model.SysEmployeeModel.StaffCode, "0");
             var existedName = CheckExistUserName(model.Username, "0");
@@ -228,7 +228,7 @@ namespace eFMS.API.System.Controllers
         public IActionResult ResetPassword(string id)
         {
             var item = sysUserService.Get(x => x.Id == id).FirstOrDefault();
-            item.Password = Constants.Password;
+            item.Password = SystemConstants.Password;
             item.Password = BCrypt.Net.BCrypt.HashPassword(item.Password);
             var hs = sysUserService.Update(item, x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Update);

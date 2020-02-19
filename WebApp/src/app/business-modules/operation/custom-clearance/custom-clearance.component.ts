@@ -13,6 +13,7 @@ import _map from 'lodash/map';
 import { NgProgress } from '@ngx-progressbar/core';
 import { HttpClient } from '@angular/common/http';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -36,10 +37,10 @@ export class CustomClearanceComponent extends AppList {
         private _toastrService: ToastrService,
         private _operationRepo: OperationRepo,
         private _ngProgressService: NgProgress,
-        private _http: HttpClient,
         private _documentRepo: DocumentationRepo,
         private _catalogueRepo: CatalogueRepo,
         private _exportRepo: ExportRepo,
+        private _router: Router,
     ) {
         super();
         this.requestList = this.getListCustomsDeclaration;
@@ -270,6 +271,15 @@ export class CustomClearanceComponent extends AppList {
                 },
                 () => { }
             );
+    }
+
+    gotoCreateCD() {
+        this._router.navigate(["home/operation/custom-clearance/new"]);
+    }
+
+    import() {
+        this._router.navigate(["home/operation/custom-clearance/import"]);
+
     }
 
 

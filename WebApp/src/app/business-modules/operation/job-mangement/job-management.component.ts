@@ -198,4 +198,8 @@ export class JobManagementComponent extends AppList implements OnInit {
         this.getShipments(this.dataSearch);
     }
 
+    gotoCreateJob() {
+        this._router.navigate(["home/operation/new"])
+    }
+
 }

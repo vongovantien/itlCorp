@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Common.NoSql;
 using eFMS.API.Infrastructure.Extensions;
-using eFMS.API.Infrastructure.Models;
 using eFMS.API.Operation.DL.Common;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
@@ -143,7 +143,7 @@ namespace eFMS.API.Operation.Controllers
             model.Source = OperationConstants.FromEFMS;
             var hs = customsDeclarationService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -317,9 +317,16 @@ namespace eFMS.API.Operation.Controllers
             {
                 result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
                 return Ok(result);
+
             }
-            result = new ResultHandle { Status = hs.Success, Message = message };
-            return BadRequest(result);
+            else
+            {
+                var message = HandleError.GetMessage(hs, Crud.Delete);
+                result = new ResultHandle { Status = hs.Success, Message = message };
+                return BadRequest(result);
+
+            }
+
         }
 
         /// <summary>

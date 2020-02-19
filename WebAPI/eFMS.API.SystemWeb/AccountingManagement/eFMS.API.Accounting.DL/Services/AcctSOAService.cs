@@ -3,7 +3,6 @@ using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
-using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -64,7 +63,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var userCurrent = currentUser.UserID;
                 //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
-                model.Status = Constants.STATUS_SOA_NEW;
+                model.Status = AccountingConstants.STATUS_SOA_NEW;
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                 model.UserCreated = model.UserModified = userCurrent;
                 model.Currency = model.Currency.Trim();
@@ -87,12 +86,12 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
                             var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_BUY || c.type == Constants.TYPE_CHARGE_OBH_BUY))
+                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == AccountingConstants.TYPE_CHARGE_BUY || c.type == AccountingConstants.TYPE_CHARGE_OBH_BUY))
                                                                            && (x.Soano == null || x.Soano == string.Empty)).ToList();
 
                             //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
                             var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_SELL || c.type == Constants.TYPE_CHARGE_OBH_SELL))
+                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == AccountingConstants.TYPE_CHARGE_SELL || c.type == AccountingConstants.TYPE_CHARGE_OBH_SELL))
                                                                            && (x.Soano == null || x.Soano == string.Empty)).ToList();
 
                             if (surchargeCredit.Count() > 0)
@@ -201,12 +200,12 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
                             var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_BUY || c.type == Constants.TYPE_CHARGE_OBH_BUY))
+                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == AccountingConstants.TYPE_CHARGE_BUY || c.type == AccountingConstants.TYPE_CHARGE_OBH_BUY))
                                                                            && (x.Soano == null || x.Soano == string.Empty)).ToList();
 
                             //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
                             var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_SELL || c.type == Constants.TYPE_CHARGE_OBH_SELL))
+                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == AccountingConstants.TYPE_CHARGE_SELL || c.type == AccountingConstants.TYPE_CHARGE_OBH_SELL))
                                                                            && (x.Soano == null || x.Soano == string.Empty)).ToList();
 
                             if (surchargeCredit.Count() > 0)
@@ -494,7 +493,7 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<ChargeSOAResult> GetChargeBuySell(Expression<Func<ChargeSOAResult, bool>> query)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && (x.Type == Constants.TYPE_CHARGE_BUY || x.Type == Constants.TYPE_CHARGE_SELL));
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && (x.Type == AccountingConstants.TYPE_CHARGE_BUY || x.Type == AccountingConstants.TYPE_CHARGE_SELL));
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
@@ -568,9 +567,9 @@ namespace eFMS.API.Accounting.DL.Services
                                    HBL = ops.Hwbno,
                                    MBL = ops.Mblno,
                                    Type = sur.Type,
-                                   Debit = sur.Type == Constants.TYPE_CHARGE_SELL ? (decimal?)sur.Total : null,
-                                   Credit = sur.Type == Constants.TYPE_CHARGE_BUY ? (decimal?)sur.Total : null,
-                                   SOANo = sur.Type == Constants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
+                                   Debit = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? (decimal?)sur.Total : null,
+                                   Credit = sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? (decimal?)sur.Total : null,
+                                   SOANo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
                                    IsOBH = false,
                                    Currency = sur.CurrencyId,
                                    InvoiceNo = sur.InvoiceNo,
@@ -578,14 +577,14 @@ namespace eFMS.API.Accounting.DL.Services
                                    CustomerID = sur.PaymentObjectId,
                                    ServiceDate = ops.ServiceDate,
                                    CreatedDate = ops.DatetimeCreated,
-                                   InvoiceIssuedDate = sur.Type == Constants.TYPE_CHARGE_SELL ? debitN.DatetimeCreated : creditN.DatetimeCreated,
+                                   InvoiceIssuedDate = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? debitN.DatetimeCreated : creditN.DatetimeCreated,
                                    TransactionType = null,
                                    UserCreated = ops.UserCreated,
                                    Quantity = sur.Quantity,
                                    UnitId = sur.UnitId,
                                    UnitPrice = sur.UnitPrice,
                                    VATRate = sur.Vatrate,
-                                   CreditDebitNo = sur.Type == Constants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
+                                   CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
                                    DatetimeModified = sur.DatetimeModified,
                                    CommodityGroupID = ops.CommodityGroupId,
                                    Service = "CL",
@@ -615,9 +614,9 @@ namespace eFMS.API.Accounting.DL.Services
                                             HBL = cstd.Hwbno,
                                             MBL = cst.Mawb,
                                             Type = sur.Type,
-                                            Debit = sur.Type == Constants.TYPE_CHARGE_SELL ? (decimal?)sur.Total : null,
-                                            Credit = sur.Type == Constants.TYPE_CHARGE_BUY ? (decimal?)sur.Total : null,
-                                            SOANo = sur.Type == Constants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
+                                            Debit = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? (decimal?)sur.Total : null,
+                                            Credit = sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? (decimal?)sur.Total : null,
+                                            SOANo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
                                             IsOBH = false,
                                             Currency = sur.CurrencyId,
                                             InvoiceNo = sur.InvoiceNo,
@@ -625,14 +624,14 @@ namespace eFMS.API.Accounting.DL.Services
                                             CustomerID = sur.PaymentObjectId,
                                             ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
                                             CreatedDate = cst.DatetimeCreated,
-                                            InvoiceIssuedDate = sur.Type == Constants.TYPE_CHARGE_SELL ? debitN.DatetimeCreated : creditN.DatetimeCreated,
+                                            InvoiceIssuedDate = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? debitN.DatetimeCreated : creditN.DatetimeCreated,
                                             TransactionType = cst.TransactionType,
                                             UserCreated = cst.UserCreated,
                                             Quantity = sur.Quantity,
                                             UnitId = sur.UnitId,
                                             UnitPrice = sur.UnitPrice,
                                             VATRate = sur.Vatrate,
-                                            CreditDebitNo = sur.Type == Constants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
+                                            CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
                                             DatetimeModified = sur.DatetimeModified,
                                             CommodityGroupID = null,
                                             Service = cst.TransactionType,
@@ -647,7 +646,7 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<ChargeSOAResult> GetChargeOBHSell(Expression<Func<ChargeSOAResult, bool>> query)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == Constants.TYPE_CHARGE_OBH);
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == AccountingConstants.TYPE_CHARGE_OBH);
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
@@ -792,7 +791,7 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<ChargeSOAResult> GetChargeOBHBuy(Expression<Func<ChargeSOAResult, bool>> query)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == Constants.TYPE_CHARGE_OBH);
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == AccountingConstants.TYPE_CHARGE_OBH);
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
@@ -1136,7 +1135,7 @@ namespace eFMS.API.Accounting.DL.Services
                 Credit = chg.Credit,
                 Currency = chg.Currency,
                 CurrencyToLocal = criteria.CurrencyLocal,
-                CurrencyToUSD = Constants.CURRENCY_USD,
+                CurrencyToUSD = AccountingConstants.CURRENCY_USD,
                 AmountDebitLocal =
                             (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, criteria.CurrencyLocal) > 0
                             ?
@@ -1150,17 +1149,17 @@ namespace eFMS.API.Accounting.DL.Services
                             :
                                 GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, criteria.CurrencyLocal)) * (chg.Credit != null ? chg.Credit.Value : 0),
                 AmountDebitUSD =
-                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD) > 0
+                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD) > 0
                             ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD)
+                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD)
                             :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, Constants.CURRENCY_USD)) * (chg.Debit != null ? chg.Debit.Value : 0),
+                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, AccountingConstants.CURRENCY_USD)) * (chg.Debit != null ? chg.Debit.Value : 0),
                 AmountCreditUSD =
-                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD) > 0
+                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD) > 0
                             ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD)
+                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD)
                             :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, Constants.CURRENCY_USD)) * (chg.Credit != null ? chg.Credit.Value : 0),
+                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, AccountingConstants.CURRENCY_USD)) * (chg.Credit != null ? chg.Credit.Value : 0),
                 SOANo = chg.SOANo,
                 DatetimeModifiedSurcharge = chg.DatetimeModified,
                 CDNote = chg.CDNote
@@ -1328,7 +1327,7 @@ namespace eFMS.API.Accounting.DL.Services
                 Credit = chg.Credit,
                 Currency = chg.Currency,
                 CurrencyToLocal = criteria.CurrencyLocal,
-                CurrencyToUSD = Constants.CURRENCY_USD,
+                CurrencyToUSD = AccountingConstants.CURRENCY_USD,
                 AmountDebitLocal =
                             (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, criteria.CurrencyLocal) > 0
                             ?
@@ -1342,17 +1341,17 @@ namespace eFMS.API.Accounting.DL.Services
                             :
                                 GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, criteria.CurrencyLocal)) * (chg.Credit != null ? chg.Credit.Value : 0),
                 AmountDebitUSD =
-                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD) > 0
+                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD) > 0
                             ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD)
+                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD)
                             :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, Constants.CURRENCY_USD)) * (chg.Debit != null ? chg.Debit.Value : 0),
+                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, AccountingConstants.CURRENCY_USD)) * (chg.Debit != null ? chg.Debit.Value : 0),
                 AmountCreditUSD =
-                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD) > 0
+                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD) > 0
                             ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD)
+                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD)
                             :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, Constants.CURRENCY_USD)) * (chg.Credit != null ? chg.Credit.Value : 0),
+                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, AccountingConstants.CURRENCY_USD)) * (chg.Credit != null ? chg.Credit.Value : 0),
                 SOANo = chg.SOANo,
                 DatetimeModifiedSurcharge = chg.DatetimeModified
             });
@@ -1561,7 +1560,7 @@ namespace eFMS.API.Accounting.DL.Services
                             ServiceDate = chg.ServiceDate,
                             Note = chg.Note,
                             CurrencyToLocal = currencyLocal,
-                            CurrencyToUSD = Constants.CURRENCY_USD,
+                            CurrencyToUSD = AccountingConstants.CURRENCY_USD,
                             AmountDebitLocal = (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, currencyLocal) > 0
                             ?
                                 GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, currencyLocal)
@@ -1572,16 +1571,16 @@ namespace eFMS.API.Accounting.DL.Services
                                 GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, currencyLocal)
                             :
                                 GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, currencyLocal)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                            AmountDebitUSD = (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD) > 0
+                            AmountDebitUSD = (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD) > 0
                             ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD)
+                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD)
                             :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, Constants.CURRENCY_USD)) * (chg.Debit != null ? chg.Debit.Value : 0),
-                            AmountCreditUSD = (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD) > 0
+                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, AccountingConstants.CURRENCY_USD)) * (chg.Debit != null ? chg.Debit.Value : 0),
+                            AmountCreditUSD = (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD) > 0
                             ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD)
+                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD)
                             :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, Constants.CURRENCY_USD)) * (chg.Credit != null ? chg.Credit.Value : 0),
+                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, AccountingConstants.CURRENCY_USD)) * (chg.Credit != null ? chg.Credit.Value : 0),
                         };
             return query;
         }
