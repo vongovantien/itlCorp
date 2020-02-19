@@ -428,7 +428,7 @@ namespace eFMS.API.Documentation.DL.Services
             var detail = GetById(id);
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = detail.PersonIncharge, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+            int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = detail.PersonIncharge, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange, detail.TransactionType);
             return code;
         }
 
