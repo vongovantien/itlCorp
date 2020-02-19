@@ -2,10 +2,11 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { MasterPageComponent } from './master-page/master-page.component';
-import { NotfoundPageComponent } from './notfound-page/notfound-page.component';
+import { NotfoundPageComponent } from './404/404-page.component';
 import { AuthGuardService } from 'src/app/shared/services/auth-guard.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MenuResolveGuard } from './menu.resolve';
+import { ForbiddenPageComponent } from './403/403.component';
 
 const routes: Routes = [
     {
@@ -107,12 +108,16 @@ const routes: Routes = [
      * PAGE NOT FOUND 
      */
     {
-        path: 'page-not-found',
+        path: '404',
         component: NotfoundPageComponent
     },
     {
+        path: '403',
+        component: ForbiddenPageComponent
+    },
+    {
         path: '**',
-        redirectTo: 'page-not-found',
+        redirectTo: '404',
         pathMatch: 'full'
     }
 

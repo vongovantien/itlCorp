@@ -51,7 +51,7 @@ export class AuthInterceptor implements HttpInterceptor {
                         window.location.href = '#/login';
                         break;
                     case 403:
-                        // TODO redirect to forbidden page.
+                        window.location.href = '#/403';
                         break;
                 }
                 // if (error instanceof TimeoutError) {

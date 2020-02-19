@@ -13,7 +13,7 @@ import { PageSidebarComponent } from "./master-page/page-sidebar/page-sidebar.co
 import { AppComponent } from "./app.component";
 import { LoginComponent } from "./login/login.component";
 import { MasterPageComponent } from "./master-page/master-page.component";
-import { NotfoundPageComponent } from "./notfound-page/notfound-page.component";
+import { NotfoundPageComponent } from "./404/404-page.component";
 import { DashboardComponent } from "./dashboard/dashboard.component";
 
 import {
@@ -37,6 +37,7 @@ import { environment } from "src/environments/environment";
 
 import { reducers, CustomSerializer, effects } from "./store";
 import { MenuResolveGuard } from "./menu.resolve";
+import { ForbiddenPageComponent } from "./403/403.component";
 
 const authConfig: AuthConfig = {
     issuer: environment.HOST.INDENTITY_SERVER_URL,
@@ -59,7 +60,8 @@ const authConfig: AuthConfig = {
         HeaderComponent,
         FooterComponent,
         PageSidebarComponent,
-        DashboardComponent
+        DashboardComponent,
+        ForbiddenPageComponent
     ],
     imports: [
         BrowserModule,
