@@ -69,16 +69,12 @@
             <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')">
 
                 <form-create-sea-export>
-                    <div class="row m--margin-top-20" *ngIf="!!shipmentDetail">
-                        <div class="col-md-4">
-                            <span>Created: {{shipmentDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
-                            <span class="text-success">{{shipmentDetail.userCreated}}</span>
-                        </div>
-                        <div class="col-md-4">
-                            <span>Modified: {{shipmentDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
-                            </span> <span class="text-success">{{shipmentDetail.userModified}}</span>
-                        </div>
-                    </div>
+                    <ng-container *ngIf="!!shipmentDetail">
+                        <date-time-modified [timeCreated]="shipmentDetail.datetimeCreated"
+                            [userCreated]="shipmentDetail.userCreated" [timeModified]="shipmentDetail.datetimeModified"
+                            [userModified]="shipmentDetail.userModified">
+                        </date-time-modified>
+                    </ng-container>
                 </form-create-sea-export>
 
                 <shipment-good-summary-lcl> Shipment Goods Summary </shipment-good-summary-lcl>

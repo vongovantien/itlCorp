@@ -1,7 +1,7 @@
 
 export class PermissionShipment {
 
-    allowUpdate: boolean = false;
+    allowUpdate: boolean = true;
     allowDelete: boolean = false;
     allowAddCharge: boolean = true;
     allowUpdateCharge: boolean = true;

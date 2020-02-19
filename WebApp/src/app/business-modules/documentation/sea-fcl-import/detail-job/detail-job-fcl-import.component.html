@@ -67,16 +67,14 @@
                 <tab heading="Shipment Detail" [active]="selectedTab === 'SHIPMENT'"
                     (selectTab)="onSelectTab('shipment')">
                     <form-create-sea-import>
-                        <div class="row m--margin-top-20" *ngIf="!!fclImportDetail">
-                            <div class="col-md-4">
-                                <span>Created: {{fclImportDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
-                                <span class="text-success">{{fclImportDetail.userCreated}}</span>
-                            </div>
-                            <div class="col-md-4">
-                                <span>Modified: {{fclImportDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
-                                </span> <span class="text-success">{{fclImportDetail.userModified}}</span>
-                            </div>
-                        </div>
+                        <ng-container *ngIf="!!fclImportDetail">
+                            <date-time-modified [timeCreated]="fclImportDetail.datetimeCreated"
+                                [userCreated]="fclImportDetail.userCreated"
+                                [timeModified]="fclImportDetail.datetimeModified"
+                                [userModified]="fclImportDetail.userModified">
+                            </date-time-modified>
+                        </ng-container>
+
                     </form-create-sea-import>
 
                     <shipment-good-summary> Shipment Goods Summary </shipment-good-summary>

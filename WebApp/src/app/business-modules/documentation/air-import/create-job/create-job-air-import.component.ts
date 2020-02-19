@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -19,7 +19,6 @@ import * as fromShareBusiness from '../../../share-business/store';
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
-import { ClassGetter } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-create-job-air-import',
     templateUrl: './create-job-air-import.component.html'
@@ -38,7 +37,8 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
-        protected _store: Store<fromShareBusiness.IShareBussinessState>
+        protected _store: Store<fromShareBusiness.IShareBussinessState>,
+        protected _cd: ChangeDetectorRef
     ) {
         super();
     }
@@ -51,6 +51,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.AirImport;
 
         this.formImportJobDetailPopup.service = 'air';
+        this._cd.detectChanges();
     }
 
     onSubmitData() {

@@ -53,7 +53,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
 
 
     ) {
-        super(_toastService, _documenRepo, _router, _store);
+        super(_toastService, _documenRepo, _router, _store, _cd);
         this._progressRef = this._ngProgressService.ref();
 
     }

@@ -77,7 +77,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
                 (res: CsTransaction) => {
                     if (!!res) {
                         this.shipment = new CsTransaction(res);
-
+                        console.log(this.shipment);
                         this.containerDetail = res.packageContainer;
                         this.commodities = res.commodity;
                         this.description = res.desOfGoods;

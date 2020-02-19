@@ -53,7 +53,7 @@ export * from './files-attach/files-attach.component';
 export * from './manifest/housebill-in-manifest/housebills-in-manifest.component';
 
 export * from './arrival-note-air/arrival-note-air.component';
-
+export * from './date-time-modified/date-time-modified.component';
 
 // TODO export components from shareBussiness.
 

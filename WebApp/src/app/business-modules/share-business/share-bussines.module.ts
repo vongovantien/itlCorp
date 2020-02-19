@@ -56,6 +56,7 @@ import {
     ShareBussinessFilesAttachComponent,
     ShareBusinessHousebillsInManifestComponent,
     ShareBusinessArrivalNoteAirComponent,
+    ShareBussinessDateTimeModifiedComponent
 
 } from './components';
 
@@ -106,7 +107,8 @@ const COMPONENTS = [
     ShareBussinessCdNoteDetailAirPopupComponent,
     ShareBussinessFilesAttachComponent,
     ShareBusinessHousebillsInManifestComponent,
-    ShareBusinessArrivalNoteAirComponent
+    ShareBusinessArrivalNoteAirComponent,
+    ShareBussinessDateTimeModifiedComponent
 ];
 
 
