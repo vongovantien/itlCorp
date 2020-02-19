@@ -75,8 +75,9 @@
                                     <div class="form-group">
                                         <div class="float-right">
                                             <ng-container *ngIf="(isLocked | async) === false">
-                                                <app-add-button title="Add New House Bill" (click)="gotoCreate()">
-                                                </app-add-button>
+                                                <app-permission-button title="Add New House Bill"
+                                                    (click)="gotoCreate()">
+                                                </app-permission-button>
                                             </ng-container>
                                         </div>
                                     </div>

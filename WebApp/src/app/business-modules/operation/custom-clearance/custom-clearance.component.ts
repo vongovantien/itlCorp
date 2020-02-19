@@ -40,7 +40,7 @@ export class CustomClearanceComponent extends AppList {
         private _documentRepo: DocumentationRepo,
         private _catalogueRepo: CatalogueRepo,
         private _exportRepo: ExportRepo,
-        private _router: Router
+        private _router: Router,
     ) {
         super();
         this.requestList = this.getListCustomsDeclaration;
@@ -275,6 +275,11 @@ export class CustomClearanceComponent extends AppList {
 
     gotoCreateCD() {
         this._router.navigate(["home/operation/custom-clearance/new"]);
+    }
+
+    import() {
+        this._router.navigate(["home/operation/custom-clearance/import"]);
+
     }
 
 
