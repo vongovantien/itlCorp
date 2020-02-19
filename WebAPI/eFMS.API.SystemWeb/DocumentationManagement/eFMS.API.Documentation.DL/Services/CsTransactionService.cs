@@ -148,8 +148,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public object AddCSTransaction(CsTransactionEditModel model)
         {
-            var job = DataContext.First(x => x.Id == model.Id && x.CurrentStatus != TermData.Canceled);
-            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return new HandleState(403);
 
