@@ -36,7 +36,6 @@ export class CustomClearanceComponent extends AppList {
         private _toastrService: ToastrService,
         private _operationRepo: OperationRepo,
         private _ngProgressService: NgProgress,
-        private _http: HttpClient,
         private _documentRepo: DocumentationRepo,
         private _catalogueRepo: CatalogueRepo,
         private _exportRepo: ExportRepo,
