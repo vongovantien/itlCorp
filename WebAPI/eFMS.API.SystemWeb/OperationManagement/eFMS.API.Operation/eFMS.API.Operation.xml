@@ -108,6 +108,7 @@
             <summary>
             delete multiple custom clearance
             </summary>
+            <param name="listCustom"></param>
             <param name="customs">list of clearances selected</param>
             <returns></returns>
         </member>
