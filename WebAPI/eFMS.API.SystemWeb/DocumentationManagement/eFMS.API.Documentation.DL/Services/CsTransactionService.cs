@@ -169,6 +169,11 @@ namespace eFMS.API.Documentation.DL.Services
             transaction.IsLocked = false;
             transaction.LockedDate = null;
             transaction.CurrentStatus = TermData.Processing; //Mặc định gán CurrentStatus = Processing
+            transaction.GroupId = _currentUser.GroupId;
+            transaction.DepartmentId = _currentUser.DepartmentId;
+            transaction.OfficeId = _currentUser.OfficeID;
+            transaction.CompanyId = _currentUser.CompanyID;
+
             var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
             if (!string.IsNullOrEmpty(employeeId))
             {
@@ -242,6 +247,13 @@ namespace eFMS.API.Documentation.DL.Services
             //}
             var transaction = mapper.Map<CsTransaction>(model);
             transaction.DatetimeModified = DateTime.Now;
+
+            transaction.CurrentStatus = job.CurrentStatus;
+            transaction.GroupId = job.GroupId;
+            transaction.DepartmentId = job.DepartmentId;
+            transaction.OfficeId = job.OfficeId;
+            transaction.CompanyId = job.CompanyId;
+
             if (transaction.IsLocked.HasValue)
             {
                 if (transaction.IsLocked == true)
