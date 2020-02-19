@@ -4,6 +4,7 @@ import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/s
 import { spinnerReducer, ISpinnerState } from './spinner.reducer';
 import { catalogueReducer, ICatalogueState } from './catalogue.reducer';
 import { IClaimUserState, claimUserReducer } from './claim.reducer';
+import { IMenuState, menuReducer } from './menu.reducer';
 
 
 export interface IRouterStateUrl {
@@ -18,13 +19,15 @@ export interface IAppState {
     // spinnerReducer: ISpinnerState;
     catalogueReducer: ICatalogueState;
     claimReducer: IClaimUserState;
+    menuReducer: IMenuState;
 }
 
 export const reducers: ActionReducerMap<IAppState> = {
     routerReducer: fromRouter.routerReducer,
     // spinnerReducer: spinnerReducer,
     catalogueReducer: catalogueReducer,
-    claimReducer: claimUserReducer
+    claimReducer: claimUserReducer,
+    menuReducer: menuReducer
 };
 
 // * Custom Serializer
@@ -50,6 +53,8 @@ export class CustomSerializer implements fromRouter.RouterStateSerializer<IRoute
 export const routerState = createFeatureSelector<fromRouter.RouterReducerState<IRouterStateUrl>>('routerReducer');
 export const catalogueState = createFeatureSelector<any>('catalogueReducer');
 export const claimUserState = createFeatureSelector<any>('claimReducer');
+export const menuState = createFeatureSelector<any>('menuReducer');
+
 
 export const getRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state);
 export const getQueryParamsRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.queryParams);
@@ -91,4 +96,7 @@ export const getClaimUserState = createSelector(claimUserState, (state: IClaimUs
 export const getClaimUserOfficeState = createSelector(claimUserState, (state: IClaimUserState) => state && state.officeId);
 export const getClaimUserDepartGrouptate = createSelector(claimUserState, (state: IClaimUserState) => state && { departmentId: state.departmentId, groupId: state.groupId });
 
+// * Menu
+export const getMenuPermissionState = createSelector(menuState, (state: IMenuState) => state);
+export const getMenuUserPermissionState = createSelector(menuState, (state: IMenuState) => state && state.permission);
 

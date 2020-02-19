@@ -281,6 +281,9 @@ export class SettlementListChargeComponent extends AppList {
 
     updateChargeWithJob(charge: Surcharge, index?: number) {
         this.selectedIndexSurcharge = index;
+        if (!charge || charge.isFromShipment) {
+            return;
+        }
         const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
         if (!!shipment) {
             this.tableListChargePopup.selectedShipment = shipment;
@@ -310,12 +313,8 @@ export class SettlementListChargeComponent extends AppList {
                 this.tableListChargePopup.isUpdate = true;
                 this.tableListChargePopup.show();
             }
-        } else {
-            this._toastService.warning("Shipment was not found !");
         }
     }
-
-
 }
 
 

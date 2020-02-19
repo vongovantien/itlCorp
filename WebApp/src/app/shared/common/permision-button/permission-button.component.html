@@ -1,0 +1,37 @@
+<ng-container *ngIf="isShow">
+    <ng-container [ngSwitch]="type">
+        <ng-container *ngSwitchCase="'import'">
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="onClick()"
+                *ngIf="!!menuPermission && menuPermission.import">
+                <span>
+                    <i class="la la-upload"></i>
+                    <span>
+                        {{title}}
+                    </span>
+                </span>
+            </button>
+        </ng-container>
+        <ng-container *ngSwitchCase="'export'">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onClick()"
+                *ngIf="!!menuPermission && menuPermission.export">
+                <span>
+                    <i class="la la-download"></i>
+                    <span>
+                        {{title}}
+                    </span>
+                </span>
+            </button>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="onClick()"
+                *ngIf="!!menuPermission && menuPermission.allowAdd">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        {{title}}
+                    </span>
+                </span>
+            </button>
+        </ng-container>
+    </ng-container>
+</ng-container>

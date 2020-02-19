@@ -440,8 +440,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             if (typeof date !== 'string') {
                 if (!!date && !!date.startDate) {
                     charge.invoiceDate = new Date(date.startDate);
-                } else {
-                    charge.invoiceDate = null;
                 }
             }
         }

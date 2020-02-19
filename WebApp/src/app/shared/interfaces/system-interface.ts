@@ -31,6 +31,8 @@ namespace SystemInterface {
         import: boolean;
         export: boolean;
         speacialActions: any[];
+        allowAdd: boolean;
         [name: string]: any;
+
     }
 }

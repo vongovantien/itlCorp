@@ -75,19 +75,15 @@
                                         </div>
                                         <div class="col-lg-8">
                                             <div class="form-group">
-                                                <button type="button" style="float:right"
-                                                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                                    (click)="gotoCreateHouseBill()"
-                                                    [disabled]="!!(selectedShipment | async)?.isLocked">
-                                                    <span>
-                                                        <i class="la la-plus"></i>
-                                                        <span>
-                                                            Add New House Bill
-                                                        </span>
-                                                    </span>
-                                                </button>
+                                                <div class="float-right">
+                                                    <ng-container
+                                                        *ngIf="(selectedShipment | async)?.isLocked === false">
+                                                        <app-permission-button title="Add New House Bill"
+                                                            (click)="gotoCreateHouseBill()">
+                                                        </app-permission-button>
+                                                    </ng-container>
+                                                </div>
                                             </div>
-
                                         </div>
                                     </div>
                                     <div class="table-wrapper table-scrollabler" id="hoursebill-list-table">
