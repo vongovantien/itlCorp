@@ -91,7 +91,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         const modelUpdate = this.getDataForm();
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
-
+        modelUpdate.transactionType = "AE";
         for (const dim of modelUpdate.dimensionDetails) {
             dim.hblId = this.hblId;
             // dim.mblId = this.jobId;

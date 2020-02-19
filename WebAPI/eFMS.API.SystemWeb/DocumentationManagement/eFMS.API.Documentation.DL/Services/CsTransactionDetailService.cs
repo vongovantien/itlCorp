@@ -168,7 +168,8 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return new HandleState("Housebill not found !");
                     }
-                    var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+                    ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
+                    var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
                     int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
                     if (code == 403) return new HandleState(403);
                     if (model.CsMawbcontainers?.Count > 0)
@@ -1012,7 +1013,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+                    var job = csTransactionRepo.Get(x => x.Id == hbl.JobId).FirstOrDefault();
+                    ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
+                    var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+
                     int code = GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
                     if (code == 403) return new HandleState(403);
 

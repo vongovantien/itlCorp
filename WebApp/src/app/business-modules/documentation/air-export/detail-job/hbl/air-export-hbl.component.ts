@@ -201,7 +201,6 @@ export class AirExportHBLComponent extends AppList implements OnInit {
                     }
                 },
             );
-
     }
 
     selectHBL(hbl: HouseBill) {

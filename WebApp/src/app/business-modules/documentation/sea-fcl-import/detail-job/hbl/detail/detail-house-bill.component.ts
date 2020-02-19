@@ -155,12 +155,12 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         modelUpdate.dofooter = this.hblDetail.dofooter;
         modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
-
         this.updateHbl(modelUpdate);
     }
 
     updateHbl(body: any) {
         this._progressRef.start();
+        body.transactionType = 'SFI';
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),

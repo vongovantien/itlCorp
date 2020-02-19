@@ -43,7 +43,8 @@
                     </li>
                 </ul>
             </div>
-            <app-default-button (click)="onSaveHBLDetail()" [buttonSetting]="saveButtonSetting"></app-default-button>
+            <app-default-button (click)="onSaveHBLDetail()" *ngIf="allowUpdate" [buttonSetting]="saveButtonSetting">
+            </app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </app-sub-header>

@@ -154,6 +154,7 @@ export class HouseBill extends BaseModel {
     poInvoiceNo: string = null;
     parentId: string = null;
     permission: PermissionHouseBill = new PermissionHouseBill();
+    transactionType: string = null;
 
     constructor(object?: any) {
         super();
