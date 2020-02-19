@@ -249,6 +249,13 @@ export class DocumentationRepo {
         );
     }
 
+    checkViewDetailHblPermission(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/CheckPermission/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     getListHouseBillAscHBLOfJob(data: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetListHouseBillAscHBL`, data).pipe(
             catchError((error) => throwError(error)),

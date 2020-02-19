@@ -18,7 +18,8 @@
                     <a class="dropdown-item pointer" (click)="previewAttachList()">Attach List Preview</a>
                 </div>
             </div>
-            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="confirmSave.show()"></app-default-button>
+            <app-default-button *ngIf="allowUpdate" [buttonSetting]="saveButtonSetting" (onClick)="confirmSave.show()">
+            </app-default-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>
     </app-sub-header>

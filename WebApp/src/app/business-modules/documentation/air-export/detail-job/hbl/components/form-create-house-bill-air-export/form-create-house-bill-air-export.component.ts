@@ -60,6 +60,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     agents: Observable<Customer[]>;
     currencies: Observable<CommonInterface.INg2Select[]>;
 
+
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameVn', label: 'Name ABBR' },
         { field: 'partnerNameEn', label: 'Name EN' },

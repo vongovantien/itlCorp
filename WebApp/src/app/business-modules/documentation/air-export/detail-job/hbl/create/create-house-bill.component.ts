@@ -31,7 +31,7 @@ import isUUID from 'validator/lib/isUUID';
 })
 export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
-    @ViewChild(AirExportHBLFormCreateComponent, { static: false }) formCreateHBLComponent: AirExportHBLFormCreateComponent;
+    @ViewChild(AirExportHBLFormCreateComponent, { static: true }) formCreateHBLComponent: AirExportHBLFormCreateComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(AirExportHBLAttachListComponent, { static: false }) attachListComponent: AirExportHBLAttachListComponent;
@@ -80,6 +80,8 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                 }
             );
     }
+
+
 
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();

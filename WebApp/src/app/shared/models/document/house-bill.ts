@@ -1,5 +1,6 @@
 import { BaseModel } from "../base.model";
 import { DIM } from "./dimension";
+import { PermissionHouseBill } from "./permissionHouseBill";
 
 export class HouseBill extends BaseModel {
     id: string = '00000000-0000-0000-0000-000000000000';
@@ -152,6 +153,7 @@ export class HouseBill extends BaseModel {
     finalPOD: string = null;
     poInvoiceNo: string = null;
     parentId: string = null;
+    permission: PermissionHouseBill = new PermissionHouseBill();
 
     constructor(object?: any) {
         super();

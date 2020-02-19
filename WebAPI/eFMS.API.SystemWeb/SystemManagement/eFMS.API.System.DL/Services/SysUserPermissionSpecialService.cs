@@ -8,7 +8,6 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -27,12 +26,10 @@ namespace eFMS.API.System.DL.Services
 
         public List<SysUserPermissionSpecialViewModel> GetBy(Guid id)
         {
-            var actionDefaults = specialActionRepository.Get().ToList();
+            var actionDefaults = DataContext.Get(x => x.UserPermissionId == id).ToList();
             var modules = actionDefaults.GroupBy(x => x.ModuleId);
             if (modules == null) return null;
-            var specialPermissions = DataContext.Get(x => x.UserPermissionId == id);
             var menus = menuRepository.Get().ToList();
-
             List<SysUserPermissionSpecialViewModel> results = new List<SysUserPermissionSpecialViewModel>();
             foreach (var item in modules)
             {
@@ -59,19 +56,12 @@ namespace eFMS.API.System.DL.Services
                         {
                             ModuleId = x.ModuleId,
                             MenuId = x.MenuId,
-                            NameEn = x.NameEn,
-                            NameVn = x.NameVn,
-                            IsAllow = false,
-                            UserPermissionId = id
+                            NameEn = x.ActionName,
+                            NameVn = x.ActionName,
+                            IsAllow = x.IsAllow,
+                            UserPermissionId = id,
+                            Id = x.Id
                         }).ToList();
-                    perSpecial.PermissionSpecialActions.ForEach(x => {
-                        var detail = specialPermissions.FirstOrDefault(y => y.ActionName == x.NameEn);
-                        if (detail != null)
-                        {
-                            x.Id = detail.Id;
-                            x.IsAllow = detail.IsAllow;
-                        }
-                    });
                     sampleSpecials.Add(perSpecial);
                 }
                 specialP.SysPermissionSpecials = sampleSpecials;

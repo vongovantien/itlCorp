@@ -46,6 +46,8 @@ export const getTransactionPermission = createSelector(shareBussinessState, (sta
 
 export const getHBLSState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.houseBill.hbls);
 export const getDetailHBlState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.houseBill && state.houseBill.hbl);
+
+export const getDetailHBlPermissionState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.houseBill && state.houseBill.hbl.permission);
 export const getHBLLoadingState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.houseBill && state.houseBill.isLoading);
 
 export const getHBLContainersState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.houseBill && state.houseBill.containers);

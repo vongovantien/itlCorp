@@ -159,6 +159,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                 (res: CsTransactionDetail) => {
                     console.log("detail hbl from store", res);
                     if (!!res) {
+                        console.log(res);
                         this.updateFormValue(res);
                     }
                 }
