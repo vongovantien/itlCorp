@@ -15,6 +15,7 @@ import * as fromShareBussiness from './../../../share-business/store';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import isUUID from 'validator/lib/isUUID';
+import { CsTransaction } from '@models';
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 @Component({
@@ -34,7 +35,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     action: any = {};
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
-    shipmentDetail: any;
+    shipmentDetail: CsTransaction;
     dataReport: any = null;
 
     constructor(

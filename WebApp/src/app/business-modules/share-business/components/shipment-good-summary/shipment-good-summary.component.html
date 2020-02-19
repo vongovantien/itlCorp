@@ -64,15 +64,17 @@
                             name="description"></textarea>
                     </div>
                     <div class="col-md-4">
-                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="openContainerListPopup()" [disabled]="isLocked | async">
-                            <span>
-                                <i class="la la-list"></i>
+                        <ng-container *ngIf="(isLocked | async) === false">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="openContainerListPopup()" *ngIf="shipment.permission.allowUpdate">
                                 <span>
-                                    Container List
+                                    <i class="la la-list"></i>
+                                    <span>
+                                        Container List
+                                    </span>
                                 </span>
-                            </span>
-                        </button>
+                            </button>
+                        </ng-container>
                     </div>
                 </div>
             </div>
