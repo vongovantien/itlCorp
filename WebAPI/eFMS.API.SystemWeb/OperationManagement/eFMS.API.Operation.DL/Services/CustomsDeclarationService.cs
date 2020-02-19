@@ -24,6 +24,7 @@ using eFMS.API.Common.Helpers;
 using eFMS.API.Operation.Service.ViewModels;
 using eFMS.API.Operation.Service.Contexts;
 using ITL.NetCore.Connection;
+using eFMS.API.Infrastructure.Models;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -469,10 +470,7 @@ namespace eFMS.API.Operation.DL.Services
                         var ItemForbidDelete = customs.Where(i => i.UserCreated != currentUser.UserID);
                         return new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid");
                     }
-                    else
-                    {
-                        result = deleteMultipleModel(customs);
-                    }
+                    result = deleteMultipleModel(customs);
                     break;
                 case PermissionRange.Group:
                     if (customs.Any(x => x.GroupId != currentUser.GroupId
@@ -487,10 +485,7 @@ namespace eFMS.API.Operation.DL.Services
                                      && x.CompanyId != currentUser.CompanyID);
                         return new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid");
                     }
-                    else
-                    {
-                        result = deleteMultipleModel(customs);
-                    }
+                    result = deleteMultipleModel(customs);
                     break;
                 case PermissionRange.Department:
                     if (customs.Any(x => x.DepartmentId != currentUser.DepartmentId
@@ -503,10 +498,7 @@ namespace eFMS.API.Operation.DL.Services
                                      && x.CompanyId != currentUser.CompanyID);
                         return new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid");
                     }
-                    else
-                    {
-                        result = deleteMultipleModel(customs);
-                    }
+                    result = deleteMultipleModel(customs);
                     break;
                 case PermissionRange.Office:
                     if (customs.Any(x => x.OfficeId != currentUser.OfficeID && x.CompanyId != currentUser.CompanyID))
@@ -514,27 +506,21 @@ namespace eFMS.API.Operation.DL.Services
                         var ItemForbidDelete = customs.Where(x => x.OfficeId != currentUser.OfficeID && x.CompanyId != currentUser.CompanyID);
                         return new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid");
                     }
-                    else
-                    {
-                        result = deleteMultipleModel(customs);
-                    }
+                    result = deleteMultipleModel(customs);
                     break;
                 case PermissionRange.Company:
                     if (customs.Any(x => x.CompanyId != currentUser.CompanyID))
                     {
                         var ItemForbidDelete = customs.Where(x => x.CompanyId != currentUser.CompanyID);
-                        return new HandleState(new {Message = "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid" });
+                        return new HandleState(new { Message = "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " Invalid" });
                     }
-                    else
-                    {
-                        result = deleteMultipleModel(customs);
-                    }
+                    result = deleteMultipleModel(customs);
                     break;
                 case PermissionRange.All:
                     result = deleteMultipleModel(customs);
                     break;
                 default:
-                    break;
+                    return new HandleState(403);
             }
 
             return result;
@@ -1066,28 +1052,6 @@ namespace eFMS.API.Operation.DL.Services
 
             var data = mapper.Map<List<CustomsDeclarationModel>>(query);
             return data;
-        }
-
-        public HandleState Update(CustomsDeclarationModel model)
-        {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            int code = 200;
-            switch (permissionRange)
-            {
-                case PermissionRange.Owner:
-                    if (model.UserCreated != currentUser.UserID)
-                    {
-                        code = 403;
-                    }
-                    break;
-                default:
-                    code = 200;
-                    break;
-            }
-            if (code == 403) return new HandleState(403);
-            model.DatetimeModified = DateTime.Now;
-            model.UserModified = currentUser.UserID;
-            throw new NotImplementedException();
         }
 
         public int CheckDetailPermission(int id)

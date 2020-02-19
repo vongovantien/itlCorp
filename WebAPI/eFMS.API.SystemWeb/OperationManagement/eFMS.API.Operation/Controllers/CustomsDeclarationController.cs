@@ -7,6 +7,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.NoSql;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Infrastructure.Models;
 using eFMS.API.Operation.DL.Common;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
@@ -128,6 +129,9 @@ namespace eFMS.API.Operation.Controllers
         [AuthorizeEx(Menu.opsCustomClearance, UserPermission.Add)]
         public IActionResult AddNew(CustomsDeclarationModel model)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
+            if (code == 403) return Forbid();
             var existedMessage = CheckExist(model, model.Id);
             if (existedMessage != null)
             {
@@ -158,12 +162,15 @@ namespace eFMS.API.Operation.Controllers
         [AuthorizeEx(Menu.opsCustomClearance, UserPermission.Update)]
         public IActionResult Update(CustomsDeclarationModel model)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
+            if (code == 403) return Forbid();
             var existedMessage = CheckExist(model, model.Id);
             if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
-            var hs = customsDeclarationService.Update(model);
+            var hs = customsDeclarationService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -171,6 +178,13 @@ namespace eFMS.API.Operation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        private int CheckForbitUpdate(string action)
+        {
+            var permissionRange = PermissionExtention.GetPermissionRange(action);
+            var modelCheckUpdate = new BaseUpdateModel { UserCreated = currentUser.UserID, GroupId = currentUser.GroupId, DepartmentId = currentUser.DepartmentId, OfficeId = currentUser.OfficeID, CompanyId = currentUser.CompanyID };
+            return PermissionExtention.GetPermissionCommonItem(modelCheckUpdate, permissionRange, currentUser);
         }
 
         /// <summary>
@@ -203,6 +217,9 @@ namespace eFMS.API.Operation.Controllers
         [HttpPost("ImportClearancesFromEcus")]
         public IActionResult ImportClearancesFromEcus()
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
+            if (code == 403) return Forbid();
             var hs = customsDeclarationService.ImportClearancesFromEcus();
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -294,11 +311,11 @@ namespace eFMS.API.Operation.Controllers
             }
 
             var hs = customsDeclarationService.DeleteMultiple(listCustom);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result;
             if (hs.Success)
             {
-                var message = HandleError.GetMessage(hs, Crud.Delete);
-                result = new ResultHandle { Status = hs.Success,  Message = stringLocalizer[message].Value };
+                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
                 return Ok(result);
 
             }
@@ -341,6 +358,8 @@ namespace eFMS.API.Operation.Controllers
         [Authorize]
         public IActionResult UploadFile(IFormFile uploadedFile)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            if (_user.UserMenuPermission.Import == false) return Forbid();
             var file = new FileHelper().UploadExcel(uploadedFile);
             if (file != null)
             {
@@ -406,6 +425,9 @@ namespace eFMS.API.Operation.Controllers
         [Authorize]
         public IActionResult Import([FromBody]List<CustomsDeclarationModel> data)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
+            if (code == 403) return Forbid();
             var result = customsDeclarationService.Import(data);
             if (result != null)
             {

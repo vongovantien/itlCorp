@@ -74,6 +74,9 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- INSERT & UPDATE HOUSEBILLS --
         public HandleState AddTransactionDetail(CsTransactionDetailModel model)
         {
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            if (permissionRangeWrite == PermissionRange.None) return new HandleState(403);
+
             if (model.CsMawbcontainers?.Count > 0)
             {
                 var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, model.Id);
@@ -160,7 +163,9 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return new HandleState("Housebill not found !");
                     }
-
+                    var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+                    int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
+                    if (code == 403) return new HandleState(403);
                     if (model.CsMawbcontainers?.Count > 0)
                     {
                         var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, model.Id);
@@ -169,6 +174,8 @@ namespace eFMS.API.Documentation.DL.Services
                             return checkDuplicateCont;
                         }
                     }
+               
+
                     model.UserModified = currentUser.UserID;
                     model.DatetimeModified = DateTime.Now;
                     var isUpdateDone = Update(model, x => x.Id == hb.Id);
@@ -385,7 +392,6 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
             detail.Permission = new PermissionAllowBase
             {
                 AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
@@ -418,7 +424,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
                                                                  && x.Services.Contains(transactionType)
                                                                  )?.Select(x => x.UserId).ToList();
-            int code = PermissionEx.GetPermissionToUpdateHblDocument(model, permissionRange, currentUser, authorizeUserIds);
+            int code = PermissionEx.GetPermissionToUpdateHbl(model, permissionRange, currentUser, authorizeUserIds);
             return code;
         }
 
@@ -429,11 +435,14 @@ namespace eFMS.API.Documentation.DL.Services
             bool result = false;
             switch (permissionRangeWrite)
             {
+                case PermissionRange.None:
+                    result = false;
+                    break;
                 case PermissionRange.All:
                     result = true;
                     break;
                 case PermissionRange.Owner:
-                    if (detail.SaleManId == currentUser.UserID || authorizeUserIds.Contains(detail.SaleManId))
+                    if (detail.SaleManId == currentUser.UserID || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -443,7 +452,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Group:
-                    if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID)
+                    if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID || detail.UserCreated == currentUser.UserID)
                         || authorizeUserIds.Contains(detail.SaleManId))
                     {
                         result = true;
@@ -454,7 +463,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Department:
-                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.SaleManId))
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -464,7 +473,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Office:
-                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.SaleManId))
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -474,7 +483,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Company:
-                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.SaleManId))
+                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -486,6 +495,13 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return result;
         }
+
+        private int GetPermissionToDelete(ModelUpdate model, PermissionRange permissionRange)
+        {
+            int code = PermissionEx.GetPermissionToDeleteHbl(model, permissionRange, currentUser);
+            return code;
+        }
+
 
         public CsTransactionDetailModel GetSeparateByHblid(Guid hbId)
         {
@@ -998,6 +1014,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
+                    var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+                    int code = GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
+                    if (code == 403) return new HandleState(403);
+
                     var charges = surchareRepository.Get(x => x.Hblid == hbl.Id).ToList();
                     var isSOA = false;
                     foreach (var item in charges)

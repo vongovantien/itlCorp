@@ -61,7 +61,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
     ngOnInit(): void {
         this.levelPermissions = [
-            'Owner', 'Group', 'Department', 'Office', 'Company', 'All'
+            'None', 'Owner', 'Group', 'Department', 'Office', 'Company', 'All'
         ];
         this._activedRouter.params
             .pipe(

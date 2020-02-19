@@ -18,8 +18,8 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<SysMenu> menuRepository;
         private readonly IContextBase<SysPermissionSpecialAction> specialActionRepository;
 
-        public SysPermissionSampleSpecialService(IContextBase<SysPermissionSampleSpecial> repository, 
-            IMapper mapper, 
+        public SysPermissionSampleSpecialService(IContextBase<SysPermissionSampleSpecial> repository,
+            IMapper mapper,
             IContextBase<SysMenu> menuRepo,
             IContextBase<SysPermissionSpecialAction> specialActionRepo) : base(repository, mapper)
         {
@@ -29,10 +29,10 @@ namespace eFMS.API.System.DL.Services
 
         public List<SysPermissionSampleSpecialViewModel> GetBy(Guid? permissionId)
         {
-            var actionDefaults = specialActionRepository.Get().ToList();
+            var actionDefaults = DataContext.Get(x => x.PermissionId == permissionId).ToList();
             var modules = actionDefaults.GroupBy(x => x.ModuleId);
             if (modules == null) return null;
-            var specialPermissions = DataContext.Get(x => x.PermissionId == permissionId);
+            //var specialPermissions = DataContext.Get(x => x.PermissionId == permissionId);
             var menus = menuRepository.Get().ToList();
 
             List<SysPermissionSampleSpecialViewModel> results = new List<SysPermissionSampleSpecialViewModel>();
@@ -42,7 +42,7 @@ namespace eFMS.API.System.DL.Services
                 var module = menus.FirstOrDefault(x => x.Id == item.Key);
                 specialP.ModuleName = module?.NameEn;
                 specialP.ModuleID = module?.Id;
-                specialP.PermissionID = permissionId == null? Guid.Empty:(Guid)permissionId;
+                specialP.PermissionID = permissionId == null ? Guid.Empty : (Guid)permissionId;
                 List<SysPermissionSpecialViewModel> sampleSpecials = new List<SysPermissionSpecialViewModel>();
                 var actions = actionDefaults.Where(x => x.ModuleId == item.Key);
                 var actionsInMenu = actions.GroupBy(x => x.MenuId);
@@ -57,20 +57,23 @@ namespace eFMS.API.System.DL.Services
                         ModuleId = item.Key
                     };
                     perSpecial.PermissionSpecialActions = actions.Where(x => x.MenuId == actionInMenu.Key)
-                        .Select(x => new PermissionSpecialAction {
+                        .Select(x => new PermissionSpecialAction
+                        {
+                            Id = x.Id,
                             ModuleId = x.ModuleId,
                             MenuId = x.MenuId,
-                            NameEn = x.NameEn,
-                            NameVn = x.NameVn,
+                            NameEn = x.ActionName,
+                            NameVn = x.ActionName,
                             IsAllow = false,
                             PermissionId = permissionId == null ? Guid.Empty : (Guid)permissionId
                         }).ToList();
-                    perSpecial.PermissionSpecialActions.ForEach(x => {
-                        var detail = specialPermissions.FirstOrDefault(y => y.ActionName == x.NameEn);
-                        if(detail != null)
+                    perSpecial.PermissionSpecialActions.ForEach(x =>
+                    {
+                        var detail = actionDefaults.FirstOrDefault(y => y.ActionName == x.NameEn);
+                        if (detail != null)
                         {
-                            x.Id = (short)(permissionId == null ? 0 : specialPermissions.FirstOrDefault(y => y.ActionName == x.NameEn)?.Id);
-                            x.IsAllow = permissionId == null ? false : specialPermissions.FirstOrDefault(y => y.ActionName == x.NameEn)?.IsAllow;
+                            x.Id = (short)(permissionId == null ? 0 : actionDefaults.FirstOrDefault(y => y.ActionName == x.NameEn)?.Id);
+                            x.IsAllow = permissionId == null ? false : actionDefaults.FirstOrDefault(y => y.ActionName == x.NameEn)?.IsAllow;
                         }
                     });
                     sampleSpecials.Add(perSpecial);
