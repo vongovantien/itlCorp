@@ -1,19 +1,12 @@
 <div class="sea-fcl-import-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="gotoCreateJob()">
-                <span>
-                    <i class="la la-plus"></i>
-                    <span>
-                        Create new job
-                    </span>
-                </span>
-            </button>
+            <app-add-button title="create new job" (click)="gotoCreateJob()"></app-add-button>
         </div>
     </app-sub-header>
     <div class="m-content">
-        <form-search-sea [transaction]="transactionService" (onSearch)="onSearchMasterBills($event)" (onReset)="onResetMasterBills($event)"></form-search-sea>
+        <form-search-sea [transaction]="transactionService" (onSearch)="onSearchMasterBills($event)"
+            (onReset)="onResetMasterBills($event)"></form-search-sea>
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="table-wrapper table-scrollable" id="masterbill-list-table">

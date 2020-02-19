@@ -3,13 +3,17 @@ import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@a
 import { Observable } from 'rxjs';
 import { SystemRepo } from './shared/repositories/system.repo';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Store } from '@ngrx/store';
+import { IAppState } from './store/reducers';
+import { MenuUpdatePermissionAction } from './store/actions';
 
 @Injectable()
 export class MenuResolveGuard implements Resolve<any> {
 
     constructor(
         private _systemRepo: SystemRepo,
-        private _router: Router
+        private _router: Router,
+        private _store: Store<IAppState>
     ) {
     }
     resolve(
@@ -23,6 +27,9 @@ export class MenuResolveGuard implements Resolve<any> {
                 .subscribe(
                     (res: SystemInterface.IUserPermission) => {
                         console.log(res);
+
+                        // * Dispatch to redux.
+                        this._store.dispatch(new MenuUpdatePermissionAction(res));
                         if (!!res && !res.access) {
                             this._router.navigate(["/login"]);
                         }

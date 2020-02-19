@@ -22,7 +22,7 @@ export * from './combo-grid/app-combo-grid.component';
 export * from './switch-toggle/switch-toggle.component';
 export * from './table-body/table-body.component';
 export * from './table-cell/table-cell.component';
-
+export * from './add-button/add-button.component';
 
 export * from './popup/index';
 

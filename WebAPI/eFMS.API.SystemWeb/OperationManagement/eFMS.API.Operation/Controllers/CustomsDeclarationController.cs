@@ -139,7 +139,7 @@ namespace eFMS.API.Operation.Controllers
             model.Source = OperationConstants.FromEFMS;
             var hs = customsDeclarationService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -300,6 +300,7 @@ namespace eFMS.API.Operation.Controllers
                 var message = HandleError.GetMessage(hs, Crud.Delete);
                 result = new ResultHandle { Status = hs.Success,  Message = stringLocalizer[message].Value };
                 return Ok(result);
+
             }
             else
             {
@@ -308,6 +309,7 @@ namespace eFMS.API.Operation.Controllers
                 return BadRequest(result);
 
             }
+
         }
 
         /// <summary>
