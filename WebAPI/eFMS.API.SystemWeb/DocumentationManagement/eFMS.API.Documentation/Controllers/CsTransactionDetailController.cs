@@ -40,6 +40,15 @@ namespace eFMS.API.Documentation.Controllers
             csTransactionService = csTransaction;
         }
 
+        [HttpGet("CheckPermission/{id}")]
+        public IActionResult CheckDetailPermission(Guid id)
+        {
+
+            var result = csTransactionDetailService.CheckDetailPermission(id);
+            if (result == 403) return Forbid();
+            return Ok(true);
+        }
+
         [HttpGet]
         [Route("GetByJob")]
         public IActionResult GetByJob(Guid jobId)
