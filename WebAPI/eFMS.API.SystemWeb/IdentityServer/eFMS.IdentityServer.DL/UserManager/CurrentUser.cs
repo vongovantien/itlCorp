@@ -2,10 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 using System.Linq;
-using eFMS.IdentityServer.DL.Models;
 using eFMS.IdentityServer.DL.IService;
+using eFMS.API.Common.Models;
 
 namespace eFMS.IdentityServer.DL.UserManager
 {

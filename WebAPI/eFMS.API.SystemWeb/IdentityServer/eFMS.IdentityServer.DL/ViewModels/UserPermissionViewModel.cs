@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Common.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -20,9 +21,9 @@ namespace eFMS.IdentityServer.DL.ViewModels
         public bool? Export { get; set; }
         public List<SpecialAction> SpecialActions { get; set; }
     }
-    public class SpecialAction
-    {
-        public string ActionName { get; set; }
-        public bool? IsAllow { get; set; }
-    }
+    //public class SpecialAction
+    //{
+    //    public string ActionName { get; set; }
+    //    public bool? IsAllow { get; set; }
+    //}
 }

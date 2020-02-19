@@ -16,9 +16,9 @@ using eFMS.API.Common;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
-using eFMS.API.Infrastructure.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
+using eFMS.API.Common.Models;
 
 namespace eFMS.API.Documentation.DL.Services
 {

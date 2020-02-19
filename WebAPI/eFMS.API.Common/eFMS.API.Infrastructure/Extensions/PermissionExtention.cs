@@ -1,7 +1,6 @@
 ﻿using eFMS.API.Common.Globals;
-using eFMS.API.Infrastructure.Models;
+using eFMS.API.Common.Models;
 using eFMS.IdentityServer.DL.UserManager;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace eFMS.API.Infrastructure.Extensions

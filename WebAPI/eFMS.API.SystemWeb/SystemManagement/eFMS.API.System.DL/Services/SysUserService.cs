@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using eFMS.API.System.Service.Contexts;
 using Microsoft.Extensions.Localization;
 using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.Common.Globals;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -353,7 +354,7 @@ namespace eFMS.API.System.DL.Services
                     objUser.EmployeeId = objEmployee.Id;
                     objUser.Id = Guid.NewGuid().ToString();
                     objUser.UserCreated = objUser.UserModified = currentUser.UserID;
-                    objUser.Password = BCrypt.Net.BCrypt.HashPassword(Constants.Password);
+                    objUser.Password = BCrypt.Net.BCrypt.HashPassword(Constants.PERMISSION_RANGE_OWNER);
                     sysUsers.Add(objUser);
 
                 }

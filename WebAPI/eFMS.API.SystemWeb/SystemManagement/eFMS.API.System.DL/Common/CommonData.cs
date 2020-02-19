@@ -8,7 +8,7 @@ namespace eFMS.API.System.DL.Common
         public string DisplayName { get; set; }
     }
 
-    public static class Constants
+    public static class SystemConstants
     {
         public static readonly string Owner = "Owner";
         public static readonly string Password = "12345678";

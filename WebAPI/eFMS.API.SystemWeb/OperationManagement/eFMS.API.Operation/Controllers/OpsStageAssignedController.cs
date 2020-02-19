@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -10,7 +8,6 @@ using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.Infrastructure.Common;
 using eFMS.API.Operation.Infrastructure.Middlewares;
-using eFMS.API.Operation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

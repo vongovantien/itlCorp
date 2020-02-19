@@ -27,6 +27,7 @@
   <ItemGroup>
     <Compile Remove="Infrastructure\ErrorHandler\ErrorMessages.cs" />
     <Compile Remove="Infrastructure\ErrorHandler\IErrorHandler.cs" />
+    <Compile Remove="IService\IOpsTransactionService.cs" />
     <Compile Remove="Services\OpsTransactionSevice.cs" />
   </ItemGroup>
 

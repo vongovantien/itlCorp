@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eFMS.API.Operation.DL.Common
+﻿namespace eFMS.API.Operation.DL.Common
 {
     public class Templates
     {

@@ -1,7 +1,6 @@
-﻿using eFMS.IdentityServer.DL.Models;
+﻿using eFMS.API.Common.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.IdentityServer.DL.UserManager
 {

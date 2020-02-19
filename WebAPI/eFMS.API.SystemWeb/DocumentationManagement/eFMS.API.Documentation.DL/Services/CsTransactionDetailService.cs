@@ -14,8 +14,8 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Infrastructure.Models;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Common.Models;
 
 namespace eFMS.API.Documentation.DL.Services
 {
