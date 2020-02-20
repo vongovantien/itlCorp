@@ -79,7 +79,9 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- INSERT & UPDATE HOUSEBILLS --
         public HandleState AddTransactionDetail(CsTransactionDetailModel model)
         {
-            var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            var job = csTransactionRepo.Get(x => x.Id == model.JobId).FirstOrDefault();
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403);
 
             if (model.CsMawbcontainers?.Count > 0)
@@ -96,6 +98,11 @@ namespace eFMS.API.Documentation.DL.Services
             model.UserModified = model.UserCreated = currentUser.UserID;
             model.DatetimeModified = model.DatetimeCreated = DateTime.Now;
             model.Active = true;
+            model.GroupId = _currentUser.GroupId;
+            model.DepartmentId = _currentUser.DepartmentId;
+            model.OfficeId = _currentUser.OfficeID;
+            model.CompanyId = _currentUser.CompanyID;
+
             string contSealNo = string.Empty;
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -181,9 +188,16 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
 
-
                     model.UserModified = currentUser.UserID;
                     model.DatetimeModified = DateTime.Now;
+
+                    model.UserCreated = hb.UserCreated;
+                    model.DatetimeCreated = hb.DatetimeCreated;
+                    model.GroupId = hb.GroupId;
+                    model.DepartmentId = hb.DepartmentId;
+                    model.OfficeId = hb.OfficeId;
+                    model.CompanyId = hb.CompanyId;
+
                     var isUpdateDone = Update(model, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
                     {
