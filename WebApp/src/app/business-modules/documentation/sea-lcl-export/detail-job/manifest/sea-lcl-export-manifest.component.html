@@ -4,21 +4,31 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
+            <span *ngIf="(isLocked | async) === true" class="m--margin-right-10 align-middle">
+                <i class="fa fa-lock text-danger fa-3x"></i>
+            </span>
+
             <button id="button-nested" dropdownToggle type="button" class="btn btn-success" (click)="previewManifest()">
                 <i class="la la-print"></i> Preview<span class="caret"></span>
             </button>
-            <button type="button" (click)="showRefreshPopup()"
-                class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-refresh"></i>
-                    <span>
-                        Refresh
-                    </span>
-                </span>
-            </button>
-            <app-default-button (click)="addOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
-                [dataTarget]="saveButtonSetting.dataTarget">
-            </app-default-button>
+
+            <ng-container *ngIf="(isLocked | async) === false">
+                <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
+                    <button type="button" (click)="showRefreshPopup()"
+                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-refresh"></i>
+                            <span>
+                                Refresh
+                            </span>
+                        </span>
+                    </button>
+                    <app-default-button (click)="addOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
+                        [dataTarget]="saveButtonSetting.dataTarget">
+                    </app-default-button>
+                </ng-container>
+            </ng-container>
+
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </div>
@@ -27,7 +37,9 @@
 <form-manifest [type]="portType">
     <housebills-in-manifest (emitVolum)="getVolumn($event)"></housebills-in-manifest>
 </form-manifest>
+
 <add-hbl-to-manifest-popup-share (onAdd)="onAdd()"></add-hbl-to-manifest-popup-share>
+
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
