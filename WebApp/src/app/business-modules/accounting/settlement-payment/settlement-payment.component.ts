@@ -2,13 +2,14 @@ import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { AccountingRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
-import { SortService, BaseService } from 'src/app/shared/services';
+import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, map, } from 'rxjs/operators';
 import { User, SettlementPayment } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-settlement-payment',
@@ -36,7 +37,6 @@ export class SettlementPaymentComponent extends AppList {
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _progressService: NgProgress,
-        private _baseService: BaseService,
         private _router: Router
     ) {
         super();
@@ -92,7 +92,8 @@ export class SettlementPaymentComponent extends AppList {
     }
 
     getUserLogged() {
-        this.userLogged = this._baseService.getUserLogin() || 'admin';
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
     }
 
 

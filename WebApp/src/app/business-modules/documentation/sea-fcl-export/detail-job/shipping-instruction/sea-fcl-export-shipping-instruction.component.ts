@@ -14,6 +14,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { CsTransaction } from 'src/app/shared/models';
 import { SeaFclExportBillDetailComponent } from './bill-detail/sea-fcl-export-bill-detail.component';
 import { ReportPreviewComponent } from 'src/app/shared/common';
+import { getTransactionPermission, getTransactionLocked } from './../../../../share-business/store';
 
 @Component({
     selector: 'app-sea-fcl-export-shipping-instruction',
@@ -46,6 +47,9 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                 this.getHouseBills();
             }
         });
+
+        this.permissionShipments = this._store.select(getTransactionPermission);
+        this.isLocked = this._store.select(getTransactionLocked);
     }
     getHouseBills() {
         this.isLoading = true;

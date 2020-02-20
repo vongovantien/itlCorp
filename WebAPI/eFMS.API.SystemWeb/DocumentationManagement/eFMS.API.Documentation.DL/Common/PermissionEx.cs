@@ -22,26 +22,26 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Group:
-                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID)
+                    if (model.BillingOpsId != currentUser.UserID && (model.GroupId != currentUser.GroupId && model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID)
                         && !authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.BillingOpsId))
+                    if (model.BillingOpsId != currentUser.UserID && model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.BillingOpsId))
+                    if (model.BillingOpsId != currentUser.UserID && model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Company:
-                    if (model.CompanyId != currentUser.CompanyID && !authorizeUserIds.Contains(model.BillingOpsId))
+                    if (model.BillingOpsId != currentUser.UserID && model.CompanyId != currentUser.CompanyID && !authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 403;
                     }

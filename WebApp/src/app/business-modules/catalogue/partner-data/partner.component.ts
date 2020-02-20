@@ -5,8 +5,7 @@ import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
+
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { Router } from '@angular/router';
 import { SystemConstants } from 'src/constants/system.const';
@@ -19,7 +18,9 @@ import { ExportRepo, CatalogueRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ConfirmPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
+
 type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
+
 enum PartnerDataTab {
     ALL = 'allTab',
     CUSTOMER = 'Customer',

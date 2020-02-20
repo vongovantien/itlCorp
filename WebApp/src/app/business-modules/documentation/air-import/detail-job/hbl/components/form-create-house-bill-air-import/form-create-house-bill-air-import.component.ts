@@ -1,14 +1,14 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
-import { Customer, User, PortIndex, Currency, CsTransaction, Unit, HouseBill } from '@models';
+import { Customer, User, PortIndex, CsTransaction, HouseBill } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 
 import { AppForm } from 'src/app/app.form';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 
-import { map, filter, tap, takeUntil, catchError, skip, finalize } from 'rxjs/operators';
+import { tap, takeUntil, catchError, skip, finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
@@ -16,8 +16,7 @@ import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetail
 import { SystemConstants } from 'src/constants/system.const';
 import _merge from 'lodash/merge';
 import { cloneDeep } from 'lodash';
-import * as fromShareBussiness from './../../../../../../share-business/store';
-import { prepareNg2SelectData } from 'src/helper/data.helper';
+
 import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
 import { FormValidators } from 'src/app/shared/validators';
 @Component({

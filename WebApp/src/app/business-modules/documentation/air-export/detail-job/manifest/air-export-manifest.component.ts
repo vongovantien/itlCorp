@@ -4,7 +4,7 @@ import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { getParamsRouterState } from 'src/app/store';
 import { Params, Router } from '@angular/router';
@@ -17,6 +17,9 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/share-business/components/manifest/form-manifest/components/form-manifest.component';
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
 import { CommonEnum } from '@enums';
+import { getTransactionLocked, getTransactionPermission, TransactionGetDetailAction } from '@share-bussiness';
+
+import isUUID from 'validator/lib/isUUID';
 
 @Component({
     selector: 'app-air-export-manifest',
@@ -73,18 +76,26 @@ export class AirExportManifestComponent extends AppList {
             { title: 'Freight Charge', field: '', sortable: true }
         ];
 
+        this.isLocked = this._store.select(getTransactionLocked);
+        this.permissionShipments = this._store.select(getTransactionPermission);
+
     }
 
     ngAfterViewInit() {
         this.formManifest.isAir = true;
         this.cdRef.detectChanges();
         this._store.select(getParamsRouterState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
-                if (param.jobId) {
+                if (param.jobId && isUUID(param.jobId)) {
                     this.jobId = param.jobId;
 
                     this.formManifest.jobId = this.jobId;
+
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);
+
+                    this._store.dispatch(new TransactionGetDetailAction(this.jobId));
+
                     this.getHblList(this.jobId);
                     this.getManifest(this.jobId);
 

@@ -97,7 +97,9 @@ export abstract class AppForm extends AppPage {
     }
 
     reset($event?: any) {
-        this.requestReset($event);
+        if (!!this.requestReset) {
+            this.requestReset($event);
+        }
     }
 
     closeOtherSelects(element: { optionsOpened: any; }) {

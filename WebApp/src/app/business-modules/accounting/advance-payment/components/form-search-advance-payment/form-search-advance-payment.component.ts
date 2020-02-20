@@ -2,8 +2,9 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
 import { User } from 'src/app/shared/models';
-import { BaseService } from 'src/app/shared/services';
+
 import { formatDate } from '@angular/common';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'adv-payment-form-search',
@@ -29,7 +30,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     userLogged: User;
     constructor(
         private _fb: FormBuilder,
-        private _baseService: BaseService
+
 
     ) {
         super();
@@ -87,14 +88,15 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     }
 
     getUserLogged() {
-        this.userLogged = this._baseService.getUserLogin() || 'admin';
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
         this.requester.setValue(this.userLogged.preferred_username);
     }
 
     getStatusApproval(): CommonInterface.ICommonTitleValue[] {
         return [
             { title: 'New', value: 'New' },
-            { title: 'Request Approval', value: 'RequestApproval'},
+            { title: 'Request Approval', value: 'RequestApproval' },
             { title: 'Leader Approved', value: 'LeaderApproved' },
             { title: 'Department Manager Approved', value: 'DepartmentManagerApproved' },
             { title: 'Accountant Manager Approved', value: 'AccountantManagerApproved' },

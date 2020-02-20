@@ -1,7 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
-import { BaseService } from 'src/app/shared/services/base.service';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
@@ -56,7 +55,6 @@ export class AddPartnerDataComponent extends AppList {
     isDup: boolean = false;
 
     constructor(private route: ActivatedRoute,
-        private baseService: BaseService,
         private router: Router,
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
@@ -285,7 +283,6 @@ export class AddPartnerDataComponent extends AppList {
                 this.getPartnerGroupActive(this.partnerType);
             }
         }, err => {
-            this.baseService.handleError(err);
         });
     }
     getPartnerGroupActive(partnerGroup: any): any {
@@ -455,22 +452,17 @@ export class AddPartnerDataComponent extends AppList {
             );
     }
     onSave() {
-        this.baseService.spinnerShow();
         this._catalogueRepo.createPartner(this.partner)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     if (res.status) {
-                        this.baseService.spinnerHide();
-                        this.baseService.successToast(res.message);
+                        this.toastr.success(res.message);
                         this.router.navigate(["/home/catalogue/partner-data"]);
 
                     }
 
                 }, err => {
-                    this.baseService.spinnerHide();
-                    this.baseService.handleError(err);
-
                 });
     }
     sortBySaleMan(sortData: CommonInterface.ISortData): void {

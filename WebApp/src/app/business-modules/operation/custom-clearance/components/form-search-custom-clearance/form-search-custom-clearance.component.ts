@@ -1,11 +1,11 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
-import { BaseService, DataService } from 'src/app/shared/services';
+import { DataService } from 'src/app/shared/services';
 import { User } from 'src/app/shared/models';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { SystemConstants } from 'src/constants/system.const';
-import { takeUntil, catchError, map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
 
 @Component({
@@ -33,7 +33,6 @@ export class CustomClearanceFormSearchComponent extends AppForm {
 
     constructor(
         private _fb: FormBuilder,
-        private _baseService: BaseService,
         private _dataService: DataService,
         private _sysRepo: SystemRepo
     ) {
@@ -84,7 +83,7 @@ export class CustomClearanceFormSearchComponent extends AppForm {
     }
 
     getUserLogged() {
-        this.userLogged = this._baseService.getUserLogin() || 'admin';
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
     }
 
     getListUser() {

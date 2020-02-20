@@ -10,7 +10,6 @@ import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
 import { DataService } from 'src/app/shared/services';
@@ -24,9 +23,9 @@ import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupC
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../share-business/store';
-import * as dataHelper from 'src/helper/data.helper';
 import _groupBy from 'lodash/groupBy';
 import { OPSTransactionGetDetailSuccessAction } from '../store';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -212,8 +211,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     saveShipment(form: NgForm) {
         console.log(this.opsTransaction);
-        this.opsTransaction.serviceDate = !!this.serviceDate ? (this.serviceDate.startDate != null ? dataHelper.dateTimeToUTC(this.serviceDate.startDate) : null) : null;
-        this.opsTransaction.finishDate = !!this.finishDate ? (this.finishDate.startDate != null ? dataHelper.dateTimeToUTC(this.finishDate.startDate) : null) : null;
+        this.opsTransaction.serviceDate = !!this.serviceDate ? (this.serviceDate.startDate != null ? formatDate(this.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null) : null;
+        this.opsTransaction.finishDate = !!this.finishDate ? (this.finishDate.startDate != null ? formatDate(this.finishDate.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
         const s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
         if (form.invalid || this.opsTransaction.shipmentMode == null
@@ -281,7 +280,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             .subscribe(
                 (res: any) => {
                     this.listPackageTypes = res;
-                    this.packageTypes = dataHelper.prepareNg2SelectData(this.listPackageTypes, 'id', 'unitNameEn');
+                    this.packageTypes = this.utility.prepareNg2SelectData(this.listPackageTypes, 'id', 'unitNameEn');
                 },
             );
     }
@@ -305,7 +304,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             .subscribe(
                 (res: any) => {
                     this.commodityGroup = res;
-                    this.commodityGroup = dataHelper.prepareNg2SelectData(this.commodityGroup,
+                    this.commodityGroup = this.utility.prepareNg2SelectData(this.commodityGroup,
                         "id",
                         "groupNameEn"
                     );
@@ -365,9 +364,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 finalize(() => this._progressRef.complete())
             ).subscribe(
                 (responses: any) => {
-                    this.productServices = dataHelper.prepareNg2SelectData(responses.productServices, 'value', 'displayName');
-                    this.serviceModes = dataHelper.prepareNg2SelectData(responses.serviceModes, 'value', 'displayName');
-                    this.shipmentModes = dataHelper.prepareNg2SelectData(responses.shipmentModes, 'value', 'displayName');
+                    this.productServices = this.utility.prepareNg2SelectData(responses.productServices, 'value', 'displayName');
+                    this.serviceModes = this.utility.prepareNg2SelectData(responses.serviceModes, 'value', 'displayName');
+                    this.shipmentModes = this.utility.prepareNg2SelectData(responses.shipmentModes, 'value', 'displayName');
                 },
             );
     }
@@ -440,7 +439,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             ).subscribe(
                 (responses: any) => {
                     this._data.setDataService(SystemConstants.CSTORAGE.CURRENCY, responses || []);
-                    this.lstCurrencies = prepareNg2SelectData(responses, "id", "id");
+                    this.lstCurrencies = this.utility.prepareNg2SelectData(responses, "id", "id");
                 },
             );
     }

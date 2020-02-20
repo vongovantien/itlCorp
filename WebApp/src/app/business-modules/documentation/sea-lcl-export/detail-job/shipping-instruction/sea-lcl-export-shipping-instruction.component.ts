@@ -14,6 +14,7 @@ import { CsTransaction } from 'src/app/shared/models';
 import { SeaLclExportBillDetailComponent } from './bill-detail/sea-lcl-export-bill-detail.component';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { SeaLclExportBillInstructionComponent } from './bill-instruction/sea-lcl-export-bill-instruction.component';
+import { getTransactionPermission, getTransactionLocked } from '../../../../share-business/store';
 
 @Component({
     selector: 'app-sea-lcl-export-shipping-instruction',
@@ -46,6 +47,9 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                 this.getHouseBills();
             }
         });
+
+        this.permissionShipments = this._store.select(getTransactionPermission);
+        this.isLocked = this._store.select(getTransactionLocked);
     }
     getHouseBills() {
         this.isLoading = true;
@@ -58,7 +62,6 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                 this.billDetail.housebills = res;
 
                 this.getBillingInstruction(this.jobId);
-                console.log(this.houseBills);
             },
         );
     }

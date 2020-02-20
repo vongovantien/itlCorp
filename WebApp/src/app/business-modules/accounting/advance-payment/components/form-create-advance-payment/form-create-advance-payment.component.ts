@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { User, Currency } from 'src/app/shared/models';
-import { BaseService, DataService } from 'src/app/shared/services';
+import { DataService } from 'src/app/shared/services';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
@@ -33,7 +33,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
     constructor(
         private _fb: FormBuilder,
-        private _baseService: BaseService,
         private _catalogueRepo: CatalogueRepo,
         private _dataService: DataService,
     ) {
@@ -117,7 +116,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     getUserLogged() {
-        this.userLogged = this._baseService.getUserLogin() || 'admin';
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
         this.requester.setValue(this.userLogged.id);
     }
 

@@ -30,22 +30,28 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                    <div class="row">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
-                                (click)="openPopUpAssignStage()" appLoadingButton [state]="!!data && data.isLocked">
-                                <span>
-                                    <i class="la la-plus"></i>
-                                    <span>
-                                        Assign
-                                    </span>
-                                </span>
-                            </button>
+                <ng-container *ngIf="!!data && !data.isLocked">
+                    <ng-container *ngIf="!!data && data.permission.allowUpdate">
+                        <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button"
+                                        class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+                                        (click)="openPopUpAssignStage()" appLoadingButton
+                                        [state]="!!data && data.isLocked">
+                                        <span>
+                                            <i class="la la-plus"></i>
+                                            <span>
+                                                Assign
+                                            </span>
+                                        </span>
+                                    </button>
 
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </ng-container>
+                </ng-container>
             </div>
         </div>
 

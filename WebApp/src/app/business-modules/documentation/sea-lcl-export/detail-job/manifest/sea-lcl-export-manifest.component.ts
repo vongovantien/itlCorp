@@ -18,6 +18,7 @@ import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/sha
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
 import { CommonEnum } from '@enums';
 import { ShareBusinessHousebillsInManifestComponent } from 'src/app/business-modules/share-business/components';
+import { TransactionGetDetailAction, getTransactionLocked, getTransactionPermission } from '@share-bussiness';
 
 @Component({
     selector: 'app-sea-lcl-export-manifest',
@@ -75,6 +76,9 @@ export class SeaLclExportManifestComponent extends AppList {
 
         ];
 
+        this.isLocked = this._store.select(getTransactionLocked);
+        this.permissionShipments = this._store.select(getTransactionPermission);
+
     }
     ngAfterViewInit() {
         this._store.select(getParamsRouterState)
@@ -84,6 +88,8 @@ export class SeaLclExportManifestComponent extends AppList {
                     this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);
+                    this._store.dispatch(new TransactionGetDetailAction(this.jobId));
+
                     this.getHblList(this.jobId);
                     this.getManifest(this.jobId);
 

@@ -1,14 +1,14 @@
 import { AppList } from "src/app/app.list";
 import { Component, ViewChild } from "@angular/core";
-import { Router } from "@angular/router";
 import { NgProgress } from "@ngx-progressbar/core";
 import { SystemRepo } from "@repositories";
-import { SortService, BaseService } from "@services";
+import { SortService } from "@services";
 import { ToastrService } from "ngx-toastr";
 import { catchError, finalize, map } from "rxjs/operators";
 import { ConfirmPopupComponent } from "@common";
 import { AuthorizationAddPopupComponent } from "./components/popup/add-authorization/add-authorization.popup";
 import { User, Authorization } from "@models";
+import { SystemConstants } from "src/constants/system.const";
 
 @Component({
   selector: 'app-authorization',
@@ -23,13 +23,13 @@ export class AuthorizationComponent extends AppList {
   authorizations: Authorization[] = [];
   selectedAuthorization: Authorization;
   userLogged: User;
-  
-  constructor(private _router: Router,
+
+    constructor(
     private _systemRepo: SystemRepo,
     private _sortService: SortService,
     private _progressService: NgProgress,
     private _toastService: ToastrService,
-    private _baseService: BaseService,) {
+    ) {
     super();
     this._progressRef = this._progressService.ref();
     this.requestList = this.searchAuthorization;
@@ -105,13 +105,15 @@ export class AuthorizationComponent extends AppList {
   }
 
   openPopupAddAuthorization() {
-    this.userLogged = this._baseService.getUserLogin() || 'admin';
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
 
     this.authorizationAddPopupComponent.action = 'create';
     this.authorizationAddPopupComponent.authorizationActive.setValue(true);
+    this.authorizationAddPopupComponent.minDateEffective = this.authorizationAddPopupComponent.minDateExpired = this.minDate;   
 
-    //this.authorizationAddPopupComponent.getUsers();
-    let indexPIC = this.authorizationAddPopupComponent.personInChargeList.findIndex(x => x.id == this.userLogged.id);
+        // this.authorizationAddPopupComponent.getUsers();
+        const indexPIC = this.authorizationAddPopupComponent.personInChargeList.findIndex(x => x.id == this.userLogged.id);
     if (indexPIC > -1) {
       this.authorizationAddPopupComponent.personInChargeActive = [this.authorizationAddPopupComponent.personInChargeList[indexPIC]];
     }
@@ -127,10 +129,11 @@ export class AuthorizationComponent extends AppList {
     this._systemRepo.getAuthorizationById(authorization.id).subscribe(
       (res: any) => {
         if (res.id !== 0) {
-          var _authorization = new Authorization(res);
+                    const _authorization = new Authorization(res);
           this.authorizationAddPopupComponent.action = "update";
           this.authorizationAddPopupComponent.activeServices = this.authorizationAddPopupComponent.getCurrentActiveService(_authorization.services);
           this.authorizationAddPopupComponent.authorization = _authorization;
+          this.authorizationAddPopupComponent.minDateEffective = this.authorizationAddPopupComponent.minDateExpired = this.createMoment(!!_authorization.startDate ? new Date(_authorization.startDate) : null);
           this.authorizationAddPopupComponent.getDetail();
           this.authorizationAddPopupComponent.show();
         } else {

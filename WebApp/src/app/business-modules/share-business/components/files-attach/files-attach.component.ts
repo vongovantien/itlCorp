@@ -5,9 +5,10 @@ import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
-import { getParamsRouterState } from '@store';
+import { getParamsRouterState, IAppState } from '@store';
 import { Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
+import { getTransactionLocked, getTransactionPermission } from '../../store';
 
 
 @Component({
@@ -24,14 +25,19 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
     files: IShipmentAttachFile[] = [];
     selectedFile: IShipmentAttachFile;
 
+
     constructor(
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
-        private _store: Store<any>
+        private _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
+
+        this.isLocked = this._store.select(getTransactionLocked);
+
+        this.permissionShipments = this._store.select(getTransactionPermission);
 
     }
 
