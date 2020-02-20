@@ -125,6 +125,12 @@ export class OperationRepo {
     getClearanceTypes() {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetClearanceTypes`);
     }
+    updateJobToClearances(body: any) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/UpdateJobToClearances`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 
 
