@@ -321,7 +321,7 @@ namespace eFMS.API.Operation.Controllers
             }
             else
             {
-                var message = HandleError.GetMessage(hs, Crud.Delete);
+                message = HandleError.GetMessage(hs, Crud.Delete);
                 result = new ResultHandle { Status = hs.Success, Message = message };
                 return BadRequest(result);
 
