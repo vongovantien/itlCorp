@@ -14,6 +14,7 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { getDetailHBlPermissionState } from './../../../../../share-business/store';
 
 @Component({
     selector: 'app-detail-hbl-lcl-export',
@@ -28,6 +29,8 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
     hblDetail: CsTransactionDetail;
 
     dataReport: Crystal;
+
+    allowUpdate: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -68,6 +71,16 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
         });
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+
+        this._store.select(getDetailHBlPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.allowUpdate = res.allowUpdate;
+                    }
+                }
+            );
     }
 
     ngAfterViewInit() {
@@ -126,6 +139,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
 
     updateHbl(body: any) {
         this._progressRef.start();
+        body.transactionType = 'SLE';
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),

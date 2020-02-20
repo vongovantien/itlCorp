@@ -13,6 +13,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { getDetailHBlPermissionState } from './../../../../../share-business/store';
 
 @Component({
     selector: 'app-detail-hbl-fcl-export',
@@ -28,6 +29,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
 
     dataReport: Crystal;
 
+    allowUpdate: boolean = false;
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -67,6 +69,16 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         });
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+
+        this._store.select(getDetailHBlPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.allowUpdate = res.allowUpdate;
+                    }
+                }
+            );
     }
 
     ngAfterViewInit() {
@@ -125,6 +137,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
 
     updateHbl(body: any) {
         this._progressRef.start();
+        body.transactionType = 'SFE';
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),

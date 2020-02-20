@@ -282,7 +282,7 @@ export class CreateHouseBillComponent extends AppForm {
             deliveryOrderPrintedDate: null,
             dofooter: null,
             dosentTo1: null,
-            dosentTo2: null,
+            dosentTo2: null
         };
         return body;
     }
@@ -346,4 +346,5 @@ export interface ITransactionDetail {
     dosentTo2: string;
     packageQty: number;
     packageType: number;
+
 }

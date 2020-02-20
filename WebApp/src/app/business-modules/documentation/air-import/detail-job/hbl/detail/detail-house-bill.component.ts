@@ -6,7 +6,7 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { ReportPreviewComponent } from '@common';
-import { ShareBusinessDeliveryOrderComponent, ShareBusinessArrivalNoteAirComponent } from '@share-bussiness';
+import { ShareBusinessDeliveryOrderComponent, ShareBusinessArrivalNoteAirComponent, getDetailHBlPermissionState } from '@share-bussiness';
 
 import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
@@ -38,6 +38,8 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
+    allowUpdate: boolean = false;
+
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -78,6 +80,15 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         });
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+        this._store.select(getDetailHBlPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.allowUpdate = res.allowUpdate;
+                    }
+                }
+            );
     }
 
     getDetailHbl() {
@@ -156,7 +167,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
         modelUpdate.subAbbr = this.hblDetail.subAbbr;
-
+        modelUpdate.transactionType = "AI";
 
         this.updateHbl(modelUpdate);
     }

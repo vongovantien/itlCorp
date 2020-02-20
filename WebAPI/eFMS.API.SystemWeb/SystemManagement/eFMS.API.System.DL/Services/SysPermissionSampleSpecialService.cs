@@ -8,7 +8,6 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -64,18 +63,9 @@ namespace eFMS.API.System.DL.Services
                             MenuId = x.MenuId,
                             NameEn = x.ActionName,
                             NameVn = x.ActionName,
-                            IsAllow = false,
+                            IsAllow = x.IsAllow,
                             PermissionId = permissionId == null ? Guid.Empty : (Guid)permissionId
                         }).ToList();
-                    perSpecial.PermissionSpecialActions.ForEach(x =>
-                    {
-                        var detail = actionDefaults.FirstOrDefault(y => y.ActionName == x.NameEn);
-                        if (detail != null)
-                        {
-                            x.Id = (short)(permissionId == null ? 0 : actionDefaults.FirstOrDefault(y => y.ActionName == x.NameEn)?.Id);
-                            x.IsAllow = permissionId == null ? false : actionDefaults.FirstOrDefault(y => y.ActionName == x.NameEn)?.IsAllow;
-                        }
-                    });
                     sampleSpecials.Add(perSpecial);
                 }
                 specialP.SysPermissionSpecials = sampleSpecials;

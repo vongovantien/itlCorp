@@ -14,7 +14,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
-import { ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBussinessHBLGoodSummaryLCLComponent } from 'src/app/business-modules/share-business';
+import { ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBussinessHBLGoodSummaryLCLComponent, getDetailHBlPermissionState } from 'src/app/business-modules/share-business';
 import isUUID from 'validator/lib/isUUID';
 
 enum HBL_TAB {
@@ -45,6 +45,8 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
+    allowUpdate: boolean = false;
+
 
     constructor(
         protected _progressService: NgProgress,
@@ -62,6 +64,16 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     }
 
     ngOnInit() {
+
+        this._store.select(getDetailHBlPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.allowUpdate = res.allowUpdate;
+                    }
+                }
+            );
     }
 
     ngAfterViewInit() {
@@ -167,6 +179,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     updateHbl(body: any) {
         this._progressRef.start();
+        body.transactionType = 'SLI';
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),

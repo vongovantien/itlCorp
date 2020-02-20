@@ -2,7 +2,8 @@
     <app-sub-header>
         <div class="c-button-actions">
             <div class="dropdown m-dropdown m-dropdown--inline">
-                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="gotoSeparate()">
+                <button *ngIf="allowUpdate" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="gotoSeparate()">
                     <span>
                         <i class="la la-plus"></i>
                         <span>
@@ -18,7 +19,8 @@
                     <a class="dropdown-item pointer" (click)="previewAttachList()">Attach List Preview</a>
                 </div>
             </div>
-            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="confirmSave.show()"></app-default-button>
+            <app-default-button *ngIf="allowUpdate" [buttonSetting]="saveButtonSetting" (onClick)="confirmSave.show()">
+            </app-default-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>
     </app-sub-header>

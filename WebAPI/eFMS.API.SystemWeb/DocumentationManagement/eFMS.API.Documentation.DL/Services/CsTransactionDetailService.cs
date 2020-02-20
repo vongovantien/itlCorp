@@ -36,6 +36,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsDimensionDetailService dimensionDetailService;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysAuthorization> authorizationRepository;
+        readonly IUserPermissionService permissionService;
+
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -52,7 +54,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransactionDetail> csTransactiondetail,
             ICsMawbcontainerService contService, ICurrentUser user,
             ICsDimensionDetailService dimensionService,
-            IContextBase<SysAuthorization> authorizationRepo) : base(repository, mapper)
+            IContextBase<SysAuthorization> authorizationRepo,
+            IUserPermissionService perService) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -69,6 +72,7 @@ namespace eFMS.API.Documentation.DL.Services
             countryRepository = countryRepo;
             dimensionDetailService = dimensionService;
             authorizationRepository = authorizationRepo;
+            permissionService = perService;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -163,7 +167,8 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return new HandleState("Housebill not found !");
                     }
-                    var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+                    ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
+                    var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
                     int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
                     if (code == 403) return new HandleState(403);
                     if (model.CsMawbcontainers?.Count > 0)
@@ -174,7 +179,7 @@ namespace eFMS.API.Documentation.DL.Services
                             return checkDuplicateCont;
                         }
                     }
-               
+
 
                     model.UserModified = currentUser.UserID;
                     model.DatetimeModified = DateTime.Now;
@@ -384,11 +389,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = GetById(id);
             if (detail == null) return null;
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
-                                                                 && x.AssignTo == currentUser.UserID
-                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
-                                                                 && x.Services.Contains(detail.TransactionType)
-                                                                 )?.Select(x => x.UserId).ToList();
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds(detail.TransactionType, currentUser);
+
+
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
@@ -677,7 +680,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                                         .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + " x" + ' ' + GetUnitNameById(s.PackageTypeId)) : string.Empty));
             });
             return results;
-        }     
+        }
 
         public IQueryable<CsTransactionDetail> GetHouseBill(string transactionType)
         {
@@ -698,31 +701,26 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Owner:
                     houseBills = houseBills.Where(x => x.SaleManId == currentUser.UserID
                                                 || authorizeUserIds.Contains(x.SaleManId)
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Group:
                     houseBills = houseBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.SaleManId)
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Department:
                     houseBills = houseBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.SaleManId)
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Office:
                     houseBills = houseBills.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.SaleManId)
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Company:
                     houseBills = houseBills.Where(x => x.CompanyId == currentUser.CompanyID
                                                 || authorizeUserIds.Contains(x.SaleManId)
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
             }
@@ -782,7 +780,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var houseBillData = query.Select(s => s.detail).GroupBy(g => g.Id).Select(s => s.FirstOrDefault());
             var res = from detail in houseBillData//DataContext.Get()
-                      //join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
+                                                  //join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                       join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                       from cus in customers.DefaultIfEmpty()
                       join shipper in catPartnerRepo.Get() on detail.ShipperId equals shipper.Id into shippers
@@ -1014,7 +1012,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+                    var job = csTransactionRepo.Get(x => x.Id == hbl.JobId).FirstOrDefault();
+                    ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
+                    var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+
                     int code = GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
                     if (code == 403) return new HandleState(403);
 

@@ -10,8 +10,10 @@ import { Crystal } from '@models';
 import { ReportPreviewComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { AirExportHBLFormCreateComponent } from '../components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
+import { getDetailHBlState, getDetailHBlPermissionState } from '@share-bussiness';
 
 
 @Component({
@@ -24,6 +26,8 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     hblId: string;
 
     dataReport: Crystal;
+
+    allowUpdate: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -64,6 +68,15 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         });
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+        this._store.select(getDetailHBlPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.allowUpdate = res.allowUpdate;
+                    }
+                }
+            );
     }
 
     saveHBL() {
@@ -78,7 +91,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         const modelUpdate = this.getDataForm();
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
-
+        modelUpdate.transactionType = "AE";
         for (const dim of modelUpdate.dimensionDetails) {
             dim.hblId = this.hblId;
             // dim.mblId = this.jobId;

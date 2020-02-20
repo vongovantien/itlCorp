@@ -187,6 +187,22 @@ export class AirExportHBLComponent extends AppList implements OnInit {
         this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/new`]);
     }
 
+    gotoDetail(id: string) {
+        this._documentRepo.checkViewDetailHblPermission(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${id}`]);
+                    } else {
+                        this._toastService.error("You don't have permission to view detail");
+                    }
+                },
+            );
+    }
+
     selectHBL(hbl: HouseBill) {
         if (!this.selectedHbl || !!this.selectedHbl && this.selectedHbl.id !== hbl.id) {
             this.selectedHbl = new CsTransactionDetail(hbl);

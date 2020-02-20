@@ -193,6 +193,22 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
             );
     }
 
+    gotoDetail(id: string) {
+        this._documentRepo.checkViewDetailHblPermission(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this._router.navigate([`/home/documentation/sea-lcl-import/${this.jobId}/hbl/${id}`]);
+                    } else {
+                        this._toastService.error("You don't have permission to view detail");
+                    }
+                },
+            );
+    }
+
     deleteJob() {
         this.confirmDeleteJobPopup.show();
     }

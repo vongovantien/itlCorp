@@ -192,7 +192,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result = true;
                     break;
                 case PermissionRange.Owner:
-                    if (detail.BillingOpsId == currentUser.UserID || authorizeUserIds.Contains(detail.BillingOpsId))
+                    if (detail.BillingOpsId == currentUser.UserID || detail.UserCreated == currentUser.UserID || authorizeUserIds.Contains(detail.BillingOpsId))
                     {
                         result = true;
                     }
@@ -203,7 +203,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Group:
                     if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID)
-                        || authorizeUserIds.Contains(detail.BillingOpsId))
+                        || authorizeUserIds.Contains(detail.BillingOpsId) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -213,7 +213,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Department:
-                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.BillingOpsId))
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.BillingOpsId) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -223,7 +223,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Office:
-                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.BillingOpsId))
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.BillingOpsId) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -233,7 +233,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Company:
-                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.BillingOpsId))
+                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.BillingOpsId) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -321,7 +321,6 @@ namespace eFMS.API.Documentation.DL.Services
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && (x.BillingOpsId == currentUser.UserID || x.SalemanId == currentUser.UserID
                                                  || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)
-                                                 || authorizeUserIds.Contains(x.UserCreated)
                                                  || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Group:
@@ -329,27 +328,26 @@ namespace eFMS.API.Documentation.DL.Services
                                                 && ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Department:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
-                                                || authorizeUserIds.Contains(x.SalemanId) || authorizeUserIds.Contains(x.UserCreated)
+                                                || authorizeUserIds.Contains(x.SalemanId)
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Office:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
-                                                || authorizeUserIds.Contains(x.SalemanId) || authorizeUserIds.Contains(x.UserCreated)
+                                                || authorizeUserIds.Contains(x.SalemanId) 
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Company:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && (x.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(x.BillingOpsId)
-                                                || authorizeUserIds.Contains(x.SalemanId) || authorizeUserIds.Contains(x.UserCreated)
+                                                || authorizeUserIds.Contains(x.SalemanId) 
                                                 || x.UserCreated == currentUser.UserID));
                     break;
             }

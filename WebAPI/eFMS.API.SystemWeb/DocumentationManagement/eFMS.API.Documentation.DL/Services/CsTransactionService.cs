@@ -491,7 +491,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result = true;
                     break;
                 case PermissionRange.Owner:
-                    if (detail.PersonIncharge == currentUser.UserID || authorizeUserIds.Contains(detail.PersonIncharge))
+                    if (detail.PersonIncharge == currentUser.UserID || detail.UserCreated == currentUser.UserID || authorizeUserIds.Contains(detail.PersonIncharge))
                     {
                         result = true;
                     }
@@ -566,31 +566,26 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Owner:
                     masterBills = masterBills.Where(x => x.PersonIncharge == currentUser.UserID 
                                                 || authorizeUserIds.Contains(x.PersonIncharge) 
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Group:
                     masterBills = masterBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Department:
                     masterBills = masterBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Office:
                     masterBills = masterBills.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Company:
                     masterBills = masterBills.Where(x => x.CompanyId == currentUser.CompanyID 
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
             }
