@@ -4,7 +4,7 @@ import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, take, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { getParamsRouterState } from 'src/app/store';
 import { Params, Router } from '@angular/router';
@@ -16,7 +16,8 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/share-business/components/manifest/form-manifest/components/form-manifest.component';
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
-import { TransactionTypeEnum, CommonEnum } from '@enums';
+import { CommonEnum } from '@enums';
+import { TransactionGetDetailAction, getTransactionLocked, getTransactionPermission } from '@share-bussiness';
 
 @Component({
     selector: 'app-sea-fcl-export-manifest',
@@ -76,16 +77,20 @@ export class SeaFclExportManifestComponent extends AppList {
 
         ];
 
+        this.isLocked = this._store.select(getTransactionLocked);
+        this.permissionShipments = this._store.select(getTransactionPermission);
+
     }
     ngAfterViewInit() {
         this._store.select(getParamsRouterState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
                 if (param.jobId) {
-                    console.log(param.jobId)
                     this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
                     this.formManifest.getShipmentDetail(this.formManifest.jobId);
+
+                    this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                     this.getHblList(this.jobId);
                     this.getManifest(this.jobId);
 

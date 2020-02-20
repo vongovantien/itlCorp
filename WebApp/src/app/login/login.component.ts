@@ -7,7 +7,6 @@ import { SystemConstants } from 'src/constants/system.const';
 import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
 import { CookieService } from 'ngx-cookie-service';
 import crypto_js from 'crypto-js';
-import { BaseService } from 'src/app/shared/services/base.service';
 
 import { RSAHelper } from 'src/helper/RSAHelper';
 import { SystemRepo } from '../shared/repositories/system.repo';
@@ -15,8 +14,8 @@ import { Observable } from 'rxjs';
 import { Company } from '@models';
 import { share } from 'rxjs/operators';
 import { HttpHeaders } from '@angular/common/http';
-import { Store } from '@ngrx/store';
-import { IAppState } from '../store/reducers';
+
+import { NgxSpinnerService } from 'ngx-spinner';
 
 
 @Component({
@@ -38,7 +37,7 @@ export class LoginComponent {
     ngAfterViewInit(): void {
         if (this.route.snapshot.paramMap.get("isEndSession")) {
             setTimeout(() => {
-                this.baseService.warningToast("Login again to continue, please !", "Expired Session");
+                this.toastr.warning("Login again to continue, please !", "Expired Session");
             }, 50);
         }
 
@@ -47,12 +46,12 @@ export class LoginComponent {
 
     constructor(
         private toastr: ToastrService,
-        private baseService: BaseService,
         private router: Router,
         private route: ActivatedRoute,
         private oauthService: OAuthService,
         private cookieService: CookieService,
         private _systemRepo: SystemRepo,
+        private _spinner: NgxSpinnerService
     ) {
         this.oauthService.setStorage(localStorage);
         this.oauthService.setupAutomaticSilentRefresh();
@@ -74,17 +73,12 @@ export class LoginComponent {
                 this.selectedCompanyId = companies[0].id;
             }
         );
-
-        // if (this.baseService.checkLoginSession()) {
-        //     this.setupLocalInfo();
-        //     this.router.navigateByUrl('/');
-        // }
     }
 
     async Login(form: NgForm) {
         if (form.form.status !== "INVALID" && !!this.selectedCompanyId) {
             try {
-                this.baseService.spinnerShow();
+                this._spinner.show();
                 this.currenURL = this.route.snapshot.paramMap.get("url") || 'home/dashboard';
 
                 await this.configureWithNewConfigApi();
@@ -108,14 +102,15 @@ export class LoginComponent {
                                 this.currenURL = "home/dashboard";
                             }
                             this.router.navigateByUrl(this.currenURL);
-                            this.baseService.spinnerHide();
+                            this._spinner.hide();
+
                             this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
                         }
                     }).catch((err) => {
-                        this.baseService.spinnerHide();
+                        this._spinner.hide();
                     });
             } catch (error) {
-                this.baseService.spinnerHide();
+                this._spinner.hide();
             }
         }
     }

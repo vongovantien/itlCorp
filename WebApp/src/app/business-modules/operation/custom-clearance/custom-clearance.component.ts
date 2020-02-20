@@ -1,5 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { BaseService } from 'src/app/shared/services/base.service';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
@@ -11,7 +10,6 @@ import { OperationRepo, DocumentationRepo, CatalogueRepo, ExportRepo } from 'src
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import _map from 'lodash/map';
 import { NgProgress } from '@ngx-progressbar/core';
-import { HttpClient } from '@angular/common/http';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Router } from '@angular/router';
 

@@ -1,6 +1,4 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { catchError } from "rxjs/operators";
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
@@ -48,8 +46,6 @@ export class SalemanPopupComponent extends PopupBase {
 
     @Input() popupData: Saleman;
     constructor(
-        private baseService: BaseService,
-        private api_menu: API_MENU,
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder

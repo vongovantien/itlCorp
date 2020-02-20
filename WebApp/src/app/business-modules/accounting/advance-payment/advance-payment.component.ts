@@ -3,12 +3,13 @@ import { AppList } from 'src/app/app.list';
 import { AccountingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { SortService, BaseService } from 'src/app/shared/services';
+import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePayment, AdvancePaymentRequest, User } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-advance-payment',
@@ -34,7 +35,6 @@ export class AdvancePaymentComponent extends AppList {
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _progressService: NgProgress,
-        private _baseService: BaseService,
         private _router: Router
     ) {
         super();
@@ -156,7 +156,7 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     getUserLogged() {
-        this.userLogged = this._baseService.getUserLogin() || 'admin';
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
     }
 
     gotoDetailAdvPayment(adv: AdvancePayment) {

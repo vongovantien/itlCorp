@@ -5,7 +5,6 @@ import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/fo
 import { AppForm } from 'src/app/app.form';
 import { DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { User } from 'src/app/shared/models';
-import { BaseService } from 'src/app/shared/services';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
@@ -15,6 +14,7 @@ import { Observable } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { ActivatedRoute, Params } from '@angular/router';
 import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueAgentState, getCataloguePortState } from '@store';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'form-create-sea-import',
@@ -81,7 +81,6 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         protected _documentRepo: DocumentationRepo,
         protected _catalogueRepo: CatalogueRepo,
         protected _fb: FormBuilder,
-        protected _baseService: BaseService,
         private _store: Store<fromShare.ITransactionState>,
         private _route: ActivatedRoute
 
@@ -236,7 +235,8 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
     }
 
     getUserLogged() {
-        this.userLogged = this._baseService.getUserLogin();
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
         this.personIncharge.setValue(this.userLogged.id);
         this.personIncharge.disable();
     }

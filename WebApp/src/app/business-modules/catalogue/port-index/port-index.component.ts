@@ -12,7 +12,6 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import * as dataHelper from 'src/helper/data.helper';
 import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
 import { AppList } from 'src/app/app.list';
 import { FormPortIndexComponent } from './components/form-port-index.component';
@@ -155,7 +154,7 @@ export class PortIndexComponent extends AppList implements OnInit {
             .subscribe(
                 (responses) => {
                     if (responses) {
-                        this.formPopup.modes = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
+                        this.formPopup.modes = this.utility.prepareNg2SelectData(responses, 'id', 'name');
                     } else {
                         this.formPopup.modes = [];
                     }
@@ -168,7 +167,7 @@ export class PortIndexComponent extends AppList implements OnInit {
             .subscribe(
                 (responses) => {
                     if (responses) {
-                        this.formPopup.areas = dataHelper.prepareNg2SelectData(responses, 'id', 'nameEn');
+                        this.formPopup.areas = this.utility.prepareNg2SelectData(responses, 'id', 'nameEn');
                     } else {
                         this.formPopup.areas = [];
                     }
@@ -181,7 +180,7 @@ export class PortIndexComponent extends AppList implements OnInit {
             .subscribe(
                 (responses) => {
                     if (responses) {
-                        this.formPopup.countries = dataHelper.prepareNg2SelectData(responses, 'id', 'nameEn');
+                        this.formPopup.countries = this.utility.prepareNg2SelectData(responses, 'id', 'nameEn');
                     } else {
                         this.formPopup.countries = [];
                     }

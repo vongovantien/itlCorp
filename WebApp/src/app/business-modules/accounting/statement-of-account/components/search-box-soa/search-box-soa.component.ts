@@ -6,7 +6,7 @@ import { AppPage } from 'src/app/app.base';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Currency, Partner, User } from 'src/app/shared/models';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
-import { BaseService, SortService, DataService } from 'src/app/shared/services';
+import { SortService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
@@ -43,7 +43,6 @@ export class StatementOfAccountSearchComponent extends AppPage {
     constructor(
         private _sysRepo: SystemRepo,
         private _catalogueRepo: CatalogueRepo,
-        private _baseService: BaseService,
         private _sortService: SortService,
         private _dataService: DataService
     ) {
@@ -57,7 +56,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
     }
 
     getUserLogged() {
-        this.userLogged = this._baseService.getUserLogin();
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
     }
 
     getBasicData() {
