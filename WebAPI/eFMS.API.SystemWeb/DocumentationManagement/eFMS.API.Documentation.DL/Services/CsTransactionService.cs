@@ -232,6 +232,11 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState UpdateCSTransaction(CsTransactionEditModel model)
         {
             var job = DataContext.First(x => x.Id == model.Id && x.CurrentStatus != TermData.Canceled);
+            if (job == null)
+            {
+                return new HandleState("Shipment not found !");
+            }
+
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange, job.TransactionType);
