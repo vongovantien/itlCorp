@@ -4,7 +4,7 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { IFormAddCompany, CompanyInformationFormAddComponent } from '../components/form-add-company/form-add-company.component';
-import { Company, Office } from 'src/app/shared/models';
+import { Company, Office } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { AppList } from 'src/app/app.list';
 import { forkJoin } from 'rxjs';
@@ -28,7 +28,7 @@ export class CompanyInformationDetailComponent extends AppList {
     companyId: string = '';
     company: Company;
 
-    offices: any[] = [];
+    offices: Office[] = [];
 
     headersOffice: CommonInterface.IHeaderTable[];
 

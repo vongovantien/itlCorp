@@ -85,9 +85,9 @@ namespace eFMS.API.System.DL.Services
                           select new SysUserLevelModel
                           {
                               GroupName = g.NameVn,
-                              CompanyName = c.BunameVn, 
-                              OfficeName = o.BranchNameVn, 
-                              DepartmentName = depart.DeptName, 
+                              CompanyName = c.BunameVn,
+                              OfficeName = o.BranchNameVn,
+                              DepartmentName = depart.DeptName,
                               Position = d.Position
                           };
 
@@ -117,17 +117,17 @@ namespace eFMS.API.System.DL.Services
                             UserModified = x.User.UserLevel.UserModified,
                             Position = x.User.UserLevel.Position
                         });
-            if (criteria.Type == "office")
+            if (criteria.Type == "company")
             {
-                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId);
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.GroupId == SystemConstants.SpecialGroup && x.OfficeId == null && x.DepartmentId == null);
             }
-            else if (criteria.Type == "company")
+            else if (criteria.Type == "office")
             {
-                results = results.Where(x => x.CompanyId == criteria.CompanyId);
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.GroupId == SystemConstants.SpecialGroup && x.DepartmentId == null);
             }
             else if (criteria.Type == "department")
             {
-                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId);
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId && x.GroupId == SystemConstants.SpecialGroup);
             }
             else if (criteria.Type == "group")
             {

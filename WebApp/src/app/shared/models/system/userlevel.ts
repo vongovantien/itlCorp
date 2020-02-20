@@ -3,8 +3,8 @@ export class UserLevel {
     userId: string = null;
     groupId: number = 0;
     departmentId: number = null;
-    officeId: string = "00000000-0000-0000-0000-000000000000";
-    companyId: string = "00000000-0000-0000-0000-000000000000";
+    officeId: string = null;
+    companyId: string = null;
     position: string = null;
     employeeName: string = '';
     employeeNameVn: string = '';
