@@ -73,7 +73,7 @@
 <app-form-port-index (onChange)="resetSearch($event)"></app-form-port-index>
 <!--end::add-port-index-modal-->
 
-<!--begin::confirm-delete-modal-->
 <app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this port index'">
 </app-delete-confirm-modal>
-<!--end::confirm-delete-modal-->
+
+<!-- <confirm-popup #confirmDeletePopup body="You want to delete this port index?" (onSubmit)="onDelete(true)"></confirm-popup> -->

@@ -119,6 +119,13 @@ export class OperationRepo {
         return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/uploadFile`, files, "uploadedFile");
     }
 
+    updateJobToClearances(body: any) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/UpdateJobToClearances`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 
 
 }

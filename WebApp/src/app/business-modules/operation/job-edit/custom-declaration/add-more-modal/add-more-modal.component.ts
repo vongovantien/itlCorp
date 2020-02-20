@@ -1,19 +1,17 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { SortService, BaseService } from 'src/app/shared/services';
+import { SortService } from 'src/app/shared/services';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, finalize, tap } from 'rxjs/operators';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { SearchMultipleComponent } from '../components/search-multiple/search-multiple.component';
-import { OperationRepo } from 'src/app/shared/repositories';
+import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
 
 @Component({
     selector: 'app-add-more-modal',
@@ -56,15 +54,11 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     constructor(
         private _fb: FormBuilder,
         private _sortService: SortService,
-        private api_menu: API_MENU,
-        private baseServices: BaseService,
-        private _http: HttpClient,
-        private spiner: NgxSpinnerService,
+        private _documentationRepo: DocumentationRepo,
         private _operationRepo: OperationRepo) {
         super();
 
         this.requestSort = this.sortLocal;
-        // this.requestList = this.getDataNotImported;
     }
     ngOnInit() {
         this.initForm();
@@ -111,12 +105,12 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     sortLocal(sort: string): void {
         this.notImportedCustomClearances = this._sortService.sort(this.notImportedCustomClearances, sort, this.order);
     }
-    async refreshData() {
+
+    refreshData() {
         this.keyword = '';
-
-
         this.getListCleranceNotImported();
     }
+
     setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;
         this.pager.totalPages = pager.totalPages;
@@ -124,6 +118,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         this.notImportedCustomClearances = [];
         this.getListCleranceNotImported();
     }
+
     changeAllNotImported() {
 
         if (this.checkAllNotImported) {
@@ -155,22 +150,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         });
         this.customNo = this.form.controls['customNo'];
     }
-    // searchClearanceNotImported(event) {
-    //     const keySearch = this.keyword.trim().toLocaleLowerCase();
-    //     if (keySearch !== null && keySearch.length < 1 && keySearch.length > 0) {
-    //         return 0;
-    //     }
-    //     this.dataNotImportedSearch = this.notImportedData.filter(item => item.clearanceNo.includes(keySearch)
-    //         || (item.hblid == null ? '' : item.hblid.toLocaleLowerCase()).includes(keySearch)
-    //         || (item.exportCountryCode == null ? '' : item.exportCountryCode.toLocaleLowerCase()).includes(keySearch)
-    //         || (item.importCountryCode == null ? '' : item.importCountryCode.toLocaleLowerCase()).includes(keySearch)
-    //         || (item.commodityCode == null ? '' : item.commodityCode.toLocaleLowerCase()).includes(keySearch)
-    //         || (item.firstClearanceNo == null ? '' : item.firstClearanceNo.toLocaleLowerCase()).includes(keySearch)
-    //         || (item.qtyCont == null ? '' : item.qtyCont.toString()).includes(keySearch)
-    //     );
-    //     this.totalItems = this.dataNotImportedSearch.length;
-    //     this.notImportedCustomClearances = this.dataNotImportedSearch.slice(0, (this.pageSize - 1));
-    // }
+
     removeAllChecked() {
         this.checkAllNotImported = false;
         const checkedData = this.notImportedCustomClearances.filter(x => x.isChecked === true);
@@ -183,34 +163,27 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
             }
         }
     }
-    // getDataNotImported() {
-    //     if (this.notImportedData != null) {
-    //         this.totalItems = this.notImportedData.length;
-    //         console.log(this.notImportedData);
-    //         if (this.page > 1) {
-    //             this.notImportedCustomClearances = this.notImportedData.slice(this.page * (this.pageSize), (this.page + 1) * this.pageSize);
-    //         }
-    //         else {
-    //             this.notImportedCustomClearances = this.notImportedData.slice(this.page, (this.pageSize - 1));
-    //         }
 
-    //         /* this.notImportedCustomClearances = this.notImportedData.slice(this.page * (this.pageSize), (this.page + 1) * this.pageSize);*/
-    //     }
-    // }
-    async updateJobToClearance() {
+    updateJobToClearance() {
         const dataToUpdate = this.notImportedCustomClearances.filter(x => x.isChecked === true);
         if (dataToUpdate.length > 0) {
             dataToUpdate.forEach(x => {
                 x.jobNo = this.currentJob.jobNo;
             });
-            const responses = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.updateToAJob, dataToUpdate, false, true);
-            if (responses.success === true) {
-                this.updateShipmentVolumn(dataToUpdate);
-                this.isCloseModal.emit(true);
-                this.hide();
-            }
+
+            this._operationRepo.updateJobToClearances(dataToUpdate)
+                .pipe(finalize(() => this.hide()))
+                .subscribe(
+                    (responses: CommonInterface.IResult | any) => {
+                        if (responses.success === true) {
+                            this.updateShipmentVolumn(dataToUpdate);
+                            this.isCloseModal.emit(true);
+                        }
+                    }
+                );
         }
     }
+
     onSearchAutoComplete(keyword: string) {
         this.pager.currentPage = 1;
         this.pager.pageSize = 15;
@@ -253,7 +226,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     }
 
 
-    async updateShipmentVolumn(importedData) {
+    updateShipmentVolumn(importedData) {
         if (importedData != null) {
             this.currentJob.sumGrossWeight = 0;
             this.currentJob.sumNetWeight = 0;
@@ -274,7 +247,12 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
             if (this.currentJob.sumCbm === 0) {
                 this.currentJob.sumCbm = null;
             }
-            await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.currentJob, false, false);
+
+            this._documentationRepo.updateShipment(this.currentJob).subscribe(
+                (res) => {
+
+                }
+            );
         }
     }
     getListCleranceNotImported() {
@@ -287,8 +265,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
                 }
                 this.strKeySearch = this.customNo.value + ',' + this.customNoSearch;
                 this.strKeySearch = this.customNoSearch;
-            }
-            else {
+            } else {
                 this.strKeySearch = this.customNo.value;
             }
         } else {
@@ -312,7 +289,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
             );
     }
 
-    async showPopupSearch() {
+    showPopupSearch() {
         this.popupSearchMultiple.show();
         this.customNo.setValue('');
     }

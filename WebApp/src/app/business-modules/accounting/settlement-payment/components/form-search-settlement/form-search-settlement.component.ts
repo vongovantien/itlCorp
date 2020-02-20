@@ -1,9 +1,9 @@
-import { Component, Output, EventEmitter} from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { User } from 'src/app/shared/models';
-import { BaseService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'settle-payment-form-search',
@@ -28,7 +28,6 @@ export class SettlementFormSearchComponent extends AppForm {
     userLogged: User;
     constructor(
         private _fb: FormBuilder,
-        private _baseService: BaseService
 
     ) {
         super();
@@ -84,7 +83,7 @@ export class SettlementFormSearchComponent extends AppForm {
     }
 
     getUserLogged() {
-        this.userLogged = this._baseService.getUserLogin() || 'admin';
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.requester.setValue(this.userLogged.preferred_username);
     }
 

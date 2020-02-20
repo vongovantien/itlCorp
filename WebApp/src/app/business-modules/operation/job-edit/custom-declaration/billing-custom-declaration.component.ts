@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { BaseService } from 'src/app/shared/services/base.service';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagingService } from 'src/app/shared/services/paging-service';
@@ -39,8 +37,6 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
     sortKey: string = "";
 
     constructor(
-        private baseServices: BaseService,
-        private api_menu: API_MENU,
         private pagerService: PagingService,
         private sortService: SortService,
         private _documentRepo: DocumentationRepo,
@@ -127,39 +123,45 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
         this.customClearances = this.sortService.sort(this.customClearances, property, this.isDesc);
     }
 
-    async removeImported() {
+    removeImported() {
         const dataToUpdate = this.importedData.filter(x => x.isChecked === true);
         if (dataToUpdate.length > 0) {
             dataToUpdate.forEach(x => {
                 x.jobNo = null;
             });
-            const responses = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.updateToAJob, dataToUpdate, false, true);
-            if (responses.success === true) {
-                this._operationRepo.getListImportedInJob(this.currentJob.jobNo).pipe(
-                    takeUntil(this.ngUnsubscribe),
-                    catchError(this.catchError),
-                    finalize(() => {
-                        this.dataImportedSearch = this.importedData;
-                        this.setPageMaster(this.pagerMaster);
-                        this.updateShipmentVolumn();
-                    })
-                ).subscribe(
-                    (res: any) => {
-                        this.importedData = res;
-                        if (this.importedData != null) {
-                            this.importedData.forEach(element => {
-                                element.isChecked = false;
-                            });
-                        } else {
-                            this.importedData = [];
+
+            this._operationRepo.updateJobToClearances(dataToUpdate)
+                .subscribe(
+                    (responses: any) => {
+                        if (responses.success === true) {
+                            this._operationRepo.getListImportedInJob(this.currentJob.jobNo).pipe(
+                                takeUntil(this.ngUnsubscribe),
+                                catchError(this.catchError),
+                                finalize(() => {
+                                    this.dataImportedSearch = this.importedData;
+                                    this.setPageMaster(this.pagerMaster);
+                                    this.updateShipmentVolumn();
+                                })
+                            ).subscribe(
+                                (res: any) => {
+                                    this.importedData = res;
+                                    if (this.importedData != null) {
+                                        this.importedData.forEach(element => {
+                                            element.isChecked = false;
+                                        });
+                                    } else {
+                                        this.importedData = [];
+                                    }
+                                }
+                            );
                         }
                     }
                 );
-            }
+
         }
     }
 
-    async updateShipmentVolumn() {
+    updateShipmentVolumn() {
         if (this.importedData != null) {
             this.currentJob.sumGrossWeight = 0;
             this.currentJob.sumNetWeight = 0;
@@ -185,7 +187,7 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
                 this.currentJob.sumCbm = null;
             }
 
-            await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.currentJob, false, false);
+            this._documentRepo.updateShipment(this.currentJob).subscribe(() => { });
         }
     }
 
