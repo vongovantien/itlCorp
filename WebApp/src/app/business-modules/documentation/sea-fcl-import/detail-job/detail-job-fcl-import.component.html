@@ -4,7 +4,7 @@
             <ng-container *ngIf="!!fclImportDetail && !fclImportDetail.isLocked">
                 <button type="button"
                     class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                    (click)="lockShipment()">
+                    (click)="lockShipment()" *ngIf="!!fclImportDetail && fclImportDetail.permission.allowLock">
                     <span>
                         <i class="la la-lock"></i>
                         <span>
@@ -26,31 +26,35 @@
                     <a class="dropdown-item pointer" (click)="previewPLsheet('VND')">Preview with VND</a>
                 </div>
             </div>
-
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="showDuplicateConfirm()" [disabled]="ACTION === 'COPY'">
-                <span>
-                    <i class="la la-search-plus"></i>
+            <ng-container *ngIf="!!fclImportDetail && !fclImportDetail.isLocked">
+                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="showDuplicateConfirm()" [disabled]="ACTION === 'COPY'"
+                    *ngIf="!!fclImportDetail && fclImportDetail.permission.allowUpdate">
                     <span>
-                        Duplicate
+                        <i class="la la-search-plus"></i>
+                        <span>
+                            Duplicate
+                        </span>
                     </span>
-                </span>
-            </button>
+                </button>
 
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="deleteJob()" [disabled]="ACTION === 'COPY'"
-                *ngIf="!!fclImportDetail && !fclImportDetail.isLocked">
-                <span>
-                    <i class="la la-trash"></i>
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="deleteJob()" [disabled]="ACTION === 'COPY'"
+                    *ngIf="!!fclImportDetail && fclImportDetail.permission.allowDelete">
                     <span>
-                        Delete
+                        <i class="la la-trash"></i>
+                        <span>
+                            Delete
+                        </span>
                     </span>
-                </span>
-            </button>
+                </button>
 
-            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onUpdateShipmentDetail()"
-                [disabled]="selectedTab !== 'SHIPMENT'" *ngIf="!!fclImportDetail && !fclImportDetail.isLocked">
-            </app-default-button>
+                <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onUpdateShipmentDetail()"
+                    [disabled]="selectedTab !== 'SHIPMENT'"
+                    *ngIf="!!fclImportDetail && fclImportDetail.permission.allowUpdate">
+                </app-default-button>
+            </ng-container>
+
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancelPopup.show()">
             </app-default-button>
@@ -63,16 +67,14 @@
                 <tab heading="Shipment Detail" [active]="selectedTab === 'SHIPMENT'"
                     (selectTab)="onSelectTab('shipment')">
                     <form-create-sea-import>
-                        <div class="row m--margin-top-20" *ngIf="!!fclImportDetail">
-                            <div class="col-md-4">
-                                <span>Created: {{fclImportDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
-                                <span class="text-success">{{fclImportDetail.userCreated}}</span>
-                            </div>
-                            <div class="col-md-4">
-                                <span>Modified: {{fclImportDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
-                                </span> <span class="text-success">{{fclImportDetail.userModified}}</span>
-                            </div>
-                        </div>
+                        <ng-container *ngIf="!!fclImportDetail">
+                            <date-time-modified [timeCreated]="fclImportDetail.datetimeCreated"
+                                [userCreated]="fclImportDetail.userCreated"
+                                [timeModified]="fclImportDetail.datetimeModified"
+                                [userModified]="fclImportDetail.userModified">
+                            </date-time-modified>
+                        </ng-container>
+
                     </form-create-sea-import>
 
                     <shipment-good-summary> Shipment Goods Summary </shipment-good-summary>

@@ -6,7 +6,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 import { SeaLCLImportCreateJobComponent } from '../create-job/create-job-lcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransactionDetail } from 'src/app/shared/models';
+import { CsTransactionDetail, CsTransaction } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
 
@@ -33,7 +33,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
 
     jobId: string;
 
-    shipmentDetail: any;
+    shipmentDetail: CsTransaction;
 
     selectedTab: TAB | string = 'SHIPMENT';
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
@@ -95,7 +95,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
-                (res: CsTransactionDetail) => {
+                (res: CsTransaction) => {
                     if (!!res) {
                         this.shipmentDetail = res;
 

@@ -14,6 +14,7 @@ import { takeUntil, skip } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import { GetContainerAction } from './../../store';
+import { CsTransaction } from '@models';
 
 @Component({
     selector: 'shipment-good-summary',
@@ -39,6 +40,8 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
     containers: Container[] = [];
 
     isSave: boolean = false;
+
+    shipment: CsTransaction = new CsTransaction();
 
     constructor(
         protected _actionStoreSubject: ActionsSubject,
@@ -71,8 +74,10 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         this._store.select(fromStore.getTransactionDetailCsTransactionState)
             .pipe(skip(1))
             .subscribe(
-                (res: any) => {
+                (res: CsTransaction) => {
                     if (!!res) {
+                        this.shipment = new CsTransaction(res);
+                        console.log(this.shipment);
                         this.containerDetail = res.packageContainer;
                         this.commodities = res.commodity;
                         this.description = res.desOfGoods;

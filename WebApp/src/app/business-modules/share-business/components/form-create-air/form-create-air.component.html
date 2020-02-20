@@ -259,14 +259,17 @@
                                         [decimals]="digitDecimal" autoFormatCurrency>
                                 </div>
                             </div>
-                            <div class="col-md-2 pointer d-flex align-items-end jusify-content-center">
-                                <div class="form-group">
-                                    <label></label>
-                                    <a (click)="showDIMVolume()" title="Dimension Volume">
-                                        <i class="fa fa-pencil fa-2x"></i>
-                                    </a>
+                            <ng-container *ngIf="!shipmentDetail.isLocked">
+                                <div class="col-md-2 pointer d-flex align-items-end jusify-content-center"
+                                    *ngIf="shipmentDetail.permission.allowUpdate">
+                                    <div class="form-group">
+                                        <label></label>
+                                        <a (click)="showDIMVolume()" title="Dimension Volume">
+                                            <i class="fa fa-pencil fa-2x"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
+                            </ng-container>
                         </div>
                     </div>
                     <div class="col-md-4">

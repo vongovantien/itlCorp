@@ -17,6 +17,7 @@ import * as fromShareBussiness from './../../../share-business/store';
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 import isUUID from 'validator/lib/isUUID';
+import { CsTransaction } from '@models';
 
 @Component({
     selector: 'app-detail-job-fcl-import',
@@ -33,7 +34,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     selectedTab: TAB | string = 'SHIPMENT';
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
-    fclImportDetail: any; // TODO Model.
+    fclImportDetail: CsTransaction;
     action: any = {};
 
     dataReport: any = null;
