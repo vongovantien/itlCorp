@@ -16,6 +16,7 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
+using eFMS.IdentityServer.DL.IService;
 
 namespace eFMS.API.Documentation.DL.Services
 {
