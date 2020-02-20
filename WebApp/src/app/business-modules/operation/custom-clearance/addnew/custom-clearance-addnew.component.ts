@@ -1,8 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import moment from 'moment/moment';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
-import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { Location } from '@angular/common';
@@ -11,7 +8,7 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { CatalogueRepo, OperationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -27,14 +24,12 @@ export class CustomClearanceAddnewComponent implements OnInit {
     listUnit: any = [];
     isConvertJob: boolean = false;
 
-    constructor(private baseServices: BaseService,
-        private api_menu: API_MENU,
-        private route: ActivatedRoute,
-        private _location: Location,
+    constructor(private _location: Location,
         private cdr: ChangeDetectorRef,
         private sortService: SortService,
         private _catalogueRepo: CatalogueRepo,
         private _operationRepo: OperationRepo,
+        private _documentation: DocumentationRepo,
         private toastr: ToastrService
     ) {
         this.keepCalendarOpeningWithRange = true;
@@ -89,9 +84,11 @@ export class CustomClearanceAddnewComponent implements OnInit {
             this.customDeclaration.unitCode = this.strUnitCurrent;
             console.log(this.customDeclaration);
 
-            const respone = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.add, this.customDeclaration, true, true);
+            // const respone = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.add, this.customDeclaration, true, true);
+            const respone = await this._operationRepo.addCustomDeclaration(this.customDeclaration).toPromise();
             console.log(respone);
-            if (respone) {
+            if (respone['status'] === true) {
+                this.toastr.success(respone['message']);
                 this._location.back();
             } else {
                 // Reset lại clearanceDate
@@ -122,7 +119,9 @@ export class CustomClearanceAddnewComponent implements OnInit {
             this.customDeclaration.unitCode = this.strUnitCurrent;
             console.log(this.customDeclaration);
             const shipment = this.mapClearanceToShipment();
-            const response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertClearanceToJob, { opsTransaction: shipment, customsDeclaration: this.customDeclaration }, true, true);
+            //const response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertClearanceToJob, { opsTransaction: shipment, customsDeclaration: this.customDeclaration }, true, true);
+            const response = await this._documentation.convertClearanceToJob({ opsTransaction: shipment, customsDeclaration: this.customDeclaration }).toPromise();
+
             if (response.status) {
                 this.isConvertJob = false;
                 this._location.back();
@@ -177,11 +176,11 @@ export class CustomClearanceAddnewComponent implements OnInit {
                 shipment.packageTypeId = this.listUnit[index].id;
             }
         } else {
-            this.baseServices.errorToast("Không có customer để tạo job mới");
+            this.toastr.error("Không có customer để tạo job mới");
             shipment = null;
         }
         if (this.customDeclaration.clearanceDate == null) {
-            this.baseServices.errorToast("Không có clearance date để tạo job mới");
+            this.toastr.error("Không có clearance date để tạo job mới");
             shipment = null;
         }
         return shipment;
@@ -268,13 +267,9 @@ export class CustomClearanceAddnewComponent implements OnInit {
     routeClearanceCurrent: any = [];
     cargoTypeCurrent: any = [];
 
-    private value: any = {};
     private _disabledV: string = '0';
     public disabled: boolean = false;
 
-    private get disabledV(): string {
-        return this._disabledV;
-    }
 
     private set disabledV(value: string) {
         this._disabledV = value;
@@ -294,7 +289,6 @@ export class CustomClearanceAddnewComponent implements OnInit {
     }
 
     public refreshValue(value: any): void {
-        this.value = value;
     }
 
     public selectedServiceType(value: any): void {
@@ -320,19 +314,19 @@ export class CustomClearanceAddnewComponent implements OnInit {
         this.cargoTypeCurrent = [value.id];
     }
 
-    public removedServiceType(value: any): void {
+    public removedServiceType(): void {
         this.serviceTypeCurrent = [];
     }
 
-    public removedTypeClearance(value: any): void {
+    public removedTypeClearance(): void {
         this.typeClearanceCurrent = [];
     }
 
-    public removedRouteClearance(value: any): void {
+    public removedRouteClearance(): void {
         this.routeClearanceCurrent = [];
     }
 
-    public removedCargoType(value: any): void {
+    public removedCargoType(): void {
         this.cargoTypeCurrent = [];
     }
 }

@@ -293,14 +293,11 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = DataContext.Get(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled)?.FirstOrDefault();
             if (detail == null) return false;
-            else
-            {
-                var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
-                //int code = GetPermissionToDelete(new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
-                var model = new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId };
-                int code = PermissionEx.GetPermissionToDelete(model, permissionRange, currentUser);
-                if (code == 403) return false;
-            }
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+            //int code = GetPermissionToDelete(new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+            var model = new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId };
+            int code = PermissionEx.GetPermissionToDelete(model, permissionRange, currentUser);
+            if (code == 403) return false;
             var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null));
             if (query.Any())
             {
@@ -492,6 +489,10 @@ namespace eFMS.API.Documentation.DL.Services
                     model.OpsTransaction.DatetimeModified = DateTime.Now;
                     model.OpsTransaction.UserModified = currentUser.UserID;
                     model.OpsTransaction.ProductService = productService;
+                    model.OpsTransaction.GroupId = currentUser.GroupId;
+                    model.OpsTransaction.DepartmentId = currentUser.DepartmentId;
+                    model.OpsTransaction.OfficeId = currentUser.OfficeID;
+                    model.OpsTransaction.CompanyId = currentUser.CompanyID;
                     int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
                     model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
                     var dayStatus = (int)(model.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
@@ -523,6 +524,10 @@ namespace eFMS.API.Documentation.DL.Services
                     clearance.UserCreated = model.CustomsDeclaration.UserModified = currentUser.UserID;
                     clearance.Source = DocumentConstants.CLEARANCE_FROM_EFMS;
                     clearance.JobNo = model.OpsTransaction.JobNo;
+                    clearance.GroupId = currentUser.GroupId;
+                    clearance.DepartmentId = currentUser.DepartmentId;
+                    clearance.OfficeId = currentUser.OfficeID;
+                    clearance.CompanyId = currentUser.CompanyID;
                     customDeclarationRepository.Add(clearance, false);
                 }
                 DataContext.SubmitChanges();
@@ -555,6 +560,8 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list)
         {
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403);
             var result = new HandleState();
             try
             {
@@ -568,12 +575,19 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (item.CustomsDeclaration.JobNo == null)
                     {
+                        var model = new BaseUpdateModel { UserCreated = item.CustomsDeclaration.UserCreated, GroupId = item.CustomsDeclaration.GroupId, DepartmentId = item.CustomsDeclaration.DepartmentId, OfficeId = item.CustomsDeclaration.OfficeId, CompanyId = item.CustomsDeclaration.CompanyId };
+                        var code = PermissionExtention.GetPermissionCommonItem(model, permissionRange, currentUser);
+                        if (code == 403) return new HandleState(403);
                         item.OpsTransaction.Id = Guid.NewGuid();
                         item.OpsTransaction.Hblid = Guid.NewGuid();
                         item.OpsTransaction.DatetimeCreated = DateTime.Now;
                         item.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
                         item.OpsTransaction.DatetimeModified = DateTime.Now;
                         item.OpsTransaction.UserModified = currentUser.UserID;
+                        item.OpsTransaction.GroupId = currentUser.GroupId;
+                        item.OpsTransaction.DepartmentId = currentUser.DepartmentId;
+                        item.OpsTransaction.OfficeId = currentUser.OfficeID;
+                        item.OpsTransaction.CompanyId = currentUser.CompanyID;
                         int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
                         item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, (countNumberJob + i));
                         var dayStatus = (int)(item.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;

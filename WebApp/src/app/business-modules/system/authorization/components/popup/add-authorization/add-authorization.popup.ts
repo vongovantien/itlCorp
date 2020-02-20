@@ -41,6 +41,7 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     activeServices: any = [];
 
     minDateExpired: any = null;
+    minDateEffective: any = null;
 
     constructor(
         private _fb: FormBuilder,
@@ -87,7 +88,7 @@ export class AuthorizationAddPopupComponent extends PopupBase {
                 map((data: any) => data.startDate)
             )
             .subscribe((value: any) => {
-                this.minDateExpired = value; // * Update MinDate -> ExpiredDate.
+                this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
             });
     }
 
@@ -118,12 +119,13 @@ export class AuthorizationAddPopupComponent extends PopupBase {
         [this.personInCharge].forEach((control: AbstractControl) => this.setError(control));
         this.isSubmited = true;
         if (this.formAuthorization.valid) {
+            var serviceCode = this.authorizedPerson.value ? (this.authorizedPerson.value.length > 0 ? this.authorizationService.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
             const _authorization: Authorization = {
                 id: this.authorization.id,
                 userId: this.personInChargeActive[0].id,
                 assignTo: this.authorizedPerson.value ? (this.authorizedPerson.value.length > 0 ? this.authorizedPerson.value[0].id : '') : '',
                 name: this.authorizationName.value,
-                services: this.authorizedPerson.value ? (this.authorizedPerson.value.length > 0 ? this.authorizationService.value[0].id : '') : '',
+                services: serviceCode,
                 description: this.authorizationNote.value,
                 startDate: this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
                 endDate: this.expirationDate.value ? (this.expirationDate.value.startDate !== null ? formatDate(this.expirationDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
@@ -198,7 +200,7 @@ export class AuthorizationAddPopupComponent extends PopupBase {
             expirationDate: !!this.authorization.endDate ? { startDate: new Date(this.authorization.endDate) } : null,
             authorizationNote: this.authorization.description,
             authorizationActive: this.authorization.active
-        });
+        });          
     }
 
     getCurrentActiveService(ChargeService: any) {
@@ -224,6 +226,8 @@ export class AuthorizationAddPopupComponent extends PopupBase {
         this.isSubmited = false;
         this.authorization = new Authorization();
         this.formAuthorization.reset();
+        this.minDateExpired = null;
+        this.minDateEffective = null;
         //this.formAuthorization.updateValueAndValidity();
     }
 }

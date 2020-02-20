@@ -2914,6 +2914,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.ConvertTime).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeCreated)
@@ -2923,6 +2925,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DatetimeModified)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
                 entity.Property(e => e.DocumentType)
                     .HasMaxLength(50)
@@ -2939,6 +2943,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.Hblid)
                     .HasColumnName("HBLID")
@@ -2963,6 +2969,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PartnerTaxCode)
                     .HasMaxLength(50)

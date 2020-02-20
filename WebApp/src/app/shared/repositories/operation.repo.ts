@@ -115,8 +115,8 @@ export class OperationRepo {
         return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/Add`, body);
     }
 
-    upLoadClearanceFile(files: any) {
-        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/uploadFile`, files, "uploadedFile");
+    updateCustomDeclaration(body: any) {
+        return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/Update`, body);
     }
 
     updateJobToClearances(body: any) {
@@ -126,8 +126,13 @@ export class OperationRepo {
         );
     }
 
+    upLoadClearanceFile(files: any) {
+        return this._api.postFile(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/uploadFile`, files, "uploadedFile");
+    }
 
-
+    getClearanceTypes() {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetClearanceTypes`);
+    }
 }
 
 
