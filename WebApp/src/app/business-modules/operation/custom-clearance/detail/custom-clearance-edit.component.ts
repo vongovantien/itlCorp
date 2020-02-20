@@ -1,17 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
 import find from 'lodash/find';
 import { NgForm } from '@angular/forms';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { OperationRepo } from '@repositories';
+import { OperationRepo, DocumentationRepo, CatalogueRepo } from '@repositories';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-custom-clearance-edit',
@@ -25,13 +24,13 @@ export class CustomClearanceEditComponent implements OnInit {
     listCommodity: any = [];
     listUnit: any = [];
     _clearanceDate: any;
-    listUser: any[] = [];
     isConvertJob: boolean = false;
 
-    constructor(private baseServices: BaseService,
-        private api_menu: API_MENU,
-        private _operationRepo: OperationRepo,
-        private route: ActivatedRoute) {
+    constructor(private _operationRepo: OperationRepo,
+        private _documentation: DocumentationRepo,
+        private route: ActivatedRoute,
+        private toart: ToastrService,
+        private _catalogueRepo: CatalogueRepo) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -49,17 +48,6 @@ export class CustomClearanceEditComponent implements OnInit {
             if (!!prams.id) {
                 this.getCustomCleanranceById(+prams.id);
             }
-        });
-
-        // this.getListUser();
-    }
-
-    getListUser() {
-        this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
-            this.listUser = res.map(x => ({ "text": x.username, "id": x.id }));
-        }, err => {
-            this.listUser = [];
-            this.baseServices.handleError(err);
         });
     }
 
@@ -123,8 +111,9 @@ export class CustomClearanceEditComponent implements OnInit {
             this.customDeclaration.commodityCode = this.strCommodityCurrent;
             this.customDeclaration.unitCode = this.strUnitCurrent;
 
-            const respone = await this.baseServices.putAsync(this.api_menu.Operation.CustomClearance.update, this.customDeclaration, true, true);
-            if (respone.status) {
+            const respone = await this._operationRepo.updateCustomDeclaration(this.customDeclaration).toPromise();
+            if (respone['status'] === true) {
+                this.toart.success(respone['message']);
                 this.getCustomCleanranceById(this.customDeclaration.id);
                 this.mapClearanceToShipment();
             } else {
@@ -154,7 +143,7 @@ export class CustomClearanceEditComponent implements OnInit {
             this.customDeclaration.unitCode = this.strUnitCurrent;
 
             const shipment = this.mapClearanceToShipment();
-            const response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertClearanceToJob, { opsTransaction: shipment, customsDeclaration: this.customDeclaration }, true, true);
+            const response = await this._documentation.convertClearanceToJob({ opsTransaction: shipment, customsDeclaration: this.customDeclaration }).toPromise();
             if (response.status) {
                 this.getCustomCleanranceById(this.customDeclaration.id);
             } else {
@@ -208,24 +197,22 @@ export class CustomClearanceEditComponent implements OnInit {
                 shipment.packageTypeId = this.listUnit[index].id;
             }
         } else {
-            this.baseServices.errorToast("Không có customer để tạo job mới");
+            this.toart.error("Không có customer để tạo job mới");
             shipment = null;
         }
         if (this.customDeclaration.clearanceDate == null) {
-            this.baseServices.errorToast("Không có clearance date để tạo job mới");
+            this.toart.error("Không có clearance date để tạo job mới");
             shipment = null;
         }
         return shipment;
     }
 
     async getListCustomer() {
-        //partnerGroup = 3 ~ Customer
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER }, true, true);
-        this.listCustomer = res;
+        this.listCustomer = await this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER }).toPromise();
     }
 
     getClearanceType() {
-        this.baseServices.get(this.api_menu.Operation.CustomClearance.getClearanceTypes).subscribe((res: any) => {
+        this._operationRepo.getClearanceTypes().subscribe((res: any) => {
             this.serviceTypes = res.serviceTypes.map(x => ({ "text": x.displayName, "id": x.value }));
             this.typeClearance = res.types.map(x => ({ "text": x.displayName, "id": x.value }));
             this.routeClearance = res.routes.map(x => ({ "text": x.displayName, "id": x.value }));
@@ -234,26 +221,20 @@ export class CustomClearanceEditComponent implements OnInit {
     }
 
     async getListPort() {
-        //placeType = 8 ~ Port
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port }, true, true);
-        this.listPort = res;
+        this.listPort = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port }).toPromise();
     }
 
     getListCountry() {
-        this.baseServices.get(this.api_menu.Catalogue.Country.getAll).subscribe((res: any) => {
-            this.listCountry = res;
-        });
+        this._catalogueRepo.getCountry().subscribe((res: any) => { this.listCountry = res; });
     }
 
     async getListCommodity() {
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, {}, true, true);
-        this.listCommodity = res;
+        this._catalogueRepo.getCommondity({}).subscribe((res: any) => { this.listCommodity = res; });
     }
 
     async getListUnit() {
-        //unitType = Package
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: 'Package' }, true, true);
-        this.listUnit = res;
+        // unitType = Package
+        this._catalogueRepo.getUnit({ unitType: 'Package' }).subscribe((res: any) => { this.listUnit = res; });
     }
 
     /**
@@ -300,18 +281,10 @@ export class CustomClearanceEditComponent implements OnInit {
     routeClearanceCurrent: any = [];
     cargoTypeCurrent: any = [];
 
-    private value: any = {};
     private _disabledV: string = '0';
     public disabled: boolean = false;
 
-    private get disabledV(): string {
-        return this._disabledV;
-    }
 
-    private set disabledV(value: string) {
-        this._disabledV = value;
-        this.disabled = this._disabledV === '1';
-    }
 
     public selected(value: any): void {
         console.log('Selected value is: ', value);
@@ -325,8 +298,7 @@ export class CustomClearanceEditComponent implements OnInit {
         console.log('New search input: ', value);
     }
 
-    public refreshValue(value: any): void {
-        this.value = value;
+    public refreshValue(): void {
     }
 
     public selectedServiceType(value: any): void {
@@ -348,19 +320,19 @@ export class CustomClearanceEditComponent implements OnInit {
         this.cargoTypeCurrent = [value.id];
     }
 
-    public removedServiceType(value: any): void {
+    public removedServiceType(): void {
         this.serviceTypeCurrent = [];
     }
 
-    public removedTypeClearance(value: any): void {
+    public removedTypeClearance(): void {
         this.typeClearanceCurrent = [];
     }
 
-    public removedRouteClearance(value: any): void {
+    public removedRouteClearance(): void {
         this.routeClearanceCurrent = [];
     }
 
-    public removedCargoType(value: any): void {
+    public removedCargoType(): void {
         this.cargoTypeCurrent = [];
     }
 }

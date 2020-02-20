@@ -211,6 +211,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult ConvertClearanceToJob(OpsTransactionClearanceModel model)
         {
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return Forbid();
             var hs = transactionService.ConvertClearanceToJob(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };

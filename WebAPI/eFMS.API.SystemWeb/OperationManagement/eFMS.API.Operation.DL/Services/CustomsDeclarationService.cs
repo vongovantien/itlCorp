@@ -226,7 +226,11 @@ namespace eFMS.API.Operation.DL.Services
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
-
+            if(rangeSearch == PermissionRange.None)
+            {
+                rowsCount = 0;
+                return null;
+            }
             Expression<Func<CustomsDeclaration, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                                                                     && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
                                                                                     && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
@@ -250,16 +254,18 @@ namespace eFMS.API.Operation.DL.Services
                     query = query.And(x => x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Group:
-                    query = query.And(x => x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    query = query.And(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
+                                        || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Department:
-                    query = query.And(x => x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    query = query.And(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
+                                        || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Office:
-                    query = query.And(x => x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    query = query.And(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Company:
-                    query = query.And(x => x.CompanyId == currentUser.CompanyID);
+                    query = query.And(x => x.CompanyId == currentUser.CompanyID || x.UserCreated == currentUser.UserID);
                     break;
                 default:
                     break;
@@ -464,6 +470,9 @@ namespace eFMS.API.Operation.DL.Services
 
             switch (permissionRangeDelete)
             {
+                case PermissionRange.None:
+                    result = new HandleState(403);
+                    break;
                 case PermissionRange.Owner:
                     if (customs.Any(x => x.UserCreated != currentUser.UserID))
                     {
@@ -1061,51 +1070,8 @@ namespace eFMS.API.Operation.DL.Services
 
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
-
-            switch (permissionRange)
-            {
-                case PermissionRange.Owner:
-                    if (detail.UserCreated != currentUser.UserID)
-                    {
-                        code = 403;
-                    }
-                    break;
-                case PermissionRange.Group:
-                    if (detail.GroupId != currentUser.GroupId
-                        && detail.DepartmentId != currentUser.DepartmentId
-                        && detail.OfficeId != currentUser.OfficeID
-                        && detail.CompanyId != currentUser.CompanyID
-                        )
-                    {
-                        code = 403;
-                    }
-                    break;
-                case PermissionRange.Department:
-                    if (detail.DepartmentId != currentUser.DepartmentId
-                       && detail.OfficeId != currentUser.OfficeID
-                       && detail.CompanyId != currentUser.CompanyID
-                       )
-                    {
-                        code = 403;
-                    }
-                    break;
-                case PermissionRange.Office:
-                    if (detail.OfficeId != currentUser.OfficeID
-                       && detail.CompanyId != currentUser.CompanyID
-                       )
-                    {
-                        code = 403;
-                    }
-                    break;
-                case PermissionRange.Company:
-                    if (detail.CompanyId != currentUser.CompanyID)
-                    {
-                        code = 403;
-                    }
-                    break;
-                default:
-                    break;
-            }
+            var model = new BaseUpdateModel { UserCreated = currentUser.UserID, GroupId = currentUser.GroupId, DepartmentId = currentUser.DepartmentId, OfficeId = currentUser.OfficeID, CompanyId = currentUser.CompanyID };
+            code = PermissionExtention.GetPermissionCommonItem(model, permissionRange, currentUser);
             return code;
         }
 
@@ -1161,15 +1127,17 @@ namespace eFMS.API.Operation.DL.Services
 
         public CustomsDeclarationModel GetDetail(int id)
         {
-            CustomsDeclarationModel detail = Get(x => x.Id == id).FirstOrDefault();
+            CustomsDeclaration clearance = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            if (clearance == null) return null;
+            var result = mapper.Map<CustomsDeclarationModel>(clearance);
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
 
-            detail.Permission = new PermissionAllowBase
+            result.Permission = new PermissionAllowBase
             {
-                AllowUpdate = GetPermissionDetail(permissionRangeWrite, detail),
+                AllowUpdate = GetPermissionDetail(permissionRangeWrite, result),
             };
-            return detail;
+            return result;
         }
 
         private HandleState deleteMultipleModel(List<CustomsDeclarationModel> customs)

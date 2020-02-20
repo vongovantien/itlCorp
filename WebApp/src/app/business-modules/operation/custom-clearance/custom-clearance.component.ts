@@ -32,7 +32,6 @@ export class CustomClearanceComponent extends AppList {
 
     headers: CommonInterface.IHeaderTable[];
     constructor(
-        private baseServices: BaseService,
         private _sortService: SortService,
         private _toastrService: ToastrService,
         private _operationRepo: OperationRepo,
@@ -241,19 +240,19 @@ export class CustomClearanceComponent extends AppList {
                     shipment.packageTypeId = this.listUnit[index].id;
                 }
             } else {
-                this.baseServices.errorToast(`Không có customer để tạo job mới`, `${clearance.clearanceNo}`);
+                this._toastrService.error(`Không có customer để tạo job mới`, `${clearance.clearanceNo}`);
                 shipment = null;
             }
             if (clearance.mblid == null) {
-                this.baseServices.errorToast(`Không có MBL/MAWB để tạo job mới`, `${clearance.clearanceNo} `);
+                this._toastrService.error(`Không có MBL/MAWB để tạo job mới`, `${clearance.clearanceNo} `);
                 shipment = null;
             }
             if (clearance.hblid == null) {
-                this.baseServices.errorToast(`Không có HBL/HAWB để tạo job mới`, `${clearance.clearanceNo} `);
+                this._toastrService.error(`Không có HBL/HAWB để tạo job mới`, `${clearance.clearanceNo} `);
                 shipment = null;
             }
             if (clearance.clearanceDate == null) {
-                this.baseServices.errorToast(`Không có clearance date để tạo job mới`, `${clearance.clearanceNo} `);
+                this._toastrService.error(`Không có clearance date để tạo job mới`, `${clearance.clearanceNo} `);
                 shipment = null;
             }
             clearancesToConvert.push({ opsTransaction: shipment, customsDeclaration: clearance });

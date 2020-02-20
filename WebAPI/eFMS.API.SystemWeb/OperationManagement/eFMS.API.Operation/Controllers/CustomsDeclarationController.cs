@@ -31,7 +31,6 @@ namespace eFMS.API.Operation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    [Authorize]
     public class CustomsDeclarationController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
@@ -141,6 +140,10 @@ namespace eFMS.API.Operation.Controllers
             model.DatetimeModified = DateTime.Now;
             model.UserCreated = model.UserModified = currentUser.UserID;
             model.Source = OperationConstants.FromEFMS;
+            model.GroupId = currentUser.GroupId;
+            model.DepartmentId = currentUser.DepartmentId;
+            model.OfficeId = currentUser.OfficeID;
+            model.CompanyId = currentUser.CompanyID;
             var hs = customsDeclarationService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
