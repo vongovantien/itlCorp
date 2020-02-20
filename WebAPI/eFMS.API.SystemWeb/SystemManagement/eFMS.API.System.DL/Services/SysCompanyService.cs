@@ -42,6 +42,14 @@ namespace eFMS.API.System.DL.Services
             return bu.ProjectTo<SysCompanyModel>(mapper.ConfigurationProvider);
         }
 
+        public IQueryable<SysCompany> GetByUserId(string id)
+        {
+            var userLevels = sysLevelRepository.Get(x => x.UserId == id).ToList();
+            var lstSysCompanies = DataContext.Get(x => x.Active == true).ToList();
+            var lsts = lstSysCompanies.Where(item => userLevels.Any(uslv => uslv.CompanyId.Equals(item.Id)));
+            return lsts.AsQueryable();
+        }
+
         public List<SysCompanyModel> Paging(SysCompanyCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = Query(criteria);

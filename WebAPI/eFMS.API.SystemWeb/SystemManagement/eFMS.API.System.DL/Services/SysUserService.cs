@@ -27,11 +27,18 @@ namespace eFMS.API.System.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly ISysEmployeeService sysEmployeeService;
         private readonly ICurrentUser currentUser;
+        private readonly ISysCompanyService sysCompanyRepository;
+        private readonly ISysOfficeService sysOfficeRepository;
+
 
 
         public SysUserService(IContextBase<SysUser> repository, IMapper mapper,
             IContextBase<SysEmployee> employeeRepo,
-            IContextBase<SysUserLevel> userlevelRepo, IDistributedCache distributedCache, IStringLocalizer<LanguageSub> localizer, ISysEmployeeService employeeService, ICurrentUser currUser) : base(repository, mapper)
+            IContextBase<SysUserLevel> userlevelRepo, IDistributedCache distributedCache, IStringLocalizer<LanguageSub> localizer,
+            ISysEmployeeService employeeService,
+            ICurrentUser currUser,
+            ISysCompanyService sysCompanyRepo,
+            ISysOfficeService sysOfficeRepo) : base(repository, mapper)
         {
             employeeRepository = employeeRepo;
             userlevelRepository = userlevelRepo;
@@ -39,6 +46,8 @@ namespace eFMS.API.System.DL.Services
             stringLocalizer = localizer;
             sysEmployeeService = employeeService;
             currentUser = currUser;
+            sysCompanyRepository = sysCompanyRepo;
+            sysOfficeRepository = sysOfficeRepo;
         }
 
         public List<SysUserViewModel> GetAll()
@@ -74,7 +83,32 @@ namespace eFMS.API.System.DL.Services
         {
             var users = DataContext.Get();
             var employees = employeeRepository.Get();
-            var data = users.Join(employees, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
+            var userLevels = userlevelRepository.Get();
+            var companies = sysCompanyRepository.Get();
+            var offices = sysCompanyRepository.Get();
+
+            //var data = users.Join(employees, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
+            //var dataJoin = from uslv in userLevels
+            //               join c in companies on uslv.CompanyId equals c.Id
+            //               join o in offices on uslv.OfficeId equals o.Id
+            //               select new { uslv,c,o};
+
+            var data = users.Join(employees, x => x.EmployeeId , y => y.Id, (x, y) => new { x, y });
+            //var data = from u in users
+            //           join e in employees on u.EmployeeId equals e.Id
+            //           join uslv in userLevels on u.Id equals uslv.UserId into userlevel
+            //           from us in userlevel.DefaultIfEmpty()
+            //           group new { u } by us.OfficeId into newgroup
+
+            //           select new SysUserViewModel
+            //           {
+            //               Id = newgroup.Select(t => t.u.Id).FirstOrDefault(),
+            //               Username = newgroup.Select(t => t.u.Username).FirstOrDefault()
+
+            //           };
+
+
+
             if (criteria.All == null)
             {
                 data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -86,11 +120,11 @@ namespace eFMS.API.System.DL.Services
             }
             else
             {
-                if(criteria.All.Contains("Active"))
+                if (criteria.All.Contains("Active"))
                 {
                     criteria.Active = true;
                 }
-                if(criteria.All.Contains("InActive"))
+                if (criteria.All.Contains("InActive"))
                 {
                     criteria.Active = false;
                 }
@@ -102,6 +136,7 @@ namespace eFMS.API.System.DL.Services
                           || (x.x.Active == criteria.Active)
                           ));
             }
+            data = data.OrderByDescending(x => x.x.DatetimeModified);
             rowsCount = data.Count();
             if (size > 1)
             {
@@ -122,6 +157,25 @@ namespace eFMS.API.System.DL.Services
                 results.Add(model);
             }
             return results.AsQueryable();
+        }
+
+        public HandleState Delete(string id)
+        {
+            try
+            {
+                var item = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                var hs = DataContext.Delete(x => x.Id == id);
+                if (hs.Success)
+                {
+                    hs = sysEmployeeService.Delete(x => x.Id == item.EmployeeId);
+                }
+                return hs;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+
         }
 
         public IQueryable<SysUserViewModel> Query(SysUserCriteria criteria)
@@ -248,7 +302,7 @@ namespace eFMS.API.System.DL.Services
                     item.IsValid = false;
                     item.UserTypeValid = false;
                 }
-                else if(!userType.Equals("Normal User") && !userType.Equals("Local Admin") && !userType.Equals("Super Admin"))
+                else if (!userType.Equals("Normal User") && !userType.Equals("Local Admin") && !userType.Equals("Super Admin"))
                 {
                     item.UserType = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
                     item.IsValid = false;
@@ -263,7 +317,8 @@ namespace eFMS.API.System.DL.Services
                     item.WorkingStatus = stringLocalizer[LanguageSub.MSG_USER_WORKINGSTATUS_EMPTY];
                     item.IsValid = false;
                     item.WorkingStatusValid = false;
-                }else if(!workingStatus.Equals("Working") && !workingStatus.Equals("Maternity leave") && !workingStatus.Equals("Off"))
+                }
+                else if (!workingStatus.Equals("Working") && !workingStatus.Equals("Maternity leave") && !workingStatus.Equals("Off"))
                 {
                     item.WorkingStatus = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
                     item.IsValid = false;
@@ -279,7 +334,7 @@ namespace eFMS.API.System.DL.Services
                     item.IsValid = false;
                     item.StatusValid = false;
                 }
-                else if(!status.Equals("Active") && !status.Equals("Inactive"))
+                else if (!status.Equals("Active") && !status.Equals("Inactive"))
                 {
                     item.Status = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
                     item.IsValid = false;
@@ -334,7 +389,7 @@ namespace eFMS.API.System.DL.Services
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 List<SysUser> sysUsers = new List<SysUser>();
                 List<SysEmployee> sysEmployees = new List<SysEmployee>();
-                foreach(var item in data)
+                foreach (var item in data)
                 {
                     var objUser = new SysUserModel();
                     var objEmployee = new SysEmployee();
@@ -344,7 +399,7 @@ namespace eFMS.API.System.DL.Services
                     objEmployee.EmployeeNameVn = item.EmployeeNameVn;
                     objEmployee.Tel = item.Tel;
                     objEmployee.Title = item.Title;
-                    
+
                     sysEmployees.Add(objEmployee);
 
                     objUser.Username = item.Username;
@@ -358,10 +413,10 @@ namespace eFMS.API.System.DL.Services
                     sysUsers.Add(objUser);
 
                 }
-               
+
                 dc.SysEmployee.AddRange(sysEmployees);
                 dc.SysUser.AddRange(sysUsers);
-                
+
                 //cache.Remove(Templates.SysUser.n.ListName);
                 dc.SaveChanges();
                 return new HandleState();

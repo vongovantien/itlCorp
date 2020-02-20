@@ -44,6 +44,20 @@ namespace eFMS.API.System.Controllers
             var results = sysOfficeService.GetOffices();
             return Ok(results);
         }
+
+        /// <summary>
+        /// get by userId
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetByUserId")]
+        public IActionResult GetByUserId(string id)
+        {
+            var results = sysOfficeService.GetByUserId(id);
+            return Ok(results);
+        }
+
+
+
         /// <summary>
         /// get and paging the list of office
         /// </summary>

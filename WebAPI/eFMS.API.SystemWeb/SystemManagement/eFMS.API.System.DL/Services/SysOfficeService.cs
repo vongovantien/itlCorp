@@ -57,7 +57,6 @@ namespace eFMS.API.System.DL.Services
         public IQueryable<SysOffice> GetOffices()
         {
             var lstSysOffice = DataContext.Get();
-            lstSysOffice = DataContext.Get();
 
             List<SysOfficeModel> resultData = new List<SysOfficeModel>();
 
@@ -71,15 +70,15 @@ namespace eFMS.API.System.DL.Services
                 office.CompanyName = item.companyName;
                 resultData.Add(office);
             }
-            //RedisCacheHelper.SetObject(cache, Templates.SysBranch.NameCaching.ListName, resultData);
-
             return resultData.AsQueryable();
+        }
 
-
-            //data = DataContext.Get();
-
-            //var results = data?.Select(x => mapper.Map<SysOfficeModel>(x));
-            //return results;
+        public IQueryable<SysOffice> GetByUserId(string id)
+        {
+            var userLevels = sysLevelRepository.Get(x => x.UserId == id).ToList();
+            var lstSysOffice = DataContext.Get(x=>x.Active == true).ToList();
+            var lsts = lstSysOffice.Where(item => userLevels.Any(uslv => uslv.OfficeId.Equals(item.Id)));
+            return lsts.AsQueryable();
         }
 
         public IQueryable<SysOfficeViewModel> Paging(SysOfficeCriteria criteria, int page, int size, out int rowsCount)
@@ -223,7 +222,7 @@ namespace eFMS.API.System.DL.Services
                 var hs = new HandleState();
                 List<SysOffice> results = null;
 
-                var sysLevel = sysLevelRepository?.Get(lv => lv.UserId == username && lv.CompanyId == companyId).Select(x =>x.OfficeId).ToList();
+                var sysLevel = sysLevelRepository?.Get(lv => lv.UserId == username && lv.CompanyId == companyId).Select(x => x.OfficeId).ToList();
                 if (sysLevel == null)
                 {
                     return null;
@@ -236,11 +235,11 @@ namespace eFMS.API.System.DL.Services
 
                 return results;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }
-               
+
         }
     }
 }
