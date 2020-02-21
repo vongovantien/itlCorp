@@ -298,9 +298,6 @@ export class CustomClearanceEditComponent implements OnInit {
         console.log('New search input: ', value);
     }
 
-    public refreshValue(): void {
-    }
-
     public selectedServiceType(value: any): void {
         this.serviceTypeCurrent = [value.id];
         if (this.serviceTypeCurrent[0] == 'Air' || this.serviceTypeCurrent[0] == 'Express') {

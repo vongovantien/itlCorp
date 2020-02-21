@@ -284,13 +284,6 @@ export class CustomClearanceAddnewComponent implements OnInit {
         console.log('Removed value is: ', value);
     }
 
-    public typed(value: any): void {
-        console.log('New search input: ', value);
-    }
-
-    public refreshValue(value: any): void {
-    }
-
     public selectedServiceType(value: any): void {
         //console.log('ServiceType: ', value);
         this.serviceTypeCurrent = [value.id];
