@@ -27,5 +27,8 @@ namespace eFMS.API.System.DL.ViewModels
         public string Title { get; set; }
         public string WorkingStatus { get; set; }
         public string Tel { get; set; }
+        public string Position { get; set; }
+        public string CompanyName { get; set; }
+        public string OfficeName { get; set; }
     }
 }

@@ -13,6 +13,7 @@ namespace eFMS.API.System.DL.Models
         public string OfficeName { get; set; }
         public string Name { get; set; }
         public Guid Buid { get; set; }
+        public string UserName { get; set; }
         public List<SysUserPermissionGeneralViewModel> SysPermissionSampleGenerals { get; set; }
         public List<SysUserPermissionSpecialViewModel> SysPermissionSampleSpecials { get; set; }
     }

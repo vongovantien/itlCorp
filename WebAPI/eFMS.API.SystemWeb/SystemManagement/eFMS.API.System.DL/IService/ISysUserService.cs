@@ -19,6 +19,8 @@ namespace eFMS.API.System.DL.IService
         IQueryable<SysUserViewModel> Query(SysUserCriteria criteria);
         List<SysUserImportModel> CheckValidImport(List<SysUserImportModel> list);
         HandleState Import(List<SysUserViewModel> data);
+        HandleState Delete(string id);
+
 
 
     }

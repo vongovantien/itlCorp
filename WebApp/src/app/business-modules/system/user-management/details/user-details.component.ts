@@ -23,6 +23,7 @@ export class UserDetailsComponent extends AppPage {
         workingStatus: '',
         isLdap: false,
         active: false,
+        description: ''
     };
     userId: string = '';
 
@@ -68,7 +69,9 @@ export class UserDetailsComponent extends AppPage {
                 userType: this.formAdd.usertype.value.value,
                 active: this.formAdd.active.value.value,
                 workingStatus: this.formAdd.workingg.value.value,
-                isLdap: this.formAdd.ldap.value
+                isLdap: this.formAdd.ldap.value,
+                description: this.formAdd.description.value
+
             };
             this._systemRepo.updateUser(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
@@ -117,7 +120,7 @@ export class UserDetailsComponent extends AppPage {
                         this.formAdd.formGroup.patchValue(this.formData);
                         this.formAdd.active.setValue(this.formAdd.status.filter(i => i.value === res.data.active)[0]);
                         this.formAdd.usertype.setValue(this.formAdd.usertypes.filter(i => i.value === res.data.userType)[0]);
-
+                        this.formAdd.description.setValue(res.data.description);
 
 
                     }

@@ -91,7 +91,8 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
-                    .IsUnicode(false);                
+                    .IsUnicode(false);
+
             });
 
             modelBuilder.Entity<CatPlace>(entity =>
@@ -474,6 +475,7 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
             });
 
             modelBuilder.Entity<SysImage>(entity =>
@@ -540,6 +542,7 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Route)
                     .HasMaxLength(150)
                     .IsUnicode(false);
+
             });
 
             modelBuilder.Entity<SysOffice>(entity =>
@@ -831,6 +834,8 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.Description).HasMaxLength(4000);
+
                 entity.Property(e => e.EmployeeId)
                     .HasColumnName("EmployeeID")
                     .HasMaxLength(50)
@@ -908,6 +913,7 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
             });
 
             modelBuilder.Entity<SysUserPermission>(entity =>

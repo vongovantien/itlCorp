@@ -36,13 +36,16 @@ namespace eFMS.API.System.Controllers
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
         private readonly ISysEmployeeService sysEmployeeService;
-        public SysUserController(IStringLocalizer<LanguageSub> localizer, ISysUserService service, IMapper iMapper, ICurrentUser currUser, ISysEmployeeService isysEmployeeService)
+        private readonly ISysUserLevelService sysUserLevelService;
+
+        public SysUserController(IStringLocalizer<LanguageSub> localizer, ISysUserService service, IMapper iMapper, ICurrentUser currUser, ISysEmployeeService isysEmployeeService, ISysUserLevelService isysUserLevelService)
         {
             stringLocalizer = localizer;
             sysUserService = service;
             mapper = iMapper;
             currentUser = currUser;
             sysEmployeeService = isysEmployeeService;
+            sysUserLevelService = isysUserLevelService;
         }
 
         [HttpGet]
@@ -181,13 +184,17 @@ namespace eFMS.API.System.Controllers
         [Authorize]
         public IActionResult Delete(string id)
         {
-            var item = sysUserService.Get(x => x.Id == id).FirstOrDefault();
+            //var item = sysUserService.Get(x => x.Id == id).FirstOrDefault();
             //if (item.Active == true)
             //{
             //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             //}
-            item.Active = false;
-            var hs = sysUserService.Update(item,x=>x.Id == id);
+            //item.Active = false;
+            if(sysUserLevelService.Any(x=>x.UserId == id))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
+            }
+            var hs = sysUserService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -205,7 +212,7 @@ namespace eFMS.API.System.Controllers
         [Route("{id}")]
         public IActionResult GetBy(string id)
         {
-            var result = sysUserService.First(x => x.Id == id);
+            var result = sysUserService.Get(x => x.Id == id).FirstOrDefault();
             result.SysEmployeeModel = sysEmployeeService.First(x => x.Id == result.EmployeeId);
             if (result == null)
             {

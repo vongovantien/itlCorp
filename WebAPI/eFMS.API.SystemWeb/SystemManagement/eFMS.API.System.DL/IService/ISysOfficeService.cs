@@ -25,6 +25,9 @@ namespace eFMS.API.System.DL.IService
 
         List<SysOffice> GetOfficePermission(string username, Guid companyId);
 
+        IQueryable<SysOffice> GetByUserId(string id);
+
+
 
 
     }

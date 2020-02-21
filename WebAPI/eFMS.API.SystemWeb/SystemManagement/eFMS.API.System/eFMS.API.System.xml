@@ -155,6 +155,12 @@
             
             </summary>
         </member>
+        <member name="M:eFMS.API.System.Controllers.SysCompanyController.GetByUserId(System.String)">
+            <summary>
+            get by userId
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.System.Controllers.SysGroupController">
             <summary>
             
@@ -222,6 +228,12 @@
         <member name="M:eFMS.API.System.Controllers.SysOfficeController.GetAll">
             <summary>
             get all data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysOfficeController.GetByUserId(System.String)">
+            <summary>
+            get by userId
             </summary>
             <returns></returns>
         </member>

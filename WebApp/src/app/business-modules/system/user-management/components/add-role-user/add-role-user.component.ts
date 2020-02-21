@@ -61,7 +61,7 @@ export class AddRoleUserComponent extends AppList {
     }
 
     getCompanies() {
-        this._systemRepo.getListCompany()
+        this._systemRepo.getListCompaniesByUserId(this.userId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; }),
@@ -73,18 +73,6 @@ export class AddRoleUserComponent extends AppList {
             );
     }
 
-    getOffices() {
-        this._systemRepo.getListOffices()
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this.isLoading = false; }),
-            ).subscribe(
-                (res: any) => {
-                    this.offices = res;
-                    this.officeData = res;
-                },
-            );
-    }
 
     cancelSave() {
         this.listRoles = this.listRoles.filter(x => !!x.id);
@@ -95,7 +83,7 @@ export class AddRoleUserComponent extends AppList {
             catchError(this.catchError),
             finalize(() => { this.isLoading = false; }),
             tap((roles: any) => this.listRoles = roles),
-            switchMap((listRole: any) => this._systemRepo.getListOffices())
+            switchMap((listRole: any) => this._systemRepo.getListOfficesByUserId(this.userId))
         ).subscribe(
             (res: any) => {
                 if (!!res) {

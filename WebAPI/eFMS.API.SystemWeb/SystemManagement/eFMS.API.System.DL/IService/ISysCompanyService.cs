@@ -18,5 +18,7 @@ namespace eFMS.API.System.DL.IService
         HandleState Update(Guid id, SysCompanyAddModel sysBuModel);
         HandleState Delete(Guid id);
         List<SysCompanyModel> GetCompanyPermissionLevel();
+        IQueryable<SysCompany> GetByUserId(string id);
+
     }
 }

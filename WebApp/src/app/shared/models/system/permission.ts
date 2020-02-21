@@ -43,6 +43,7 @@ export class PermissionSample {
     sysPermissionSampleGenerals: PermissionSampleGeneral[] = new Array<PermissionSampleGeneral>();
     sysPermissionSampleSpecials: PermissionSampleSpecial[] = new Array<PermissionSampleSpecial>();
     isDup: boolean = false;
+    userName: string = null;
 
     // custom
     offices: Office[] = [];

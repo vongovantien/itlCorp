@@ -48,6 +48,17 @@ namespace eFMS.API.System.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// get by userId
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetByUserId")]
+        public IActionResult GetByUserId(string id)
+        {
+            var results = sysCompanyService.GetByUserId(id);
+            return Ok(results);
+        }
+
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(SysCompanyCriteria search)

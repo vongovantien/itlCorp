@@ -14,5 +14,6 @@ namespace eFMS.API.System.DL.IService
         HandleState Update(SysEmployeeModel sysEmployeeModel);
         HandleState Insert(SysEmployeeModel sysEmployeeModel);
 
+
     }
 }

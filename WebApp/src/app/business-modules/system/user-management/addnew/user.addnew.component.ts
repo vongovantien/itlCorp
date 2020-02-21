@@ -44,8 +44,8 @@ export class UserAddNewComponent extends AppPage {
                 userType: this.formAdd.usertype.value.value,
                 workingStatus: this.formAdd.workingg.value.value,
                 isLdap: this.formAdd.ldap.value,
-                active: this.formAdd.active.value.value
-
+                active: this.formAdd.active.value.value,
+                description: this.formAdd.description.value
             };
 
             console.log(body);
@@ -58,7 +58,7 @@ export class UserAddNewComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message, '');
-                            this._router.navigate([`home/system/user-management/${res.data.id}`]);
+                            this._router.navigate([`home/system/user-management/${res.data}`]);
 
 
                         } else {
@@ -80,4 +80,5 @@ export interface IAddUser {
     workingStatus: string;
     isLdap: boolean;
     active: boolean;
+    description: string;
 }

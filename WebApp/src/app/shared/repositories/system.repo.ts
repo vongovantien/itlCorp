@@ -119,6 +119,15 @@ export class SystemRepo {
         );
     }
 
+    getListCompaniesByUserId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysCompany/GetByUserId`, { id: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
     getListUserLevelByUserId(id: string) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUserLevel/GetByUserId`, { id: id }).pipe(
             catchError((error) => throwError(error)),
@@ -413,6 +422,15 @@ export class SystemRepo {
                 map((data: any) => data)
             );
     }
+
+    getListOfficesByUserId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetByUserId`, { id: id })
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+
 
     deleteUserLevel(id: number) {
         return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel/${id}`)

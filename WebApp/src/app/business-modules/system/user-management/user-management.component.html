@@ -38,7 +38,7 @@
                                                 <i class="la la-edit"></i>
                                             </button>
 
-                                            <button type="button" [disabled]="user.active"
+                                            <button type="button" *ngIf="!user.active"
                                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                 title="Remove" (click)="showDeletePopup(user)">
                                                 <i class="la la-trash"></i>

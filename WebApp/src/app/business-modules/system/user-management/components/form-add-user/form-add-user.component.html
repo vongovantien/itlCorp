@@ -128,22 +128,28 @@
                                 placeholder="Please Enter Phone Number">
                         </div>
                     </div>
-                    <div class="col-lg-2">
+
+                    <div class="col-lg-8">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                LDAP
+                                Description
                             </label>
-                            <div class="m-checkbox-list">
-                                <span class="m-switch m-switch--success">
-                                    <label>
-                                        <input type="checkbox" formControlName="ldap" checked="checked" name="">
-                                        <span></span>
-
-                                    </label>
-                                </span>
+                            <input type="text" class="form-control m-input m-input--square"
+                                formControlName="description" placeholder="Please Enter Description">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">LDAP</label>
+                            <div class="m-checkbox-inline">
+                                <app-switch [(toggle)]="ldap.value" (toggleChange)="ldap.setValue($event)">
+                                </app-switch>
 
                             </div>
                         </div>
+
                     </div>
                     <div class="col-lg-4" *ngIf="isDetail">
                         <div class="form-group">
@@ -157,15 +163,6 @@
 
 
                     </div>
-                    <!-- <div class="col-lg-8">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Description
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square"
-                                formControlName="description" placeholder="Please Enter Description">
-                        </div>
-                    </div> -->
                 </div>
                 <div class="row" *ngIf="isDetail">
                     <div class="col-6">
