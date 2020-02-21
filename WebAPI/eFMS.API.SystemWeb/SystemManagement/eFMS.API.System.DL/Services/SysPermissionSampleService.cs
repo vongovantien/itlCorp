@@ -117,7 +117,7 @@ namespace eFMS.API.System.DL.Services
                                 IsAllow = s.IsAllow,
                                 MenuId = s.MenuId,
                                 ModuleId = s.ModuleId,
-                                ActionName = s.NameEn,
+                                ActionName = s.ActionName,
                                 PermissionId = permision.Id
                             };
                             permissioSampleSpecialRepository.Add(peritem, false);
