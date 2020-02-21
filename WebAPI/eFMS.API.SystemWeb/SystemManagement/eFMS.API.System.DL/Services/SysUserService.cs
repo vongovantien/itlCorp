@@ -107,8 +107,6 @@ namespace eFMS.API.System.DL.Services
 
             //           };
 
-
-
             if (criteria.All == null)
             {
                 data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0
