@@ -28,10 +28,10 @@ namespace eFMS.API.System.DL.Services
 
         public List<SysPermissionSampleSpecialViewModel> GetBy(Guid? permissionId)
         {
-            var actionDefaults = DataContext.Get(x => x.PermissionId == permissionId).ToList();
+            var actionDefaults = specialActionRepository.Get().ToList();
             var modules = actionDefaults.GroupBy(x => x.ModuleId);
             if (modules == null) return null;
-            //var specialPermissions = DataContext.Get(x => x.PermissionId == permissionId);
+            var specialPermissions = DataContext.Get(x => x.PermissionId == permissionId);
             var menus = menuRepository.Get().ToList();
 
             List<SysPermissionSampleSpecialViewModel> results = new List<SysPermissionSampleSpecialViewModel>();
@@ -58,12 +58,13 @@ namespace eFMS.API.System.DL.Services
                     perSpecial.PermissionSpecialActions = actions.Where(x => x.MenuId == actionInMenu.Key)
                         .Select(x => new PermissionSpecialAction
                         {
-                            Id = x.Id,
+                            Id = (short)(specialPermissions.FirstOrDefault(s => s.MenuId == x.MenuId && s.ActionName == x.ActionName) != null ? (short)specialPermissions.FirstOrDefault(s => s.MenuId == x.MenuId && s.ActionName == x.ActionName).Id : 0),
                             ModuleId = x.ModuleId,
                             MenuId = x.MenuId,
-                            NameEn = x.ActionName,
-                            NameVn = x.ActionName,
-                            IsAllow = x.IsAllow,
+                            NameEn = x.NameEn,
+                            NameVn = x.NameVn,
+                            ActionName = x.ActionName,
+                            IsAllow = specialPermissions.FirstOrDefault(s => s.MenuId == x.MenuId && s.ActionName == x.ActionName) != null? specialPermissions.FirstOrDefault(s => s.MenuId == x.MenuId && s.ActionName == x.ActionName).IsAllow: false,
                             PermissionId = permissionId == null ? Guid.Empty : (Guid)permissionId
                         }).ToList();
                     sampleSpecials.Add(perSpecial);

@@ -170,7 +170,7 @@ namespace eFMS.API.System.DL.Services
                                 var peritem = permissioSampleSpecialRepository.First(x => x.Id == s.Id);
                                 peritem.IsAllow = s.IsAllow;
                                 peritem.UserModified = currentUser.UserID;
-                                var t = permissioSampleSpecialRepository.Update(peritem, x => x.Id == s.Id, false);
+                                var t = permissioSampleSpecialRepository.Update(peritem, x => x.Id == s.Id, true);
                             }
                         }
                     }

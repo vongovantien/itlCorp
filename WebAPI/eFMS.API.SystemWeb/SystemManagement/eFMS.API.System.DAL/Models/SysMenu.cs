@@ -5,10 +5,6 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysMenu
     {
-        public SysMenu()
-        {
-        }
-
         public string Id { get; set; }
         public string ParentId { get; set; }
         public string NameVn { get; set; }
@@ -24,6 +20,5 @@ namespace eFMS.API.System.Service.Models
         public int? OrderNumber { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-
     }
 }
