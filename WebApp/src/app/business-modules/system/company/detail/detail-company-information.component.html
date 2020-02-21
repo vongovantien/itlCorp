@@ -69,7 +69,12 @@
                                                         </a>
                                                     </div>
                                                 </td>
-                                                <td>{{office.code}}</td>
+                                                <td>
+                                                    <a [routerLink]="['/home/system/'+'office/' + office.id]"
+                                                        routerLinkActive="router-link-active">
+                                                        {{office.code}}
+                                                    </a>
+                                                </td>
                                                 <td>{{office.branchNameEn}}</td>
                                                 <td>{{office.branchNameVn}}</td>
                                                 <td>{{office.shortName}}</td>
