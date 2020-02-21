@@ -116,11 +116,11 @@ namespace eFMS.IdentityServer.DL.Services
             {
                 if (user != null)
                 {
+                    var t = BCrypt.Net.BCrypt.GetPasswordWorkFactor(password);
                     if (BCrypt.Net.BCrypt.Verify(password, user.Password))
                     {                   
                         employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
                         modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, false, employee);
-                        //modelReturn = SetLoginReturnModel(user, employee);
                         LogUserLogin(user, employee.CompanyId);
                         return 1;
                     }
