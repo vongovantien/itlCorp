@@ -141,14 +141,12 @@ namespace eFMS.API.System.DL.Services
                     var checkExisted = data.Where(d => userPermissions.Any(u => d.Id == u.Id));
                     foreach (var item in userPermissions)
                     {
-                        if (checkExisted.Where(x => x.Id == item.Id).Select(t => t.Id).FirstOrDefault() != Guid.Empty)
+                        if (checkExisted.Where(x => x.Id == item.Id).Select(t => t.Id).FirstOrDefault() == Guid.Empty)
                         {
-                            hs = DataContext.Update(item, x => x.Id == item.Id);
-                        }
-                        else
-                        {
+                            //hs = DataContext.Update(item, x => x.Id == item.Id);
                             hs = DataContext.Add(item, false);
                         }
+              
                     }
                     if (hs.Success)
                     {
