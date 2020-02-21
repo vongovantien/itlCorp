@@ -58,12 +58,8 @@ export class UserManagementComponent extends AppList {
         this.headers = [
             { title: 'User Name', field: 'username', sortable: true, width: 100 },
             { title: 'Name EN', field: 'employeeNameEn', sortable: true },
-            { title: 'Title', field: 'title', sortable: true },
+            { title: 'FullName', field: 'employeeNameVn', sortable: true },
             { title: 'User Type', field: 'userType', sortable: true },
-            { title: 'Role', field: 'role', sortable: true },
-            { title: 'Level permission', field: '', sortable: true },
-            { title: 'Company', field: 'company', sortable: true },
-            { title: 'Office', field: 'office', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
         this.dataSearch = {
@@ -80,12 +76,14 @@ export class UserManagementComponent extends AppList {
 
     onSearchUser(dataSearch: any) {
         this.dataSearch = dataSearch;
+        this.page = 1;
         this.criteria = {};
         if (this.dataSearch.type === 'All') {
             this.criteria.all = this.dataSearch.keyword;
-
-        }
-        else {
+            if (this.dataSearch.keyword.toLowerCase() === "active" || this.dataSearch.keyword.toLowerCase() === "inactive") {
+                this.criteria.all = this.dataSearch.keyword.toLowerCase();
+            }
+        } else {
             this.criteria.all = null;
         }
         if (this.dataSearch.type === 'username') {
@@ -96,8 +94,26 @@ export class UserManagementComponent extends AppList {
 
             this.criteria.employeeNameEn = this.dataSearch.keyword;
         }
+        if (this.dataSearch.type === 'employeeNameVn') {
+
+            this.criteria.employeeNameVn = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'userType') {
+
+            this.criteria.userType = this.dataSearch.keyword;
+        }
         if (this.dataSearch.type === 'active') {
-            this.criteria.active = this.dataSearch.keyword === "Active" ? true : false;
+            if (this.dataSearch.keyword !== "") {
+                if (this.dataSearch.keyword.toLowerCase() === "active") {
+                    this.criteria.active = true;
+                } else if (this.dataSearch.keyword.toLowerCase() === "inactive") {
+                    this.criteria.active = false;
+                } else {
+                    this.criteria.active = null;
+                }
+            }
+
+            // this.criteria.active = this.dataSearch.keyword === "Active" ? true : false;
             // this.criteria.active = this.dataSearch.keyword;
         }
         this.searchUser();

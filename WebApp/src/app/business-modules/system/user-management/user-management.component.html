@@ -48,14 +48,15 @@
                                     <td class="text-underline text-primary pointer"><a
                                             (click)="gotoDetailUser(user.id)">{{user.username}}</a> </td>
                                     <td>{{user.employeeNameEn}}</td>
-                                    <td>{{user.title}}</td>
+                                    <td>{{user.employeeNameVn}}</td>
                                     <td>{{user.userType}}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td [ngClass]="user.active ? 'text-success' : 'text-danger'">
-                                        {{user.active ? 'Active' : 'InActive'}}</td>
+
+                                    <td *ngIf="user.active != null"
+                                        [ngClass]="user.active ? 'text-success' : 'text-danger'">
+                                        {{user.active  ? 'Active' : 'InActive'  }}</td>
+                                    <td *ngIf="user.active == null">
+                                        {{user.active}}
+                                    </td>
                                 </tr>
                             </ng-container>
                             <tr *ngIf="!isLoading && !users.length" app-table-none-record

@@ -35,7 +35,7 @@
                                 </button>
                             </td>
                             <td>
-                                <div class="form-group"
+                                <div class="form-group" *ngIf="!item.id"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  &&( item.permissionSampleId === null || item.isDup) }">
                                     <select [(ngModel)]="item.permissionSampleId"
                                         (ngModelChange)="selectedRole(item,$event)" class="form-control border">
@@ -44,10 +44,14 @@
                                         </option>
                                     </select>
                                 </div>
-
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  &&( item.permissionSampleId === null || item.isDup) }"
+                                    *ngIf="item.id">
+                                    <input type="text" class="form-control" [value]="item.name" [readonly]="true">
+                                </div>
                             </td>
                             <td>
-                                <div class="form-group "
+                                <div class="form-group " *ngIf="!item.id"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (item.buid === null  || item.isDup) }">
                                     <select [(ngModel)]="item.buid" (ngModelChange)="selectedCompany($event,item)"
                                         class="form-control border">
@@ -55,11 +59,16 @@
                                         <option *ngFor="let item of companies" [ngValue]="item.id">{{item.bunameVn}}
                                         </option>
                                     </select>
-
+                                </div>
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && (item.buid === null  || item.isDup) }"
+                                    *ngIf="item.id">
+                                    <input type="text" class="form-control" [value]="item.companyName"
+                                        [readonly]="true">
                                 </div>
                             </td>
                             <td>
-                                <div class="form-group"
+                                <div class="form-group" *ngIf="!item.id"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.officeId === null || item.isDup)  }">
                                     <select class="form-control border" (ngModelChange)="selectedOffice(item,$event)"
                                         [(ngModel)]="item.officeId">
@@ -70,7 +79,11 @@
                                     </select>
 
                                 </div>
-
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.officeId === null || item.isDup)  }"
+                                    *ngIf="item.id">
+                                    <input type="text" class="form-control" [value]="item.officeName" [readonly]="true">
+                                </div>
                             </td>
                         </tr>
                         <tr app-table-none-record *ngIf="!listRoles.length"></tr>
@@ -81,11 +94,8 @@
                                     <i class="fa fa-plus-circle fa-2x"></i>
                                 </a>
                             </td>
-
                         </tr>
                     </ng-container>
-
-
                 </tbody>
             </table>
         </div>

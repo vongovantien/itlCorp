@@ -28,6 +28,9 @@ namespace eFMS.API.System.DL.Common
         public static readonly string FILE_NOT_FOUND = "FILE_NOT_FOUND";
         public static readonly string NOT_FOUND_DATA_EXCEL = "NOT_FOUND_DATA_EXCEL";
 
+        public static readonly string MSG_USERNAME_EXISTED = "MSG_USERNAME_EXISTED";
+
+
         #region Unit
         public static readonly string MSG_NAME_EN_EXISTED = "MSG_NAME_EN_EXISTED";
         public static readonly string MSG_NAME_LOCAL_EXISTED = "MSG_NAME_LOCAL_EXISTED";

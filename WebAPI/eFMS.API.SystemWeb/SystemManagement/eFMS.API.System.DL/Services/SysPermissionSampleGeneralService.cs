@@ -56,7 +56,7 @@ namespace eFMS.API.System.DL.Services
                         {
                             perDetail.Id = detail.Id;
                             perDetail.Access = detail.Access;
-                            perDetail.Detail = detail.Delete;
+                            perDetail.Detail = detail.Detail;
                             perDetail.Write = detail.Write;
                             perDetail.Delete = detail.Delete;
                             perDetail.List = detail.List;

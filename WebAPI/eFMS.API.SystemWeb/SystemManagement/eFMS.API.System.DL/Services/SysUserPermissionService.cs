@@ -76,7 +76,9 @@ namespace eFMS.API.System.DL.Services
                               Name = p.Name,
                               OfficeId = d.OfficeId,
                               PermissionSampleId = d.PermissionSampleId,
-                              Buid = c.Id
+                              Buid = c.Id,
+                              CompanyName = c.BunameVn, 
+                              OfficeName = o.BranchNameVn
                           };
 
             return results;
@@ -146,7 +148,6 @@ namespace eFMS.API.System.DL.Services
                             //hs = DataContext.Update(item, x => x.Id == item.Id);
                             hs = DataContext.Add(item, false);
                         }
-              
                     }
                     if (hs.Success)
                     {
