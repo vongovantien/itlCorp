@@ -79,82 +79,88 @@ namespace eFMS.API.System.DL.Services
             result.EmployeeNameVn = employee?.EmployeeNameVn;
             return result;
         }
-        public IQueryable<SysUserViewModel> Paging(SysUserCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<SysUserViewModel> Paging(SysUserCriteria criteria, int page, int size, out int? rowsCount)
         {
             var users = DataContext.Get();
             var employees = employeeRepository.Get();
             var userLevels = userlevelRepository.Get();
             var companies = sysCompanyRepository.Get();
             var offices = sysCompanyRepository.Get();
-
-            //var data = users.Join(employees, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
-            //var dataJoin = from uslv in userLevels
-            //               join c in companies on uslv.CompanyId equals c.Id
-            //               join o in offices on uslv.OfficeId equals o.Id
-            //               select new { uslv,c,o};
-
-            var data = users.Join(employees, x => x.EmployeeId , y => y.Id, (x, y) => new { x, y });
-            //var data = from u in users
-            //           join e in employees on u.EmployeeId equals e.Id
-            //           join uslv in userLevels on u.Id equals uslv.UserId into userlevel
-            //           from us in userlevel.DefaultIfEmpty()
-            //           group new { u } by us.OfficeId into newgroup
-
-            //           select new SysUserViewModel
-            //           {
-            //               Id = newgroup.Select(t => t.u.Id).FirstOrDefault(),
-            //               Username = newgroup.Select(t => t.u.Username).FirstOrDefault()
-
-            //           };
-
-
-
+            var data = users.Join(employees, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
             if (criteria.All == null)
             {
-                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          && (x.y.EmployeeNameEn ?? "").IndexOf(criteria.EmployeeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          && (x.y.Title ?? "").IndexOf(criteria.Title ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          && (x.x.UserType ?? "").IndexOf(criteria.UserType ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          && (x.x.Active == criteria.Active || criteria.Active == null)
-                );
+                if (criteria.Active != null)
+                {
+                    data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                       && (x.y.EmployeeNameEn ?? "").IndexOf(criteria.EmployeeNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                       && (x.y.EmployeeNameVn ?? "").IndexOf(criteria.EmployeeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                       && (x.x.UserType ?? "").IndexOf(criteria.UserType ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                       && (x.x.Active == criteria.Active)
+                       );
+                }
+                else
+                {
+                    data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                              && (x.y.EmployeeNameEn ?? "").IndexOf(criteria.EmployeeNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                              && (x.y.EmployeeNameVn ?? "").IndexOf(criteria.EmployeeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                              && (x.x.UserType ?? "").IndexOf(criteria.UserType ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                              );
+                }
             }
             else
             {
-                if (criteria.All.Contains("Active"))
+                if (criteria.All == "active")
                 {
                     criteria.Active = true;
                 }
-                if (criteria.All.Contains("InActive"))
+                if (criteria.All =="inactive")
                 {
                     criteria.Active = false;
                 }
-                data = data.Where(x => (
-                          ((x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                          || (x.y.EmployeeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          || (x.y.Title ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          || (x.x.UserType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          || (x.x.Active == criteria.Active)
-                          ));
+                if (criteria.Active == null)
+                {
+                    if (criteria.All == "status")
+                    {
+                        data = null;
+                    }
+                    else
+                    {
+                        data = data.Where(x => (
+                    ((x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                    || (x.y.EmployeeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    || (x.y.EmployeeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    || (x.x.UserType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    ));
+                    }
+
+                }
+                if (criteria.Active != null)
+                {
+                    data = data.Where(x => x.x.Active == criteria.Active);
+                }
             }
-            data = data.OrderByDescending(x => x.x.DatetimeModified);
-            rowsCount = data.Count();
+
+            data = data?.OrderByDescending(x => x.x.DatetimeModified);
+            rowsCount = data?.Count();
             if (size > 1)
             {
                 if (page < 1)
                 {
                     page = 1;
                 }
-                data = data.Skip((page - 1) * size).Take(size);
+                data = data?.Skip((page - 1) * size).Take(size);
             }
-
             List<SysUserViewModel> results = new List<SysUserViewModel>();
-            foreach (var item in data)
+            if(data!= null)
             {
-                var model = mapper.Map<SysUserViewModel>(item.x);
-                model.EmployeeNameEn = item.y.EmployeeNameEn;
-                model.EmployeeNameVn = item.y.EmployeeNameVn;
-                model.Title = item.y.Title;
-                results.Add(model);
+                foreach (var item in data)
+                {
+                    var model = mapper.Map<SysUserViewModel>(item.x);
+                    model.EmployeeNameEn = item.y.EmployeeNameEn;
+                    model.EmployeeNameVn = item.y.EmployeeNameVn;
+                    model.Title = item.y.Title;
+                    results.Add(model);
+                }
             }
             return results.AsQueryable();
         }
@@ -187,7 +193,7 @@ namespace eFMS.API.System.DL.Services
             {
                 data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                          && (x.y.EmployeeNameEn ?? "").IndexOf(criteria.EmployeeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                         && (x.y.Title ?? "").IndexOf(criteria.Title ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                         && (x.y.EmployeeNameVn ?? "").IndexOf(criteria.EmployeeNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                          && (x.x.UserType ?? "").IndexOf(criteria.UserType ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                          && (x.x.Active == criteria.Active || criteria.Active == null));
             }

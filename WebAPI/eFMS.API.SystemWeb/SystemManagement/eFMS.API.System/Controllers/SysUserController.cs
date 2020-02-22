@@ -59,7 +59,7 @@ namespace eFMS.API.System.Controllers
         [Route("Paging")]
         public IActionResult Paging(SysUserCriteria criteria, int page, int size)
         {
-            var data = sysUserService.Paging(criteria, page, size, out int rowCount);
+            var data = sysUserService.Paging(criteria, page, size, out int? rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
@@ -344,14 +344,14 @@ namespace eFMS.API.System.Controllers
                 {
                     if (sysUserService.Any(x => x.Username.ToLower().Trim() == username.ToLower().Trim()))
                     {
-                        message = stringLocalizer[LanguageSub.MSG_NAME_EXISTED].Value;
+                        message = stringLocalizer[LanguageSub.MSG_USERNAME_EXISTED].Value;
                     }
                 }
                 else
                 {
                     if (sysUserService.Any(x=>x.Username!= null && x.Username.ToLower().Trim() == username.ToLower().Trim() && x.Id != id))
                     {
-                        message = stringLocalizer[LanguageSub.MSG_NAME_EXISTED].Value;
+                        message = stringLocalizer[LanguageSub.MSG_USERNAME_EXISTED].Value;
                     }
                 }
             }

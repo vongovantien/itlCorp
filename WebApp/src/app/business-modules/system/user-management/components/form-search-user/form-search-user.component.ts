@@ -24,12 +24,8 @@ export class UserFormSearchComponent extends AppForm {
             settingFields: <CommonInterface.IValueDisplay[]>[
                 { displayName: 'User Name', fieldName: 'username' },
                 { displayName: 'Name En', fieldName: 'employeeNameEn' },
-                { displayName: 'Title', fieldName: 'title' },
+                { displayName: 'Full Name', fieldName: 'employeeNameVn' },
                 { displayName: 'User Type', fieldName: 'userType' },
-                { displayName: 'Role', fieldName: 'role' },
-                { displayName: 'Level Permission', fieldName: 'levelPermission' },
-                { displayName: 'Company', fieldName: 'company' },
-                { displayName: 'Office', fieldName: 'office' },
                 { displayName: 'Status', fieldName: 'active' }
             ]
         };
@@ -47,7 +43,7 @@ export class UserFormSearchComponent extends AppForm {
     }
 
     onReset(data: any) {
-
+        this.onSearch.emit(data);
     }
 
 }

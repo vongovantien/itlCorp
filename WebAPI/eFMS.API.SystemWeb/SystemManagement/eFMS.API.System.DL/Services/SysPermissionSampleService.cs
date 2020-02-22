@@ -102,6 +102,8 @@ namespace eFMS.API.System.DL.Services
                     foreach(var general in listGeneral)
                     {
                         general.PermissionId = permision.Id;
+                        general.DatetimeModified = DateTime.Now;
+                        general.UserModified = currentUser.UserID;
                         permissioSampleGeneralRepository.Add(general, false);
                     }
                 }
@@ -117,8 +119,10 @@ namespace eFMS.API.System.DL.Services
                                 IsAllow = s.IsAllow,
                                 MenuId = s.MenuId,
                                 ModuleId = s.ModuleId,
-                                ActionName = s.NameEn,
-                                PermissionId = permision.Id
+                                ActionName = s.ActionName,
+                                PermissionId = permision.Id,
+                                DatetimeModified = DateTime.Now,
+                                UserModified = currentUser.UserID
                             };
                             permissioSampleSpecialRepository.Add(peritem, false);
                         }
@@ -145,6 +149,7 @@ namespace eFMS.API.System.DL.Services
                     foreach(var general in list)
                     {
                         general.UserModified = currentUser.UserID;
+                        general.DatetimeModified = DateTime.Now;
                         permissioSampleGeneralRepository.Update(general, x => x.Id == general.Id, false);
                     }
                 }
@@ -163,6 +168,8 @@ namespace eFMS.API.System.DL.Services
                                 peritem.ModuleId = s.ModuleId;
                                 peritem.ActionName = s.NameEn;
                                 peritem.PermissionId = entity.Id;
+                                peritem.UserModified = currentUser.UserID;
+                                peritem.DatetimeModified = DateTime.Now;
                                 permissioSampleSpecialRepository.Add(peritem, false);
                             }
                             else
@@ -170,7 +177,8 @@ namespace eFMS.API.System.DL.Services
                                 var peritem = permissioSampleSpecialRepository.First(x => x.Id == s.Id);
                                 peritem.IsAllow = s.IsAllow;
                                 peritem.UserModified = currentUser.UserID;
-                                var t = permissioSampleSpecialRepository.Update(peritem, x => x.Id == s.Id, false);
+                                peritem.DatetimeModified = DateTime.Now;
+                                var t = permissioSampleSpecialRepository.Update(peritem, x => x.Id == s.Id, true);
                             }
                         }
                     }

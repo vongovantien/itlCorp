@@ -123,9 +123,8 @@
                                     Service Type
                                 </label>
                                 <ng-select [allowClear]="true" [items]="serviceTypes" [disabled]="disabled"
-                                    [active]="serviceTypeCurrent" (data)="refreshValue($event)"
-                                    (selected)="selectedServiceType($event)" (removed)="removedServiceType($event)"
-                                    (typed)="typed($event)" placeholder="Select service type">
+                                    [active]="serviceTypeCurrent" (selected)="selectedServiceType($event)"
+                                    (removed)="removedServiceType()" placeholder="Select service type">
                                 </ng-select>
                             </div>
                         </div>
@@ -157,9 +156,8 @@
                                         *ngIf="addForm.submitted && typeClearanceCurrent.length==0 && isConvertJob">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="typeClearance" [disabled]="disabled"
-                                    [active]="typeClearanceCurrent" (data)="refreshValue($event)"
-                                    (selected)="selectedTypeClearance($event)" (removed)="removedTypeClearance($event)"
-                                    (typed)="typed($event)" placeholder="Select type">
+                                    [active]="typeClearanceCurrent" (selected)="selectedTypeClearance($event)"
+                                    (removed)="removedTypeClearance()" placeholder="Select type">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="addForm.submitted && typeClearanceCurrent.length==0 && isConvertJob">
@@ -173,10 +171,8 @@
                                     Route
                                 </label>
                                 <ng-select [allowClear]="true" [items]="routeClearance" [disabled]="disabled"
-                                    [active]="routeClearanceCurrent" (data)="refreshValue($event)"
-                                    (selected)="selectedRouteClearance($event)"
-                                    (removed)="removedRouteClearance($event)" (typed)="typed($event)"
-                                    placeholder="Select route">
+                                    [active]="routeClearanceCurrent" (selected)="selectedRouteClearance($event)"
+                                    (removed)="removedRouteClearance()" placeholder="Select route">
                                 </ng-select>
                             </div>
                         </div>
@@ -190,9 +186,8 @@
                                     Cargo Type <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="cargoTypes" [disabled]="disabled"
-                                    [active]="cargoTypeCurrent" (data)="refreshValue($event)"
-                                    (selected)="selectedCargoType($event)" (removed)="removedCargoType($event)"
-                                    (typed)="typed($event)" placeholder="Select filter">
+                                    [active]="cargoTypeCurrent" (selected)="selectedCargoType($event)"
+                                    (removed)="removedCargoType($event)" placeholder="Select filter">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="addForm.submitted && cargoTypeCurrent.length==0">
@@ -206,9 +201,8 @@
                                         Cargo Type
                                     </label>
                                     <ng-select [allowClear]="true" [items]="cargoTypes" [disabled]="true"
-                                        [active]="cargoTypeCurrent" (data)="refreshValue($event)"
-                                        (selected)="selectedCargoType($event)" (removed)="removedCargoType($event)"
-                                        (typed)="typed($event)" placeholder="Select filter">
+                                        [active]="cargoTypeCurrent" (selected)="selectedCargoType($event)"
+                                        (removed)="removedCargoType($event)" placeholder="Select filter">
                                     </ng-select>
                                 </div>
                             </ng-template>

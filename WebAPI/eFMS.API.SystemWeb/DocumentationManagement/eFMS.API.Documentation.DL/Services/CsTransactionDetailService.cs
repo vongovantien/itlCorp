@@ -421,10 +421,6 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     detail.Permission.AllowLock = true;
                 }
-                if (specialActions.Any(x => x.Action.Contains("Add Charge")))
-                {
-                    detail.Permission.AllowAddCharge = true;
-                }
                 if (specialActions.Any(x => x.Action.Contains("Update Charge")))
                 {
                     detail.Permission.AllowUpdateCharge = true;

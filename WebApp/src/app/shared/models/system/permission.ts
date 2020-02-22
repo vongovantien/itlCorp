@@ -44,6 +44,7 @@ export class PermissionSample {
     sysPermissionSampleSpecials: PermissionSampleSpecial[] = new Array<PermissionSampleSpecial>();
     isDup: boolean = false;
     userName: string = null;
+    companyName: string = '';
 
     // custom
     offices: Office[] = [];

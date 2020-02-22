@@ -309,17 +309,17 @@ namespace eFMS.API.Documentation.DL.Common
         {
             if (specialActions.Count > 0)
             {
-                if (specialActions.Any(x => x.Action.Contains("Lock")))
+                if (specialActions.Any(x => x.Action.Contains("LockShipment")))
                 {
                     detailPermission.AllowLock = true;
                 }
-                if (specialActions.Any(x => x.Action.Contains("Add Charge")))
-                {
-                    detailPermission.AllowAddCharge = true;
-                }
-                if (specialActions.Any(x => x.Action.Contains("Update Charge")))
+                if (specialActions.Any(x => x.Action.Contains("UpdateCharge")))
                 {
                     detailPermission.AllowUpdateCharge = true;
+                }
+                if (specialActions.Any(x => x.Action.Contains("AssignStage")))
+                {
+                    detailPermission.AllowAssignStage = true;
                 }
             }
             return detailPermission;

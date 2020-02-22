@@ -26,10 +26,12 @@ namespace eFMS.API.System.DL.Services
 
         public List<SysUserPermissionSpecialViewModel> GetBy(Guid id)
         {
-            var actionDefaults = DataContext.Get(x => x.UserPermissionId == id).ToList();
+            var actionDefaults = specialActionRepository.Get().ToList();
             var modules = actionDefaults.GroupBy(x => x.ModuleId);
             if (modules == null) return null;
+            var specialPermissions = DataContext.Get(x => x.UserPermissionId == id).ToList();
             var menus = menuRepository.Get().ToList();
+
             List<SysUserPermissionSpecialViewModel> results = new List<SysUserPermissionSpecialViewModel>();
             foreach (var item in modules)
             {
@@ -54,13 +56,13 @@ namespace eFMS.API.System.DL.Services
                     perSpecial.PermissionSpecialActions = actions.Where(x => x.MenuId == actionInMenu.Key)
                         .Select(x => new UserPermissionSpecialAction
                         {
+                            Id = specialPermissions.FirstOrDefault(s => s.MenuId == x.MenuId && s.ActionName == x.ActionName) != null ? specialPermissions.FirstOrDefault(s => s.MenuId == x.MenuId && s.ActionName == x.ActionName).Id : Guid.Empty,
                             ModuleId = x.ModuleId,
                             MenuId = x.MenuId,
-                            NameEn = x.ActionName,
-                            NameVn = x.ActionName,
-                            IsAllow = x.IsAllow,
-                            UserPermissionId = id,
-                            Id = x.Id
+                            NameEn = x.NameEn,
+                            NameVn = x.NameVn,
+                            IsAllow = specialPermissions.FirstOrDefault(s => s.MenuId == x.MenuId && s.ActionName == x.ActionName) != null ? specialPermissions.FirstOrDefault(s => s.MenuId == x.MenuId && s.ActionName == x.ActionName).IsAllow : false,
+                            UserPermissionId = id
                         }).ToList();
                     sampleSpecials.Add(perSpecial);
                 }
