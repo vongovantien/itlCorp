@@ -24,18 +24,22 @@ namespace eFMS.IdentityServer.DL.Services
         readonly LDAPConfig ldap;
         IContextBase<SysEmployee> employeeRepository;
         public readonly IContextBase<SysUserLevel> userLevelRepository;
+       
+
 
         public AuthenticateService(
             IContextBase<SysUser> repository, IMapper mapper,
             ISysUserLogService logService,
             IOptions<LDAPConfig> ldapConfig,
             IContextBase<SysUserLevel> userLevelRepo,
+            IContextBase<SysUser> sysUserRepo,
             IContextBase<SysEmployee> employeeRepo) : base(repository, mapper)
         {
             userLogService = logService;
             ldap = ldapConfig.Value;
             employeeRepository = employeeRepo;
             userLevelRepository = userLevelRepo;
+   
         }
 
         public UserViewModel GetUserById(string id)
@@ -93,97 +97,178 @@ namespace eFMS.IdentityServer.DL.Services
             SearchResult ldapInfo = null;
             bool isAuthenticated = false;
             SysEmployee employee;
-            foreach (var path in ldap.LdapPaths)
-            {
-                Ldap.Path = path;
-                isAuthenticated = Ldap.IsAuthenticated(ldap.Domain, username, password);
 
-                if (isAuthenticated)
-                {
-                    ldapInfo = Ldap.GetNodeInfomation(ldap.Domain, username, password);
-                    break;
-                }
-            }
-            var user = DataContext.Get(x => x.Username == username).FirstOrDefault();
-           
-
-            if (user == null && !isAuthenticated)
+            var sysUser = DataContext.Get(x => x.Username == username).FirstOrDefault();
+            if (sysUser == null)
             {
                 modelReturn = null;
                 return -2;
             }
-            if (isAuthenticated)
+            if (sysUser.IsLdap == true)
             {
-                if (user != null)
+                // Nếu có sysUser có password LDAP.
+                if(sysUser.PasswordLdap != null)
                 {
-                    var t = BCrypt.Net.BCrypt.GetPasswordWorkFactor(password);
-                    if (BCrypt.Net.BCrypt.Verify(password, user.Password))
-                    {                   
-                        employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
-                        modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, false, employee);
-                        LogUserLogin(user, employee.CompanyId);
+                    // Check password - passwordLDAP.
+                    if (BCrypt.Net.BCrypt.Verify(password, sysUser.PasswordLdap))
+                    {
+                        if (!ValidateCompany(username, companyId))
+                        {
+                            modelReturn = null;
+                            return -3;
+                        }
+                        if (!ValidateOffice(sysUser.Id))
+                        {
+                            modelReturn = null;
+                            return -4;
+                        }
+
+                        // Get danh sách level office của user.
+                        var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.CompanyId == companyId && lv.OfficeId != null)?.FirstOrDefault();
+
+                        employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId)?.FirstOrDefault();
+                        modelReturn = SetLoginReturnModel(sysUser, employee);
+
+                        modelReturn.companyId = companyId;
+                        modelReturn.officeId = levelOffice.OfficeId;
+                        modelReturn.departmentId = levelOffice.DepartmentId;
+                        modelReturn.groupId = levelOffice.GroupId;
+
+                        LogUserLogin(sysUser, companyId);
                         return 1;
                     }
+                    else
+                    {
+                        modelReturn = null;
+                        return -2;
+                    }
+                }
+                else
+                {
+                    // Check username are login using LDAP.
+                    foreach (var path in ldap.LdapPaths)
+                    {
+                        Ldap.Path = path;
+                        isAuthenticated = Ldap.IsAuthenticated(ldap.Domain, username, password);
+
+                        // if username login using LDAP -> get ldapInfo.
+                        if (isAuthenticated)
+                        {
+                            ldapInfo = Ldap.GetNodeInfomation(ldap.Domain, username, password);
+                            break;
+                        }
+                    }
+
+                    if(isAuthenticated && sysUser.PasswordLdap == null)
+                    {
+                        if (!ValidateCompany(username, companyId))
+                        {
+                            modelReturn = null;
+                            return -3;
+                        }
+                        if (!ValidateOffice(sysUser.Id))
+                        {
+                            modelReturn = null;
+                            return -4;
+                        }
+                        var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
+                        employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId).FirstOrDefault();
+
+                        sysUser.Password = password;
+                        modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, false, employee);
+
+                        modelReturn.companyId = companyId;
+                        modelReturn.officeId = levelOffice.OfficeId;
+                        modelReturn.departmentId = levelOffice.DepartmentId;
+                        modelReturn.groupId = levelOffice?.GroupId;
+
+                        // Update Log
+                        LogUserLogin(sysUser, companyId);
+
+                        //sysUser.PasswordLdap = BCrypt.Net.BCrypt.HashString(password);
+                        // var hs = DataContext.Update(sysUser, u => u.Id == sysUser.Id);
+                        
+                        return 1;
+                    }
+
+                    if(!isAuthenticated)
+                    {
+                        modelReturn = null;
+                        return -2;
+                    }
+                }
+            }
+            else
+            {
+                // Check if LDAP.
+                foreach (var path in ldap.LdapPaths)
+                {
+                    Ldap.Path = path;
+                    isAuthenticated = Ldap.IsAuthenticated(ldap.Domain, username, password);
+                    if (isAuthenticated)
+                    {
+                        ldapInfo = Ldap.GetNodeInfomation(ldap.Domain, username, password);
+                        break;
+                    }
+                }
+
+                if(isAuthenticated)
+                {
+                    var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
+                    if(levelOffice == null)
+                    {
+                        modelReturn = null;
+                        return -4;
+                    }
+
+                    //sysUser = new SysUser { Username = username, Password = password, UserCreated = "admin" };
+                    modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, true, null);
+                    modelReturn.companyId = companyId;
+                    modelReturn.officeId = levelOffice.OfficeId;
+                    modelReturn.departmentId =levelOffice.DepartmentId;
+                    modelReturn.groupId = levelOffice?.GroupId;
+
+                    LogUserLogin(sysUser, modelReturn.companyId);
+                    return 1;
+                }
+
+                // Check username,password.
+                if (BCrypt.Net.BCrypt.Verify(password, sysUser.Password))
+                {
+                    if (!ValidateCompany(sysUser.Id, companyId))
+                    {
+                        modelReturn = null;
+                        return -3;
+                    }
+                    if (!ValidateOffice(sysUser.Id))
+                    {
+                        modelReturn = null;
+                        return -4;
+                    }
+                    var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null && lv.CompanyId == companyId)?.FirstOrDefault();
+
+                    //modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, true, null);
+                    employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId)?.FirstOrDefault();
+                    modelReturn = SetLoginReturnModel(sysUser, employee);
+
+                    modelReturn.companyId = companyId;
+                    modelReturn.officeId = levelOffice.OfficeId;
+                    modelReturn.departmentId = levelOffice.DepartmentId;
+                    modelReturn.groupId = levelOffice?.GroupId;
+
+                    // Update Log
+                    LogUserLogin(sysUser, companyId);
+                    return 1;
                 }
                 else
                 {
                     modelReturn = null;
                     return -2;
                 }
-                if(!ValidateCompany(username,companyId))
-                {
-                    modelReturn = null;
-                    return -3;
-                }
-                if(!ValidateOffice(user.Id))
-                {
-                    modelReturn = null;
-                    return -4;
-                }
-                var levelOffice = userLevelRepository.Get(lv => lv.UserId == user.Id && lv.OfficeId != null)?.FirstOrDefault();
-
-                user = new SysUser { Username = username, Password = password, UserCreated = "admin" };
-                modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, true, null);
-                modelReturn.companyId = companyId;
-                modelReturn.officeId = levelOffice.OfficeId;
-                modelReturn.departmentId = (int)levelOffice.DepartmentId;
-                modelReturn.groupId = levelOffice.GroupId;
-
-                LogUserLogin(user, modelReturn.companyId);
-                return 1;
             }
-            if (BCrypt.Net.BCrypt.Verify(password, user.Password))
-            {
-                var levelCompany = userLevelRepository.Get(level => level.CompanyId == companyId && level.UserId == username)?.FirstOrDefault();
-                if (!ValidateCompany(username, companyId))
-                {
-                    modelReturn = null;
-                    return -3;
-                }
-                if (!ValidateOffice(user.Id))
-                {
-                    modelReturn = null;
-                    return -4;
-                }
 
-                // Get danh sách level office của user.
-                var levelOffice = userLevelRepository.Get(lv => lv.UserId == user.Id && lv.CompanyId == companyId && lv.OfficeId != null)?.FirstOrDefault();
-
-                employee = employeeRepository.Get(x => x.Id == user.EmployeeId)?.FirstOrDefault();
-                modelReturn = SetLoginReturnModel(user, employee);
-                modelReturn.companyId = companyId;
-                modelReturn.officeId = levelOffice.OfficeId;
-                modelReturn.departmentId = (int)levelOffice.DepartmentId;
-                modelReturn.groupId = levelOffice.GroupId;
-
-                LogUserLogin(user, companyId);
-                return 1;
-            }
-            else
-            {
-                modelReturn = null;
-                return -2;
-            }
+            modelReturn = null;
+            return -2;
         }
         private LoginReturnModel SetLoginReturnModel(SysUser user, SysEmployee employee)
         {
@@ -237,6 +322,8 @@ namespace eFMS.IdentityServer.DL.Services
                 employee.LdapObjectGuid = sysEmployee.LdapObjectGuid;
                 employee.EmployeeNameEn = sysEmployee.EmployeeNameEn;
                 employee.Email = sysEmployee.Email;
+                user.PasswordLdap = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
                 DataContext.Update(user, x => x.Id == user.Id);
                 employeeRepository.Update(sysEmployee, x => x.Id == employee.Id);
                 modelReturn = new LoginReturnModel { idUser = user.Id, userName = user.Username, email = sysEmployee.Email };
@@ -258,9 +345,9 @@ namespace eFMS.IdentityServer.DL.Services
             userLogService.Add(userLog);
         }
 
-        private Boolean ValidateCompany(string userName, Guid companyId)
+        private Boolean ValidateCompany(string userId, Guid companyId)
         {
-            var levelCompany = userLevelRepository.Get(level => level.CompanyId == companyId && level.UserId == userName)?.FirstOrDefault();
+            var levelCompany = userLevelRepository.Get(level => level.CompanyId == companyId && level.UserId == userId)?.FirstOrDefault();
             if (levelCompany == null)
             {
                 return false;

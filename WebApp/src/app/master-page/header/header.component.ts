@@ -61,8 +61,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this.currenUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         if (!!this.currenUser) {
             forkJoin([
-                this._systemRepo.getOfficePermission(this.currenUser.userName, this.currenUser.companyId),
-                this._systemRepo.getDepartmentGroupPermission(this.currenUser.userName, this.currenUser.officeId)
+                this._systemRepo.getOfficePermission(this.currenUser.id, this.currenUser.companyId),
+                this._systemRepo.getDepartmentGroupPermission(this.currenUser.id, this.currenUser.officeId)
             ]).pipe(
                 tap((res: any) => {
                     this.offices = res[0] || [];

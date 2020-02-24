@@ -53,7 +53,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
 
     getMenu(officeId: string) {
         if (!!this.userLogged) {
-            this._systemRepo.getMenu(this.userLogged.userName, officeId)
+            this._systemRepo.getMenu(this.userLogged.id, officeId)
                 .subscribe(
                     (res: Menu[]) => {
                         this.Menu = res.map((m: Menu) => new Menu(m));
