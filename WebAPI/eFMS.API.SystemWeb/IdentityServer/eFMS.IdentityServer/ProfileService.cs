@@ -47,7 +47,7 @@ namespace eFMS.IdentityServer
            
             var claims = new List<Claim>
                 {
-                    new Claim(JwtClaimTypes.Id, user.Id.ToString()),
+                    new Claim(JwtClaimTypes.Id, user.Id),
                     new Claim(JwtClaimTypes.Email, user.Email),
                     new Claim(JwtClaimTypes.PreferredUserName,user.Username),
                     new Claim(JwtClaimTypes.PhoneNumber,user.Tel??""),
