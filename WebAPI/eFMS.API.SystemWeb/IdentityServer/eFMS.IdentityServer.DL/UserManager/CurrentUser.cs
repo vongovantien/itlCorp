@@ -40,7 +40,7 @@ namespace eFMS.IdentityServer.DL.UserManager
                 return groupId;
             }
         }
-        private int departmentId;
+        private int? departmentId;
         public int? DepartmentId
         {
             get
@@ -48,6 +48,10 @@ namespace eFMS.IdentityServer.DL.UserManager
                 if (departmentId == 0 && currentUser.FirstOrDefault(x => x.Type == "departmentId") != null)
                 {
                     departmentId = Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "departmentId").Value);
+                    if(departmentId == 0)
+                    {
+                        departmentId = null;
+                    }
                 }
                 return departmentId;
             }

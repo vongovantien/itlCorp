@@ -64,7 +64,7 @@ namespace eFMS.IdentityServer
                 list_Claim.Add(new Claim("email", modelReturn.email));
                 list_Claim.Add(new Claim("companyId", modelReturn.companyId.ToString()));
                 list_Claim.Add(new Claim("officeId", modelReturn.officeId.ToString()));
-                list_Claim.Add(new Claim("departmentId", modelReturn.departmentId.ToString()));
+                list_Claim.Add(new Claim("departmentId",(modelReturn.departmentId != null) ? modelReturn.departmentId.ToString() : "0"));
                 list_Claim.Add(new Claim("groupId", modelReturn.groupId.ToString()));
 
                 context.Result = new GrantValidationResult(
