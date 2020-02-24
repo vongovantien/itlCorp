@@ -22,6 +22,8 @@ using StackExchange.Redis;
 using ITL.NetCore.Connection.Caching;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Infrastructure.Authorizations;
+using Microsoft.AspNetCore.Authentication;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -99,6 +101,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatCurrencyService, CatCurrencyService>();
             services.AddTransient<ICatCurrencyExchangeService, CatCurrencyExchangeService>();
             services.AddTransient<ICatSaleManService, CatSalemanService>();
+            services.AddTransient<IClaimsTransformation, ClaimsExtender>();
         }
 
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)

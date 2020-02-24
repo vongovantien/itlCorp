@@ -1,7 +1,5 @@
 ﻿using eFMS.API.Common;
-using eFMS.API.Infrastructure.Authorizations;
 using eFMS.IdentityServer.DL.UserManager;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
@@ -20,20 +18,12 @@ namespace eFMS.API.Infrastructure
         private static IConfiguration configuration;
         public static IServiceCollection AddInfrastructure<TLanguage>(this IServiceCollection services, IConfiguration configuration)
         {
-            //InfrastructureServiceRegister.configuration = configuration;
-            //services.Configure<CrosOptions>(options => configuration.GetSection(nameof(CrosOptions)).Bind(options));
-            //services.Configure<GlobalOptions>(options => configuration.GetSection(nameof(GlobalOptions)).Bind(options));
-            //services.Configure<ServiceOptions>(options => configuration.GetSection(nameof(ServiceOptions)).Bind(options));
-
             services
                 .BindingSettingConfig(configuration)
                 .AddCrossOrigin()
-                //.AddExtensions()
                 .AddCustomCulture()
                 .ApiVersionningconfig()
                 .AddCustomAuthentication();
-                //.AddCustonJsonFormat()
-                //.AddMvcEx<TLanguage>();
 
             return services;
         }
@@ -87,7 +77,6 @@ namespace eFMS.API.Infrastructure
         static IServiceCollection AddCustomAuthentication(this IServiceCollection services)
         {
             services.AddUserManager();
-            services.AddTransient<IClaimsTransformation, ClaimsExtender>();
 
             services.AddMvcCore()
                 .AddAuthorization();
