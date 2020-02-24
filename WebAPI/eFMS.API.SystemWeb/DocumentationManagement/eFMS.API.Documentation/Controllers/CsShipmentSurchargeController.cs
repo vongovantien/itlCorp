@@ -167,7 +167,7 @@ namespace eFMS.API.Documentation.Controllers
                                       .Select(y => y.Key);
             if (query.Any())
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
             }
             var hs = csShipmentSurchargeService.AddAndUpate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);

@@ -14,6 +14,7 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Common.NoSql;
 using System;
+using eFMS.API.Common.Infrastructure.Common;
 
 namespace eFMS.API.Catalogue.Controllers
 {

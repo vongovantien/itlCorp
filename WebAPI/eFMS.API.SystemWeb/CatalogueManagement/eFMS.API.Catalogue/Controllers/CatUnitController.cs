@@ -6,6 +6,7 @@ using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -182,10 +183,10 @@ namespace eFMS.API.Catalogue.Controllers
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
                 else if(catUnitService.Any(x => x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower() || string.IsNullOrEmpty(model.UnitNameEn))){
-                    message = stringLocalizer[LanguageSub.MSG_NAME_EN_EXISTED].Value;
+                    message = stringLocalizer[CatalogueLanguageSub.MSG_NAME_EN_EXISTED].Value;
                 }
                 else if(catUnitService.Any(x => x.UnitNameVn.ToLower() == model.UnitNameVn.ToLower() || string.IsNullOrEmpty(model.UnitNameVn))){
-                    message = stringLocalizer[LanguageSub.MSG_NAME_LOCAL_EXISTED].Value;
+                    message = stringLocalizer[CatalogueLanguageSub.MSG_NAME_LOCAL_EXISTED].Value;
                 }
             }
             else
@@ -196,11 +197,11 @@ namespace eFMS.API.Catalogue.Controllers
                 }
                 else if(catUnitService.Any(x => (x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower() && x.Id != id) || string.IsNullOrEmpty(model.UnitNameEn)))
                 {
-                    message = stringLocalizer[LanguageSub.MSG_NAME_EN_EXISTED].Value;
+                    message = stringLocalizer[CatalogueLanguageSub.MSG_NAME_EN_EXISTED].Value;
                 }
                 else if(catUnitService.Any(x => (x.UnitNameVn.ToLower() == model.UnitNameVn.ToLower() && x.Id != id) || string.IsNullOrEmpty(model.UnitNameVn)))
                 {
-                    message = stringLocalizer[LanguageSub.MSG_NAME_LOCAL_EXISTED].Value;
+                    message = stringLocalizer[CatalogueLanguageSub.MSG_NAME_LOCAL_EXISTED].Value;
                 }
             }
             return message;

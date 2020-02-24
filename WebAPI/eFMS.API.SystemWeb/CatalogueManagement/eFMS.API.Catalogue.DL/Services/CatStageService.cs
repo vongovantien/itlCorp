@@ -27,7 +27,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatStageService(IContextBase<CatStage> repository, 
             ICacheServiceBase<CatStage> cacheService, 
             IMapper mapper,
-            IStringLocalizer<LanguageSub> localizer,
+            IStringLocalizer<CatalogueLanguageSub> localizer,
             IContextBase<CatDepartment> departmentRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -169,7 +169,7 @@ namespace eFMS.API.Catalogue.DL.Services
                
                 if (string.IsNullOrEmpty(item.StageNameEn))
                 {
-                    item.StageNameEn = stringLocalizer[LanguageSub.MSG_STAGE_NAME_EN_EMPTY];
+                    item.StageNameEn = stringLocalizer[CatalogueLanguageSub.MSG_STAGE_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (item.DepartmentId==null)
@@ -179,12 +179,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (string.IsNullOrEmpty(item.Status))
                 {
-                    item.Status = stringLocalizer[LanguageSub.MSG_STAGE_STATUS_EMPTY];
+                    item.Status = stringLocalizer[CatalogueLanguageSub.MSG_STAGE_STATUS_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = stringLocalizer[LanguageSub.MSG_STAGE_CODE_EMPTY];
+                    item.Code = stringLocalizer[CatalogueLanguageSub.MSG_STAGE_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -192,12 +192,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     var stage = stages.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
                     if (stage != null)
                     {
-                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_EXISTED],item.Code);
+                        item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_STAGE_EXISTED],item.Code);
                         item.IsValid = false;
                     }
                     if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
                     {
-                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_CODE_DUPLICATE], item.Code);
+                        item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_STAGE_CODE_DUPLICATE], item.Code);
                         item.IsValid = false;
                     }
                 }

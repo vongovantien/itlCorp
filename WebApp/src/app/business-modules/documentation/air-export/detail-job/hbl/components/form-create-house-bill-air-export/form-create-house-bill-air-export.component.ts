@@ -494,12 +494,19 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 if (!this.formCreate.controls["wtpp"].value) {
                                     this.formCreate.controls["wtpp"].setValue(this.AA);
                                     this.formCreate.controls["wtcll"].setValue(null);
+
+                                    this.formCreate.controls["totalPp"].setValue(this.AA);
+                                    this.formCreate.controls["totalCll"].setValue(null);
+
                                 }
                                 break;
                             case 'CLL':
                                 if (!this.formCreate.controls["wtcll"].value) {
                                     this.formCreate.controls["wtcll"].setValue(this.AA);
                                     this.formCreate.controls["wtpp"].setValue(null);
+
+                                    this.formCreate.controls["totalCll"].setValue(this.AA);
+                                    this.formCreate.controls["totalPp"].setValue(null);
                                 }
                                 break;
                         }
@@ -523,12 +530,18 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 if (!this.formCreate.controls["dueAgentPp"].value) {
                                     this.formCreate.controls["dueAgentPp"].setValue(this.AA);
                                     this.formCreate.controls["dueAgentCll"].setValue(null);
+
+                                    this.formCreate.controls["totalPp"].setValue(this.AA);
+                                    this.formCreate.controls["totalCll"].setValue(null);
                                 }
                                 break;
                             case 'CLL':
                                 if (!this.formCreate.controls["dueAgentCll"].value) {
                                     this.formCreate.controls["dueAgentCll"].setValue(this.AA);
                                     this.formCreate.controls["dueAgentPp"].setValue(null);
+
+                                    this.formCreate.controls["totalCll"].setValue(this.AA);
+                                    this.formCreate.controls["totalPp"].setValue(null);
                                 }
                                 break;
                         }

@@ -58,7 +58,7 @@
             
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsArrivalFrieghtChargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsArrivalFrieghtChargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             constructor
             </summary>
@@ -154,7 +154,7 @@
             
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsManifestService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsManifestService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             constructor
             </summary>
@@ -202,7 +202,7 @@
             
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsMawbcontainerService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsMawbcontainerService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
             <summary>
             constructor
             </summary>
@@ -274,7 +274,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             constructor
             </summary>
@@ -389,7 +389,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsTransactionService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.API.Documentation.DL.IService.ISysImageService)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.DocumentationLanguageSub},eFMS.API.Documentation.DL.IService.ICsTransactionService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.API.Documentation.DL.IService.ISysImageService)">
             <summary>
             constructor
             </summary>
@@ -566,7 +566,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.IOpsTransactionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Common.Globals.Menu)">
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.IOpsTransactionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Common.Globals.Menu)">
             <summary>
             
             </summary>
@@ -661,7 +661,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.#ctor(eFMS.API.Documentation.DL.IService.IShipmentService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub})">
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.#ctor(eFMS.API.Documentation.DL.IService.IShipmentService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
             <summary>
             Constructor
             </summary>

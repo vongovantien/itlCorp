@@ -211,7 +211,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var cdNote = DataContext.First(x => (x.Id == model.Id && x.Code == model.Code));
                 if (cdNote == null)
                 {
-                    return new HandleState(stringLocalizer[LanguageSub.MSG_CDNOTE_NOT_NOT_FOUND].Value);
+                    return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_NOT_FOUND].Value);
                 }
                 cdNote = mapper.Map<AcctCdnote>(model);
                 var stt = DataContext.Update(cdNote, x => x.Id == cdNote.Id, false);
@@ -617,7 +617,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var cdNote = DataContext.Where(x => x.Id == idSoA).FirstOrDefault();
                 if (cdNote == null)
                 {
-                    hs = new HandleState(stringLocalizer[LanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND].Value);
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND].Value);
                 }
                 else
                 {
@@ -629,7 +629,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (isOtherSOA == true)
                     {
-                        hs = new HandleState(stringLocalizer[LanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA].Value);
+                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA].Value);
                     }
                     else
                     {

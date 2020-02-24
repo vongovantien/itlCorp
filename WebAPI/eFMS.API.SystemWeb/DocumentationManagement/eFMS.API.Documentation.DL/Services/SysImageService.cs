@@ -75,8 +75,8 @@ namespace eFMS.API.Documentation.DL.Services
                         Name = fileName,
                         Folder = model.FolderName ?? "Shipment",
                         ObjectId = model.JobId.ToString(),
-                        UserCreated = currentUser.UserID, //admin.
-                        UserModified = currentUser.UserID,
+                        UserCreated = currentUser.UserName, //admin.
+                        UserModified = currentUser.UserName,
                         DateTimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now
                     };

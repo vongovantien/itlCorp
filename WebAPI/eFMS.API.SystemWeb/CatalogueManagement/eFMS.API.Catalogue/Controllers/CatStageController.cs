@@ -11,6 +11,7 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;

@@ -109,7 +109,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupRole.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_ROLE_ON_USER, "role"].Value, Data = checkDupRole });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_DUPLICATE_ROLE_ON_USER, "role"].Value, Data = checkDupRole });
             }
 
             var hs = userPermissionService.Add(list);

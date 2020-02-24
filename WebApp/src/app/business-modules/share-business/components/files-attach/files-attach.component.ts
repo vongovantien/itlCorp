@@ -61,7 +61,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-                            this._toastService.success("Upload file successfully !");
+                            this._toastService.success("Upload file successfully!");
                             if (!!this.jobId) {
                                 this.getFileShipment(this.jobId);
                             }
@@ -104,7 +104,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
             .subscribe(
                 (res: any) => {
                     if (res.result.success) {
-                        this._toastService.success("File deleted Successfully!");
+                        this._toastService.success("File deleted successfully!");
                         this.getFileShipment(this.jobId);
                     } else {
                         this._toastService.error("some thing wrong");

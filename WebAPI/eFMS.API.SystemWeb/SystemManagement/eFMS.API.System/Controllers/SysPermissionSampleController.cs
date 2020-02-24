@@ -147,7 +147,7 @@ namespace eFMS.API.System.Controllers
             var permission = permissionGeneralService.Get(x => x.Id == id);
             if (permission != null && permission.FirstOrDefault(x => x.Active == true) != null)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
             var hs = permissionGeneralService.Delete(id);
 
