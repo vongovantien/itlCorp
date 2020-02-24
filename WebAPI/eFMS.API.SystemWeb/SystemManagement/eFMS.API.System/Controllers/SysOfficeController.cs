@@ -184,10 +184,10 @@ namespace eFMS.API.System.Controllers
         }
 
         [HttpGet]
-        [Route("GetOfficePermission/{username}/{companyId}")]
-        public IActionResult GetOfficePermission(string username,Guid companyId)
+        [Route("GetOfficePermission/{userId}/{companyId}")]
+        public IActionResult GetOfficePermission(string userId, Guid companyId)
         {
-            var officesPermission = sysOfficeService.GetOfficePermission(username,companyId);
+            var officesPermission = sysOfficeService.GetOfficePermission(userId, companyId);
             return Ok(officesPermission);
         }
 

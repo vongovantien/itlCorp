@@ -225,7 +225,7 @@ namespace eFMS.IdentityServer.DL.Services
                     modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, true, null);
                     modelReturn.companyId = companyId;
                     modelReturn.officeId = levelOffice.OfficeId;
-                    modelReturn.departmentId = (int)levelOffice?.DepartmentId;
+                    modelReturn.departmentId =levelOffice.DepartmentId;
                     modelReturn.groupId = levelOffice?.GroupId;
 
                     LogUserLogin(sysUser, modelReturn.companyId);
@@ -235,7 +235,7 @@ namespace eFMS.IdentityServer.DL.Services
                 // Check username,password.
                 if (BCrypt.Net.BCrypt.Verify(password, sysUser.Password))
                 {
-                    if (!ValidateCompany(username, companyId))
+                    if (!ValidateCompany(sysUser.Id, companyId))
                     {
                         modelReturn = null;
                         return -3;
@@ -245,7 +245,7 @@ namespace eFMS.IdentityServer.DL.Services
                         modelReturn = null;
                         return -4;
                     }
-                    var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
+                    var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null && lv.CompanyId == companyId)?.FirstOrDefault();
 
                     //modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, true, null);
                     employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId)?.FirstOrDefault();
@@ -253,7 +253,7 @@ namespace eFMS.IdentityServer.DL.Services
 
                     modelReturn.companyId = companyId;
                     modelReturn.officeId = levelOffice.OfficeId;
-                    modelReturn.departmentId = (int)levelOffice?.DepartmentId;
+                    modelReturn.departmentId = levelOffice.DepartmentId;
                     modelReturn.groupId = levelOffice?.GroupId;
 
                     // Update Log
@@ -345,9 +345,9 @@ namespace eFMS.IdentityServer.DL.Services
             userLogService.Add(userLog);
         }
 
-        private Boolean ValidateCompany(string userName, Guid companyId)
+        private Boolean ValidateCompany(string userId, Guid companyId)
         {
-            var levelCompany = userLevelRepository.Get(level => level.CompanyId == companyId && level.UserId == userName)?.FirstOrDefault();
+            var levelCompany = userLevelRepository.Get(level => level.CompanyId == companyId && level.UserId == userId)?.FirstOrDefault();
             if (levelCompany == null)
             {
                 return false;

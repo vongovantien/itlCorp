@@ -189,10 +189,10 @@ namespace eFMS.API.System.Controllers
         }
 
         [HttpGet]
-        [Route("GetDepartmentGroupPermission/{username}/{officeId}")]
-        public IActionResult GetDepartmentGroupPermission(string username, Guid officeId)
+        [Route("GetDepartmentGroupPermission/{userId}/{officeId}")]
+        public IActionResult GetDepartmentGroupPermission(string userId, Guid officeId)
         {
-            var departmentGroups = sysGroupService.GetGroupDepartmentPermission(username,officeId);
+            var departmentGroups = sysGroupService.GetGroupDepartmentPermission(userId, officeId);
             return Ok(departmentGroups);
         }
 
