@@ -29,7 +29,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatCommodityService(IContextBase<CatCommodity> repository, 
             ICacheServiceBase<CatCommodity> cacheService, 
             IMapper mapper,
-            IStringLocalizer<LanguageSub> localizer,
+            IStringLocalizer<CatalogueLanguageSub> localizer,
             ICatCommodityGroupService commodityGroupService,
             ICurrentUser user) : base(repository, cacheService, mapper)
         {
@@ -205,30 +205,30 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_EMPTY];
+                    item.Code = stringLocalizer[CatalogueLanguageSub.MSG_COMMOIDITY_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
                 {
                     if (commodities.Any(x => x.Code != null && x.Code.ToLower() == item.Code.ToLower()))
                     {
-                        item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_EXISTED, item.Code];
+                        item.Code = stringLocalizer[CatalogueLanguageSub.MSG_COMMOIDITY_CODE_EXISTED, item.Code];
                         item.IsValid = false;
                     }
                     else if (list.Count(x => x.Code != null && x.Code.ToLower() == item.Code.ToLower()) > 1)
                     {
-                        item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_DUPLICATED, item.Code];
+                        item.Code = stringLocalizer[CatalogueLanguageSub.MSG_COMMOIDITY_CODE_DUPLICATED, item.Code];
                         item.IsValid = false;
                     }
                 }
                 if (string.IsNullOrEmpty(item.CommodityNameEn))
                 {
-                    item.CommodityNameEn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_EN_EMPTY];
+                    item.CommodityNameEn = stringLocalizer[CatalogueLanguageSub.MSG_COMMOIDITY_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CommodityNameVn))
                 {
-                    item.CommodityNameVn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_LOCAL_EMPTY];
+                    item.CommodityNameVn = stringLocalizer[CatalogueLanguageSub.MSG_COMMOIDITY_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (item.CommodityGroupId == null)
@@ -246,7 +246,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (string.IsNullOrEmpty(item.Status))
                 {
-                    item.Status = stringLocalizer[LanguageSub.MSG_COMMOIDITY_STATUS_EMPTY];
+                    item.Status = stringLocalizer[CatalogueLanguageSub.MSG_COMMOIDITY_STATUS_EMPTY];
                     item.IsValid = false;
                 }
             });

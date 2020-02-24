@@ -142,17 +142,17 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.NameEn))
                 {
-                    item.NameEn = stringLocalizer[LanguageSub.MSG_COUNTRY_NAME_EN_EMPTY];
+                    item.NameEn = stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.NameVn))
                 {
-                    item.NameVn = stringLocalizer[LanguageSub.MSG_COUNTRY_NAME_LOCAL_EMPTY];
+                    item.NameVn = stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = stringLocalizer[LanguageSub.MSG_COUNTRY_CODE_EMPTY];
+                    item.Code = stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -160,12 +160,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     var country = countries.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
                     if (country != null)
                     {
-                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_COUNTRY_EXISTED], item.Code);
+                        item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_EXISTED], item.Code);
                         item.IsValid = false;
                     }
                     if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
                     {
-                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_COUNTRY_CODE_DUPLICATE], item.Code);
+                        item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_CODE_DUPLICATE], item.Code);
                         item.IsValid = false;
                     }
                 }

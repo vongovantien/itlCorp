@@ -25,7 +25,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysUser> sysUserRepository;
 
 
-        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user, IContextBase<SysUser> sysUserRepo) : base(repository, mapper)
+        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<CatalogueLanguageSub> localizer, ICurrentUser user, IContextBase<SysUser> sysUserRepo) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;

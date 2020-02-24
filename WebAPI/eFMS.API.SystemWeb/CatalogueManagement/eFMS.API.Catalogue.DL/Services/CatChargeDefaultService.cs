@@ -14,6 +14,7 @@ using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.Caching;
+using eFMS.API.Common.Globals;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -43,12 +44,12 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.Type))
                 {
-                    item.TypeError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY];
+                    item.TypeError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.ChargeCode))
                 {
-                    item.ChargeCodeError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_EMPTY];
+                    item.ChargeCodeError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -56,7 +57,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var charge = charges.FirstOrDefault(x => x.Code.ToLower() == item.ChargeCode.ToLower());
                     if (charge == null)
                     {
-                        item.ChargeCodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_NOT_FOUND], item.ChargeCode);
+                        item.ChargeCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_CODE_NOT_FOUND], item.ChargeCode);
                         item.IsValid = false;
                     }
                     else
@@ -65,17 +66,17 @@ namespace eFMS.API.Catalogue.DL.Services
                         if(defaultAccount.Where(x => x.ChargeId == item.ChargeId && x.Type == item.Type).GroupBy(x => x.ChargeId == item.ChargeId && x.Type == item.Type)
                             .Any(x => x.Count() > 0))
                         {
-                            item.ChargeCodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_EXISTED], item.ChargeCode);
+                            item.ChargeCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_EXISTED], item.ChargeCode);
                             item.IsValid = false;
                         }
                         if (list.Where(x => x.ChargeId == item.ChargeId && x.Type == item.Type).GroupBy(x => x.ChargeId == item.ChargeId && x.Type == item.Type)
                            .Any(x => x.Count() > 1))
                         {
-                            item.ChargeCodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_DUPLICATED], item.ChargeCode);
+                            item.ChargeCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_DUPLICATED], item.ChargeCode);
                             item.IsValid = false;
                         }
                         if(list.Where(x => x.ChargeId == item.ChargeId).GroupBy(x => x.ChargeId).Any(x => x.Count() > 3)){
-                            item.ChargeCodeError = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_NOT_VALID], item.ChargeCode);
+                            item.ChargeCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_NOT_VALID], item.ChargeCode);
                             item.IsValid = false;
                         }
                     }
@@ -85,10 +86,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     && item.DebitVat == null
                     && item.CreditVat == null)
                 {
-                    item.DebitAccountNoError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
-                    item.CreditAccountNoError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
-                    item.CreditVatError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
-                    item.DebitVatError = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
+                    item.DebitAccountNoError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
+                    item.CreditAccountNoError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
+                    item.CreditVatError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
+                    item.DebitVatError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
                     item.IsValid = false;
                 }
                 if (item.DebitVat != null)
