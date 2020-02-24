@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
@@ -22,8 +20,6 @@ using StackExchange.Redis;
 using ITL.NetCore.Connection.Caching;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Catalogue.Infrastructure.Common;
-using eFMS.API.Infrastructure.Authorizations;
-using Microsoft.AspNetCore.Authentication;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -101,40 +97,6 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatCurrencyService, CatCurrencyService>();
             services.AddTransient<ICatCurrencyExchangeService, CatCurrencyExchangeService>();
             services.AddTransient<ICatSaleManService, CatSalemanService>();
-            services.AddTransient<IClaimsTransformation, ClaimsExtender>();
-        }
-
-        public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
-        {
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.Authority = configuration["Authentication:Authority"];
-                options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
-                options.Audience = configuration["Authentication:ApiName"];
-                options.SaveToken = true;
-                //options.Events = new JwtBearerEvents() //for test
-                //{
-                //    OnTokenValidated = async context =>
-                //    {
-                //        try
-                //        {
-                //            String userID = context.Principal.FindFirstValue("id");
-                            
-                //                List<Claim> lstClaim = new List<Claim>();
-                //                lstClaim.Add(new Claim(JwtClaimTypes.Role, "ABC"));
-                //                context.Principal.AddIdentity(new ClaimsIdentity(lstClaim, JwtBearerDefaults.AuthenticationScheme, "name", "role"));
-                //        }
-                //        catch { }
-                //    }
-                //};
-            });
-            return services;
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
@@ -180,5 +142,40 @@ namespace eFMS.API.Catalogue.Infrastructure
                 });
             return services;
         }
+
+        #region For Demo
+        //public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
+        //{
+        //    JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+        //    services.AddAuthentication(options =>
+        //    {
+        //        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        //        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        //    })
+        //    .AddJwtBearer(options =>
+        //    {
+        //        options.Authority = configuration["Authentication:Authority"];
+        //        options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
+        //        options.Audience = configuration["Authentication:ApiName"];
+        //        options.SaveToken = true;
+        //        //options.Events = new JwtBearerEvents() //for test
+        //        //{
+        //        //    OnTokenValidated = async context =>
+        //        //    {
+        //        //        try
+        //        //        {
+        //        //            String userID = context.Principal.FindFirstValue("id");
+
+        //        //                List<Claim> lstClaim = new List<Claim>();
+        //        //                lstClaim.Add(new Claim(JwtClaimTypes.Role, "ABC"));
+        //        //                context.Principal.AddIdentity(new ClaimsIdentity(lstClaim, JwtBearerDefaults.AuthenticationScheme, "name", "role"));
+        //        //        }
+        //        //        catch { }
+        //        //    }
+        //        //};
+        //    });
+        //    return services;
+        //}
+        #endregion
     }
 }

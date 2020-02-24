@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Compile Remove="Common\DataEnums.cs" />
+    <Compile Remove="Common\WebUrl.cs" />
     <Compile Remove="Helpers\RedisCacheHelper.cs" />
     <Compile Remove="Models\CatAreaModel.cs" />
     <Compile Remove="Models\CatBranchModel.cs" />

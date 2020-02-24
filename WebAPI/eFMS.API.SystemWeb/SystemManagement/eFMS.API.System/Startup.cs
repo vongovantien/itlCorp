@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using eFMS.API.System.DL.Common;
+using eFMS.API.Infrastructure;
 
 namespace eFMS.API.System
 {
@@ -40,28 +42,13 @@ namespace eFMS.API.System
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper();
-            services.AddDistributedRedisCache(options =>
-            {
-                options.InstanceName = "System";
-                options.Configuration = Configuration.GetConnectionString("Redis");
-            });
             services.AddSession();
-            services.AddAuthorize(Configuration);
+            services.AddInfrastructure<LanguageSub>(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             ServiceRegister.Register(services);
-            services.AddCrossOrigin();
-            services.AddApiVersioning(config =>
-            {
-                config.ReportApiVersions = true;
-                config.AssumeDefaultVersionWhenUnspecified = true;
-                config.DefaultApiVersion = new ApiVersion(1, 0);
-                config.ApiVersionReader = new HeaderApiVersionReader("api-version");
-            });
-            services.AddCulture(Configuration);
-            services.AddSwagger();
-            services.AddConfigureSetting(Configuration);
+            services.AddCustomSwagger();
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

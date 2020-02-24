@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Infrastructure;
 using eFMS.API.Shipment.Infrastructure;
 using eFMS.API.Shipment.Infrastructure.Middlewares;
@@ -8,8 +9,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -39,35 +38,14 @@ namespace eFMS.API.Shipment
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthorize(Configuration);
-
-            services.AddMvcCore()
-                .AddAuthorization();
             services.AddAutoMapper();
-            services.AddCustomDbContext(Configuration);
+            services.AddSession();
+            services.AddInfrastructure<LanguageSub>(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             ServiceRegister.Register(services);
-            IdentityServiceRegister.IdentityRegister(services);
-            services.AddCrossOrigin();
-            services.AddApiVersioning(config =>
-            {
-                config.ReportApiVersions = true;
-                config.AssumeDefaultVersionWhenUnspecified = true;
-                config.DefaultApiVersion = new ApiVersion(1, 0);
-                config.ApiVersionReader = new HeaderApiVersionReader("api-version");
-            });
-
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddJsonLocalization(opts => opts.ResourcesPath = Configuration["LANGUAGE_PATH"]);
-            services.AddCulture(Configuration);
-            services.AddSwagger(Configuration);
-            services.AddConfigureSetting(Configuration);
-            //services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
-            //services.AddOptions().AddCatelogueManagementApiServices();
-            //services.AddOptions().AddSystemManagementApiServices();
-            //DbHelper.DbHelper.ConnectionString = ConfigurationExtensions.GetConnectionString(Configuration, "eFMSConnection");
+            services.AddCustomSwagger();
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)
@@ -115,8 +93,6 @@ namespace eFMS.API.Shipment
             });
 
             app.UseCors("AllowAllOrigins");
-            //app.UseCors("CorsPolicy");
-            //ConfigureAuth(app);
             app.UseAuthentication();
             app.UseStaticFiles();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));

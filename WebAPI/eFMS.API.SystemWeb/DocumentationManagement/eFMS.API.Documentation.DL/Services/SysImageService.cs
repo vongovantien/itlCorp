@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
-using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
@@ -13,9 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services

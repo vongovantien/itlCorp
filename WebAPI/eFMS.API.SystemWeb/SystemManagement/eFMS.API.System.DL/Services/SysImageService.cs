@@ -2,10 +2,8 @@
 using AutoMapper.QueryableExtensions;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
-using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
-using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -13,10 +11,7 @@ using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.System.DL.Services

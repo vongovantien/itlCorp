@@ -1,15 +1,14 @@
 ﻿using AutoMapper;
+using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.Infrastructure;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
-using eFMS.API.Common;
+using eFMS.API.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -40,28 +39,13 @@ namespace eFMS.API.Accounting
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper();
-            services.AddDistributedRedisCache(options =>
-            {
-                options.InstanceName = "Accounting";
-                options.Configuration = Configuration.GetConnectionString("Redis");
-            });
             services.AddSession();
-            services.AddAuthorize(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
+            services.AddInfrastructure<LanguageSub>(Configuration);
             ServiceRegister.Register(services);
-            services.AddCrossOrigin();
-            services.AddApiVersioning(config =>
-            {
-                config.ReportApiVersions = true;
-                config.AssumeDefaultVersionWhenUnspecified = true;
-                config.DefaultApiVersion = new ApiVersion(1, 0);
-                config.ApiVersionReader = new HeaderApiVersionReader("api-version");
-            });
-            services.AddCulture(Configuration);
-            services.AddSwagger();
-            services.AddConfigureSetting(Configuration);
+            services.AddCustomSwagger();
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)
