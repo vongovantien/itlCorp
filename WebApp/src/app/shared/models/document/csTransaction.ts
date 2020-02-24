@@ -4,6 +4,7 @@ import { TransactionTypeEnum } from "../../enums/transaction-type.enum";
 import { DIM } from "./dimension";
 import { PermissionShipment } from "./permissionShipment";
 import { BaseModel } from "../base.model";
+import { SystemConstants } from "src/constants/system.const";
 
 export class CsTransaction extends BaseModel {
     id: string = "00000000-0000-0000-0000-000000000000";
@@ -83,11 +84,13 @@ export class CsTransaction extends BaseModel {
 
     constructor(object?: any) {
         super();
-        const self = this;       
+        const self = this;
         for (const key in object) {
             if (self.hasOwnProperty(key.toString())) {
                 self[key] = object[key];
+                self.personIncharge = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS)).id;
             }
+
         }
     }
 }

@@ -3,6 +3,7 @@ import { Employee } from "./employee";
 export class User {
     id: string = '';
     username: string = '';
+    userName: string = null;
     password: string = '';
     userGroupId: string = '';
     employeeId: string = '';

@@ -16,6 +16,7 @@ import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.p
 import * as fromStore from './../../store/index';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { SystemConstants } from 'src/constants/system.const';
 
 
 @Component({
@@ -244,7 +245,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     initForm() {
         this.formGroup = this._fb.group({
             jobNo: [{ value: null, disabled: true }],
-            personIncharge: [{ value: this.userLogged.id, disabled: true }],
+            personIncharge: [{ value: this.userLogged.userName, disabled: true }],
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
@@ -332,7 +333,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     getUserLogged() {
-        this.userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        console.log(this.userLogged);
     }
 
     getCarriers() {
