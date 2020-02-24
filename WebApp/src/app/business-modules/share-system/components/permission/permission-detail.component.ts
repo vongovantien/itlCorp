@@ -229,9 +229,10 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
             this._router.navigate([`home/system/group/${this.ids}`]);
         } else if (this.type === 'department') {
             this._router.navigate([`home/system/department/${this.ids}`]);
-        } else {
+        } else if (this.type === 'company') {
             this._router.navigate([`home/system/company/${this.ids}`]);
-
+        } else {
+            this._router.navigate([`home/system/permission`]);
         }
     }
 

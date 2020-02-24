@@ -78,7 +78,7 @@ namespace eFMS.API.System.DL.Services
             var companies = companyRepository.Get();
             var departments = departmentRepository.Get();
             var results = from d in data
-                          join g in groups on d.DepartmentId equals g.Id
+                          join g in groups on d.GroupId equals g.Id
                           join o in offices on d.OfficeId equals o.Id
                           join c in companies on d.CompanyId equals c.Id
                           join depart in departments on d.DepartmentId equals depart.Id
