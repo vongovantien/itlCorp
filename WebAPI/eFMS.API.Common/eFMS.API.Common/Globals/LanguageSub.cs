@@ -28,5 +28,8 @@ namespace eFMS.API.Common.Globals
         public static readonly string FILE_NOT_FOUND = "FILE_NOT_FOUND";
         public static readonly string NOT_FOUND_DATA_EXCEL = "NOT_FOUND_DATA_EXCEL";
 
+        public static readonly string DO_NOT_HAVE_PERMISSION = "DO_NOT_HAVE_PERMISSION";
+
+
     }
 }

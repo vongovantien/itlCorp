@@ -31,7 +31,9 @@ namespace eFMS.API.Common.Infrastructure.Common
                 case 204:
                     message = LanguageSub.MSG_OBJECT_RELATION_NOT_VALID;
                     break;
-
+                case 403:
+                    message = LanguageSub.DO_NOT_HAVE_PERMISSION;
+                    break;
             }
             return message;
         }

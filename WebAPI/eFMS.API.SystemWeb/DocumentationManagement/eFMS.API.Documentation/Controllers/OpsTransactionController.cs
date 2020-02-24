@@ -179,7 +179,7 @@ namespace eFMS.API.Documentation.Controllers
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (transactionService.CheckAllowDelete(id) == false)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }
             var hs = transactionService.SoftDeleteJob(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);

@@ -466,18 +466,18 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (CheckExistClearance(model.CustomsDeclaration, model.CustomsDeclaration.Id))
                 {
-                    result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCENO_EXISTED, model.CustomsDeclaration.ClearanceNo].Value);
+                    result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCENO_EXISTED, model.CustomsDeclaration.ClearanceNo].Value);
                     return result;
                 }
                 string productService = SetProductServiceShipment(model);
                 if (model.CustomsDeclaration.CargoType == null && model.CustomsDeclaration.ServiceType == "Sea")
                 {
-                    result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
+                    result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
                     return result;
                 }
                 if (productService == null)
                 {
-                    result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
+                    result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
                     return result;
                 }
                 if (model.CustomsDeclaration.JobNo == null)
@@ -602,12 +602,12 @@ namespace eFMS.API.Documentation.DL.Services
                         string productService = SetProductServiceShipment(item);
                         if (item.CustomsDeclaration.CargoType == null && item.CustomsDeclaration.ServiceType == "Sea")
                         {
-                            result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
+                            result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
                             return result;
                         }
                         if (productService == null)
                         {
-                            result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
+                            result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
                             return result;
                         }
                         item.OpsTransaction.ProductService = productService;
@@ -675,11 +675,11 @@ namespace eFMS.API.Documentation.DL.Services
             var existedMBL = DataContext.Any(x => x.Id != model.Id && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
             if (existedHBL)
             {
-                return stringLocalizer[LanguageSub.MSG_HBNO_EXISTED, model.Hwbno].Value;
+                return stringLocalizer[DocumentationLanguageSub.MSG_HBNO_EXISTED, model.Hwbno].Value;
             }
             if (existedMBL)
             {
-                return stringLocalizer[LanguageSub.MSG_MAWB_EXISTED, model.Mblno].Value;
+                return stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, model.Mblno].Value;
             }
             return null;
         }
