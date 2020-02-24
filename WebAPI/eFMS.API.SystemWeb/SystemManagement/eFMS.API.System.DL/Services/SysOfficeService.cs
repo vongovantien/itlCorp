@@ -215,14 +215,14 @@ namespace eFMS.API.System.DL.Services
             return result;
         }
 
-        public List<SysOffice> GetOfficePermission(string username, Guid companyId)
+        public List<SysOffice> GetOfficePermission(string userId, Guid companyId)
         {
             try
             {
                 var hs = new HandleState();
                 List<SysOffice> results = null;
 
-                var sysLevel = sysLevelRepository?.Get(lv => lv.UserId == username && lv.CompanyId == companyId).Select(x => x.OfficeId).ToList();
+                var sysLevel = sysLevelRepository?.Get(lv => lv.UserId == userId && lv.CompanyId == companyId).Select(x => x.OfficeId).ToList();
                 if (sysLevel == null)
                 {
                     return null;
