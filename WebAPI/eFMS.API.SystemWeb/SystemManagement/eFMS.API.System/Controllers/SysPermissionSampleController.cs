@@ -98,7 +98,7 @@ namespace eFMS.API.System.Controllers
         public IActionResult Add(SysPermissionSampleModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            
+            model.Id = Guid.NewGuid();
             var hs = permissionGeneralService.Add(model);
 
             var message = HandleError.GetMessage(hs, Crud.Insert);

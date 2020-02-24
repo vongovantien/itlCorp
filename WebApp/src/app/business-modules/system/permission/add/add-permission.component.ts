@@ -88,11 +88,12 @@ export class PermissionCreateComponent extends AppForm {
 
                         // * Reset form.
                         this.formCreateComponent.isSubmitted = false;
-                        this.formCreateComponent.resetFormControl(this.formCreateComponent.permissionName);
+                        // this.formCreateComponent.resetFormControl(this.formCreateComponent.permissionName);
 
                         // * Update default control
                         this.formCreateComponent.formCreate.controls['type'].setValue(this.formCreateComponent.types[0]);
                         this.formCreateComponent.formCreate.controls['status'].setValue(this.formCreateComponent.statuss[0]);
+                        this._router.navigate([`home/system/permission/${res.data.id}`]);
 
                     } else {
                         this._toastService.error(res.message);
@@ -118,6 +119,7 @@ export class PermissionCreateComponent extends AppForm {
     gotoList() {
         this._router.navigate(["home/system/permission"]);
     }
+
 }
 
 

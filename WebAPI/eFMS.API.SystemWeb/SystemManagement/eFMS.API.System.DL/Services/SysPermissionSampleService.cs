@@ -90,9 +90,8 @@ namespace eFMS.API.System.DL.Services
         public override HandleState Add(SysPermissionSampleModel entity)
         {
             var permision = mapper.Map<SysPermissionSample>(entity);
-            permision.UserCreated = currentUser.UserID;
+            permision.UserCreated = permision.UserModified = currentUser.UserID;
             permision.DatetimeCreated = permision.DatetimeModified = DateTime.Now;
-            permision.Id = Guid.NewGuid();
             var result = DataContext.Add(permision, false);
             if (result.Success)
             {
