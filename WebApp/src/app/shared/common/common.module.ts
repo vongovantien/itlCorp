@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SubHeaderComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, TableDetailComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent, AppPermissionButtonComponent } from '.';
+import { SubHeaderComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, TableDetailComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent, AppPermissionButtonComponent, ExportCrystalComponent } from '.';
 import { ModalModule, CollapseModule, TooltipModule, PaginationModule, BsDropdownModule } from 'ngx-bootstrap';
 import { ConfirmPopupComponent, InfoPopupComponent } from './popup';
 import { SelectModule } from 'ng2-select';
@@ -11,7 +11,6 @@ import { AppPaginationComponent } from './pagination/pagination.component';
 import { TableCellComponent } from './table-cell/table-cell.component';
 import { PipeModule } from '../pipes/pipe.module';
 import { RouterModule } from '@angular/router';
-
 const COMPONENTS = [
     SubHeaderComponent,
     TableLayoutComponent,
@@ -36,8 +35,8 @@ const COMPONENTS = [
     ConfirmPopupComponent,
     InfoPopupComponent,
     TableCellComponent,
-    AppPermissionButtonComponent
-
+    AppPermissionButtonComponent,
+    ExportCrystalComponent
 ];
 
 @NgModule({

@@ -227,6 +227,7 @@
     <Content Include="aspnet_client\system_web\4_7_3282\CrystalReportWebFormViewer4\js\strings_ko.js" />
     <Content Include="aspnet_client\system_web\4_7_3282\CrystalReportWebFormViewer4\js\strings_ru.js" />
     <Content Include="Default.aspx" />
+    <Content Include="ExportCrystal.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -247,6 +248,13 @@
     </Compile>
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ExportCrystal.aspx.cs">
+      <DependentUpon>ExportCrystal.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ExportCrystal.aspx.designer.cs">
+      <DependentUpon>ExportCrystal.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

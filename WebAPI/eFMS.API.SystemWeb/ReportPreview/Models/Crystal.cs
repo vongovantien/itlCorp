@@ -41,6 +41,8 @@ namespace ReportPerview.Models
         public Dictionary<string, object> Parameters { get; set; }
         public bool AllowPrint { get; set; }
         public bool AllowExport { get; set; }
+        public bool IsLandscape { get; set; }
+        public string PathReportGenerate { get; set; }
     }
     public class SubReport
     {
