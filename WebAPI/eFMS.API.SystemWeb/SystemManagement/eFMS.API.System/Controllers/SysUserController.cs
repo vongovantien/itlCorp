@@ -192,7 +192,7 @@ namespace eFMS.API.System.Controllers
             //item.Active = false;
             if(sysUserLevelService.Any(x=>x.UserId == id))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
             var hs = sysUserService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -344,14 +344,14 @@ namespace eFMS.API.System.Controllers
                 {
                     if (sysUserService.Any(x => x.Username.ToLower().Trim() == username.ToLower().Trim()))
                     {
-                        message = stringLocalizer[LanguageSub.MSG_USERNAME_EXISTED].Value;
+                        message = stringLocalizer[SystemLanguageSub.MSG_USERNAME_EXISTED].Value;
                     }
                 }
                 else
                 {
                     if (sysUserService.Any(x=>x.Username!= null && x.Username.ToLower().Trim() == username.ToLower().Trim() && x.Id != id))
                     {
-                        message = stringLocalizer[LanguageSub.MSG_USERNAME_EXISTED].Value;
+                        message = stringLocalizer[SystemLanguageSub.MSG_USERNAME_EXISTED].Value;
                     }
                 }
             }

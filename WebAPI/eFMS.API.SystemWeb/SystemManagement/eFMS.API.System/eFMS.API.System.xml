@@ -9,7 +9,7 @@
             Controller Department
             </summary>
         </member>
-        <member name="M:eFMS.API.System.Controllers.CatDepartmentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.LanguageSub},eFMS.API.System.DL.IService.ICatDepartmentService)">
+        <member name="M:eFMS.API.System.Controllers.CatDepartmentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.System.DL.IService.ICatDepartmentService)">
             <summary>
             Contructor
             </summary>
@@ -97,7 +97,7 @@
             Controller Authorization
             </summary>
         </member>
-        <member name="M:eFMS.API.System.Controllers.SysAuthorizationController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.LanguageSub},eFMS.API.System.DL.IService.ISysAuthorizationService,AutoMapper.IMapper,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.System.Controllers.SysAuthorizationController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.System.DL.IService.ISysAuthorizationService,AutoMapper.IMapper,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             Contructor
             </summary>
@@ -166,7 +166,7 @@
             
             </summary>
         </member>
-        <member name="M:eFMS.API.System.Controllers.SysGroupController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.LanguageSub},eFMS.API.System.DL.IService.ISysGroupService,AutoMapper.IMapper,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.System.Controllers.SysGroupController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.System.DL.IService.ISysGroupService,AutoMapper.IMapper,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             constructor
             </summary>
@@ -286,7 +286,7 @@
             
             </summary>
         </member>
-        <member name="M:eFMS.API.System.Controllers.SysPermissionGeneralController.#ctor(eFMS.API.System.DL.IService.ISysPermissionSampleService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.LanguageSub})">
+        <member name="M:eFMS.API.System.Controllers.SysPermissionGeneralController.#ctor(eFMS.API.System.DL.IService.ISysPermissionSampleService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
             <summary>
             constructor
             </summary>
@@ -369,7 +369,7 @@
             Controller Department
             </summary>
         </member>
-        <member name="M:eFMS.API.System.Controllers.SysPermissionSampleSpecialController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.LanguageSub},eFMS.API.System.DL.IService.ISysPermissionSampleSpecialService)">
+        <member name="M:eFMS.API.System.Controllers.SysPermissionSampleSpecialController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.System.DL.IService.ISysPermissionSampleSpecialService)">
             <summary>
             
             </summary>
@@ -388,7 +388,7 @@
             Controller Department
             </summary>
         </member>
-        <member name="M:eFMS.API.System.Controllers.SysRoleController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.LanguageSub},eFMS.API.System.DL.IService.ISysRoleService)">
+        <member name="M:eFMS.API.System.Controllers.SysRoleController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.System.DL.IService.ISysRoleService)">
             <summary>
             Contructor
             </summary>
@@ -441,7 +441,7 @@
             
             </summary>
         </member>
-        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.#ctor(eFMS.API.System.DL.IService.ISysUserLevelService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.LanguageSub},eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper)">
+        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.#ctor(eFMS.API.System.DL.IService.ISysUserLevelService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.SystemLanguageSub},eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper)">
             <summary>
             constructor
             </summary>
@@ -531,7 +531,7 @@
             Controller Department
             </summary>
         </member>
-        <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.#ctor(eFMS.API.System.DL.IService.ISysUserPermissionService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.System.DL.Common.LanguageSub},eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.System.Controllers.SysUserPermissionController.#ctor(eFMS.API.System.DL.IService.ISysUserPermissionService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             constructor
             </summary>
