@@ -5,7 +5,7 @@
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mawb.value}">
                         <label required>MAWB No</label>
-                        <input type="text" class="form-control" formControlName="mawb">
+                        <input type="text" class="form-control" formControlName="mawb" placeholder="Master airway bill">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -15,7 +15,7 @@
                             [currentActiveItemId]="{ field: 'id', value: customerId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                             [displayFields]="displayFieldsCustomer" [height]="200"
-                            (remove)="resetFormControl(customerId)">
+                            (remove)="resetFormControl(customerId)" placeholder="Please select customer">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -26,7 +26,8 @@
                             [currentActiveItemId]="{ field: 'id', value: saleManId.value}"
                             [selectedDisplayFields]="['username']" [dataSources]="saleMans | async"
                             [displayFields]="[{field: 'username', label: 'User Name'}]" [height]="200"
-                            [disabled]="!customerId.value" (remove)="resetFormControl(saleManId)">
+                            [disabled]="!customerId.value" (remove)="resetFormControl(saleManId)"
+                            placeholder="Please select salesman">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -39,7 +40,7 @@
                             [currentActiveItemId]="{ field: 'id', value: shipperId.value, hardValue:!!selectedCustomer ? selectedCustomer.shortName : null}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
                             [displayFields]="displayFieldsCustomer" [height]="200"
-                            (remove)="resetFormControl(shipperId)">
+                            (remove)="resetFormControl(shipperId)" placeholder="Please select shipper">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="shipperDescription"></textarea>
@@ -52,7 +53,7 @@
                             [currentActiveItemId]="{ field: 'id', value: consigneeId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
                             [displayFields]="displayFieldsCustomer" [height]="200"
-                            (remove)="resetFormControl(consigneeId)">
+                            (remove)="resetFormControl(consigneeId)" placeholder="Please select consignee">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="consigneeDescription"></textarea>
@@ -66,7 +67,7 @@
                             [currentActiveItemId]="{ field: 'id', value: forwardingAgentId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                             [displayFields]="displayFieldsCustomer" [height]="200"
-                            (remove)="resetFormControl(forwardingAgentId)">
+                            (remove)="resetFormControl(forwardingAgentId)" placeholder="Please select agent">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="forwardingAgentDescription"></textarea>
@@ -78,7 +79,8 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger':isSubmitted && !hwbno.value}">
                                 <label required>HAWB No</label>
-                                <input type="text" class="form-control" formControlName="hwbno">
+                                <input type="text" class="form-control" formControlName="hwbno"
+                                    placeholder="House airway bill">
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">
@@ -140,7 +142,8 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Place of Receipt</label>
-                        <input type="text" class="form-control" formControlName="pickupPlace">
+                        <input type="text" class="form-control" formControlName="pickupPlace"
+                            placeholder="Place of receipt">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -150,7 +153,7 @@
                             [currentActiveItemId]="{ field: 'id', value: pol.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                             [displayFields]="displayFieldPort" [loading]="isLoadingPort | async"
-                            (remove)="resetFormControl(pol)">
+                            (remove)="resetFormControl(pol)" placeholder="Select departure airport">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -217,7 +220,7 @@
                             [currentActiveItemId]="{ field: 'id', value: pod.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                             [displayFields]="displayFieldPort" [loading]="isLoadingPort | async"
-                            (remove)="resetFormControl(pod)">
+                            (remove)="resetFormControl(pod)" placeholder="Select destination airport">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -236,7 +239,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
-                                        formControlName="flightDate" />
+                                        formControlName="flightDate" placeholder="Select flight date" />
                                     <span class="m-input-icon_clear" (click)="resetFormControl(flightDate)"
                                         *ngIf="!!flightDate.value && !!flightDate.value.startDate">
                                         <i class="la la-times"></i>
@@ -257,7 +260,8 @@
                             <div class="form-group">
                                 <label>Air Freight</label>
                                 <ng-select #airFreight [items]="termTypes" [allowClear]="true"
-                                    (opened)="closeOtherSelects(airFreight)" formControlName="freightPayment">
+                                    (opened)="closeOtherSelects(airFreight)" formControlName="freightPayment"
+                                    placeholder="Air freight">
                                 </ng-select>
                             </div>
                         </div>
@@ -275,7 +279,8 @@
                             <div class="form-group">
                                 <label>Currency</label>
                                 <ng-select #currency [items]="currencies | async" [allowClear]="true"
-                                    (opened)="closeOtherSelects(currency)" formControlName="currencyId">
+                                    (opened)="closeOtherSelects(currency)" formControlName="currencyId"
+                                    placeholder="Currency">
                                 </ng-select>
                             </div>
                         </div>
@@ -293,7 +298,8 @@
                             <div class="form-group">
                                 <label>WT/VAL</label>
                                 <ng-select #wtsVal [items]="wts" [allowClear]="true"
-                                    (opened)="closeOtherSelects(wtsVal)" formControlName="wtorValpayment">
+                                    (opened)="closeOtherSelects(wtsVal)" formControlName="wtorValpayment"
+                                    placeholder="PP/CLL">
                                 </ng-select>
                             </div>
                         </div>
@@ -301,7 +307,8 @@
                             <div class="form-group">
                                 <label>Other</label>
                                 <ng-select #otherWts [items]="wts" [allowClear]="true"
-                                    (opened)="closeOtherSelects(otherWts)" formControlName="otherPayment">
+                                    (opened)="closeOtherSelects(otherWts)" formControlName="otherPayment"
+                                    placeholder="PP/CLL">
                                 </ng-select>
                             </div>
                         </div>
@@ -342,7 +349,8 @@
                             <div class="form-group">
                                 <label>Number of Origin B/L</label>
                                 <ng-select #obl [items]="numberOBLs" [allowClear]="true"
-                                    (opened)="closeOtherSelects(obl)" formControlName="originBlnumber">
+                                    (opened)="closeOtherSelects(obl)" formControlName="originBlnumber"
+                                    placeholder="B/L">
                                 </ng-select>
                             </div>
                         </div>
@@ -353,7 +361,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
-                                        formControlName="issueHbldate" />
+                                        formControlName="issueHbldate" placeholder="Select Issued Date" />
                                     <span class="m-input-icon_clear" (click)="resetFormControl(issueHbldate)"
                                         *ngIf="!!issueHbldate.value && !!issueHbldate.value.startDate">
                                         <i class="la la-times"></i>
