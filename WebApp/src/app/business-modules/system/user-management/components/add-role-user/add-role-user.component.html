@@ -2,9 +2,11 @@
     <div class="m-portlet__body">
         <div class="m-form m--margin-bottom-10">
             <div class="m--align-right">
-                <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveRole()">
+                <app-default-button class="m--margin-right-10" [buttonSetting]="saveButtonSetting"
+                    (onClick)="saveRole()">
                 </app-default-button>
-                <button (click)="cancelSave()" type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                <button (click)="cancelSave()" type="button"
+                    class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

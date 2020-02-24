@@ -554,6 +554,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var shipment = csTransactionRepo.Get(x => x.Id == criteria.JobId).FirstOrDefault();
             var transactionType = DataTypeEx.GetType(criteria.TransactionType);
+            if (shipment == null) return null;
             var houseBills = GetHouseBill(shipment.TransactionType);
 
             var query = (from detail in houseBills//DataContext.Get()
@@ -884,6 +885,11 @@ namespace eFMS.API.Documentation.DL.Services
         public List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = Query(criteria);
+            if(data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
             rowsCount = data.Count();
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             if (size > 0)
