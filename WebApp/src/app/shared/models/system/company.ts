@@ -13,6 +13,9 @@ export class Company {
     datetimeModified: string = '';
     active: boolean = true;
     sysBranch: any[] = [];
+    nameUserCreated: string = '';
+    nameUserModified: string = '';
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

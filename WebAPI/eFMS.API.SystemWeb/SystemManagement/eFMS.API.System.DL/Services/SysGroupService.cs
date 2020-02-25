@@ -19,21 +19,23 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<CatDepartment> departmentRepository;
         private readonly ICatDepartmentService departmentService;
         private readonly ICurrentUser currentUser;
-        private readonly IContextBase<SysUserLevel> sysLevelRepository; 
+        private readonly IContextBase<SysUserLevel> sysLevelRepository;
+        private readonly IContextBase<SysUser> userRepository;
 
         public SysGroupService(IContextBase<SysGroup> repository,
             IMapper mapper,
             IContextBase<CatDepartment> departmentRepo,
             ICatDepartmentService deptService,
             IContextBase<SysUserLevel> userLevelRepo,
-            ICurrentUser currUser) : base(repository, mapper)
+            ICurrentUser currUser,
+            IContextBase<SysUser> userRepo) : base(repository, mapper)
         {
             SetChildren<SysUserLevel>("Id", "GroupId");
             departmentRepository = departmentRepo;
             departmentService = deptService;
             currentUser = currUser;
             sysLevelRepository = userLevelRepo;
-
+            userRepository = userRepo;
         }
 
         public SysGroupModel GetById(short id)
@@ -49,6 +51,8 @@ namespace eFMS.API.System.DL.Services
                 result.OfficeName = department.OfficeName;
                 result.CompanyId = department.CompanyId;
                 result.OfficeId = department.BranchId;
+                result.NameUserCreated = userRepository.Get(x => x.Id == department.UserCreated).FirstOrDefault()?.Username;
+                result.NameUserModified = userRepository.Get(x => x.Id == department.UserModified).FirstOrDefault()?.Username;
             }
             return result;
         }
@@ -140,7 +144,7 @@ namespace eFMS.API.System.DL.Services
                     DepartmentId = item.DepartmentId,
                     DepartmentName = department.DeptNameEn,
                     CompanyName = department.CompanyName,
-                    OfficeName = department.OfficeName,
+                    OfficeName = department.OfficeName
                 });
 
                 return results;
