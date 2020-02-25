@@ -163,6 +163,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var supplier = partnerRepository.Get(x => x.Id == details.SupplierId).FirstOrDefault();
                 details.SupplierName = supplier?.PartnerNameEn;
+                details.UserCreatedName = userRepository.Get(x => x.Id == details.UserCreated).FirstOrDefault()?.Username;
+                details.UserModifiedName = userRepository.Get(x => x.Id == details.UserModified).FirstOrDefault()?.Username;
             }
             return details;
         }

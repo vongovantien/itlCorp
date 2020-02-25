@@ -12,6 +12,8 @@ namespace eFMS.API.System.DL.Models
         public Guid OfficeId { get; set; }
         public string UserId { get; set; }
         public Guid PermissionSampleId { get; set; }
+        public string UserCreatedName { get; set; }
+        public string UserModifiedName { get; set; }
 
         public List<SysPermissionSampleGeneralViewModel> SysPermissionSampleGenerals { get; set; }
         public List<SysPermissionSampleSpecialViewModel> SysPermissionSampleSpecials { get; set; }

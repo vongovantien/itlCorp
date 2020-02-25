@@ -45,6 +45,8 @@ export class PermissionSample {
     isDup: boolean = false;
     userName: string = null;
     companyName: string = '';
+    userCreatedName: string = '';
+    userModifiedName: string = '';
 
     // custom
     offices: Office[] = [];

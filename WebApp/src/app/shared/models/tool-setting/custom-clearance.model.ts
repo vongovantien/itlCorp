@@ -29,6 +29,8 @@ export class CustomClearance {
     note: string;
     userCreated: string;
     userModified: string;
+    userModifieddName: string;
+    userCreatedName: string;
     datetimeCreated: Date = null;
     datetimeModified: null;
     customerName: null;

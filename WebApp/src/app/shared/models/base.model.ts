@@ -6,8 +6,8 @@ export class BaseModel {
     userModified: string = '';
     datetimeModified: string = '';
 
-    groupId: number = -1;
-    departmentId: number = -1;
+    groupId: number = null;
+    departmentId: number = null;
     officeId: string = '';
     companyId: string = '';
 }

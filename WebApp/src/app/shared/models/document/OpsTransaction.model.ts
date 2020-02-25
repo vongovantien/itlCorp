@@ -1,9 +1,10 @@
 
 import { Container } from "./container.model";
 import { PermissionShipment } from "./permissionShipment";
+import { BaseModel } from "../base.model";
 
 
-export class OpsTransaction {
+export class OpsTransaction extends BaseModel {
         userModified: string = null;
         userCreated: string = null;
         sumPackages: number = null;
@@ -17,7 +18,6 @@ export class OpsTransaction {
         warehouseId: string = null;
         finishDate: any = null;
         billingOpsId: string = null;
-        datetimeCreated: Date = null;
         purchaseOrderNo: string = null;
         flightVessel: string = null;
         supplierId: string = null;
@@ -36,7 +36,6 @@ export class OpsTransaction {
         id: string = "00000000-0000-0000-0000-000000000000";
         hblid: string = "00000000-0000-0000-0000-000000000000";
         agentId: string = null;
-        datetimeModified: Date = null;
         salemanId: string = null;
         supplierName: string = null;
         agentName: string = null;
@@ -47,11 +46,16 @@ export class OpsTransaction {
         containerDescription: string = '';
         commodityGroupId: string = '';
         isLocked: boolean = false;
+        userCreatedName: string = '';
+        userModifiedName: string = '';
+        currentStatus: string = '';
+
 
         permission: PermissionShipment = new PermissionShipment();
 
 
         constructor(object?: any) {
+                super();
                 const self = this;
                 for (const key in object) {
                         if (self.hasOwnProperty(key.toString())) {
