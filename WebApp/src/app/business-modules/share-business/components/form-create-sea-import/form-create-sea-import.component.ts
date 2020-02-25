@@ -237,7 +237,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
-        this.personIncharge.setValue(this.userLogged.id);
+        this.personIncharge.setValue(this.userLogged.userName);
         this.personIncharge.disable();
     }
 

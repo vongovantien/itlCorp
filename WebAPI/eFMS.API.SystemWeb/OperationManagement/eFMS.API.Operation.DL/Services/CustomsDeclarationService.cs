@@ -112,13 +112,13 @@ namespace eFMS.API.Operation.DL.Services
                         DataContext.Add(item, false);
                     }
                     DataContext.SubmitChanges();
-                    result = new HandleState(true, lists.Count + stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS]);
+                    result = new HandleState(true, lists.Count + stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS]);
                     ClearCache();
                     Get();
                 }
                 else
                 {
-                    result = new HandleState(true, stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA]);
+                    result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA]);
                 }
                 return result;
             }
@@ -553,7 +553,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.ClearanceNoValid = true;
                 if (string.IsNullOrEmpty(_clearanceNo))
                 {
-                    item.ClearanceNo = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_NO_EMPTY];
+                    item.ClearanceNo = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_NO_EMPTY];
                     item.IsValid = false;
                     item.ClearanceNoValid = false;
                 }
@@ -562,7 +562,7 @@ namespace eFMS.API.Operation.DL.Services
                     //Check valid maxlength for Clearance No
                     if (_clearanceNo.Length > 100)
                     {
-                        item.ClearanceNo = string.Format(stringLocalizer[LanguageSub.MSG_INVALID_MAX_LENGTH], 50);
+                        item.ClearanceNo = string.Format(stringLocalizer[OperationLanguageSub.MSG_INVALID_MAX_LENGTH], 50);
                         item.IsValid = false;
                         item.ClearanceNoValid = false;
                     }
@@ -571,7 +571,7 @@ namespace eFMS.API.Operation.DL.Services
                     Regex pattern = new Regex(@"^[a-zA-Z0-9 ./_-]*$");
                     if (!pattern.IsMatch(_clearanceNo))
                     {
-                        item.ClearanceNo = stringLocalizer[LanguageSub.MSG_CUSTOM_INVALID_CHARACTER_SPECIAL];
+                        item.ClearanceNo = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_INVALID_CHARACTER_SPECIAL];
                         item.IsValid = false;
                         item.ClearanceNoValid = false;
                     }
@@ -600,7 +600,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.ClearanceDateValid = true;
                 if (string.IsNullOrEmpty(_clearanceDate))
                 {
-                    item.ClearanceDateStr = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_DATE_EMPTY];
+                    item.ClearanceDateStr = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_DATE_EMPTY];
                     item.IsValid = false;
                     item.ClearanceDateValid = false;
                 }
@@ -609,7 +609,7 @@ namespace eFMS.API.Operation.DL.Services
                     isDate = DateTime.TryParse(_clearanceDate, out dateTimeDefault);
                     if (!isDate)
                     {
-                        item.ClearanceDateStr = stringLocalizer[LanguageSub.MSG_INVALID_DATE];
+                        item.ClearanceDateStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_DATE];
                         item.IsValid = false;
                         item.ClearanceDateValid = false;
                     }
@@ -625,7 +625,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.PartnerTaxCodeValid = true;
                 if (string.IsNullOrEmpty(_partnerTaxCode))
                 {
-                    item.CustomerName = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_CUSTOMER_CODE_EMPTY];
+                    item.CustomerName = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_CUSTOMER_CODE_EMPTY];
                     item.IsValid = false;
                     item.PartnerTaxCodeValid = false;
                 }
@@ -649,7 +649,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.MblidValid = true;
                 if (string.IsNullOrEmpty(_mbl))
                 {
-                    item.Mblid = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_MBL_EMPTY];
+                    item.Mblid = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_MBL_EMPTY];
                     item.IsValid = false;
                     item.MblidValid = false;
                 }
@@ -658,7 +658,7 @@ namespace eFMS.API.Operation.DL.Services
                     //Check valid maxlength for MblId
                     if (_mbl.Length > 250)
                     {
-                        item.Mblid = string.Format(stringLocalizer[LanguageSub.MSG_INVALID_MAX_LENGTH], 50);
+                        item.Mblid = string.Format(stringLocalizer[OperationLanguageSub.MSG_INVALID_MAX_LENGTH], 50);
                         item.IsValid = false;
                         item.MblidValid = false;
                     }
@@ -667,7 +667,7 @@ namespace eFMS.API.Operation.DL.Services
                     Regex pattern = new Regex(@"^[a-zA-Z0-9 ./_-]*$");
                     if (!pattern.IsMatch(_mbl))
                     {
-                        item.Mblid = stringLocalizer[LanguageSub.MSG_CUSTOM_INVALID_CHARACTER_SPECIAL];
+                        item.Mblid = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_INVALID_CHARACTER_SPECIAL];
                         item.IsValid = false;
                         item.MblidValid = false;
                     }
@@ -678,7 +678,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.HblidValid = true;
                 if (string.IsNullOrEmpty(_hbl))
                 {
-                    item.Hblid = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_HBL_EMPTY];
+                    item.Hblid = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_HBL_EMPTY];
                     item.IsValid = false;
                     item.HblidValid = false;
                 }
@@ -687,7 +687,7 @@ namespace eFMS.API.Operation.DL.Services
                     //Check valid maxlength for HblId
                     if (_hbl.Length > 250)
                     {
-                        item.Hblid = string.Format(stringLocalizer[LanguageSub.MSG_INVALID_MAX_LENGTH], 50);
+                        item.Hblid = string.Format(stringLocalizer[OperationLanguageSub.MSG_INVALID_MAX_LENGTH], 50);
                         item.IsValid = false;
                         item.HblidValid = false;
                     }
@@ -696,7 +696,7 @@ namespace eFMS.API.Operation.DL.Services
                     Regex pattern = new Regex(@"^[a-zA-Z0-9 ./_-]*$");
                     if (!pattern.IsMatch(_hbl))
                     {
-                        item.Hblid = stringLocalizer[LanguageSub.MSG_CUSTOM_INVALID_CHARACTER_SPECIAL];
+                        item.Hblid = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_INVALID_CHARACTER_SPECIAL];
                         item.IsValid = false;
                         item.HblidValid = false;
                     }
@@ -707,7 +707,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.GatewayValid = true;
                 if (string.IsNullOrEmpty(_gateway))
                 {
-                    item.GatewayName = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY];
+                    item.GatewayName = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY];
                     item.IsValid = false;
                     item.GatewayValid = false;
                 }
@@ -735,7 +735,7 @@ namespace eFMS.API.Operation.DL.Services
                     isDecimal = decimal.TryParse(_grossWeight, out decimalDefault);
                     if (!isDecimal || _grossWeight.IndexOf(",") > -1)
                     {
-                        item.GrossWeightStr = stringLocalizer[LanguageSub.MSG_INVALID_NUMBER];
+                        item.GrossWeightStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_NUMBER];
                         item.IsValid = false;
                         item.GrossWeightValid = false;
                     }
@@ -744,7 +744,7 @@ namespace eFMS.API.Operation.DL.Services
                         var valueConvert = Convert.ToDecimal(_grossWeight);
                         if (valueConvert < 0)
                         {
-                            item.GrossWeightStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
+                            item.GrossWeightStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_NEGATIVE];
                             item.IsValid = false;
                             item.GrossWeightValid = false;
                         }
@@ -764,7 +764,7 @@ namespace eFMS.API.Operation.DL.Services
                     isDecimal = decimal.TryParse(_netWeight, out decimalDefault);
                     if (!isDecimal || _netWeight.IndexOf(",") > -1)
                     {
-                        item.NetWeightStr = stringLocalizer[LanguageSub.MSG_INVALID_NUMBER];
+                        item.NetWeightStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_NUMBER];
                         item.IsValid = false;
                         item.NetWeightValid = false;
                     }
@@ -773,7 +773,7 @@ namespace eFMS.API.Operation.DL.Services
                         var valueConvert = Convert.ToDecimal(_netWeight);
                         if (valueConvert < 0)
                         {
-                            item.NetWeightStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
+                            item.NetWeightStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_NEGATIVE];
                             item.IsValid = false;
                             item.NetWeightValid = false;
                         }
@@ -793,7 +793,7 @@ namespace eFMS.API.Operation.DL.Services
                     isDecimal = decimal.TryParse(_cbm, out decimalDefault);
                     if (!isDecimal || _cbm.IndexOf(",") > -1)
                     {
-                        item.CbmStr = stringLocalizer[LanguageSub.MSG_INVALID_NUMBER];
+                        item.CbmStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_NUMBER];
                         item.IsValid = false;
                         item.CbmValid = false;
                     }
@@ -802,7 +802,7 @@ namespace eFMS.API.Operation.DL.Services
                         var valueConvert = Convert.ToDecimal(_cbm);
                         if (valueConvert < 0)
                         {
-                            item.CbmStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
+                            item.CbmStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_NEGATIVE];
                             item.IsValid = false;
                             item.CbmValid = false;
                         }
@@ -822,7 +822,7 @@ namespace eFMS.API.Operation.DL.Services
                     isInt = int.TryParse(_qtyCont, out intDefault);
                     if (!isInt)
                     {
-                        item.QtyContStr = stringLocalizer[LanguageSub.MSG_INVALID_NUMBER];
+                        item.QtyContStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_NUMBER];
                         item.IsValid = false;
                         item.QtyContValid = false;
                     }
@@ -831,7 +831,7 @@ namespace eFMS.API.Operation.DL.Services
                         var valueConvert = Convert.ToInt32(_qtyCont);
                         if (valueConvert < 0)
                         {
-                            item.QtyContStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
+                            item.QtyContStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_NEGATIVE];
                             item.IsValid = false;
                             item.QtyContValid = false;
                         }
@@ -851,7 +851,7 @@ namespace eFMS.API.Operation.DL.Services
                     isInt = int.TryParse(_pcs, out intDefault);
                     if (!isInt)
                     {
-                        item.PcsStr = stringLocalizer[LanguageSub.MSG_INVALID_NUMBER];
+                        item.PcsStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_NUMBER];
                         item.IsValid = false;
                         item.PcsValid = false;
                     }
@@ -860,7 +860,7 @@ namespace eFMS.API.Operation.DL.Services
                         var valueConvert = Convert.ToInt32(_pcs);
                         if (valueConvert < 0)
                         {
-                            item.PcsStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
+                            item.PcsStr = stringLocalizer[OperationLanguageSub.MSG_INVALID_NEGATIVE];
                             item.IsValid = false;
                             item.PcsValid = false;
                         }
@@ -895,7 +895,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.ServiceTypeValid = true;
                 if (string.IsNullOrEmpty(_serviceType))
                 {
-                    item.ServiceType = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY];
+                    item.ServiceType = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY];
                     item.IsValid = false;
                     item.ServiceTypeValid = false;
                 }
@@ -919,7 +919,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.CargoTypeValid = true;
                 if (!item.ServiceType.Equals("Air") && !item.ServiceType.Equals("Express") && string.IsNullOrEmpty(_cargoType))
                 {
-                    item.CargoType = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY];
+                    item.CargoType = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY];
                     item.IsValid = false;
                     item.CargoTypeValid = false;
                 }
@@ -947,7 +947,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.RouteValid = true;
                 if (string.IsNullOrEmpty(_route))
                 {
-                    item.Route = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_ROUTE_EMPTY];
+                    item.Route = stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ROUTE_EMPTY];
                     item.IsValid = false;
                     item.RouteValid = false;
                 }
@@ -1006,15 +1006,15 @@ namespace eFMS.API.Operation.DL.Services
                 //Check double ClearanceNo & ClearanceDate
                 if (list.Where(x => !string.IsNullOrEmpty(item.ClearanceNo) && item.ClearanceDate != null && x.ClearanceNo == item.ClearanceNo && x.ClearanceDate == item.ClearanceDate).Count() > 1)
                 {
-                    item.ClearanceNo = string.Format(stringLocalizer[LanguageSub.MSG_DUPLICATE_DATA].Value, item.ClearanceNo);
-                    item.ClearanceDateStr = string.Format(stringLocalizer[LanguageSub.MSG_DUPLICATE_DATA].Value, item.ClearanceDateStr);
+                    item.ClearanceNo = string.Format(stringLocalizer[OperationLanguageSub.MSG_DUPLICATE_DATA].Value, item.ClearanceNo);
+                    item.ClearanceDateStr = string.Format(stringLocalizer[OperationLanguageSub.MSG_DUPLICATE_DATA].Value, item.ClearanceDateStr);
                     item.IsValid = item.ClearanceNoValid = item.ClearanceDateValid = false;
                 }
 
                 //Check exist ClearanceNo & ClearanceDate
                 if (DataContext.Any(x => x.ClearanceNo == item.ClearanceNo && x.ClearanceDate == item.ClearanceDate))
                 {
-                    item.ClearanceNo = item.ClearanceDateStr = string.Format(stringLocalizer[LanguageSub.MSG_CLEARANCENO_EXISTED].Value, item.ClearanceNo);
+                    item.ClearanceNo = item.ClearanceDateStr = string.Format(stringLocalizer[OperationLanguageSub.MSG_CLEARANCENO_EXISTED].Value, item.ClearanceNo);
                     item.IsValid = false;
                     item.ClearanceNoValid = item.ClearanceDateValid = false;
                 }

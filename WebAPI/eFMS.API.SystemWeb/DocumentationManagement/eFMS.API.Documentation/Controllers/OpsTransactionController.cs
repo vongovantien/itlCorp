@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Infrastructure.Extensions;
-using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -179,7 +179,7 @@ namespace eFMS.API.Documentation.Controllers
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (transactionService.CheckAllowDelete(id) == false)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }
             var hs = transactionService.SoftDeleteJob(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);

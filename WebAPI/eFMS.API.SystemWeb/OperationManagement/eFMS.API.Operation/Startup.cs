@@ -1,20 +1,18 @@
 ﻿using AutoMapper;
 using eFMS.API.Operation.Infrastructure;
 using eFMS.API.Operation.Infrastructure.Middlewares;
-using eFMS.API.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using static eFMS.API.Provider.Infrasture.Settings;
 using eFMS.API.Infrastructure;
+using eFMS.API.Common.Globals;
 
 namespace eFMS.API.Operation
 {
@@ -43,25 +41,13 @@ namespace eFMS.API.Operation
         {
             services.AddAutoMapper();
             services.AddSession();
-            services.AddAuthorize(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             ServiceRegister.Register(services, Configuration);
-            IdentityServiceRegister.IdentityRegister(services);
-            services.AddCrossOrigin();
-            services.AddApiVersioning(config =>
-            {
-                config.ReportApiVersions = true;
-                config.AssumeDefaultVersionWhenUnspecified = true;
-                config.DefaultApiVersion = new ApiVersion(1, 0);
-                config.ApiVersionReader = new HeaderApiVersionReader("api-version");
-            });
+            services.AddInfrastructure<LanguageSub>(Configuration);
+            services.AddCustomSwagger();
             services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
-            //services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddCulture(Configuration);
-            services.AddSwagger();
-            services.AddConfigureSetting(Configuration);
             services.AddCatelogueManagementApiServices();
             services.AddSystemManagementApiServices();
         }

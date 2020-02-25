@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
-using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
@@ -98,14 +98,14 @@ namespace eFMS.API.System.Controllers
 
             if (CheckExistsDateRangeAuthorization(model))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_SIMILAR_AUTHORIZATION].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_SIMILAR_AUTHORIZATION].Value });
             }
 
             if (model.EndDate != null)
             {
                 if (model.StartDate.Date > model.EndDate.Value.Date)
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE].Value });
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE].Value });
                 }
             }
 
@@ -135,14 +135,14 @@ namespace eFMS.API.System.Controllers
 
             if (CheckExistsDateRangeAuthorization(model))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_SIMILAR_AUTHORIZATION].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_SIMILAR_AUTHORIZATION].Value });
             }
 
             if (model.EndDate != null)
             {
                 if (model.StartDate.Date > model.EndDate.Value.Date)
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE].Value });
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE].Value });
                 }
             }
 
@@ -176,7 +176,7 @@ namespace eFMS.API.System.Controllers
             var item = sysAuthorizationService.GetAuthorizationById(id);
             if (item.Active == true)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
 
             var hs = sysAuthorizationService.Delete(x => x.Id == id);

@@ -7,4 +7,8 @@
         public string eFMSConnection;
         public string RedisConnection;
     }
+    public class WebUrl
+    {
+        public string Url;
+    }
 }

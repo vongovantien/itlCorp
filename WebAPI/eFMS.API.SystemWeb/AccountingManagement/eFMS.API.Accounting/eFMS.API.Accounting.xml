@@ -9,7 +9,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctAdvancePaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctAdvancePaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             Contructor
             </summary>
@@ -143,7 +143,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper)">
             <summary>
             Contructor
             </summary>
@@ -280,7 +280,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             constructor
             </summary>

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
-using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
-using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -109,7 +107,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupRole.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_ROLE_ON_USER, "role"].Value, Data = checkDupRole });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_DUPLICATE_ROLE_ON_USER, "role"].Value, Data = checkDupRole });
             }
 
             var hs = userPermissionService.Add(list);

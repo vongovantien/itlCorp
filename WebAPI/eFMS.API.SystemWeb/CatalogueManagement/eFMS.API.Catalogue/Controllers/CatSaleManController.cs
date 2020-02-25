@@ -12,6 +12,7 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

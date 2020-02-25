@@ -1,12 +1,12 @@
-﻿using eFMS.API.Accounting.DL.Common;
-using eFMS.API.Common.Globals;
+﻿using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using System;
 
-namespace eFMS.API.Accounting.Infrastructure.Common
+namespace eFMS.API.Common.Infrastructure.Common
 {
     public static class HandleError
     {
+
         public static string GetMessage(HandleState hs, Crud crud)
         {
             string message = string.Empty;
@@ -31,11 +31,14 @@ namespace eFMS.API.Accounting.Infrastructure.Common
                 case 204:
                     message = LanguageSub.MSG_OBJECT_RELATION_NOT_VALID;
                     break;
-
+                case 403:
+                    message = LanguageSub.DO_NOT_HAVE_PERMISSION;
+                    break;
             }
             return message;
         }
-        public static String SuccessMessage(Crud crud)
+
+        private static string SuccessMessage(Crud crud)
         {
             string message = LanguageSub.MSG_DATA_NOT_FOUND;
             switch (crud)

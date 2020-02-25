@@ -4,11 +4,11 @@ using System.Linq;
 using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
-using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
@@ -37,7 +37,7 @@ namespace eFMS.API.System.Controllers
         /// </summary>
         /// <param name="sysUserLevel"></param>
         /// <param name="localizer"></param>
-        public SysUserLevelController(ISysUserLevelService sysUserLevel, IStringLocalizer<LanguageSub> localizer, ICurrentUser currUser, IMapper iMapper)
+        public SysUserLevelController(ISysUserLevelService sysUserLevel, IStringLocalizer<SystemLanguageSub> localizer, ICurrentUser currUser, IMapper iMapper)
         {
             userLevelService = sysUserLevel;
             stringLocalizer = localizer;
@@ -124,7 +124,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupUser.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "office"].Value, Data = checkDupUser });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "office"].Value, Data = checkDupUser });
             }
             foreach (var item in users)
             {
@@ -136,7 +136,7 @@ namespace eFMS.API.System.Controllers
             }
             if (modelDupdatelidate != null)
             {
-                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "office"].Value, Data = modelDupdatelidate });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "office"].Value, Data = modelDupdatelidate });
             }
             var hs = userLevelService.AddUser(users);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -168,7 +168,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupUser.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "company"].Value, Data = checkDupUser });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "company"].Value, Data = checkDupUser });
             }
             foreach (var item in users)
             {
@@ -180,7 +180,7 @@ namespace eFMS.API.System.Controllers
             }
             if (modelDupdatelidate != null)
             {
-                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "company"].Value, Data = modelDupdatelidate });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "company"].Value, Data = modelDupdatelidate });
             }
 
             var hs = userLevelService.AddUser(users);
@@ -328,7 +328,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupUser.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "department"].Value, Data = checkDupUser });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "department"].Value, Data = checkDupUser });
             }
             foreach (var item in users)
             {
@@ -340,7 +340,7 @@ namespace eFMS.API.System.Controllers
             }
             if (modelDupdatelidate != null)
             {
-                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "department"].Value, Data = modelDupdatelidate });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "department"].Value, Data = modelDupdatelidate });
             }
             var hs = userLevelService.AddUser(users);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -399,7 +399,7 @@ namespace eFMS.API.System.Controllers
                                 .ToList();
             if (checkDupUser.Count > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "group"].Value, Data = checkDupUser });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL, "group"].Value, Data = checkDupUser });
             }
             foreach (var item in users)
             {
@@ -411,7 +411,7 @@ namespace eFMS.API.System.Controllers
             }
             if (modelDupdatelidate != null)
             {
-                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "group"].Value, Data = modelDupdatelidate });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "group"].Value, Data = modelDupdatelidate });
             }
             var hs = userLevelService.AddUser(users);
             var message = HandleError.GetMessage(hs, Crud.Insert);

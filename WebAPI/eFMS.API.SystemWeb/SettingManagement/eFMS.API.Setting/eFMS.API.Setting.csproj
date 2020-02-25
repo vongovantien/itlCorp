@@ -19,6 +19,7 @@
   <ItemGroup>
     <Compile Remove="Controllers\CatCurrencyController.cs" />
     <Compile Remove="Controllers\SysEmployeesController.cs" />
+    <Compile Remove="Infrastructure\Common\HandleError.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
   </ItemGroup>
 
@@ -47,6 +48,9 @@
   <ItemGroup>
     <Reference Include="eFMS.API.Common">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.API.Infrastructure">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Provider">
       <HintPath>..\..\OperationManagement\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>

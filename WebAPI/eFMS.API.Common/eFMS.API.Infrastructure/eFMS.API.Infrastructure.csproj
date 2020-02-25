@@ -15,8 +15,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="IdentityServiceRegister.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="IdentityModel" Version="3.10.0" />
+    <PackageReference Include="LocalizationCultureCore" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>

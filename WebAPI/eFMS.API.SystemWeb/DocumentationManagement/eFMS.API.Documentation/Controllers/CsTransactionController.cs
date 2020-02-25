@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
-using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -44,7 +43,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="service">inject ICsTransactionService</param>
         /// <param name="user">inject ICurrentUser</param>
         /// <param name="serviceSurcharge">inject ICsShipmentSurchargeService</param>
-        public CsTransactionController(IStringLocalizer<LanguageSub> localizer, 
+        public CsTransactionController(IStringLocalizer<DocumentationLanguageSub> localizer, 
             ICsTransactionService service, 
             ICurrentUser user,
             ICsShipmentSurchargeService serviceSurcharge,
@@ -275,7 +274,7 @@ namespace eFMS.API.Documentation.Controllers
 
             if (csTransactionService.CheckAllowDelete(id) == false)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }
             //var hs = csTransactionService.DeleteCSTransaction(id);
             var hs = csTransactionService.SoftDeleteJob(id);
@@ -349,7 +348,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
             if (model.TransactionType == string.Empty)
-                return stringLocalizer[LanguageSub.MSG_NOT_FOUND_TRANSACTION_TYPE].Value;
+                return stringLocalizer[DocumentationLanguageSub.MSG_NOT_FOUND_TRANSACTION_TYPE].Value;
             string message = string.Empty;
             
             //model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
@@ -364,7 +363,7 @@ namespace eFMS.API.Documentation.Controllers
                     && x.TransactionType == model.TransactionType 
                     && x.CurrentStatus != TermData.Canceled))
                     {
-                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                        message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
                     }
                 }
             }
@@ -378,7 +377,7 @@ namespace eFMS.API.Documentation.Controllers
                         && x.Id != id
                         && x.CurrentStatus != TermData.Canceled))
                     {
-                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                        message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
                     }
                 }
             }
@@ -414,7 +413,7 @@ namespace eFMS.API.Documentation.Controllers
             string message = string.Empty;
             if(model.Pol == model.Pod && model.Pol != null && model.Pod != null)
             {
-                message = model.Pod == model.Pol ? stringLocalizer[LanguageSub.MSG_POD_DIFFERENT_POL].Value : message;
+                message = model.Pod == model.Pol ? stringLocalizer[DocumentationLanguageSub.MSG_POD_DIFFERENT_POL].Value : message;
             }
             return message;
         }
@@ -424,48 +423,48 @@ namespace eFMS.API.Documentation.Controllers
             string message = string.Empty;
             if (model.Etd.HasValue)
             {
-                message = model.Etd.Value.Date >= model.Eta.Value.Date ? stringLocalizer[LanguageSub.MSG_ETD_BEFORE_ETA].Value : message;
+                message = model.Etd.Value.Date >= model.Eta.Value.Date ? stringLocalizer[DocumentationLanguageSub.MSG_ETD_BEFORE_ETA].Value : message;
             }
 
             if (model.Eta.HasValue)
             {
                 if (model.Etd.HasValue)
                 {
-                    message = model.Eta.Value.Date <= model.Etd.Value.Date ? stringLocalizer[LanguageSub.MSG_ETA_AFTER_ETD].Value : message;
+                    message = model.Eta.Value.Date <= model.Etd.Value.Date ? stringLocalizer[DocumentationLanguageSub.MSG_ETA_AFTER_ETD].Value : message;
                 }
             }
             else
             {
-                message = stringLocalizer[LanguageSub.MSG_ETA_REQUIRED].Value;
+                message = stringLocalizer[DocumentationLanguageSub.MSG_ETA_REQUIRED].Value;
             }
 
             // change request 14/2/19.
-            // message = string.IsNullOrEmpty(model.Mbltype) ? stringLocalizer[LanguageSub.MSG_MBL_TYPE_REQUIRED].Value : message;
+            // message = string.IsNullOrEmpty(model.Mbltype) ? stringLocalizer[DocumentationLanguageSub.MSG_MBL_TYPE_REQUIRED].Value : message;
 
-            message = string.IsNullOrEmpty(model.ShipmentType) ? stringLocalizer[LanguageSub.MSG_SHIPMENT_TYPE_REQUIRED].Value : message;
+            message = string.IsNullOrEmpty(model.ShipmentType) ? stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_TYPE_REQUIRED].Value : message;
 
             if (model.Pol != null && model.Pol != Guid.Empty)
             {
-                message = model.Pol == model.Pod ? stringLocalizer[LanguageSub.MSG_POL_DIFFERENT_POD].Value : message;
+                message = model.Pol == model.Pod ? stringLocalizer[DocumentationLanguageSub.MSG_POL_DIFFERENT_POD].Value : message;
             }
 
             if (model.Pod == null || model.Pod == Guid.Empty)
             {
-                message = stringLocalizer[LanguageSub.MSG_POD_REQUIRED].Value;
+                message = stringLocalizer[DocumentationLanguageSub.MSG_POD_REQUIRED].Value;
             }
             else
             {
-                message = model.Pod == model.Pol ? stringLocalizer[LanguageSub.MSG_POD_DIFFERENT_POL].Value : message;
+                message = model.Pod == model.Pol ? stringLocalizer[DocumentationLanguageSub.MSG_POD_DIFFERENT_POL].Value : message;
             }
 
             if(model.DeliveryPlace != null && model.DeliveryPlace != Guid.Empty)
             {
-                message = model.DeliveryPlace == model.Pol ? stringLocalizer[LanguageSub.MSG_PODELI_DIFFERENT_POL].Value : message;
+                message = model.DeliveryPlace == model.Pol ? stringLocalizer[DocumentationLanguageSub.MSG_PODELI_DIFFERENT_POL].Value : message;
             }
 
-            message = string.IsNullOrEmpty(model.TypeOfService) ? stringLocalizer[LanguageSub.MSG_SERVICE_TYPE_REQUIRED].Value : message;
+            message = string.IsNullOrEmpty(model.TypeOfService) ? stringLocalizer[DocumentationLanguageSub.MSG_SERVICE_TYPE_REQUIRED].Value : message;
 
-            message = string.IsNullOrEmpty(model.PersonIncharge) ? stringLocalizer[LanguageSub.MSG_PERSON_IN_CHARGE_REQUIRED].Value : message;
+            message = string.IsNullOrEmpty(model.PersonIncharge) ? stringLocalizer[DocumentationLanguageSub.MSG_PERSON_IN_CHARGE_REQUIRED].Value : message;
 
             return message;
         }

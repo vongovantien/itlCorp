@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\WebUrl.cs" />
     <Compile Remove="Helpers\RedisCacheHelper.cs" />
   </ItemGroup>
 

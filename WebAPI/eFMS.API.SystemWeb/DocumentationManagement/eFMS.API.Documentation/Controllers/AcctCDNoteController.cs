@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Documentation.DL.Common;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
-using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

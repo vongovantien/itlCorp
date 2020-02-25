@@ -47,7 +47,7 @@ export class FormCreateUnitPopupComponent extends PopupBase implements OnInit {
             descriptionEn: [],
             descriptionVn: [],
             active: [],
-            id: []
+            id: [123]
         });
 
         this.code = this.form.controls['code'];
@@ -76,7 +76,6 @@ export class FormCreateUnitPopupComponent extends PopupBase implements OnInit {
             return;
         }
         const formData = this.form.getRawValue();
-
         if (this.form.valid) {
             const body: IUnit = {
                 id: formData.id,
@@ -89,7 +88,7 @@ export class FormCreateUnitPopupComponent extends PopupBase implements OnInit {
                 unitType: formData.unitType[0].id,
             };
             if (!this.isUpdate) {
-                this._catalogueRepo.addUnit(body)
+                this._catalogueRepo.addUnit(Object.assign({}, body, { id: 0 }))
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             this.onHandleResult(res);

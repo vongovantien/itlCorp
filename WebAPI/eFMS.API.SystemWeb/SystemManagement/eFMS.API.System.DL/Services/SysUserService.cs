@@ -34,7 +34,7 @@ namespace eFMS.API.System.DL.Services
 
         public SysUserService(IContextBase<SysUser> repository, IMapper mapper,
             IContextBase<SysEmployee> employeeRepo,
-            IContextBase<SysUserLevel> userlevelRepo, IDistributedCache distributedCache, IStringLocalizer<LanguageSub> localizer,
+            IContextBase<SysUserLevel> userlevelRepo, IDistributedCache distributedCache, IStringLocalizer<SystemLanguageSub> localizer,
             ISysEmployeeService employeeService,
             ICurrentUser currUser,
             ISysCompanyService sysCompanyRepo,
@@ -236,7 +236,7 @@ namespace eFMS.API.System.DL.Services
                 item.UsernameValid = true;
                 if (string.IsNullOrEmpty(userName))
                 {
-                    item.Username = stringLocalizer[LanguageSub.MSG_USER_USERNAME_EMPTY];
+                    item.Username = stringLocalizer[SystemLanguageSub.MSG_USER_USERNAME_EMPTY];
                     item.IsValid = false;
                     item.UsernameValid = false;
                 }
@@ -256,7 +256,7 @@ namespace eFMS.API.System.DL.Services
                 item.EmployeeNameEnValid = true;
                 if (string.IsNullOrEmpty(nameEN))
                 {
-                    item.EmployeeNameEn = stringLocalizer[LanguageSub.MSG_USER_NAMEEN_EMPTY];
+                    item.EmployeeNameEn = stringLocalizer[SystemLanguageSub.MSG_USER_NAMEEN_EMPTY];
                     item.IsValid = false;
                     item.EmployeeNameEnValid = false;
                 }
@@ -266,7 +266,7 @@ namespace eFMS.API.System.DL.Services
                 item.EmployeeNameVnValid = true;
                 if (string.IsNullOrEmpty(nameVN))
                 {
-                    item.EmployeeNameVn = stringLocalizer[LanguageSub.MSG_USER_NAMEVN_EMPTY];
+                    item.EmployeeNameVn = stringLocalizer[SystemLanguageSub.MSG_USER_NAMEVN_EMPTY];
                     item.IsValid = false;
                     item.EmployeeNameVnValid = false;
                 }
@@ -275,7 +275,7 @@ namespace eFMS.API.System.DL.Services
                 item.StaffCodeValid = true;
                 if (string.IsNullOrEmpty(staffCode))
                 {
-                    item.StaffCode = stringLocalizer[LanguageSub.MSG_USER_STAFFCODE_EMPTY];
+                    item.StaffCode = stringLocalizer[SystemLanguageSub.MSG_USER_STAFFCODE_EMPTY];
                     item.IsValid = false;
                     item.StaffCodeValid = false;
                 }
@@ -295,7 +295,7 @@ namespace eFMS.API.System.DL.Services
                 //item.TitleValid = true;
                 //if (string.IsNullOrEmpty(title))
                 //{
-                //    item.Title = stringLocalizer[LanguageSub.MSG_USER_TITLE_EMPTY];
+                //    item.Title = stringLocalizer[SystemLanguageSub.MSG_USER_TITLE_EMPTY];
                 //    item.IsValid = false;
                 //    item.TitleValid = false;
                 //}
@@ -304,7 +304,7 @@ namespace eFMS.API.System.DL.Services
                 item.UserTypeValid = true;
                 if (string.IsNullOrEmpty(userType))
                 {
-                    item.UserType = stringLocalizer[LanguageSub.MSG_USER_USERTYPE_EMPTY];
+                    item.UserType = stringLocalizer[SystemLanguageSub.MSG_USER_USERTYPE_EMPTY];
                     item.IsValid = false;
                     item.UserTypeValid = false;
                 }
@@ -320,7 +320,7 @@ namespace eFMS.API.System.DL.Services
                 item.WorkingStatusValid = true;
                 if (string.IsNullOrEmpty(workingStatus))
                 {
-                    item.WorkingStatus = stringLocalizer[LanguageSub.MSG_USER_WORKINGSTATUS_EMPTY];
+                    item.WorkingStatus = stringLocalizer[SystemLanguageSub.MSG_USER_WORKINGSTATUS_EMPTY];
                     item.IsValid = false;
                     item.WorkingStatusValid = false;
                 }
@@ -336,7 +336,7 @@ namespace eFMS.API.System.DL.Services
                 item.StatusValid = true;
                 if (string.IsNullOrEmpty(status))
                 {
-                    item.Status = stringLocalizer[LanguageSub.MSG_USER_STATUS_EMPTY];
+                    item.Status = stringLocalizer[SystemLanguageSub.MSG_USER_STATUS_EMPTY];
                     item.IsValid = false;
                     item.StatusValid = false;
                 }

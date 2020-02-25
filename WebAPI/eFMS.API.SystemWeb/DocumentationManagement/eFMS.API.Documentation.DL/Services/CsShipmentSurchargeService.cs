@@ -66,10 +66,10 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
                 if (charge == null)
-                    hs = new HandleState(stringLocalizer[LanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
                 if (charge != null && (charge.CreditNo != null || charge.Soano != null || charge.DebitNo != null || charge.PaySoano != null))
                 {
-                    hs = new HandleState(stringLocalizer[LanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
                 }
                 else
                 {
@@ -360,12 +360,12 @@ namespace eFMS.API.Documentation.DL.Services
                     var charge = DataContext.Where(x => x.Id == item).FirstOrDefault();
                     if (charge == null)
                     {
-                        hs = new HandleState(stringLocalizer[LanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
+                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
                         return hs;
                     }
                     if (charge != null && (charge.CreditNo != null || charge.Soano != null || charge.DebitNo != null || charge.PaySoano != null))
                     {
-                        hs = new HandleState(stringLocalizer[LanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
+                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
                         return hs;
                     }
                     hs = DataContext.Delete(x => x.Id == item, false);

@@ -1,25 +1,17 @@
 ﻿using AutoMapper;
-using eFMS.API.Common;
-using eFMS.API.Setting.Service;
+using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure;
 using eFMS.API.Setting.Infrastructure;
-using eFMS.API.Setting.Infrastructure.Filters;
 using eFMS.API.Setting.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Swashbuckle.AspNetCore.Swagger;
-using System.Collections.Generic;
-using System.Globalization;
 using static eFMS.API.Provider.Infrasture.Settings;
 
 namespace eFMS.API.Setting
@@ -48,34 +40,15 @@ namespace eFMS.API.Setting
         {
           
             services.AddAutoMapper();
-            services.AddDistributedRedisCache(options =>
-            {
-                options.InstanceName = "Setting";
-                options.Configuration = Configuration.GetConnectionString("Redis");
-            });
-            services.AddAuthorize(Configuration);
+            services.AddSession();
+            services.AddInfrastructure<LanguageSub>(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddMemoryCache();
-            services.AddConfigureSetting(Configuration);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
+            services.AddMemoryCache();
             ServiceRegister.Register(services);
-            services.AddCrossOrigin();
-            // configure jwt authentication
-           
-
-            //services.AddCustomAuthentication(Configuration);
-            services.AddApiVersioning(config =>
-            {
-                config.ReportApiVersions = true;
-                config.AssumeDefaultVersionWhenUnspecified = true;
-                config.DefaultApiVersion = new ApiVersion(1, 0);
-                config.ApiVersionReader = new HeaderApiVersionReader("api-version");
-            });
             services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
             services.AddCatelogueManagementApiServices();
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddCulture(Configuration);
-            services.AddSwagger();
+            services.AddCustomSwagger();
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

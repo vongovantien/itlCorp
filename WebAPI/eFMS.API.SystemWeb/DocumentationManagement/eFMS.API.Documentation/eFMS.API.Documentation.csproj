@@ -20,6 +20,7 @@
     <Compile Remove="Controllers\SysEmployeesController.cs" />
     <Compile Remove="Infrastructure\AttributeEx\AuthorizeEx.cs" />
     <Compile Remove="Infrastructure\ClaimsExtender.cs" />
+    <Compile Remove="Infrastructure\Common\HandleError.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
   </ItemGroup>
 

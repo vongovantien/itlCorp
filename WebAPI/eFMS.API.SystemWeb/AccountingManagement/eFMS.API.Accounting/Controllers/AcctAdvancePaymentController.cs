@@ -7,7 +7,6 @@ using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
-using eFMS.API.Accounting.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using System.Collections.Generic;
+using eFMS.API.Common.Infrastructure.Common;
 
 namespace eFMS.API.Accounting.Controllers
 {

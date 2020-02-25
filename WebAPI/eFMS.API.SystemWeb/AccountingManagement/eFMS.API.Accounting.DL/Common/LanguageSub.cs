@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Accounting.DL.Common
 {
-    public partial class LanguageSub
+    public partial class AccountingLanguageSub
     {
         //Global
         public static readonly string MSG_DATA_NOT_FOUND = "MSG_DATA_NOT_FOUND";

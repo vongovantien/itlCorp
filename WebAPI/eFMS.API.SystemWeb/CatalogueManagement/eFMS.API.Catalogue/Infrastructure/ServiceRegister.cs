@@ -9,17 +9,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.Extensions.Configuration;
-using System.Globalization;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Localization.Routing;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
 using eFMS.API.Catalogue.Infrastructure.Filters;
-using eFMS.API.Common;
 using System.IO;
 using System.Reflection;
 using System;
@@ -27,9 +20,6 @@ using StackExchange.Redis;
 using ITL.NetCore.Connection.Caching;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Catalogue.Infrastructure.Common;
-using eFMS.API.Catalogue.DL.Common;
-using System.Security.Claims;
-using IdentityModel;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -107,81 +97,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatCurrencyService, CatCurrencyService>();
             services.AddTransient<ICatCurrencyExchangeService, CatCurrencyExchangeService>();
             services.AddTransient<ICatSaleManService, CatSalemanService>();
-
         }
-
-        public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddJsonLocalization(opts => opts.ResourcesPath = configuration["LANGUAGE_PATH"]);
-            //Multiple language setting
-            var supportedCultures = new[]
-            {
-                new CultureInfo("en-US"),
-                new CultureInfo("vi-VN")
-            };
-            var localizationOptions = new RequestLocalizationOptions()
-            {
-                DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
-                SupportedCultures = supportedCultures,
-                SupportedUICultures = supportedCultures
-            };
-
-            localizationOptions.RequestCultureProviders = new[]
-            {
-                 new RouteDataRequestCultureProvider()
-                 {
-                     RouteDataStringKey = "lang",
-                     Options = localizationOptions
-                 }
-            };
-
-            services.AddSingleton(localizationOptions);
-            return services;
-        }
-
-        public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
-        {
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.Authority = configuration["Authentication:Authority"];
-                options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
-                options.Audience = configuration["Authentication:ApiName"];
-                options.SaveToken = true;
-                options.Events = new JwtBearerEvents()
-                {
-                    OnTokenValidated = async context =>
-                    {
-                        try
-                        {
-                            String userID = context.Principal.FindFirstValue("id");
-                            
-                                List<Claim> lstClaim = new List<Claim>();
-                                lstClaim.Add(new Claim(JwtClaimTypes.Role, "ABC"));
-                                context.Principal.AddIdentity(new ClaimsIdentity(lstClaim, JwtBearerDefaults.AuthenticationScheme, "name", "role"));
-                        }
-                        catch { }
-                    }
-                };
-            });
-            //.AddIdentityServerAuthentication(options =>
-            //{
-            //    options.Authority = configuration["Authentication:Authority"];
-            //    options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
-            //    options.ApiName = configuration["Authentication:ApiName"];
-            //    options.ApiSecret = configuration["Authentication:ApiSecret"];
-            //});
-            services.Configure<WebUrl>(option => {
-                option.Url = configuration.GetSection("WebUrl").Value;
-            });
-            return services;
-        }
-        public static IServiceCollection AddSwagger(this IServiceCollection services)
+        public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(
                 options =>
@@ -225,37 +142,40 @@ namespace eFMS.API.Catalogue.Infrastructure
                 });
             return services;
         }
-        public static IServiceCollection AddConfigureSetting(this IServiceCollection service, IConfiguration configuration)
-        {
-            service.Configure<Settings>(options =>
-            {
-                options.MongoConnection
-                    = configuration.GetSection("ConnectionStrings:MongoConnection").Value;
-                options.MongoDatabase
-                    = configuration.GetSection("ConnectionStrings:Database").Value;
-                options.RedisConnection
-                    = configuration.GetSection("ConnectionStrings:Redis").Value;
-                options.eFMSConnection
-                    = configuration.GetSection("ConnectionStrings:eFMSConnection").Value;
-            });
-            return service;
-        }
-        public static IServiceCollection AddCrossOrigin(this IServiceCollection services)
-        {
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder =>
-                    {
-                        builder
-                            .WithHeaders("accept", "content-type", "origin", "x-custom-header")
-                            .AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowCredentials();
-                    });
-            });
-            return services;
-        }
+
+        #region For Demo
+        //public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
+        //{
+        //    JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+        //    services.AddAuthentication(options =>
+        //    {
+        //        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        //        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        //    })
+        //    .AddJwtBearer(options =>
+        //    {
+        //        options.Authority = configuration["Authentication:Authority"];
+        //        options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
+        //        options.Audience = configuration["Authentication:ApiName"];
+        //        options.SaveToken = true;
+        //        //options.Events = new JwtBearerEvents() //for test
+        //        //{
+        //        //    OnTokenValidated = async context =>
+        //        //    {
+        //        //        try
+        //        //        {
+        //        //            String userID = context.Principal.FindFirstValue("id");
+
+        //        //                List<Claim> lstClaim = new List<Claim>();
+        //        //                lstClaim.Add(new Claim(JwtClaimTypes.Role, "ABC"));
+        //        //                context.Principal.AddIdentity(new ClaimsIdentity(lstClaim, JwtBearerDefaults.AuthenticationScheme, "name", "role"));
+        //        //        }
+        //        //        catch { }
+        //        //    }
+        //        //};
+        //    });
+        //    return services;
+        //}
+        #endregion
     }
 }

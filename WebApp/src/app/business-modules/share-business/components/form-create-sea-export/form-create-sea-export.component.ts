@@ -15,6 +15,7 @@ import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../share-business/store';
 import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, getCatalogueCarrierLoadingState, getCatalogueAgentLoadingState, getCataloguePortLoadingState } from '@store';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'form-create-sea-export',
@@ -225,9 +226,9 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     }
 
     getUserLogged() {
-        this.userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
-        this.personalIncharge.setValue(this.userLogged.id);
+        this.personalIncharge.setValue(this.userLogged.userName);
         this.personalIncharge.disable();
     }
 

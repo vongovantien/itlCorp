@@ -15,5 +15,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string SupplierName { get; set; }
         public string CustomerName { get; set; }
         public PermissionAllowBase Permission { get; set; }
+        public string UserName { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
@@ -147,7 +148,7 @@ namespace eFMS.API.System.Controllers
             var permission = permissionGeneralService.Get(x => x.Id == id);
             if (permission != null && permission.FirstOrDefault(x => x.Active == true) != null)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
             var hs = permissionGeneralService.Delete(id);
 

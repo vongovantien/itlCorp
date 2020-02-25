@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -102,7 +103,7 @@ namespace eFMS.API.Documentation.Controllers
             if(shipmentNotExits.Count > 0)
             {
                 _status = true;
-                _message = stringLocalizer[LanguageSub.MSG_NOT_EXIST_SHIPMENT].Value + string.Join(", ",shipmentNotExits) + " !";
+                _message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_EXIST_SHIPMENT].Value + string.Join(", ",shipmentNotExits) + " !";
             }
             ResultHandle result = new ResultHandle { Status = _status, Message = _message };
             return Ok(result);

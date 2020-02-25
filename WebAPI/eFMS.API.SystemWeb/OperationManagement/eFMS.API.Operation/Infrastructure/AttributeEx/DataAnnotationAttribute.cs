@@ -1,4 +1,5 @@
-﻿using eFMS.API.Operation.DL.Common;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Operation.DL.Common;
 using Microsoft.Extensions.Localization;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -47,7 +48,7 @@ namespace eFMS.API.Operation.Infrastructure.AttributeEx
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var stringLocalizer = validationContext.GetService(typeof(IStringLocalizer<LanguageSub>)) as IStringLocalizer<LanguageSub>;
-            this.ErrorMessage = stringLocalizer[LanguageSub.EF_ANNOTATIONS_STRING_LENGTH]?.Value;
+            this.ErrorMessage = stringLocalizer[OperationLanguageSub.EF_ANNOTATIONS_STRING_LENGTH]?.Value;
             if (!string.IsNullOrEmpty(this.DisplayName))
             {
                 validationContext.DisplayName = stringLocalizer[this.DisplayName]?.Value;

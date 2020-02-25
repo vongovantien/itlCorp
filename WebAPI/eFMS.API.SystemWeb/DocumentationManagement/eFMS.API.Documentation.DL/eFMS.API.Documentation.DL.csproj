@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\WebUrl.cs" />
     <Compile Remove="Models\PermissionAllowBase.cs" />
     <Compile Remove="Models\ReportResults\OCLContainerReportResult.cs" />
   </ItemGroup>
