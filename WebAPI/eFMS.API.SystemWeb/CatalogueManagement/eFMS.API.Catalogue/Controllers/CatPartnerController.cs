@@ -100,6 +100,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [Authorize]
         public IActionResult Get(CatPartnerCriteria criteria, int page, int size)
         {
             var data = catPartnerService.Paging(criteria, page, size, out int rowCount);

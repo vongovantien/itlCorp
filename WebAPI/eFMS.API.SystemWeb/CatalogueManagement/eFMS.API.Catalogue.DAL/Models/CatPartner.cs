@@ -15,7 +15,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string AddressShippingVn { get; set; }
         public string AddressShippingEn { get; set; }
         public string ShortName { get; set; }
-        public string DepartmentId { get; set; }
+        public int? DepartmentId { get; set; }
         public short? CountryId { get; set; }
         public short? CountryShippingId { get; set; }
         public string AccountNo { get; set; }
@@ -61,5 +61,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public string InternalReferenceNo { get; set; }
         public string CoLoaderCode { get; set; }
         public string WorkPhoneEx { get; set; }
+        public short? GroupId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }

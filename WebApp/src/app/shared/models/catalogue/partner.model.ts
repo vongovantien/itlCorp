@@ -9,7 +9,6 @@ export class Partner {
     addressShippingVn: string = '';
     addressShippingEn: string = '';
     shortName: string = '';
-    departmentId: string = '';
     countryId: number = 0;
     countryShippingId: number = 0;
     accountNo: string = '';

@@ -38,5 +38,9 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public DateTime? ConvertTime { get; set; }
         public string CargoType { get; set; }
+        public short? GroupId { get; set; }
+        public int? DepartmentId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }
