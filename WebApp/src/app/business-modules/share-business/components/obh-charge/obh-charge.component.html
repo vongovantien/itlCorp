@@ -297,7 +297,7 @@
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
                     </tr>
                     <tr *ngIf="(isLocked | async) === false">
-                        <ng-container *ngIf="(permissionShipments | async)?.allowAddCharge">
+                        <ng-container *ngIf="(permissionShipments | async)?.allowUpdateCharge">
                             <td colspan=1 class="fixed-side">
                                 <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"
                                     (click)="addCharge('OBH')">
