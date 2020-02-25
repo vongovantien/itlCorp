@@ -51,12 +51,10 @@ export class DepartmentComponent extends AppList {
 
   showDeletePopup(department: Department) {
     this.selectedDepartment = department;
-    console.log(this.selectedDepartment)
     this.confirmDeletePopup.show();
   }
 
   onSearchDepartment(data: any) {
-    console.log(data);
     this.page = 1; // reset page.
     this.searchDepartment(data);
   }
@@ -114,8 +112,7 @@ export class DepartmentComponent extends AppList {
       );
   }
 
-  export() {
-    console.log(this.dataSearch);
+  export() {  
     this._exportRepo.exportDepartment(this.dataSearch)
       .subscribe(
         (response: ArrayBuffer) => {

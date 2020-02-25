@@ -28,6 +28,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CustomsDeclaration> customsDeclarationRepo;
         readonly IContextBase<AcctCdnote> acctCdnoteRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
+        readonly IContextBase<SysUser> sysUserRepo;
+
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -40,7 +42,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatUnit> catUnit,
             IContextBase<CustomsDeclaration> customsDeclaration,
             IContextBase<AcctCdnote> acctCdnote,
-            IContextBase<CatPartner> catPartner) : base(repository, mapper)
+            IContextBase<CatPartner> catPartner,
+            IContextBase<SysUser> sysUser) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -53,6 +56,7 @@ namespace eFMS.API.Accounting.DL.Services
             customsDeclarationRepo = customsDeclaration;
             acctCdnoteRepo = acctCdnote;
             catPartnerRepo = catPartner;
+            sysUserRepo = sysUser;
         }
 
         #region -- Insert & Update SOA
@@ -1535,7 +1539,13 @@ namespace eFMS.API.Accounting.DL.Services
                                  DateType = s.DateType,
                                  CreatorShipment = s.CreatorShipment
                              };
-            return resultData.FirstOrDefault();
+            var result = resultData.FirstOrDefault();
+            if(result != null)
+            {
+                result.UserNameCreated = sysUserRepo.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
+                result.UserNameModified = sysUserRepo.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
+            }
+            return result;
         }
 
         private IQueryable<ChargeShipmentModel> GetListChargeOfSoa(IQueryable<ChargeSOAResult> charge, List<CatCurrencyExchange> currencyExchange, string soaNo, string currencyLocal)

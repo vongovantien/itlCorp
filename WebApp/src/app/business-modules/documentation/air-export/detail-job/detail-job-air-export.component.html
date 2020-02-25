@@ -71,11 +71,11 @@
                     <div class="row m--margin-top-20" *ngIf="!!shipmentDetail">
                         <div class="col-md-4">
                             <span>Created: {{shipmentDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
-                            <span class="text-success">{{shipmentDetail.userCreated}}</span>
+                            <span class="text-success">{{shipmentDetail.userNameCreated}}</span>
                         </div>
                         <div class="col-md-4">
                             <span>Modified: {{shipmentDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
-                            </span> <span class="text-success">{{shipmentDetail.userModified}}</span>
+                            </span> <span class="text-success">{{shipmentDetail.userNameModified}}</span>
                         </div>
                         <ng-container *ngIf="!shipmentDetail.isLocked">
                             <div class="col-md-4 text-right" *ngIf="shipmentDetail.permission.allowUpdate">

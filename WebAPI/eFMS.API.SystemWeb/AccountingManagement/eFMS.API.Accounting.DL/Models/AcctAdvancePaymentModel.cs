@@ -9,5 +9,8 @@ namespace eFMS.API.Accounting.DL.Models
     {
         public List<AcctAdvanceRequestModel> AdvanceRequests { get; set; }
         public int NumberOfRequests { get; set; }
+        public string UserNameCreated { get; set; }
+        public string UserNameModified { get; set; }
+        public string RequesterName { get; set; }
     }
 }
