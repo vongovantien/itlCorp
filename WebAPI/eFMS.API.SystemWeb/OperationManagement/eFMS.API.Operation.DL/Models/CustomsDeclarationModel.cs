@@ -10,6 +10,8 @@ namespace eFMS.API.Operation.DL.Models
         public string ExportCountryName { get; set; }
         public string GatewayName { get; set; }
         public PermissionAllowBase Permission { get; set; }
+        public string UserCreatedName { get; set; }
+        public string UserModifieddName { get; set; }
     }
 
 }

@@ -20,17 +20,20 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUserLevel> sysLevelRepository;
+        private readonly IContextBase<SysUser> userRepository;
 
         //private readonly ICurrentUser currentUser;
         public SysCompanyService(
             IContextBase<SysCompany> repository, 
             IMapper mapper,
             IContextBase<SysUserLevel> userLevelRepo,
-            ICurrentUser icurrentUser) : base(repository, mapper)
+            ICurrentUser icurrentUser,
+            IContextBase<SysUser> userRepo) : base(repository, mapper)
         {
             currentUser = icurrentUser;
             //currentUser = user;
             sysLevelRepository = userLevelRepo;
+            userRepository = userRepo;
             SetChildren<SysCompany>("ID", "BUID");
             SetChildren<SysOffice>("Id", "BuId");
             SetChildren<SysUserLevel>("Id", "CompanyId");
@@ -40,6 +43,18 @@ namespace eFMS.API.System.DL.Services
         {
             var bu = DataContext.Get();
             return bu.ProjectTo<SysCompanyModel>(mapper.ConfigurationProvider);
+        }
+
+        public SysCompanyModel Get(Guid id)
+        {
+            var result = Get(x => x.Id == id)?.FirstOrDefault();
+            if (result == null) return null;
+            else
+            {
+                result.NameUserCreated = userRepository.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
+                result.NameUserModified = userRepository.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
+                return result;
+            }
         }
 
         public IQueryable<SysCompany> GetByUserId(string id)

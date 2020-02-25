@@ -343,7 +343,7 @@
                             <span
                                 class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeCreated | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
                             <span class="m--font-bolder m--margin-left-5">by</span>
-                            <span class="m--font-brand m--margin-left-5">{{customDeclaration.userCreated}}</span>
+                            <span class="m--font-brand m--margin-left-5">{{customDeclaration.userCreatedName}}</span>
                         </div>
                         <div class="col-md-4 m--margin-top-10 m--margin-bottom-5"
                             *ngIf="customDeclaration.userModified; else nousermodified">
@@ -351,7 +351,7 @@
                             <span
                                 class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeModified | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
                             <span class="m--font-bolder m--margin-left-5">by</span>
-                            <span class="m--font-brand m--margin-left-5">{{customDeclaration.userModified}}</span>
+                            <span class="m--font-brand m--margin-left-5">{{customDeclaration.userModifieddName}}</span>
                         </div>
                         <ng-template #nousermodified>
                             <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">&nbsp;</div>

@@ -18,6 +18,8 @@ export class Group {
     departmentName: string = '';
     companyName: string = '';
     officeName: string = '';
+    nameUserCreated: string = '';
+    nameUserModified: string = '';
 
     constructor(data?: any) {
         console.log(data);

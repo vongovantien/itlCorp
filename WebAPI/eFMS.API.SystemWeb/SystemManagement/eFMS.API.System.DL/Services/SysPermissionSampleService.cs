@@ -23,6 +23,7 @@ namespace eFMS.API.System.DL.Services
         private readonly ISysPermissionSampleSpecialService permissionSampleSpecialService;
         private readonly IContextBase<SysPermissionSampleSpecial> permissioSampleSpecialRepository;
         private readonly ISysUserPermissionService userPermissionRepository;
+        private readonly IContextBase<SysUser> userRepository;
 
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
@@ -36,7 +37,8 @@ namespace eFMS.API.System.DL.Services
             IContextBase<SysPermissionSampleSpecial> permissioSampleSpecialRepo,
             IStringLocalizer<LanguageSub> localizer,
             ISysUserPermissionService userPermissionRepo,
-            ICurrentUser currUser) : base(repository, mapper)
+            ICurrentUser currUser,
+            IContextBase<SysUser> userRepo) : base(repository, mapper)
         {
             roleRepository = roleRepo;
             permissionSampleGeneralService = perSampleGeneralService;
@@ -46,6 +48,7 @@ namespace eFMS.API.System.DL.Services
             stringLocalizer = localizer;
             currentUser = currUser;
             userPermissionRepository =  userPermissionRepo;
+            userRepository = userRepo;
         }
 
         public SysPermissionSampleModel GetBy(Guid? id)
@@ -58,6 +61,8 @@ namespace eFMS.API.System.DL.Services
             }
             result.SysPermissionSampleGenerals = permissionSampleGeneralService.GetBy(id);
             result.SysPermissionSampleSpecials = permissionSampleSpecialService.GetBy(id);
+            result.NameUserCreated = userRepository.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
+            result.NameUserModified = userRepository.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
             return result;
         }
 

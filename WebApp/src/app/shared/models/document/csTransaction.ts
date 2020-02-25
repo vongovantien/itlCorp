@@ -82,6 +82,8 @@ export class CsTransaction extends BaseModel {
 
     permission: PermissionShipment = new PermissionShipment();
 
+    userNameCreated: string = '';
+    userNameModified: string = '';
     constructor(object?: any) {
         super();
         const self = this;

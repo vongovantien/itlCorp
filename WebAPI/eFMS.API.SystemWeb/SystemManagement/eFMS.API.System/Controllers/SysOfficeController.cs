@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
+using System.Linq;
 
 namespace eFMS.API.System.Controllers
 {
@@ -25,12 +26,15 @@ namespace eFMS.API.System.Controllers
         private readonly ISysOfficeService sysOfficeService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        public SysOfficeController(IStringLocalizer<LanguageSub> localizer, ISysOfficeService service, IMapper iMapper ,ICurrentUser icurrentUser)
+        private readonly ISysUserService sysUserService;
+
+        public SysOfficeController(IStringLocalizer<LanguageSub> localizer, ISysOfficeService service, IMapper iMapper ,ICurrentUser icurrentUser, ISysUserService isysUserService)
         {
             stringLocalizer = localizer;
             sysOfficeService = service;
             mapper = iMapper;
             currentUser = icurrentUser;
+            sysUserService = isysUserService;
         }
 
         /// <summary>
@@ -199,6 +203,10 @@ namespace eFMS.API.System.Controllers
         public IActionResult GetBy(Guid id)
         {
             var result = sysOfficeService.First(x => x.Id == id);
+            var userCreate = sysUserService.Get(x => x.Id == result.UserCreated).FirstOrDefault();
+            var userModified = sysUserService.Get(x => x.Id == result.UserModified).FirstOrDefault();
+            result.UserCreated = userCreate?.Username;
+            result.UserModified = userModified?.Username;
             if (result == null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "Error", Data = result });

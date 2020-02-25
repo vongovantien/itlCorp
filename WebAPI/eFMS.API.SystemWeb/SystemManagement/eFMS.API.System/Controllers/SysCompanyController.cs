@@ -102,7 +102,7 @@ namespace eFMS.API.System.Controllers
         [Route("{id}")]
         public IActionResult GetBy(Guid id)
         {
-            var result = sysCompanyService.First(x => x.Id == id);
+            var result = sysCompanyService.Get(id);
             if (result == null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "Không tìm thấy Company", Data = result });

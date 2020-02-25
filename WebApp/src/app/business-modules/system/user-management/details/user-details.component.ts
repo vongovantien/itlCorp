@@ -4,11 +4,10 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AppPage } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { IAddUser } from '../addnew/user.addnew.component';
 import { User } from 'src/app/shared/models';
-import { UserLevel } from 'src/app/shared/models/system/userlevel';
 
 @Component({
     selector: 'app-user-details',

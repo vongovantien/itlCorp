@@ -149,11 +149,11 @@
                     <div class="row" *ngIf="!!department">
                         <div class="col-6" *ngIf="!!department.datetimeCreated">
                             Created: {{department.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
-                                class="text-success">{{department.userCreated}}</span>
+                                class="text-success">{{department.userNameCreated}}</span>
                         </div>
                         <div class="col-6" *ngIf="!!department.datetimeModified">
                             Modified: {{department.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
-                                class="text-success">{{department.userModified}}</span>
+                                class="text-success">{{department.userNameModified}}</span>
                         </div>
                     </div>
                 </form>

@@ -16,7 +16,8 @@ export class SettlementPayment {
     statusApprovalName: string = '';
     userCreated: string = '';
     userModified: string = '';
-
+    userNameCreated: string = '';
+    userNameModified: string = '';
 
     settleRequests: SettleRequestsPayment[] = [];
 
