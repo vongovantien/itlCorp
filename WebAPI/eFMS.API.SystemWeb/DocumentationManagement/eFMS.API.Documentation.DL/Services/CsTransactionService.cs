@@ -1990,6 +1990,10 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+            var _pathReportGenerate = folderDownloadReport + "\\PLSheet" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(listCharge);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);

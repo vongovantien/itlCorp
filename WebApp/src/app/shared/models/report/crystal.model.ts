@@ -8,6 +8,7 @@ export class Crystal{
     allowPrint: boolean;
     allowExport: boolean;
     isLandscape: boolean;
+    pathReportGenerate: string;
 }
 
 export class SubReport{
