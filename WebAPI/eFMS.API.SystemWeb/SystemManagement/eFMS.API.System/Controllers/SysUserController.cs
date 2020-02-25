@@ -105,7 +105,7 @@ namespace eFMS.API.System.Controllers
             if (hsEmloyee.Success)
             {
                 model.EmployeeId = model.SysEmployeeModel.Id;
-                model.UserCreated = model.UserModified = currentUser.UserID;
+                model.UserCreated = model.UserModified = currentUser.UserName;
                 model.Id = Guid.NewGuid().ToString();
                 model.DatetimeCreated = model.DatetimeModified  = DateTime.Now;
                 var hs = sysUserService.Insert(model);
@@ -147,7 +147,7 @@ namespace eFMS.API.System.Controllers
             }
             var employeeCurrent = sysEmployeeService.Get(x => x.Id == userCurrent.EmployeeId).FirstOrDefault();
             model.SysEmployeeModel.Id = employeeCurrent.Id;
-            model.SysEmployeeModel.UserModified = currentUser.UserID;
+            model.SysEmployeeModel.UserModified = currentUser.UserName;
             model.SysEmployeeModel.DatetimeModified = DateTime.Now;
             model.SysEmployeeModel.Active = true;
 
@@ -156,7 +156,7 @@ namespace eFMS.API.System.Controllers
             ResultHandle resultEmployee = new ResultHandle { Status = hsEmployee.Success, Message = stringLocalizer[messageEmployee].Value };
             if (hsEmployee.Success)
             {
-                model.UserModified = currentUser.UserID;
+                model.UserModified = currentUser.UserName;
                 model.DatetimeModified = DateTime.Now;
                 model.Password = userCurrent.Password;
                 model.EmployeeId = model.SysEmployeeModel.Id;
