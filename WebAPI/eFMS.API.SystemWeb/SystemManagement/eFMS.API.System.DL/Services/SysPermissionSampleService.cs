@@ -61,8 +61,8 @@ namespace eFMS.API.System.DL.Services
             }
             result.SysPermissionSampleGenerals = permissionSampleGeneralService.GetBy(id);
             result.SysPermissionSampleSpecials = permissionSampleSpecialService.GetBy(id);
-            result.UserCreatedName = userRepository.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
-            result.UserModifiedName = userRepository.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
+            result.NameUserCreated = userRepository.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
+            result.NameUserModified = userRepository.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
             return result;
         }
 
