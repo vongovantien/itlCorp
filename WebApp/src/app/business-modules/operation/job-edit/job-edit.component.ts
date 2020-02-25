@@ -410,8 +410,13 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 finalize(() => this._progressRef.complete())
             ).subscribe(
                 (responses: any) => {
-                    this.billingOps = responses;
-                    this.salemans = responses;
+                    if (responses != null) {
+                        this.salemans = responses.filter(x => x.active === true);
+                        this.billingOps = responses.filter(x => x.active === true);
+                    } else {
+                        this.salemans = [];
+                        this.billingOps = [];
+                    }
 
                     this._data.setDataService(SystemConstants.CSTORAGE.SYSTEM_USER, responses);
                 },
