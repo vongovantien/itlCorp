@@ -97,7 +97,10 @@ namespace eFMS.API.System.DL.Services
             permission.SysPermissionSampleGenerals = userPermissionGeneralService.GetBy(permission.Id);
             permission.SysPermissionSampleSpecials = userPermissionSpecialService.GetBy(permission.Id);
             permission.UserName = userRepository.Get(x => x.Id == permission.UserId).Select(t => t.Username).FirstOrDefault();
-
+            var userCreated = userRepository.Get(x => x.Id == permission.UserCreated).FirstOrDefault();
+            var userModified = userRepository.Get(x => x.Id == permission.UserModified).FirstOrDefault();
+            permission.NameUserCreated = userCreated?.Username;
+            permission.NameUserModified = userModified?.Username;
             return permission;
         }
 
@@ -113,6 +116,13 @@ namespace eFMS.API.System.DL.Services
             permission.SysPermissionSampleSpecials = userPermissionSpecialService.GetBy(permission.Id);
 
             permission.UserName = userRepository.Get(x=>x.Id == permission.UserId).Select(t=>t.Username).FirstOrDefault();
+            var userCreated = userRepository.Get(x => x.Id == permission.UserCreated).FirstOrDefault();
+            var userModified = userRepository.Get(x => x.Id == permission.UserModified).FirstOrDefault();
+
+            permission.NameUserCreated = userCreated?.Username;
+            permission.NameUserModified = userModified?.Username;
+           
+
             return permission;
         }
         public HandleState Add(List<SysUserPermissionEditModel> list)

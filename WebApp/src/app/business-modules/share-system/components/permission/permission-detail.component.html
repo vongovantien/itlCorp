@@ -7,11 +7,11 @@
         <div class="row">
             <div class="col-6">
                 <span>Created: {{permissionSample.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span> <span
-                    class="text-success">{{permissionSample.userCreatedName}}</span>
+                    class="text-success">{{permissionSample.nameUserCreated}}</span>
             </div>
             <div class="col-6">
                 <span>Modified: {{permissionSample.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by </span> <span
-                    class="text-success">{{permissionSample.userModifiedName}}</span>
+                    class="text-success">{{permissionSample.nameUserModified}}</span>
             </div>
         </div>
     </div>
@@ -64,13 +64,13 @@
                     *ngIf="!!permissionSample && !!permissionSample.id && ( type === 'office'  || type ==='user' || type ==='company' || type ==='department' || type ==='group')">
                     <div class="col-6">
                         Created: {{permissionSample.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
-                            class="text-success">{{permissionSample.userCreatedName}}</span>
+                            class="text-success">{{permissionSample.nameUserCreated}}</span>
 
 
                     </div>
                     <div class="col-6">
                         Modified: {{permissionSample.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
-                            class="text-success">{{permissionSample.userModifiedName}} </span>
+                            class="text-success">{{permissionSample.nameUserModified}} </span>
 
 
                     </div>

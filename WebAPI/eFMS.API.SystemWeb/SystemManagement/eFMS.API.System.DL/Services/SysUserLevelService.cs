@@ -78,10 +78,14 @@ namespace eFMS.API.System.DL.Services
             var companies = companyRepository.Get();
             var departments = departmentRepository.Get();
             var results = from d in data
-                          join g in groups on d.GroupId equals g.Id
-                          join o in offices on d.OfficeId equals o.Id
-                          join c in companies on d.CompanyId equals c.Id
-                          join depart in departments on d.DepartmentId equals depart.Id
+                          join g in groups on d.GroupId equals g.Id into groupss
+                          from g in groupss.DefaultIfEmpty()
+                          join o in offices on d.OfficeId equals o.Id into office
+                          from o in office.DefaultIfEmpty()
+                          join c in companies on d.CompanyId equals c.Id into company
+                          from c in company.DefaultIfEmpty()
+                          join depart in departments on d.DepartmentId equals depart.Id into departs
+                          from depart in departs.DefaultIfEmpty()
                           select new SysUserLevelModel
                           {
                               GroupName = g.NameVn,
