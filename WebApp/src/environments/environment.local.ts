@@ -13,5 +13,6 @@ export const environment = {
         EXPORT: "localhost:63492",
         SETTING: "localhost:44363",
         INDENTITY_SERVER_URL: "https://localhost:44369",
+        EXPORT_CRYSTAL:"localhost:53717/ExportCrystal.aspx",
     },
 };

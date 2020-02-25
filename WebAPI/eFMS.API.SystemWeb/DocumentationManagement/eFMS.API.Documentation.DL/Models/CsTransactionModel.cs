@@ -20,5 +20,7 @@ namespace eFMS.API.Documentation.DL.Models
         public Guid? HblId { get; set; }
         public string PlaceDeliveryName { get; set; }
         public PermissionAllowBase Permission { get; set; }
+        public string UserNameCreated { get; set; }
+        public string UserNameModified { get; set; }
     }
 }

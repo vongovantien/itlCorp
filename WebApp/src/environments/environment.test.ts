@@ -13,7 +13,8 @@ export const environment = {
         REPORT: "test.api-efms.itlvn.com/ReportPreview/Default.aspx",
         EXPORT: "test.api-efms.itlvn.com/Export",
         SETTING: "test.api-efms.itlvn.com/Setting",
-        INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver"
+        INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver",
+        EXPORT_CRYSTAL: "test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
     },
 
 };   

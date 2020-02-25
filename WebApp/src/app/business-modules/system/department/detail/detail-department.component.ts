@@ -140,7 +140,9 @@ export class DepartmentDetailComponent extends AppList {
                 datetimeModified: '',
                 active: this.status.value,
                 inactiveOn: '',
-                companyId: null
+                companyId: null,
+                userNameCreated: '',
+                userNameModified: ''
             };
             this._progressRef.start();
             //Update Info Department
@@ -171,8 +173,7 @@ export class DepartmentDetailComponent extends AppList {
             .pipe(
                 catchError(this.catchError),
                 tap(data => {
-                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));
-                    console.log(this.officeList)
+                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));                    
                 }),
                 switchMap(() => this._systemRepo.getDetailDepartment(this.departmentId).pipe(
                     catchError(this.catchError),
@@ -220,8 +221,7 @@ export class DepartmentDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (data: any) => {
-                    console.log(data);
+                (data: any) => {          
                     this.groups = data;
                 },
             );
