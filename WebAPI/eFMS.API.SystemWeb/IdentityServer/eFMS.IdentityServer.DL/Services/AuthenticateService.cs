@@ -24,7 +24,7 @@ namespace eFMS.IdentityServer.DL.Services
         readonly LDAPConfig ldap;
         IContextBase<SysEmployee> employeeRepository;
         public readonly IContextBase<SysUserLevel> userLevelRepository;
-       
+
 
 
         public AuthenticateService(
@@ -39,7 +39,7 @@ namespace eFMS.IdentityServer.DL.Services
             ldap = ldapConfig.Value;
             employeeRepository = employeeRepo;
             userLevelRepository = userLevelRepo;
-   
+
         }
 
         public UserViewModel GetUserById(string id)
@@ -107,12 +107,12 @@ namespace eFMS.IdentityServer.DL.Services
             if (sysUser.IsLdap == true)
             {
                 // Nếu có sysUser có password LDAP.
-                if(sysUser.PasswordLdap != null)
+                if (sysUser.PasswordLdap != null)
                 {
                     // Check password - passwordLDAP.
                     if (BCrypt.Net.BCrypt.Verify(password, sysUser.PasswordLdap))
                     {
-                        if (!ValidateCompany(username, companyId))
+                        if (!ValidateCompany(sysUser.Id, companyId))
                         {
                             modelReturn = null;
                             return -3;
@@ -159,9 +159,9 @@ namespace eFMS.IdentityServer.DL.Services
                         }
                     }
 
-                    if(isAuthenticated && sysUser.PasswordLdap == null)
+                    if (isAuthenticated && sysUser.PasswordLdap == null)
                     {
-                        if (!ValidateCompany(username, companyId))
+                        if (!ValidateCompany(sysUser.Id, companyId))
                         {
                             modelReturn = null;
                             return -3;
@@ -173,9 +173,8 @@ namespace eFMS.IdentityServer.DL.Services
                         }
                         var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
                         employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId).FirstOrDefault();
-
-                        sysUser.Password = password;
-                        modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, false, employee);
+                                              
+                        modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, password, employee);
 
                         modelReturn.companyId = companyId;
                         modelReturn.officeId = levelOffice.OfficeId;
@@ -184,14 +183,10 @@ namespace eFMS.IdentityServer.DL.Services
 
                         // Update Log
                         LogUserLogin(sysUser, companyId);
-
-                        //sysUser.PasswordLdap = BCrypt.Net.BCrypt.HashString(password);
-                        // var hs = DataContext.Update(sysUser, u => u.Id == sysUser.Id);
-                        
                         return 1;
                     }
 
-                    if(!isAuthenticated)
+                    if (!isAuthenticated)
                     {
                         modelReturn = null;
                         return -2;
@@ -200,39 +195,6 @@ namespace eFMS.IdentityServer.DL.Services
             }
             else
             {
-                // Check if LDAP.
-                foreach (var path in ldap.LdapPaths)
-                {
-                    Ldap.Path = path;
-                    isAuthenticated = Ldap.IsAuthenticated(ldap.Domain, username, password);
-                    if (isAuthenticated)
-                    {
-                        ldapInfo = Ldap.GetNodeInfomation(ldap.Domain, username, password);
-                        break;
-                    }
-                }
-
-                if(isAuthenticated)
-                {
-                    var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
-                    if(levelOffice == null)
-                    {
-                        modelReturn = null;
-                        return -4;
-                    }
-
-                    //sysUser = new SysUser { Username = username, Password = password, UserCreated = "admin" };
-                    modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, true, null);
-                    modelReturn.companyId = companyId;
-                    modelReturn.officeId = levelOffice.OfficeId;
-                    modelReturn.departmentId =levelOffice.DepartmentId;
-                    modelReturn.groupId = levelOffice?.GroupId;
-
-                    LogUserLogin(sysUser, modelReturn.companyId);
-                    return 1;
-                }
-
-                // Check username,password.
                 if (BCrypt.Net.BCrypt.Verify(password, sysUser.Password))
                 {
                     if (!ValidateCompany(sysUser.Id, companyId))
@@ -246,8 +208,7 @@ namespace eFMS.IdentityServer.DL.Services
                         return -4;
                     }
                     var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null && lv.CompanyId == companyId)?.FirstOrDefault();
-
-                    //modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, true, null);
+                                   
                     employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId)?.FirstOrDefault();
                     modelReturn = SetLoginReturnModel(sysUser, employee);
 
@@ -305,29 +266,22 @@ namespace eFMS.IdentityServer.DL.Services
             };
             return sysEmployee;
         }
-        private LoginReturnModel UpdateUserInfoFromLDAP(SearchResult ldapInfo, SysUser user, bool isNew = false, SysEmployee employee = null)
+        private LoginReturnModel UpdateUserInfoFromLDAP(SearchResult ldapInfo, SysUser user, string password, SysEmployee employee = null)
         {
             LoginReturnModel modelReturn = null;
-            var sysEmployee = MapUserInfoFromLDAP(ldapInfo);
-            if (isNew == true)
-            {
-                var newUser = new SysUser { Id = user.Username, Password = BCrypt.Net.BCrypt.HashPassword(user.Password), EmployeeId = sysEmployee.Id, Username = user.Username };
-                DataContext.Add(newUser);
-                employeeRepository.Add(sysEmployee);
-                modelReturn = new LoginReturnModel { idUser = newUser.Id, userName = newUser.Username, email = sysEmployee.Email };
-            }
-            else
-            {
-                user.LdapObjectGuid = sysEmployee.LdapObjectGuid;
-                employee.LdapObjectGuid = sysEmployee.LdapObjectGuid;
-                employee.EmployeeNameEn = sysEmployee.EmployeeNameEn;
-                employee.Email = sysEmployee.Email;
-                user.PasswordLdap = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
-                DataContext.Update(user, x => x.Id == user.Id);
-                employeeRepository.Update(sysEmployee, x => x.Id == employee.Id);
-                modelReturn = new LoginReturnModel { idUser = user.Id, userName = user.Username, email = sysEmployee.Email };
-            }
+            var sysEmployee = MapUserInfoFromLDAP(ldapInfo);
+
+            user.LdapObjectGuid = sysEmployee.LdapObjectGuid;
+            employee.LdapObjectGuid = sysEmployee.LdapObjectGuid;
+            employee.EmployeeNameEn = sysEmployee.EmployeeNameEn;
+            employee.Email = sysEmployee.Email;
+
+            user.PasswordLdap = BCrypt.Net.BCrypt.HashPassword(password);
+
+            DataContext.Update(user, x => x.Id == user.Id);
+            employeeRepository.Update(sysEmployee, x => x.Id == employee.Id);
+            modelReturn = new LoginReturnModel { idUser = user.Id, userName = user.Username, email = sysEmployee.Email };
             return modelReturn;
         }
         private void LogUserLogin(SysUser user, Guid? workplaceId)
