@@ -64,13 +64,13 @@
                     *ngIf="!!permissionSample && !!permissionSample.id && ( type === 'office'  || type ==='user' || type ==='company' || type ==='department' || type ==='group')">
                     <div class="col-6">
                         Created: {{permissionSample.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
-                            class="text-success">{{permissionSample.userCreated}}</span>
+                            class="text-success">{{permissionSample.nameUserCreated}}</span>
 
 
                     </div>
                     <div class="col-6">
                         Modified: {{permissionSample.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
-                            class="text-success">{{permissionSample.userModified}} </span>
+                            class="text-success">{{permissionSample.nameUserModified}} </span>
 
 
                     </div>

@@ -105,7 +105,7 @@ namespace eFMS.API.System.Controllers
             if (hsEmloyee.Success)
             {
                 model.EmployeeId = model.SysEmployeeModel.Id;
-                model.UserCreated = model.UserModified = currentUser.UserName;
+                model.UserCreated = model.UserModified = currentUser.UserID;
                 model.Id = Guid.NewGuid().ToString();
                 model.DatetimeCreated = model.DatetimeModified  = DateTime.Now;
                 var hs = sysUserService.Insert(model);
@@ -147,7 +147,7 @@ namespace eFMS.API.System.Controllers
             }
             var employeeCurrent = sysEmployeeService.Get(x => x.Id == userCurrent.EmployeeId).FirstOrDefault();
             model.SysEmployeeModel.Id = employeeCurrent.Id;
-            model.SysEmployeeModel.UserModified = currentUser.UserName;
+            model.SysEmployeeModel.UserModified = currentUser.UserID;
             model.SysEmployeeModel.DatetimeModified = DateTime.Now;
             model.SysEmployeeModel.Active = true;
 
@@ -156,7 +156,7 @@ namespace eFMS.API.System.Controllers
             ResultHandle resultEmployee = new ResultHandle { Status = hsEmployee.Success, Message = stringLocalizer[messageEmployee].Value };
             if (hsEmployee.Success)
             {
-                model.UserModified = currentUser.UserName;
+                model.UserModified = currentUser.UserID;
                 model.DatetimeModified = DateTime.Now;
                 model.Password = userCurrent.Password;
                 model.EmployeeId = model.SysEmployeeModel.Id;
@@ -194,6 +194,7 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
+            var user = sysUserService.Get(x => x.Id == id).FirstOrDefault();
             var hs = sysUserService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
 
@@ -213,6 +214,10 @@ namespace eFMS.API.System.Controllers
         public IActionResult GetBy(string id)
         {
             var result = sysUserService.Get(x => x.Id == id).FirstOrDefault();
+            var userCreate = sysUserService.Get(x => x.Id == result.UserCreated).FirstOrDefault();
+            var userModified = sysUserService.Get(x => x.Id == result.UserModified).FirstOrDefault();
+            result.UserCreated = userCreate?.Username;
+            result.UserModified = userModified?.Username;
             result.SysEmployeeModel = sysEmployeeService.First(x => x.Id == result.EmployeeId);
             if (result == null)
             {
