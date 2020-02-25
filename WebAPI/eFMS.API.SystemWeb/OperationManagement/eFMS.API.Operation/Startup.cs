@@ -1,21 +1,18 @@
 ﻿using AutoMapper;
 using eFMS.API.Operation.Infrastructure;
 using eFMS.API.Operation.Infrastructure.Middlewares;
-using eFMS.API.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using static eFMS.API.Provider.Infrasture.Settings;
 using eFMS.API.Infrastructure;
-using eFMS.API.Operation.DL.Common;
+using eFMS.API.Common.Globals;
 
 namespace eFMS.API.Operation
 {

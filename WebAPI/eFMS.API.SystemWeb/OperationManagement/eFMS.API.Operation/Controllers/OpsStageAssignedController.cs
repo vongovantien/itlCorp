@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Operation.DL.Common;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
-using eFMS.API.Operation.Infrastructure.Common;
 using eFMS.API.Operation.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
@@ -99,7 +99,7 @@ namespace eFMS.API.Operation.Controllers
             if (!ModelState.IsValid) return BadRequest();
             if (opsStageAssignedService.Any(x => x.JobId == model.JobId && x.StageId == model.StageId && x.MainPersonInCharge == model.MainPersonInCharge))
             {
-                message = stringLocalizer[LanguageSub.MSG_STAGE_ASSIGNED_EXISTED].Value;
+                message = stringLocalizer[OperationLanguageSub.MSG_STAGE_ASSIGNED_EXISTED].Value;
                 return BadRequest(new ResultHandle { Status = false, Message = message });
             }
             var hs = opsStageAssignedService.Add(model);

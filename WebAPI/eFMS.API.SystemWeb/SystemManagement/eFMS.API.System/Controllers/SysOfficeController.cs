@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.System.DL.Common;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
-using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using eFMS.API.System.Models;
 using eFMS.IdentityServer.DL.UserManager;

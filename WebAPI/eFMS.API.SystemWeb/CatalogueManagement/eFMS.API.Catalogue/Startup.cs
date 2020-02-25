@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.Infrastructure;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using eFMS.API.Common.Globals;
 using eFMS.API.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;

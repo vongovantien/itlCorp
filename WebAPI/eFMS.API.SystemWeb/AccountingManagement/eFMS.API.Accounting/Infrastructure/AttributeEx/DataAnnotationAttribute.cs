@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Accounting.DL.Common;
+using eFMS.API.Common.Globals;
 using Microsoft.Extensions.Localization;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -22,7 +23,7 @@ namespace eFMS.API.Accounting.Infrastructure.AttributeEx
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var stringLocalizer = validationContext.GetService(typeof(IStringLocalizer<LanguageSub>)) as IStringLocalizer<LanguageSub>;
-            this.ErrorMessage = stringLocalizer[LanguageSub.EF_ANNOTATIONS_REQUIRED]?.Value;
+            this.ErrorMessage = stringLocalizer[AccountingLanguageSub.EF_ANNOTATIONS_REQUIRED]?.Value;
             if (!string.IsNullOrEmpty(this.DisplayName))
             {
                 validationContext.DisplayName = stringLocalizer[this.DisplayName]?.Value;

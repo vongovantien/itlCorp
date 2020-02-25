@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
 using eFMS.API.Infrastructure;
-using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.Infrastructure;
 using eFMS.API.Setting.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Builder;
@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

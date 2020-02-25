@@ -19,6 +19,7 @@
   <ItemGroup>
     <Compile Remove="Controllers\CatCurrencyController.cs" />
     <Compile Remove="Controllers\SysEmployeesController.cs" />
+    <Compile Remove="Infrastructure\Common\HandleError.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
   </ItemGroup>
 

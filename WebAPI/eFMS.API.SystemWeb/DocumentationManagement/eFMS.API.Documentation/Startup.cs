@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using eFMS.API.Documentation.DL.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.Infrastructure;
 using eFMS.API.Shipment.Infrastructure;
 using eFMS.API.Shipment.Infrastructure.Middlewares;

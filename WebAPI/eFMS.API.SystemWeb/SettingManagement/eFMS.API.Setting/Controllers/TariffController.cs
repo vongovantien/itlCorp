@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
-using eFMS.API.Setting.Infrastructure.Common;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.Common.Infrastructure.Common;
 
 namespace eFMS.API.Setting.Controllers
 {

@@ -21,6 +21,6 @@ for %%d in (
 	..\eFMS.API.SystemWeb\SystemManagement\eFMS.API.System.DL,
 	..\eFMS.API.SystemWeb\SystemManagement\eFMS.API.System,
 	..\eFMS.API.SystemWeb\eFMS.API.ReportData,
-	..\eFMS.API.SystemWeb\ReportPerview
+	..\eFMS.API.SystemWeb\ReportPreview
 ) do dotnet build "%%d"
 pause

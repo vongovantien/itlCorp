@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.Infrastructure;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
+using eFMS.API.Common.Globals;
 using eFMS.API.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;

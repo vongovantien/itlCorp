@@ -1,6 +1,6 @@
 ﻿namespace eFMS.API.Operation.DL.Common
 {
-    public class LanguageSub
+    public class OperationLanguageSub
     {
         //Global
         public static readonly string MSG_DATA_NOT_FOUND = "MSG_DATA_NOT_FOUND";
