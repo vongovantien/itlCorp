@@ -1293,15 +1293,7 @@ namespace eFMS.API.ReportData
                 "User Name",
                 "Name EN",
                 "Full Name",
-                "Title",
                 "User Type",
-                "Role",
-                "Level Permission",
-                "Company",
-                "Office",
-                "Department",
-                "Group",
-                "Working Status",
                 "Status"
             };
             try
@@ -1322,15 +1314,7 @@ namespace eFMS.API.ReportData
                         worksheet.Cells[i + addressStartContent, 2].Value = item.UserName;
                         worksheet.Cells[i + addressStartContent, 3].Value = item.EmployeeNameEN;
                         worksheet.Cells[i + addressStartContent, 4].Value = item.EmployeeNameVN;
-                        worksheet.Cells[i + addressStartContent, 5].Value = item.Title;
-                        worksheet.Cells[i + addressStartContent, 6].Value = item.UserType;
-                        worksheet.Cells[i + addressStartContent, 7].Value = item.Role;
-                        worksheet.Cells[i + addressStartContent, 8].Value = item.LevelPermission;
-                        worksheet.Cells[i + addressStartContent, 9].Value = item.Company;
-                        worksheet.Cells[i + addressStartContent, 10].Value = item.Office;
-                        worksheet.Cells[i + addressStartContent, 11].Value = item.Department;
-                        worksheet.Cells[i + addressStartContent, 12].Value = item.Group;
-                        worksheet.Cells[i + addressStartContent, 13].Value = item.WorkingStatus;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.UserType;
 
                         string status = "";
                         if (item.Active == true)
@@ -1341,7 +1325,7 @@ namespace eFMS.API.ReportData
                         {
                             status = "Inactive";
                         }
-                        worksheet.Cells[i + addressStartContent, 14].Value = status;
+                        worksheet.Cells[i + addressStartContent, 6].Value = status;
 
                         no++;
                     }
