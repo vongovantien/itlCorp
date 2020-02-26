@@ -16,7 +16,9 @@ export class SOA {
     surchargeIds: string = '';
     userCreated: string = '';
     userModified: string = '';
-
+    userNameCreated: string = '';
+    userNameModified: string = '';
+    
     amountBalanceUSD: number = 0;
     amountCreditLocal: number = 0;
     amountCreditUSD: number = 0;

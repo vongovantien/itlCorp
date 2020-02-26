@@ -210,7 +210,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
 
     saveShipment(form: NgForm) {
-        console.log(this.opsTransaction);
         this.opsTransaction.serviceDate = !!this.serviceDate ? (this.serviceDate.startDate != null ? formatDate(this.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.opsTransaction.finishDate = !!this.finishDate ? (this.finishDate.startDate != null ? formatDate(this.finishDate.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
@@ -235,6 +234,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.opsTransaction.sumNetWeight = this.opsTransaction.sumNetWeight != null ? Number(this.opsTransaction.sumNetWeight.toFixed(2)) : null;
             this.opsTransaction.sumCbm = this.opsTransaction.sumCbm != null ? Number(this.opsTransaction.sumCbm.toFixed(2)) : null;
 
+            console.log(this.opsTransaction);
             this.updateShipment();
         }
     }
@@ -410,8 +410,13 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 finalize(() => this._progressRef.complete())
             ).subscribe(
                 (responses: any) => {
-                    this.billingOps = responses;
-                    this.salemans = responses;
+                    if (responses != null) {
+                        this.salemans = responses.filter(x => x.active === true);
+                        this.billingOps = responses.filter(x => x.active === true);
+                    } else {
+                        this.salemans = [];
+                        this.billingOps = [];
+                    }
 
                     this._data.setDataService(SystemConstants.CSTORAGE.SYSTEM_USER, responses);
                 },

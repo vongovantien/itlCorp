@@ -142,15 +142,15 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Created: {{ group.datetimeCreated | date: 'dd/MM/yyyy HH:mm' }} by
-                                    {{group.userCreated}}</label>
+                                    <span class="text-success">{{group.nameUserCreated}}</span></label>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label *ngIf="group.datetimeModified">Modified:
                                     {{ group.datetimeModified | date: 'dd/MM/yyyy HH:mm' }}
-                                    by
-                                    {{group.userModified}}</label>
+                                    by <span class="text-success">{{group.nameUserModified}}</span>
+                                </label>
                             </div>
                         </div>
                     </div>

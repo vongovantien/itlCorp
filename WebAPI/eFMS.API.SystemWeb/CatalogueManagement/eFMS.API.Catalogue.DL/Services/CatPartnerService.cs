@@ -20,6 +20,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using eFMS.API.Common;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Common.Models;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -376,6 +377,86 @@ namespace eFMS.API.Catalogue.DL.Services
                 results.Add(partner);
             }
             return results;
+        }
+
+        public CatPartnerModel GetDetail(string id)
+        {
+            var queryDetail = Get(x => x.Id == id).FirstOrDefault();
+            var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+
+            queryDetail.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = GetPermissionDetail(permissionRangeWrite, salemans, queryDetail)
+            };
+            return queryDetail;
+        }
+
+        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, List<CatSaleman> salemans, CatPartnerModel detail)
+        {
+            bool result = false;
+            switch (permissionRangeWrite)
+            {
+                case PermissionRange.None:
+                    result = false;
+                    break;
+                case PermissionRange.All:
+                    result = true;
+                    break;
+                case PermissionRange.Owner:
+                    if (salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(detail.Id)) || detail.UserCreated == currentUser.UserID)
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID || detail.UserCreated == currentUser.UserID)
+                     )
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(detail.Id)) || detail.UserCreated == currentUser.UserID)
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(detail.Id)) || detail.UserCreated == currentUser.UserID)
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (detail.CompanyId == currentUser.CompanyID || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(detail.Id)) || detail.UserCreated == currentUser.UserID)
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                    break;
+            }
+            return result;
         }
 
         #region import

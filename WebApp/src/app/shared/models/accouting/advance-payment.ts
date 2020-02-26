@@ -23,6 +23,9 @@ export class AdvancePayment {
     advanceRequests: AdvancePaymentRequest[] = [];
     amount: number = 0;
     paymentMethodName: string = '';
+    userNameCreated: string = '';
+    userNameModified: string = '';
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

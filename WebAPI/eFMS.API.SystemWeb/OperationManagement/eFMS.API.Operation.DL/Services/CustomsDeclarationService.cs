@@ -40,6 +40,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<CatCommodity> commodityRepository;
         private readonly IContextBase<OpsTransaction> opsTransactionRepo;
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
+        private readonly IContextBase<SysUser> userRepository;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository,
             ICacheServiceBase<CustomsDeclaration> cacheService,
@@ -53,7 +54,8 @@ namespace eFMS.API.Operation.DL.Services
             IStringLocalizer<LanguageSub> localizer,
             IContextBase<CatCommodity> commodityRepo,
             IContextBase<OpsTransaction> opsTransaction,
-            IContextBase<OpsStageAssigned> opsStageAssigned
+            IContextBase<OpsStageAssigned> opsStageAssigned,
+            IContextBase<SysUser> userRepo
             ) : base(repository, cacheService, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -66,6 +68,7 @@ namespace eFMS.API.Operation.DL.Services
             commodityRepository = commodityRepo;
             opsTransactionRepo = opsTransaction;
             opsStageAssignedRepo = opsStageAssigned;
+            userRepository = userRepo;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -1130,6 +1133,8 @@ namespace eFMS.API.Operation.DL.Services
             CustomsDeclaration clearance = DataContext.Get(x => x.Id == id).FirstOrDefault();
             if (clearance == null) return null;
             var result = mapper.Map<CustomsDeclarationModel>(clearance);
+            result.UserCreatedName = userRepository.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
+            result.UserModifieddName = userRepository.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
 

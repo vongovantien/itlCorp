@@ -13,5 +13,7 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal AmountCreditUSD { get; set; }
         public decimal AmountBalanceUSD { get { return this.AmountDebitUSD - this.AmountCreditUSD; } }
         public string ServicesNameSoa { get; set; }
+        public string UserNameCreated { get; set; }
+        public string UserNameModified { get; set; }
     }
 }

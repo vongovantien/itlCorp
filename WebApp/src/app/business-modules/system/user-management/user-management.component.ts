@@ -80,7 +80,7 @@ export class UserManagementComponent extends AppList {
         this.criteria = {};
         if (this.dataSearch.type === 'All') {
             this.criteria.all = this.dataSearch.keyword;
-            if (this.dataSearch.keyword.toLowerCase() === "active" || this.dataSearch.keyword.toLowerCase() === "inactive") {
+            if (!!this.dataSearch.keyword && (this.dataSearch.keyword.toLowerCase() === "active" || this.dataSearch.keyword.toLowerCase() === "inactive")) {
                 this.criteria.all = this.dataSearch.keyword.toLowerCase();
             }
         } else {

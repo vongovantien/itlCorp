@@ -106,7 +106,9 @@ export class DepartmentAddNewComponent extends AppPage {
                 datetimeModified: '',
                 active: this.status.value,
                 inactiveOn: '',
-                companyId: null
+                companyId: null,
+                userNameCreated: '',
+                userNameModified:''
             };
             this._progressRef.start();
             //Add new Department
@@ -133,8 +135,7 @@ export class DepartmentAddNewComponent extends AppPage {
             )
             .subscribe(
                 (data: any) => {
-                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));
-                    console.log(this.officeList)
+                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));                    
                 },
             );
     }

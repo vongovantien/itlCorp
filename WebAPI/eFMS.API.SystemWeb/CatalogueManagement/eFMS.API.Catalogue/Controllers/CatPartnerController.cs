@@ -7,7 +7,6 @@ using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
-using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
@@ -132,7 +131,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            var data = catPartnerService.First(x => x.Id == id);
+            var data = catPartnerService.GetDetail(id);
             return Ok(data);
         }
         /// <summary>

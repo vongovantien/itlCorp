@@ -163,6 +163,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var supplier = partnerRepository.Get(x => x.Id == details.SupplierId).FirstOrDefault();
                 details.SupplierName = supplier?.PartnerNameEn;
+                details.UserCreatedName = userRepository.Get(x => x.Id == details.UserCreated).FirstOrDefault()?.Username;
+                details.UserModifiedName = userRepository.Get(x => x.Id == details.UserModified).FirstOrDefault()?.Username;
             }
             return details;
         }
@@ -250,10 +252,17 @@ namespace eFMS.API.Documentation.DL.Services
         {
             criteria.RangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
             var data = Query(criteria);
-            rowsCount = data.Select(x => x.Id).Count();
-            var totalProcessing = data.Count(x => x.CurrentStatus == TermData.Processing);
-            var totalfinish = data.Count(x => x.CurrentStatus == TermData.Finish);
-            var totalOverdued = data.Count(x => x.CurrentStatus == TermData.Overdue);
+            int totalProcessing = 0;
+            int totalfinish = 0;
+            int totalOverdued = 0;
+            if (data == null) rowsCount = 0;
+            else
+            {
+                rowsCount = data.Select(x => x.Id).Count();
+                totalProcessing = data.Count(x => x.CurrentStatus == TermData.Processing);
+                totalfinish = data.Count(x => x.CurrentStatus == TermData.Finish);
+                totalOverdued = data.Count(x => x.CurrentStatus == TermData.Overdue);
+            }
             int totalCanceled = 0;
             if (criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
             {

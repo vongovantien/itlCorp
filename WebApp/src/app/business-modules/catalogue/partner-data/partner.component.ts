@@ -147,7 +147,7 @@ export class PartnerComponent extends AppList implements OnInit {
     }
 
     showDetail(event) {
-        this.partner = event;
+        this.partner = event
         this._catalogueRepo.checkViewDetailPartnerPermission(this.partner.id)
             .pipe(
                 catchError(this.catchError),
@@ -162,6 +162,7 @@ export class PartnerComponent extends AppList implements OnInit {
                 },
             );
     }
+
 
     onDelete() {
         this._catalogueRepo.deletePartner(this.partner.id)

@@ -20,7 +20,8 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<SysCompany> sysCompanyRepo;
         private readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly ICurrentUser currentUser;
-        public CatDepartmentService(IContextBase<CatDepartment> repository, IMapper mapper, IContextBase<SysOffice> sysOffice, IContextBase<SysCompany> sysCompany, ICurrentUser user) : base(repository, mapper)
+        private readonly IContextBase<SysUser> sysUserRepo;
+        public CatDepartmentService(IContextBase<CatDepartment> repository, IMapper mapper, IContextBase<SysOffice> sysOffice, IContextBase<SysCompany> sysCompany, ICurrentUser user, IContextBase<SysUser> sysUser) : base(repository, mapper)
         {
             sysOfficeRepo = sysOffice;
             sysCompanyRepo = sysCompany;
@@ -28,6 +29,7 @@ namespace eFMS.API.System.DL.Services
             SetChildren<SysGroup>("Id", "DepartmentId");
             SetChildren<SysUserLevel>("Id", "DepartmentId");
             currentUser = user;
+            sysUserRepo = sysUser;
         }
 
         public IQueryable<CatDepartmentModel> QueryData(CatDepartmentCriteria criteria)
@@ -128,6 +130,8 @@ namespace eFMS.API.System.DL.Services
                 data.CompanyId = off != null ? off.Buid : Guid.Empty;
                 data.OfficeName = off != null ? off.BranchNameEn : "";
                 data.CompanyName = com != null ? com.BunameEn : "";
+                data.UserNameCreated = sysUserRepo.Get(x => x.Id == dept.UserCreated).FirstOrDefault()?.Username;
+                data.UserNameModified = sysUserRepo.Get(x => x.Id == dept.UserModified).FirstOrDefault()?.Username;
             }
             return data;
         }
