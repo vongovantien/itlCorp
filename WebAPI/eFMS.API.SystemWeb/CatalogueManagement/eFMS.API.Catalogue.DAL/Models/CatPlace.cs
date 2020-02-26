@@ -19,6 +19,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string ModeOfTransport { get; set; }
         public string GeoCode { get; set; }
         public string PlaceTypeId { get; set; }
+        public string FlightVesselNo { get; set; }
         public string Note { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }

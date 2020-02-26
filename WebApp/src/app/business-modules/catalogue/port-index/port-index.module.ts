@@ -17,7 +17,6 @@ const routing: Routes = [
         children: [
             {
                 path: '', component: PortIndexComponent
-
             },
             {
                 path: 'import', component: PortIndexImportComponent, data: { name: "Import" }

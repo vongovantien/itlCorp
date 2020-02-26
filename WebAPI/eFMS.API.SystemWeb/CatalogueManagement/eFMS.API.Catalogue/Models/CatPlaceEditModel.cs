@@ -36,5 +36,6 @@ namespace eFMS.API.Catalogue.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InActiveOn { get; set; }
+        public string FlightVesselNo { get; set; }
     }
 }

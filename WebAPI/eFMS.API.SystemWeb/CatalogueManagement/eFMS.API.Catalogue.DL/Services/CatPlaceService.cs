@@ -273,7 +273,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     InActiveOn = x.InActiveOn,
                     CountryName = x.CountryNameVN,
                     AreaName = x.AreaNameVN,
-                    LocalAreaName = x.LocalAreaNameVN
+                    LocalAreaName = x.LocalAreaNameVN,
+                    FlightVesselNo = x.FlightVesselNo,
                 });
             }
             else
@@ -305,7 +306,9 @@ namespace eFMS.API.Catalogue.DL.Services
                     InActiveOn = x.InActiveOn,
                     CountryName = x.CountryNameEN,
                     AreaName = x.AreaNameEN,
-                    LocalAreaName = x.LocalAreaNameEN
+                    LocalAreaName = x.LocalAreaNameEN,
+                    FlightVesselNo = x.FlightVesselNo,
+
                 });
             }
         }

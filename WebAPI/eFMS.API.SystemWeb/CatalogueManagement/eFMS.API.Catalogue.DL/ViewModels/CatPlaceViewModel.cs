@@ -32,5 +32,6 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string CountryName { get; set; }
         public string AreaName { get; set; }
         public string LocalAreaName { get; set; }
+        public string FlightVesselNo { get; set; }
     }
 }

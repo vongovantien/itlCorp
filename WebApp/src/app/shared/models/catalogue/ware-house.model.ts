@@ -9,6 +9,7 @@ export class Warehouse {
     countryName: string;
     provinceName: string;
     districtName: string;
+    flightVesselNo: string;
     address: string;
     placeType: number;
     active?: boolean;

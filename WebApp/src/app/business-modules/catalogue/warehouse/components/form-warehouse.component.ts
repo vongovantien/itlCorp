@@ -31,6 +31,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
     district: AbstractControl;
     address: AbstractControl;
     active: AbstractControl;
+    flightVesselNo: AbstractControl;
 
     isSubmitted: boolean = false;
     isUpdate: boolean = false;
@@ -56,6 +57,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
             province: [null, Validators.required],
             district: [null, Validators.required],
             address: [null, FormValidators.required],
+            flightVesselNo: [],
             active: [true]
         });
         this.code = this.warehouseForm.controls['code'];
@@ -65,6 +67,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
         this.province = this.warehouseForm.controls['province'];
         this.district = this.warehouseForm.controls['district'];
         this.address = this.warehouseForm.controls['address'];
+        this.flightVesselNo = this.warehouseForm.controls['flightVesselNo'];
         this.active = this.warehouseForm.controls['active'];
     }
 
@@ -93,7 +96,8 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
             province: provinceActive || [],
             district: districtActive || [],
             address: res.address,
-            active: res.active
+            active: res.active,
+            flightVesselNo: res.flightVesselNo
         });
     }
 
@@ -131,6 +135,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
         this.warehouse.provinceID = this.province.value[0].id;
         this.warehouse.districtID = this.district.value[0].id;
         this.warehouse.address = this.address.value;
+        this.warehouse.flightVesselNo = this.flightVesselNo.value;
         this.warehouse.active = !!this.isUpdate ? this.active.value : true;
     }
     trimInputForm(formData: any) {
