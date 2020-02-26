@@ -1242,6 +1242,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
                 entity.Property(e => e.PartnerId)
                     .IsRequired()
                     .HasColumnName("PartnerID")
@@ -1257,6 +1259,10 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.UnitId).HasColumnName("UnitID");
 
                 entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")

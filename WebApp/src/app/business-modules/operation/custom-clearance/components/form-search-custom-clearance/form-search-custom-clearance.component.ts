@@ -121,10 +121,15 @@ export class CustomClearanceFormSearchComponent extends AppForm {
 
     resetSearch() {
         this.onSearch.emit({});
-
+        this.personalHandle.setValue(this.users.filter((user: User) => user.id === this.userLogged.id)[0]);
         this.clearanceNo.setValue(null);
+        this.clearanceDate.setValue({
+            startDate: new Date(new Date().setDate(new Date().getDate() - 30)),
+            endDate: new Date()
+        });
         this.importDate.setValue(null);
         this.type.setValue(null);
+        this.importStatus.setValue(this.status[1]);
 
     }
 }

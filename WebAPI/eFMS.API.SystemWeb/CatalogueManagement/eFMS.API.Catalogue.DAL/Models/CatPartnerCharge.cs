@@ -14,5 +14,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public decimal? UnitPrice { get; set; }
         public string CurrencyId { get; set; }
         public decimal? Vatrate { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? DatetimeModified { get; set; }
     }
 }
