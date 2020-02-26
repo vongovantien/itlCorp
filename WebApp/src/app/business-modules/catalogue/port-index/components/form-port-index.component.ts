@@ -61,6 +61,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     }
 
     onSubmit() {
+        this.hide();
         this.isSubmitted = true;
 
         // Trick to remove validate ng-select
@@ -87,11 +88,13 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
             }
         }
     }
+
     trimInputForm(formData) {
         this.trimInputValue(this.code, formData.code);
         this.trimInputValue(this.portIndexeNameEN, formData.portIndexeNameEN);
         this.trimInputValue(this.portIndexeNameLocal, formData.portIndexeNameLocal);
     }
+
     setPortIndexModel() {
         this.portIndex.placeType = PlaceTypeEnum.Port;
         this.portIndex.active = !!this.isUpdate ? this.active.value : true;

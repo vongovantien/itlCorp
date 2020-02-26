@@ -4,10 +4,10 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-default-button [buttonSetting]="addButtonSetting" (click)="showAdd()"></app-default-button>
-            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
-            <app-default-button [buttonSetting]="importButtonSetting"
-                [routerLink]="['/home/catalogue/ware-house/import']"></app-default-button>
+            <app-permission-button (click)="showAdd()" type="add" title="Add New"></app-permission-button>
+            <app-permission-button (click)="export()" type="export" title="Export"></app-permission-button>
+            <app-permission-button [routerLink]="['/home/catalogue/ware-house/import']" type="import" title="Import">
+            </app-permission-button>
         </div>
     </div>
 </div>
@@ -78,7 +78,8 @@
                                 </td>
                             </tr>
                         </ng-container>
-                        <tr app-table-none-record *ngIf="!warehouses.length"></tr>
+                        <tr app-table-row-loading *ngIf="isLoading"></tr>
+                        <tr app-table-none-record *ngIf="!warehouses.length && !isLoading"></tr>
                     </tbody>
                 </table>
             </div>
@@ -112,3 +113,5 @@
 <form-warehouse (saveSuccess)="resetSearch($event)"></form-warehouse>
 
 <confirm-popup body="You want to delete this warehouse?" (onSubmit)="onDelete($event)"></confirm-popup>
+
+<info-popup [body]="infoPopupTitle"></info-popup>

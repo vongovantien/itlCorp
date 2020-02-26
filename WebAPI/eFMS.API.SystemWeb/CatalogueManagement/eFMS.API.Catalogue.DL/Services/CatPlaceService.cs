@@ -24,6 +24,8 @@ using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.Helpers;
 using ITL.NetCore.Connection.Caching;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Common.Models;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -35,8 +37,8 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatCountry> countryRepository;
         private readonly IContextBase<CatArea> areaRepository;
 
-        public CatPlaceService(IContextBase<CatPlace> repository, 
-            ICacheServiceBase<CatPlace> cacheService, 
+        public CatPlaceService(IContextBase<CatPlace> repository,
+            ICacheServiceBase<CatPlace> cacheService,
             IMapper mapper,
             IStringLocalizer<CatalogueLanguageSub> localizer,
             ICurrentUser user,
@@ -125,8 +127,37 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatPlaceViewModel> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount)
         {
+            IQueryable<sp_GetCatPlace> data = null;
             List<CatPlaceViewModel> results = null;
-            var data = Query(criteria);
+
+            if (criteria.PlaceType == CatPlaceTypeEnum.Warehouse )
+            {
+                ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
+                var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+                if (rangeSearch == PermissionRange.None)
+                {
+                    rowsCount = 0;
+                    return null;
+                }
+                data = QueryByPermission(criteria, rangeSearch);
+            }
+            if(criteria.PlaceType == CatPlaceTypeEnum.Port)
+            {
+                ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
+                var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+                if (rangeSearch == PermissionRange.None)
+                {
+                    rowsCount = 0;
+                    return null;
+                }
+                data = QueryByPermission(criteria, rangeSearch);
+            }
+            else
+            {
+                data = Query(criteria);
+
+            }
+
             rowsCount = data.Count();
             if (rowsCount == 0) return results;
             if (size > 1)
@@ -136,7 +167,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                data = data.Skip((page-1)* size).Take(size);
+                data = data.Skip((page - 1) * size).Take(size);
             }
             results = GetCulturalData(data).ToList();
             return results;
@@ -151,7 +182,7 @@ namespace eFMS.API.Catalogue.DL.Services
             // Join left với country.
             var places = from x in DataContext.Get(x => (x.PlaceTypeId == placetype || string.IsNullOrEmpty(placetype)
                                             && (x.Active == criteria.Active || criteria.Active == null))
-                                            && (x.ModeOfTransport.IndexOf(criteria.ModeOfTransport,StringComparison.OrdinalIgnoreCase) > -1) || string.IsNullOrEmpty(criteria.ModeOfTransport))
+                                            && (x.ModeOfTransport.IndexOf(criteria.ModeOfTransport, StringComparison.OrdinalIgnoreCase) > -1) || string.IsNullOrEmpty(criteria.ModeOfTransport))
                          join coun in countries on x.CountryId equals coun.Id into coun2
                          from coun in coun2.DefaultIfEmpty()
                          select new sp_GetCatPlace
@@ -182,71 +213,25 @@ namespace eFMS.API.Catalogue.DL.Services
                              DatetimeModified = x.DatetimeModified,
                              Active = x.Active
                          };
-        
+
             return places;
         }
         public IQueryable<sp_GetCatPlace> Query(CatPlaceCriteria criteria)
         {
-            string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
-            var list = GetBy(placetype);
-            IQueryable<sp_GetCatPlace> results = null;
-            if (criteria.All == null)
-            {
-                results = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                    && ((x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                    && ((x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                    && ((x.CountryNameEN ?? "").IndexOf(criteria.CountryNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                    && ((x.CountryNameVN ?? "").IndexOf(criteria.CountryNameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                    && ((x.DistrictNameEN ?? "").IndexOf(criteria.DistrictNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                    && ((x.DistrictNameVN ?? "").IndexOf(criteria.DistrictNameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                    && (x.CountryID  == criteria.CountryId || criteria.CountryId==null)
-                                    && (x.ProvinceID == criteria.ProvinceId || criteria.ProvinceId == null)
-                                    && (x.DistrictID == criteria.DistrictId || criteria.DistrictId == null)
-                                    && ((x.ProvinceNameEN ?? "").IndexOf(criteria.ProvinceNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                    && ((x.ProvinceNameVN ?? "").IndexOf(criteria.ProvinceNAmeVN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                    && ((x.Address ?? "").IndexOf(criteria.Address ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    //&& ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                    && (x.AreaNameEN ?? "").IndexOf(criteria.AreaNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                    && (x.AreaNameVN ?? "").IndexOf(criteria.AreaNameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                    && (x.Active == criteria.Active || criteria.Active == null)
-                    ).AsQueryable();
-            }
-            else
-            {
-                results = list.Where(x => (
-                                      ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || ((x.NameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || ((x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || ((x.CountryNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || ((x.CountryNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || ((x.DistrictNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || ((x.DistrictNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || ((x.ProvinceNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || ((x.ProvinceNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || ((x.Address ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || (x.AreaNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.AreaNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || ((x.ModeOfTransport ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   )
-                                   //&& ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   && (x.Active == criteria.Active || criteria.Active == null)
-                                   ).AsQueryable();
-            }
-            return results;
+            return QueryCriteria(criteria);
         }
-
         private IQueryable<sp_GetCatPlace> GetBy(string placeTypeID)
         {
             var data = GetView(placeTypeID).AsQueryable();
             return data;
         }
+
         private IQueryable<CatPlaceViewModel> GetCulturalData(IQueryable<sp_GetCatPlace> list)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             if (currentCulture.Name == "vi-VN")
             {
-                 return list.Select(x => new CatPlaceViewModel
+                return list.Select(x => new CatPlaceViewModel
                 {
                     ID = x.ID,
                     Code = x.Code,
@@ -311,6 +296,43 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 });
             }
+        }
+
+        public IQueryable<sp_GetCatPlace> QueryByPermission(CatPlaceCriteria criteria, PermissionRange range)
+        {
+            IQueryable<sp_GetCatPlace> data = null;
+            var list = QueryCriteria(criteria);
+
+            switch (range)
+            {
+                case PermissionRange.Owner:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Group:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID
+                    && x.GroupId == currentUser.GroupId
+                    && x.DepartmentId == currentUser.DepartmentId
+                    && x.OfficeId == currentUser.OfficeID
+                    && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Department:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID
+                    && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Office:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Company:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.All:
+                    data = list;
+                    break;
+                default:
+                    break;
+            }
+
+            return data;
         }
 
         private List<sp_GetCatPlace> GetView(string placeTypeID)
@@ -527,7 +549,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             else
                             {
                                 var countNew = list.Count(i => i.Code.ToLower() == item.Code.ToLower());
-                                if(countNew > 1)
+                                if (countNew > 1)
                                 {
                                     item.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_CODE_DUPLICATE], item.Code);
                                     item.IsValid = false;
@@ -582,7 +604,7 @@ namespace eFMS.API.Catalogue.DL.Services
             else if (newList.Count(x => (x.Code ?? "").ToLower() == item.Code.ToLower()) > 0)
             {
                 var existedItemDuplicate = newList.FirstOrDefault(x => (x.Code ?? "").ToLower() == item.Code.ToLower());
-                if(existedItemDuplicate != null)
+                if (existedItemDuplicate != null)
                 {
                     existedItemDuplicate.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_CODE_DUPLICATE], item.Code);
                     existedItemDuplicate.IsValid = false;
@@ -593,7 +615,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             else
             {
-                if(places.Any(i => (i.Code ?? "").ToLower() == item.Code.ToLower()))
+                if (places.Any(i => (i.Code ?? "").ToLower() == item.Code.ToLower()))
                 {
                     item.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_CODE_EXISTED], item.Code);
                     item.IsValid = false;
@@ -619,7 +641,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var modes = DataEnums.ModeOfTransportData;
             var portIndexs = DataContext.Get(x => x.PlaceTypeId == placeTypeName).ToList();
             var results = new List<CatPlaceImportModel>();
-            foreach(var item in list)
+            foreach (var item in list)
             {
                 var result = CheckCatplaceValidImport(portIndexs, results, item);
                 result.PlaceTypeId = placeTypeName;
@@ -630,7 +652,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => (i.NameEn ??"").ToLower() == item.CountryName.ToLower());
+                    var country = countries.FirstOrDefault(i => (i.NameEn ?? "").ToLower() == item.CountryName.ToLower());
                     if (country == null)
                     {
                         result.CountryNameError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_COUNTRY_NOT_FOUND], item.CountryName);
@@ -648,7 +670,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    if(DataEnums.ModeOfTransportData.Any(x => x.Id.ToUpper() == item.ModeOfTransport.ToUpper())){
+                    if (DataEnums.ModeOfTransportData.Any(x => x.Id.ToUpper() == item.ModeOfTransport.ToUpper()))
+                    {
                         result.ModeOfTransport = item.ModeOfTransport.ToUpper();
                     }
                     else
@@ -791,7 +814,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return results;
         }
-        
+
         public HandleState Import(List<CatPlaceImportModel> data)
         {
             try
@@ -799,9 +822,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 foreach (var item in data)
                 {
                     bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
-                    DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now: null;
+                    DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var catPlace = new CatPlace
-                    {   Id = Guid.NewGuid(),
+                    {
+                        Id = Guid.NewGuid(),
                         Code = item.Code,
                         NameEn = item.NameEn,
                         NameVn = item.NameVn,
@@ -846,5 +870,75 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
+        public bool CheckAllowPermissionAction(Guid placeID, PermissionRange range)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
+
+            var detail = DataContext.Get(x => x.Id == placeID)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, range, currentUser);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        private IQueryable<sp_GetCatPlace> QueryCriteria(CatPlaceCriteria criteria)
+        {
+            string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
+            var list = GetBy(placetype);
+
+            if (criteria.All == null)
+            {
+                list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    && ((x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    && ((x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    && ((x.CountryNameEN ?? "").IndexOf(criteria.CountryNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    && ((x.CountryNameVN ?? "").IndexOf(criteria.CountryNameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    && ((x.DistrictNameEN ?? "").IndexOf(criteria.DistrictNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    && ((x.DistrictNameVN ?? "").IndexOf(criteria.DistrictNameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    && (x.CountryID == criteria.CountryId || criteria.CountryId == null)
+                                    && (x.ProvinceID == criteria.ProvinceId || criteria.ProvinceId == null)
+                                    && (x.DistrictID == criteria.DistrictId || criteria.DistrictId == null)
+                                    && ((x.ProvinceNameEN ?? "").IndexOf(criteria.ProvinceNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    && ((x.ProvinceNameVN ?? "").IndexOf(criteria.ProvinceNAmeVN ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    && ((x.Address ?? "").IndexOf(criteria.Address ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                    && (x.AreaNameEN ?? "").IndexOf(criteria.AreaNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.AreaNameVN ?? "").IndexOf(criteria.AreaNameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.Active == criteria.Active || criteria.Active == null)
+                    ).AsQueryable();
+            }
+            else
+            {
+                list = list.Where(x => (
+                                      ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || ((x.NameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || ((x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || ((x.CountryNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || ((x.CountryNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || ((x.DistrictNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || ((x.DistrictNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || ((x.ProvinceNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || ((x.ProvinceNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || ((x.Address ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || (x.AreaNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.AreaNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || ((x.ModeOfTransport ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   )
+                                   && (x.Active == criteria.Active || criteria.Active == null)
+                                   ).AsQueryable();
+            }
+            return list;
+        }
     }
 }

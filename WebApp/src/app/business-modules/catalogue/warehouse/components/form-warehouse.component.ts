@@ -6,9 +6,9 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgProgress } from '@ngx-progressbar/core';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'form-warehouse',
@@ -127,7 +127,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
         }
     }
     setWarehouseModel() {
-        this.warehouse.placeType = PlaceTypeEnum.Warehouse;
+        this.warehouse.placeType = CommonEnum.PlaceTypeEnum.Warehouse;
         this.warehouse.code = this.code.value;
         this.warehouse.nameEn = this.warehouseNameEN.value;
         this.warehouse.nameVn = this.warehouseNameVN.value;

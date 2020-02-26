@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { SortService } from '@services';
 import { CatalogueRepo, ExportRepo } from '@repositories';
 import { Warehouse } from '@models';
@@ -22,12 +22,14 @@ export class WarehouseComponent extends AppList implements OnInit {
 
     @ViewChild(FormWarehouseComponent, { static: false }) formPopup: FormWarehouseComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
 
-    warehouses: Array<Warehouse> = [];
+
+    warehouses: Warehouse[] = [];
     warehouse: Warehouse = new Warehouse();
 
     criteria: any = { placeType: CommonEnum.PlaceTypeEnum.Warehouse };
-    configSearch: CommonInterface.IConfigSearchOption;
+    infoPopupTitle: string = 'You are not allow to delete this warehouse';
 
     constructor(private sortService: SortService,
         private _catalogueRepo: CatalogueRepo,
@@ -79,6 +81,7 @@ export class WarehouseComponent extends AppList implements OnInit {
     }
 
     requestWarehouses() {
+        this.isLoading = true;
         this._catalogueRepo.pagingPlace(this.page, this.pageSize, Object.assign({}, this.criteria))
             .pipe(
                 catchError(this.catchError),
@@ -90,9 +93,10 @@ export class WarehouseComponent extends AppList implements OnInit {
                     };
                 })
             ).subscribe(
-                (res: any) => {
+                (res: CommonInterface.IResponsePaging) => {
                     this.totalItems = res.totalItems || 0;
-                    this.warehouses = res.data;
+                    this.warehouses = (res.data || []).map(i => new Warehouse(i)) || [];
+                    console.log(this.warehouses);
                 },
             );
     }
@@ -110,13 +114,24 @@ export class WarehouseComponent extends AppList implements OnInit {
     }
 
     showDetail(item: Warehouse) {
-        this.warehouse = item;
-        [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
-        this.formPopup.title = "Update Warehouse";
-        this.formPopup.code.disable();
-        this.formPopup.warehouse = item;
-        this.formPopup.setFormValue(item);
-        this.formPopup.show();
+        this._catalogueRepo.checkAllowGetDetailPlace(item.id)
+            .subscribe(
+                (res: boolean) => {
+                    if (res) {
+                        this.warehouse = item;
+                        [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
+                        this.formPopup.title = "Update Warehouse";
+                        this.formPopup.code.disable();
+                        this.formPopup.warehouse = item;
+                        this.formPopup.setFormValue(item);
+                        this.formPopup.show();
+                    } else {
+                        this.infoPopupTitle = "You are not allow to view detail of this warehouse";
+                        this.infoPopup.show();
+                    }
+                }
+            )
+
     }
 
     onDelete(event) {
@@ -140,11 +155,21 @@ export class WarehouseComponent extends AppList implements OnInit {
                 );
         }
     }
-    showConfirmDelete(item: Warehouse) {
-        this.warehouse = item;
-        this.confirmPopup.show();
-    }
 
+    showConfirmDelete(item: Warehouse) {
+        this._catalogueRepo.checkAllowDeletePlace(item.id)
+            .subscribe(
+                (res: boolean) => {
+                    if (res) {
+                        this.warehouse = item;
+                        this.confirmPopup.show();
+                    } else {
+                        this.infoPopupTitle = "You are not allow to delete this warehouse";
+                        this.infoPopup.show();
+                    }
+                }
+            );
+    }
     resetSearch(event: { field: string; searchString: any; }) {
         this.criteria = {
             placeType: CommonEnum.PlaceTypeEnum.Warehouse

@@ -1,44 +1,85 @@
-<!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
-            <!--begin:: breadcrumbs-->
             <app-breadcrumb></app-breadcrumb>
-            <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
-            <app-default-button [buttonSetting]="addButtonSetting" (click)="showAdd()"></app-default-button>
-            <app-default-button [buttonSetting]="importButtonSetting"
-                [routerLink]="['/home/catalogue/port-index/import']"></app-default-button>
-            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
+            <app-permission-button (click)="showAdd()" type="add" title="Add New"></app-permission-button>
+            <app-permission-button (click)="export()" type="export" title="Export"></app-permission-button>
+            <app-permission-button [routerLink]="['/home/catalogue/port-index/import']" type="import" title="Import">
+            </app-permission-button>
         </div>
     </div>
 </div>
-<!--end:: subheader-->
-<!--begin::m-content of Port-index-->
+
 <div class="m-content">
-    <!--begin:: m-portlet of search-form-->
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <!--begin::Form-->
             <div class="m-form">
                 <app-search-options [configSearch]="configSearch" (search)="onSearch($event)"
                     (reset_search)=resetSearch($event)>
                 </app-search-options>
             </div>
-            <!--end::Form-->
         </div>
     </div>
-    <!--end::m-portlet of search-form-->
-    <!--begin:: m-portlet of port-index-table-->
+
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <!--begin: Datatable of port-index-list-table -->
-            <app-table-layout [records]="portIndexs" [settings]="portIndexSettings" (sortChange)="onSortChange($event)"
-                (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
-            </app-table-layout>
-            <!--end: Datatable of port-index-list-table -->
-            <!--begin::pagination-->
+            <div class="table-wrapper">
+                <table class="table table-striped table-brand dataTable">
+                    <thead app-table-header [headers]="headers"
+                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                        <th class="m--w-50 first table-actions-col">
+                            Actions
+                        </th>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="!!portIndexs.length">
+                            <tr *ngFor="let port of portIndexs;let i = index;">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 70px">
+                                        <button type="button"
+                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            (click)="showDetail(port)" title="Edit port">
+                                            <i class="la la-edit"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            (click)="showConfirmDelete(port)" title="Remove port">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>{{port.code}}</span>
+                                </td>
+                                <td>
+                                    <span>{{port.nameEn}}</span>
+                                </td>
+                                <td>
+                                    <span>{{port.nameVn}}</span>
+                                </td>
+                                <td>
+                                    <span>{{port.countryName}}</span>
+                                </td>
+                                <td>
+                                    <span>{{port.areaName}}</span>
+                                </td>
+                                <td>
+                                    <span>{{port.modeOfTransport}}</span>
+                                </td>
+                                <td>
+                                    <span [ngClass]="port.active ? 'text-success' : 'text-danger'">
+                                        {{ port.active ? 'Active' : 'Inactive'}}
+                                    </span>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <tr app-table-row-loading *ngIf="isLoading"></tr>
+                        <tr app-table-none-record *ngIf="!portIndexs.length && !isLoading"></tr>
+                    </tbody>
+                </table>
+            </div>
             <div class="pagination-nav ">
                 <div class="row">
                     <div class="col-sm-6">
@@ -62,18 +103,12 @@
                     </div>
                 </div>
             </div>
-            <!--end::pagination-->
         </div>
     </div>
-    <!--end:: m-portlet of port-index-table-->
 </div>
-<!--end::m-content of Port-index-->
 
-<!--begin::add-port-index-modal-->
 <app-form-port-index (onChange)="resetSearch($event)"></app-form-port-index>
-<!--end::add-port-index-modal-->
 
-<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this port index'">
-</app-delete-confirm-modal>
+<confirm-popup body="You want to delete this port index?" (onSubmit)="onDelete(true)"></confirm-popup>
 
-<!-- <confirm-popup #confirmDeletePopup body="You want to delete this port index?" (onSubmit)="onDelete(true)"></confirm-popup> -->
+<info-popup [body]="infoPopupTitle"></info-popup>

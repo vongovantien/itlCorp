@@ -20,6 +20,9 @@ using System.Linq;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Hosting;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.Extensions;
+using ITL.NetCore.Common;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -36,6 +39,8 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ICurrentUser currentUser;
+
 
         /// <summary>
         /// constructor
@@ -44,14 +49,16 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="service">inject interface ICatPlaceService</param>
         /// <param name="iMapper">inject interface IMapper</param>
         /// <param name="hostingEnvironment"></param>
-        public CatPlaceController(IStringLocalizer<LanguageSub> localizer, 
-            ICatPlaceService service, 
+        public CatPlaceController(IStringLocalizer<LanguageSub> localizer,
+            ICatPlaceService service,
             IMapper iMapper,
+            ICurrentUser curUser,
             IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catPlaceService = service;
             mapper = iMapper;
+            currentUser = curUser;
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -99,11 +106,35 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [AuthorizeEx(Menu.catWarehouse, UserPermission.AllowAccess)]
         public IActionResult Get(CatPlaceCriteria criteria, int page, int size)
         {
             var data = catPlaceService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
+        }
+
+        [HttpGet("CheckAllowDetail/{id}")]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            PermissionRange permissionRange;
+            ICurrentUser _user = null;
+            CatPlaceModel place = catPlaceService.First(x => x.Id == id);
+            if (place == null)
+            {
+                return Ok(false);
+            }
+            if (place.PlaceTypeId == CatPlaceTypeEnum.Warehouse.ToString())
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
+            }
+            if (place.PlaceTypeId == CatPlaceTypeEnum.Port.ToString())
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
+            }
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            return Ok(catPlaceService.CheckAllowPermissionAction(id, permissionRange));
         }
 
         /// <summary>
@@ -179,6 +210,20 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Post(CatPlaceEditModel model)
         {
+            PermissionRange permissionRange;
+            ICurrentUser _user = null;
+            if (model.PlaceType == CatPlaceTypeEnum.Warehouse)
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
+            }
+            if (model.PlaceType == CatPlaceTypeEnum.Port)
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
+            }
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return Forbid();
+
             if (!ModelState.IsValid) return BadRequest();
 
             var checkExistMessage = CheckExist(Guid.Empty, model);
@@ -186,8 +231,14 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+
             model.PlaceTypeId = PlaceTypeEx.GetPlaceType(model.PlaceType);
             var catPlace = mapper.Map<CatPlaceModel>(model);
+            catPlace.GroupId = currentUser.GroupId;
+            catPlace.DepartmentId = currentUser.DepartmentId;
+            catPlace.OfficeId = currentUser.OfficeID;
+            catPlace.CompanyId = currentUser.CompanyID;
+
             var hs = catPlaceService.Add(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -195,6 +246,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(result);
             }
+
             return Ok(result);
         }
 
@@ -206,8 +258,29 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
+        [AuthorizeEx(Menu.catWarehouse, UserPermission.Update)]
         public IActionResult Put(Guid id, CatPlaceEditModel model)
         {
+        
+            PermissionRange permissionRange;
+            ICurrentUser _user = null;
+            if (model.PlaceType == CatPlaceTypeEnum.Warehouse)
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
+            }
+            if (model.PlaceType == CatPlaceTypeEnum.Port)
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
+            }
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return Forbid();
+            bool code = catPlaceService.CheckAllowPermissionAction(model.Id, permissionRange);
+
+            if (code == false)
+            {
+                return Forbid();
+            }
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(id, model);
             if (checkExistMessage.Length > 0)
@@ -215,8 +288,8 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catPlace = mapper.Map<CatPlaceModel>(model);
-            catPlace.Id = id;
-            //var hs = catPlaceService.Update(catPlace, x => x.Id == id);
+            // catPlace.Id = id;
+            // var hs = catPlaceService.Update(catPlace, x => x.Id == id);
             var hs = catPlaceService.Update(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -227,6 +300,33 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// check permission delete item
+        /// </summary>
+        /// <param name="id">id of data that want to delete</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDelete/{id}")]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            PermissionRange permissionRange;
+            ICurrentUser _user = null;
+            CatPlaceModel place = catPlaceService.First(x => x.Id == id);
+            if (place == null)
+            {
+                return Ok(false);
+            }
+            if (place.PlaceTypeId == CatPlaceTypeEnum.Warehouse.ToString())
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
+            }
+            if (place.PlaceTypeId == CatPlaceTypeEnum.Port.ToString())
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
+            }
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            return Ok(catPlaceService.CheckAllowPermissionAction(id, permissionRange));
+        }
         /// <summary>
         /// delete an existed item
         /// </summary>
@@ -276,7 +376,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult UpLoadFile(IFormFile uploadedFile, CatPlaceTypeEnum type)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
-            if(file != null)
+            if (file != null)
             {
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
@@ -330,12 +430,12 @@ namespace eFMS.API.Catalogue.Controllers
                 };
                 list.Add(warehouse);
             }
-            list = list.Where(x => x.Code != null 
-                || x.NameEn != null 
-                || x.NameVn != null 
-                || x.Address != null 
-                || x.CountryName != null 
-                || x.ProvinceName != null 
+            list = list.Where(x => x.Code != null
+                || x.NameEn != null
+                || x.NameVn != null
+                || x.Address != null
+                || x.CountryName != null
+                || x.ProvinceName != null
                 || x.DisplayName != null).ToList();
             return list;
         }
@@ -480,5 +580,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return message;
         }
+
+
     }
 }

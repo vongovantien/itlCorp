@@ -29,7 +29,8 @@
             "@validators": ["src/app/shared/validators"],
             "@constants": ["src/constants"],
             "@share-bussiness": ["src/app/business-modules/share-business"],
-            "@store": ["src/app/store"]
+            "@store": ["src/app/store"],
+            "@system-constants": ["src/constants"]
         }
     }
 }
