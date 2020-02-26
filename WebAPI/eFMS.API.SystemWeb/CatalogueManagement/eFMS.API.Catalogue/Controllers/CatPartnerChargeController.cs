@@ -8,6 +8,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
 using ITL.NetCore.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -51,6 +52,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpPut("AddAndUpdate")]
+        [Authorize]
         public IActionResult AddAndUpdate(string partnerId, List<DL.Models.CatPartnerChargeModel> charges)
         {
             ResultHandle result = new ResultHandle();
