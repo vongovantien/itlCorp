@@ -15,6 +15,7 @@ using Microsoft.Extensions.Localization;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using System.Collections.Generic;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.Extensions;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -53,6 +54,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [AuthorizeEx(Menu.acctAP, UserPermission.AllowAccess)]
         public IActionResult Paging(AcctAdvancePaymentCriteria criteria, int pageNumber, int pageSize)
         {
             var data = acctAdvancePaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
@@ -120,7 +122,8 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        [Authorize]
+        //[Authorize]
+        [AuthorizeEx(Menu.acctAP, UserPermission.Add)]
         public IActionResult Add(AcctAdvancePaymentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -238,7 +241,8 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-        [Authorize]
+        //[Authorize]
+        [AuthorizeEx(Menu.acctAP, UserPermission.Update)]
         public IActionResult Update(AcctAdvancePaymentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -326,6 +330,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SaveAndSendRequest")]
+        [Authorize]
         public IActionResult SaveAndSendRequest(AcctAdvancePaymentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -407,8 +412,12 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
                     return BadRequest(_result);
                 }
+                return Ok(result);
             }
-            return Ok(result);
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         /// <summary>
@@ -425,12 +434,13 @@ namespace eFMS.API.Accounting.Controllers
             if (!updateApproval.Success)
             {
                 _result = new ResultHandle { Status = updateApproval.Success, Message = updateApproval.Exception.Message };
+                return BadRequest(_result);
             }
             else
             {
                 _result = new ResultHandle { Status = updateApproval.Success };
+                return Ok(_result);
             }
-            return Ok(_result);
         }
 
         /// <summary>
@@ -448,12 +458,13 @@ namespace eFMS.API.Accounting.Controllers
             if (!denieApproval.Success)
             {
                 _result = new ResultHandle { Status = denieApproval.Success, Message = denieApproval.Exception.Message };
+                return BadRequest(_result);
             }
             else
             {
                 _result = new ResultHandle { Status = denieApproval.Success };
+                return Ok(_result);
             }
-            return Ok(_result);
         }
 
         /// <summary>

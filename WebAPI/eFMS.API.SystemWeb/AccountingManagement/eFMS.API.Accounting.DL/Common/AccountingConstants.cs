@@ -67,5 +67,7 @@ namespace eFMS.API.Accounting.DL.Common
 
         public static readonly string CURRENCY_LOCAL = "VND";
         public static readonly string CURRENCY_USD = "USD";
+        public static readonly short SpecialGroup = 11;
+        public static readonly int AccountantDeptId = 1;
     }
 }
