@@ -214,6 +214,24 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return results;
         }
+
+        public int CheckDetailPermission(string id)
+        {
+            var detail = Get(x => x.Id == id).FirstOrDefault();
+            var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = detail.UserCreated, Salemans = salemans }, permissionRange);
+            return code;
+        }
+
+        private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange)
+        {
+            int code = PermissionEx.GetPermissionToUpdate(model, permissionRange, currentUser);
+            return code;
+        }
+
+
         public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
@@ -234,10 +252,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 case PermissionRange.Owner:
                     if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
                     {
-                       partners = partners.Where(x=> //salemans.Any(y => y.PartnerId.Equals(x.Id))
-
-                       //||
-                       x.SalePersonId == currentUser.UserID
+                       partners = partners.Where(x=>
+                       salemans.Any(y=>y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
                        || x.UserCreated == currentUser.UserID
                        );
                     }
@@ -251,8 +267,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         partners = partners.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
-                       || x.SalePersonId == currentUser.UserID
-                       || salemans.Any(y => y.PartnerId.Equals(x.Id))
+                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
                        );
                     }
                     else
@@ -267,8 +282,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         partners = partners.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
-                       || x.SalePersonId == currentUser.UserID
-                       || salemans.Any(y => y.PartnerId.Equals(x.Id))
+                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
                        );
                     }
                     else
@@ -283,8 +297,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         partners = partners.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
-                       || x.SalePersonId == currentUser.UserID
-                       || salemans.Any(y => y.PartnerId.Equals(x.Id))
+                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+
                        );
                     }
                     else
@@ -299,8 +313,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         partners = partners.Where(x => (x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
-                       || x.SalePersonId == currentUser.UserID
-                       || salemans.Any(y => y.PartnerId.Equals(x.Id))
+                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+
                        );
                     }
                     else

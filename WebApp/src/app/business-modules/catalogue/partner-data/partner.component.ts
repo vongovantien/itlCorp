@@ -145,10 +145,24 @@ export class PartnerComponent extends AppList implements OnInit {
         this.partner = event;
         this.confirmDeletePopup.show();
     }
+
     showDetail(event) {
         this.partner = event;
-        this.router.navigate([`/home/catalogue/partner-data/detail/${this.partner.id}`]);
+        this._catalogueRepo.checkViewDetailPartnerPermission(this.partner.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.router.navigate([`/home/catalogue/partner-data/detail/${this.partner.id}`]);
+                    } else {
+                        this._toastService.error("You don't have permission to view detail");
+                    }
+                },
+            );
     }
+
     onDelete() {
         this._catalogueRepo.deletePartner(this.partner.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))

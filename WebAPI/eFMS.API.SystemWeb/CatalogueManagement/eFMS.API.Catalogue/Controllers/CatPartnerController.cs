@@ -135,6 +135,20 @@ namespace eFMS.API.Catalogue.Controllers
             var data = catPartnerService.First(x => x.Id == id);
             return Ok(data);
         }
+        /// <summary>
+        /// check permission
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
+
+        [HttpGet("CheckPermission/{id}")]
+        public IActionResult CheckDetailPermission(string id)
+        {
+
+            var result = catPartnerService.CheckDetailPermission(id);
+            if (result == 403) return Forbid();
+            return Ok(true);
+        }
 
         /// <summary>
         /// check tax code

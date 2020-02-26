@@ -25,5 +25,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Delete(string id);
         HandleState Update(CatPartnerModel model);
         IQueryable<CatPartnerModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria);
+        int CheckDetailPermission(string id);
+
     }
 }
