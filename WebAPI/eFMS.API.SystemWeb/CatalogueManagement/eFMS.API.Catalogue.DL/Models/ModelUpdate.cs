@@ -10,6 +10,7 @@ namespace eFMS.API.Catalogue.DL.Models
     public class ModelUpdate : BaseUpdateModel
     {
         public string UserCreator { get; set; }
+        public string PartnerGroup { get; set; }
         public List<CatSaleman> Salemans { get; set; }
 
     }

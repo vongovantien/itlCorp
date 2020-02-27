@@ -77,6 +77,9 @@ namespace eFMS.API.Catalogue.DL.Services
         #region CRUD
         public override HandleState Add(CatPartnerModel entity)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRangeWrite == PermissionRange.None) return new HandleState(403);
             var partner = mapper.Map<CatPartner>(entity);
             partner.DatetimeCreated = DateTime.Now;
             partner.DatetimeModified = DateTime.Now;
@@ -113,6 +116,12 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Update(CatPartnerModel model)
         {
+            var listSalemans = salemanRepository.Get(x => x.PartnerId == model.Id).ToList();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+
+            int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = model.UserCreated, Salemans = listSalemans,PartnerGroup = model.PartnerGroup }, permissionRange);
+            if (code == 403) return new HandleState(403);
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
@@ -222,7 +231,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = detail.UserCreated, Salemans = salemans }, permissionRange);
+            int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = detail.UserCreated, Salemans = salemans,PartnerGroup = detail.PartnerGroup }, permissionRange);
             return code;
         }
 
