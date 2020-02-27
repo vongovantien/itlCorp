@@ -13,7 +13,6 @@ export class AppPermissionButtonComponent extends AppForm implements OnInit {
     @Input() type: string = 'add';
 
     menuPermission: SystemInterface.IUserPermission;
-    isShow: boolean = false;
 
     constructor(
         private _store: Store<IAppState>
@@ -29,7 +28,6 @@ export class AppPermissionButtonComponent extends AppForm implements OnInit {
                 (res: SystemInterface.IUserPermission) => {
                     if (res !== null && res !== undefined) {
                         this.menuPermission = res;
-                        this.isShow = res.allowAdd;
                     }
                 }
             );

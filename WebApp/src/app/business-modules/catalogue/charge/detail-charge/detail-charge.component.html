@@ -4,8 +4,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-default-button [buttonSetting]="saveButtonSetting" (click)="updateCharge()"></app-default-button>
-
+            <app-permission-button title="Save" type="save" (click)="updateCharge()"> </app-permission-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" routerLink="/home/catalogue/charge">
             </app-default-button>
         </div>
