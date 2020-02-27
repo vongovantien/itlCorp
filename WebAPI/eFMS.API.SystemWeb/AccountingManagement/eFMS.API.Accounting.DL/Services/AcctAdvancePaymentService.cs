@@ -75,6 +75,11 @@ namespace eFMS.API.Accounting.DL.Services
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = QueryData(criteria);
+            if (data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
 
             //Phân trang
             var _totalItem = data.Select(s => s.Id).Count();
@@ -93,6 +98,10 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IQueryable<AcctAdvancePaymentResult> QueryData(AcctAdvancePaymentCriteria criteria)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            criteria.RangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (criteria.RangeSearch == PermissionRange.None) return null;
+
             var advance = DataContext.Get();
             var request = acctAdvanceRequestRepo.Get();
             var approveAdvance = acctApproveAdvanceRepo.Get(x => x.IsDeputy == false);
@@ -390,8 +399,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState AddAdvancePayment(AcctAdvancePaymentModel model)
         {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403,"");
 
             try
             {
@@ -485,8 +495,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState DeleteAdvancePayment(string advanceNo)
         {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None) return new HandleState(403,"");
 
             try
             {
@@ -592,8 +603,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState UpdateAdvancePayment(AcctAdvancePaymentModel model)
         {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403,"");
 
             try
             {
@@ -650,7 +662,6 @@ namespace eFMS.API.Accounting.DL.Services
                             var requestNew = request.Where(x => x.UserCreated == null || x.UserCreated == string.Empty).ToList();
                             if (requestNew != null && requestNew.Count > 0)
                             {
-                                //requestNew.ForEach(req =>
                                 foreach (var item in requestNew)
                                 {
                                     item.Id = Guid.NewGuid();
@@ -1107,15 +1118,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                     && x.CompanyId == companyId).Select(s => s.UserId).ToList();
             return managers;
         }
-        
-        //Lấy ra AccountantManagerId của Dept Accountant
-        //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
-        private string GetAccountantId(string idBranch)
-        {
-            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == AccountingConstants.DEPT_CODE_ACCOUNTANT).FirstOrDefault()?.ManagerId;
-            return accountantManagerId;
-        }
-
+                
         //Lấy ra BUHeadId của BUHead
         private string GetBUHeadId(string idBranch)
         {

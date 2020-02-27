@@ -13,6 +13,7 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Infrastructure.Extensions;
+using System;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -49,13 +50,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        //[Authorize]
-        [AuthorizeEx(Menu.acctSOA, UserPermission.Add)]
+        [Authorize]
         public IActionResult AddNew(AcctSoaModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
 
             var hs = acctSOAService.AddSOA(model);
+            if (hs.Code == 403) return Forbid();
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -73,13 +74,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-        //[Authorize]
-        [AuthorizeEx(Menu.acctSOA, UserPermission.Update)]
+        [Authorize]
         public IActionResult UpdateSOA(AcctSoaModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
 
             var hs = acctSOAService.UpdateSOA(model);
+            if (hs.Code == 403) return Forbid();
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -88,6 +89,36 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Check allow delete SOA
+        /// </summary>
+        /// <param name="id">Id of SOA</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDelete/{id}")]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None)
+                return Ok(false);
+            return Ok(true);
+        }
+
+        /// <summary>
+        /// Check allow detail SOA
+        /// </summary>
+        /// <param name="id">Id of SOA</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDetail/{id}")]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None)
+                return Ok(false);
+            return Ok(true);
         }
 
         /// <summary>
@@ -101,7 +132,9 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Delete(string soaNo)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = acctSOAService.DeleteSOA(soaNo);//acctSOAService.Delete(x => x.Soano == soaNo);
+            var hs = acctSOAService.DeleteSOA(soaNo);
+            if (hs.Code == 403) return Forbid();
+
             //Update SOANo = NULL & PaySOANo = NULL for ShipmentSurcharge
             acctSOAService.UpdateSOASurCharge(soaNo);
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -121,7 +154,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="pageSize">number items per page</param>
         /// <returns></returns>
         [HttpPost("Paging")]
-        [AuthorizeEx(Menu.acctSOA, UserPermission.AllowAccess)]
+        [Authorize]
         public IActionResult Paging(AcctSOACriteria criteria, int pageNumber, int pageSize)
         {
             var data = acctSOAService.Paging(criteria, pageNumber, pageSize, out int totalItems);
@@ -136,6 +169,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("QueryData")]
+        [Authorize]
         public IActionResult QueryData(AcctSOACriteria criteria)
         {
             var data = acctSOAService.GetListSOA(criteria);
@@ -149,11 +183,16 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="currencyLocal">currencyLocal that want to retrieve SOA</param>
         /// <returns></returns>
         [HttpGet("GetBySoaNo/{soaNo}&{currencyLocal}")]
+        [Authorize]
         public IActionResult GetBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None) return Forbid();
+
             if (string.IsNullOrEmpty(currencyLocal))
                 currencyLocal = AccountingConstants.CURRENCY_LOCAL;
-            var results = acctSOAService.GetDetailBySoaNoAndCurrencyLocal(soaNo, currencyLocal);//acctSOAService.GetBySoaNoAndCurrencyLocal(soaNo, currencyLocal);
+            var results = acctSOAService.GetDetailBySoaNoAndCurrencyLocal(soaNo, currencyLocal);
             return Ok(results);
         }
 
@@ -177,7 +216,7 @@ namespace eFMS.API.Accounting.Controllers
         [Route("GetShipmentsAndCDdNotesNotExistInResultFilter")]
         public ActionResult GetShipmentsAndCDdNotesNotExistInResultFilter(MoreChargeShipmentCriteria criteria)
         {
-            var data = acctSOAService.GetListMoreCharge(criteria);//acctSOAService.GetListMoreChargeByCondition(criteria);
+            var data = acctSOAService.GetListMoreCharge(criteria);
 
             //Danh sách shipment
             var listShipment = data
