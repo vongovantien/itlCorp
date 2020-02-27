@@ -380,7 +380,7 @@
             </div>
             <!--end::  m-portlet-->
             <!--begin:: form-actions-->
-            <div class="form-actions m--align-right">
+            <div class="form-actions m--align-right" *ngIf="customDeclaration">
                 <button *ngIf="customDeclaration.jobNo; else allowSave" type="" disabled="true" hidden="true"
                     class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                     (click)="isConvertJob = false; updateCustomClearance(updateForm)">
@@ -393,7 +393,7 @@
                 </button>
                 <ng-template #allowSave>
                     <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="updateCustomClearance(updateForm)">
+                        *ngIf="customDeclaration.permission.allowUpdate" (click)="updateCustomClearance(updateForm)">
                         <span>
                             <i class="la la la-save"></i>
                             <span>
@@ -413,6 +413,7 @@
                 </button>
                 <ng-template #allowSaveAndConvert>
                     <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                        *ngIf="customDeclaration.permission.allowUpdate"
                         (click)="isConvertJob = true;convertClearanceToShipment(updateForm)">
                         <span>
                             <i class="la la la-save"></i>

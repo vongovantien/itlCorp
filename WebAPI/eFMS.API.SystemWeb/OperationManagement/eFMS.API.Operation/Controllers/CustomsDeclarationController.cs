@@ -307,6 +307,23 @@ namespace eFMS.API.Operation.Controllers
             if (statusCode == 403) return Ok(false);
             return Ok(true);
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("CheckDeletePermission")]
+        [Authorize]
+        public IActionResult CheckDeletePermission()
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if(permissionRangeDelete == PermissionRange.None)
+            {
+                return Ok(false);
+            }
+            return Ok(true);
+        }
 
         /// <summary>
         /// delete multiple custom clearance
@@ -333,16 +350,9 @@ namespace eFMS.API.Operation.Controllers
             if (hs.Success)
             {
                 result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-                return Ok(result);
-
             }
-            else
-            {
-                message = HandleError.GetMessage(hs, Crud.Delete);
-                result = new ResultHandle { Status = hs.Success, Message = message };
-                return BadRequest(result);
-
-            }
+            result = new ResultHandle { Status = hs.Success, Message = message };
+            return Ok(result);
 
         }
 

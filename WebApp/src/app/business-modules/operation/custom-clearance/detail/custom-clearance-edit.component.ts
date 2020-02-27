@@ -17,7 +17,7 @@ import { ToastrService } from 'ngx-toastr';
     templateUrl: './custom-clearance-edit.component.html',
 })
 export class CustomClearanceEditComponent implements OnInit {
-    customDeclaration: CustomClearance = new CustomClearance();
+    customDeclaration: CustomClearance; // = new CustomClearance();
     listCustomer: any[] = [];
     listPort: any = [];
     listCountry: any = [];

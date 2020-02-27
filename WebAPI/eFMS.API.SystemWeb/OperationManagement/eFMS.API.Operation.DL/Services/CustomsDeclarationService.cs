@@ -474,7 +474,7 @@ namespace eFMS.API.Operation.DL.Services
             switch (permissionRangeDelete)
             {
                 case PermissionRange.None:
-                    result = new HandleState(403);
+                    result = new HandleState(403, "");
                     break;
                 case PermissionRange.Owner:
                     if (customs.Any(x => x.UserCreated != currentUser.UserID))
