@@ -10,7 +10,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { AppList } from 'src/app/app.list';
 
 import { FormPortIndexComponent } from './components/form-port-index.component';
-import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { CommonEnum } from '@enums';
 
 import { of } from 'rxjs';
@@ -22,15 +22,13 @@ import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
 })
 export class PortIndexComponent extends AppList implements OnInit {
     @ViewChild(FormPortIndexComponent, { static: false }) formPopup: FormPortIndexComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     portIndexs: Array<PortIndex> = [];
     portIndex: PortIndex = new PortIndex();
 
     criteria: any = { placeType: CommonEnum.PlaceTypeEnum.Port };
-
-    infoPopupTitle: string = 'You are not allow to delete this port';
 
     constructor(private sortService: SortService,
         private exportRepository: ExportRepo,
@@ -153,8 +151,7 @@ export class PortIndexComponent extends AppList implements OnInit {
             ).subscribe(
                 (res: PortIndex | boolean) => {
                     if (!res) {
-                        this.infoPopupTitle = 'You are not allow to view detail of this port';
-                        this.infoPopup.show();
+                        this.info403Popup.show();
                     } else {
                         [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
                         this.formPopup.title = "Update Port Index";
@@ -224,8 +221,7 @@ export class PortIndexComponent extends AppList implements OnInit {
                         this.confirmDeletePopup.show();
                         this.portIndex = item;
                     } else {
-                        this.infoPopupTitle = 'You are not allow to delete this port';
-                        this.infoPopup.show();
+                        this.info403Popup.show();
                     }
                 }
             )

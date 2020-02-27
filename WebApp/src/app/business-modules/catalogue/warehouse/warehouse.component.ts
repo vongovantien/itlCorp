@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { SortService } from '@services';
 import { CatalogueRepo, ExportRepo } from '@repositories';
 import { Warehouse } from '@models';
@@ -22,14 +22,13 @@ export class WarehouseComponent extends AppList implements OnInit {
 
     @ViewChild(FormWarehouseComponent, { static: false }) formPopup: FormWarehouseComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) infoPopup: Permission403PopupComponent;
 
 
     warehouses: Warehouse[] = [];
     warehouse: Warehouse = new Warehouse();
 
     criteria: any = { placeType: CommonEnum.PlaceTypeEnum.Warehouse };
-    infoPopupTitle: string = 'You are not allow to delete this warehouse';
 
     constructor(private sortService: SortService,
         private _catalogueRepo: CatalogueRepo,
@@ -126,7 +125,6 @@ export class WarehouseComponent extends AppList implements OnInit {
                         this.formPopup.setFormValue(item);
                         this.formPopup.show();
                     } else {
-                        this.infoPopupTitle = "You are not allow to view detail of this warehouse";
                         this.infoPopup.show();
                     }
                 }
@@ -164,7 +162,6 @@ export class WarehouseComponent extends AppList implements OnInit {
                         this.warehouse = item;
                         this.confirmPopup.show();
                     } else {
-                        this.infoPopupTitle = "You are not allow to delete this warehouse";
                         this.infoPopup.show();
                     }
                 }
