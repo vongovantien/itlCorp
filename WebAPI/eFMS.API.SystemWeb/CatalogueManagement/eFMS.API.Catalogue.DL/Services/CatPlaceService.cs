@@ -872,11 +872,9 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public bool CheckAllowPermissionAction(Guid placeID, PermissionRange range)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
-
             var detail = DataContext.Get(x => x.Id == placeID)?.FirstOrDefault();
             if (detail == null) return false;
-
+           
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
                 UserCreated = detail.UserCreated,
