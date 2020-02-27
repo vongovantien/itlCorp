@@ -74,6 +74,14 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         typeButton: ButtonType.save
     };
 
+    addButtonSetting: ButtonModalSetting = {
+        typeButton: ButtonType.add
+    };
+
+    exportButtonSetting: ButtonModalSetting = {
+        typeButton: ButtonType.export
+    };
+
 
     configComoBoGrid: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',

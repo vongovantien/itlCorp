@@ -112,7 +112,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                         return;
                     }
                     this.settlementPayment = res;
-
+                    console.log(this.settlementPayment)
                     switch (this.settlementPayment.settlement.statusApproval) {
                         case 'New':
                         case 'Denied':

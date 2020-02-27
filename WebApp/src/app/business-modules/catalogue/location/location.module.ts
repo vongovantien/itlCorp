@@ -24,7 +24,7 @@ const routing: Routes = [
         path: '', data: { name: "" },
         children: [
             {
-                path: '', component: LocationComponent
+                path: '', component: LocationComponent, data: { reuse: true }
             },
             {
                 path: 'location-import', component: LocationImportComponent, data: { name: "Import" }

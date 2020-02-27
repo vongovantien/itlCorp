@@ -110,19 +110,19 @@ export class CustomClearanceComponent extends AppList {
         }
     }
     showDetail(id) {
-        // this._documentRepo.checkViewDetailPermission(id)
-        // .pipe(
-        //     catchError(this.catchError),
-        //     finalize(() => this._progressRef.complete())
-        // ).subscribe(
-        //     (res: any) => {
-        //         if (res) {
-        //             this._router.navigate(['/home/operation/custom-clearance/detail', id]);
-        //         } else {
-        //             this.canNotAllowActionPopup.show();
-        //         }
-        //     },
-        // );
+        this._operationRepo.checkViewDetailPermission(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this._router.navigate(['/home/operation/custom-clearance/detail', id]);
+                    } else {
+                        this.canNotAllowActionPopup.show();
+                    }
+                },
+            );
     }
     getDataFromEcus() {
         this._progressRef.start();

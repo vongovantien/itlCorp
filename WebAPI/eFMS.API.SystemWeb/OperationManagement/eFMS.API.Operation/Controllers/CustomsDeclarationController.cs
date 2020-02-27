@@ -295,6 +295,20 @@ namespace eFMS.API.Operation.Controllers
         }
 
         /// <summary>
+        /// get custom declarations by id
+        /// </summary>
+        /// <param name="id">id that want to retrieve custom declarations</param>
+        /// <returns></returns>
+        [HttpGet("CheckPermission/{id}")]
+        [Authorize]
+        public IActionResult CheckPermission(int id)
+        {
+            var statusCode = customsDeclarationService.CheckDetailPermission(id);
+            if (statusCode == 403) return Ok(false);
+            return Ok(true);
+        }
+
+        /// <summary>
         /// delete multiple custom clearance
         /// </summary>
         /// <param name="listCustom"></param>

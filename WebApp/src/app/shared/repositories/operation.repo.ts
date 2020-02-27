@@ -110,6 +110,9 @@ export class OperationRepo {
     getDetailCustomsDeclaration(id: number) {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetById/${id}`);
     }
+    checkViewDetailPermission(id: number) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/CheckPermission/${id}`);
+    }
 
     addCustomDeclaration(body: any) {
         return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/Add`, body);

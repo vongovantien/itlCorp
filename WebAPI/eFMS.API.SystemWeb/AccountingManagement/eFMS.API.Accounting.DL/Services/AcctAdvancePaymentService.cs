@@ -15,6 +15,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.Models.ReportResults;
+using eFMS.API.Infrastructure.Extensions;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -101,8 +102,8 @@ namespace eFMS.API.Accounting.DL.Services
             var isAccountantDeputy = false;
             if (!string.IsNullOrEmpty(criteria.Requester))
             {
-                isManagerDeputy = CheckDeputyManagerByUser(criteria.Requester);
-                isAccountantDeputy = CheckDeputyAccountantByUser(criteria.Requester);
+                isManagerDeputy = CheckDeputyManagerByUser(currentUser.DepartmentId, criteria.Requester);
+                isAccountantDeputy = CheckDeputyAccountantByUser(currentUser.DepartmentId, criteria.Requester);
             }
 
             List<string> refNo = new List<string>();
@@ -317,7 +318,7 @@ namespace eFMS.API.Accounting.DL.Services
         public List<Shipments> GetShipments()
         {
             var userCurrent = currentUser.UserID;
-            
+
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
             var shipmentsOperation = from ops in opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED)
@@ -389,6 +390,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState AddAdvancePayment(AcctAdvancePaymentModel model)
         {
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403);
+
             try
             {
                 var userCurrent = currentUser.UserID;
@@ -399,6 +403,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                 advance.DatetimeCreated = advance.DatetimeModified = DateTime.Now;
                 advance.UserCreated = advance.UserModified = userCurrent;
+                advance.GroupId = currentUser.GroupId;
+                advance.DepartmentId = currentUser.DepartmentId;
+                advance.OfficeId = currentUser.OfficeID;
+                advance.CompanyId = currentUser.CompanyID;
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -476,6 +485,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState DeleteAdvancePayment(string advanceNo)
         {
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None) return new HandleState(403);
+
             try
             {
                 using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -493,7 +505,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
                         if (advance == null) return new HandleState("Not found Advance Payment No: " + advanceNo);
-                        if(    advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW 
+                        if (advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                             && advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)
                         {
                             return new HandleState("Not allow delete. Advance Payment are awaiting approval.");
@@ -580,6 +592,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState UpdateAdvancePayment(AcctAdvancePaymentModel model)
         {
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403);
+
             try
             {
                 var userCurrent = currentUser.UserID;
@@ -600,12 +615,17 @@ namespace eFMS.API.Accounting.DL.Services
 
                 advance.DatetimeModified = DateTime.Now;
                 advance.UserModified = userCurrent;
+                advance.GroupId = advanceCurrent.GroupId;
+                advance.DepartmentId = advanceCurrent.DepartmentId;
+                advance.OfficeId = advanceCurrent.OfficeId;
+                advance.CompanyId = advanceCurrent.CompanyId;
+
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
                 if (model.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED) && advanceCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
                     advance.StatusApproval = AccountingConstants.STATUS_APPROVAL_NEW;
                 }
-                
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -673,7 +693,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return hs;
             }
         }
-
+        
         #region PREVIEW ADVANCE PAYMENT
         public Crystal Preview(Guid advanceId)
         {
@@ -1065,35 +1085,29 @@ namespace eFMS.API.Accounting.DL.Services
             var infoGrpOfUser = sysGroupRepo.Get(x => x.Id == grpIdOfUser).FirstOrDefault();
             return infoGrpOfUser;
         }
-
         //Lấy Info Dept của User
-        //BrandId "27d26acb-e247-47b7-961e-afa7b3d7e11e"
-        private CatDepartment GetInfoDeptOfUser(string userId, string idBranch)
+        private CatDepartment GetInfoDeptOfUser(int? departmentId)
         {
-            var deptIdOfUser = GetInfoGroupOfUser(userId)?.DepartmentId;
-            var deptOfUser = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault();
+            var deptOfUser = catDepartmentRepo.Get(x => x.Id == departmentId).FirstOrDefault();
             return deptOfUser;
         }
-
         //Lấy ra Leader của User
-        //Leader đây chính là ManagerID của Group
         private string GetLeaderIdOfUser(string userId)
         {
             var leaderIdOfUser = GetInfoGroupOfUser(userId)?.ManagerId;
             return leaderIdOfUser;
         }
 
-        //Lấy ra ManagerId của User
-        //BrandId "27d26acb-e247-47b7-961e-afa7b3d7e11e"
-        private string GetManagerIdOfUser(string userId, string idBranch)
+        private List<string> GetDeptManagerOfUser(Guid? companyId, Guid? officeId, int? departmentId, string userId)
         {
-            //Lấy ra deptId của User
-            var deptIdOfUser = GetInfoGroupOfUser(userId)?.DepartmentId;
-            //Lấy ra mangerId của User
-            var managerIdOfUser = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault()?.ManagerId;
-            return managerIdOfUser;
+            var managers = sysUserLevelRepo.Get(x => x.GroupId == AccountingConstants.SpecialGroup
+                                                    && x.DepartmentId == departmentId
+                                                    && x.DepartmentId != null
+                                                    && x.OfficeId == officeId
+                                                    && x.CompanyId == companyId).Select(s => s.UserId).ToList();
+            return managers;
         }
-
+        
         //Lấy ra AccountantManagerId của Dept Accountant
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetAccountantId(string idBranch)
@@ -1103,10 +1117,9 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy ra BUHeadId của BUHead
-        //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetBUHeadId(string idBranch)
         {
-            var buHeadId = sysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault()?.ManagerId;
+            var buHeadId = "BU Head";
             return buHeadId;
         }
 
@@ -1133,17 +1146,17 @@ namespace eFMS.API.Accounting.DL.Services
         public HandleState CheckExistsInfoManagerOfRequester(AcctApproveAdvanceModel approve)
         {
             var userCurrent = currentUser.UserID;
-
+            
             var acctApprove = mapper.Map<AcctApproveAdvance>(approve);
             //Lấy ra brandId của user 
-            var brandOfUser = currentUser.OfficeID;//GetEmployeeByUserId(userCurrent)?.CompanyId;
+            var brandOfUser = currentUser.OfficeID;
             if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
 
             //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
             acctApprove.Leader = GetLeaderIdOfUser(userCurrent);
-            acctApprove.Manager = GetManagerIdOfUser(userCurrent, brandOfUser.ToString());
+            acctApprove.Manager = GetDeptManagerOfUser(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.UserID).FirstOrDefault();
             if (string.IsNullOrEmpty(acctApprove.Manager)) return new HandleState("Not found department manager of user");
-            acctApprove.Accountant = GetAccountantId(brandOfUser.ToString());
+            acctApprove.Accountant = GetDeptManagerOfUser(currentUser.CompanyID, currentUser.OfficeID, AccountingConstants.AccountantDeptId, currentUser.UserID).FirstOrDefault();
             if (string.IsNullOrEmpty(acctApprove.Accountant)) return new HandleState("Not found accountant manager");
             acctApprove.Buhead = GetBUHeadId(brandOfUser.ToString());
 
@@ -1183,7 +1196,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var advance = DataContext.Get(x => x.AdvanceNo == approve.AdvanceNo).FirstOrDefault();
                     if (advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
-                        && advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED 
+                        && advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                         && advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE
                         && advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
                     {
@@ -1196,19 +1209,21 @@ namespace eFMS.API.Accounting.DL.Services
                     try
                     {
                         //Lấy ra brandId của user 
-                        var brandOfUser = currentUser.OfficeID;//GetEmployeeByUserId(userCurrent)?.CompanyId;
+                        var brandOfUser = currentUser.OfficeID;
                         if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
 
                         //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
                         acctApprove.Leader = GetLeaderIdOfUser(userCurrent);
-                        acctApprove.Manager = GetManagerIdOfUser(userCurrent, brandOfUser.ToString());
+                        acctApprove.Manager = GetDeptManagerOfUser(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.UserID).FirstOrDefault();
                         if (string.IsNullOrEmpty(acctApprove.Manager)) return new HandleState("Not found department manager of user");
-                        acctApprove.Accountant = GetAccountantId(brandOfUser.ToString());
+                        acctApprove.Accountant = GetDeptManagerOfUser(currentUser.CompanyID, currentUser.OfficeID, AccountingConstants.AccountantDeptId, currentUser.UserID).FirstOrDefault();
                         if (string.IsNullOrEmpty(acctApprove.Accountant)) return new HandleState("Not found accountant manager");
                         acctApprove.Buhead = GetBUHeadId(brandOfUser.ToString());//Lấy ra BuHead dựa vào Brand của userCurrent
 
                         var emailLeaderOrManager = string.Empty;
                         var userLeaderOrManager = string.Empty;
+                        List<string> usersDeputy = new List<string>();
+
                         //Send mail đề nghị approve đến Leader(Nếu có) nếu không có thì send tới Manager Dept
                         //Lấy ra Leader của User & Manager Dept của User Requester
                         if (string.IsNullOrEmpty(acctApprove.Leader))
@@ -1218,6 +1233,9 @@ namespace eFMS.API.Accounting.DL.Services
                             var employeeIdOfUserManager = GetEmployeeIdOfUser(userLeaderOrManager);
                             //Lấy ra email của Manager
                             emailLeaderOrManager = GetEmployeeByEmployeeId(employeeIdOfUserManager)?.Email;
+
+                            var deptCodeRequester = GetInfoDeptOfUser(currentUser.DepartmentId)?.Code;
+                            usersDeputy = GetListUserDeputyByDept(deptCodeRequester);
                         }
                         else
                         {
@@ -1230,7 +1248,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not found Leader or Manager of user");
 
-                        var sendMailResult = SendMailSuggestApproval(acctApprove.AdvanceNo, userLeaderOrManager, emailLeaderOrManager);
+                        var sendMailResult = SendMailSuggestApproval(acctApprove.AdvanceNo, userLeaderOrManager, emailLeaderOrManager, usersDeputy);
 
                         if (sendMailResult)
                         {
@@ -1253,7 +1271,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             trans.Commit();
                         }
-                                                
+
                         return !sendMailResult ? new HandleState("Send mail suggest approval failed") : new HandleState();
                     }
                     catch (Exception ex)
@@ -1274,8 +1292,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy ra ds các user được ủy quyền theo nhóm leader, manager department, accountant manager, BUHead dựa vào dept
-        //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
-        private List<string> GetListUserDeputyByDept(string dept, string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
+        private List<string> GetListUserDeputyByDept(string dept)
         {
             Dictionary<string, string> listUsers = new Dictionary<string, string> {
                  { "william.hiep", AccountingConstants.DEPT_CODE_OPS },//User ủy quyền cho dept OPS
@@ -1289,7 +1306,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         //Check group trước đó đã được approve hay chưa? Nếu group trước đó đã approve thì group hiện tại mới được Approve
         //Nếu group hiện tại đã được approve thì không cho approve nữa
-        private HandleState CheckApprovedOfDeptPrevAndDeptCurrent(string advanceNo, string userId, string deptOfUser)
+        private HandleState CheckApprovedOfDeptPrevAndDeptCurrent(string advanceNo, ICurrentUser _userCurrent, string deptOfUser)
         {
             HandleState result = new HandleState("Not allow approve/deny");
 
@@ -1297,7 +1314,7 @@ namespace eFMS.API.Accounting.DL.Services
             var acctApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeputy == false).FirstOrDefault();
             if (acctApprove == null)
             {
-                result = new HandleState("Not found Advance Approval by AdvanceNo is " + advanceNo);
+                result = new HandleState("Not found advance approval by AdvanceNo is " + advanceNo);
                 return result;
             }
 
@@ -1305,28 +1322,32 @@ namespace eFMS.API.Accounting.DL.Services
             var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
             if (advance == null)
             {
-                result = new HandleState("Not found Advance Payment by AdvanceNo is" + advanceNo);
+                result = new HandleState("Not found advance payment by AdvanceNo is" + advanceNo);
                 return result;
             }
 
             //Lấy ra brandId của user requester
-            var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.CompanyId;
+            var brandOfUserRequest = advance.OfficeId;
             if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
 
             //Lấy ra brandId của userId
-            var brandOfUserId = currentUser.OfficeID;//GetEmployeeByUserId(userId)?.CompanyId;
-            if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
+            var brandOfUserId = _userCurrent.OfficeID;
+            if (brandOfUserId == Guid.Empty || brandOfUserId == null) return new HandleState("Not found office of user");
 
             //Trường hợp không có Leader
             if (string.IsNullOrEmpty(acctApprove.Leader))
             {
                 //Manager Department Approve
+                var managerOfUserRequester = GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, advance.DepartmentId, advance.Requester).FirstOrDefault();
                 //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt (Manager Dept) hay không
-                if (userId == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || CheckDeputyManagerByUser(userId))
+                if (_userCurrent.UserID == managerOfUserRequester
+                    || CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (GetInfoGroupOfUser(userId)?.DepartmentId != GetInfoGroupOfUser(advance.Requester)?.DepartmentId)
+                    if (_userCurrent.CompanyID == advance.CompanyId
+                       && _userCurrent.OfficeID == advance.OfficeId
+                       && _userCurrent.DepartmentId != advance.DepartmentId)
                     {
                         result = new HandleState("Not in the same department");
                     }
@@ -1355,8 +1376,10 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 //Accountant Approve
+                var accountantOfUser = GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, AccountingConstants.AccountantDeptId, advance.Requester).FirstOrDefault();
                 //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt (Accoutant) hay không
-                if (userId == GetAccountantId(brandOfUserId.ToString()) || CheckDeputyAccountantByUser(userId))
+                if (_userCurrent.UserID == accountantOfUser 
+                    || CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID))
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
@@ -1383,11 +1406,13 @@ namespace eFMS.API.Accounting.DL.Services
             else //Trường hợp có leader
             {
                 //Leader Approve
-                if (userId == GetLeaderIdOfUser(advance.Requester))
+                if (_userCurrent.UserID == GetLeaderIdOfUser(advance.Requester))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (GetInfoGroupOfUser(userId)?.DepartmentId != GetInfoGroupOfUser(advance.Requester)?.DepartmentId)
+                    if (_userCurrent.CompanyID == advance.CompanyId
+                       && _userCurrent.OfficeID == advance.OfficeId
+                       && _userCurrent.DepartmentId != advance.DepartmentId)
                     {
                         result = new HandleState("Not in the same department");
                     }
@@ -1417,12 +1442,16 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 //Manager Department Approve
+                var managerOfUserRequester = GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, advance.DepartmentId, advance.Requester).FirstOrDefault();
                 //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt (Manager Dept) hay không
-                if (userId == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || CheckDeputyManagerByUser(userId))
+                if (_userCurrent.UserID == managerOfUserRequester
+                    || CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (GetInfoGroupOfUser(userId)?.DepartmentId != GetInfoGroupOfUser(advance.Requester)?.DepartmentId)
+                    if (_userCurrent.CompanyID == advance.CompanyId
+                       && _userCurrent.OfficeID == advance.OfficeId
+                       && _userCurrent.DepartmentId != advance.DepartmentId)
                     {
                         result = new HandleState("Not in the same department");
                     }
@@ -1454,8 +1483,10 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 //Accountant Approve
+                var accountantOfUser = GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, AccountingConstants.AccountantDeptId, advance.Requester).FirstOrDefault();
                 //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt (Accoutant) hay không
-                if (userId == GetAccountantId(brandOfUserId.ToString()) || CheckDeputyAccountantByUser(userId))
+                if (_userCurrent.UserID == accountantOfUser
+                    || CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID))
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
@@ -1490,6 +1521,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var userAprNext = string.Empty;
             var emailUserAprNext = string.Empty;
+            List<string> usersDeputy = new List<string>();
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -1503,7 +1535,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (approve == null)
                     {
-                        if(acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Any() == false)
+                        if (acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Any() == false)
                         {
                             return new HandleState("Not found Advance Approval by AdvanceNo is " + advance.AdvanceNo);
                         }
@@ -1514,25 +1546,25 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     //Lấy ra brandId của user requester
-                    var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.CompanyId;
+                    var brandOfUserRequest = advance.OfficeId;
                     if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
 
                     //Lấy ra brandId của userId
-                    var brandOfUserId = currentUser.OfficeID;//GetEmployeeByUserId(userCurrent)?.CompanyId;
-                    if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
+                    var brandOfUserId = currentUser.OfficeID;
+                    if (brandOfUserId == Guid.Empty || brandOfUserId == null) return new HandleState("Not found office of user");
 
                     //Lấy ra dept code của userApprove dựa vào userApprove
-                    var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
+                    var deptCodeOfUser = GetInfoDeptOfUser(currentUser.DepartmentId)?.Code;
                     if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
 
                     //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-                    var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
+                    var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, currentUser, deptCodeOfUser);
                     if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                     if (approve != null && advance != null)
                     {
                         if (userCurrent == GetLeaderIdOfUser(advance.Requester))
                         {
-                            if(    advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED
+                            if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED
                                 || advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED
                                 || advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
                                 || advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
@@ -1543,13 +1575,17 @@ namespace eFMS.API.Accounting.DL.Services
                             approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
 
                             //Lấy email của Department Manager
-                            userAprNext = GetManagerIdOfUser(userCurrent, brandOfUserId.ToString());
+                            userAprNext = GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, advance.DepartmentId, advance.Requester).FirstOrDefault();
                             var userAprNextId = GetEmployeeIdOfUser(userAprNext);
                             emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+
+                            var deptCodeRequester = GetInfoDeptOfUser(advance.DepartmentId)?.Code;
+                            usersDeputy = GetListUserDeputyByDept(deptCodeRequester);
                         }
-                        else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        else if (userCurrent == GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, advance.DepartmentId, advance.Requester).FirstOrDefault()
+                            || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
-                            if (   advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED 
+                            if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED
                                 || advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
                                 || advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
@@ -1560,11 +1596,15 @@ namespace eFMS.API.Accounting.DL.Services
                             approve.ManagerApr = userCurrent;
 
                             //Lấy email của Accountant Manager
-                            userAprNext = GetAccountantId(brandOfUserId.ToString());
+                            userAprNext = GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, AccountingConstants.AccountantDeptId, advance.Requester).FirstOrDefault();
                             var userAprNextId = GetEmployeeIdOfUser(userAprNext);
                             emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId)?.Email;
+
+                            var deptCodeAccountant = GetInfoDeptOfUser(AccountingConstants.AccountantDeptId)?.Code;
+                            usersDeputy = GetListUserDeputyByDept(deptCodeAccountant);
                         }
-                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                        else if (userCurrent == GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, AccountingConstants.AccountantDeptId, advance.Requester).FirstOrDefault()//GetAccountantId(brandOfUserId.ToString()) 
+                            || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                         {
                             if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
@@ -1587,7 +1627,8 @@ namespace eFMS.API.Accounting.DL.Services
                         trans.Commit();
                     }
 
-                    if (userCurrent == GetAccountantId(brandOfUserId.ToString()))
+                    //Nếu currentUser là Accoutant of Requester thì return
+                    if (userCurrent == GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, AccountingConstants.AccountantDeptId, advance.Requester).FirstOrDefault())
                     {
                         return new HandleState();
                     }
@@ -1596,7 +1637,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if (string.IsNullOrEmpty(emailUserAprNext)) return new HandleState("Not found email of user " + userAprNext);
 
                         //Send mail đề nghị approve
-                        var sendMailResult = SendMailSuggestApproval(advance.AdvanceNo, userAprNext, emailUserAprNext);
+                        var sendMailResult = SendMailSuggestApproval(advance.AdvanceNo, userAprNext, emailUserAprNext, usersDeputy);
 
                         return sendMailResult ? new HandleState() : new HandleState("Send mail suggest Approval failed");
                     }
@@ -1639,15 +1680,15 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     //Lấy ra brandId của user requester
-                    var brandOfUserRequest = GetEmployeeByUserId(advance.Requester)?.CompanyId;
+                    var brandOfUserRequest = advance.OfficeId;
                     if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
 
                     //Lấy ra brandId của userId
-                    var brandOfUserId = currentUser.OfficeID;//GetEmployeeByUserId(userCurrent)?.CompanyId;
-                    if (brandOfUserId == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user");
+                    var brandOfUserId = currentUser.OfficeID;
+                    if (brandOfUserId == Guid.Empty || brandOfUserId == null) return new HandleState("Not found office of user");
 
                     //Lấy ra dept code của userApprove dựa vào userApprove
-                    var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString())?.Code;
+                    var deptCodeOfUser = GetInfoDeptOfUser(currentUser.DepartmentId)?.Code;
                     if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
 
                     //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
@@ -1663,11 +1704,12 @@ namespace eFMS.API.Accounting.DL.Services
                         if (userCurrent == GetLeaderIdOfUser(advance.Requester))
                         {
                             //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
+                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, currentUser, deptCodeOfUser);
                             if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                             approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
                         }
-                        else if (userCurrent == GetManagerIdOfUser(advance.Requester, brandOfUserRequest.ToString()) || CheckDeputyManagerByUser(userCurrent))
+                        else if (userCurrent == GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, advance.DepartmentId, advance.Requester).FirstOrDefault()
+                            || CheckDeputyManagerByUser(currentUser.DepartmentId, currentUser.UserID))
                         {
                             //Cho phép User Manager thực hiện deny khi user Manager đã Approved, 
                             //nếu Chief Accountant đã Approved thì User Manager ko được phép deny
@@ -1679,17 +1721,18 @@ namespace eFMS.API.Accounting.DL.Services
                             approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
                             approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
                         }
-                        else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || CheckDeputyAccountantByUser(userCurrent))
+                        else if (userCurrent == GetDeptManagerOfUser(advance.CompanyId, advance.OfficeId, AccountingConstants.AccountantDeptId, advance.Requester).FirstOrDefault()
+                            || CheckDeputyAccountantByUser(currentUser.DepartmentId, currentUser.UserID))
                         {
                             //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
+                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, currentUser, deptCodeOfUser);
                             if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                             approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
                             approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
                         }
                         else
                         {
-                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, userCurrent, deptCodeOfUser);
+                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, currentUser, deptCodeOfUser);
                             if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                         }
 
@@ -1725,7 +1768,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Send Mail đề nghị Approve
-        private bool SendMailSuggestApproval(string advanceNo, string userReciver, string emailUserReciver)
+        private bool SendMailSuggestApproval(string advanceNo, string userReciver, string emailUserReciver, List<string> usersDeputy)
         {
             //Lấy ra AdvancePayment dựa vào AdvanceNo
             var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
@@ -1733,7 +1776,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(advance.Requester);
-            var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameVn;
+            var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
             var emailRequester = GetEmployeeByEmployeeId(requesterId)?.Email;
 
             //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
@@ -1747,13 +1790,17 @@ namespace eFMS.API.Accounting.DL.Services
                 totalAmount = Math.Round(totalAmount.Value, 2);
             }
 
+            var userReciverId = GetEmployeeIdOfUser(userReciver);
+            var userReciverName = GetEmployeeByEmployeeId(userReciverId)?.EmployeeNameEn;
+
             //Mail Info
             var numberOfRequest = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Count();
+            numberOfRequest = numberOfRequest == 0 ? 1 : (numberOfRequest + 1);
             string subject = "eFMS - Advance Payment Approval Request from [RequesterName] - [NumberOfRequest] " + (numberOfRequest > 1 ? "times" : "time");
             subject = subject.Replace("[RequesterName]", requesterName);
             subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
             string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [UserName],</b></i></p><p>You have new Advance Payment Approval Request from <b>[RequesterName]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu duyệt tạm ứng từ <b>[RequesterName]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Chi tiết phiếu tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{0}'/></p></div>", CrystalEx.GetLogoEFMS());
-            body = body.Replace("[UserName]", userReciver);
+            body = body.Replace("[UserName]", userReciverName);
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[AdvanceNo]", advanceNo);
             body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));
@@ -1775,21 +1822,21 @@ namespace eFMS.API.Accounting.DL.Services
                 emailRequester
             };
 
-            //Lấy ra brandId của userId
-            var brandOfUserIReciver = GetEmployeeByUserId(userReciver)?.CompanyId;
-            //Lấy ra email của các User được ủy quyền của group của User Approve
-            //var deptCodeOfUserReciver = GetInfoDeptOfUser(advance.Requester).Code;
-            var deptCodeOfUserReciver = GetInfoDeptOfUser(userReciver, brandOfUserIReciver.ToString())?.Code;
-            var usersDeputy = GetListUserDeputyByDept(deptCodeOfUserReciver);
             if (usersDeputy.Count > 0)
             {
-                foreach (var userId in usersDeputy)
+                foreach (var userName in usersDeputy)
                 {
+                    //Lấy ra userId by userName
+                    var userId = sysUserRepo.Get(x => x.Username == userName).FirstOrDefault()?.Id;
+
                     //Lấy ra employeeId của user
                     var employeeIdOfUser = GetEmployeeIdOfUser(userId);
                     //Lấy ra email của user
                     var emailUser = GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
-                    emailCCs.Add(emailUser);
+                    if (!string.IsNullOrEmpty(emailUser))
+                    {
+                        emailCCs.Add(emailUser);
+                    }
                 }
             }
 
@@ -1806,9 +1853,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(advance.Requester);
-            var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameVn;
+            var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
             var emailRequester = GetEmployeeByEmployeeId(requesterId)?.Email;
-
 
             //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
             var requests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId);
@@ -1858,7 +1904,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(advance.Requester);
-            var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameVn;
+            var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
             var emailRequester = GetEmployeeByEmployeeId(requesterId)?.Email;
 
             //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
@@ -1901,21 +1947,15 @@ namespace eFMS.API.Accounting.DL.Services
             return sendMailResult;
         }
 
-        //Logo eFMS
-        //private string logoeFMSBase64()
-        //{
-        //    return "data:image/png;base64,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";
-        //}
-
         //Kiểm tra User đăng nhập vào có thuộc các user Approve Advance không, nếu không thuộc bất kỳ 1 user nào thì gán cờ IsApproved bằng true
         //Kiểm tra xem dept đã approve chưa, nếu dept của user đó đã approve thì gán cờ IsApproved bằng true
-        private bool CheckUserInApproveAdvanceAndDeptApproved(string userCurrent, AcctApproveAdvanceModel approveAdvance)
+        private bool CheckUserInApproveAdvanceAndDeptApproved(ICurrentUser userCurrent, AcctApproveAdvanceModel approveAdvance)
         {
             var isApproved = false;
-            var isDeputyManage = CheckDeputyManagerByUser(userCurrent);
-            var isDeputyAccoutant = CheckDeputyAccountantByUser(userCurrent);
+            var isDeputyManage = CheckDeputyManagerByUser(userCurrent.DepartmentId, userCurrent.UserID);
+            var isDeputyAccoutant = CheckDeputyAccountantByUser(userCurrent.DepartmentId, userCurrent.UserID);
 
-            if (userCurrent == approveAdvance.Requester) //Requester
+            if (userCurrent.UserID == approveAdvance.Requester) //Requester
             {
                 isApproved = true;
                 if (approveAdvance.RequesterAprDate == null)
@@ -1923,7 +1963,7 @@ namespace eFMS.API.Accounting.DL.Services
                     isApproved = false;
                 }
             }
-            else if (userCurrent == approveAdvance.Leader) //Leader
+            else if (userCurrent.UserID == approveAdvance.Leader) //Leader
             {
                 isApproved = true;
                 if (approveAdvance.LeaderAprDate == null)
@@ -1931,7 +1971,7 @@ namespace eFMS.API.Accounting.DL.Services
                     isApproved = false;
                 }
             }
-            else if (userCurrent == approveAdvance.Manager || userCurrent == approveAdvance.ManagerApr || isDeputyManage) //Dept Manager
+            else if (userCurrent.UserID == approveAdvance.Manager || userCurrent.UserID == approveAdvance.ManagerApr || isDeputyManage) //Dept Manager
             {
                 isApproved = true;
                 var isDeptWaitingApprove = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)).Any();
@@ -1940,7 +1980,7 @@ namespace eFMS.API.Accounting.DL.Services
                     isApproved = false;
                 }
             }
-            else if (userCurrent == approveAdvance.Accountant || userCurrent == approveAdvance.AccountantApr || isDeputyAccoutant) //Accountant Manager
+            else if (userCurrent.UserID == approveAdvance.Accountant || userCurrent.UserID == approveAdvance.AccountantApr || isDeputyAccoutant) //Accountant Manager
             {
                 isApproved = true;
                 var isDeptWaitingApprove = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any();
@@ -1949,7 +1989,7 @@ namespace eFMS.API.Accounting.DL.Services
                     isApproved = false;
                 }
             }
-            else if (userCurrent == approveAdvance.Buhead || userCurrent == approveAdvance.BuheadApr) //BUHead
+            else if (userCurrent.UserID == approveAdvance.Buhead || userCurrent.UserID == approveAdvance.BuheadApr) //BUHead
             {
                 isApproved = true;
                 if (string.IsNullOrEmpty(approveAdvance.BuheadApr) && approveAdvance.BuheadAprDate == null)
@@ -1978,7 +2018,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Kiểm tra User đăng nhập vào có thuộc các user Approve Advance không, nếu không thuộc bất kỳ 1 user nào thì gán cờ IsApproved bằng true
                 //Kiểm tra xem dept đã approve chưa, nếu dept của user đó đã approve thì gán cờ IsApproved bằng true           
-                aprAdvanceMap.IsApproved = CheckUserInApproveAdvanceAndDeptApproved(userCurrent, aprAdvanceMap);
+                aprAdvanceMap.IsApproved = CheckUserInApproveAdvanceAndDeptApproved(currentUser, aprAdvanceMap);
                 aprAdvanceMap.RequesterName = string.IsNullOrEmpty(aprAdvanceMap.Requester) ? null : GetEmployeeByUserId(aprAdvanceMap.Requester)?.EmployeeNameVn;
                 aprAdvanceMap.LeaderName = string.IsNullOrEmpty(aprAdvanceMap.Leader) ? null : GetEmployeeByUserId(aprAdvanceMap.Leader)?.EmployeeNameVn;
                 aprAdvanceMap.ManagerName = string.IsNullOrEmpty(aprAdvanceMap.Manager) ? null : GetEmployeeByUserId(aprAdvanceMap.Manager)?.EmployeeNameVn;
@@ -1986,7 +2026,7 @@ namespace eFMS.API.Accounting.DL.Services
                 aprAdvanceMap.BUHeadName = string.IsNullOrEmpty(aprAdvanceMap.Buhead) ? null : GetEmployeeByUserId(aprAdvanceMap.Buhead)?.EmployeeNameVn;
                 aprAdvanceMap.StatusApproval = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo).FirstOrDefault()?.StatusApproval;
 
-                var isManagerDeputy = CheckDeputyManagerByUser(userCurrent);
+                var isManagerDeputy = CheckDeputyManagerByUser(currentUser.DepartmentId, currentUser.UserID);
                 aprAdvanceMap.IsManager = (userCurrent == approveAdvance.Manager || userCurrent == approveAdvance.ManagerApr || isManagerDeputy) ? true : false;
             }
             else
@@ -2054,21 +2094,22 @@ namespace eFMS.API.Accounting.DL.Services
             var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo));
             return data.ToList();
         }
-        
+
         public LockedLogResultModel GetAdvanceToUnlock(List<string> keyWords)
         {
             var result = new LockedLogResultModel();
             var advancesToUnLock = DataContext.Get(x => keyWords.Contains(x.AdvanceNo));
             if (advancesToUnLock == null) return result;
-            result.LockedLogs = advancesToUnLock.Select(x => new LockedLogModel {
-                                                Id = x.Id,
-                                                AdvanceNo = x.AdvanceNo,
-                                                LockedLog = x.LockedLog
-                                            });
-            if(result.LockedLogs != null)
+            result.LockedLogs = advancesToUnLock.Select(x => new LockedLogModel
+            {
+                Id = x.Id,
+                AdvanceNo = x.AdvanceNo,
+                LockedLog = x.LockedLog
+            });
+            if (result.LockedLogs != null)
             {
                 result.Logs = new List<string>();
-                foreach(var item in advancesToUnLock)
+                foreach (var item in advancesToUnLock)
                 {
                     var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
                     result.Logs.AddRange(logs);
@@ -2097,7 +2138,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (hs.Success)
                             {
                                 var approveAdvances = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo);
-                                foreach(var approve in approveAdvances)
+                                foreach (var approve in approveAdvances)
                                 {
                                     approve.IsDeputy = true;
                                     approve.UserModified = currentUser.UserID;
@@ -2122,30 +2163,24 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        private bool CheckDeputyManagerByUser(string user)
+        private bool CheckDeputyManagerByUser(int? departmentId, string userId)
         {
             var result = false;
-            //Lấy ra brandId của user
-            var brandOfUserId = GetEmployeeByUserId(user)?.CompanyId;
-            //Lấy ra dept code của user dựa vào user
-            var deptCodeOfUser = GetInfoDeptOfUser(user, brandOfUserId.ToString())?.Code;
+            var deptCodeOfUser = GetInfoDeptOfUser(departmentId)?.Code;
             if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser != AccountingConstants.DEPT_CODE_ACCOUNTANT)
             {
-                result = GetListUserDeputyByDept(deptCodeOfUser).Contains(user) ? true : false;
+                result = GetListUserDeputyByDept(deptCodeOfUser).Contains(userId) ? true : false;
             }
             return result;
         }
 
-        private bool CheckDeputyAccountantByUser(string user)
+        private bool CheckDeputyAccountantByUser(int? departmentId, string userId)
         {
             var result = false;
-            //Lấy ra brandId của user
-            var brandOfUserId = GetEmployeeByUserId(user)?.CompanyId;
-            //Lấy ra dept code của user dựa vào user
-            var deptCodeOfUser = GetInfoDeptOfUser(user, brandOfUserId.ToString())?.Code;
+            var deptCodeOfUser = GetInfoDeptOfUser(departmentId)?.Code;
             if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser == AccountingConstants.DEPT_CODE_ACCOUNTANT)
             {
-                result = GetListUserDeputyByDept(deptCodeOfUser).Contains(user) ? true : false;
+                result = GetListUserDeputyByDept(deptCodeOfUser).Contains(userId) ? true : false;
             }
             return result;
         }

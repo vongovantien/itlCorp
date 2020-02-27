@@ -1,20 +1,8 @@
-<!--begin:: subheader-->
-<div class="m-subheader">
-    <div class="d-flex align-items-center">
-        <div class="mr-auto">
-            <!--begin:: breadcrumbs-->
-            <app-breadcrumb></app-breadcrumb>
-            <!--end:: breadcrumbs-->
-        </div>
-    </div>
-</div>
-<!--end:: subheader-->
-<!--begin::m-content-->
+<app-sub-header></app-sub-header>
+
 <div class="m-content">
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <!--begin::Form-->
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
@@ -71,15 +59,12 @@
                     </app-default-button>
                 </div>
             </div>
-            <!--end::Form-->
         </div>
     </div>
-    <!--end::m-portlet-->
-    <!--begin:: m-portlet-->
+
     <div class="m-portlet" style="position: relative">
         <ng-progress [thick]="true" [color]="'#2ea2f4'" [spinner]="true"></ng-progress>
         <div class="m-portlet__body">
-            <!--begin: Datatable -->
             <div class="table-wrapper" id="">
                 <table class="table table-striped table-brand dataTable">
                     <thead>
@@ -175,19 +160,12 @@
                         </ng-container>
                     </tbody>
                 </table>
-                <!-- <app-table-detail [records]="data" [settings]="WarehouseImportSettings" [hasOreder]="true" (sortChange)="onSortChange($event)"></app-table-detail> -->
             </div>
-            <!--end: Datatable -->
 
-            <!--begin::pagination-->
             <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)">
             </app-pagination>
-            <!--end::pagination-->
         </div>
     </div>
-    <!--end:: m-portlet-->
 </div>
-<!--end::m-content-->
-<!--begin::modal-->
+
 <info-popup [body]="'There are invalid data. Please check Import!'"></info-popup>
-<!--end::modal-->

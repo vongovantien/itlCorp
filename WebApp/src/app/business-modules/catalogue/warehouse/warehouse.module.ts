@@ -17,7 +17,7 @@ const routing: Routes = [
     {
         path: '', data: { name: "" }, children: [
             {
-                path: '', component: WarehouseComponent
+                path: '', component: WarehouseComponent, data: { reuse: true }
             },
             { path: 'import', component: WarehouseImportComponent, data: { name: "Import", level: 3 } },
         ]

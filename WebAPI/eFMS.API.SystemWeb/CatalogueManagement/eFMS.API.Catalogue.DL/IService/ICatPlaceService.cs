@@ -29,6 +29,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Update(CatPlaceModel model);
         HandleState Delete(Guid id);
         List<vw_catProvince> GetAllProvinces();
+        bool CheckAllowPermissionAction(Guid Id, PermissionRange range);
 
     }
 }

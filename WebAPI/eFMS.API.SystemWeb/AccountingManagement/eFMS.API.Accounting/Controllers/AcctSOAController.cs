@@ -12,6 +12,7 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.Extensions;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -48,7 +49,8 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        [Authorize]
+        //[Authorize]
+        [AuthorizeEx(Menu.acctSOA, UserPermission.Add)]
         public IActionResult AddNew(AcctSoaModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -71,7 +73,8 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-        [Authorize]
+        //[Authorize]
+        [AuthorizeEx(Menu.acctSOA, UserPermission.Update)]
         public IActionResult UpdateSOA(AcctSoaModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -98,7 +101,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Delete(string soaNo)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = acctSOAService.Delete(x => x.Soano == soaNo);
+            var hs = acctSOAService.DeleteSOA(soaNo);//acctSOAService.Delete(x => x.Soano == soaNo);
             //Update SOANo = NULL & PaySOANo = NULL for ShipmentSurcharge
             acctSOAService.UpdateSOASurCharge(soaNo);
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -118,6 +121,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="pageSize">number items per page</param>
         /// <returns></returns>
         [HttpPost("Paging")]
+        [AuthorizeEx(Menu.acctSOA, UserPermission.AllowAccess)]
         public IActionResult Paging(AcctSOACriteria criteria, int pageNumber, int pageSize)
         {
             var data = acctSOAService.Paging(criteria, pageNumber, pageSize, out int totalItems);

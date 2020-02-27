@@ -23,6 +23,7 @@ export abstract class AppList extends AppPage {
     left: CommonType.DIRECTION = 'left';
 
     headers: CommonInterface.IHeaderTable[];
+    configSearch: CommonInterface.IConfigSearchOption;
 
     constructor() {
         super();

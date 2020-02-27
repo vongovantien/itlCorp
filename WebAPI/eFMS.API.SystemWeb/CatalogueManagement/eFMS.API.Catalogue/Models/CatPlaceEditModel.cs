@@ -18,6 +18,7 @@ namespace eFMS.API.Catalogue.Models
         [Required(AllowEmptyStrings = false, ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
         [StringLength(200, MinimumLength = 3, ErrorMessage = "EF_ANNOTATIONS_STRING_LENGTH")]
         public string NameEn{ get; set; }
+        public Guid Id { get; set; }
         public string DisplayName { get; set; }
         public string Address { get; set; }
         public Guid? DistrictId { get; set; }
@@ -36,5 +37,6 @@ namespace eFMS.API.Catalogue.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InActiveOn { get; set; }
+        public string FlightVesselNo { get; set; }
     }
 }
