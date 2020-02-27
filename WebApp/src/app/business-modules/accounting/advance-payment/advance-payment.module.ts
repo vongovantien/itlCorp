@@ -23,7 +23,7 @@ const routing: Routes = [
         data: { name: "" },
         children: [
             {
-                path: '', component: AdvancePaymentComponent
+                path: '', component: AdvancePaymentComponent,data: {reuse: true}
             },
             {
                 path: "new", component: AdvancePaymentAddNewComponent,

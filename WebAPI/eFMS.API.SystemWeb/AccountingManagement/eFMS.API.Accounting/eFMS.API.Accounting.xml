@@ -67,6 +67,20 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.CheckAllowDelete(System.Guid)">
+            <summary>
+            Check allow delete advance payment
+            </summary>
+            <param name="id">Id of advance payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.CheckAllowDetail(System.Guid)">
+            <summary>
+            Check allow detail advance payment
+            </summary>
+            <param name="id">Id of advance payment</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Delete(System.String)">
             <summary>
             delete an advance payment existed item
@@ -138,6 +152,26 @@
             <param name="advanceNo">advanceNo that want to retrieve approve advance</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetAdvancesOfShipment">
+            <summary>
+            Get list advance of shipment
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetAdvancePayment(System.Collections.Generic.List{System.String})">
+            <summary>
+            Get advances to unlock
+            </summary>
+            <param name="keyWords"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.UnLock(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.LockedLogModel})">
+            <summary>
+            Unlock advance
+            </summary>
+            <param name="advancePayments"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController">
             <summary>
             A base class for an MVC controller without view support.
@@ -172,6 +206,20 @@
             Get list shipment of settlement payment list by settlementNo
             </summary>
             <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CheckAllowDelete(System.Guid)">
+            <summary>
+            Check allow delete settlement payment
+            </summary>
+            <param name="id">Id of settlement payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CheckAllowDetail(System.Guid)">
+            <summary>
+            Check allow detail settlement payment
+            </summary>
+            <param name="id">Id of settlement payment</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Delete(System.String)">
@@ -275,6 +323,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.UnLock(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.LockedLogModel})">
+            <summary>
+            Unlock settlement payment
+            </summary>
+            <param name="settlePayments"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSOAController">
             <summary>
             A base class for an MVC controller without view support.
@@ -300,6 +355,20 @@
             Update SOA
             </summary>
             <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.CheckAllowDelete(System.Guid)">
+            <summary>
+            Check allow delete SOA
+            </summary>
+            <param name="id">Id of SOA</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.CheckAllowDetail(System.Guid)">
+            <summary>
+            Check allow detail SOA
+            </summary>
+            <param name="id">Id of SOA</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.Delete(System.String)">

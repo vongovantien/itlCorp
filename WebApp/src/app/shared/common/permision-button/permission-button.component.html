@@ -1,7 +1,7 @@
 <ng-container *ngIf="isShow">
     <ng-container [ngSwitch]="type">
         <ng-container *ngSwitchCase="'import'">
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="onClick()"
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
                 *ngIf="!!menuPermission && menuPermission.import">
                 <span>
                     <i class="la la-upload"></i>
@@ -12,7 +12,7 @@
             </button>
         </ng-container>
         <ng-container *ngSwitchCase="'export'">
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onClick()"
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                 *ngIf="!!menuPermission && menuPermission.export">
                 <span>
                     <i class="la la-download"></i>
@@ -22,8 +22,30 @@
                 </span>
             </button>
         </ng-container>
+        <ng-container *ngSwitchCase="'save'">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                *ngIf="!!menuPermission && menuPermission.write !== 'None'">
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        {{title}}
+                    </span>
+                </span>
+            </button>
+        </ng-container>
+        <ng-container *ngSwitchCase="'save-and-send'">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                *ngIf="!!menuPermission && menuPermission.write !== 'None'">
+                <span>
+                    <i class="la la-download"></i>
+                    <span>
+                        {{title}}
+                    </span>
+                </span>
+            </button>
+        </ng-container>
         <ng-container *ngSwitchDefault>
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="onClick()"
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                 *ngIf="!!menuPermission && menuPermission.allowAdd">
                 <span>
                     <i class="la la-plus"></i>

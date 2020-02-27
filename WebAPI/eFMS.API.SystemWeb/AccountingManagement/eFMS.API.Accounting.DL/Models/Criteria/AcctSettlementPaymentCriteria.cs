@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Common.Globals;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,5 +15,6 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public DateTime? AdvanceDateTo { get; set; }
         public string PaymentMethod { get; set; }
         public string StatusApproval { get; set; }
+        public PermissionRange RangeSearch { get; set; }
     }
 }
