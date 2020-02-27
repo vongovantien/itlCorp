@@ -1,25 +1,27 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import _map from 'lodash/map';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { SortService } from 'src/app/shared/services/sort.service';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { AppList } from 'src/app/app.list';
-import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
-import { Charge } from 'src/app/shared/models';
+
+import { SortService } from '@services';
+import { CatalogueRepo, ExportRepo } from '@repositories';
+import { Charge } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
+
+import { AppList } from 'src/app/app.list';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+
+import { catchError, finalize, map } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-charge',
     templateUrl: './charge.component.html',
-    styleUrls: ['./charge.component.scss']
 })
 export class ChargeComponent extends AppList implements OnInit {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: any;
-    headers: CommonInterface.IHeaderTable[];
-    dataSearch: any = {};
+
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
+    ListCharges: Charge[] = [];
+    idChargeToDelete: string = "";
 
     constructor(
         private _progressService: NgProgress,
@@ -33,13 +35,7 @@ export class ChargeComponent extends AppList implements OnInit {
         this.requestList = this.searchCharge;
         this.requestSort = this.sortCharge;
     }
-    pager: PagerSetting = PAGINGSETTING;
-    ListCharges: any = [];
-    idChargeToUpdate: any = "";
-    idChargeToDelete: any = "";
-    idChargeToAdd: any = "";
-    searchKey: string = "";
-    searchObject: any = {};
+
 
     ngOnInit() {
         this.headers = [
@@ -51,6 +47,7 @@ export class ChargeComponent extends AppList implements OnInit {
         ];
         this.searchCharge();
     }
+
     sortCharge(sort: string): void {
         this.ListCharges = this.sortService.sort(this.ListCharges, sort, this.order);
     }
@@ -93,7 +90,7 @@ export class ChargeComponent extends AppList implements OnInit {
             ).subscribe(
                 (res: any) => {
                     this.totalItems = res.totalItems;
-                    this.ListCharges = res.data;
+                    this.ListCharges = res.data || [];
                 },
             );
     }
@@ -123,22 +120,12 @@ export class ChargeComponent extends AppList implements OnInit {
             );
     }
 
-    public itemsToString(value: Array<any> = []): string {
-        return value
-            .map((item: any) => {
-                return item.text;
-            }).join(',');
-    }
-
     export() {
         this._exportRepo.exportCharge(this.dataSearch)
             .subscribe(
                 (response: ArrayBuffer) => {
                     this.downLoadFile(response, "application/ms-excel", 'Charge.xlsx');
                 },
-                () => {
-                },
-                () => { }
             );
     }
 }
