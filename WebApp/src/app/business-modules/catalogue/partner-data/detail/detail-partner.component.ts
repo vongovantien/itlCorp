@@ -82,7 +82,6 @@ export class PartnerDetailComponent extends AppList {
                 this.dataSearchSaleman.partnerId = this.partner.id;
             }
         });
-        this.partner.departmentId = "Head Office";
         this.getDataCombobox();
     }
 
@@ -358,7 +357,7 @@ export class PartnerDetailComponent extends AppList {
             element.createDate = element.createDate !== null ? formatDate(element.createDate.startDate !== undefined ? element.createDate.startDate : element.createDate, 'yyyy-MM-dd', 'en') : null;
         });
         if (this.partner.countryId == null || this.partner.provinceId == null
-            || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
+            || this.partner.countryShippingId == null || this.partner.provinceShippingId == null) {
             return;
         }
 

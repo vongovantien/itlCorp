@@ -1,3 +1,5 @@
+import { PermissionPartner } from "./permissionPartner";
+
 export class Partner {
     id: string = '';
     partnerGroup: string = '';
@@ -9,7 +11,6 @@ export class Partner {
     addressShippingVn: string = '';
     addressShippingEn: string = '';
     shortName: string = '';
-    departmentId: string = '';
     countryId: number = 0;
     countryShippingId: number = 0;
     accountNo: string = '';
@@ -58,6 +59,10 @@ export class Partner {
     workPhoneEx: string = '';
     saleManRequests: SaleManRequest[] = [];
     saleMans: SaleManRequest[] = [];
+
+    permission: PermissionPartner = new PermissionPartner();
+
+
 
     constructor(data?: any) {
         const self = this;
