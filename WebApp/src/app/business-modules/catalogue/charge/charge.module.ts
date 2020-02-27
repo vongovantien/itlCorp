@@ -21,7 +21,7 @@ const routing: Routes = [
         path: '', data: { name: "" },
         children: [
             {
-                path: '', component: ChargeComponent
+                path: '', component: ChargeComponent, data: { reuse: true }
             },
             {
 
