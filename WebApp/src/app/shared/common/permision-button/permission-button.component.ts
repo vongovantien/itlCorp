@@ -9,7 +9,6 @@ import { AppForm } from 'src/app/app.form';
     templateUrl: './permission-button.component.html',
 })
 export class AppPermissionButtonComponent extends AppForm implements OnInit {
-    @Output() click: EventEmitter<any> = new EventEmitter<any>();
     @Input() title: string = 'new';
     @Input() type: string = 'add';
 
@@ -34,9 +33,5 @@ export class AppPermissionButtonComponent extends AppForm implements OnInit {
                     }
                 }
             );
-    }
-
-    onClick() {
-        this.click.emit();
     }
 }

@@ -15,8 +15,10 @@ import { SystemConstants } from 'src/constants/system.const';
     templateUrl: './add-charge.component.html',
 })
 export class AddChargeComponent extends AppPage {
+
     @ViewChild(FormAddChargeComponent, { static: false }) formAddCharge: FormAddChargeComponent;
     @ViewChild(VoucherListComponent, { static: false }) voucherList: VoucherListComponent;
+
     constructor(
         protected router: Router,
         protected _catalogueRepo: CatalogueRepo,
@@ -26,7 +28,9 @@ export class AddChargeComponent extends AppPage {
         super();
         this._progressRef = this._progressService.ref();
     }
+
     ChargeToAdd: CatChargeToAddOrUpdate = new CatChargeToAddOrUpdate();
+
     ngOnInit() {
     }
 
@@ -60,9 +64,7 @@ export class AddChargeComponent extends AppPage {
         } else {
             return null;
         }
-
     }
-
 
     addCharge() {
         this.formAddCharge.isSubmitted = true;

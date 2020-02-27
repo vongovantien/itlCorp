@@ -10,13 +10,11 @@ import { AppList } from 'src/app/app.list';
 import { User } from 'src/app/shared/models';
 import { language } from 'src/languages/language.en';
 import { Employee } from 'src/app/shared/models/system/employee';
-import { AppPaginationComponent } from 'src/app/shared/common';
-declare var $: any;
+import { AppPaginationComponent, InfoPopupComponent } from 'src/app/shared/common';
 
 @Component({
     selector: 'app-user-management-import',
     templateUrl: './user-management-import.component.html',
-    styleUrls: ['./user-management-import.component.scss']
 })
 export class UserManagementImportComponent extends AppList {
     constructor(
@@ -37,7 +35,7 @@ export class UserManagementImportComponent extends AppList {
     headers: CommonInterface.IHeaderTable[];
     @ViewChild(AppPaginationComponent, { static: false }) child;
     @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
-
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
 
     isDesc = true;
     sortKey: string;
@@ -104,7 +102,7 @@ export class UserManagementImportComponent extends AppList {
         await this.baseService.downloadfile(this.api_menu.System.User_Management.downloadExcel, 'UserImportTemplate.xlsx');
     }
 
-    async setPage(pager: PagerSetting) {
+    setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;
         this.pager.pageSize = pager.pageSize;
         this.pager.totalPages = pager.totalPages;
@@ -142,16 +140,14 @@ export class UserManagementImportComponent extends AppList {
             return;
         }
         if (this.totalRows - this.totalValidRows > 0) {
-            $('#upload-alert-modal').modal('show');
-        }
-        else {
+            this.infoPopup.show();
+        } else {
             this.progressBar.start();
             console.log(this.data);
             this.data.forEach(element => {
                 if (element.status === 'Active') {
                     element.active = true;
-                }
-                else {
+                } else {
                     element.active = false;
                 }
             });
@@ -160,8 +156,7 @@ export class UserManagementImportComponent extends AppList {
                 this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
                 this.reset();
                 this.progressBar.complete();
-            }
-            else {
+            } else {
                 this.progressBar.complete();
                 this.baseService.handleError(response);
             }
@@ -172,7 +167,6 @@ export class UserManagementImportComponent extends AppList {
     reset() {
         this.data = null;
         this.pagedItems = null;
-        $("#inputFile").val('');
         this.pager.totalItems = 0;
         this.totalRows = this.totalValidRows = 0;
     }

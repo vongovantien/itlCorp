@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
+
 import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
 import { CatChargeDefaultAccount } from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
-import findIndex from 'lodash/findIndex';
-
-
 
 
 @Component({
@@ -13,21 +11,27 @@ import findIndex from 'lodash/findIndex';
 })
 
 export class VoucherListComponent extends AppList implements OnInit {
-    constructor() {
-        super();
-    }
+
     ngDataTypeChargeDefault = [
         { id: "Công Nợ", text: "Công Nợ" },
         { id: "Giải Chi", text: "Giải Chi" },
         { id: "Loại Khác", text: "Loại Khác" }
     ];
     isAddNewLine: boolean = false;
+
     value: any = {};
+
     ChargeToAdd: CatChargeToAddOrUpdate = new CatChargeToAddOrUpdate();
+
     isMaximumAccountRow: boolean = false;
     isSameVoucherType: boolean = false;
     isSubmitted: boolean = false;
-    headers: CommonInterface.IHeaderTable[];
+
+    constructor() {
+        super();
+    }
+
+
     ngOnInit() {
         this.headers = [
             { title: 'Voucher Type', field: '', sortable: false, width: 100 },
@@ -48,8 +52,9 @@ export class VoucherListComponent extends AppList implements OnInit {
     }
 
     selectedTypeDefault(value: any, index: number) {
-        const listAcc = this.ChargeToAdd.listChargeDefaultAccount;
-        if (findIndex(listAcc, function (o) { return o.type === value.text; }) !== -1) {
+        // const listAcc = this.ChargeToAdd.listChargeDefaultAccount;
+        if (this.ChargeToAdd.listChargeDefaultAccount.findIndex(o => o.type === value.text) !== -1) {
+            // if (findIndex(listAcc, function (o) { return o.type === value.text; }) !== -1) {
             this.isSameVoucherType = true;
         } else {
             this.isSameVoucherType = false;
@@ -64,7 +69,8 @@ export class VoucherListComponent extends AppList implements OnInit {
         if (voucherType === null || voucherType === undefined) {
             return [];
         } else {
-            const indexCurrenVoucher = findIndex(this.ngDataTypeChargeDefault, function (o) { return o.text === voucherType; });
+            // const indexCurrenVoucher = findIndex(this.ngDataTypeChargeDefault, function (o) { return o.text === voucherType; });
+            const indexCurrenVoucher = this.ngDataTypeChargeDefault.findIndex(o => o.text = voucherType);
             const aciveVoucherType = [this.ngDataTypeChargeDefault[indexCurrenVoucher]];
             return aciveVoucherType;
         }

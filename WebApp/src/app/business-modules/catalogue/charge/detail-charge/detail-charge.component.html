@@ -1,41 +1,21 @@
-<!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <app-breadcrumb></app-breadcrumb>
         </div>
+        <div class="c-button-actions">
+            <app-default-button [buttonSetting]="saveButtonSetting" (click)="updateCharge()"></app-default-button>
+
+            <app-default-button [buttonSetting]="cancelButtonSetting" routerLink="/home/catalogue/charge">
+            </app-default-button>
+        </div>
     </div>
 </div>
-<!--end:: subheader-->
-<!--begin::m-content-->
+
 <div class="m-content">
-    <!--begin::Form-->
+
     <form-add-charge></form-add-charge>
+
     <voucher-list></voucher-list>
 
-    <!--begin:: form-actions-->
-    <div class="form-actions m--align-right">
-        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="updateCharge()">
-            <span>
-                <i class="la la la-save"></i>
-                <span>
-                    save
-                </span>
-            </span>
-        </button>
-        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-            routerLink="/home/catalogue/charge">
-            <span>
-                <i class="la la-ban"></i>
-                <span>
-                    cancel
-                </span>
-            </span>
-        </button>
-    </div>
-    <!--end:: form-actions-->
-
-
-    <!--end::Form-->
 </div>
-<!--end::m-content-->
