@@ -75,7 +75,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult CheckDetailPermission(Guid id)
         {
             var result = transactionService.CheckDetailPermission(id);
-            if (result == 403) return Forbid();
+            if (result == 403) return Ok(false);
             return Ok(true);
         }
 

@@ -7,7 +7,7 @@ import { catchError, map, finalize } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo, CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import _map from 'lodash/map';
 import { NgProgress } from '@ngx-progressbar/core';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -21,7 +21,7 @@ import { Router } from '@angular/router';
 export class CustomClearanceComponent extends AppList {
     @ViewChild('confirmConvertPopup', { static: false }) confirmConvertPopup: ConfirmPopupComponent;
     @ViewChild('confirmDeletePopup', { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-
+    @ViewChild(InfoPopupComponent, { static: false }) canNotAllowActionPopup: InfoPopupComponent;
     listCustomDeclaration: CustomDeclaration[] = [];
     searchObject: any = {};
     listCustomer: any = [];
@@ -109,7 +109,21 @@ export class CustomClearanceComponent extends AppList {
             }
         }
     }
-
+    showDetail(id) {
+        // this._documentRepo.checkViewDetailPermission(id)
+        // .pipe(
+        //     catchError(this.catchError),
+        //     finalize(() => this._progressRef.complete())
+        // ).subscribe(
+        //     (res: any) => {
+        //         if (res) {
+        //             this._router.navigate(['/home/operation/custom-clearance/detail', id]);
+        //         } else {
+        //             this.canNotAllowActionPopup.show();
+        //         }
+        //     },
+        // );
+    }
     getDataFromEcus() {
         this._progressRef.start();
         this._operationRepo.importCustomClearanceFromEcus()

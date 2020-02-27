@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 export class JobManagementComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) canNotAllowActionPopup: InfoPopupComponent;
 
     shipments: Shipment[] = [];
     selectedShipment: Shipment = null;
@@ -105,7 +105,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                         this.deleteMessage = `Do you want to delete job No ${shipment.jobNo}?`;
                         this.confirmDeleteJobPopup.show();
                     } else {
-                        this.canNotDeleteJobPopup.show();
+                        this.canNotAllowActionPopup.show();
                     }
                 },
             );
@@ -140,7 +140,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                     if (res) {
                         this._router.navigate(['/home/operation/job-edit/', id]);
                     } else {
-                        this._toastService.error("You don't have permission to view detail");
+                        this.canNotAllowActionPopup.show();
                     }
                 },
             );

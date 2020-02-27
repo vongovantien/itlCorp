@@ -76,8 +76,9 @@
                                 </div>
                             </td>
                             <td>
-                                <a
-                                    [routerLink]="['/home/operation/custom-clearance/detail',   custom.id ]">{{custom.clearanceNo}}</a>
+                                <!-- <a
+                                    [routerLink]="['/home/operation/custom-clearance/detail',   custom.id ]">{{custom.clearanceNo}}</a> -->
+                                <a href="javascript:void(0)" (click)="showDetail(custom.id)">{{custom.clearanceNo}}</a>
                             </td>
                             <td>
                                 <span>{{custom.type}}</span>
@@ -161,3 +162,4 @@
 <confirm-popup [labelConfirm]="'Ok'" [labelCancel]="'No'" [title]="'Warning'"
     [body]="'Do you Want To delete clearanceNo selected ?'" #confirmDeletePopup (onSubmit)="onConfirmDelete()">
 </confirm-popup>
+<info-popup [body]="'You are not allow for this action'"></info-popup>
