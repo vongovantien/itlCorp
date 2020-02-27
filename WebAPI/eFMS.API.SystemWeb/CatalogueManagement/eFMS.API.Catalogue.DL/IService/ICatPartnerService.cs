@@ -27,6 +27,8 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatPartnerModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria);
         int CheckDetailPermission(string id);
         CatPartnerModel GetDetail(string id);
+        int CheckDeletePermission(string id);
+
 
 
     }

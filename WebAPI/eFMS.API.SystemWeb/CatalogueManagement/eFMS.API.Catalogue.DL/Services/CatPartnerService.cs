@@ -235,12 +235,28 @@ namespace eFMS.API.Catalogue.DL.Services
             return code;
         }
 
+        public int CheckDeletePermission(string id)
+        {
+            var detail = Get(x => x.Id == id).FirstOrDefault();
+            var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            int code = GetPermissionToDelete(new ModelUpdate { UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange);
+            return code;
+        }
+
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange)
         {
             int code = PermissionEx.GetPermissionToUpdate(model, permissionRange, currentUser);
             return code;
         }
 
+
+        private int GetPermissionToDelete(ModelUpdate model, PermissionRange permissionRange)
+        {
+            int code = PermissionEx.GetPermissionToDelete(model, permissionRange, currentUser);
+            return code;
+        }
 
         public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
@@ -394,10 +410,14 @@ namespace eFMS.API.Catalogue.DL.Services
             var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            int checkDelete = GetPermissionToDelete(new ModelUpdate { UserCreator = queryDetail.UserCreated, Salemans = salemans, PartnerGroup = queryDetail.PartnerGroup }, permissionRangeDelete);
+
 
             queryDetail.Permission = new PermissionAllowBase
             {
-                AllowUpdate = GetPermissionDetail(permissionRangeWrite, salemans, queryDetail)
+                AllowUpdate = GetPermissionDetail(permissionRangeWrite, salemans, queryDetail),
+                AllowDelete = checkDelete == 403 ? false : true
             };
             return queryDetail;
         }

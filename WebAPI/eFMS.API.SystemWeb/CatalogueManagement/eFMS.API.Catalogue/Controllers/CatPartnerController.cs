@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using eFMS.API.Catalogue.Authorize;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
@@ -116,6 +117,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("PagingCustomer")]
+        [AuthorizeEx(Menu.catPartnerdata, UserPermission.AllowAccess)]
         public IActionResult GetCustomer(CatPartnerCriteria criteria, int page, int size)
         {
             var data = catPartnerService.PagingCustomer(criteria, page, size, out int rowCount);
@@ -145,7 +147,22 @@ namespace eFMS.API.Catalogue.Controllers
         {
 
             var result = catPartnerService.CheckDetailPermission(id);
-            if (result == 403) return Forbid();
+            if (result == 403) return Ok(false);
+            return Ok(true);
+        }
+
+        /// <summary>
+        /// check permission
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
+
+        [HttpGet("CheckPermissionDelete/{id}")]
+        public IActionResult CheckDeletePermission(string id)
+        {
+
+            var result = catPartnerService.CheckDeletePermission(id);
+            if (result == 403) return Ok(false);
             return Ok(true);
         }
 

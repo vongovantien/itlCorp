@@ -16,7 +16,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
 import { ExportRepo, CatalogueRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
 
 type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
@@ -37,6 +37,8 @@ enum PartnerDataTab {
 export class PartnerComponent extends AppList implements OnInit {
     @ViewChild(PartnerListComponent, { static: false }) allPartnerComponent: PartnerListComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: any;
+    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
+
     pager: PagerSetting = PAGINGSETTING;
     partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
     configSearch: any = {
@@ -157,29 +159,50 @@ export class PartnerComponent extends AppList implements OnInit {
                     if (res) {
                         this.router.navigate([`/home/catalogue/partner-data/detail/${this.partner.id}`]);
                     } else {
-                        this._toastService.error("You don't have permission to view detail");
+                        this.info403Popup.show();
                     }
                 },
             );
     }
 
-
     onDelete() {
-        this._catalogueRepo.deletePartner(this.partner.id)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-
-                        this.allPartnerComponent.dataSearch = this.criteria;
-                        this.allPartnerComponent.getPartners();
+        let allowDelete = false;
+        this._catalogueRepo.checkDeletePartnerPermission(this.partner.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (!res) {
+                        this.info403Popup.show();
                         this.confirmDeletePopup.hide();
+                        allowDelete = false;
+                        return;
                     } else {
-                        this._toastService.error(res.message);
+                        allowDelete = true;
+                        this._progressRef.start();
                     }
-                }
+                },
             );
+        if (allowDelete) {
+            this.confirmDeletePopup.hide();
+            this._catalogueRepo.deletePartner(this.partner.id)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+
+                            this.allPartnerComponent.dataSearch = this.criteria;
+                            this.allPartnerComponent.getPartners();
+                            this.confirmDeletePopup.hide();
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
+        }
+
     }
 
     addPartner() {

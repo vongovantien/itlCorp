@@ -73,7 +73,7 @@ namespace eFMS.API.Catalogue.DL.Common
                 case PermissionRange.Owner:
                     if (model.PartnerGroup.Contains("CUSTOMER"))
                     {
-                        if (model.Salemans.FindAll(x => x.SaleManId == currentUser.UserID).Count == 0)
+                        if (model.Salemans.FindAll(x => x.SaleManId == currentUser.UserID).Count == 0 && model.UserCreator != currentUser.UserID)
                         {
                             code = 403;
                         }
