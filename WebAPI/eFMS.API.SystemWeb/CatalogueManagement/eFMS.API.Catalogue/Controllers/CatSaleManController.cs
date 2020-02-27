@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using eFMS.API.Catalogue.Authorize;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
@@ -72,6 +73,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [AuthorizeEx(Menu.catPartnerdata, UserPermission.AllowAccess)]
         public IActionResult Get(CatSalemanCriteria criteria, int page, int size)
         {
             var data = catSaleManService.Paging(criteria, page, size, out int rowCount);

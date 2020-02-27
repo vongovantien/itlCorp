@@ -9,7 +9,7 @@ namespace eFMS.API.Catalogue.DL.Common
 {
     public static class PermissionEx
     {
-        public static int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser)
+        public static int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser,int? flagDetail)
         {
             int code = 0;
             switch (permissionRange)
@@ -25,10 +25,11 @@ namespace eFMS.API.Catalogue.DL.Common
                             code = 403;
                         }
                     }
-                    else
+                    else if(flagDetail != null)
                     {
                         if (model.UserCreator != currentUser.UserID) code = 403;
                     }
+            
                     break;
                 case PermissionRange.Group:
                     if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)

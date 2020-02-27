@@ -5,7 +5,9 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -23,13 +25,14 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
+        private readonly IContextBase<CatPartner> catPartnerRepository;
 
-
-        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<CatalogueLanguageSub> localizer, ICurrentUser user, IContextBase<SysUser> sysUserRepo) : base(repository, mapper)
+        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<CatalogueLanguageSub> localizer, ICurrentUser user, IContextBase<SysUser> sysUserRepo, IContextBase<CatPartner> partnerRepo) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
             sysUserRepository = sysUserRepo;
+            catPartnerRepository = partnerRepo;
         }
 
         public IQueryable<CatSaleman> GetSaleMan()
@@ -90,16 +93,56 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatSaleManViewModel> Query(CatSalemanCriteria criteria)
         {
             var salesMan = GetSaleMan().Where(x => x.PartnerId == criteria.PartnerId);
-            var sysUser = sysUserRepository.Get();
+            var salesManData = GetSaleMan().Where(x => x.PartnerId == criteria.PartnerId);
 
+            var sysUser = sysUserRepository.Get();
+            var partner = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
+
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+
+
+            switch (rangeSearch)
+            {
+                case PermissionRange.None:
+                    salesMan = null;
+                    break;
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    salesMan = salesMan.Where(x => x.SaleManId == currentUser.UserID || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Group:
+                    if ((partner.GroupId == currentUser.GroupId
+                     && partner.DepartmentId == currentUser.DepartmentId
+                     && partner.OfficeId == currentUser.OfficeID
+                     && partner.CompanyId == currentUser.CompanyID))
+                    {
+                        salesMan = salesMan.Where(x => x.SaleManId == currentUser.UserID || x.PartnerId.Equals(partner.Id));
+                    }
+                    else if (partner.UserCreated == currentUser.UserID)
+                    {
+                        salesMan = salesMan.Where(x => x.UserCreated == currentUser.UserID);
+                    }
+                    else {
+                        salesMan = salesMan.Where(x => x.SaleManId == currentUser.UserID || x.UserCreated == currentUser.UserID);
+                    };
+                    break;
+
+            }
+            if (salesMan == null)
+            {
+                return null;
+            }
             var query = from saleman in salesMan
                         join users in sysUser on saleman.SaleManId equals users.Id
                         select new { saleman, users };
             if (criteria.All == null)
             {
-                query = query.Where(x => 
+                query = query.Where(x =>
                            //(x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           (x.saleman.Company == criteria.Company || criteria.Company == Guid.Empty  )
+                           (x.saleman.Company == criteria.Company || criteria.Company == Guid.Empty)
                            //&& (x.saleman.Office ?? "").IndexOf(criteria.Office ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.saleman.Office == criteria.Office || criteria.Office == Guid.Empty)
                            && (x.saleman.Status == criteria.Status || criteria.Status == null)

@@ -120,11 +120,16 @@ namespace eFMS.API.Catalogue.DL.Services
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
 
-            int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = model.UserCreated, Salemans = listSalemans,PartnerGroup = model.PartnerGroup }, permissionRange);
+            int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = model.UserCreated, Salemans = listSalemans,PartnerGroup = model.PartnerGroup }, permissionRange,null);
             if (code == 403) return new HandleState(403);
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
+            entity.GroupId = currentUser.GroupId;
+            entity.CompanyId = currentUser.CompanyID;
+            entity.OfficeId = currentUser.OfficeID;
+            entity.DepartmentId = currentUser.DepartmentId;
+
             if (entity.Active == false)
             {
                 entity.InactiveOn = DateTime.Now;
@@ -231,7 +236,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = detail.UserCreated, Salemans = salemans,PartnerGroup = detail.PartnerGroup }, permissionRange);
+            int code = GetPermissionToUpdate(new ModelUpdate {GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId  = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans,PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
             return code;
         }
 
@@ -241,13 +246,13 @@ namespace eFMS.API.Catalogue.DL.Services
             var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
-            int code = GetPermissionToDelete(new ModelUpdate { UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange);
+            int code = GetPermissionToDelete(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange);
             return code;
         }
 
-        private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange)
+        private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange,int? flagDetail)
         {
-            int code = PermissionEx.GetPermissionToUpdate(model, permissionRange, currentUser);
+            int code = PermissionEx.GetPermissionToUpdate(model, permissionRange, currentUser, flagDetail);
             return code;
         }
 
@@ -266,7 +271,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var salemans = salemanRepository.Get().ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            var dataSalemans = salemans.Select(x => x.PartnerId);
 
             switch (rangeSearch)
             {
@@ -278,10 +282,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 case PermissionRange.Owner:
                     if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
                     {
-                       partners = partners.Where(x=>
-                       salemans.Any(y=>y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       || x.UserCreated == currentUser.UserID
-                       );
+                        partners = partners.Where(x => salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+                        || x.UserCreated == currentUser.UserID);
                     }
                     else
                     {
@@ -291,7 +293,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 case PermissionRange.Group:
                     if(partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
                     {
-                        partners = partners.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                        partners = partners.Where(x => (x.GroupId == currentUser.GroupId && ( x.DepartmentId == currentUser.DepartmentId) && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
                        );
@@ -411,7 +413,7 @@ namespace eFMS.API.Catalogue.DL.Services
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             var permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
-            int checkDelete = GetPermissionToDelete(new ModelUpdate { UserCreator = queryDetail.UserCreated, Salemans = salemans, PartnerGroup = queryDetail.PartnerGroup }, permissionRangeDelete);
+            int checkDelete = GetPermissionToDelete(new ModelUpdate { GroupId = queryDetail.GroupId, OfficeId = queryDetail.OfficeId, CompanyId = queryDetail.CompanyId, UserCreator = queryDetail.UserCreated, Salemans = salemans, PartnerGroup = queryDetail.PartnerGroup }, permissionRangeDelete);
 
             queryDetail.Permission = new PermissionAllowBase
             {

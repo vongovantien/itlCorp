@@ -91,9 +91,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                     if (!!res) {
                         this.permissionSample = new PermissionSample(res);
                         console.log(this.permissionSample);
-
                         if (this.type !== 'office' && this.type !== 'user' && this.type !== 'group' && this.type !== 'department' && this.type !== 'company') {
-
                             setTimeout(() => {
                                 this.formCreateComponent.formCreate.setValue({
                                     permissionName: this.permissionSample.name,
@@ -104,8 +102,6 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
                             }, 100);
                         }
-
-
                     } else {
                         this.permissionSample = new PermissionSample();
                     }

@@ -53,6 +53,7 @@ export class ShareSystemAddUserComponent extends AppList {
             this.positions = [
                 { id: 'Manager-Leader', text: 'Manager-Leader' },
                 { id: 'Deputy', text: 'Deputy' },
+                { id: 'Assistant', text: 'Assistant' },
                 { id: 'Staff', text: 'Staff' },
             ];
         } else {
