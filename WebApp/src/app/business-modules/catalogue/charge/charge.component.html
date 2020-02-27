@@ -1,19 +1,10 @@
-<!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button routerLink="/home/catalogue/charge/addnew" type="button"
-                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-plus"></i>
-                    <span>
-                        add new
-                    </span>
-                </span>
-            </button>
+            <app-permission-button title="Add New" routerLink="/home/catalogue/charge/addnew"></app-permission-button>
             <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
                 <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase dropdown-toggle"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -31,66 +22,26 @@
                         href="javascript:void(0)">Import account voucher</a>
                 </div>
             </div>
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
-                <span>
-                    <i class="la la-upload"></i>
-                    <span>
-                        export
-                    </span>
-                </span>
-            </button>
+            <app-permission-button type="export" (click)="export()" title="Export"></app-permission-button>
         </div>
     </div>
 </div>
-<!--end:: subheader-->
-<!--begin::m-content of charge-->
+
 <div class="m-content">
-    <!--begin:: m-portlet of search-form-->
+
     <form-search-charge (onSearch)="onSearchCharge($event)"></form-search-charge>
-    <!--end::m-portlet of search-form-->
-    <!--begin:: m-portlet of charge-table-->
+
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <!--begin: Datatable -->
             <div class="table-wrapper" id="">
                 <table class="table table-striped table-brand dataTable">
-                    <!-- <thead>
-                        <tr>
-                            <th class="table-actions-col no-sorting">Actions</th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
-                                (click)="sort('code')">
-                                <span>Code</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameEn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameEn') }"
-                                (click)="sort('chargeNameEn')">
-                                <span>Name EN</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameVn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameVn') }"
-                                (click)="sort('chargeNameVn')">
-                                <span>Name Local</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
-                                (click)="sort('type')">
-                                <span>Type</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'active'), 'sorting_desc': (!isDesc && sortKey == 'active') }"
-                                (click)="sort('active')">
-                                <span>Status</span>
-                            </th>
-                        </tr>
-                    </thead> -->
                     <thead app-table-header [headers]="headers"
                         (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                         <th class="m--w-50 first">Actions
                         </th>
                     </thead>
                     <tbody *ngIf="ListCharges">
-                        <ng-container *ngIf="ListCharges.length > 0; else noRecord">
+                        <ng-container *ngIf="!!ListCharges.length">
                             <tr *ngFor="let item of ListCharges">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
@@ -106,7 +57,6 @@
                                         </button>
                                     </div>
                                 </td>
-
                                 <td>
                                     <span>{{item.code}}</span>
                                 </td>
@@ -125,19 +75,16 @@
                                     </span>
                                 </td>
                             </tr>
-
                         </ng-container>
-                    </tbody>
-                    <ng-template #noRecord>
-                        <tr *ngIf="!ListCharges.length" app-table-none-record [colspan]="headers.length + 1">
+                        <tr *ngIf="!ListCharges.length && !isLoading" app-table-none-record
+                            [colspan]="headers.length + 1">
                         </tr>
-                    </ng-template>
+                        <tr *ngIf="isLoading" app-table-row-loading>
+                        </tr>
+                    </tbody>
+
                 </table>
             </div>
-            <!--end: Datatable -->
-            <!--begin::pagination-->
-            <!-- <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
-                (pagerObject)="setPage($event)"></app-pagination> -->
             <div class="pagination-nav ">
                 <div class="row">
                     <div *ngIf="!!ListCharges.length" class="col-sm-6">
@@ -161,52 +108,11 @@
                     </div>
                 </div>
             </div>
-            <!--end::pagination-->
         </div>
     </div>
-    <!--end:: m-portlet of charge-table-->
 </div>
-<!--end::m-content of charge-->
 
 
-<!--begin::confirm-delete-modal-->
-<!-- <div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Notification</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="confirm-text-block">
-                    <span>You want to delete this Charge?</span>
-                </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    data-dismiss="modal" (click)="deleteCharge()">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Yes
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            Cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div> -->
+
 <confirm-popup [body]="'You want to delete this Charge?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteCharge()">
 </confirm-popup>
-<!--end::confirm-delete-modal-->

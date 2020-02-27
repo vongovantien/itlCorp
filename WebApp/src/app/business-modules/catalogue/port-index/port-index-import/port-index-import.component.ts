@@ -135,7 +135,7 @@ export class PortIndexImportComponent extends AppPage implements OnInit {
         }
     }
 
-    async downloadSample() {
+    downloadSample() {
         this.catalogueRepo.downloadPlaceExcel(PlaceTypeEnum.Port)
             .pipe(catchError(this.catchError))
             .subscribe(

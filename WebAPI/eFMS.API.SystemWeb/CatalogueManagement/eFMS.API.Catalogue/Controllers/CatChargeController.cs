@@ -7,14 +7,11 @@ using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
-using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
-using eFMS.API.Common.NoSql;
-using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -86,6 +83,13 @@ namespace eFMS.API.Catalogue.Controllers
         {
             var data = catChargeService.Query(criteria);        
             return Ok(data);
+        }
+
+        [HttpPost("GetByPartnerCodes")]
+        public IActionResult GetDefaultByPartnerCodes(List<string> partnerCodes)
+        {
+            var results = catChargeService.Get(x => partnerCodes.Contains(x.Code));
+            return Ok(results);
         }
 
         /// <summary>

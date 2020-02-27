@@ -97,6 +97,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatCurrencyService, CatCurrencyService>();
             services.AddTransient<ICatCurrencyExchangeService, CatCurrencyExchangeService>();
             services.AddTransient<ICatSaleManService, CatSalemanService>();
+            services.AddTransient<ICatPartnerChargeService, CatPartnerChargeService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

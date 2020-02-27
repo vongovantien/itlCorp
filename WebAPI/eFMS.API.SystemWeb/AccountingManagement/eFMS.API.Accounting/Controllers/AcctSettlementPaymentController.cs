@@ -17,6 +17,7 @@ using System.Linq;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.Extensions;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -57,6 +58,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [AuthorizeEx(Menu.acctSP, UserPermission.AllowAccess)]
         public IActionResult Paging(AcctSettlementPaymentCriteria criteria, int pageNumber, int pageSize)
         {
             var data = acctSettlementPaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
@@ -108,7 +110,7 @@ namespace eFMS.API.Accounting.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
-                return Ok(result);
+                return BadRequest(result);
             }
             return Ok(result);
         }
@@ -133,32 +135,6 @@ namespace eFMS.API.Accounting.Controllers
             var data = new { settlement = settlement, chargeGrpSettlement = chargeGrpSettlement, chargeNoGrpSettlement = chargeNoGrpSettlement };
             return Ok(data);
         }
-
-        /// <summary>
-        /// Get settlement payment by settlementId
-        /// </summary>
-        /// <param name="settlementId">settlementId that want to retrieve Settlement Payment</param>
-        /// <returns></returns>
-        //[HttpGet]
-        //[Route("GetSettlementPaymentById")]
-        //public IActionResult GetSettlementPaymentById(Guid settlementId)
-        //{
-        //    var data = acctSettlementPaymentService.GetSettlementPaymentById(settlementId);
-        //    return Ok(data);
-        //}
-
-        /// <summary>
-        /// Get list shipment settlement by settlementNo
-        /// </summary>
-        /// <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
-        /// <returns></returns>
-        //[HttpGet]
-        //[Route("GetShipmentsSettlementBySettlementNo")]
-        //public IActionResult GetShipmentsSettlementBySettlementNo(string settlementNo)
-        //{
-        //    var data = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlementNo);
-        //    return Ok(data);
-        //}
 
         /// <summary>
         /// Get Payment Management By Shipment
@@ -249,7 +225,6 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
         {
             var data = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(criteria);
-            //ResultHandle result = new ResultHandle { Status = data, Message = data ? "Charge has already existed!" : "" };
             ResultHandle result = new ResultHandle { Status = data.Status, Message = data.Message };
             return Ok(result);
         }
@@ -261,7 +236,8 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        [Authorize]
+        //[Authorize]
+        [AuthorizeEx(Menu.acctSP, UserPermission.Add)]
         public IActionResult Add(CreateUpdateSettlementModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -288,16 +264,15 @@ namespace eFMS.API.Accounting.Controllers
                     var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
                     if (_checkDuplicate.Status)
                     {
-                        //ResultHandle _result = new ResultHandle { Status = false, Message = "Charge has already existed!" };
                         ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
-                        return Ok(_result);
+                        return BadRequest(_result);
                     }
                 }
             }
             else
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
-                return Ok(_result);
+                return BadRequest(_result);
             }
 
             var hs = acctSettlementPaymentService.AddSettlementPayment(model);
@@ -306,7 +281,7 @@ namespace eFMS.API.Accounting.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
-                return Ok(result);
+                return BadRequest(result);
             }
             return Ok(result);
         }
@@ -318,7 +293,8 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-        [Authorize]
+        //[Authorize]
+        [AuthorizeEx(Menu.acctSP, UserPermission.Update)]
         public IActionResult Update(CreateUpdateSettlementModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -352,16 +328,15 @@ namespace eFMS.API.Accounting.Controllers
                     var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
                     if (_checkDuplicate.Status)
                     {
-                        //ResultHandle _result = new ResultHandle { Status = false, Message = "Charge has already existed!" };
                         ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
-                        return Ok(_result);
+                        return BadRequest(_result);
                     }
                 }
             }
             else
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
-                return Ok(_result);
+                return BadRequest(_result);
             }
 
             var hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
@@ -370,7 +345,7 @@ namespace eFMS.API.Accounting.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
-                return Ok(result);
+                return BadRequest(result);
             }
             return Ok(result);
         }
@@ -410,16 +385,15 @@ namespace eFMS.API.Accounting.Controllers
                     var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
                     if (_checkDuplicate.Status)
                     {
-                        //ResultHandle _result = new ResultHandle { Status = false, Message = "Charge has already existed!" };
                         ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
-                        return Ok(_result);
+                        return BadRequest(_result);
                     }
                 }
             }
             else
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
-                return Ok(_result);
+                return BadRequest(_result);
             }
 
             //Check exist thông tin Manager, Accountant của User requester
@@ -444,7 +418,7 @@ namespace eFMS.API.Accounting.Controllers
                 if (!model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_NEW) && !model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the settlement payment status is New or Deny" };
-                    return Ok(_result);
+                    return BadRequest(_result);
                 }
                 model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
@@ -465,8 +439,12 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
                     return BadRequest(_result);
                 }
+                return Ok(result);
             }
-            return Ok(result);
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         /// <summary>
@@ -484,12 +462,13 @@ namespace eFMS.API.Accounting.Controllers
             if (!updateApproval.Success)
             {
                 _result = new ResultHandle { Status = updateApproval.Success, Message = updateApproval.Exception.Message };
+                return BadRequest(_result);
             }
             else
             {
                 _result = new ResultHandle { Status = updateApproval.Success };
+                return Ok(_result);
             }
-            return Ok(_result);
         }
 
         /// <summary>
@@ -508,12 +487,13 @@ namespace eFMS.API.Accounting.Controllers
             if (!denieApproval.Success)
             {
                 _result = new ResultHandle { Status = denieApproval.Success, Message = denieApproval.Exception.Message };
+                return BadRequest(_result);
             }
             else
             {
                 _result = new ResultHandle { Status = denieApproval.Success };
+                return Ok(_result);
             }
-            return Ok(_result);
         }
 
         /// <summary>

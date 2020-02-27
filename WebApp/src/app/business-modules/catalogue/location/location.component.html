@@ -1,21 +1,8 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
-            <span>
-                <i class="la la-download"></i>
-                <span>
-                    import
-                </span>
-            </span>
-        </button>
-        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
-            <span>
-                <i class="la la-upload"></i>
-                <span>
-                    export
-                </span>
-            </span>
-        </button>
+        <app-permission-button (click)="export()" type="export" title="Export"></app-permission-button>
+        <app-permission-button (click)="import()" type="import" title="Import">
+        </app-permission-button>
     </div>
 </app-sub-header>
 <div class="m-content">

@@ -19,6 +19,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string ModeOfTransport { get; set; }
         public string GeoCode { get; set; }
         public string PlaceTypeId { get; set; }
+        public string FlightVesselNo { get; set; }
         public string Note { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
@@ -26,5 +27,9 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
+        public short? GroupId { get; set; }
+        public int? DepartmentId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }

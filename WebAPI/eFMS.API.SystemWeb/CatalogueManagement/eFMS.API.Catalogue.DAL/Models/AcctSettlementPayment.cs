@@ -19,5 +19,9 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public decimal? Amount { get; set; }
+        public short? GroupId { get; set; }
+        public int? DepartmentId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }

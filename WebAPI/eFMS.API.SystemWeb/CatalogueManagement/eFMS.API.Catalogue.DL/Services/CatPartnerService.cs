@@ -616,7 +616,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.AddressShippingVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND];
                     item.IsValid = false;
                 }
-
                 if (item.CountryBilling.Length == 0)
                 {
                     item.CountryBillingError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_BILLING_EMPTY];

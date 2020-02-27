@@ -28,12 +28,12 @@ namespace eFMS.IdentityServer.DL.UserManager
         public Guid OfficeID => currentUser.FirstOrDefault(x => x.Type == "officeId").Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "officeId").Value) : Guid.Empty;
         //public int DepartmentId => currentUser.FirstOrDefault(x => x.Type == "departmentId").Value != null ? Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "departmentId").Value) : 0;
         //public short GroupId => (short)(currentUser.FirstOrDefault(x => x.Type == "groupId").Value != null ? Convert.ToInt16(currentUser.FirstOrDefault(x => x.Type == "groupId").Value) : 0);
-        private short groupId;
+        private short? groupId;
         public short? GroupId
         {
             get
             {
-                if(groupId == 0 && currentUser.FirstOrDefault(x => x.Type == "groupId") != null)
+                if(groupId == null && currentUser.FirstOrDefault(x => x.Type == "groupId") != null)
                 {
                     groupId = (short)Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "groupId").Value);
                 }
@@ -45,7 +45,7 @@ namespace eFMS.IdentityServer.DL.UserManager
         {
             get
             {
-                if (departmentId == 0 && currentUser.FirstOrDefault(x => x.Type == "departmentId") != null)
+                if (departmentId == null && currentUser.FirstOrDefault(x => x.Type == "departmentId") != null)
                 {
                     departmentId = Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "departmentId").Value);
                     if(departmentId == 0)

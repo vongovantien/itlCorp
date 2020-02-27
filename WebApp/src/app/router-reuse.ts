@@ -92,8 +92,10 @@ export class CustomRouteReuseStrategy implements RouteReuseStrategy {
         /** The url we are going to return */
         if (route.routeConfig) {
             // const url = route.routeConfig.path;
-            return route.url.join("/") || route.parent.url.join("/");
+            // return route.url.join("/") || route.parent.url.join("/");
             // return url;
+            return this.getResolvedUrl(route);
+
         }
     }
 

@@ -1,20 +1,20 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize, map } from 'rxjs/operators';
 
-import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
-import { PORTINDEXCOLUMNSETTING } from './port-index.columns';
-import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
-import { ButtonType } from 'src/app/shared/enums/type-button.enum';
-import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { SortService } from 'src/app/shared/services/sort.service';
+import { PortIndex } from '@models';
+import { SortService } from '@services';
+import { CatalogueRepo, ExportRepo } from '@repositories';
+
 import { SystemConstants } from 'src/constants/system.const';
-import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
 import { AppList } from 'src/app/app.list';
+
 import { FormPortIndexComponent } from './components/form-port-index.component';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
+import { CommonEnum } from '@enums';
+
+import { of } from 'rxjs';
+import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-port-index',
@@ -22,24 +22,13 @@ import { FormPortIndexComponent } from './components/form-port-index.component';
 })
 export class PortIndexComponent extends AppList implements OnInit {
     @ViewChild(FormPortIndexComponent, { static: false }) formPopup: FormPortIndexComponent;
-    portIndexSettings: ColumnSetting[] = PORTINDEXCOLUMNSETTING;
-    portIndexs: Array<PortIndex>;
+    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
+    portIndexs: Array<PortIndex> = [];
     portIndex: PortIndex = new PortIndex();
-    criteria: any = { placeType: PlaceTypeEnum.Port };
-    addButtonSetting: ButtonModalSetting = {
-        typeButton: ButtonType.add
-    };
-    importButtonSetting: ButtonModalSetting = {
-        typeButton: ButtonType.import
-    };
-    exportButtonSetting: ButtonModalSetting = {
-        typeButton: ButtonType.export
-    };
-    configSearch: any = {
-        settingFields: this.portIndexSettings.filter(x => x.allowSearch === true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
-        typeSearch: TypeSearch.outtab
-    };
-    isDesc: boolean = false;
+
+    criteria: any = { placeType: CommonEnum.PlaceTypeEnum.Port };
 
     constructor(private sortService: SortService,
         private exportRepository: ExportRepo,
@@ -47,15 +36,32 @@ export class PortIndexComponent extends AppList implements OnInit {
         private toastService: ToastrService,
         private _progressService: NgProgress) {
         super();
+
         this._progressRef = this._progressService.ref();
         this.requestList = this.requestPortIndex;
+        this.requestSort = this.onSortChange;
     }
 
     ngOnInit() {
+        this.headers = [
+            { title: 'Code', field: 'code', sortable: true },
+            { title: 'Name(EN)', field: 'nameEn', sortable: true },
+            { title: 'Name(Local)', field: 'nameVn', sortable: true },
+            { title: 'Country', field: 'countryName', sortable: true },
+            { title: 'Zone', field: 'areaName', sortable: true },
+            { title: 'Mode', field: 'modeOfTransport', sortable: true },
+            { title: 'Status', field: 'active', sortable: true },
+        ];
+        this.configSearch = {
+            settingFields: this.headers.map(x => ({ "fieldName": x.field, "displayName": x.title })),
+            typeSearch: CommonEnum.TypeSearch.outtab
+        };
         this.requestPortIndex();
         this.getDataCombobox();
     }
+
     requestPortIndex() {
+        this.isLoading = true;
         this.catalogueRepo.pagingPlace(this.page, this.pageSize, Object.assign({}, this.criteria))
             .pipe(
                 catchError(this.catchError),
@@ -67,15 +73,16 @@ export class PortIndexComponent extends AppList implements OnInit {
                     };
                 })
             ).subscribe(
-                (res: any) => {
+                (res: CommonInterface.IResponsePaging) => {
                     this.totalItems = res.totalItems || 0;
-                    this.portIndexs = res.data;
+                    this.portIndexs = res.data || [];
                 },
             );
     }
+
     onSearch(event) {
         this.criteria = {
-            placeType: PlaceTypeEnum.Port
+            placeType: CommonEnum.PlaceTypeEnum.Port
         };
         if (event.field === "All") {
             this.criteria.all = event.searchString;
@@ -114,12 +121,14 @@ export class PortIndexComponent extends AppList implements OnInit {
         this.page = 1;
         this.requestList();
     }
+
     resetSearch(event) {
         this.criteria = {
-            placeType: PlaceTypeEnum.Port
+            placeType: CommonEnum.PlaceTypeEnum.Port
         };
         this.onSearch(event);
     }
+
     showAdd() {
         this.formPopup.portindexForm.reset();
         [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [false, false];
@@ -129,16 +138,29 @@ export class PortIndexComponent extends AppList implements OnInit {
     }
 
     showDetail(item: PortIndex) {
-        this.catalogueRepo.getDetailPlace(item.id)
-            .pipe(catchError(this.catchError), finalize(() => { }))
-            .subscribe(
-                (res) => {
-                    [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
-                    this.formPopup.title = "Update Port Index";
-                    this.formPopup.code.disable();
-                    this.formPopup.portIndex = res;
-                    this.formPopup.setFormValue(res);
-                    this.formPopup.show();
+        this.catalogueRepo.checkAllowGetDetailPlace(item.id)
+            .pipe(
+                tap((res: boolean) => res),
+                switchMap((res: boolean) => {
+                    if (res) {
+                        return this.catalogueRepo.getDetailPlace(item.id);
+                    } else {
+                        return of(false);
+                    }
+                })
+            ).subscribe(
+                (res: PortIndex | boolean) => {
+                    if (!res) {
+                        this.info403Popup.show();
+                    } else {
+                        [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
+                        this.formPopup.title = "Update Port Index";
+
+                        this.formPopup.code.disable();
+                        this.formPopup.portIndex = res as PortIndex;
+                        this.formPopup.setFormValue(res);
+                        this.formPopup.show();
+                    }
                 }
             );
     }
@@ -148,6 +170,7 @@ export class PortIndexComponent extends AppList implements OnInit {
         this.getAreas();
         this.getModeOfTransport();
     }
+
     getModeOfTransport() {
         this.catalogueRepo.getModeOfTransport()
             .pipe(catchError(this.catchError), finalize(() => { }))
@@ -161,6 +184,7 @@ export class PortIndexComponent extends AppList implements OnInit {
                 }
             );
     }
+
     getAreas() {
         this.catalogueRepo.getAreas()
             .pipe(catchError(this.catchError), finalize(() => { }))
@@ -174,6 +198,7 @@ export class PortIndexComponent extends AppList implements OnInit {
                 }
             );
     }
+
     getCountries() {
         this.catalogueRepo.getCountry()
             .pipe(catchError(this.catchError), finalize(() => { }))
@@ -188,9 +213,20 @@ export class PortIndexComponent extends AppList implements OnInit {
             );
     }
 
-    showConfirmDelete(item) {
-        this.portIndex = item;
+    showConfirmDelete(item: PortIndex) {
+        this.catalogueRepo.checkAllowDeletePlace(item.id)
+            .subscribe(
+                (res: boolean) => {
+                    if (res) {
+                        this.confirmDeletePopup.show();
+                        this.portIndex = item;
+                    } else {
+                        this.info403Popup.show();
+                    }
+                }
+            )
     }
+
     onDelete(event) {
         if (event) {
             this.catalogueRepo.deletePlace(this.portIndex.id)
@@ -213,11 +249,10 @@ export class PortIndexComponent extends AppList implements OnInit {
         }
     }
 
-    onSortChange(column) {
-        const property = column.primaryKey;
-        this.isDesc = !this.isDesc;
-        this.portIndexs = this.sortService.sort(this.portIndexs, property, this.isDesc);
+    onSortChange() {
+        this.portIndexs = this.sortService.sort(this.portIndexs, this.sort, this.order);
     }
+
     export() {
         this.exportRepository.exportPortIndex(this.criteria)
             .pipe(catchError(this.catchError))

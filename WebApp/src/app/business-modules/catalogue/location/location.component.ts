@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit } from "@angular/core";
 import { Router } from "@angular/router";
 
 import { AppList } from "src/app/app.list";
-import { ExportRepo } from "src/app/shared/repositories";
+import { ExportRepo } from "@repositories";
 import { NgProgress } from "@ngx-progressbar/core";
 import { SystemConstants } from "src/constants/system.const";
 
