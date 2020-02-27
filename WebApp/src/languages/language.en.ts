@@ -1,5 +1,4 @@
-import { WAREHOUSEENCOLUMNSETTING } from "../app/business-modules/catalogue/warehouse/warehouse.columns";
-import { WAREHOUSEIMPORTENCOLUMNSETTING } from "src/app/business-modules/catalogue/warehouse/warehouse-import/warehouse-import.columns";
+
 import { environment } from "src/environments/environment";
 
 export const language = {
@@ -142,8 +141,6 @@ export const language = {
             ]
         }
     ],
-    Warehouse: WAREHOUSEENCOLUMNSETTING,
-    WarehouseImport: WAREHOUSEIMPORTENCOLUMNSETTING,
     NOTIFI_MESS: {
         DOWNLOAD_ERR: "Download Error",
         FILE_NOT_FOUND: "File Not Found !",

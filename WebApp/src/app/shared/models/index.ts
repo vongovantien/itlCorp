@@ -15,6 +15,7 @@ export { SaleManRequest } from './catalogue/customer.model';
 export * from './catalogue/commodity.model';
 export * from './catalogue/commonity-group.model';
 export * from './catalogue/country.model';
+export * from './catalogue/ware-house.model';
 
 export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';

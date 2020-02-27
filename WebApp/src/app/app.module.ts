@@ -5,7 +5,7 @@ import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { StoreModule } from "@ngrx/store";
-
+import { RouteReuseStrategy } from "@angular/router";
 
 import { HeaderComponent } from "./master-page/header/header.component";
 import { FooterComponent } from "./master-page/footer/footer.component";
@@ -38,6 +38,7 @@ import { environment } from "src/environments/environment";
 import { reducers, CustomSerializer, effects } from "./store";
 import { MenuResolveGuard } from "./menu.resolve";
 import { ForbiddenPageComponent } from "./403/403.component";
+import { CustomRouteReuseStrategy } from "./router-reuse";
 
 const authConfig: AuthConfig = {
     issuer: environment.HOST.INDENTITY_SERVER_URL,
@@ -107,8 +108,11 @@ const authConfig: AuthConfig = {
             provide: RouterStateSerializer, useClass: CustomSerializer
         },
         { provide: DEFAULT_TIMEOUT, useValue: !environment.production ? 100000 : 30000 },
-        MenuResolveGuard
-
+        MenuResolveGuard,
+        {
+            provide: RouteReuseStrategy,
+            useClass: CustomRouteReuseStrategy
+        }
     ],
 
     bootstrap: [AppComponent],

@@ -778,7 +778,7 @@ export class CatalogueRepo {
     }
 
     getDetailStage(id: number) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage//getById/${id}`).pipe(
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/getById/${id}`).pipe(
             map((data: any) => data)
         );
     }
@@ -822,5 +822,17 @@ export class CatalogueRepo {
 
     upLoadChargeVoucher(files: any) {
         return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChargeDefaultAccount/UploadFile`, files, "uploadedFile");
+    }
+
+    checkAllowDeletePlace(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowGetDetailPlace(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
     }
 }
