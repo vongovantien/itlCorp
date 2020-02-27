@@ -413,7 +413,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             int checkDelete = GetPermissionToDelete(new ModelUpdate { UserCreator = queryDetail.UserCreated, Salemans = salemans, PartnerGroup = queryDetail.PartnerGroup }, permissionRangeDelete);
 
-
             queryDetail.Permission = new PermissionAllowBase
             {
                 AllowUpdate = GetPermissionDetail(permissionRangeWrite, salemans, queryDetail),
