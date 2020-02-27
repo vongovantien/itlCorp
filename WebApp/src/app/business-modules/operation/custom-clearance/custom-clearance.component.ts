@@ -3,7 +3,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { catchError, map, finalize } from 'rxjs/operators';
+import { catchError, map, finalize, takeUntil } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo, CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
@@ -12,6 +12,8 @@ import _map from 'lodash/map';
 import { NgProgress } from '@ngx-progressbar/core';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Router } from '@angular/router';
+import { IAppState, getMenuUserPermissionState } from '@store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -27,9 +29,11 @@ export class CustomClearanceComponent extends AppList {
     listCustomer: any = [];
     listPort: any = [];
     listUnit: any = [];
+    menuPermission: SystemInterface.IUserPermission;
 
     headers: CommonInterface.IHeaderTable[];
     constructor(
+        private _store: Store<IAppState>,
         private _sortService: SortService,
         private _toastrService: ToastrService,
         private _operationRepo: OperationRepo,
@@ -46,7 +50,15 @@ export class CustomClearanceComponent extends AppList {
     }
 
     ngOnInit() {
-
+        this._store.select(getMenuUserPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: SystemInterface.IUserPermission) => {
+                    if (res !== null && res !== undefined) {
+                        this.menuPermission = res;
+                    }
+                }
+            );
         this.headers = [
             { title: 'Clearance No', field: 'clearanceNo', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
@@ -141,20 +153,25 @@ export class CustomClearanceComponent extends AppList {
 
     confirmConvert() {
         if (this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo).length > 0) {
-            // this._operationRepo.checkDeletePermission()
-            //     .pipe(
-            //         catchError(this.catchError),
-            //         finalize(() => this._progressRef.complete())
-            //     ).subscribe(
-            //         (res: any) => {
-            //             if (res) {
-            //                 this.confirmDeletePopup.show();
-            //             } else {
-            //                 this.canNotAllowActionPopup.show();
-            //             }
-            //         },
-            //     );
+            const clearancesToConvert = this.mapClearancesToJobs();
+            if (clearancesToConvert.filter(x => x.opsTransaction === null).length > 0) {
+                return;
+            } else {
+                this._documentRepo.checkAllowConvertJob(clearancesToConvert)
+                    .pipe(
+                        catchError(this.catchError),
+                        finalize(() => this._progressRef.complete())
+                    ).subscribe(
+                        (res: any) => {
+                            if (res.status) {
+                                this.confirmConvertPopup.show();
+                            } else {
+                                this.canNotAllowActionPopup.show();
+                            }
+                        },
+                    );
 
+            }
         } else {
             // this._toastrService.warning('Custom clearance was not selected');
 

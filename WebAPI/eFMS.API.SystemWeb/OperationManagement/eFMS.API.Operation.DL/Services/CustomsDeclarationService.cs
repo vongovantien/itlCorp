@@ -1070,10 +1070,8 @@ namespace eFMS.API.Operation.DL.Services
         {
             int code = 0;
             var detail = GetById(id);
-
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
-            var model = new BaseUpdateModel { UserCreated = currentUser.UserID, GroupId = currentUser.GroupId, DepartmentId = currentUser.DepartmentId, OfficeId = currentUser.OfficeID, CompanyId = currentUser.CompanyID };
+            var model = new BaseUpdateModel { UserCreated = detail.UserCreated, GroupId = detail.GroupId, DepartmentId = detail.DepartmentId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId };
             code = PermissionExtention.GetPermissionCommonItem(model, permissionRange, currentUser);
             return code;
         }

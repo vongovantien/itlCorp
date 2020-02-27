@@ -4,7 +4,7 @@
         <div class="mr-auto">
             <app-breadcrumb></app-breadcrumb>
         </div>
-        <div class="c-button-actions">
+        <div class="c-button-actions" *ngIf="customDeclaration">
             <span *ngIf="customDeclaration.jobNo; else nojobno" class="m--font-bolder m--font-success">Imported</span>
             <ng-template #nojobno>
                 <span class="m--font-bolder m--font-danger">Not Imported</span>
@@ -380,7 +380,7 @@
             </div>
             <!--end::  m-portlet-->
             <!--begin:: form-actions-->
-            <div class="form-actions m--align-right" *ngIf="customDeclaration">
+            <div class="form-actions m--align-right" *ngIf="!!customDeclaration">
                 <button *ngIf="customDeclaration.jobNo; else allowSave" type="" disabled="true" hidden="true"
                     class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                     (click)="isConvertJob = false; updateCustomClearance(updateForm)">

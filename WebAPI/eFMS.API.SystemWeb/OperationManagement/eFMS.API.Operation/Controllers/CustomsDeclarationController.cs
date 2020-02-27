@@ -303,15 +303,13 @@ namespace eFMS.API.Operation.Controllers
         [Authorize]
         public IActionResult CheckPermission(int id)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var statusCode = customsDeclarationService.CheckDetailPermission(id);
             if (statusCode == 403) return Ok(false);
             return Ok(true);
         }
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
+        ///
         [HttpGet("CheckDeletePermission")]
         [Authorize]
         public IActionResult CheckDeletePermission()

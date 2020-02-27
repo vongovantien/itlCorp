@@ -202,6 +202,17 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(transactionService.CheckAllowDelete(id));
         }
 
+        [HttpPost("CheckAllowConvertJob")]
+        [Authorize]
+        public IActionResult CheckAllowConvertJob([FromBody]List<OpsTransactionClearanceModel> list)
+        {
+            currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var hs = transactionService.CheckAllowConvertJob(list);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
+            return Ok(result);
+        }
+
         /// <summary>
         /// convert a custom clearance to a job
         /// </summary>
@@ -211,6 +222,7 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult ConvertClearanceToJob(OpsTransactionClearanceModel model)
         {
+            currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return Forbid();
             var hs = transactionService.ConvertClearanceToJob(model);
@@ -232,6 +244,9 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult ConvertExistedClearancesToJobs([FromBody]List<OpsTransactionClearanceModel> list)
         {
+            currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return Forbid();
             HandleState hs = transactionService.ConvertExistedClearancesToJobs(list);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
