@@ -57,25 +57,25 @@ namespace eFMS.API.Infrastructure.Extensions
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID && model.UserCreated != currentUser.UserID)
+                    if (model.GroupId != currentUser.GroupId && model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID && model.UserCreated != currentUser.UserID)
+                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID && model.UserCreated != currentUser.UserID)
+                    if (model.OfficeId != currentUser.OfficeID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Company:
-                    if (model.CompanyId != currentUser.CompanyID && model.UserCreated != currentUser.UserID)
+                    if (model.CompanyId != currentUser.CompanyID)
                     {
                         code = 403;
                     }

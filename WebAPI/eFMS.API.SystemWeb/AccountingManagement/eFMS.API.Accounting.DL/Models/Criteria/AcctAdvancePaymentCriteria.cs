@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Common.Globals;
+using System;
 using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.DL.Models.Criteria
@@ -14,5 +15,6 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string PaymentMethod { get; set; }
         public string StatusApproval { get; set; }
         public string StatusPayment { get; set; }
+        public PermissionRange RangeSearch { get; set; }
     }
 }

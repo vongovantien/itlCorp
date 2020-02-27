@@ -2,7 +2,7 @@
     attr.data-target="#{{dataTarget}}" (click)="onClickButton()"
     attr.title="{{ (isEdit || isDelete || isDetail)? buttonAttribute.titleButton:'' }}"
     attr.data-dismiss="{{(isCancel || isDelete)?'modal':''}}" [disabled]="disabled">
-    <span *ngIf="isAdd || isImport || isExport || isCancel || isSave || isSearch">
+    <span *ngIf="isAdd || isImport || isExport || isCancel || isSave || isSearch || isPreview">
         <i attr.class="{{buttonAttribute.icon}}"></i>
         <span>
             {{ buttonAttribute.titleButton }}

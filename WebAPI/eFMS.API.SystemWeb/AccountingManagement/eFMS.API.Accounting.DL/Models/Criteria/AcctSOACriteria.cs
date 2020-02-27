@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Common.Globals;
+using System;
 
 namespace eFMS.API.Accounting.DL.Models.Criteria
 {
@@ -12,5 +13,6 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string SoaCurrency { get; set; }
         public string SoaUserCreate { get; set; }
         public string CurrencyLocal { get; set; }
+        public PermissionRange RangeSearch { get; set; }
     }
 }

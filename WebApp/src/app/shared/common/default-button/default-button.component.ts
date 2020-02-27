@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ButtonModalSetting, ButtonAttributeSetting } from '../../models/layout/button-modal-setting.model';
 import { ButtonType } from '../../enums/type-button.enum';
-import { AddDefaultButton, EditDefaultButton, DeleteDefaultButton, ImportDefaultButton, ExportDefaultButton, SaveDefaultButton, CancelDefaultButton, ResetDefaultButton, DetailDefaultButton, SearchDefaultButton } from '../../enums/default-button-enum';
+import { AddDefaultButton, EditDefaultButton, DeleteDefaultButton, ImportDefaultButton, ExportDefaultButton, SaveDefaultButton, CancelDefaultButton, ResetDefaultButton, DetailDefaultButton, SearchDefaultButton, PreviewDefaultButton } from '../../enums/default-button-enum';
 
 @Component({
     selector: 'app-default-button',
@@ -23,6 +23,7 @@ export class DefaultButtonComponent implements OnInit {
     isCancel: boolean = false;
     isDetail: boolean = false;
     isSearch: boolean = false;
+    isPreview: boolean = false;
     buttonAttribute: ButtonAttributeSetting;
 
 
@@ -68,9 +69,13 @@ export class DefaultButtonComponent implements OnInit {
             this.isDetail = true;
             this.setSyleButton(DetailDefaultButton);
         }
-        if (typeButton == ButtonType.search) {
+        if (typeButton === ButtonType.search) {
             this.isSearch = true;
             this.setSyleButton(SearchDefaultButton);
+        }
+        if (typeButton === ButtonType.preview) {
+            this.isPreview = true;
+            this.setSyleButton(PreviewDefaultButton);
         }
     }
     setSyleButton(DefaultButton: ButtonAttributeSetting): any {

@@ -58,7 +58,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
-        [AuthorizeEx(Menu.acctSP, UserPermission.AllowAccess)]
+        [Authorize]
         public IActionResult Paging(AcctSettlementPaymentCriteria criteria, int pageNumber, int pageSize)
         {
             var data = acctSettlementPaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
@@ -73,6 +73,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("QueryData")]
+        [Authorize]
         public IActionResult QueryData(AcctSettlementPaymentCriteria criteria)
         {
             var data = acctSettlementPaymentService.QueryData(criteria);
@@ -93,6 +94,38 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
+        /// Check allow delete settlement payment
+        /// </summary>
+        /// <param name="id">Id of settlement payment</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None)
+                return Ok(false);
+            return Ok(true);
+        }
+
+        /// <summary>
+        /// Check allow detail settlement payment
+        /// </summary>
+        /// <param name="id">Id of settlement payment</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None)
+                return Ok(false);
+            return Ok(true);
+        }
+
+        /// <summary>
         /// delete an settlement payment existed item
         /// </summary>
         /// <param name="settlementNo">settlementNo of existed item that want to delete</param>
@@ -105,6 +138,7 @@ namespace eFMS.API.Accounting.Controllers
             ChangeTrackerHelper.currentUser = currentUser.UserID;
 
             HandleState hs = acctSettlementPaymentService.DeleteSettlementPayment(settlementNo);
+            if (hs.Code == 403) return Forbid();
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -122,8 +156,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetDetailSettlementPaymentById")]
+        [Authorize]
         public IActionResult GetDetailSettlementPaymentById(Guid settlementId)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None) return Forbid();
+
             var settlement = acctSettlementPaymentService.GetSettlementPaymentById(settlementId);
             List<ShipmentSettlement> chargeGrpSettlement = new List<ShipmentSettlement>();
             List<ShipmentChargeSettlement> chargeNoGrpSettlement = new List<ShipmentChargeSettlement>();
@@ -236,8 +275,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        //[Authorize]
-        [AuthorizeEx(Menu.acctSP, UserPermission.Add)]
+        [Authorize]
         public IActionResult Add(CreateUpdateSettlementModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -276,6 +314,7 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             var hs = acctSettlementPaymentService.AddSettlementPayment(model);
+            if (hs.Code == 403) return Forbid();
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -293,8 +332,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-        //[Authorize]
-        [AuthorizeEx(Menu.acctSP, UserPermission.Update)]
+        [Authorize]
         public IActionResult Update(CreateUpdateSettlementModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -340,6 +378,7 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             var hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
+            if (hs.Code == 403) return Forbid();
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -412,6 +451,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctSettlementPaymentService.AddSettlementPayment(model);
+                if (hs.Code == 403) return Forbid();
             }
             else //Update Settlement Payment
             {
@@ -422,6 +462,7 @@ namespace eFMS.API.Accounting.Controllers
                 }
                 model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
+                if (hs.Code == 403) return Forbid();
             }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -565,11 +606,16 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Unlock settlement payment
+        /// </summary>
+        /// <param name="settlePayments"></param>
+        /// <returns></returns>
         [HttpPost("UnLock")]
         [Authorize]
-        public IActionResult UnLock(List<LockedLogModel> advancePayments)
+        public IActionResult UnLock(List<LockedLogModel> settlePayments)
         {
-            var result = acctSettlementPaymentService.UnLock(advancePayments);
+            var result = acctSettlementPaymentService.UnLock(settlePayments);
             return Ok(result);
         }
     }

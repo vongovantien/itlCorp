@@ -196,7 +196,8 @@ export class SettlementPaymentComponent extends AppList {
             );
     }
 
-
-
+    export(){
+        console.log('export settlement');
+    }
 
 }

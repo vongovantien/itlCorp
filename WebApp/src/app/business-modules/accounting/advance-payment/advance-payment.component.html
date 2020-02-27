@@ -1,23 +1,8 @@
 <div class="advance-payment-page">
     <app-sub-header>
-        <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                [routerLink]="'/home/accounting/advance-payment/new'">
-                <span>
-                    <i class="la la-plus"></i>
-                    <span>
-                        add new
-                    </span>
-                </span>
-            </button>
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-upload"></i>
-                    <span>
-                        export
-                    </span>
-                </span>
-            </button>
+        <div class="c-button-actions">         
+            <app-permission-button title="Add New" [routerLink]="'/home/accounting/advance-payment/new'"></app-permission-button>            
+            <app-permission-button type="export" title="Export" (click)="export()"></app-permission-button>
         </div>
     </app-sub-header>
     <div class="m-content">
@@ -46,13 +31,6 @@
                                                         title="Collapse" type="button">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
-                                                    <!-- <span
-                                                        *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
-                                                        <a (click)="deleteAdvancePayment(advancePayment)"
-                                                            title="Delete advance payment" class="pointer">
-                                                            <i class="la la-trash text-danger"></i>
-                                                        </a>
-                                                    </span> -->
                                                     <button [disabled]="advancePayment.statusApproval !== 'New' && advancePayment.statusApproval !== 'Denied'"
                                                         class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"                                                       
                                                         title="Delete advance payment"
