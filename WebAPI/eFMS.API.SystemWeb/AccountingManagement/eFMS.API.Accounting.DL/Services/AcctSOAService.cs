@@ -4,6 +4,8 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -62,6 +64,9 @@ namespace eFMS.API.Accounting.DL.Services
         #region -- Insert & Update SOA
         public HandleState AddSOA(AcctSoaModel model)
         {
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403);
+
             try
             {
                 var userCurrent = currentUser.UserID;
@@ -71,6 +76,11 @@ namespace eFMS.API.Accounting.DL.Services
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                 model.UserCreated = model.UserModified = userCurrent;
                 model.Currency = model.Currency.Trim();
+                model.GroupId = currentUser.GroupId;
+                model.DepartmentId = currentUser.DepartmentId;
+                model.OfficeId = currentUser.OfficeID;
+                model.CompanyId = currentUser.CompanyID;
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -110,7 +120,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 //    }
                                 //);
                                 //dc.CsShipmentSurcharge.UpdateRange(surchargeCredit);
-                                foreach(var item in surchargeCredit)
+                                foreach (var item in surchargeCredit)
                                 {
                                     item.PaySoano = soa.Soano;
                                     item.UserModified = userCurrent;
@@ -165,6 +175,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState UpdateSOA(AcctSoaModel model)
         {
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403);
+
             try
             {
                 var userCurrent = currentUser.UserID;
@@ -175,7 +188,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
                         //var hsUpdateSoaSurcharge = UpdateSOASurCharge(model.Soano);                      
-                        var surcharge = csShipmentSurchargeRepo.Get(x => x.Soano == model.Soano || x.PaySoano == model.Soano).ToList();                        
+                        var surcharge = csShipmentSurchargeRepo.Get(x => x.Soano == model.Soano || x.PaySoano == model.Soano).ToList();
                         foreach (var item in surcharge)
                         {
                             //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
@@ -197,6 +210,12 @@ namespace eFMS.API.Accounting.DL.Services
                         model.CreditAmount = amountDebitCreditShipment.CreditAmount;
 
                         var soa = mapper.Map<AcctSoa>(model);
+                        var soaCurrent = DataContext.Get(x => x.Id == soa.Id).FirstOrDefault();
+                        soa.GroupId = soaCurrent.GroupId;
+                        soa.DepartmentId = soaCurrent.DepartmentId;
+                        soa.OfficeId = soaCurrent.OfficeId;
+                        soa.CompanyId = soaCurrent.CompanyId;
+
                         //Update các thông tin của SOA
                         var hs = DataContext.Update(soa, x => x.Id == soa.Id);
 
@@ -224,7 +243,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 //}
                                 //);
                                 //dc.CsShipmentSurcharge.UpdateRange(surchargeCredit);
-                                foreach(var item in surchargeCredit)
+                                foreach (var item in surchargeCredit)
                                 {
                                     item.PaySoano = soa.Soano;
                                     item.UserModified = userCurrent;
@@ -245,7 +264,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 //}
                                 //);
                                 //dc.CsShipmentSurcharge.UpdateRange(surchargeDebit);
-                                foreach(var item in surchargeDebit)
+                                foreach (var item in surchargeDebit)
                                 {
                                     item.Soano = soa.Soano;
                                     item.UserModified = userCurrent;
@@ -276,6 +295,15 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
+        public HandleState DeleteSOA(string soaNo)
+        {
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None) return new HandleState(403);
+
+            var hs = DataContext.Delete(x => x.Soano == soaNo);
+            return hs;
+        }
+
         public HandleState UpdateSOASurCharge(string soaNo)
         {
             try
@@ -299,7 +327,7 @@ namespace eFMS.API.Accounting.DL.Services
                             //);
                             //dc.CsShipmentSurcharge.UpdateRange(surcharge);
                             //dc.SaveChanges();
-                            foreach(var item in surcharge)
+                            foreach (var item in surcharge)
                             {
                                 item.Soano = null;
                                 item.PaySoano = null;
@@ -392,7 +420,7 @@ namespace eFMS.API.Accounting.DL.Services
         #region -- List Status SOA --
         public object GetListStatusSoa()
         {
-            return CustomData.StatusSoa;
+            return Common.CustomData.StatusSoa;
         }
         #endregion -- List Status SOA --
 
@@ -552,71 +580,24 @@ namespace eFMS.API.Accounting.DL.Services
             //                   };
             //queryBuySell = queryBuySell.Where(x => !string.IsNullOrEmpty(x.Service));
             var queryBuySellOperation = from sur in surcharge
-                               join ops in opst on sur.Hblid equals ops.Hblid //into ops2
-                               //from ops in ops2.DefaultIfEmpty()
-                               join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
-                               from creditN in creditN2.DefaultIfEmpty()
-                               join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
-                               from debitN in debitN2.DefaultIfEmpty()
-                               join chg in charge on sur.ChargeId equals chg.Id into chg2
-                               from chg in chg2.DefaultIfEmpty()
-                               select new ChargeSOAResult
-                               {
-                                   ID = sur.Id,
-                                   HBLID = sur.Hblid,
-                                   ChargeID = sur.ChargeId,
-                                   ChargeCode = chg.Code,
-                                   ChargeName = chg.ChargeNameEn,
-                                   JobId = ops.JobNo,
-                                   HBL = ops.Hwbno,
-                                   MBL = ops.Mblno,
-                                   Type = sur.Type,
-                                   Debit = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? (decimal?)sur.Total : null,
-                                   Credit = sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? (decimal?)sur.Total : null,
-                                   SOANo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
-                                   IsOBH = false,
-                                   Currency = sur.CurrencyId,
-                                   InvoiceNo = sur.InvoiceNo,
-                                   Note = sur.Notes,
-                                   CustomerID = sur.PaymentObjectId,
-                                   ServiceDate = ops.ServiceDate,
-                                   CreatedDate = ops.DatetimeCreated,
-                                   InvoiceIssuedDate = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? debitN.DatetimeCreated : creditN.DatetimeCreated,
-                                   TransactionType = null,
-                                   UserCreated = ops.UserCreated,
-                                   Quantity = sur.Quantity,
-                                   UnitId = sur.UnitId,
-                                   UnitPrice = sur.UnitPrice,
-                                   VATRate = sur.Vatrate,
-                                   CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
-                                   DatetimeModified = sur.DatetimeModified,
-                                   CommodityGroupID = ops.CommodityGroupId,
-                                   Service = "CL",
-                                   CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
-                               };
-            queryBuySellOperation = queryBuySellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
-
-            var queryBuySellDocument = from sur in surcharge
-                                        join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
-                                        //from cstd in cstd2.DefaultIfEmpty()
-                                        join cst in csTrans on cstd.JobId equals cst.Id //into cst2
-                                        //from cst in cst2.DefaultIfEmpty()
+                                        join ops in opst on sur.Hblid equals ops.Hblid //into ops2
+                                                                                       //from ops in ops2.DefaultIfEmpty()
                                         join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
                                         from creditN in creditN2.DefaultIfEmpty()
                                         join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
                                         from debitN in debitN2.DefaultIfEmpty()
                                         join chg in charge on sur.ChargeId equals chg.Id into chg2
                                         from chg in chg2.DefaultIfEmpty()
-                                       select new ChargeSOAResult
+                                        select new ChargeSOAResult
                                         {
                                             ID = sur.Id,
                                             HBLID = sur.Hblid,
                                             ChargeID = sur.ChargeId,
                                             ChargeCode = chg.Code,
                                             ChargeName = chg.ChargeNameEn,
-                                            JobId = cst.JobNo,
-                                            HBL = cstd.Hwbno,
-                                            MBL = cst.Mawb,
+                                            JobId = ops.JobNo,
+                                            HBL = ops.Hwbno,
+                                            MBL = ops.Mblno,
                                             Type = sur.Type,
                                             Debit = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? (decimal?)sur.Total : null,
                                             Credit = sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? (decimal?)sur.Total : null,
@@ -626,21 +607,68 @@ namespace eFMS.API.Accounting.DL.Services
                                             InvoiceNo = sur.InvoiceNo,
                                             Note = sur.Notes,
                                             CustomerID = sur.PaymentObjectId,
-                                            ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
-                                            CreatedDate = cst.DatetimeCreated,
+                                            ServiceDate = ops.ServiceDate,
+                                            CreatedDate = ops.DatetimeCreated,
                                             InvoiceIssuedDate = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? debitN.DatetimeCreated : creditN.DatetimeCreated,
-                                            TransactionType = cst.TransactionType,
-                                            UserCreated = cst.UserCreated,
+                                            TransactionType = null,
+                                            UserCreated = ops.UserCreated,
                                             Quantity = sur.Quantity,
                                             UnitId = sur.UnitId,
                                             UnitPrice = sur.UnitPrice,
                                             VATRate = sur.Vatrate,
                                             CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
                                             DatetimeModified = sur.DatetimeModified,
-                                            CommodityGroupID = null,
-                                            Service = cst.TransactionType,
+                                            CommodityGroupID = ops.CommodityGroupId,
+                                            Service = "CL",
                                             CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
                                         };
+            queryBuySellOperation = queryBuySellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+
+            var queryBuySellDocument = from sur in surcharge
+                                       join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
+                                                                                          //from cstd in cstd2.DefaultIfEmpty()
+                                       join cst in csTrans on cstd.JobId equals cst.Id //into cst2
+                                                                                       //from cst in cst2.DefaultIfEmpty()
+                                       join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
+                                       from creditN in creditN2.DefaultIfEmpty()
+                                       join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
+                                       from debitN in debitN2.DefaultIfEmpty()
+                                       join chg in charge on sur.ChargeId equals chg.Id into chg2
+                                       from chg in chg2.DefaultIfEmpty()
+                                       select new ChargeSOAResult
+                                       {
+                                           ID = sur.Id,
+                                           HBLID = sur.Hblid,
+                                           ChargeID = sur.ChargeId,
+                                           ChargeCode = chg.Code,
+                                           ChargeName = chg.ChargeNameEn,
+                                           JobId = cst.JobNo,
+                                           HBL = cstd.Hwbno,
+                                           MBL = cst.Mawb,
+                                           Type = sur.Type,
+                                           Debit = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? (decimal?)sur.Total : null,
+                                           Credit = sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? (decimal?)sur.Total : null,
+                                           SOANo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
+                                           IsOBH = false,
+                                           Currency = sur.CurrencyId,
+                                           InvoiceNo = sur.InvoiceNo,
+                                           Note = sur.Notes,
+                                           CustomerID = sur.PaymentObjectId,
+                                           ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
+                                           CreatedDate = cst.DatetimeCreated,
+                                           InvoiceIssuedDate = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? debitN.DatetimeCreated : creditN.DatetimeCreated,
+                                           TransactionType = cst.TransactionType,
+                                           UserCreated = cst.UserCreated,
+                                           Quantity = sur.Quantity,
+                                           UnitId = sur.UnitId,
+                                           UnitPrice = sur.UnitPrice,
+                                           VATRate = sur.Vatrate,
+                                           CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
+                                           DatetimeModified = sur.DatetimeModified,
+                                           CommodityGroupID = null,
+                                           Service = cst.TransactionType,
+                                           CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                       };
             queryBuySellDocument = queryBuySellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryBuySell = queryBuySellOperation.Union(queryBuySellDocument);
@@ -701,91 +729,91 @@ namespace eFMS.API.Accounting.DL.Services
             //                   };
             //queryObhSell = queryObhSell.Where(x => !string.IsNullOrEmpty(x.Service));
             var queryObhSellOperation = from sur in surcharge
-                               join ops in opst on sur.Hblid equals ops.Hblid //into ops2
-                               //from ops in ops2.DefaultIfEmpty()
-                               join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
-                               from debitN in debitN2.DefaultIfEmpty()
-                               join chg in charge on sur.ChargeId equals chg.Id into chg2
-                               from chg in chg2.DefaultIfEmpty()
-                               select new ChargeSOAResult
-                               {
-                                   ID = sur.Id,
-                                   HBLID = sur.Hblid,
-                                   ChargeID = sur.ChargeId,
-                                   ChargeCode = chg.Code,
-                                   ChargeName = chg.ChargeNameEn,
-                                   JobId = ops.JobNo,
-                                   HBL = ops.Hwbno,
-                                   MBL = ops.Mblno,
-                                   Type = sur.Type + "-SELL",
-                                   Debit = sur.Total,
-                                   Credit = null,
-                                   SOANo = sur.Soano,
-                                   IsOBH = true,
-                                   Currency = sur.CurrencyId,
-                                   InvoiceNo = sur.InvoiceNo,
-                                   Note = sur.Notes,
-                                   CustomerID = sur.PaymentObjectId,
-                                   ServiceDate = ops.ServiceDate,
-                                   CreatedDate = ops.DatetimeCreated,
-                                   InvoiceIssuedDate = debitN.DatetimeCreated,
-                                   TransactionType = null,
-                                   UserCreated = ops.UserCreated,
-                                   Quantity = sur.Quantity,
-                                   UnitId = sur.UnitId,
-                                   UnitPrice = sur.UnitPrice,
-                                   VATRate = sur.Vatrate,
-                                   CreditDebitNo = sur.DebitNo,
-                                   DatetimeModified = sur.DatetimeModified,
-                                   CommodityGroupID = ops.CommodityGroupId,
-                                   Service = "CL",
-                                   CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
-                               };
+                                        join ops in opst on sur.Hblid equals ops.Hblid //into ops2
+                                                                                       //from ops in ops2.DefaultIfEmpty()
+                                        join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
+                                        from debitN in debitN2.DefaultIfEmpty()
+                                        join chg in charge on sur.ChargeId equals chg.Id into chg2
+                                        from chg in chg2.DefaultIfEmpty()
+                                        select new ChargeSOAResult
+                                        {
+                                            ID = sur.Id,
+                                            HBLID = sur.Hblid,
+                                            ChargeID = sur.ChargeId,
+                                            ChargeCode = chg.Code,
+                                            ChargeName = chg.ChargeNameEn,
+                                            JobId = ops.JobNo,
+                                            HBL = ops.Hwbno,
+                                            MBL = ops.Mblno,
+                                            Type = sur.Type + "-SELL",
+                                            Debit = sur.Total,
+                                            Credit = null,
+                                            SOANo = sur.Soano,
+                                            IsOBH = true,
+                                            Currency = sur.CurrencyId,
+                                            InvoiceNo = sur.InvoiceNo,
+                                            Note = sur.Notes,
+                                            CustomerID = sur.PaymentObjectId,
+                                            ServiceDate = ops.ServiceDate,
+                                            CreatedDate = ops.DatetimeCreated,
+                                            InvoiceIssuedDate = debitN.DatetimeCreated,
+                                            TransactionType = null,
+                                            UserCreated = ops.UserCreated,
+                                            Quantity = sur.Quantity,
+                                            UnitId = sur.UnitId,
+                                            UnitPrice = sur.UnitPrice,
+                                            VATRate = sur.Vatrate,
+                                            CreditDebitNo = sur.DebitNo,
+                                            DatetimeModified = sur.DatetimeModified,
+                                            CommodityGroupID = ops.CommodityGroupId,
+                                            Service = "CL",
+                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                        };
             queryObhSellOperation = queryObhSellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryObhSellDocument = from sur in surcharge
-                               join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
-                               //from cstd in cstd2.DefaultIfEmpty()
-                               join cst in csTrans on cstd.JobId equals cst.Id //into cst2
-                               //from cst in cst2.DefaultIfEmpty()
-                               join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
-                               from debitN in debitN2.DefaultIfEmpty()
-                               join chg in charge on sur.ChargeId equals chg.Id into chg2
-                               from chg in chg2.DefaultIfEmpty()
-                               select new ChargeSOAResult
-                               {
-                                   ID = sur.Id,
-                                   HBLID = sur.Hblid,
-                                   ChargeID = sur.ChargeId,
-                                   ChargeCode = chg.Code,
-                                   ChargeName = chg.ChargeNameEn,
-                                   JobId = cst.JobNo,
-                                   HBL = cstd.Hwbno,
-                                   MBL = cst.Mawb,
-                                   Type = sur.Type + "-SELL",
-                                   Debit = sur.Total,
-                                   Credit = null,
-                                   SOANo = sur.Soano,
-                                   IsOBH = true,
-                                   Currency = sur.CurrencyId,
-                                   InvoiceNo = sur.InvoiceNo,
-                                   Note = sur.Notes,
-                                   CustomerID = sur.PaymentObjectId,
-                                   ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
-                                   CreatedDate = cst.DatetimeCreated,
-                                   InvoiceIssuedDate = debitN.DatetimeCreated,
-                                   TransactionType = cst.TransactionType,
-                                   UserCreated = cst.UserCreated,
-                                   Quantity = sur.Quantity,
-                                   UnitId = sur.UnitId,
-                                   UnitPrice = sur.UnitPrice,
-                                   VATRate = sur.Vatrate,
-                                   CreditDebitNo = sur.DebitNo,
-                                   DatetimeModified = sur.DatetimeModified,
-                                   CommodityGroupID = null,
-                                   Service = cst.TransactionType,
-                                   CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
-                               };
+                                       join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
+                                                                                          //from cstd in cstd2.DefaultIfEmpty()
+                                       join cst in csTrans on cstd.JobId equals cst.Id //into cst2
+                                                                                       //from cst in cst2.DefaultIfEmpty()
+                                       join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
+                                       from debitN in debitN2.DefaultIfEmpty()
+                                       join chg in charge on sur.ChargeId equals chg.Id into chg2
+                                       from chg in chg2.DefaultIfEmpty()
+                                       select new ChargeSOAResult
+                                       {
+                                           ID = sur.Id,
+                                           HBLID = sur.Hblid,
+                                           ChargeID = sur.ChargeId,
+                                           ChargeCode = chg.Code,
+                                           ChargeName = chg.ChargeNameEn,
+                                           JobId = cst.JobNo,
+                                           HBL = cstd.Hwbno,
+                                           MBL = cst.Mawb,
+                                           Type = sur.Type + "-SELL",
+                                           Debit = sur.Total,
+                                           Credit = null,
+                                           SOANo = sur.Soano,
+                                           IsOBH = true,
+                                           Currency = sur.CurrencyId,
+                                           InvoiceNo = sur.InvoiceNo,
+                                           Note = sur.Notes,
+                                           CustomerID = sur.PaymentObjectId,
+                                           ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
+                                           CreatedDate = cst.DatetimeCreated,
+                                           InvoiceIssuedDate = debitN.DatetimeCreated,
+                                           TransactionType = cst.TransactionType,
+                                           UserCreated = cst.UserCreated,
+                                           Quantity = sur.Quantity,
+                                           UnitId = sur.UnitId,
+                                           UnitPrice = sur.UnitPrice,
+                                           VATRate = sur.Vatrate,
+                                           CreditDebitNo = sur.DebitNo,
+                                           DatetimeModified = sur.DatetimeModified,
+                                           CommodityGroupID = null,
+                                           Service = cst.TransactionType,
+                                           CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                       };
             queryObhSellDocument = queryObhSellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryObhSell = queryObhSellOperation.Union(queryObhSellDocument);
@@ -848,91 +876,91 @@ namespace eFMS.API.Accounting.DL.Services
             //queryObhBuy = queryObhBuy.Where(x => !string.IsNullOrEmpty(x.Service));
 
             var queryObhBuyOperation = from sur in surcharge
-                              join ops in opst on sur.Hblid equals ops.Hblid //into ops2
-                              //from ops in ops2.DefaultIfEmpty()
-                              join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
-                              from creditN in creditN2.DefaultIfEmpty()
-                              join chg in charge on sur.ChargeId equals chg.Id into chg2
-                              from chg in chg2.DefaultIfEmpty()
-                              select new ChargeSOAResult
-                              {
-                                  ID = sur.Id,
-                                  HBLID = sur.Hblid,
-                                  ChargeID = sur.ChargeId,
-                                  ChargeCode = chg.Code,
-                                  ChargeName = chg.ChargeNameEn,
-                                  JobId = ops.JobNo,
-                                  HBL = ops.Hwbno,
-                                  MBL = ops.Mblno,
-                                  Type = sur.Type + "-BUY",
-                                  Debit = null,
-                                  Credit = sur.Total,
-                                  SOANo = sur.PaySoano,
-                                  IsOBH = true,
-                                  Currency = sur.CurrencyId,
-                                  InvoiceNo = sur.InvoiceNo,
-                                  Note = sur.Notes,
-                                  CustomerID = sur.PayerId,
-                                  ServiceDate = ops.ServiceDate,
-                                  CreatedDate = ops.DatetimeCreated,
-                                  InvoiceIssuedDate = creditN.DatetimeCreated,
-                                  TransactionType = null,
-                                  UserCreated = ops.UserCreated,
-                                  Quantity = sur.Quantity,
-                                  UnitId = sur.UnitId,
-                                  UnitPrice = sur.UnitPrice,
-                                  VATRate = sur.Vatrate,
-                                  CreditDebitNo = sur.CreditNo,
-                                  DatetimeModified = sur.DatetimeModified,
-                                  CommodityGroupID = ops.CommodityGroupId,
-                                  Service = "CL",
-                                  CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
-                              };
+                                       join ops in opst on sur.Hblid equals ops.Hblid //into ops2
+                                                                                      //from ops in ops2.DefaultIfEmpty()
+                                       join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
+                                       from creditN in creditN2.DefaultIfEmpty()
+                                       join chg in charge on sur.ChargeId equals chg.Id into chg2
+                                       from chg in chg2.DefaultIfEmpty()
+                                       select new ChargeSOAResult
+                                       {
+                                           ID = sur.Id,
+                                           HBLID = sur.Hblid,
+                                           ChargeID = sur.ChargeId,
+                                           ChargeCode = chg.Code,
+                                           ChargeName = chg.ChargeNameEn,
+                                           JobId = ops.JobNo,
+                                           HBL = ops.Hwbno,
+                                           MBL = ops.Mblno,
+                                           Type = sur.Type + "-BUY",
+                                           Debit = null,
+                                           Credit = sur.Total,
+                                           SOANo = sur.PaySoano,
+                                           IsOBH = true,
+                                           Currency = sur.CurrencyId,
+                                           InvoiceNo = sur.InvoiceNo,
+                                           Note = sur.Notes,
+                                           CustomerID = sur.PayerId,
+                                           ServiceDate = ops.ServiceDate,
+                                           CreatedDate = ops.DatetimeCreated,
+                                           InvoiceIssuedDate = creditN.DatetimeCreated,
+                                           TransactionType = null,
+                                           UserCreated = ops.UserCreated,
+                                           Quantity = sur.Quantity,
+                                           UnitId = sur.UnitId,
+                                           UnitPrice = sur.UnitPrice,
+                                           VATRate = sur.Vatrate,
+                                           CreditDebitNo = sur.CreditNo,
+                                           DatetimeModified = sur.DatetimeModified,
+                                           CommodityGroupID = ops.CommodityGroupId,
+                                           Service = "CL",
+                                           CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                       };
             queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryObhBuyDocument = from sur in surcharge
-                              join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
-                              //from cstd in cstd2.DefaultIfEmpty()
-                              join cst in csTrans on cstd.JobId equals cst.Id //into cst2
-                              //from cst in cst2.DefaultIfEmpty()
-                              join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
-                              from creditN in creditN2.DefaultIfEmpty()
-                              join chg in charge on sur.ChargeId equals chg.Id into chg2
-                              from chg in chg2.DefaultIfEmpty()
-                              select new ChargeSOAResult
-                              {
-                                  ID = sur.Id,
-                                  HBLID = sur.Hblid,
-                                  ChargeID = sur.ChargeId,
-                                  ChargeCode = chg.Code,
-                                  ChargeName = chg.ChargeNameEn,
-                                  JobId = cst.JobNo,
-                                  HBL = cstd.Hwbno,
-                                  MBL = cst.Mawb,
-                                  Type = sur.Type + "-BUY",
-                                  Debit = null,
-                                  Credit = sur.Total,
-                                  SOANo = sur.PaySoano,
-                                  IsOBH = true,
-                                  Currency = sur.CurrencyId,
-                                  InvoiceNo = sur.InvoiceNo,
-                                  Note = sur.Notes,
-                                  CustomerID = sur.PayerId,
-                                  ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
-                                  CreatedDate = cst.DatetimeCreated,
-                                  InvoiceIssuedDate = creditN.DatetimeCreated,
-                                  TransactionType = cst.TransactionType,
-                                  UserCreated = cst.UserCreated,
-                                  Quantity = sur.Quantity,
-                                  UnitId = sur.UnitId,
-                                  UnitPrice = sur.UnitPrice,
-                                  VATRate = sur.Vatrate,
-                                  CreditDebitNo = sur.CreditNo,
-                                  DatetimeModified = sur.DatetimeModified,
-                                  CommodityGroupID = null,
-                                  Service = cst.TransactionType,
-                                  CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
-                              };
+                                      join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
+                                                                                         //from cstd in cstd2.DefaultIfEmpty()
+                                      join cst in csTrans on cstd.JobId equals cst.Id //into cst2
+                                                                                      //from cst in cst2.DefaultIfEmpty()
+                                      join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
+                                      from creditN in creditN2.DefaultIfEmpty()
+                                      join chg in charge on sur.ChargeId equals chg.Id into chg2
+                                      from chg in chg2.DefaultIfEmpty()
+                                      select new ChargeSOAResult
+                                      {
+                                          ID = sur.Id,
+                                          HBLID = sur.Hblid,
+                                          ChargeID = sur.ChargeId,
+                                          ChargeCode = chg.Code,
+                                          ChargeName = chg.ChargeNameEn,
+                                          JobId = cst.JobNo,
+                                          HBL = cstd.Hwbno,
+                                          MBL = cst.Mawb,
+                                          Type = sur.Type + "-BUY",
+                                          Debit = null,
+                                          Credit = sur.Total,
+                                          SOANo = sur.PaySoano,
+                                          IsOBH = true,
+                                          Currency = sur.CurrencyId,
+                                          InvoiceNo = sur.InvoiceNo,
+                                          Note = sur.Notes,
+                                          CustomerID = sur.PayerId,
+                                          ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
+                                          CreatedDate = cst.DatetimeCreated,
+                                          InvoiceIssuedDate = creditN.DatetimeCreated,
+                                          TransactionType = cst.TransactionType,
+                                          UserCreated = cst.UserCreated,
+                                          Quantity = sur.Quantity,
+                                          UnitId = sur.UnitId,
+                                          UnitPrice = sur.UnitPrice,
+                                          VATRate = sur.Vatrate,
+                                          CreditDebitNo = sur.CreditNo,
+                                          DatetimeModified = sur.DatetimeModified,
+                                          CommodityGroupID = null,
+                                          Service = cst.TransactionType,
+                                          CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                      };
             queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryObhBuy = queryObhBuyOperation.Union(queryObhBuyDocument);
@@ -967,8 +995,8 @@ namespace eFMS.API.Accounting.DL.Services
             var dataMerge = queryBuySell.Union(queryObhBuy).Union(queryObhSell);
 
             var queryData = from data in dataMerge
-                            //join chg in charge on data.ChargeID equals chg.Id into chg2
-                            //from chg in chg2.DefaultIfEmpty()
+                                //join chg in charge on data.ChargeID equals chg.Id into chg2
+                                //from chg in chg2.DefaultIfEmpty()
                             join uni in unit on data.UnitId equals uni.Id into uni2
                             from uni in uni2.DefaultIfEmpty()
                             select new ChargeSOAResult
@@ -1069,7 +1097,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     query = query.And(chg => chg.Debit.HasValue);
                 }
-                if(criteria.Type == "Credit")
+                if (criteria.Type == "Credit")
                 {
                     query = query.And(chg => chg.Credit.HasValue);
                 }
@@ -1208,7 +1236,7 @@ namespace eFMS.API.Accounting.DL.Services
                    chg.CustomerID == criteria.CustomerID
                 && chg.IsOBH == criteria.IsOBH;
 
-            if(criteria.InSoa == true)
+            if (criteria.InSoa == true)
             {
                 query = query.Or(chg => !string.IsNullOrEmpty(chg.SOANo));
             }
@@ -1313,7 +1341,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var charge = GetChargeShipmentDocAndOperation(query);
-            
+
             var data = charge.Select(chg => new ChargeShipmentModel
             {
                 ID = chg.ID,
@@ -1540,7 +1568,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  CreatorShipment = s.CreatorShipment
                              };
             var result = resultData.FirstOrDefault();
-            if(result != null)
+            if (result != null)
             {
                 result.UserNameCreated = sysUserRepo.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
                 result.UserNameModified = sysUserRepo.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
@@ -1635,8 +1663,8 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (var item in arrayGrpServiceTypeId)
                 {
                     //Lấy ra DisplayName của serviceTypeId
-                    serviceName += CustomData.Services.Where(x => x.Value == item).FirstOrDefault() != null ?
-                                CustomData.Services.Where(x => x.Value == item).FirstOrDefault().DisplayName.Trim() + ";"
+                    serviceName += Common.CustomData.Services.Where(x => x.Value == item).FirstOrDefault() != null ?
+                                Common.CustomData.Services.Where(x => x.Value == item).FirstOrDefault().DisplayName.Trim() + ";"
                                 : string.Empty;
                 }
                 serviceName = (serviceName + ")").Replace(";)", string.Empty);
@@ -1656,39 +1684,39 @@ namespace eFMS.API.Accounting.DL.Services
             var charge = GetChargeShipmentDocAndOperation(query);
             var partner = catPartnerRepo.Get();
             var dataResult = from s in soa
-                        join chg in charge on s.Soano equals chg.SOANo into chg2
-                        from chg in chg2.DefaultIfEmpty()
-                        join pat in partner on s.Customer equals pat.Id into pat2
-                        from pat in pat2.DefaultIfEmpty()
-                        select new ExportSOAModel
-                        {
-                            SOANo = s.Soano,
-                            CustomerName = pat.PartnerNameEn,
-                            TaxCode = pat.TaxCode,
-                            CustomerAddress = pat.AddressEn,
-                            ServiceDate = chg.ServiceDate,
-                            JobId = chg.JobId,
-                            HBL = chg.HBL,
-                            MBL = chg.MBL,
-                            CustomNo = chg.CustomNo,
-                            ChargeCode = chg.ChargeCode,
-                            ChargeName = chg.ChargeName,
-                            CreditDebitNo = chg.CreditDebitNo,
-                            Debit = chg.Debit,
-                            Credit = chg.Credit,
-                            CurrencySOA = s.Currency,
-                            CurrencyCharge = chg.Currency,
-                            CreditExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
-                            ?
-                                GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                            DebitExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
-                            ?
-                                GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),
-                        };
+                             join chg in charge on s.Soano equals chg.SOANo into chg2
+                             from chg in chg2.DefaultIfEmpty()
+                             join pat in partner on s.Customer equals pat.Id into pat2
+                             from pat in pat2.DefaultIfEmpty()
+                             select new ExportSOAModel
+                             {
+                                 SOANo = s.Soano,
+                                 CustomerName = pat.PartnerNameEn,
+                                 TaxCode = pat.TaxCode,
+                                 CustomerAddress = pat.AddressEn,
+                                 ServiceDate = chg.ServiceDate,
+                                 JobId = chg.JobId,
+                                 HBL = chg.HBL,
+                                 MBL = chg.MBL,
+                                 CustomNo = chg.CustomNo,
+                                 ChargeCode = chg.ChargeCode,
+                                 ChargeName = chg.ChargeName,
+                                 CreditDebitNo = chg.CreditDebitNo,
+                                 Debit = chg.Debit,
+                                 Credit = chg.Credit,
+                                 CurrencySOA = s.Currency,
+                                 CurrencyCharge = chg.Currency,
+                                 CreditExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
+                                 ?
+                                     GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
+                                 :
+                                     GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
+                                 DebitExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
+                                 ?
+                                     GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
+                                 :
+                                     GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),
+                             };
             return dataResult;
         }
 

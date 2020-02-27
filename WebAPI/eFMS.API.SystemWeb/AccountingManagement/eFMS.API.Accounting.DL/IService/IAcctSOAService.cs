@@ -15,6 +15,8 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState UpdateSOA(AcctSoaModel model);
 
+        HandleState DeleteSOA(string soaNo);
+
         HandleState UpdateSOASurCharge(string soaNo);
 
         IQueryable<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount);
