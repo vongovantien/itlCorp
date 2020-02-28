@@ -1,3 +1,4 @@
+
 export class CustomDeclaration {
     cargoType: any = null;
     cbm: number = 0;

@@ -264,93 +264,93 @@ namespace eFMS.API.Catalogue.DL.Services
             var sysUsers = sysUserRepository.Get();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var salemans = salemanRepository.Get().ToList();
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
-            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            //PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             var dataSalemans = salemans.Select(x => x.PartnerId);
 
-            switch (rangeSearch)
-            {
-                case PermissionRange.None:
-                    partners = null;
-                    break;
-                case PermissionRange.All:
-                    break;
-                case PermissionRange.Owner:
-                    if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-                    {
-                       partners = partners.Where(x=>
-                       salemans.Any(y=>y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       || x.UserCreated == currentUser.UserID
-                       );
-                    }
-                    else
-                    {
-                        partners = partners.Where(x => x.UserCreated == currentUser.UserID);
-                    }
-                    break;
-                case PermissionRange.Group:
-                    if(partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-                    {
-                        partners = partners.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                       || x.UserCreated == currentUser.UserID
-                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       );
-                    }
-                    else
-                    {
-                        partners = partners.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                        || x.UserCreated == currentUser.UserID
-                        );
-                    }
-                    break;
-                case PermissionRange.Department:
-                    if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-                    {
-                        partners = partners.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                       || x.UserCreated == currentUser.UserID
-                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       );
-                    }
-                    else
-                    {
-                        partners = partners.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.DepartmentId == currentUser.DepartmentId && x.CompanyId == currentUser.CompanyID)
-                        || x.UserCreated == currentUser.UserID
-                        );
-                    }
-                    break;
-                case PermissionRange.Office:
-                    if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-                    {
-                        partners = partners.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                       || x.UserCreated == currentUser.UserID
-                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+            //switch (rangeSearch)
+            //{
+            //    case PermissionRange.None:
+            //        partners = null;
+            //        break;
+            //    case PermissionRange.All:
+            //        break;
+            //    case PermissionRange.Owner:
+            //        if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
+            //        {
+            //           partners = partners.Where(x=>
+            //           salemans.Any(y=>y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+            //           || x.UserCreated == currentUser.UserID
+            //           );
+            //        }
+            //        else
+            //        {
+            //            partners = partners.Where(x => x.UserCreated == currentUser.UserID);
+            //        }
+            //        break;
+            //    case PermissionRange.Group:
+            //        if(partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
+            //        {
+            //            partners = partners.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+            //           || x.UserCreated == currentUser.UserID
+            //           || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+            //           );
+            //        }
+            //        else
+            //        {
+            //            partners = partners.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+            //            || x.UserCreated == currentUser.UserID
+            //            );
+            //        }
+            //        break;
+            //    case PermissionRange.Department:
+            //        if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
+            //        {
+            //            partners = partners.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+            //           || x.UserCreated == currentUser.UserID
+            //           || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+            //           );
+            //        }
+            //        else
+            //        {
+            //            partners = partners.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.DepartmentId == currentUser.DepartmentId && x.CompanyId == currentUser.CompanyID)
+            //            || x.UserCreated == currentUser.UserID
+            //            );
+            //        }
+            //        break;
+            //    case PermissionRange.Office:
+            //        if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
+            //        {
+            //            partners = partners.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+            //           || x.UserCreated == currentUser.UserID
+            //           || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
 
-                       );
-                    }
-                    else
-                    {
-                        partners = partners.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                        || x.UserCreated == currentUser.UserID
-                        );
-                    }
-                    break;
-                case PermissionRange.Company:
-                    if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-                    {
-                        partners = partners.Where(x => (x.CompanyId == currentUser.CompanyID)
-                       || x.UserCreated == currentUser.UserID
-                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+            //           );
+            //        }
+            //        else
+            //        {
+            //            partners = partners.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+            //            || x.UserCreated == currentUser.UserID
+            //            );
+            //        }
+            //        break;
+            //    case PermissionRange.Company:
+            //        if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
+            //        {
+            //            partners = partners.Where(x => (x.CompanyId == currentUser.CompanyID)
+            //           || x.UserCreated == currentUser.UserID
+            //           || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
 
-                       );
-                    }
-                    else
-                    {
-                        partners = partners.Where(x => (x.CompanyId == currentUser.CompanyID)
-                        || x.UserCreated == currentUser.UserID
-                        );
-                    }
-                    break;
-            }
+            //           );
+            //        }
+            //        else
+            //        {
+            //            partners = partners.Where(x => (x.CompanyId == currentUser.CompanyID)
+            //            || x.UserCreated == currentUser.UserID
+            //            );
+            //        }
+            //        break;
+            //}
 
             if (partners == null) return null;
 

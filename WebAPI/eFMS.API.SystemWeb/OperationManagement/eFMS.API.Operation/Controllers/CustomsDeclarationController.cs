@@ -287,11 +287,43 @@ namespace eFMS.API.Operation.Controllers
         [AuthorizeEx(Menu.opsCustomClearance, UserPermission.Detail)]
         public IActionResult GetById(int id)
         {
-            var statusCode = customsDeclarationService.CheckDetailPermission(id);
-            if (statusCode == 403) return Forbid();
+            //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            //var statusCode = customsDeclarationService.CheckDetailPermission(id);
+            //if (statusCode == 403) return Forbid();
 
             var results = customsDeclarationService.GetDetail(id);
             return Ok(results);
+        }
+
+        /// <summary>
+        /// get custom declarations by id
+        /// </summary>
+        /// <param name="id">id that want to retrieve custom declarations</param>
+        /// <returns></returns>
+        [HttpGet("CheckPermission/{id}")]
+        [Authorize]
+        public IActionResult CheckPermission(int id)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var statusCode = customsDeclarationService.CheckDetailPermission(id);
+            if (statusCode == 403) return Ok(false);
+            return Ok(true);
+        }
+        
+        ///
+        [HttpPost("CheckDeletePermission")]
+        [Authorize]
+        public IActionResult CheckDeletePermission(List<CustomsDeclarationModel> clearances)
+        {
+            var hs = customsDeclarationService.CheckAllowDelete(clearances);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result;
+            if (hs.Success)
+            {
+                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            }
+            result = new ResultHandle { Status = hs.Success, Message = hs.Exception.Message.ToString() };
+            return Ok(result);
         }
 
         /// <summary>
@@ -319,16 +351,9 @@ namespace eFMS.API.Operation.Controllers
             if (hs.Success)
             {
                 result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-                return Ok(result);
-
             }
-            else
-            {
-                message = HandleError.GetMessage(hs, Crud.Delete);
-                result = new ResultHandle { Status = hs.Success, Message = message };
-                return BadRequest(result);
-
-            }
+            result = new ResultHandle { Status = hs.Success, Message = message };
+            return Ok(result);
 
         }
 

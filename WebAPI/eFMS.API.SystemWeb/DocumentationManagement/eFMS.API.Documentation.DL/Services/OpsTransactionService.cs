@@ -853,5 +853,53 @@ namespace eFMS.API.Documentation.DL.Services
             int code = PermissionEx.GetPermissionItemOpsToUpdate(model, permissionRange, currentUser, authorizeUserIds);
             return code;
         }
+
+        public HandleState CheckAllowConvertJob(List<OpsTransactionClearanceModel> list)
+        {
+            var result = new HandleState();
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            switch (permissionRange)
+            {
+                case PermissionRange.None:
+                    result = new HandleState(403, "You don't have permission to convert");
+                    break;
+                case PermissionRange.Owner:
+                    var items = list.Where(x => x.CustomsDeclaration.UserCreated != currentUser.UserID).Select(x => x.CustomsDeclaration.ClearanceNo);
+                    if (items.Count() > 0)
+                    {
+                        result = new HandleState(false, "Items: " + String.Join(", ", items.Distinct()) + " . You don't have permission to convert");
+                    }
+                    break;
+                case PermissionRange.Group:
+                    items = list.Where(x => x.CustomsDeclaration.GroupId != currentUser.GroupId).Select(x => x.CustomsDeclaration.ClearanceNo);
+                    if (items.Count() > 0)
+                    {
+                        result = new HandleState(false, "Items: " + String.Join(", ", items.Distinct()) + " . You don't have permission to convert");
+                    }
+                    break;
+                case PermissionRange.Department:
+                    items = list.Where(x => x.CustomsDeclaration.DepartmentId != currentUser.DepartmentId).Select(x => x.CustomsDeclaration.ClearanceNo);
+                    if (items.Count() > 0)
+                    {
+                        result = new HandleState(false, "Items: " + String.Join(", ", items.Distinct()) + " . You don't have permission to convert");
+                    }
+                    break;
+                case PermissionRange.Office:
+                    items = list.Where(x => x.CustomsDeclaration.OfficeId != currentUser.OfficeID).Select(x => x.CustomsDeclaration.ClearanceNo);
+                    if (items.Count() > 0)
+                    {
+                        result = new HandleState(false, "Items: " + String.Join(", ", items.Distinct()) + " . You don't have permission to convert");
+                    }
+                    break;
+                case PermissionRange.Company:
+                    items = list.Where(x => x.CustomsDeclaration.CompanyId != currentUser.CompanyID).Select(x => x.CustomsDeclaration.ClearanceNo);
+                    if (items.Count() > 0)
+                    {
+                        result = new HandleState(false, "Items: " + String.Join(", ", items.Distinct()) + " . You don't have permission to convert");
+                    }
+                    break;
+            }
+            return result;
+        }
     }
 }

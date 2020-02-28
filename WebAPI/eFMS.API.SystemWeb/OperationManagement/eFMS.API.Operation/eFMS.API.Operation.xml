@@ -104,6 +104,16 @@
             <param name="id">id that want to retrieve custom declarations</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.CheckPermission(System.Int32)">
+            <summary>
+            get custom declarations by id
+            </summary>
+            <param name="id">id that want to retrieve custom declarations</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.CheckDeletePermission(System.Collections.Generic.List{eFMS.API.Operation.DL.Models.CustomsDeclarationModel})">
+            
+        </member>
         <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.DeleteMultiple(System.Collections.Generic.List{eFMS.API.Operation.DL.Models.CustomsDeclarationModel})">
             <summary>
             delete multiple custom clearance
