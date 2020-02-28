@@ -8,6 +8,7 @@ using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -94,7 +95,7 @@ namespace eFMS.API.Accounting.DL.Services
         #region --- LIST SETTLEMENT PAYMENT ---
         public List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = QueryData(criteria);
+            var data = QueryDataPermission(criteria);
             if (data == null)
             {
                 rowsCount = 0;
@@ -116,13 +117,49 @@ namespace eFMS.API.Accounting.DL.Services
             return data.ToList();
         }
 
-        public IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria)
+        private IQueryable<AcctSettlementPayment> GetSettlementsPermission()
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
-            criteria.RangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            if (criteria.RangeSearch == PermissionRange.None) return null;
+            PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (_permissionRange == PermissionRange.None) return null;
 
-            var settlement = DataContext.Get();
+            IQueryable<AcctSettlementPayment> settlements = null;
+            switch (_permissionRange)
+            {
+                case PermissionRange.None:
+                    break;
+                case PermissionRange.All:
+                    settlements = DataContext.Get();
+                    break;
+                case PermissionRange.Owner:
+                    settlements = DataContext.Get(x => x.UserCreated == _user.UserID);
+                    break;
+                case PermissionRange.Group:
+                    settlements = DataContext.Get(x => x.GroupId == _user.GroupId
+                                                    && x.DepartmentId == _user.DepartmentId
+                                                    && x.OfficeId == _user.OfficeID
+                                                    && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Department:
+                    settlements = DataContext.Get(x => x.DepartmentId == _user.DepartmentId
+                                                    && x.OfficeId == _user.OfficeID
+                                                    && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Office:
+                    settlements = DataContext.Get(x => x.OfficeId == _user.OfficeID
+                                                    && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Company:
+                    settlements = DataContext.Get(x => x.CompanyId == _user.CompanyID);
+                    break;
+            }
+            return settlements;
+        }
+
+        private IQueryable<AcctSettlementPaymentResult> GetDatas(AcctSettlementPaymentCriteria criteria, IQueryable<AcctSettlementPayment> settlements)
+        {
+            if (settlements == null) return null;
+
             var approveSettle = acctApproveSettlementRepo.Get(x => x.IsDeputy == false);
             var user = sysUserRepo.Get();
             var surcharge = csShipmentSurchargeRepo.Get();
@@ -143,7 +180,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<string> refNo = new List<string>();
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
-                refNo = (from set in settlement
+                refNo = (from set in settlements
                          join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
                          from sur in sc.DefaultIfEmpty()
                          join ops in opst on sur.Hblid equals ops.Hblid into op
@@ -180,7 +217,7 @@ namespace eFMS.API.Accounting.DL.Services
                          select set.SettlementNo).ToList();
             }
 
-            var data = from set in settlement
+            var data = from set in settlements
                        join u in user on set.Requester equals u.Id into u2
                        from u in u2.DefaultIfEmpty()
                        join apr in approveSettle on set.SettlementNo equals apr.SettlementNo into apr1
@@ -246,6 +283,20 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Sort Array sẽ nhanh hơn
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
+            return data;
+        }
+
+        private IQueryable<AcctSettlementPaymentResult> QueryDataPermission(AcctSettlementPaymentCriteria criteria)
+        {
+            var settlements = GetSettlementsPermission();
+            var data = GetDatas(criteria, settlements);
+            return data;
+        }
+        
+        public IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria)
+        {
+            var settlements = DataContext.Get();
+            var data = GetDatas(criteria, settlements);
             return data;
         }
 
@@ -3021,5 +3072,130 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
         #endregion
+
+        public bool CheckDetailPermissionBySettlementNo(string settlementNo)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.SettlementNo == settlementNo)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        public bool CheckDetailPermissionBySettlementId(Guid settlementId)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Id == settlementId)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        public bool CheckDeletePermissionBySettlementNo(string settlementNo)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.SettlementNo == settlementNo)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        public bool CheckDeletePermissionBySettlementId(Guid settlementId)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Id == settlementId)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        public bool CheckUpdatePermissionBySettlementId(Guid settlementId)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Id == settlementId)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
     }
 }

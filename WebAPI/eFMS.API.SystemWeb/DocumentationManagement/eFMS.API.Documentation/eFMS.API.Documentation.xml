@@ -478,6 +478,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckDeletePermission(System.Guid)">
+            <summary>
+            Check delete permission
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Delete(System.Guid)">
             <summary>
             delete an existed item

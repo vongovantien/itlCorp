@@ -116,6 +116,8 @@
   "MSG_STAGE_CODE_DUPLICATE": "Code {0} has been duplicated!|wrong",
   "MSG_STAGE_STATUS_EMPTY": "Status is not allow empty!|wrong",
 
-  "EF_DISPLAYNAME_CODE": "Mã code"
+  "EF_DISPLAYNAME_CODE": "Mã code",
   //------------end  : Commodity
+
+  "DO_NOT_HAVE_PERMISSION": "Bạn không có quyền để thực hiện hành động này"
 }

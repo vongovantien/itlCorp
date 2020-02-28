@@ -5,6 +5,7 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -293,6 +294,56 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
+        public bool CheckUpdatePermission(string soaNo)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Soano == soaNo)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        public bool CheckDeletePermission(string soaNo)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Soano == soaNo)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
         public HandleState DeleteSOA(string soaNo)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
@@ -307,7 +358,6 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
-                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -316,16 +366,6 @@ namespace eFMS.API.Accounting.DL.Services
                         if (surcharge.Count() > 0)
                         {
                             //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
-                            //surcharge.ForEach(a =>
-                            //{
-                            //    a.Soano = null;
-                            //    a.PaySoano = null;
-                            //    a.UserModified = currentUser.UserID;
-                            //    a.DatetimeModified = DateTime.Now;
-                            //}
-                            //);
-                            //dc.CsShipmentSurcharge.UpdateRange(surcharge);
-                            //dc.SaveChanges();
                             foreach (var item in surcharge)
                             {
                                 item.Soano = null;
@@ -532,54 +572,8 @@ namespace eFMS.API.Accounting.DL.Services
             var charge = catChargeRepo.Get();
 
             //BUY & SELL
-            //var queryBuySell = from sur in surcharge
-            //                   join ops in opst on sur.Hblid equals ops.Hblid into ops2
-            //                   from ops in ops2.DefaultIfEmpty()
-            //                   join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
-            //                   from cstd in cstd2.DefaultIfEmpty()
-            //                   join cst in csTrans on cstd.JobId equals cst.Id into cst2
-            //                   from cst in cst2.DefaultIfEmpty()
-            //                   join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
-            //                   from creditN in creditN2.DefaultIfEmpty()
-            //                   join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
-            //                   from debitN in debitN2.DefaultIfEmpty()
-            //                   select new ChargeSOAResult
-            //                   {
-            //                       ID = sur.Id,
-            //                       HBLID = sur.Hblid,
-            //                       ChargeID = sur.ChargeId,
-            //                       JobId = (cst.JobNo != null ? cst.JobNo : ops.JobNo),
-            //                       HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno),
-            //                       MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno),
-            //                       Type = sur.Type,
-            //                       Debit = sur.Type == Constants.TYPE_CHARGE_SELL ? (decimal?)sur.Total : null,
-            //                       Credit = sur.Type == Constants.TYPE_CHARGE_BUY ? (decimal?)sur.Total : null,
-            //                       SOANo = sur.Type == Constants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
-            //                       IsOBH = false,
-            //                       Currency = sur.CurrencyId,
-            //                       InvoiceNo = sur.InvoiceNo,
-            //                       Note = sur.Notes,
-            //                       CustomerID = sur.PaymentObjectId,
-            //                       ServiceDate = ops.Hblid == sur.Hblid ? ops.ServiceDate :
-            //                       (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
-            //                       CreatedDate = ops.Hblid == sur.Hblid ? ops.DatetimeCreated : cst.DatetimeCreated,
-            //                       InvoiceIssuedDate = sur.Type == Constants.TYPE_CHARGE_SELL ? debitN.DatetimeCreated : creditN.DatetimeCreated,
-            //                       TransactionType = cst.TransactionType,
-            //                       UserCreated = ops.Hblid == sur.Hblid ? ops.UserCreated : cst.UserCreated,
-            //                       Quantity = sur.Quantity,
-            //                       UnitId = sur.UnitId,
-            //                       UnitPrice = sur.UnitPrice,
-            //                       VATRate = sur.Vatrate,
-            //                       CreditDebitNo = sur.Type == Constants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
-            //                       DatetimeModified = sur.DatetimeModified,
-            //                       CommodityGroupID = ops.CommodityGroupId,
-            //                       Service = ops.Hblid == sur.Hblid ? "CL" : cst.TransactionType,
-            //                       CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
-            //                   };
-            //queryBuySell = queryBuySell.Where(x => !string.IsNullOrEmpty(x.Service));
             var queryBuySellOperation = from sur in surcharge
-                                        join ops in opst on sur.Hblid equals ops.Hblid //into ops2
-                                                                                       //from ops in ops2.DefaultIfEmpty()
+                                        join ops in opst on sur.Hblid equals ops.Hblid
                                         join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
                                         from creditN in creditN2.DefaultIfEmpty()
                                         join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
@@ -623,10 +617,8 @@ namespace eFMS.API.Accounting.DL.Services
             queryBuySellOperation = queryBuySellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryBuySellDocument = from sur in surcharge
-                                       join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
-                                                                                          //from cstd in cstd2.DefaultIfEmpty()
-                                       join cst in csTrans on cstd.JobId equals cst.Id //into cst2
-                                                                                       //from cst in cst2.DefaultIfEmpty()
+                                       join cstd in csTransDe on sur.Hblid equals cstd.Id
+                                       join cst in csTrans on cstd.JobId equals cst.Id
                                        join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
                                        from creditN in creditN2.DefaultIfEmpty()
                                        join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
@@ -683,52 +675,8 @@ namespace eFMS.API.Accounting.DL.Services
             var debitNote = acctCdnoteRepo.Get();
             var charge = catChargeRepo.Get();
             //OBH Receiver (SELL - Credit)
-            //var queryObhSell = from sur in surcharge
-            //                   join ops in opst on sur.Hblid equals ops.Hblid into ops2
-            //                   from ops in ops2.DefaultIfEmpty()
-            //                   join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
-            //                   from cstd in cstd2.DefaultIfEmpty()
-            //                   join cst in csTrans on cstd.JobId equals cst.Id into cst2
-            //                   from cst in cst2.DefaultIfEmpty()
-            //                   join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
-            //                   from debitN in debitN2.DefaultIfEmpty()
-            //                   select new ChargeSOAResult
-            //                   {
-            //                       ID = sur.Id,
-            //                       HBLID = sur.Hblid,
-            //                       ChargeID = sur.ChargeId,
-            //                       JobId = (cst.JobNo != null ? cst.JobNo : ops.JobNo),
-            //                       HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno),
-            //                       MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno),
-            //                       Type = sur.Type + "-SELL",
-            //                       Debit = sur.Total,
-            //                       Credit = null,
-            //                       SOANo = sur.Soano,
-            //                       IsOBH = true,
-            //                       Currency = sur.CurrencyId,
-            //                       InvoiceNo = sur.InvoiceNo,
-            //                       Note = sur.Notes,
-            //                       CustomerID = sur.PaymentObjectId,
-            //                       ServiceDate = ops.Hblid == sur.Hblid ? ops.ServiceDate :
-            //                       (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
-            //                       CreatedDate = ops.Hblid == sur.Hblid ? ops.DatetimeCreated : cst.DatetimeCreated,
-            //                       InvoiceIssuedDate = debitN.DatetimeCreated,
-            //                       TransactionType = cst.TransactionType,
-            //                       UserCreated = ops.Hblid == sur.Hblid ? ops.UserCreated : cst.UserCreated,
-            //                       Quantity = sur.Quantity,
-            //                       UnitId = sur.UnitId,
-            //                       UnitPrice = sur.UnitPrice,
-            //                       VATRate = sur.Vatrate,
-            //                       CreditDebitNo = sur.DebitNo,
-            //                       DatetimeModified = sur.DatetimeModified,
-            //                       CommodityGroupID = ops.CommodityGroupId,
-            //                       Service = ops.Hblid == sur.Hblid ? "CL" : cst.TransactionType,
-            //                       CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
-            //                   };
-            //queryObhSell = queryObhSell.Where(x => !string.IsNullOrEmpty(x.Service));
             var queryObhSellOperation = from sur in surcharge
-                                        join ops in opst on sur.Hblid equals ops.Hblid //into ops2
-                                                                                       //from ops in ops2.DefaultIfEmpty()
+                                        join ops in opst on sur.Hblid equals ops.Hblid
                                         join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
                                         from debitN in debitN2.DefaultIfEmpty()
                                         join chg in charge on sur.ChargeId equals chg.Id into chg2
@@ -770,10 +718,8 @@ namespace eFMS.API.Accounting.DL.Services
             queryObhSellOperation = queryObhSellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryObhSellDocument = from sur in surcharge
-                                       join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
-                                                                                          //from cstd in cstd2.DefaultIfEmpty()
-                                       join cst in csTrans on cstd.JobId equals cst.Id //into cst2
-                                                                                       //from cst in cst2.DefaultIfEmpty()
+                                       join cstd in csTransDe on sur.Hblid equals cstd.Id
+                                       join cst in csTrans on cstd.JobId equals cst.Id
                                        join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
                                        from debitN in debitN2.DefaultIfEmpty()
                                        join chg in charge on sur.ChargeId equals chg.Id into chg2
@@ -829,53 +775,8 @@ namespace eFMS.API.Accounting.DL.Services
             var creditNote = acctCdnoteRepo.Get();
             var charge = catChargeRepo.Get();
             //OBH Payer (BUY - Credit)
-            //var queryObhBuy = from sur in surcharge
-            //                  join ops in opst on sur.Hblid equals ops.Hblid into ops2
-            //                  from ops in ops2.DefaultIfEmpty()
-            //                  join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
-            //                  from cstd in cstd2.DefaultIfEmpty()
-            //                  join cst in csTrans on cstd.JobId equals cst.Id into cst2
-            //                  from cst in cst2.DefaultIfEmpty()
-            //                  join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
-            //                  from creditN in creditN2.DefaultIfEmpty()
-            //                  select new ChargeSOAResult
-            //                  {
-            //                      ID = sur.Id,
-            //                      HBLID = sur.Hblid,
-            //                      ChargeID = sur.ChargeId,
-            //                      JobId = (cst.JobNo != null ? cst.JobNo : ops.JobNo),
-            //                      HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno),
-            //                      MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno),
-            //                      Type = sur.Type + "-BUY",
-            //                      Debit = null,
-            //                      Credit = sur.Total,
-            //                      SOANo = sur.PaySoano,
-            //                      IsOBH = true,
-            //                      Currency = sur.CurrencyId,
-            //                      InvoiceNo = sur.InvoiceNo,
-            //                      Note = sur.Notes,
-            //                      CustomerID = sur.PayerId,
-            //                      ServiceDate = ops.Hblid == sur.Hblid ? ops.ServiceDate :
-            //                      (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
-            //                      CreatedDate = ops.Hblid == sur.Hblid ? ops.DatetimeCreated : cst.DatetimeCreated,
-            //                      InvoiceIssuedDate = creditN.DatetimeCreated,
-            //                      TransactionType = cst.TransactionType,
-            //                      UserCreated = ops.Hblid == sur.Hblid ? ops.UserCreated : cst.UserCreated,
-            //                      Quantity = sur.Quantity,
-            //                      UnitId = sur.UnitId,
-            //                      UnitPrice = sur.UnitPrice,
-            //                      VATRate = sur.Vatrate,
-            //                      CreditDebitNo = sur.CreditNo,
-            //                      DatetimeModified = sur.DatetimeModified,
-            //                      CommodityGroupID = ops.CommodityGroupId,
-            //                      Service = ops.Hblid == sur.Hblid ? "CL" : cst.TransactionType,
-            //                      CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
-            //                  };
-            //queryObhBuy = queryObhBuy.Where(x => !string.IsNullOrEmpty(x.Service));
-
             var queryObhBuyOperation = from sur in surcharge
-                                       join ops in opst on sur.Hblid equals ops.Hblid //into ops2
-                                                                                      //from ops in ops2.DefaultIfEmpty()
+                                       join ops in opst on sur.Hblid equals ops.Hblid
                                        join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
                                        from creditN in creditN2.DefaultIfEmpty()
                                        join chg in charge on sur.ChargeId equals chg.Id into chg2
@@ -917,10 +818,8 @@ namespace eFMS.API.Accounting.DL.Services
             queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
             var queryObhBuyDocument = from sur in surcharge
-                                      join cstd in csTransDe on sur.Hblid equals cstd.Id //into cstd2
-                                                                                         //from cstd in cstd2.DefaultIfEmpty()
-                                      join cst in csTrans on cstd.JobId equals cst.Id //into cst2
-                                                                                      //from cst in cst2.DefaultIfEmpty()
+                                      join cstd in csTransDe on sur.Hblid equals cstd.Id
+                                      join cst in csTrans on cstd.JobId equals cst.Id
                                       join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
                                       from creditN in creditN2.DefaultIfEmpty()
                                       join chg in charge on sur.ChargeId equals chg.Id into chg2
@@ -993,8 +892,6 @@ namespace eFMS.API.Accounting.DL.Services
             var dataMerge = queryBuySell.Union(queryObhBuy).Union(queryObhSell);
 
             var queryData = from data in dataMerge
-                                //join chg in charge on data.ChargeID equals chg.Id into chg2
-                                //from chg in chg2.DefaultIfEmpty()
                             join uni in unit on data.UnitId equals uni.Id into uni2
                             from uni in uni2.DefaultIfEmpty()
                             select new ChargeSOAResult
@@ -1437,13 +1334,16 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion -- Get List More Charges & Add More Charge Shipment By Criteria --
 
         #region -- Get List & Paging SOA By Criteria --
-        private IQueryable<AcctSOAResult> QueryDataListSOA(IQueryable<AcctSoa> soa)
+        private IQueryable<AcctSOAResult> QueryDataListSOA(IQueryable<AcctSoa> soas)
         {
-            //Lấy danh sách Currency Exchange của ngày hiện tại
             var partner = catPartnerRepo.Get();
-            var resultData = from s in soa
+            var resultData = from s in soas
                              join pat in partner on s.Customer equals pat.Id into pat2
                              from pat in pat2.DefaultIfEmpty()
+                             join ucreate in sysUserRepo.Get() on s.UserCreated equals ucreate.Id into ucreate2
+                             from ucreate in ucreate2.DefaultIfEmpty()
+                             join umodifies in sysUserRepo.Get() on s.UserModified equals umodifies.Id into umodifies2
+                             from umodifies in umodifies2.DefaultIfEmpty()
                              select new AcctSOAResult
                              {
                                  Id = s.Id,
@@ -1456,105 +1356,118 @@ namespace eFMS.API.Accounting.DL.Services
                                  TotalAmount = s.DebitAmount - s.CreditAmount,
                                  Status = s.Status,
                                  DatetimeCreated = s.DatetimeCreated,
-                                 UserCreated = s.UserCreated,
+                                 UserCreated = ucreate.Username,
                                  DatetimeModified = s.DatetimeModified,
-                                 UserModified = s.UserModified,
+                                 UserModified = umodifies.Username,
                              };
             //Sort Array sẽ nhanh hơn
             resultData = resultData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
             return resultData;
         }
 
-        private IQueryable<AcctSoa> GetSOA()
+        private IQueryable<AcctSoa> GetSoasPermission()
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
-            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (_permissionRange == PermissionRange.None) return null;
 
-            IQueryable<AcctSoa> soa = null;
-            switch (rangeSearch)
+            IQueryable<AcctSoa> soas = null;
+            switch (_permissionRange)
             {
                 case PermissionRange.None:
                     break;
                 case PermissionRange.All:
-                    soa = DataContext.Get();
+                    soas = DataContext.Get();
                     break;
                 case PermissionRange.Owner:
-                    soa = DataContext.Get(x => x.UserCreated == currentUser.UserID);
+                    soas = DataContext.Get(x => x.UserCreated == _user.UserID);
                     break;
                 case PermissionRange.Group:
-                    soa = DataContext.Get(x => x.GroupId == currentUser.GroupId
-                                            && x.DepartmentId == currentUser.DepartmentId
-                                            && x.OfficeId == currentUser.OfficeID
-                                            && x.CompanyId == currentUser.CompanyID);
+                    soas = DataContext.Get(x => x.GroupId == _user.GroupId
+                                            && x.DepartmentId == _user.DepartmentId
+                                            && x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
                     break;
                 case PermissionRange.Department:
-                    soa = DataContext.Get(x => x.DepartmentId == currentUser.DepartmentId
-                                            && x.OfficeId == currentUser.OfficeID
-                                            && x.CompanyId == currentUser.CompanyID);
+                    soas = DataContext.Get(x => x.DepartmentId == _user.DepartmentId
+                                            && x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
                     break;
                 case PermissionRange.Office:
-                    soa = DataContext.Get(x => x.OfficeId == currentUser.OfficeID
-                                            && x.CompanyId == currentUser.CompanyID);
+                    soas = DataContext.Get(x => x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
                     break;
                 case PermissionRange.Company:
-                    soa = DataContext.Get(x => x.CompanyId == currentUser.CompanyID);
+                    soas = DataContext.Get(x => x.CompanyId == _user.CompanyID);
                     break;
             }
-            return soa;
+            return soas;
         }
 
-        public IQueryable<AcctSOAResult> GetListSOA(AcctSOACriteria criteria)
+        private IQueryable<AcctSOAResult> GetDatas(AcctSOACriteria criteria, IQueryable<AcctSoa> soas)
         {
-            var soa = GetSOA();
+            if (soas == null) return null;
+
             if (!string.IsNullOrEmpty(criteria.StrCodes))
             {
                 //Chỉ lấy ra những charge có SOANo (Để hạn chế việc join & get data không cần thiết)
-                //var charge = GetChargeShipmentDocAndOperation().Where(x => !string.IsNullOrEmpty(x.SOANo));
                 var listCode = criteria.StrCodes.Split(',').Where(x => x.ToString() != string.Empty).ToList();
                 List<string> refNo = new List<string>();
-                refNo = (from s in soa
+                refNo = (from s in soas
                          join chg in csShipmentSurchargeRepo.Get() on s.Soano equals (chg.PaySoano ?? chg.Soano) into chg2
                          from chg in chg2.DefaultIfEmpty()
                          where
                              listCode.Contains(s.Soano) || listCode.Contains(chg.JobNo) || listCode.Contains(chg.Mblno) || listCode.Contains(chg.Hblno)
                          select s.Soano).ToList();
-                soa = soa.Where(x => refNo.Contains(x.Soano));
+                soas = soas.Where(x => refNo.Contains(x.Soano));
             }
 
             if (!string.IsNullOrEmpty(criteria.CustomerID))
             {
-                soa = soa.Where(x => x.Customer == criteria.CustomerID);
+                soas = soas.Where(x => x.Customer == criteria.CustomerID);
             }
 
             if (criteria.SoaFromDateCreate != null && criteria.SoaToDateCreate != null)
             {
-                soa = soa.Where(x =>
+                soas = soas.Where(x =>
                     x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.SoaFromDateCreate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.SoaToDateCreate.Value.Date : 1 == 2
                 );
             }
 
             if (!string.IsNullOrEmpty(criteria.SoaStatus))
             {
-                soa = soa.Where(x => x.Status == criteria.SoaStatus);
+                soas = soas.Where(x => x.Status == criteria.SoaStatus);
             }
 
             if (!string.IsNullOrEmpty(criteria.SoaCurrency))
             {
-                soa = soa.Where(x => x.Currency == criteria.SoaCurrency);
+                soas = soas.Where(x => x.Currency == criteria.SoaCurrency);
             }
 
             if (!string.IsNullOrEmpty(criteria.SoaUserCreate))
             {
-                soa = soa.Where(x => x.UserCreated == criteria.SoaUserCreate);
+                soas = soas.Where(x => x.UserCreated == criteria.SoaUserCreate);
             }
 
-            var dataResult = QueryDataListSOA(soa);
+            var dataResult = QueryDataListSOA(soas);
             return dataResult;
+        }
+
+        public IQueryable<AcctSOAResult> QueryDataPermission(AcctSOACriteria criteria)
+        {
+            var settlements = GetSoasPermission();
+            return GetDatas(criteria, settlements);
+        }
+
+        public IQueryable<AcctSOAResult> QueryData(AcctSOACriteria criteria)
+        {
+            var soas = DataContext.Get();
+            return GetDatas(criteria, soas);
         }
 
         public IQueryable<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = GetListSOA(criteria);
+            var data = QueryDataPermission(criteria);
             if (data == null)
             {
                 rowsCount = 0;
@@ -1577,6 +1490,31 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion -- Get List & Paging SOA By Criteria --
 
         #region -- Details Soa --
+        public bool CheckDetailPermission(string soaNo)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Soano == soaNo)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
         private AcctSOADetailResult GetSoaBySoaNo(string soaNo)
         {
             var soa = DataContext.Get(x => x.Soano == soaNo);

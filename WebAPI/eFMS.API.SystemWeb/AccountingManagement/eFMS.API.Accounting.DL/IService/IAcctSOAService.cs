@@ -43,6 +43,12 @@ namespace eFMS.API.Accounting.DL.IService
 
         AcctSOADetailResult GetDetailBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal);
 
-        IQueryable<AcctSOAResult> GetListSOA(AcctSOACriteria criteria);
+        IQueryable<AcctSOAResult> QueryData(AcctSOACriteria criteria);
+
+        bool CheckDetailPermission(string soaNo);
+
+        bool CheckDeletePermission(string soaNo);
+
+        bool CheckUpdatePermission(string soaNo);
     }
 }

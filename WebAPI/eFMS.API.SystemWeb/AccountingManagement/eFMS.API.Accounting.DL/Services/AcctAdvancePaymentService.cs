@@ -16,6 +16,7 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Common.Models;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -74,7 +75,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = QueryData(criteria);
+            var data = QueryDataPermission(criteria);
             if (data == null)
             {
                 rowsCount = 0;
@@ -96,13 +97,48 @@ namespace eFMS.API.Accounting.DL.Services
             return data.ToList();
         }
 
-        public IQueryable<AcctAdvancePaymentResult> QueryData(AcctAdvancePaymentCriteria criteria)
+        private IQueryable<AcctAdvancePayment> GetAdvancesPermission()
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
-            criteria.RangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            if (criteria.RangeSearch == PermissionRange.None) return null;
+            PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (_permissionRange == PermissionRange.None) return null;
+            
+            IQueryable<AcctAdvancePayment> advances = null;
+            switch (_permissionRange)
+            {
+                case PermissionRange.None:
+                    break;
+                case PermissionRange.All:
+                    advances = DataContext.Get();
+                    break;
+                case PermissionRange.Owner:
+                    advances = DataContext.Get(x => x.UserCreated == _user.UserID);
+                    break;
+                case PermissionRange.Group:
+                    advances = DataContext.Get(x => x.GroupId == _user.GroupId
+                                                 && x.DepartmentId == _user.DepartmentId
+                                                 && x.OfficeId == _user.OfficeID
+                                                 && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Department:
+                    advances = DataContext.Get(x => x.DepartmentId == _user.DepartmentId
+                                                 && x.OfficeId == _user.OfficeID
+                                                 && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Office:
+                    advances = DataContext.Get(x => x.OfficeId == _user.OfficeID
+                                                 && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Company:
+                    advances = DataContext.Get(x => x.CompanyId == _user.CompanyID);
+                    break;
+            }
+            return advances;
+        }
 
-            var advance = DataContext.Get();
+        private IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria, IQueryable<AcctAdvancePayment> advances)
+        {
+            if (advances == null) return null;
             var request = acctAdvanceRequestRepo.Get();
             var approveAdvance = acctApproveAdvanceRepo.Get(x => x.IsDeputy == false);
             var user = sysUserRepo.Get();
@@ -118,7 +154,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<string> refNo = new List<string>();
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
-                refNo = (from ad in advance
+                refNo = (from ad in advances
                          join re in request on ad.AdvanceNo equals re.AdvanceNo into re2
                          from re in re2.DefaultIfEmpty()
                          where
@@ -141,7 +177,7 @@ namespace eFMS.API.Accounting.DL.Services
                          select ad.AdvanceNo).ToList();
             }
 
-            var data = from ad in advance
+            var data = from ad in advances
                        join u in user on ad.Requester equals u.Id into u2
                        from u in u2.DefaultIfEmpty()
                        join re in request on ad.AdvanceNo equals re.AdvanceNo into re2
@@ -157,12 +193,12 @@ namespace eFMS.API.Accounting.DL.Services
                             !string.IsNullOrEmpty(criteria.Requester) ?
                             (
                                     ad.Requester == criteria.Requester
-                                || (apr.Manager == criteria.Requester && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))// && apr.ManagerAprDate != null)
-                                || (apr.Accountant == criteria.Requester && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))// && apr.AccountantAprDate != null)
-                                || (apr.ManagerApr == criteria.Requester && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))// && apr.ManagerAprDate != null)
-                                || (apr.AccountantApr == criteria.Requester && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))// && apr.AccountantAprDate != null)
+                                || (apr.Manager == criteria.Requester && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
+                                || (apr.Accountant == criteria.Requester && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
+                                || (apr.ManagerApr == criteria.Requester && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
+                                || (apr.AccountantApr == criteria.Requester && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
                                 || (isManagerDeputy && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
-                                || (isAccountantDeputy && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))// && apr.AccountantAprDate != null)
+                                || (isAccountantDeputy && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
                             )
                             :
                                 true
@@ -214,7 +250,7 @@ namespace eFMS.API.Accounting.DL.Services
                            AdvanceNote = ad.AdvanceNote,
                            AdvanceCurrency = ad.AdvanceCurrency,
                            Requester = ad.Requester,
-                           RequesterName = (u.Username),
+                           RequesterName = u.Username,
                            RequestDate = ad.RequestDate,
                            DeadlinePayment = ad.DeadlinePayment,
                            UserCreated = ad.UserCreated,
@@ -266,6 +302,20 @@ namespace eFMS.API.Accounting.DL.Services
             });
             //Sort Array sẽ nhanh hơn
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
+            return data;
+        }
+
+        private IQueryable<AcctAdvancePaymentResult> QueryDataPermission(AcctAdvancePaymentCriteria criteria)
+        {
+            var advances = GetAdvancesPermission();
+            var data = GetDatas(criteria, advances);
+            return data;
+        }
+
+        public IQueryable<AcctAdvancePaymentResult> QueryData(AcctAdvancePaymentCriteria criteria)
+        {
+            var advances = DataContext.Get();
+            var data = GetDatas(criteria, advances);
             return data;
         }
 
@@ -491,6 +541,56 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return false;
             }
+        }       
+
+        public bool CheckDeletePermissionByAdvanceNo(string advanceNo)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.AdvanceNo == advanceNo)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        public bool CheckDeletePermissionByAdvanceId(Guid advanceId)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Id == advanceId)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
         }
 
         public HandleState DeleteAdvancePayment(string advanceNo)
@@ -548,6 +648,81 @@ namespace eFMS.API.Accounting.DL.Services
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
+        }
+
+        public bool CheckDetailPermissionByAdvanceNo(string advanceNo)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.AdvanceNo == advanceNo)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        public bool CheckDetailPermissionByAdvanceId(Guid advanceId)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Id == advanceId)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        public bool CheckUpdatePermissionByAdvanceId(Guid advanceId)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Id == advanceId)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
         }
 
         public AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo)

@@ -55,5 +55,15 @@ namespace eFMS.API.Accounting.DL.IService
         List<ShipmentChargeSettlement> CopyChargeFromSettlementOldToSettlementNew(ShipmentsCopyCriteria criteria);
         LockedLogResultModel GetSettlePaymentsToUnlock(List<string> keyWords);
         HandleState UnLock(List<LockedLogModel> settlePayments);
+
+        bool CheckDetailPermissionBySettlementNo(string settlementNo);
+
+        bool CheckDetailPermissionBySettlementId(Guid settlementId);
+
+        bool CheckDeletePermissionBySettlementNo(string settlementNo);
+
+        bool CheckDeletePermissionBySettlementId(Guid settlementId);
+
+        bool CheckUpdatePermissionBySettlementId(Guid settlementId);
     }
 }

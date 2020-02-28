@@ -12,8 +12,6 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Common.Infrastructure.Common;
-using eFMS.API.Infrastructure.Extensions;
-using System;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -56,7 +54,10 @@ namespace eFMS.API.Accounting.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             var hs = acctSOAService.AddSOA(model);
-            if (hs.Code == 403) return Forbid();
+            if (hs.Code == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -79,8 +80,17 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
+            var isAllowUpdate = acctSOAService.CheckUpdatePermission(model.Soano);
+            if(isAllowUpdate == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             var hs = acctSOAService.UpdateSOA(model);
-            if (hs.Code == 403) return Forbid();
+            if (hs.Code == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -94,31 +104,25 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// Check allow delete SOA
         /// </summary>
-        /// <param name="id">Id of SOA</param>
+        /// <param name="soaNo">SOA No of SOA</param>
         /// <returns></returns>
-        [HttpGet("CheckAllowDelete/{id}")]
-        public IActionResult CheckAllowDelete(Guid id)
+        [HttpGet("CheckAllowDelete/{soaNo}")]
+        public IActionResult CheckAllowDelete(string soaNo)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
-            if (permissionRange == PermissionRange.None)
-                return Ok(false);
-            return Ok(true);
+            var result = acctSOAService.CheckDeletePermission(soaNo);
+            return Ok(result);
         }
 
         /// <summary>
         /// Check allow detail SOA
         /// </summary>
-        /// <param name="id">Id of SOA</param>
+        /// <param name="soaNo">SOA No of SOA</param>
         /// <returns></returns>
-        [HttpGet("CheckAllowDetail/{id}")]
-        public IActionResult CheckAllowDetail(Guid id)
+        [HttpGet("CheckAllowDetail/{soaNo}")]
+        public IActionResult CheckAllowDetail(string soaNo)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            if (permissionRange == PermissionRange.None)
-                return Ok(false);
-            return Ok(true);
+            var result = acctSOAService.CheckDetailPermission(soaNo);
+            return Ok(result);
         }
 
         /// <summary>
@@ -131,9 +135,18 @@ namespace eFMS.API.Accounting.Controllers
         [Route("Delete")]
         public IActionResult Delete(string soaNo)
         {
+            var isAllowDelete = acctSOAService.CheckDeletePermission(soaNo);
+            if (isAllowDelete == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = acctSOAService.DeleteSOA(soaNo);
-            if (hs.Code == 403) return Forbid();
+            if (hs.Code == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             //Update SOANo = NULL & PaySOANo = NULL for ShipmentSurcharge
             acctSOAService.UpdateSOASurCharge(soaNo);
@@ -169,10 +182,9 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("QueryData")]
-        [Authorize]
         public IActionResult QueryData(AcctSOACriteria criteria)
         {
-            var data = acctSOAService.GetListSOA(criteria);
+            var data = acctSOAService.QueryData(criteria);
             return Ok(data);
         }
 
@@ -186,9 +198,11 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult GetBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            if (permissionRange == PermissionRange.None) return Forbid();
+            var isAllowViewDetail = acctSOAService.CheckDetailPermission(soaNo);
+            if (isAllowViewDetail == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             if (string.IsNullOrEmpty(currencyLocal))
                 currencyLocal = AccountingConstants.CURRENCY_LOCAL;

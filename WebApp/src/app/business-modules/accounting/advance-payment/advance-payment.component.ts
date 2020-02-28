@@ -117,7 +117,7 @@ export class AdvancePaymentComponent extends AppList {
                 catchError(this.catchError),
                 finalize(() => {
                     this.confirmDeletePopup.hide();
-                    finalize(() => this._progressRef.complete());
+                    this._progressRef.complete();
                 })
             )
             .subscribe(
