@@ -18,8 +18,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     countries: any[] = [];
     areas: any[] = [];
     modes: any[] = [];
-    isSubmitted: boolean = false;
-    isUpdate: boolean = false;
+
     portIndex: PortIndex = new PortIndex();
 
     code: AbstractControl;
@@ -29,6 +28,10 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     zone: AbstractControl;
     mode: AbstractControl;
     active: AbstractControl;
+
+    isSubmitted: boolean = false;
+    isUpdate: boolean = false;
+    isShowUpdate: boolean = false;
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,

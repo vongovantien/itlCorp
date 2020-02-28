@@ -938,5 +938,36 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return list;
         }
+
+        public CatPlaceModel GetDetail(Guid id)
+        {
+            CatPlace data = DataContext.First(x => x.Id == id);
+            if (data == null)
+            {
+                return null;
+            }
+
+            CatPlaceModel result =  mapper.Map<CatPlaceModel>(data);
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = result.UserCreated,
+                CompanyId = result.CompanyId,
+                DepartmentId = result.DepartmentId,
+                OfficeId = result.OfficeId,
+                GroupId = result.GroupId
+            };
+            result.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = PermissionExtention.GetPermissionDetail(permissionRangeWrite, baseModel, currentUser),
+            };
+
+            return result;
+        }
+
+        
     }
-}
+} 

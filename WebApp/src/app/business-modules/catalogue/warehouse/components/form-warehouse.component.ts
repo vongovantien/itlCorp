@@ -35,6 +35,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
 
     isSubmitted: boolean = false;
     isUpdate: boolean = false;
+    isShowUpdate: boolean = true;
 
     constructor(private _fb: FormBuilder,
         private _toastService: ToastrService,

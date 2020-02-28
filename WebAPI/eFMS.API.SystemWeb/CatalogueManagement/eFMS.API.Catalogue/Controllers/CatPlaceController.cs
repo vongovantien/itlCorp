@@ -145,7 +145,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
-            var data = catPlaceService.First(x => x.Id == id);
+            var data = catPlaceService.GetDetail(id);
             return Ok(data);
         }
 

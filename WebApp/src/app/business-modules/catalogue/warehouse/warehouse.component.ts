@@ -9,8 +9,8 @@ import { Warehouse } from '@models';
 import { AppList } from 'src/app/app.list';
 import { FormWarehouseComponent } from './components/form-warehouse.component';
 
-import { forkJoin } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
+import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from '@enums';
 
@@ -116,22 +116,35 @@ export class WarehouseComponent extends AppList implements OnInit {
 
     showDetail(item: Warehouse) {
         this._catalogueRepo.checkAllowGetDetailPlace(item.id)
-            .subscribe(
-                (res: boolean) => {
+            .pipe(
+                tap((res: boolean) => res),
+                switchMap((res: boolean) => {
                     if (res) {
-                        this.warehouse = item;
-                        [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
-                        this.formPopup.title = "Update Warehouse";
-                        this.formPopup.code.disable();
-                        this.formPopup.warehouse = item;
-                        this.formPopup.setFormValue(item);
-                        this.formPopup.show();
+                        return this._catalogueRepo.getDetailPlace(item.id);
                     } else {
+                        return of(false);
+                    }
+                })
+            )
+            .subscribe(
+                (res: Warehouse | boolean) => {
+                    if (!res) {
                         this.infoPopup.show();
+                    } else {
+                        this.warehouse = res as Warehouse;
+                        this.formPopup.warehouse = res as Warehouse;
+
+                        [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
+                        this.formPopup.isShowUpdate = this.warehouse.permission.allowUpdate;
+                        this.formPopup.title = "Update Warehouse";
+
+                        this.formPopup.code.disable();
+                        this.formPopup.setFormValue(res);
+                        this.formPopup.show();
+
                     }
                 }
-            )
-
+            );
     }
 
     onDelete(event) {

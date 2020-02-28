@@ -119,13 +119,13 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getById/{id}")]
         public IActionResult Get(Guid id)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
-            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            //PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
 
-            if(permissionRange == PermissionRange.None || !catChargeService.CheckAllowPermissionAction(id, permissionRange))
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }
+            //if(permissionRange == PermissionRange.None || !catChargeService.CheckAllowPermissionAction(id, permissionRange))
+            //{
+            //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            //}
 
             var result = catChargeService.GetChargeById(id);
             return Ok(result);

@@ -1,4 +1,5 @@
 import { BaseModel } from "../base.model";
+import { PermissionShipment } from "../document/permissionShipment";
 
 export class Warehouse extends BaseModel {
     id: string = "00000000-0000-0000-0000-000000000000";
@@ -20,8 +21,12 @@ export class Warehouse extends BaseModel {
         super();
         const self = this;
         for (const key in data) {
+
             if (self.hasOwnProperty(key)) {
                 self[key] = data[key];
+                if (!!data.permission) {
+                    self.permission = new PermissionShipment(data.permission);
+                }
             }
         }
     }

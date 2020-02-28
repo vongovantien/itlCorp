@@ -135,6 +135,7 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
                             localStorage.setItem(SystemConstants.ACCESS_TOKEN, tokenInfo.access_token);
                             return this.oauthService.loadUserProfile();
                         }).then((userInfo: SystemInterface.IClaimUser) => {
+                            this._spinner.hide();
                             if (userInfo) {
                                 if (this.isChangeDepartgroup) {
                                     this._store.dispatch(new ChangeDepartGroupClaimUserAction({ departmentId: this.selectedDepartGroup.departmentId, groupId: this.selectedDepartGroup.groupId }));
@@ -144,11 +145,12 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
                                     this._toastService.info(userInfo.userName.toUpperCase(), "Change Office Success");
                                 }
                             }
-                        }).finally(() => { this._spinner.hide(); });
+                        });
                 }
             }).catch(
                 (err) => {
                     this._toastService.error(err + '');
+                    this._spinner.hide();
                 });
         });
     }

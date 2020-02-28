@@ -84,6 +84,8 @@ export class DetailChargeComponent extends AddChargeComponent {
                 this.formAddCharge.updateDataToForm(this.Charge);
 
                 this.voucherList.ChargeToAdd.listChargeDefaultAccount = this.Charge.listChargeDefaultAccount;
+                this.voucherList.isShowUpdate = this.Charge.permission.allowUpdate;
+
                 this.Charge.charge.userCreated = res.userCreated;
             }
         });

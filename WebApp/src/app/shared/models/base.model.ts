@@ -1,3 +1,5 @@
+import { PermissionShipment } from "./document/permissionShipment";
+
 export class BaseModel {
     id: string = '';
 
@@ -10,5 +12,7 @@ export class BaseModel {
     departmentId: number = null;
     officeId: string = '';
     companyId: string = '';
+    permission: PermissionShipment = new PermissionShipment();
+
 }
 

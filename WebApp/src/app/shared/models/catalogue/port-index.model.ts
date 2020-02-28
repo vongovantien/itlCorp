@@ -1,3 +1,5 @@
+import { PermissionShipment } from "@models";
+
 export class PortIndex {
     id: string;
     code: string;
@@ -10,4 +12,5 @@ export class PortIndex {
     modeOfTransport: string;
     placeType: number;
     active?: boolean;
+    permission?: PermissionShipment;
 }

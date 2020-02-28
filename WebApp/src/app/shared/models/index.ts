@@ -31,6 +31,7 @@ export * from './document/delivery-order';
 export * from './document/house-bill';
 export * from './document/dimension';
 export * from './document/OpsTransaction.model';
+export * from './document/permissionShipment';
 
 export * from './tool-setting/tariff';
 
