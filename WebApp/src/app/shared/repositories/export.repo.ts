@@ -11,7 +11,7 @@ export class ExportRepo {
     }
 
     exportCustomClearance(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/ReportData/Catalogue/ExportCustomClearance`, searchObject).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );

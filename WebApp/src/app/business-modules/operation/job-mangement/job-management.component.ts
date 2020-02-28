@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 export class JobManagementComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) canNotAllowActionPopup: Permission403PopupComponent;
 
     shipments: Shipment[] = [];
     selectedShipment: Shipment = null;
@@ -105,7 +105,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                         this.deleteMessage = `Do you want to delete job No ${shipment.jobNo}?`;
                         this.confirmDeleteJobPopup.show();
                     } else {
-                        this.canNotDeleteJobPopup.show();
+                        this.canNotAllowActionPopup.show();
                     }
                 },
             );
@@ -140,7 +140,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                     if (res) {
                         this._router.navigate(['/home/operation/job-edit/', id]);
                     } else {
-                        this._toastService.error("You don't have permission to view detail");
+                        this.canNotAllowActionPopup.show();
                     }
                 },
             );
@@ -199,7 +199,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     }
 
     gotoCreateJob() {
-        this._router.navigate(["home/operation/new"])
+        this._router.navigate(["home/operation/new"]);
     }
 
 }
