@@ -50,7 +50,7 @@ export class MenuResolveGuard implements Resolve<any> {
                                 window.location.href = '#/403';
                                 break;
                             default:
-                                this._router.navigate(["/login"]);
+                                // this._router.navigate(["/login"]);
                                 break;
                         }
                     }

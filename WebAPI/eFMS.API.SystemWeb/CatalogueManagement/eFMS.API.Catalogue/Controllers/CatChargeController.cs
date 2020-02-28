@@ -124,7 +124,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             if(permissionRange == PermissionRange.None || !catChargeService.CheckAllowPermissionAction(id, permissionRange))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = LanguageSub.DO_NOT_HAVE_PERMISSION });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
             var result = catChargeService.GetChargeById(id);
@@ -172,7 +172,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             if (permissionRange == PermissionRange.None)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = LanguageSub.DO_NOT_HAVE_PERMISSION });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
             if (!ModelState.IsValid) return BadRequest();
@@ -206,7 +206,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             if (permissionRange == PermissionRange.None || !catChargeService.CheckAllowPermissionAction(model.Charge.Id, permissionRange))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = LanguageSub.DO_NOT_HAVE_PERMISSION });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
             if (!ModelState.IsValid) return BadRequest();
@@ -241,7 +241,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             if(catChargeService.CheckAllowPermissionAction(id, permissionRange))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = LanguageSub.DO_NOT_HAVE_PERMISSION });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
             var hs = catChargeService.DeleteCharge(id);

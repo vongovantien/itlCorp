@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { SortService } from '@services';
 import { CatalogueRepo, ExportRepo } from '@repositories';
 import { Warehouse } from '@models';
@@ -13,6 +13,7 @@ import { forkJoin } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from '@enums';
+
 
 @Component({
     selector: 'app-warehouse',
@@ -34,7 +35,8 @@ export class WarehouseComponent extends AppList implements OnInit {
         private _catalogueRepo: CatalogueRepo,
         private toastService: ToastrService,
         private exportRepository: ExportRepo,
-        private _progressService: NgProgress) {
+        private _progressService: NgProgress,
+    ) {
 
         super();
 
@@ -60,6 +62,7 @@ export class WarehouseComponent extends AppList implements OnInit {
         };
         this.getDataCombobox();
         this.requestWarehouses();
+
     }
 
     getDataCombobox() {
@@ -95,7 +98,6 @@ export class WarehouseComponent extends AppList implements OnInit {
                 (res: CommonInterface.IResponsePaging) => {
                     this.totalItems = res.totalItems || 0;
                     this.warehouses = (res.data || []).map(i => new Warehouse(i)) || [];
-                    console.log(this.warehouses);
                 },
             );
     }

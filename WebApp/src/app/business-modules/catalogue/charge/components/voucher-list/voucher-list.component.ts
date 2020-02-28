@@ -70,7 +70,7 @@ export class VoucherListComponent extends AppList implements OnInit {
             return [];
         } else {
             // const indexCurrenVoucher = findIndex(this.ngDataTypeChargeDefault, function (o) { return o.text === voucherType; });
-            const indexCurrenVoucher = this.ngDataTypeChargeDefault.findIndex(o => o.text = voucherType);
+            const indexCurrenVoucher = this.ngDataTypeChargeDefault.findIndex(o => o.text === voucherType);
             const aciveVoucherType = [this.ngDataTypeChargeDefault[indexCurrenVoucher]];
             return aciveVoucherType;
         }

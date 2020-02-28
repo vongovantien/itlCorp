@@ -1,5 +1,6 @@
 ﻿using eFMS.API.System.DL.Models;
 using eFMS.IdentityServer.DL.IService;
+using eFMS.IdentityServer.DL.Models;
 using eFMS.IdentityServer.Helpers;
 using IdentityServer4.Models;
 using IdentityServer4.Validation;
@@ -26,16 +27,38 @@ namespace eFMS.IdentityServer
         public Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
             RSAHelper cryption = new RSAHelper();
+            PermissionInfo userPermissionInfo;
             string password = cryption.Decrypt(context.Password);
+
+            string officeId = _contextAccessor.HttpContext.Request.Headers["officeId"];
+
+            if (!string.IsNullOrEmpty(officeId))
+            {
+                short departmentId = Int16.Parse(_contextAccessor.HttpContext.Request.Headers["departmentId"]);
+                int groupId = Int16.Parse(_contextAccessor.HttpContext.Request.Headers["groupId"]);
+                userPermissionInfo = new PermissionInfo
+                {
+                    OfficeID = new Guid(officeId),
+                    DepartmentID = departmentId,
+                    GroupID = groupId
+                };
+            }
+            else
+            {
+                userPermissionInfo = null;
+            }
+           
+
             Guid companyId = new Guid(_contextAccessor.HttpContext.Request.Headers["companyId"]);
-            var messageError = String.Empty;
+            var messageError = string.Empty;
             if (companyId == Guid.Empty)
             {
                 messageError = "Company invalid";
                 return Task.FromResult(new GrantValidationResult(TokenRequestErrors.InvalidGrant, messageError));
             }
 
-            var result = authenUser.Login(context.UserName, password, companyId, out LoginReturnModel modelReturn);
+            var result = authenUser.Login(context.UserName, password, companyId, out LoginReturnModel modelReturn, userPermissionInfo);
+
             switch (result)
             {
                 case -2:
