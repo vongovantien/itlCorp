@@ -144,7 +144,8 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
                                     this._toastService.info(userInfo.userName.toUpperCase(), "Change Office Success");
                                 }
                             }
-                        }).finally(() => { this._spinner.hide(); });
+                        });
+                    //.finally(() => { this._spinner.hide(); });
                 }
             }).catch(
                 (err) => {
