@@ -19,9 +19,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? ModifiedDate { get; set; }
         public string UserCreated { get; set; }
         public string FreightPayment { get; set; }
-        public short? GroupId { get; set; }
-        public Guid? OfficeId { get; set; }
-        public Guid? CompanyId { get; set; }
-        public int? DepartmentId { get; set; }
     }
 }

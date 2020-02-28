@@ -364,6 +364,7 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var queryDetail = csTransactionDetailRepo.Get(x => x.Id == Id).FirstOrDefault();
+                
                 var detail = mapper.Map<CsTransactionDetailModel>(queryDetail);
                 if (detail != null)
                 {

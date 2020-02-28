@@ -35,5 +35,6 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public string Location { get; set; }
     }
 }

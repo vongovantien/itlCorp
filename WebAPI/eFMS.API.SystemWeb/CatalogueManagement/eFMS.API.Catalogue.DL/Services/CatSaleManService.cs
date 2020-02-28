@@ -107,27 +107,18 @@ namespace eFMS.API.Catalogue.DL.Services
             //    case PermissionRange.All:
             //        break;
             //    case PermissionRange.Owner:
-            //        salesMan = salesMan.Where(x => x.SaleManId == currentUser.UserID || x.UserCreated == currentUser.UserID);
+            //        salesMan = salesMan.Where(x=> x.SaleManId == currentUser.UserID);
             //        break;
             //    case PermissionRange.Group:
-            //        salesMan = salesMan.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-            //        || x.UserCreated == currentUser.UserID || x.SaleManId ==  currentUser.UserID);
+            //        salesMan = salesMan.Where(x => partner.GroupId == currentUser.GroupId && x.SaleManId == currentUser.UserID);
+
             //        break;
             //    case PermissionRange.Department:
-            //        salesMan = salesMan.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.DepartmentId == currentUser.DepartmentId && x.CompanyId == currentUser.CompanyID)
-            //        || x.UserCreated == currentUser.UserID);
             //        break;
             //    case PermissionRange.Office:
-            //        salesMan = salesMan.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-            //           || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID
-            //           );
             //        break;
             //    case PermissionRange.Company:
-            //        salesMan = salesMan.Where(x => (x.CompanyId == currentUser.CompanyID)
-            //         || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID
-            //         );
             //        break;
-
             //}
             //if (salesMan == null)
             //{

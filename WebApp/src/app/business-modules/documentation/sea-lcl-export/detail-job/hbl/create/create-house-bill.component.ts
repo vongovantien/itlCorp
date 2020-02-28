@@ -7,7 +7,7 @@ import { formatDate } from '@angular/common';
 
 import { AppForm } from 'src/app/app.form';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
 import {
@@ -49,8 +49,8 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _cd: ChangeDetectorRef
-
+        protected _cd: ChangeDetectorRef,
+        private _systemRepo: SystemRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -77,11 +77,15 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                     this.gotoList();
                 }
             });
+
     }
 
     ngAfterViewInit() {
         this.goodSummaryComponent.initContainer();
         this.formCreateHBLComponent.type = 'SLE';
+        const claim = localStorage.getItem('id_token_claims_obj');
+        const currenctUser = JSON.parse(claim)["officeId"];
+        this.getDetailOffice(currenctUser);
         this._cd.detectChanges();
     }
 
@@ -225,6 +229,21 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                     }
                 }
             );
+    }
+
+    getDetailOffice(id: string) {
+        this._systemRepo.getLocationOfficeById(id)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this.formCreateHBLComponent.issueHblplace.setValue(res.data);
+                    }
+                },
+            );
+
     }
 
     gotoList() {

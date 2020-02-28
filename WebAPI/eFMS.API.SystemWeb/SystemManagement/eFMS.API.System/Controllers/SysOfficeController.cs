@@ -217,12 +217,32 @@ namespace eFMS.API.System.Controllers
             }
         }
 
+        /// get location by id
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetLocationOfficeById/{id}")]
+        public IActionResult GetLocationById(Guid id)
+        {
+            var result = sysOfficeService.Get(x=>x.Id == id).FirstOrDefault();
+            string location = result?.Location;
+            if (result == null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Error", Data = location });
+            }
+            else
+            {
+                return Ok(new ResultHandle { Status = true, Message = "Success", Data = location });
+            }
+        }
+
         private string CheckExist(Guid id, SysOfficeEditModel model)
         {
             string message = string.Empty;
             if (id == Guid.Empty)
             {
-                if (sysOfficeService.Any(x => x.BranchNameEn == model.BranchNameEn  || x.ShortName == model.ShortName))
+                if (sysOfficeService.Any(x => x.BranchNameEn == model.BranchNameEn  || x.BranchNameVn == model.BranchNameVn))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }

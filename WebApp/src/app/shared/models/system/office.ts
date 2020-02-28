@@ -23,6 +23,7 @@ export class Office {
     shortName: string = '';
     companyName: string = '';
     active: boolean = false;
+    location: string = '';
 
     constructor(data?: any) {
         const self = this;

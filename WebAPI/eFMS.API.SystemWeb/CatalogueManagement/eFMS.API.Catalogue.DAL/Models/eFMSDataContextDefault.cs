@@ -1573,13 +1573,9 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
-
                 entity.Property(e => e.CreateDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
@@ -1589,11 +1585,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
-                entity.Property(e => e.GroupId).HasColumnName("GroupID");
-
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PartnerId)
                     .HasColumnName("PartnerID")

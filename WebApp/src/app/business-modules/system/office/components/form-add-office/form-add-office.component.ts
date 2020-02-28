@@ -4,8 +4,6 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { Company } from 'src/app/shared/models';
 import { finalize, catchError } from 'rxjs/operators';
 import { Department } from 'src/app/shared/models/system/department';
-import { AppList } from 'src/app/app.list';
-import { SortService } from 'src/app/shared/services';
 import { Router } from '@angular/router';
 import { AppForm } from 'src/app/app.form';
 
@@ -46,15 +44,13 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     bankAccountUSD: AbstractControl;
     bankAccountName_VN: AbstractControl;
     bankAccountName_EN: AbstractControl;
-
     swiftCode: AbstractControl;
     bankAddress_Local: AbstractControl;
     bankAddress_En: AbstractControl;
     active: AbstractControl;
     bankName: AbstractControl;
     headers: CommonInterface.IHeaderTable[];
-
-
+    location: AbstractControl;
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
@@ -97,6 +93,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
         this.company.setValue(data.id);
 
     }
+
 
     getDepartment(data: any) {
         this.departments = data;
@@ -188,6 +185,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             bankAddress_Local: [],
             bankAddress_En: [],
             active: [this.status[0]],
+            location: []
         });
 
         this.code = this.formGroup.controls['code'];
@@ -211,6 +209,8 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
         this.bankAddress_Local = this.formGroup.controls['bankAddress_Local'];
 
         this.bankAddress_En = this.formGroup.controls['bankAddress_En'];
+        this.location = this.formGroup.controls['location'];
+
     }
 }
 
@@ -241,6 +241,7 @@ export interface IFormAddOffice {
     datetimeModified: string;
     company: string;
     active: boolean;
+    location: string;
 
 
 }
