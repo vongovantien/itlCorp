@@ -34,13 +34,13 @@
                                                     <button [disabled]="advancePayment.statusApproval !== 'New' && advancePayment.statusApproval !== 'Denied'"
                                                         class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"                                                       
                                                         title="Delete advance payment"
-                                                        (click)="deleteAdvancePayment(advancePayment)">
+                                                        (click)="prepareDeleteAdvance(advancePayment)">
                                                         <i class="la la-trash text-danger"></i>
                                                     </button>
                                                 </div>
                                             </td>
                                             <td class="text-underline text-primary pointer">
-                                                <a (click)="gotoDetailAdvPayment(advancePayment)">{{advancePayment.advanceNo}}
+                                                <a (click)="viewDetail(advancePayment)">{{advancePayment.advanceNo}}
                                                 </a>
                                             </td>
                                             <td>{{advancePayment.amount | number: '.0-3'}}</td>
@@ -161,3 +161,5 @@
 
 <confirm-popup (onSubmit)="onDeleteAdvPayment()" [body]="'Do you want to delete ?'" [labelConfirm]="'Yes'"
     [labelCancel]="'No'"></confirm-popup>
+
+<permission-403-popup></permission-403-popup>

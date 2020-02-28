@@ -1,5 +1,5 @@
 import { Component, ViewChild } from "@angular/core";
-import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from "src/app/shared/common/popup";
 import { AccountingRepo } from "src/app/shared/repositories";
 import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
@@ -16,7 +16,8 @@ export class StatementOfAccountComponent extends AppList {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    
     headers: CommonInterface.IHeaderTable[];
 
     SOAs: SOA[] = [];
@@ -53,11 +54,24 @@ export class StatementOfAccountComponent extends AppList {
         this.getSOAs();
     }
 
-    deleteSOA(soaItem: SOA) {
-        this.selectedSOA = new SOA(soaItem);
-        this.messageDelete = `Do you want to delete SOA ${soaItem.soano} ? `;
-        this.confirmPopup.show();
+    prepareDeleteSOA(soaItem: SOA){
+        this._accoutingRepo.checkAllowDeleteSOA(soaItem.soano)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.selectedSOA = new SOA(soaItem);
+                    this.messageDelete = `Do you want to delete SOA ${soaItem.soano} ? `;
+                    this.confirmPopup.show();
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
+
+    // deleteSOA(soaItem: SOA) {
+    //     this.selectedSOA = new SOA(soaItem);
+    //     this.messageDelete = `Do you want to delete SOA ${soaItem.soano} ? `;
+    //     this.confirmPopup.show();
+    // }
 
     onConfirmDeleteSOA() {
         this._progressRef.start();

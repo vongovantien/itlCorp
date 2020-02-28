@@ -44,7 +44,7 @@
                                                     <button [disabled]="settlePayment.statusApproval !== 'New' && settlePayment.statusApproval !== 'Denied'"
                                                         class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"                                                       
                                                         title="Delete"
-                                                        (click)="showDeletePopup(settlePayment)">
+                                                        (click)="prepareDeleteAdvance(settlePayment)">
                                                         <i class="la la-trash text-danger"></i>
                                                     </button>
                                                     <span>
@@ -56,7 +56,7 @@
                                                 </div>
                                             </td>
                                             <td class="text-underline text-primary pointer">
-                                                <a (click)="gotoDetailSettlement(settlePayment)">{{settlePayment.settlementNo}}
+                                                <a (click)="viewDetail(settlePayment)">{{settlePayment.settlementNo}}
                                                 </a>
                                             </td>
                                             <td>{{settlePayment.amount | number: '.0-3'}}</td>
@@ -157,3 +157,5 @@
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
+
+<permission-403-popup></permission-403-popup>

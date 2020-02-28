@@ -327,6 +327,42 @@ export class AccountingRepo {
         );
     }
 
+    checkAllowDeleteAdvance(id: string){
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowGetDetailAdvance(id: string){
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowDeleteSettlement(id: string){
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowGetDetailSettlement(id: string){
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowDeleteSOA(soaNo: string){
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CheckAllowDelete/${soaNo}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowGetDetailSOA(soaNo: string){
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CheckAllowDetail/${soaNo}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 
 

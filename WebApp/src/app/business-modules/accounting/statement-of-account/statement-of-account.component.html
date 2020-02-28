@@ -1,14 +1,5 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-            [routerLink]="'/home/accounting/statement-of-account/new'">
-            <span>
-                <i class="la la-plus"></i>
-                <span>
-                    add new
-                </span>
-            </span>
-        </button> -->
         <app-permission-button title="Add New" [routerLink]="'/home/accounting/statement-of-account/new'"></app-permission-button>
     </div>
 </app-sub-header>
@@ -51,7 +42,7 @@
                                                         <div class="table-actions">
                                                             <button type="button"
                                                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                title="Remove" (click)="deleteSOA(soa)">
+                                                                title="Remove" (click)="prepareDeleteSOA(soa)">
                                                                 <i class="la la-trash"></i>
                                                             </button>
                                                         </div>
@@ -147,3 +138,5 @@
 </div>
 
 <confirm-popup (onSubmit)="onConfirmDeleteSOA()" [body]="messageDelete" [iconConfirm]="'la la-trash'"></confirm-popup>
+
+<permission-403-popup></permission-403-popup>
