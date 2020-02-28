@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -23,5 +24,6 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Import(List<CatChargeImportModel> data);
         IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? Active, int? size);
         object GetListService();
+        bool CheckAllowPermissionAction(Guid id, PermissionRange range);
     }
 }

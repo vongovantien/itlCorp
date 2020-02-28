@@ -240,7 +240,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange, job.TransactionType);
-            if (code == 403) return new HandleState(403);
+            if (code == 403) return new HandleState(403,"");
 
             //if (model.CsMawbcontainers.Count > 0)
             //{
@@ -399,7 +399,7 @@ namespace eFMS.API.Documentation.DL.Services
                 ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
                 var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
                 int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange);
-                if (code == 403) return new HandleState(403);
+                if (code == 403) return new HandleState(403,"");
 
                 if (job == null)
                 {
@@ -447,6 +447,15 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
             int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = detail.PersonIncharge, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange, detail.TransactionType);
+            return code;
+        }
+
+        public int CheckDeletePermission(Guid id)
+        {
+            var detail = GetById(id);
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
+            var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+            int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = detail.PersonIncharge, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
             return code;
         }
 

@@ -11,13 +11,14 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { WarehouseComponent } from './warehouse.component';
 import { WarehouseImportComponent } from './warehouse-import/warehouse-import.component';
 import { FormWarehouseComponent } from './components/form-warehouse.component';
+import { OAuthModule } from 'angular-oauth2-oidc';
 
 
 const routing: Routes = [
     {
         path: '', data: { name: "" }, children: [
             {
-                path: '', component: WarehouseComponent, data: { reuse: true }
+                path: '', component: WarehouseComponent
             },
             { path: 'import', component: WarehouseImportComponent, data: { name: "Import", level: 3 } },
         ]
@@ -34,7 +35,8 @@ const routing: Routes = [
         NgProgressModule,
         SelectModule,
         ModalModule.forRoot(),
-        PaginationModule.forRoot()
+        PaginationModule.forRoot(),
+
     ],
     declarations: [
         WarehouseComponent,

@@ -114,6 +114,7 @@
   "MSG_STAGE_CODE_EMPTY": "Name Local is not allow empty!|wrong",
   "MSG_STAGE_EXISTED": "Code {0} has been existed!|wrong",
   "MSG_STAGE_CODE_DUPLICATE": "Code {0} has been duplicated!|wrong",
-  "MSG_STAGE_STATUS_EMPTY": "Status is not allow empty!|wrong"
+  "MSG_STAGE_STATUS_EMPTY": "Status is not allow empty!|wrong",
   //------------end  : STAGE
+  "DO_NOT_HAVE_PERMISSION": "Do not have permission"
 }

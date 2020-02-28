@@ -91,7 +91,7 @@ namespace eFMS.IdentityServer.DL.Services
                 }
             }
         }
-        public int Login(string username, string password, Guid companyId, out LoginReturnModel modelReturn)
+        public int Login(string username, string password, Guid companyId, out LoginReturnModel modelReturn, PermissionInfo permissionInfo)
         {
             LdapAuthentication Ldap = new LdapAuthentication();
             SearchResult ldapInfo = null;
@@ -128,11 +128,20 @@ namespace eFMS.IdentityServer.DL.Services
 
                         employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId)?.FirstOrDefault();
                         modelReturn = SetLoginReturnModel(sysUser, employee);
-
                         modelReturn.companyId = companyId;
-                        modelReturn.officeId = levelOffice.OfficeId;
-                        modelReturn.departmentId = levelOffice.DepartmentId;
-                        modelReturn.groupId = levelOffice.GroupId;
+
+                        if (permissionInfo == null)
+                        {
+                            modelReturn.officeId = levelOffice.OfficeId;
+                            modelReturn.departmentId = levelOffice.DepartmentId;
+                            modelReturn.groupId = levelOffice?.GroupId;
+                        }
+                        else
+                        {
+                            modelReturn.officeId = permissionInfo.OfficeID;
+                            modelReturn.departmentId = permissionInfo.DepartmentID;
+                            modelReturn.groupId = permissionInfo?.GroupID;
+                        }
 
                         LogUserLogin(sysUser, companyId);
                         return 1;
@@ -175,12 +184,20 @@ namespace eFMS.IdentityServer.DL.Services
                         employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId).FirstOrDefault();
                                               
                         modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, password, employee);
-
                         modelReturn.companyId = companyId;
-                        modelReturn.officeId = levelOffice.OfficeId;
-                        modelReturn.departmentId = levelOffice.DepartmentId;
-                        modelReturn.groupId = levelOffice?.GroupId;
 
+                        if (permissionInfo == null)
+                        {
+                            modelReturn.officeId = levelOffice.OfficeId;
+                            modelReturn.departmentId = levelOffice.DepartmentId;
+                            modelReturn.groupId = levelOffice?.GroupId;
+                        }
+                        else
+                        {
+                            modelReturn.officeId = permissionInfo.OfficeID;
+                            modelReturn.departmentId = permissionInfo.DepartmentID;
+                            modelReturn.groupId = permissionInfo?.GroupID;
+                        }
                         // Update Log
                         LogUserLogin(sysUser, companyId);
                         return 1;
@@ -213,9 +230,20 @@ namespace eFMS.IdentityServer.DL.Services
                     modelReturn = SetLoginReturnModel(sysUser, employee);
 
                     modelReturn.companyId = companyId;
-                    modelReturn.officeId = levelOffice.OfficeId;
-                    modelReturn.departmentId = levelOffice.DepartmentId;
-                    modelReturn.groupId = levelOffice?.GroupId;
+                    if(permissionInfo == null)
+                    {
+                        modelReturn.officeId = levelOffice.OfficeId;
+                        modelReturn.departmentId = levelOffice.DepartmentId;
+                        modelReturn.groupId = levelOffice?.GroupId;
+                    }
+                    else
+                    {
+                        modelReturn.officeId = permissionInfo.OfficeID;
+                        modelReturn.departmentId = permissionInfo.DepartmentID;
+                        modelReturn.groupId = permissionInfo?.GroupID;
+
+                    }
+                   
 
                     // Update Log
                     LogUserLogin(sysUser, companyId);
@@ -318,5 +346,7 @@ namespace eFMS.IdentityServer.DL.Services
             }
             return true;
         }
+
+        
     }
 }

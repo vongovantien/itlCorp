@@ -5,16 +5,13 @@
         </div>
         <div class="c-button-actions">
             <app-permission-button title="Add New" routerLink="/home/catalogue/charge/addnew"></app-permission-button>
+
             <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase dropdown-toggle"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span>
-                        <i class="la la-download"></i>
-                        <span>
-                            import
-                        </span>
-                    </span>
-                </button>
+
+                <app-permission-button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Import"
+                    type="import">
+                </app-permission-button>
+
                 <div class="dropdown-menu" aria-labelledby="">
                     <a routerLink="/home/catalogue/charge/import" class="dropdown-item" href="javascript:void(0)">Import
                         charge</a>
@@ -22,7 +19,9 @@
                         href="javascript:void(0)">Import account voucher</a>
                 </div>
             </div>
+
             <app-permission-button type="export" (click)="export()" title="Export"></app-permission-button>
+
         </div>
     </div>
 </div>
@@ -47,7 +46,7 @@
                                     <div class="table-actions" style="width: 70px">
                                         <button type="button"
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            [routerLink]="[item.id]" title="Edit stage">
+                                            (click)="viewDetail(item)" title="Edit stage">
                                             <i class="la la-edit"></i>
                                         </button>
                                         <button type="button"
@@ -110,9 +109,10 @@
             </div>
         </div>
     </div>
+
 </div>
-
-
 
 <confirm-popup [body]="'You want to delete this Charge?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteCharge()">
 </confirm-popup>
+
+<permission-403-popup></permission-403-popup>

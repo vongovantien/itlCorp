@@ -64,13 +64,13 @@ namespace eFMS.API.Accounting.DL.Services
         #region -- Insert & Update SOA
         public HandleState AddSOA(AcctSoaModel model)
         {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
             try
             {
                 var userCurrent = currentUser.UserID;
-                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
                 model.Status = AccountingConstants.STATUS_SOA_NEW;
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
@@ -175,19 +175,18 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState UpdateSOA(AcctSoaModel model)
         {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
             try
             {
                 var userCurrent = currentUser.UserID;
-                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
                         //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
-                        //var hsUpdateSoaSurcharge = UpdateSOASurCharge(model.Soano);                      
                         var surcharge = csShipmentSurchargeRepo.Get(x => x.Soano == model.Soano || x.PaySoano == model.Soano).ToList();
                         foreach (var item in surcharge)
                         {
@@ -273,7 +272,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
                             }
                         }
-                        //dc.SaveChanges();
                         trans.Commit();
                         return hs;
                     }
@@ -297,8 +295,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState DeleteSOA(string soaNo)
         {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
             var hs = DataContext.Delete(x => x.Soano == soaNo);
             return hs;
@@ -363,7 +362,6 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             Expression<Func<ChargeSOAResult, bool>> query = x => model.Surcharges.Where(c => c.surchargeId == x.ID && c.type == x.Type).Any();
-            //var charge = GetChargeShipmentDocAndOperation().Where(x => model.Surcharges.Where(c => c.surchargeId == x.ID && c.type == x.Type).Any());
             var charge = GetChargeShipmentDocAndOperation(query);
             var today = DateTime.Now;
             var dataResult = charge.Select(chg => new
@@ -1467,9 +1465,47 @@ namespace eFMS.API.Accounting.DL.Services
             return resultData;
         }
 
+        private IQueryable<AcctSoa> GetSOA()
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+
+            IQueryable<AcctSoa> soa = null;
+            switch (rangeSearch)
+            {
+                case PermissionRange.None:
+                    break;
+                case PermissionRange.All:
+                    soa = DataContext.Get();
+                    break;
+                case PermissionRange.Owner:
+                    soa = DataContext.Get(x => x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Group:
+                    soa = DataContext.Get(x => x.GroupId == currentUser.GroupId
+                                            && x.DepartmentId == currentUser.DepartmentId
+                                            && x.OfficeId == currentUser.OfficeID
+                                            && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Department:
+                    soa = DataContext.Get(x => x.DepartmentId == currentUser.DepartmentId
+                                            && x.OfficeId == currentUser.OfficeID
+                                            && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Office:
+                    soa = DataContext.Get(x => x.OfficeId == currentUser.OfficeID
+                                            && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Company:
+                    soa = DataContext.Get(x => x.CompanyId == currentUser.CompanyID);
+                    break;
+            }
+            return soa;
+        }
+
         public IQueryable<AcctSOAResult> GetListSOA(AcctSOACriteria criteria)
         {
-            var soa = DataContext.Get();
+            var soa = GetSOA();
             if (!string.IsNullOrEmpty(criteria.StrCodes))
             {
                 //Chỉ lấy ra những charge có SOANo (Để hạn chế việc join & get data không cần thiết)
@@ -1519,6 +1555,12 @@ namespace eFMS.API.Accounting.DL.Services
         public IQueryable<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount)
         {
             var data = GetListSOA(criteria);
+            if (data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
+
             var _totalItem = data.Select(s => s.Id).Count();
             rowsCount = (_totalItem > 0) ? _totalItem : 0;
             if (size > 0)

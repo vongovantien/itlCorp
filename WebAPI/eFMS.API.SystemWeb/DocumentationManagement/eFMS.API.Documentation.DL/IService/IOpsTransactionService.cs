@@ -27,5 +27,6 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewFormPLsheet(Guid id, string currency);
         HandleState Update(OpsTransactionModel model);
         IQueryable<OpsTransaction> QueryByPermission(PermissionRange range);
+        HandleState CheckAllowConvertJob(List<OpsTransactionClearanceModel> list);
     }
 }

@@ -54,9 +54,9 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
-        [AuthorizeEx(Menu.acctAP, UserPermission.AllowAccess)]
+        [Authorize]
         public IActionResult Paging(AcctAdvancePaymentCriteria criteria, int pageNumber, int pageSize)
-        {
+        {            
             var data = acctAdvancePaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
@@ -69,6 +69,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("QueryData")]
+        [Authorize]
         public IActionResult QueryData(AcctAdvancePaymentCriteria criteria)
         {
             var data = acctAdvancePaymentService.QueryData(criteria);
@@ -122,8 +123,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        //[Authorize]
-        [AuthorizeEx(Menu.acctAP, UserPermission.Add)]
+        [Authorize]
         public IActionResult Add(AcctAdvancePaymentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -161,6 +161,7 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             var hs = acctAdvancePaymentService.AddAdvancePayment(model);
+            if (hs.Code == 403) return Forbid();
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -186,6 +187,38 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
+        /// Check allow delete advance payment
+        /// </summary>
+        /// <param name="id">Id of advance payment</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None)
+                return Ok(false);
+            return Ok(true);
+        }
+
+        /// <summary>
+        /// Check allow detail advance payment
+        /// </summary>
+        /// <param name="id">Id of advance payment</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None)
+                return Ok(false);
+            return Ok(true);
+        }
+
+        /// <summary>
         /// delete an advance payment existed item
         /// </summary>
         /// <param name="advanceNo">advanceNo of existed item that want to delete</param>
@@ -198,6 +231,7 @@ namespace eFMS.API.Accounting.Controllers
             ChangeTrackerHelper.currentUser = currentUser.UserID;
 
             HandleState hs = acctAdvancePaymentService.DeleteAdvancePayment(advanceNo);
+            if (hs.Code == 403) return Forbid();
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -215,8 +249,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetAdvancePaymentByAdvanceNo")]
+        [Authorize]
         public IActionResult GetAdvancePaymentByAdvanceNo(string advanceNo)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None) return Forbid();
+
             var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceNo(advanceNo);
             return Ok(data);
         }
@@ -228,8 +267,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetAdvancePaymentByAdvanceId")]
+        [Authorize]
         public IActionResult GetAdvancePaymentByAdvanceId(Guid advanceId)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None) return Forbid();
+
             var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceId(advanceId);
             return Ok(data);
         }
@@ -241,8 +285,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-        //[Authorize]
-        [AuthorizeEx(Menu.acctAP, UserPermission.Update)]
+        [Authorize]
         public IActionResult Update(AcctAdvancePaymentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -287,6 +330,7 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             var hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
+            if (hs.Code == 403) return Forbid();
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -384,6 +428,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 model.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctAdvancePaymentService.AddAdvancePayment(model);
+                if (hs.Code == 403) return Forbid();
             }
             else //Update Advance Payment
             {
@@ -395,6 +440,7 @@ namespace eFMS.API.Accounting.Controllers
 
                 model.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
+                if (hs.Code == 403) return Forbid();
             }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -480,6 +526,10 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Get list advance of shipment
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetAdvancesOfShipment")]
         public IActionResult GetAdvancesOfShipment()
         {
@@ -487,6 +537,11 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Get advances to unlock
+        /// </summary>
+        /// <param name="keyWords"></param>
+        /// <returns></returns>
         [HttpPost("GetAdvancesToUnlock")]
         public IActionResult GetAdvancePayment(List<string> keyWords)
         {
@@ -494,6 +549,12 @@ namespace eFMS.API.Accounting.Controllers
             LockedLogResultModel result = acctAdvancePaymentService.GetAdvanceToUnlock(keyWords);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Unlock advance
+        /// </summary>
+        /// <param name="advancePayments"></param>
+        /// <returns></returns>
         [HttpPost("UnLock")]
         [Authorize]
         public IActionResult UnLock(List<LockedLogModel> advancePayments)

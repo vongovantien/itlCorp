@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { SortService } from '@services';
 import { CatalogueRepo, ExportRepo } from '@repositories';
@@ -7,7 +8,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { AppList } from 'src/app/app.list';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 
 import { catchError, finalize, map } from 'rxjs/operators';
 
@@ -19,6 +20,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 export class ChargeComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
 
     ListCharges: Charge[] = [];
     idChargeToDelete: string = "";
@@ -28,7 +30,8 @@ export class ChargeComponent extends AppList implements OnInit {
         private sortService: SortService,
         private _catalogueRepo: CatalogueRepo,
         private _exportRepo: ExportRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _router: Router,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -96,8 +99,15 @@ export class ChargeComponent extends AppList implements OnInit {
     }
 
     prepareDeleteCharge(id: any) {
-        this.idChargeToDelete = id;
-        this.confirmDeletePopup.show();
+        this._catalogueRepo.checkAllowDeleteCharge(id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.idChargeToDelete = id;
+                    this.confirmDeletePopup.show();
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 
     onDeleteCharge() {
@@ -127,5 +137,16 @@ export class ChargeComponent extends AppList implements OnInit {
                     this.downLoadFile(response, "application/ms-excel", 'Charge.xlsx');
                 },
             );
+    }
+
+    viewDetail(charge: Charge): void {
+        this._catalogueRepo.checkAllowGetDetailCharge(charge.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate(["home/catalogue/charge", charge.id]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 }

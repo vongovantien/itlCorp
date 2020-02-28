@@ -465,6 +465,67 @@ namespace eFMS.API.Operation.DL.Services
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetCustomDeclaration>(parameters);
         }
 
+        public HandleState CheckAllowDelete(List<CustomsDeclarationModel> customs)
+        {
+            var result = new HandleState();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            switch (permissionRangeDelete)
+            {
+                case PermissionRange.None:
+                    result = new HandleState(403, "");
+                    break;
+                case PermissionRange.Owner:
+                    if (customs.Any(x => x.UserCreated != currentUser.UserID))
+                    {
+                        var ItemForbidDelete = customs.Where(i => i.UserCreated != currentUser.UserID).Select(x => x.ClearanceNo);
+                        result = new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s).Distinct()) + " . You don't have permission to delete");
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if (customs.Any(x => x.GroupId != currentUser.GroupId
+                                     && x.DepartmentId != currentUser.DepartmentId
+                                     && x.OfficeId != currentUser.OfficeID
+                                     && x.CompanyId != currentUser.CompanyID)
+                       )
+                    {
+                        var ItemForbidDelete = customs.Where(x => x.GroupId != currentUser.GroupId
+                                     && x.DepartmentId != currentUser.DepartmentId
+                                     && x.OfficeId != currentUser.OfficeID
+                                     && x.CompanyId != currentUser.CompanyID);
+                        result = new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " . You don't have permission to delete");
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if (customs.Any(x => x.DepartmentId != currentUser.DepartmentId
+                                                         && x.OfficeId != currentUser.OfficeID
+                                                         && x.CompanyId != currentUser.CompanyID)
+                                           )
+                    {
+                        var ItemForbidDelete = customs.Where(x => x.DepartmentId != currentUser.DepartmentId
+                                     && x.OfficeId != currentUser.OfficeID
+                                     && x.CompanyId != currentUser.CompanyID);
+                        result = new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " . You don't have permission to delete");
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if (customs.Any(x => x.OfficeId != currentUser.OfficeID && x.CompanyId != currentUser.CompanyID))
+                    {
+                        var ItemForbidDelete = customs.Where(x => x.OfficeId != currentUser.OfficeID && x.CompanyId != currentUser.CompanyID);
+                        result = new HandleState(false, "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " . You don't have permission to delete");
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (customs.Any(x => x.CompanyId != currentUser.CompanyID))
+                    {
+                        var ItemForbidDelete = customs.Where(x => x.CompanyId != currentUser.CompanyID);
+                        result = new HandleState(new { Message = "Items: " + String.Join(", ", ItemForbidDelete.Select(s => s.Id).Distinct()) + " . You don't have permission to delete" });
+                    }
+                    break;
+            }
+
+            return result;
+        }
         public HandleState DeleteMultiple(List<CustomsDeclarationModel> customs)
         {
             var result = new HandleState();
@@ -474,7 +535,7 @@ namespace eFMS.API.Operation.DL.Services
             switch (permissionRangeDelete)
             {
                 case PermissionRange.None:
-                    result = new HandleState(403);
+                    result = new HandleState(403, "");
                     break;
                 case PermissionRange.Owner:
                     if (customs.Any(x => x.UserCreated != currentUser.UserID))
@@ -1070,10 +1131,8 @@ namespace eFMS.API.Operation.DL.Services
         {
             int code = 0;
             var detail = GetById(id);
-
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
-            var model = new BaseUpdateModel { UserCreated = currentUser.UserID, GroupId = currentUser.GroupId, DepartmentId = currentUser.DepartmentId, OfficeId = currentUser.OfficeID, CompanyId = currentUser.CompanyID };
+            var model = new BaseUpdateModel { UserCreated = detail.UserCreated, GroupId = detail.GroupId, DepartmentId = detail.DepartmentId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId };
             code = PermissionExtention.GetPermissionCommonItem(model, permissionRange, currentUser);
             return code;
         }

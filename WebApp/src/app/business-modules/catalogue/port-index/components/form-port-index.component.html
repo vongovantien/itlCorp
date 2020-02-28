@@ -107,7 +107,11 @@
                 </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+                <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button> -->
+
+                <!--* app-default-button -> app-permission-button-->
+                <app-permission-button title="Save" type="save" (click)="onSubmit()"> </app-permission-button>
+
                 <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
             </div>
         </div>

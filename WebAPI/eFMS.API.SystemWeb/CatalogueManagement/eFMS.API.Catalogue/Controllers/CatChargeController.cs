@@ -12,6 +12,8 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -34,6 +36,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatChargeService catChargeService;
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
+        private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
@@ -47,12 +50,14 @@ namespace eFMS.API.Catalogue.Controllers
             ICatChargeService service, 
             ICatChargeDefaultAccountService catChargeDefaultAccount, 
             IMapper imapper,
+            ICurrentUser user,
             IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catChargeService = service;
             catChargeDefaultAccountService = catChargeDefaultAccount;
             mapper = imapper;
+            currentUser = user;
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -65,6 +70,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [AuthorizeEx(Menu.catCharge, UserPermission.AllowAccess)]
         public IActionResult Get(CatChargeCriteria criteria,int pageNumber,int pageSize)
         {
             var data = catChargeService.Paging(criteria, pageNumber, pageSize, out int rowCount);
@@ -113,6 +119,14 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getById/{id}")]
         public IActionResult Get(Guid id)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+
+            if(permissionRange == PermissionRange.None || !catChargeService.CheckAllowPermissionAction(id, permissionRange))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             var result = catChargeService.GetChargeById(id);
             return Ok(result);
         }
@@ -153,6 +167,14 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Add(CatChargeAddOrUpdateModel model)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge); 
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+
+            if (permissionRange == PermissionRange.None)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(Guid.Empty, model);
             if (checkExistMessage.Length > 0)
@@ -179,6 +201,14 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Update(CatChargeAddOrUpdateModel model)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+
+            if (permissionRange == PermissionRange.None || !catChargeService.CheckAllowPermissionAction(model.Charge.Id, permissionRange))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model.Charge.Id, model);
             if (checkExistMessage.Length > 0)
@@ -203,8 +233,17 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize]
+
         public IActionResult Delete(Guid id)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+
+            if(catChargeService.CheckAllowPermissionAction(id, permissionRange))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             var hs = catChargeService.DeleteCharge(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -393,6 +432,35 @@ namespace eFMS.API.Catalogue.Controllers
         {
             var results = catChargeService.GetListService();
             return Ok(results);
+        }
+
+        [HttpGet("CheckAllowDetail/{id}")]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            var charge = catChargeService.First(x => x.Id == id);
+            if (charge == null)
+            {
+                return Ok(false);
+            }
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+
+            return Ok(catChargeService.CheckAllowPermissionAction(id, permissionRange));
+        }
+
+        [HttpGet("CheckAllowDelete/{id}")]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            var charge = catChargeService.First(x => x.Id == id);
+            if (charge == null)
+            {
+                return Ok(false);
+            }
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+
+            return Ok(catChargeService.CheckAllowPermissionAction(id, permissionRange));
         }
 
     }

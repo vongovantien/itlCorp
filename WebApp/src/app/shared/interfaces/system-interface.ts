@@ -35,4 +35,11 @@ namespace SystemInterface {
         [name: string]: any;
 
     }
+
+    export interface IToken {
+        access_token: string;
+        expire_in: number;
+        token_type: string;
+        refresh_token: string;
+    }
 }

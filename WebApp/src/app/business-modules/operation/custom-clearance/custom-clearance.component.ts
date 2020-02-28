@@ -3,15 +3,17 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { catchError, map, finalize } from 'rxjs/operators';
+import { catchError, map, finalize, takeUntil } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo, CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import _map from 'lodash/map';
 import { NgProgress } from '@ngx-progressbar/core';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Router } from '@angular/router';
+import { IAppState, getMenuUserPermissionState } from '@store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -21,15 +23,17 @@ import { Router } from '@angular/router';
 export class CustomClearanceComponent extends AppList {
     @ViewChild('confirmConvertPopup', { static: false }) confirmConvertPopup: ConfirmPopupComponent;
     @ViewChild('confirmDeletePopup', { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-
+    @ViewChild(Permission403PopupComponent, { static: false }) canNotAllowActionPopup: Permission403PopupComponent;
     listCustomDeclaration: CustomDeclaration[] = [];
     searchObject: any = {};
     listCustomer: any = [];
     listPort: any = [];
     listUnit: any = [];
+    menuPermission: SystemInterface.IUserPermission;
 
     headers: CommonInterface.IHeaderTable[];
     constructor(
+        private _store: Store<IAppState>,
         private _sortService: SortService,
         private _toastrService: ToastrService,
         private _operationRepo: OperationRepo,
@@ -46,7 +50,15 @@ export class CustomClearanceComponent extends AppList {
     }
 
     ngOnInit() {
-
+        this._store.select(getMenuUserPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: SystemInterface.IUserPermission) => {
+                    if (res !== null && res !== undefined) {
+                        this.menuPermission = res;
+                    }
+                }
+            );
         this.headers = [
             { title: 'Clearance No', field: 'clearanceNo', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
@@ -109,7 +121,21 @@ export class CustomClearanceComponent extends AppList {
             }
         }
     }
-
+    showDetail(id) {
+        this._operationRepo.checkViewDetailPermission(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this._router.navigate(['/home/operation/custom-clearance/detail', id]);
+                    } else {
+                        this.canNotAllowActionPopup.show();
+                    }
+                },
+            );
+    }
     getDataFromEcus() {
         this._progressRef.start();
         this._operationRepo.importCustomClearanceFromEcus()
@@ -127,17 +153,54 @@ export class CustomClearanceComponent extends AppList {
 
     confirmConvert() {
         if (this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo).length > 0) {
-            this.confirmConvertPopup.show();
+            const clearancesToConvert = this.mapClearancesToJobs();
+            if (clearancesToConvert.filter(x => x.opsTransaction === null).length > 0) {
+                return;
+            } else {
+                this._documentRepo.checkAllowConvertJob(clearancesToConvert)
+                    .pipe(
+                        catchError(this.catchError),
+                        finalize(() => this._progressRef.complete())
+                    ).subscribe(
+                        (res: any) => {
+                            if (res.status) {
+                                this.confirmConvertPopup.show();
+                            } else {
+                                this.canNotAllowActionPopup.show();
+                            }
+                        },
+                    );
+
+            }
         } else {
-            this._toastrService.warning('Custom clearance was not selected');
+            // this._toastrService.warning('Custom clearance was not selected');
+
+            this.canNotAllowActionPopup.show();
         }
     }
 
     deleteClearance() {
+        const customCheckedArray: CustomDeclaration[] = this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo) || [];
         if (this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo).length > 0) {
-            this.confirmDeletePopup.show();
+            this._operationRepo.checkDeletePermission(customCheckedArray)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
+                ).subscribe(
+                    (res: any) => {
+                        if (res.success) {
+                            this.confirmDeletePopup.show();
+                        } else {
+                            this._toastrService.error(res.message);
+                            // this.canNotAllowActionPopup.show();
+                        }
+                    },
+                );
+            // this.confirmDeletePopup.show();
         } else {
-            this._toastrService.warning(`You haven't selected any custom clearance yet. Please select one or more custom no to delete!`);
+
+            this.canNotAllowActionPopup.show();
+            // this._toastrService.warning(`You haven't selected any custom clearance yet. Please select one or more custom no to delete!`);
         }
     }
 
@@ -152,8 +215,9 @@ export class CustomClearanceComponent extends AppList {
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    this._toastrService.success(res.message, '');
+                    // this._toastrService.success(res.message, '');
                     this.getListCustomsDeclaration();
+                    this.canNotAllowActionPopup.show();
                 },
             );
     }
@@ -238,19 +302,19 @@ export class CustomClearanceComponent extends AppList {
                     shipment.packageTypeId = this.listUnit[index].id;
                 }
             } else {
-                this._toastrService.error(`Không có customer để tạo job mới`, `${clearance.clearanceNo}`);
+                this._toastrService.error(clearance.clearanceNo + ` Không có customer để tạo job mới`);
                 shipment = null;
             }
             if (clearance.mblid == null) {
-                this._toastrService.error(`Không có MBL/MAWB để tạo job mới`, `${clearance.clearanceNo} `);
+                this._toastrService.error(clearance.clearanceNo + ` Không có MBL/MAWB để tạo job mới`);
                 shipment = null;
             }
             if (clearance.hblid == null) {
-                this._toastrService.error(`Không có HBL/HAWB để tạo job mới`, `${clearance.clearanceNo} `);
+                this._toastrService.error(clearance.clearanceNo + ` Không có HBL/HAWB để tạo job mới`);
                 shipment = null;
             }
             if (clearance.clearanceDate == null) {
-                this._toastrService.error(`Không có clearance date để tạo job mới`, `${clearance.clearanceNo} `);
+                this._toastrService.error(clearance.clearanceNo + ` Không có clearance date để tạo job mới`);
                 shipment = null;
             }
             clearancesToConvert.push({ opsTransaction: shipment, customsDeclaration: clearance });
