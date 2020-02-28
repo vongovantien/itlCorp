@@ -359,9 +359,6 @@ namespace eFMS.API.Catalogue.DL.Services
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var sysUsers = sysUserRepository.Get();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
-<<<<<<< HEAD
-          
-=======
             var salemans = salemanRepository.Get().ToList();
             //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             //PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
@@ -452,7 +449,6 @@ namespace eFMS.API.Catalogue.DL.Services
             //}
 
             if (partners == null) return null;
->>>>>>> dev
 
             var query = (from partner in partners
                          join user in sysUsers on partner.UserCreated equals user.Id
