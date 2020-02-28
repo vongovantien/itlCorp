@@ -1,3 +1,5 @@
+import { PermissionShipment } from "../document/permissionShipment";
+
 export class CustomClearance {
     constructor() { }
     id: number = 0;
@@ -39,4 +41,6 @@ export class CustomClearance {
     gatewayName: string;
     cargoType: string;
     convertTime: Date = null;
+
+    permission: PermissionShipment = new PermissionShipment();
 }

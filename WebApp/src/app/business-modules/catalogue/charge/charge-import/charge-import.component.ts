@@ -76,7 +76,7 @@ export class ChargeImportComponent extends AppPage implements OnInit {
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
 
-    async setPage(pager: PagerSetting) {
+    setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;
         this.pager.pageSize = pager.pageSize;
         this.pager.totalPages = pager.totalPages;

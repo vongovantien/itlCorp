@@ -1,17 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { PagingService } from 'src/app/shared/services/paging-service';
-
-import { SortService } from 'src/app/shared/services/sort.service';
+import { SortService, PagingService } from '@services';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
 import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { AppPage } from 'src/app/app.base';
 import { finalize, catchError } from 'rxjs/operators';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
+import { InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'app-charge-import-account-voucher',

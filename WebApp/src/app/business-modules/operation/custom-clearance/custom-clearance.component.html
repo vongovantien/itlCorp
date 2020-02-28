@@ -39,7 +39,7 @@
                             </span>
                         </button>
                         <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="getDataFromEcus()">
+                            (click)="getDataFromEcus()" *ngIf="!!menuPermission && menuPermission.allowAdd">
                             <span>
                                 <i class="la la-refresh"></i>
                                 <span>
@@ -76,8 +76,9 @@
                                 </div>
                             </td>
                             <td>
-                                <a
-                                    [routerLink]="['/home/operation/custom-clearance/detail',   custom.id ]">{{custom.clearanceNo}}</a>
+                                <!-- <a
+                                    [routerLink]="['/home/operation/custom-clearance/detail',   custom.id ]">{{custom.clearanceNo}}</a> -->
+                                <a href="javascript:void(0)" (click)="showDetail(custom.id)">{{custom.clearanceNo}}</a>
                             </td>
                             <td>
                                 <span>{{custom.type}}</span>
@@ -155,9 +156,10 @@
 </div>
 
 <confirm-popup [labelConfirm]="'Ok'" [labelCancel]="'No'" [title]="'Warning'"
-    [body]="'Do you Want To convert ClearanceNo selected to shipment ?'" #confirmConvertPopup
+    [body]="'Do you want to convert clearance no selected to shipment ?'" #confirmConvertPopup
     (onSubmit)="onComfirmConvertToJobs()"></confirm-popup>
 
 <confirm-popup [labelConfirm]="'Ok'" [labelCancel]="'No'" [title]="'Warning'"
-    [body]="'Do you Want To delete clearanceNo selected ?'" #confirmDeletePopup (onSubmit)="onConfirmDelete()">
+    [body]="'Do you want to delete clearance no selected ?'" #confirmDeletePopup (onSubmit)="onConfirmDelete()">
 </confirm-popup>
+<permission-403-popup></permission-403-popup>

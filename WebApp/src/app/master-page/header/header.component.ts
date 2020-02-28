@@ -52,7 +52,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             .subscribe(
                 (res: any) => {
                     if (!!res && res.departmentId && res.groupId) {
-                        console.log("depart-group in redux", res);
                         this.selectedDepartmentGroup = this.departmentGroups.find(d => d.departmentId === res.departmentId && d.groupId === res.groupId);
                     }
                 }
@@ -92,13 +91,13 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     }
 
     changeOffice(office: Office) {
-        if (!!office) {
+        if (!!office && this.offices.length > 1) {
             this.officeChange.emit(office);
         }
     }
 
     changeDepartmentGroup(departmentGroup: SystemInterface.IDepartmentGroup) {
-        if (!!departmentGroup) {
+        if (!!departmentGroup && this.departmentGroups.length > 1) {
             this.groupDepartmentChange.emit(departmentGroup);
         }
     }

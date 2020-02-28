@@ -848,4 +848,16 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    checkAllowGetDetailCharge(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowDeleteCharge(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }

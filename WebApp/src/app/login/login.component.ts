@@ -92,6 +92,7 @@ export class LoginComponent {
                         return this.oauthService.loadUserProfile();
                     }).then(() => {
                         const userInfo: SystemInterface.IClaimUser = <any>this.oauthService.getIdentityClaims(); // * Get info User.
+
                         if (!!userInfo) {
                             localStorage.setItem("currently_userName", userInfo.preferred_username);
                             this.setupLocalInfo();
@@ -104,9 +105,17 @@ export class LoginComponent {
                             this.router.navigateByUrl(this.currenURL);
                             this._spinner.hide();
 
+                            // save username & password into cookies.
+                            const uf = this.encryptUserInfo(this.username, this.password);
+                            this.cookieService.set("_u", uf.username_encrypt, null, "/", window.location.hostname);
+                            this.cookieService.set("_p", uf.password_encrypt, null, "/", location.hostname);
+
                             this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
                         }
-                    }).catch((err) => {
+                    }).then(() => {
+
+                    })
+                    .catch((err) => {
                         this._spinner.hide();
                     });
             } catch (error) {

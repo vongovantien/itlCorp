@@ -1,9 +1,10 @@
 import { Injectable, InjectionToken, Inject } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, TimeoutError } from 'rxjs';
-import { catchError, timeout } from 'rxjs/operators';
+import { catchError, timeout, retry } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
+import { SystemConstants } from 'src/constants/system.const';
 
 export const DEFAULT_TIMEOUT = new InjectionToken<number>('defaultTimeout');
 
@@ -22,7 +23,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
         const timeoutValue = req.headers.get('timeout') || this.defaultTimeout;
         let token;
-        const authHeader = localStorage.getItem('access_token');
+        const authHeader = localStorage.getItem(SystemConstants.ACCESS_TOKEN);
         if (!!authHeader) {
             token = `Bearer ${authHeader}`;
         }
@@ -40,6 +41,7 @@ export class AuthInterceptor implements HttpInterceptor {
         }
         return next.handle(this.authReq).pipe(
             timeout(+timeoutValue),
+            retry(2),
             catchError((error: HttpErrorResponse) => {
                 let message: string = '';
                 switch (error.status) {
@@ -54,9 +56,9 @@ export class AuthInterceptor implements HttpInterceptor {
                         window.location.href = '#/403';
                         break;
                 }
-                // if (error instanceof TimeoutError) {
-                //     message = error.message;
-                // }
+                if (error instanceof TimeoutError) {
+                    message = "Request time out";
+                }
                 this._toastService.error(message, error.statusText);
                 return throwError(error);
             })

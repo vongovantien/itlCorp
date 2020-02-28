@@ -659,6 +659,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.CurrencyId)
                     .HasColumnName("CurrencyID")
                     .HasMaxLength(30)
@@ -672,9 +674,15 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.IncludedVat).HasColumnName("IncludedVAT");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.ServiceTypeId)
                     .HasColumnName("ServiceTypeID")

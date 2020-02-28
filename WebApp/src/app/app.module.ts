@@ -107,7 +107,7 @@ const authConfig: AuthConfig = {
         {
             provide: RouterStateSerializer, useClass: CustomSerializer
         },
-        { provide: DEFAULT_TIMEOUT, useValue: !environment.production ? 100000 : 30000 },
+        { provide: DEFAULT_TIMEOUT, useValue: !environment.production ? 200000 : 30000 },
         MenuResolveGuard,
         {
             provide: RouteReuseStrategy,

@@ -11,6 +11,7 @@ export class SystemConstants {
     // Security
     public static readonly SECRET_KEY = "ITL-$EFMS-&SECRET_KEY001";
     public static readonly USER_CLAIMS = 'id_token_claims_obj';
+    public static readonly ACCESS_TOKEN = 'access_token';
     //RSA 512 = 64 bytes for plain text encode
     public static readonly ENCRYPT_SERVER_PUBLIC_KEY: string =
         `-----BEGIN PUBLIC KEY-----
