@@ -50,7 +50,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _cd: ChangeDetectorRef,
-        private _systemRepo: SystemRepo
+        private _systemRepo?: SystemRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
