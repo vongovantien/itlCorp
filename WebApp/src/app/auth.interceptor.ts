@@ -41,7 +41,6 @@ export class AuthInterceptor implements HttpInterceptor {
         }
         return next.handle(this.authReq).pipe(
             timeout(+timeoutValue),
-            retry(2),
             catchError((error: HttpErrorResponse) => {
                 let message: string = '';
                 switch (error.status) {
