@@ -95,6 +95,11 @@ namespace eFMS.API.Accounting.DL.Services
         public List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = QueryData(criteria);
+            if (data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
 
             //Phân trang
             var _totalItem = data.Select(s => s.Id).Count();
@@ -113,6 +118,10 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            criteria.RangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (criteria.RangeSearch == PermissionRange.None) return null;
+
             var settlement = DataContext.Get();
             var approveSettle = acctApproveSettlementRepo.Get(x => x.IsDeputy == false);
             var user = sysUserRepo.Get();
@@ -308,8 +317,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState DeleteSettlementPayment(string settlementNo)
         {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            if (permissionRange == PermissionRange.None) return new HandleState(403,"");
 
             try
             {
@@ -1076,8 +1086,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState AddSettlementPayment(CreateUpdateSettlementModel model)
         {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
             try
             {
@@ -1179,8 +1190,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState UpdateSettlementPayment(CreateUpdateSettlementModel model)
         {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
             try
             {

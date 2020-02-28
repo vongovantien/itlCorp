@@ -170,6 +170,10 @@ export class AdvancePaymentComponent extends AppList {
                 break;
         }
     }
+
+    export() {
+        console.log('Export');
+    }
 }
 
 

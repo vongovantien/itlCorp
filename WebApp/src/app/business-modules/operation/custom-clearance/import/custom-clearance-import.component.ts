@@ -13,23 +13,14 @@ import { ToastrService } from 'ngx-toastr';
 import { OperationRepo } from '@repositories';
 import { finalize } from 'rxjs/operators';
 import { AppPage } from 'src/app/app.base';
-declare var $: any;
+import { InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'app-custom-clearance-import',
     templateUrl: './custom-clearance-import.component.html',
 })
 export class CustomClearanceImportComponent extends AppPage implements OnInit {
-    data: any[];
-    pagedItems: any[] = [];
-    inValidItems: any[] = [];
-    totalValidRows: number = 0;
-    totalRows: number = 0;
-    isShowInvalid: boolean = true;
-    pager: PagerSetting = PAGINGSETTING;
-    inProgress: boolean = false;
-    @ViewChild(AppPaginationComponent, { static: false }) child;
-    @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
+
     constructor(
         private pagingService: PagingService,
         private baseService: BaseService,
@@ -41,6 +32,22 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
         super();
         this._progressRef = this._progressService.ref();
     }
+
+    data: any[];
+    pagedItems: any[] = [];
+    inValidItems: any[] = [];
+    totalValidRows: number = 0;
+    totalRows: number = 0;
+    isShowInvalid: boolean = true;
+    pager: PagerSetting = PAGINGSETTING;
+    inProgress: boolean = false;
+
+    @ViewChild(AppPaginationComponent, { static: false }) child;
+    @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
+
+    isDesc = true;
+    sortKey: string;
 
     ngOnInit() {
         this.pager.totalItems = 0;
@@ -76,7 +83,7 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
 
-    async setPage(pager: PagerSetting) {
+    setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;
         this.pager.pageSize = pager.pageSize;
         this.pager.totalPages = pager.totalPages;
@@ -91,9 +98,6 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
     async downloadSample() {
         await this.baseService.downloadfile(this.api_menu.Operation.CustomClearance.downloadExcel, 'CustomClearanceImportTemplate.xlsx');
     }
-
-    isDesc = true;
-    sortKey: string;
     sort(property) {
         this.isDesc = !this.isDesc;
         this.sortKey = property;
@@ -122,7 +126,6 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
     reset() {
         this.data = null;
         this.pagedItems = null;
-        $("#inputFile").val('');
         this.pager.totalItems = 0;
         this.totalRows = this.totalValidRows = 0;
     }
@@ -141,18 +144,16 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
             return;
         }
         if (this.totalRows - this.totalValidRows > 0) {
-            $('#upload-alert-modal').modal('show');
-        }
-        else {
+            this.invaliDataAlert.show();
+        } else {
             this.progressBar.start();
             console.log(this.data);
-            var response = await this.baseService.postAsync(this.api_menu.Operation.CustomClearance.import, this.data, true, false);
+            const response = await this.baseService.postAsync(this.api_menu.Operation.CustomClearance.import, this.data, true, false);
             if (response.success) {
                 this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
                 this.reset();
                 this.progressBar.complete();
-            }
-            else {
+            } else {
                 this.progressBar.complete();
                 this.baseService.handleError(response);
             }

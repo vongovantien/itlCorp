@@ -232,6 +232,19 @@ export class CatalogueRepo {
         );
     }
 
+    checkViewDetailPartnerPermission(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/CheckPermission/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    checkDeletePartnerPermission(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/CheckPermissionDelete/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 
     getListService() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/GetListServices`)
@@ -832,6 +845,18 @@ export class CatalogueRepo {
 
     checkAllowGetDetailPlace(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowGetDetailCharge(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowDeleteCharge(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/CheckAllowDelete/${id}`).pipe(
             map((data: any) => data)
         );
     }

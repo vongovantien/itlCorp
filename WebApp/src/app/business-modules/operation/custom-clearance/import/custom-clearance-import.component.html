@@ -1,20 +1,14 @@
-<!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
-            <!--begin:: breadcrumbs-->
             <app-breadcrumb></app-breadcrumb>
-            <!--end:: breadcrumbs-->
         </div>
     </div>
 </div>
-<!--end:: subheader-->
-<!--begin::m-content-->
+
 <div class="m-content">
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <!--begin::Form-->
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
@@ -45,17 +39,19 @@
                     </div>
                 </div>
                 <div class="form-actions m--margin-top-5 m--align-right">
-                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
+                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="hideInvalid()">
                         <span>
-                            <span *ngIf="isShowInvalid"> 
+                            <span *ngIf="isShowInvalid">
                                 Show invalid rows
                             </span>
-                            <span *ngIf="isShowInvalid == false"> 
+                            <span *ngIf="isShowInvalid == false">
                                 Show All
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="import()">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -74,90 +70,105 @@
                     </button>
                 </div>
             </div>
-            <!--end::Form-->
         </div>
     </div>
-    <!--end::m-portlet-->
-    <!--begin:: m-portlet-->
+
     <div class="m-portlet" style="position: relative">
         <ng-progress [thick]="true" [color]="'#2ea2f4'" [spinner]="true"></ng-progress>
         <div class="m-portlet__body">
-            <!--begin: Datatable of trucking-table -->
             <div class="table-wrapper table-scrollable" id="">
                 <table class="table table-striped table-brand dataTable">
                     <thead>
                         <tr>
                             <th class="sorting_asc">No</th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
-                            (click)="sort('clearanceNo')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
+                                (click)="sort('clearanceNo')">
                                 <span>Clearance No*</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
-                            (click)="sort('type')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
+                                (click)="sort('type')">
                                 <span>Type</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDateStr'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDateStr') }"
-                            (click)="sort('clearanceDateStr')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDateStr'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDateStr') }"
+                                (click)="sort('clearanceDateStr')">
                                 <span>Clearance Date*</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'customerName'), 'sorting_desc': (!isDesc && sortKey == 'customerName') }"
-                            (click)="sort('customerName')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'customerName'), 'sorting_desc': (!isDesc && sortKey == 'customerName') }"
+                                (click)="sort('customerName')">
                                 <span>Customer*</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'mblid'), 'sorting_desc': (!isDesc && sortKey == 'mblid') }"
-                            (click)="sort('mblid')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'mblid'), 'sorting_desc': (!isDesc && sortKey == 'mblid') }"
+                                (click)="sort('mblid')">
                                 <span>MBL*</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblid'), 'sorting_desc': (!isDesc && sortKey == 'hblid') }"
-                            (click)="sort('hblid')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblid'), 'sorting_desc': (!isDesc && sortKey == 'hblid') }"
+                                (click)="sort('hblid')">
                                 <span>HBL*</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gatewayName'), 'sorting_desc': (!isDesc && sortKey == 'gatewayName') }"
-                            (click)="sort('gatewayName')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gatewayName'), 'sorting_desc': (!isDesc && sortKey == 'gatewayName') }"
+                                (click)="sort('gatewayName')">
                                 <span>Gate Way*</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'grossWeightStr'), 'sorting_desc': (!isDesc && sortKey == 'grossWeightStr') }"
-                            (click)="sort('grossWeightStr')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'grossWeightStr'), 'sorting_desc': (!isDesc && sortKey == 'grossWeightStr') }"
+                                (click)="sort('grossWeightStr')">
                                 <span>Gross Weight</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'netWeightStr'), 'sorting_desc': (!isDesc && sortKey == 'netWeightStr') }"
-                            (click)="sort('netWeightStr')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'netWeightStr'), 'sorting_desc': (!isDesc && sortKey == 'netWeightStr') }"
+                                (click)="sort('netWeightStr')">
                                 <span>Net Weight</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cbmStr'), 'sorting_desc': (!isDesc && sortKey == 'cbmStr') }"
-                            (click)="sort('cbmStr')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cbmStr'), 'sorting_desc': (!isDesc && sortKey == 'cbmStr') }"
+                                (click)="sort('cbmStr')">
                                 <span>CBM</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qtyContStr'), 'sorting_desc': (!isDesc && sortKey == 'qtyContStr') }"
-                            (click)="sort('qtyContStr')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qtyContStr'), 'sorting_desc': (!isDesc && sortKey == 'qtyContStr') }"
+                                (click)="sort('qtyContStr')">
                                 <span>Cont Qty</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'pcsStr'), 'sorting_desc': (!isDesc && sortKey == 'pcsStr') }"
-                            (click)="sort('pcsStr')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'pcsStr'), 'sorting_desc': (!isDesc && sortKey == 'pcsStr') }"
+                                (click)="sort('pcsStr')">
                                 <span>PCS</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityName'), 'sorting_desc': (!isDesc && sortKey == 'commodityName') }"
-                            (click)="sort('commodityName')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityName'), 'sorting_desc': (!isDesc && sortKey == 'commodityName') }"
+                                (click)="sort('commodityName')">
                                 <span>Commodity</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cargoType'), 'sorting_desc': (!isDesc && sortKey == 'cargoType') }"
-                            (click)="sort('cargoType')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cargoType'), 'sorting_desc': (!isDesc && sortKey == 'cargoType') }"
+                                (click)="sort('cargoType')">
                                 <span>Cargo Type</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceType'), 'sorting_desc': (!isDesc && sortKey == 'serviceType') }"
-                            (click)="sort('serviceType')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceType'), 'sorting_desc': (!isDesc && sortKey == 'serviceType') }"
+                                (click)="sort('serviceType')">
                                 <span>Service Type*</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'route'), 'sorting_desc': (!isDesc && sortKey == 'route') }"
-                            (click)="sort('route')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'route'), 'sorting_desc': (!isDesc && sortKey == 'route') }"
+                                (click)="sort('route')">
                                 <span>Route*</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryName'), 'sorting_desc': (!isDesc && sortKey == 'importCountryName') }"
-                            (click)="sort('importCountryName')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryName'), 'sorting_desc': (!isDesc && sortKey == 'importCountryName') }"
+                                (click)="sort('importCountryName')">
                                 <span>Import Country</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryName'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryName') }"
-                            (click)="sort('exportCountryName')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryName'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryName') }"
+                                (click)="sort('exportCountryName')">
                                 <span>Export Country</span>
                             </th>
                         </tr>
@@ -183,8 +194,7 @@
                                     [ngClass]="{'m--font-danger' : !item.partnerTaxCodeValid}">{{ item.customerName }}</span>
                             </td>
                             <td>
-                                <span
-                                    [ngClass]="{'m--font-danger' : !item.mblidValid}">{{ item.mblid }}</span>
+                                <span [ngClass]="{'m--font-danger' : !item.mblidValid}">{{ item.mblid }}</span>
                             </td>
                             <td>
                                 <span [ngClass]="{'m--font-danger' : !item.hblidValid}">{{ item.hblid }}</span>
@@ -224,49 +234,22 @@
                                 <span [ngClass]="{'m--font-danger' : !item.routeValid}">{{ item.route }}</span>
                             </td>
                             <td>
-                                <span [ngClass]="{'m--font-danger' : !item.importCountryCodeValid}">{{item.importCountryName}}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.importCountryCodeValid}">{{item.importCountryName}}</span>
                             </td>
                             <td>
-                                <span [ngClass]="{'m--font-danger' : !item.exportCountryCodeValid}">{{item.exportCountryName}}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.exportCountryCodeValid}">{{item.exportCountryName}}</span>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <!--end: Datatable of trucking-table -->
             <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
                 (pagerObject)="setPage($event)"></app-pagination>
         </div>
     </div>
-    <!--end:: m-portlet-->
 </div>
-<!--end::m-content-->
-<!--begin::modal-->
-<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Notification</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="confirm-text-block">
-                    <span>There are invalid data. Please check Import!</span>
-                </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            OK
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-  </div>
-  <!--end::modal-->
+
+
+<info-popup body="There are invalid data. Please check Import!" title="Notification"></info-popup>

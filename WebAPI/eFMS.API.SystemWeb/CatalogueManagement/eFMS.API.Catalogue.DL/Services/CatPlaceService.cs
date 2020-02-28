@@ -130,7 +130,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IQueryable<sp_GetCatPlace> data = null;
             List<CatPlaceViewModel> results = null;
 
-            if (criteria.PlaceType == CatPlaceTypeEnum.Warehouse )
+            if (criteria.PlaceType == CatPlaceTypeEnum.Warehouse)
             {
                 ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
                 var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
@@ -141,7 +141,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 data = QueryByPermission(criteria, rangeSearch);
             }
-            if(criteria.PlaceType == CatPlaceTypeEnum.Port)
+            else if (criteria.PlaceType == CatPlaceTypeEnum.Port)
             {
                 ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
                 var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
@@ -310,20 +310,20 @@ namespace eFMS.API.Catalogue.DL.Services
                     break;
                 case PermissionRange.Group:
                     data = list.Where(x => x.UserCreated == currentUser.UserID
-                    && x.GroupId == currentUser.GroupId
+                    || x.GroupId == currentUser.GroupId
                     && x.DepartmentId == currentUser.DepartmentId
                     && x.OfficeId == currentUser.OfficeID
                     && x.CompanyId == currentUser.CompanyID);
                     break;
                 case PermissionRange.Department:
-                    data = list.Where(x => x.UserCreated == currentUser.UserID && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID
+                    data = list.Where(x => x.UserCreated == currentUser.UserID || x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID
                     && x.CompanyId == currentUser.CompanyID);
                     break;
                 case PermissionRange.Office:
-                    data = list.Where(x => x.UserCreated == currentUser.UserID && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    data = list.Where(x => x.UserCreated == currentUser.UserID || x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
                     break;
                 case PermissionRange.Company:
-                    data = list.Where(x => x.UserCreated == currentUser.UserID && x.CompanyId == currentUser.CompanyID);
+                    data = list.Where(x => x.UserCreated == currentUser.UserID || x.CompanyId == currentUser.CompanyID);
                     break;
                 case PermissionRange.All:
                     data = list;
@@ -872,8 +872,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public bool CheckAllowPermissionAction(Guid placeID, PermissionRange range)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
-
             var detail = DataContext.Get(x => x.Id == placeID)?.FirstOrDefault();
             if (detail == null) return false;
 

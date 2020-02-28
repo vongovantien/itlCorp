@@ -7,8 +7,8 @@
                 <app-breadcrumb></app-breadcrumb>
             </div>
             <div class="c-button-actions">
-                <button type="button" class="btn btn-danger m-btn--square  m-btn--icon  m-btn--uppercase"
-                    (click)="showConfirmDelete()">
+                <button *ngIf="partner.permission.allowDelete" type="button"
+                    class="btn btn-danger m-btn--square  m-btn--icon  m-btn--uppercase" (click)="showConfirmDelete()">
                     <span>
                         <i class="la la-trash"></i>
                         <span>
@@ -16,7 +16,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
+                <button *ngIf="partner.permission.allowUpdate" type=""
+                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                     <span>
                         <i class="la la la-save"></i>
                         <span>
@@ -64,7 +65,8 @@
                     </div>
                     <div class="col-lg-8 m--align-right">
                         <div class="form-group">
-                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                            <app-permission-button title="add new" (click)='showPopupSaleman()'></app-permission-button>
+                            <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                 data-toggle="modal" (click)='showPopupSaleman()'>
                                 <span>
                                     <i class="la la-plus"></i>
@@ -72,7 +74,7 @@
                                         Add new
                                     </span>
                                 </span>
-                            </button>
+                            </button> -->
                         </div>
                     </div>
 
@@ -133,7 +135,8 @@
 
                 </div>
                 <div class="col-6 m--align-right">
-                    <button type="button" class="btn btn-danger m-btn--square  m-btn--icon  m-btn--uppercase"
+                    <button *ngIf="partner.permission.allowDelete" type="button"
+                        class="btn btn-danger m-btn--square  m-btn--icon  m-btn--uppercase"
                         (click)="showConfirmDelete()">
                         <span>
                             <i class="la la-trash"></i>
@@ -142,7 +145,8 @@
                             </span>
                         </span>
                     </button>
-                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
+                    <button *ngIf="partner.permission.allowUpdate"
+                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                         <span>
                             <i class="la la-save"></i>
                             <span>

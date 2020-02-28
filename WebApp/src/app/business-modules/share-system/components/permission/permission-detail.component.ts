@@ -92,7 +92,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                         this.permissionSample = new PermissionSample(res);
                         console.log(this.permissionSample);
 
-                        if (this.type !== 'office' && this.type !== 'user') {
+                        if (this.type !== 'office' && this.type !== 'user' && this.type !== 'group' && this.type !== 'department' && this.type !== 'company') {
 
                             setTimeout(() => {
                                 this.formCreateComponent.formCreate.setValue({
@@ -188,7 +188,7 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
     onSavePermissionSample() {
         this.confirmPopup.hide();
-        if (this.type === 'office' || this.type === 'user' || this.type === 'deparment' || this.type === 'company') {
+        if (this.type === 'office' || this.type === 'user' || this.type === 'deparment' || this.type === 'company' || this.type === 'group') {
             this.updateUsersPermission();
         } else {
             this.formCreateComponent.isSubmitted = true;

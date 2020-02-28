@@ -64,3 +64,8 @@ export const SearchDefaultButton: ButtonAttributeSetting = {
     icon: "la la-search"
 };
 
+export const PreviewDefaultButton: ButtonAttributeSetting = {
+    titleButton: "Preivew",
+    classStyle: "btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase",
+    icon: "la la-print"
+};

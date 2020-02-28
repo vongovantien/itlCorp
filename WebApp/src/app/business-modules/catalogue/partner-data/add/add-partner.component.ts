@@ -76,7 +76,6 @@ export class AddPartnerDataComponent extends AppList {
                 }
             }
         });
-        this.partner.departmentId = "Head Office";
         this.getDataCombobox();
     }
 
@@ -328,7 +327,7 @@ export class AddPartnerDataComponent extends AppList {
         this.getFormPartnerData();
         console.log(this.partner);
         if (this.partner.countryId == null || this.partner.provinceId == null
-            || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
+            || this.partner.countryShippingId == null || this.partner.provinceShippingId == null) {
             return;
         }
 

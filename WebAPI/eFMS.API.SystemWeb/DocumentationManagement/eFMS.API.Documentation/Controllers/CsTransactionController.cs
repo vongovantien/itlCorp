@@ -186,6 +186,8 @@ namespace eFMS.API.Documentation.Controllers
             }
             model.UserModified = currentUser.UserID;
             var hs = csTransactionService.UpdateCSTransaction(model);
+            if (hs.Code == 403) return Forbid();
+
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -258,6 +260,20 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// Check delete permission
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("CheckDeletePermission")]
+        [Authorize]
+        public IActionResult CheckDeletePermission(Guid id)
+        {
+            var result = csTransactionService.CheckDeletePermission(id);
+            if (result == 403) return Forbid();
+            return Ok(true);
+        }
+
+        /// <summary>
         /// delete an existed item
         /// </summary>
         /// <param name="id">id of existed data that want to delete</param>
@@ -276,8 +292,10 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }
-            //var hs = csTransactionService.DeleteCSTransaction(id);
+
             var hs = csTransactionService.SoftDeleteJob(id);
+            if (hs.Code == 403) return Forbid();
+
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

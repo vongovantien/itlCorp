@@ -18,10 +18,12 @@ using AutoMapper.QueryableExtensions;
 using ITL.NetCore.Connection.Caching;
 using System.Linq.Expressions;
 using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Common.Models;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatChargeService  : RepositoryBaseCache<CatCharge,CatChargeModel>, ICatChargeService
+    public class CatChargeService : RepositoryBaseCache<CatCharge, CatChargeModel>, ICatChargeService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
@@ -29,8 +31,8 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICatCurrencyService currencyService;
         private readonly ICatUnitService catUnitService;
 
-        public CatChargeService(IContextBase<CatCharge> repository, 
-            ICacheServiceBase<CatCharge> cacheService, 
+        public CatChargeService(IContextBase<CatCharge> repository,
+            ICacheServiceBase<CatCharge> cacheService,
             IMapper mapper,
             IStringLocalizer<LanguageSub> localizer,
             ICurrentUser user,
@@ -55,6 +57,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 model.Charge.Active = true;
                 model.Charge.UserCreated = model.Charge.UserModified = currentUser.UserID;
                 model.Charge.DatetimeCreated = DateTime.Now;
+
+                // Update permission
+                model.Charge.GroupId = currentUser.GroupId;
+                model.Charge.DepartmentId = currentUser.DepartmentId;
+                model.Charge.OfficeId = currentUser.OfficeID;
+                model.Charge.CompanyId = currentUser.CompanyID;
 
                 try
                 {
@@ -95,6 +103,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     model.Charge.UserModified = currentUser.UserID;
                     model.Charge.DatetimeModified = DateTime.Now;
+                    model.Charge.GroupId = currentUser.GroupId;
+                    model.Charge.DepartmentId = currentUser.DepartmentId;
+                    model.Charge.OfficeId = currentUser.OfficeID;
+                    model.Charge.CompanyId = currentUser.CompanyID;
                     var hs = DataContext.Update(model.Charge, x => x.Id == model.Charge.Id, false);
                     if (hs.Success == false) return hs;
 
@@ -113,7 +125,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             item.UserModified = currentUser.UserID;
                             item.DatetimeModified = DateTime.Now;
                             item.Id = 0;
-                            chargeDefaultRepository.Add(item,false);
+                            chargeDefaultRepository.Add(item, false);
                         }
                     }
                     chargeDefaultRepository.SubmitChanges();
@@ -149,15 +161,24 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatChargeModel> Paging(CatChargeCriteria criteria, int page, int size, out int rowsCount)
         {
-            Expression<Func<CatChargeModel, bool>> query = null;
-            if (criteria.All == null)
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None)
+            {
+                rowsCount = 0;
+                return null;
+            }
+
+            Expression<Func<CatCharge, bool>> query = null;
+            if (string.IsNullOrEmpty(criteria.All))
             {
                 query = x => (x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.Type ?? "").IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.ServiceTypeId ?? "").IndexOf(criteria.ServiceTypeId ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                    && (x.Active == criteria.Active || criteria.Active == null);
+                                    && (x.Active == criteria.Active || criteria.Active == null)
+                                    ;
             }
             else
             {
@@ -168,8 +189,34 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || (x.ServiceTypeId ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                    && (x.Active == criteria.Active || criteria.Active == null);
             }
-            var data = Paging(query, page, size, x => x.DatetimeModified, false, out rowsCount);
-            return data;
+
+            // Query with Permission Range.
+            switch (rangeSearch)
+            {
+                case PermissionRange.Owner:
+                    query = query.And(x => x.UserCreated == currentUser.UserID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Group:
+                    query = query.And(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                        || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Department:
+                    query = query.And(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                        || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Office:
+                    query = query.And(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Company:
+                    query = query.And(x => x.CompanyId == currentUser.CompanyID || x.UserCreated == currentUser.UserID);
+                    break;
+                default:
+                    break;
+            }
+            var data = DataContext.Paging(query, page, size, x => x.DatetimeModified, false, out rowsCount);
+
+            var datamap = data.ProjectTo<CatChargeModel>(mapper.ConfigurationProvider);
+            return datamap;
         }
 
         public IQueryable<CatChargeModel> Query(CatChargeCriteria criteria)
@@ -197,7 +244,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var currencies = currencyService.Get();
             var units = catUnitService.Get();
             list = list.Join(currencies, x => x.CurrencyId, y => y.Id, (x, y) => new { x, y.CurrencyName })
-                        .Join(units, x => x.x.UnitId, y => y.Id, (x, y) => new CatChargeModel {
+                        .Join(units, x => x.x.UnitId, y => y.Id, (x, y) => new CatChargeModel
+                        {
                             Id = x.x.Id,
                             Code = x.x.Code,
                             ChargeNameVn = x.x.ChargeNameVn,
@@ -308,7 +356,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 else
                 {
                     var unit = units.FirstOrDefault(x => x.Code.ToLower() == item.UnitCode.ToLower());
-                    if(unit == null)
+                    if (unit == null)
                     {
                         item.UnitError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_UNIT_NOT_FOUND];
                         item.IsValid = false;
@@ -323,7 +371,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.IsValid = false;
                     item.UnitPriceError = "Price is not allow empty and must be a decimal number";
                 }
-                if(item.Vatrate > 99) {
+                if (item.Vatrate > 99)
+                {
                     item.IsValid = false;
                     item.VatrateError = "VAT is must be lower than 100";
                 }
@@ -346,7 +395,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.TypeError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_TYPE_EMPTY];
                     item.IsValid = false;
                 }
-                if(!string.IsNullOrEmpty(item.Code))
+                if (!string.IsNullOrEmpty(item.Code))
                 {
                     var charge = charges.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
                     if (charge != null)
@@ -374,7 +423,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                foreach(var item in data)
+                foreach (var item in data)
                 {
                     var charge = new CatCharge
                     {
@@ -399,16 +448,16 @@ namespace eFMS.API.Catalogue.DL.Services
                 Get();
                 return new HandleState();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new HandleState(ex.Message);
             }
         }
 
-        public IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? active,int? size)
+        public IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? active, int? size)
         {
             IQueryable<CatChargeModel> list = null;
-            if(size != null)
+            if (size != null)
             {
                 int pageSize = (int)size;
                 list = Paging(x => x.Type != "DEBIT" && (x.Active == active || active == null)
@@ -439,6 +488,30 @@ namespace eFMS.API.Catalogue.DL.Services
             var data = DataContext.Get(x => x.Type == type);
             if (data == null) return null;
             return data.ProjectTo<CatChargeModel>(mapper.ConfigurationProvider);
+        }
+
+        public bool CheckAllowPermissionAction(Guid id, PermissionRange range)
+        {
+            CatCharge charge = DataContext.Get(o => o.Id == id).FirstOrDefault();
+            if (charge == null)
+            {
+                return false;
+            }
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = charge.UserCreated,
+                CompanyId = charge.CompanyId,
+                DepartmentId = charge.DepartmentId,
+                OfficeId = charge.OfficeId,
+                GroupId = charge.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, range, currentUser);
+
+            if (code == 403) return false;
+
+            return true;
+
         }
     }
 }

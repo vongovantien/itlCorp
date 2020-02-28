@@ -31,45 +31,21 @@
 
                 <div class="row">
                     <div class="col-12">
-                        <div class="m--align-center m--margin-top-20">
-                            <button
-                                class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save" (click)="updateSettlement()" *ngIf="!!settlementPayment && (settlementPayment.settlement.statusApproval == 'Denied' || settlementPayment.settlement.statusApproval === 'New')">
-                                <span>
-                                    <i class="la la-save"></i>
-                                    <span>
-                                        Save
-                                    </span>
-                                </span>
-                            </button>
-                            <button
-                                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save & Send Request" (click)="saveAndSendRequest()" *ngIf="!!settlementPayment && (settlementPayment.settlement.statusApproval == 'Denied' || settlementPayment.settlement.statusApproval === 'New')">
-                                <span>
-                                    <i class="la la-download"></i>
-                                    <span>
-                                        Save & Send Request
-                                    </span>
-                                </span>
-                            </button>
-                            <button class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Preview" (click)="preview()">
-                                <span>
-                                    <i class="la la-print"></i>
-                                    <span>
-                                        Preview
-                                    </span>
-                                </span>
-                            </button>
-                            <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel"
-                                (click)="back()">
-                                <span>
-                                    <i class="la la-ban"></i>
-                                    <span>
-                                        Cancel
-                                    </span>
-                                </span>
-                            </button>
+                        <div class="m--align-center m--margin-top-20">                           
+                            <div class="c-button-actions">
+                                <ng-container
+                                *ngIf="!!settlementPayment && (settlementPayment.settlement.statusApproval == 'Denied' || settlementPayment.settlement.statusApproval === 'New')">
+                                    <app-permission-button type="save" title="Save" (click)="updateSettlement()">
+                                    </app-permission-button>
+                                    <app-permission-button type="save-and-send" title="Save & Send Request"
+                                        (click)="saveAndSendRequest()"></app-permission-button>
+                                </ng-container>
+                                <app-default-button [buttonSetting]="previewButtonSetting"
+                                    (onClick)="preview()">
+                                </app-default-button>
+                                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+                                </app-default-button>
+                            </div>
                         </div>
                     </div>
                 </div>

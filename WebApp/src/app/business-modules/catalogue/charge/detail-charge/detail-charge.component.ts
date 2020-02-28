@@ -4,9 +4,9 @@ import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catCharg
 import { Router, ActivatedRoute } from '@angular/router';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { AddChargeComponent } from '../add-charge/add-charge.component';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize, timeout } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 @Component({
     selector: 'detail-charge',
     templateUrl: './detail-charge.component.html',
@@ -52,6 +52,7 @@ export class DetailChargeComponent extends AddChargeComponent {
         { text: ChargeConstants.SCI_DES, id: ChargeConstants.SCI_CODE },
         { text: ChargeConstants.CL_DES, id: ChargeConstants.CL_CODE }
     ];
+    timeOut: any;
 
     constructor(
         private route: ActivatedRoute,
@@ -67,10 +68,10 @@ export class DetailChargeComponent extends AddChargeComponent {
             this.id = params.id;
 
         });
-
     }
+
     ngAfterViewInit() {
-        setTimeout(() => {
+        this.timeOut = setTimeout(() => {
             this.getChargeDetail();
         }, 30);
     }
@@ -83,6 +84,7 @@ export class DetailChargeComponent extends AddChargeComponent {
                 this.formAddCharge.updateDataToForm(this.Charge);
 
                 this.voucherList.ChargeToAdd.listChargeDefaultAccount = this.Charge.listChargeDefaultAccount;
+                this.Charge.charge.userCreated = res.userCreated;
             }
         });
     }
@@ -111,7 +113,10 @@ export class DetailChargeComponent extends AddChargeComponent {
                     );
             }
         }
+    }
 
+    ngOnDestroy() {
+        clearTimeout(this.timeOut);
     }
 
 }

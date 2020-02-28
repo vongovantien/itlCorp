@@ -222,7 +222,11 @@ namespace eFMS.API.Catalogue.Controllers
             }
 
             permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return Forbid();
+            if (permissionRange == PermissionRange.None)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = LanguageSub.DO_NOT_HAVE_PERMISSION });
+
+            }
 
             if (!ModelState.IsValid) return BadRequest();
 
@@ -274,12 +278,16 @@ namespace eFMS.API.Catalogue.Controllers
             }
 
             permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return Forbid();
+            if (permissionRange == PermissionRange.None)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = LanguageSub.DO_NOT_HAVE_PERMISSION });
+            }
             bool code = catPlaceService.CheckAllowPermissionAction(model.Id, permissionRange);
 
             if (code == false)
             {
-                return Forbid();
+                return BadRequest(new ResultHandle { Status = false, Message = LanguageSub.DO_NOT_HAVE_PERMISSION });
+
             }
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(id, model);

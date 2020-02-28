@@ -1,7 +1,7 @@
 import { Injectable, InjectionToken, Inject } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, TimeoutError } from 'rxjs';
-import { catchError, timeout } from 'rxjs/operators';
+import { catchError, timeout, retry } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 
@@ -40,6 +40,7 @@ export class AuthInterceptor implements HttpInterceptor {
         }
         return next.handle(this.authReq).pipe(
             timeout(+timeoutValue),
+            retry(2),
             catchError((error: HttpErrorResponse) => {
                 let message: string = '';
                 switch (error.status) {
