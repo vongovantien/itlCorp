@@ -111,7 +111,7 @@
             <param name="id">id that want to retrieve custom declarations</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.CheckDeletePermission">
+        <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.CheckDeletePermission(System.Collections.Generic.List{eFMS.API.Operation.DL.Models.CustomsDeclarationModel})">
             
         </member>
         <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.DeleteMultiple(System.Collections.Generic.List{eFMS.API.Operation.DL.Models.CustomsDeclarationModel})">

@@ -180,17 +180,19 @@ export class CustomClearanceComponent extends AppList {
     }
 
     deleteClearance() {
+        const customCheckedArray: CustomDeclaration[] = this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo) || [];
         if (this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo).length > 0) {
-            this._operationRepo.checkDeletePermission()
+            this._operationRepo.checkDeletePermission(customCheckedArray)
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
                 ).subscribe(
                     (res: any) => {
-                        if (res) {
+                        if (res.success) {
                             this.confirmDeletePopup.show();
                         } else {
-                            this.canNotAllowActionPopup.show();
+                            this._toastrService.error(res.message);
+                            // this.canNotAllowActionPopup.show();
                         }
                     },
                 );

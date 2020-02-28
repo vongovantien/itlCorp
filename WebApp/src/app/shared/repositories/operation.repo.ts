@@ -50,8 +50,8 @@ export class OperationRepo {
         );
     }
 
-    checkDeletePermission() {
-        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/CheckDeletePermission`).pipe(
+    checkDeletePermission(body) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/CheckDeletePermission`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

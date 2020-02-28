@@ -311,17 +311,19 @@ namespace eFMS.API.Operation.Controllers
         }
         
         ///
-        [HttpGet("CheckDeletePermission")]
+        [HttpPost("CheckDeletePermission")]
         [Authorize]
-        public IActionResult CheckDeletePermission()
+        public IActionResult CheckDeletePermission(List<CustomsDeclarationModel> clearances)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
-            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
-            if(permissionRangeDelete == PermissionRange.None)
+            var hs = customsDeclarationService.CheckAllowDelete(clearances);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result;
+            if (hs.Success)
             {
-                return Ok(false);
+                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             }
-            return Ok(true);
+            result = new ResultHandle { Status = hs.Success, Message = hs.Exception.Message.ToString() };
+            return Ok(result);
         }
 
         /// <summary>
