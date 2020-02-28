@@ -96,45 +96,43 @@ namespace eFMS.API.Catalogue.DL.Services
             var salesManData = GetSaleMan().Where(x => x.PartnerId == criteria.PartnerId);
 
             var sysUser = sysUserRepository.Get();
-            var partner = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
+            //var partner = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
+            //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            //PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            //switch (rangeSearch)
+            //{
+            //    case PermissionRange.None:
+            //        salesMan = null;
+            //        break;
+            //    case PermissionRange.All:
+            //        break;
+            //    case PermissionRange.Owner:
+            //        salesMan = salesMan.Where(x => x.SaleManId == currentUser.UserID || x.UserCreated == currentUser.UserID);
+            //        break;
+            //    case PermissionRange.Group:
+            //        salesMan = salesMan.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+            //        || x.UserCreated == currentUser.UserID || x.SaleManId ==  currentUser.UserID);
+            //        break;
+            //    case PermissionRange.Department:
+            //        salesMan = salesMan.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.DepartmentId == currentUser.DepartmentId && x.CompanyId == currentUser.CompanyID)
+            //        || x.UserCreated == currentUser.UserID);
+            //        break;
+            //    case PermissionRange.Office:
+            //        salesMan = salesMan.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+            //           || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID
+            //           );
+            //        break;
+            //    case PermissionRange.Company:
+            //        salesMan = salesMan.Where(x => (x.CompanyId == currentUser.CompanyID)
+            //         || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID
+            //         );
+            //        break;
 
-
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
-            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-
-
-            switch (rangeSearch)
-            {
-                case PermissionRange.None:
-                    salesMan = null;
-                    break;
-                case PermissionRange.All:
-                    break;
-                case PermissionRange.Owner:
-                    salesMan = salesMan.Where(x => x.SaleManId == currentUser.UserID || x.UserCreated == currentUser.UserID);
-                    break;
-                case PermissionRange.Group:
-                    if ((partner.GroupId == currentUser.GroupId
-                     && partner.DepartmentId == currentUser.DepartmentId
-                     && partner.OfficeId == currentUser.OfficeID
-                     && partner.CompanyId == currentUser.CompanyID))
-                    {
-                        salesMan = salesMan.Where(x => x.SaleManId == currentUser.UserID || x.PartnerId.Equals(partner.Id));
-                    }
-                    else if (partner.UserCreated == currentUser.UserID)
-                    {
-                        salesMan = salesMan.Where(x => x.UserCreated == currentUser.UserID);
-                    }
-                    else {
-                        salesMan = salesMan.Where(x => x.SaleManId == currentUser.UserID || x.UserCreated == currentUser.UserID);
-                    };
-                    break;
-
-            }
-            if (salesMan == null)
-            {
-                return null;
-            }
+            //}
+            //if (salesMan == null)
+            //{
+            //    return null;
+            //}
             var query = from saleman in salesMan
                         join users in sysUser on saleman.SaleManId equals users.Id
                         select new { saleman, users };

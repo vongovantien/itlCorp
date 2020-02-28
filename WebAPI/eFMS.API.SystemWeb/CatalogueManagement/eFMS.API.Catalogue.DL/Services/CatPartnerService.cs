@@ -101,6 +101,10 @@ namespace eFMS.API.Catalogue.DL.Services
                         x.PartnerId = partner.Id;
                         x.CreateDate = DateTime.Now;
                         x.UserCreated = currentUser.UserID;
+                        //x.CompanyId = currentUser.CompanyID;
+                        //x.OfficeId = currentUser.OfficeID;
+                        //x.GroupId = currentUser.GroupId;
+                        //x.DepartmentId = currentUser.DepartmentId;
                     });
                     partner.SalePersonId = salemans.FirstOrDefault().SaleManId.ToString();
                     DataContext.Update(partner, x => x.Id == partner.Id);
@@ -148,6 +152,10 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.PartnerId = entity.Id;
                         item.CreateDate = DateTime.Now;
                         item.UserCreated = currentUser.UserID;
+                        //item.CompanyId = currentUser.CompanyID;
+                        //item.OfficeId = currentUser.OfficeID;
+                        //item.GroupId = currentUser.GroupId;
+                        //item.DepartmentId = currentUser.DepartmentId;
                         salemanRepository.Add(item);
                     }
                     else
@@ -179,6 +187,89 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = Query(criteria);
+            var salemans = salemanRepository.Get().ToList();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            switch (rangeSearch)
+            {
+                case PermissionRange.None:
+                    data = null;
+                    break;
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
+                    {
+                        data = data.Where(x => salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+                        || x.UserCreated == currentUser.UserID).ToList();
+                    }
+                    else
+                    {
+                        data = data.Where(x => x.UserCreated == currentUser.UserID).ToList();
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
+                    {
+                        data = data.Where(x => (x.GroupId == currentUser.GroupId && (x.DepartmentId == currentUser.DepartmentId) && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                       || x.UserCreated == currentUser.UserID
+                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+                       ).ToList();
+                    }
+                    else
+                    {
+                        data = data.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                        || x.UserCreated == currentUser.UserID
+                        ).ToList();
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
+                    {
+                        data = data.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                       || x.UserCreated == currentUser.UserID
+                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+                       ).ToList();
+                    }
+                    else
+                    {
+                        data = data.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.DepartmentId == currentUser.DepartmentId && x.CompanyId == currentUser.CompanyID)
+                        || x.UserCreated == currentUser.UserID
+                        ).ToList();
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
+                    {
+                        data = data.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                       || x.UserCreated == currentUser.UserID
+                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+                       ).ToList();
+                    }
+                    else
+                    {
+                        data = data.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                        || x.UserCreated == currentUser.UserID
+                        ).ToList();
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
+                    {
+                        data = data.Where(x => (x.CompanyId == currentUser.CompanyID)
+                       || x.UserCreated == currentUser.UserID
+                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+                       ).ToList();
+                    }
+                    else
+                    {
+                        data = data.Where(x => (x.CompanyId == currentUser.CompanyID)
+                        || x.UserCreated == currentUser.UserID
+                        ).ToList();
+                    }
+                    break;
+            }
+
             if (data == null)
             {
                 rowsCount = 0;
@@ -268,93 +359,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var sysUsers = sysUserRepository.Get();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
-            var salemans = salemanRepository.Get().ToList();
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
-            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-
-            switch (rangeSearch)
-            {
-                case PermissionRange.None:
-                    partners = null;
-                    break;
-                case PermissionRange.All:
-                    break;
-                case PermissionRange.Owner:
-                    if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-                    {
-                        partners = partners.Where(x => salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                        || x.UserCreated == currentUser.UserID);
-                    }
-                    else
-                    {
-                        partners = partners.Where(x => x.UserCreated == currentUser.UserID);
-                    }
-                    break;
-                case PermissionRange.Group:
-                    if(partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-                    {
-                        partners = partners.Where(x => (x.GroupId == currentUser.GroupId && ( x.DepartmentId == currentUser.DepartmentId) && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                       || x.UserCreated == currentUser.UserID
-                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       );
-                    }
-                    else
-                    {
-                        partners = partners.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                        || x.UserCreated == currentUser.UserID
-                        );
-                    }
-                    break;
-                case PermissionRange.Department:
-                    if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-                    {
-                        partners = partners.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                       || x.UserCreated == currentUser.UserID
-                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       );
-                    }
-                    else
-                    {
-                        partners = partners.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.DepartmentId == currentUser.DepartmentId && x.CompanyId == currentUser.CompanyID)
-                        || x.UserCreated == currentUser.UserID
-                        );
-                    }
-                    break;
-                case PermissionRange.Office:
-                    if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-                    {
-                        partners = partners.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                       || x.UserCreated == currentUser.UserID
-                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-
-                       );
-                    }
-                    else
-                    {
-                        partners = partners.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                        || x.UserCreated == currentUser.UserID
-                        );
-                    }
-                    break;
-                case PermissionRange.Company:
-                    if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-                    {
-                        partners = partners.Where(x => (x.CompanyId == currentUser.CompanyID)
-                       || x.UserCreated == currentUser.UserID
-                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-
-                       );
-                    }
-                    else
-                    {
-                        partners = partners.Where(x => (x.CompanyId == currentUser.CompanyID)
-                        || x.UserCreated == currentUser.UserID
-                        );
-                    }
-                    break;
-            }
-
-            if (partners == null) return null;
+          
 
             var query = (from partner in partners
                          join user in sysUsers on partner.UserCreated equals user.Id

@@ -117,7 +117,6 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("PagingCustomer")]
-        [AuthorizeEx(Menu.catPartnerdata, UserPermission.AllowAccess)]
         public IActionResult GetCustomer(CatPartnerCriteria criteria, int page, int size)
         {
             var data = catPartnerService.PagingCustomer(criteria, page, size, out int rowCount);

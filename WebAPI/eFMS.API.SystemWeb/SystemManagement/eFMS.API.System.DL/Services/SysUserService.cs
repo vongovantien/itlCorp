@@ -113,7 +113,7 @@ namespace eFMS.API.System.DL.Services
                 {
                     criteria.Active = true;
                 }
-                if (criteria.All =="inactive")
+                if (criteria.All == "inactive")
                 {
                     criteria.Active = false;
                 }
@@ -151,7 +151,7 @@ namespace eFMS.API.System.DL.Services
                 data = data?.Skip((page - 1) * size).Take(size);
             }
             List<SysUserViewModel> results = new List<SysUserViewModel>();
-            if(data!= null)
+            if (data != null)
             {
                 foreach (var item in data)
                 {
@@ -222,6 +222,29 @@ namespace eFMS.API.System.DL.Services
                 model.EmployeeNameEn = item.y.EmployeeNameEn;
                 model.EmployeeNameVn = item.y.EmployeeNameVn;
                 results.Add(model);
+            }
+            return results.AsQueryable();
+        }
+
+        public IQueryable<SysUserViewModel> QueryPermission(SysUserCriteria criteria)
+        {
+            var users = DataContext.Get();
+            var employees = employeeRepository.Get();
+            var uslevel = userlevelRepository.Get();
+            var data = from u in users
+                       join l in uslevel on u.Id equals l.UserId
+                       join e in employees on u.EmployeeId equals e.Id
+                       where l.CompanyId.ToString() == criteria.CompanyId && u.Active == criteria.Active
+                       select new  { u,e};
+            List<SysUserViewModel> results = new List<SysUserViewModel>();
+            foreach (var item in data)
+            {
+                var model = mapper.Map<SysUserViewModel>(item.u);
+                model.EmployeeNameEn = item.e.EmployeeNameEn;
+                model.EmployeeNameVn = item.e.EmployeeNameVn;
+                results.Add(model);
+            }
+            if(results.Count > 0) {
             }
             return results.AsQueryable();
         }

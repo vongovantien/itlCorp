@@ -164,6 +164,15 @@ export class SystemRepo {
         );
     }
 
+    getListUsersBylevel(body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser/GetUserByLevel`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
     getSystemUsers(body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser/Query`, body).pipe(
             catchError((error) => throwError(error)),

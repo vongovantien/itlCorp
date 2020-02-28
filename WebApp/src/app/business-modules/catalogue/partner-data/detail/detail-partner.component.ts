@@ -519,6 +519,7 @@ export class PartnerDetailComponent extends AppList {
             freightPayment: saleman.freightPayment,
             serviceName: saleman.serviceName
         };
+        this.poupSaleman.allowDelete = this.partner.permission.allowDelete;
         this.poupSaleman.showSaleman(saleMane);
         this.poupSaleman.show();
     }
