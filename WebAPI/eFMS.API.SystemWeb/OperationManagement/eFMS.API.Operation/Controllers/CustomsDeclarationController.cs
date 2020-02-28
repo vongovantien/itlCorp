@@ -287,8 +287,9 @@ namespace eFMS.API.Operation.Controllers
         [AuthorizeEx(Menu.opsCustomClearance, UserPermission.Detail)]
         public IActionResult GetById(int id)
         {
-            var statusCode = customsDeclarationService.CheckDetailPermission(id);
-            if (statusCode == 403) return Forbid();
+            //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            //var statusCode = customsDeclarationService.CheckDetailPermission(id);
+            //if (statusCode == 403) return Forbid();
 
             var results = customsDeclarationService.GetDetail(id);
             return Ok(results);
