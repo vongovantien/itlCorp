@@ -1,6 +1,7 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <app-permission-button title="Add New" [routerLink]="'/home/accounting/statement-of-account/new'"></app-permission-button>
+        <app-permission-button title="Add New" [routerLink]="'/home/accounting/statement-of-account/new'">
+        </app-permission-button>
     </div>
 </app-sub-header>
 
@@ -48,8 +49,8 @@
                                                         </div>
                                                     </td>
                                                     <td class="text-underline">
-                                                        <a [routerLink]="['/home/accounting/statement-of-account/detail/']"
-                                                            [queryParams]="{no: soa.soano, currency: 'VND'}">{{soa.soano}}</a>
+                                                        <a class="pointer"
+                                                            (click)="viewDetail(soa.soano,'VND')">{{soa.soano}}</a>
                                                     </td>
                                                     <td>
                                                         <span>{{soa.partnerName}}</span>
