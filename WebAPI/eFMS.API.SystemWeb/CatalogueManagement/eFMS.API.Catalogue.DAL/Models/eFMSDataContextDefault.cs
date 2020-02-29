@@ -46,6 +46,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatStage> CatStage { get; set; }
         public virtual DbSet<CatTransportationMode> CatTransportationMode { get; set; }
         public virtual DbSet<CatUnit> CatUnit { get; set; }
+        public virtual DbSet<CsAirWayBill> CsAirWayBill { get; set; }
         public virtual DbSet<CsArrivalAndDeliveryDefault> CsArrivalAndDeliveryDefault { get; set; }
         public virtual DbSet<CsArrivalFrieghtCharge> CsArrivalFrieghtCharge { get; set; }
         public virtual DbSet<CsArrivalFrieghtChargeDefault> CsArrivalFrieghtChargeDefault { get; set; }
@@ -1511,6 +1512,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
 
             modelBuilder.Entity<CatPlaceType>(entity =>
@@ -1766,6 +1769,129 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CsAirWayBill>(entity =>
+            {
+                entity.HasKey(e => e.JobId);
+
+                entity.ToTable("csAirWayBill");
+
+                entity.Property(e => e.JobId)
+                    .HasColumnName("JobID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Chgs)
+                    .HasColumnName("CHGS")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.ConsigneeDescription).HasMaxLength(500);
+
+                entity.Property(e => e.ConsigneeId)
+                    .HasColumnName("ConsigneeID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CurrencyId)
+                    .HasColumnName("CurrencyID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Dclrca)
+                    .HasColumnName("DCLRCA")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.Dclrcus)
+                    .HasColumnName("DCLRCUS")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Etd)
+                    .HasColumnName("ETD")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.FirstCarrierBy).HasMaxLength(250);
+
+                entity.Property(e => e.FirstCarrierTo).HasMaxLength(250);
+
+                entity.Property(e => e.FlightDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FlightNo).HasMaxLength(250);
+
+                entity.Property(e => e.ForwardingAgentDescription).HasMaxLength(500);
+
+                entity.Property(e => e.ForwardingAgentId)
+                    .HasColumnName("ForwardingAgentID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FreightPayment)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HandingInformation).HasMaxLength(250);
+
+                entity.Property(e => e.IssuedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.IssuedPlace).HasMaxLength(250);
+
+                entity.Property(e => e.IssuranceAmount).HasMaxLength(250);
+
+                entity.Property(e => e.Mblno1)
+                    .HasColumnName("MBLNo1")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Mblno2)
+                    .HasColumnName("MBLNo2")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Mblno3)
+                    .HasColumnName("MBLNo3")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Notify).HasMaxLength(250);
+
+                entity.Property(e => e.OriginBlnumber).HasColumnName("OriginBLNumber");
+
+                entity.Property(e => e.OtherPayment)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PickupPlace).HasMaxLength(500);
+
+                entity.Property(e => e.Pod).HasColumnName("POD");
+
+                entity.Property(e => e.Pol).HasColumnName("POL");
+
+                entity.Property(e => e.Route).HasMaxLength(250);
+
+                entity.Property(e => e.ShipperDescription).HasMaxLength(500);
+
+                entity.Property(e => e.ShipperId)
+                    .HasColumnName("ShipperID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TransitPlaceBy1).HasMaxLength(250);
+
+                entity.Property(e => e.TransitPlaceBy2).HasMaxLength(250);
+
+                entity.Property(e => e.TransitPlaceTo1).HasMaxLength(250);
+
+                entity.Property(e => e.TransitPlaceTo2).HasMaxLength(250);
+
+                entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
+
+                entity.Property(e => e.WtorValpayment)
+                    .HasColumnName("WTorVALPayment")
+                    .HasMaxLength(10)
                     .IsUnicode(false);
             });
 
@@ -4066,6 +4192,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.Fax).HasMaxLength(500);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.Location).HasMaxLength(4000);
 
                 entity.Property(e => e.Logo).HasColumnType("image");
 

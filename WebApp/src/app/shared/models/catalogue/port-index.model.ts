@@ -1,7 +1,7 @@
 import { PermissionShipment } from "@models";
 
 export class PortIndex {
-    id: string;
+    id: string = null;
     code: string;
     nameEn: string;
     nameVn: string;
@@ -12,5 +12,15 @@ export class PortIndex {
     modeOfTransport: string;
     placeType: number;
     active?: boolean;
+    warehouseId: string;
     permission?: PermissionShipment;
+
+    constructor(object?: any) {
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
 }

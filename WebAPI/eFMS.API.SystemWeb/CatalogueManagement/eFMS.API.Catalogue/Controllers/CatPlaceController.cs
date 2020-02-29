@@ -93,7 +93,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("Query")]
         public IActionResult Get(CatPlaceCriteria criteria)
         {
-            var results = catPlaceService.Get(criteria);
+            var results = catPlaceService.Query(criteria);
             return Ok(results);
         }
 
@@ -282,7 +282,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-            bool code = catPlaceService.CheckAllowPermissionAction(model.Id, permissionRange);
+            bool code = catPlaceService.CheckAllowPermissionAction(id, permissionRange);
 
             if (code == false)
             {

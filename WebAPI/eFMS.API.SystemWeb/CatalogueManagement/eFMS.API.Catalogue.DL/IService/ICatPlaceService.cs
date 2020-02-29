@@ -31,6 +31,6 @@ namespace eFMS.API.Catalogue.DL.IService
         List<vw_catProvince> GetAllProvinces();
         bool CheckAllowPermissionAction(Guid Id, PermissionRange range);
         CatPlaceModel GetDetail(Guid id);
-
+      
     }
 }

@@ -41,6 +41,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public string Location { get; set; }
 
         public virtual SysCompany Bu { get; set; }
         public virtual ICollection<CatDepartment> CatDepartment { get; set; }

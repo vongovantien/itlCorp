@@ -88,6 +88,12 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatPlace>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
+
+            entity.GroupId = currentUser.GroupId;
+            entity.DepartmentId = currentUser.DepartmentId;
+            entity.OfficeId = currentUser.OfficeID;
+            entity.CompanyId = currentUser.CompanyID;
+
             if (entity.Active == false)
             {
                 entity.InactiveOn = DateTime.Now;
@@ -968,6 +974,5 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
-        
     }
 } 

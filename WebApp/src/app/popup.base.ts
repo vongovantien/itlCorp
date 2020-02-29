@@ -1,11 +1,13 @@
 import { ModalOptions, ModalDirective } from "ngx-bootstrap";
 import { AppPage } from "src/app/app.base";
-import { ViewChild } from "@angular/core";
+import { ViewChild, QueryList, ViewChildren } from "@angular/core";
 import { FormControl, AbstractControl, ValidationErrors } from "@angular/forms";
+import { SelectComponent } from "ng2-select";
 
 export abstract class PopupBase extends AppPage {
 
     @ViewChild("popup", { static: false }) popup: ModalDirective;
+    @ViewChildren(SelectComponent) selectElements: QueryList<SelectComponent>;
 
     options: ModalOptions = {
         animated: false,
@@ -109,7 +111,17 @@ export abstract class PopupBase extends AppPage {
     setError(control: FormControl | AbstractControl, err: ValidationErrors = null) {
         control.setErrors(err);
     }
+
     trimInputValue(control: FormControl | AbstractControl, value: string) {
         control.setValue(value != null ? value.trim() : value);
+    }
+
+    closeOtherSelects(element: { optionsOpened: any; }) {
+        if (element.optionsOpened) {
+            const elementsToclose = this.selectElements.filter((el: any) => el !== element && el.optionsOpened);
+            elementsToclose.forEach((e: SelectComponent) => {
+                e.clickedOutside();
+            });
+        }
     }
 }
