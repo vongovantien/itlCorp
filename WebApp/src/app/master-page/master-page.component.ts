@@ -136,6 +136,7 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
                             return this.oauthService.loadUserProfile();
                         }).then((userInfo: SystemInterface.IClaimUser) => {
                             this._spinner.hide();
+                            localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfo));
                             if (userInfo) {
                                 if (this.isChangeDepartgroup) {
                                     this._store.dispatch(new ChangeDepartGroupClaimUserAction({ departmentId: this.selectedDepartGroup.departmentId, groupId: this.selectedDepartGroup.groupId }));

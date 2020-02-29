@@ -1,14 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IFormAddOffice, OfficeFormAddComponent } from '../components/form-add-office/form-add-office.component';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { AppPage } from 'src/app/app.base';
-import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Department, Office } from '@models';
+
+import { IFormAddOffice, OfficeFormAddComponent } from '../components/form-add-office/form-add-office.component';
+import { AppPage } from 'src/app/app.base';
+import { SystemRepo } from '@repositories';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
-import { Office } from 'src/app/shared/models/system/office';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, from } from 'rxjs';
-import { Department } from 'src/app/shared/models/system/department';
 
 @Component({
     selector: 'app-office-details',
@@ -60,7 +59,6 @@ export class OfficeDetailsComponent extends AppPage {
     ) {
         super();
         this._progressRef = this._progressService.ref();
-
     }
 
     ngOnInit() {
@@ -74,10 +72,6 @@ export class OfficeDetailsComponent extends AppPage {
         });
 
     }
-
-
-
-
 
     updateOffice() {
         this.formAdd.isSubmited = true;
@@ -116,15 +110,11 @@ export class OfficeDetailsComponent extends AppPage {
 
                         } else {
                             this._toastService.warning(res.message);
-
                         }
                     }
                 );
         }
-
     }
-
-
 
     getDetailOffice(id: string) {
         this._progressRef.start();
@@ -158,13 +148,10 @@ export class OfficeDetailsComponent extends AppPage {
                             this.formData.bankAccountName_EN = res.data.bankAccountNameEn;
 
                             this.formAdd.SelectedOffice = new Office(res.data);
-                            console.log('office selected:', this.formAdd.SelectedOffice);
                             this.formData.company = res.data.buid;
                             this.formData.active = res.data.active;
                             setTimeout(() => {
-                                // this.formAdd.selectedCompany = { field: 'id', value: res.data.buid };
                                 this.formAdd.update(this.formData, res.data.active);
-
                             }, 300);
                         }
                     }
@@ -178,9 +165,5 @@ export class OfficeDetailsComponent extends AppPage {
                     console.log(this.departments);
                 },
             );
-
     }
-
-
-
 }

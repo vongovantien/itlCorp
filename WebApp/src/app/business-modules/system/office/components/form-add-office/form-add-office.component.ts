@@ -1,23 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { SystemRepo } from 'src/app/shared/repositories';
-import { Company } from 'src/app/shared/models';
-import { finalize, catchError } from 'rxjs/operators';
-import { Department } from 'src/app/shared/models/system/department';
-import { AppList } from 'src/app/app.list';
-import { SortService } from 'src/app/shared/services';
+import { SystemRepo } from '@repositories';
+import { Company, Department } from '@models';
 import { Router } from '@angular/router';
+
 import { AppForm } from 'src/app/app.form';
+
+import { finalize, catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'form-add-office',
     templateUrl: './form-add-office.component.html'
 })
 export class OfficeFormAddComponent extends AppForm implements OnInit {
-    selectedDataCompany: any;
-    isSubmited: boolean = false;
-    isDetail: boolean = false;
-    isCreate: boolean = false;
+
     configOffice: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -59,7 +55,10 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
     ];
-    photoUrl: string = '';
+
+    isSubmited: boolean = false;
+    isDetail: boolean = false;
+    isCreate: boolean = false;
 
     constructor(
         private _fb: FormBuilder,
@@ -74,8 +73,6 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
         this.initForm();
         this.getDataComboBox();
         this.headers = [
-
-
             { title: 'Department Code', field: 'code', sortable: true },
             { title: 'Name EN', field: 'deptNameEn', sortable: true },
             { title: 'Name Local', field: 'deptName', sortable: true },
