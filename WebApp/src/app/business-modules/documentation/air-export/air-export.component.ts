@@ -13,182 +13,182 @@ import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-air-export',
-  templateUrl: './air-export.component.html',
+    selector: 'app-air-export',
+    templateUrl: './air-export.component.html',
 })
 export class AirExportComponent extends AppList {
-  @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-  @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
-  headers: CommonInterface.IHeaderTable[];
-  headersHBL: CommonInterface.IHeaderTable[];
+    headers: CommonInterface.IHeaderTable[];
+    headersHBL: CommonInterface.IHeaderTable[];
 
-  shipments: any[] = [];
-  houseBills: CsTransactionDetail[] = [];
-  itemToDelete: any = null;
+    shipments: any[] = [];
+    houseBills: CsTransactionDetail[] = [];
+    itemToDelete: any = null;
 
-  transactionService: number = CommonEnum.TransactionTypeEnum.AirExport;
-  tmpHouseBills: CsTransactionDetail[] = [];
-  tmpIndex: number = -1;
+    transactionService: number = CommonEnum.TransactionTypeEnum.AirExport;
+    tmpHouseBills: CsTransactionDetail[] = [];
+    tmpIndex: number = -1;
 
-  _fromDate: Date = this.createMoment().startOf('month').toDate();
-  _toDate: Date = this.createMoment().endOf('month').toDate();
+    _fromDate: Date = this.createMoment().startOf('month').toDate();
+    _toDate: Date = this.createMoment().endOf('month').toDate();
 
-  jobIdSelected: string = null;
+    jobIdSelected: string = null;
 
-  constructor(
-    private _router: Router,
-    private _toastService: ToastrService,
-    private _sortService: SortService,
-    private _documentRepo: DocumentationRepo,
-    private _ngProgessService: NgProgress,
-    private _store: Store<fromShare.IShareBussinessState>) {
-    super();
-    this._progressRef = this._ngProgessService.ref();
-    this.requestList = this.requestSearchShipment;
-    this.requestSort = this.sortShipment;
-    this.isLoading = <any>this._store.select(fromShare.getTransationLoading);
-    this.dataSearch = {
-      transactionType: this.transactionService,
-      fromDate: this._fromDate,
-      toDate: this._toDate,
-    };
-  }
-
-  ngOnInit() {
-    this.headers = [
-      { title: 'Job ID', field: 'jobNo', sortable: true },
-      { title: 'MAWB No.', field: 'mawb', sortable: true },
-      { title: 'ETD', field: 'etd', sortable: true },
-      { title: 'Airline', field: 'supplierName', sortable: true },
-      { title: 'Agent', field: 'agentName', sortable: true },
-      { title: 'AOL', field: 'polName', sortable: true },
-      { title: 'AOD', field: 'podName', sortable: true },
-      { title: 'Package Qty', field: 'packageQty', sortable: true },
-      { title: 'G.W', field: 'grossWeight', sortable: true },
-      { title: 'CBM', field: 'cbm', sortable: true },
-      { title: 'Creator', field: 'creatorName', sortable: true },
-      { title: 'Modified Date', field: 'datetimeModified', sortable: true },
-    ];
-    this.headersHBL = [
-      { title: 'HAWB No', field: 'hwbno', sortable: true },
-      { title: 'Customer', field: 'customerName', sortable: true },
-      { title: 'Salesman', field: 'saleManName', sortable: true },
-      { title: 'Notify Party', field: 'notifyParty', sortable: true },
-      { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
-      { title: 'Containers', field: 'containers', sortable: true },
-      { title: 'Packages', field: 'packages', sortable: true },
-      { title: 'G.W', field: 'gw', sortable: true },
-      { title: 'CBM', field: 'cbm', sortable: true },
-    ];
-
-    this.requestSearchShipment();
-    this.getShipments();
-  }
-
-  getShipments() {
-    this._store.select(fromShare.getTransactionListShipment)
-      .pipe(
-        takeUntil(this.ngUnsubscribe),
-      )
-      .subscribe(
-        (res: CommonInterface.IResponsePaging | any) => {
-          this.shipments = res.data || [];
-          this.totalItems = res.totalItems;
-        }
-      );
-  }
-
-  sortShipment(sortField: string) {
-    this.shipments = this._sortService.sort(this.shipments, sortField, this.order);
-  }
-
-  sortHBL(sortField: string, order: boolean) {
-    this.houseBills = this._sortService.sort(this.houseBills, sortField, order);
-  }
-
-  getListHouseBill(jobId: any, index: number) {
-    this.jobIdSelected = jobId;
-    if (this.tmpIndex === index) {
-      this.houseBills = this.tmpHouseBills;
-    } else {
-      this._progressRef.start();
-      this._documentRepo.getListHouseBillAscHBLOfJob({ jobId: jobId, hwbno: this.dataSearch.hwbno, customerId: this.dataSearch.customerId, saleManId: this.dataSearch.saleManId, creditDebitNo: this.dataSearch.creditDebitNo, soaNo: this.dataSearch.soaNo })
-        .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-        .subscribe(
-          (res: any) => {
-            this.houseBills = res || [];
-            this.tmpHouseBills = this.houseBills;
-            this.tmpIndex = index;
-          }
-        );
+    constructor(
+        private _router: Router,
+        private _toastService: ToastrService,
+        private _sortService: SortService,
+        private _documentRepo: DocumentationRepo,
+        private _ngProgessService: NgProgress,
+        private _store: Store<fromShare.IShareBussinessState>) {
+        super();
+        this._progressRef = this._ngProgessService.ref();
+        this.requestList = this.requestSearchShipment;
+        this.requestSort = this.sortShipment;
+        this.isLoading = <any>this._store.select(fromShare.getTransationLoading);
+        this.dataSearch = {
+            transactionType: this.transactionService,
+            fromDate: this._fromDate,
+            toDate: this._toDate,
+        };
     }
-  }
 
-  onSearchShipment($event: any) {
-    $event.transactionType = this.transactionService;
-    this.dataSearch = $event;
-    this.requestSearchShipment();
-    this.loadListHouseBillExpanding();
-  }
+    ngOnInit() {
+        this.headers = [
+            { title: 'Job ID', field: 'jobNo', sortable: true },
+            { title: 'MAWB No.', field: 'mawb', sortable: true },
+            { title: 'ETD', field: 'etd', sortable: true },
+            { title: 'Airline', field: 'supplierName', sortable: true },
+            { title: 'Agent', field: 'agentName', sortable: true },
+            { title: 'AOL', field: 'polName', sortable: true },
+            { title: 'AOD', field: 'podName', sortable: true },
+            { title: 'Package Qty', field: 'packageQty', sortable: true },
+            { title: 'G.W', field: 'grossWeight', sortable: true },
+            { title: 'CBM', field: 'cbm', sortable: true },
+            { title: 'Creator', field: 'creatorName', sortable: true },
+            { title: 'Modified Date', field: 'datetimeModified', sortable: true },
+        ];
+        this.headersHBL = [
+            { title: 'HAWB No', field: 'hwbno', sortable: true },
+            { title: 'Customer', field: 'customerName', sortable: true },
+            { title: 'Salesman', field: 'saleManName', sortable: true },
+            { title: 'Notify Party', field: 'notifyParty', sortable: true },
+            { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
+            { title: 'Containers', field: 'containers', sortable: true },
+            { title: 'Packages', field: 'packages', sortable: true },
+            { title: 'G.W', field: 'gw', sortable: true },
+            { title: 'CBM', field: 'cbm', sortable: true },
+        ];
 
-  onResetShipment($event: any) {
-    this.page = 1;
-    $event.transactionType = this.transactionService;
-    $event.fromDate = this._fromDate;
-    $event.toDate = this._toDate;
-    this.dataSearch = $event;
-    this.requestSearchShipment();
-    this.loadListHouseBillExpanding();
-  }
+        this.requestSearchShipment();
+        this.getShipments();
+    }
 
-  requestSearchShipment() {
-    this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
-  }
+    getShipments() {
+        this._store.select(fromShare.getTransactionListShipment)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe(
+                (res: CommonInterface.IResponsePaging | any) => {
+                    this.shipments = res.data || [];
+                    this.totalItems = res.totalItems;
+                }
+            );
+    }
 
-  confirmDelete(item: { id: string; }) {
-    this.itemToDelete = item;
-    this._progressRef.start();
-    this._documentRepo.checkMasterBillAllowToDelete(item.id)
-      .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-      .subscribe(
-        (respone: boolean) => {
-          if (respone === true) {
-            this.confirmDeletePopup.show();
-          } else {
-            this.infoPopup.show();
-          }
+    sortShipment(sortField: string) {
+        this.shipments = this._sortService.sort(this.shipments, sortField, this.order);
+    }
+
+    sortHBL(sortField: string, order: boolean) {
+        this.houseBills = this._sortService.sort(this.houseBills, sortField, order);
+    }
+
+    getListHouseBill(jobId: any, index: number) {
+        this.jobIdSelected = jobId;
+        if (this.tmpIndex === index) {
+            this.houseBills = this.tmpHouseBills;
+        } else {
+            this._progressRef.start();
+            this._documentRepo.getListHouseBillAscHBLOfJob({ jobId: jobId, hwbno: this.dataSearch.hwbno, customerId: this.dataSearch.customerId, saleManId: this.dataSearch.saleManId, creditDebitNo: this.dataSearch.creditDebitNo, soaNo: this.dataSearch.soaNo })
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: any) => {
+                        this.houseBills = res || [];
+                        this.tmpHouseBills = this.houseBills;
+                        this.tmpIndex = index;
+                    }
+                );
         }
-      );
-  }
+    }
 
-  deleteJob() {
-    this.confirmDeletePopup.hide();
-    this._progressRef.start();
+    onSearchShipment($event: any) {
+        $event.transactionType = this.transactionService;
+        this.dataSearch = $event;
+        this.requestSearchShipment();
+        this.loadListHouseBillExpanding();
+    }
 
-    this._documentRepo.deleteMasterBill(this.itemToDelete.id)
-      .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-      .subscribe(
-        (res: CommonInterface.IResult) => {
-          if (res.status) {
-            this._toastService.success(res.message);
+    onResetShipment($event: any) {
+        this.page = 1;
+        $event.transactionType = this.transactionService;
+        $event.fromDate = this._fromDate;
+        $event.toDate = this._toDate;
+        this.dataSearch = $event;
+        this.requestSearchShipment();
+        this.loadListHouseBillExpanding();
+    }
 
-            this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
-          } else {
-            this._toastService.error(res.message);
-          }
+    requestSearchShipment() {
+        this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
+
+    confirmDelete(item: { id: string; }) {
+        this.itemToDelete = item;
+        this._progressRef.start();
+        this._documentRepo.checkMasterBillAllowToDelete(item.id)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (respone: boolean) => {
+                    if (respone === true) {
+                        this.confirmDeletePopup.show();
+                    } else {
+                        this.infoPopup.show();
+                    }
+                }
+            );
+    }
+
+    deleteJob() {
+        this.confirmDeletePopup.hide();
+        this._progressRef.start();
+
+        this._documentRepo.deleteMasterBill(this.itemToDelete.id)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+
+                        this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+
+    gotoCreateJob() {
+        this._router.navigate(['home/documentation/air-export/new']);
+    }
+
+    loadListHouseBillExpanding() {
+        this.tmpIndex = -1;
+        if (this.jobIdSelected !== null) {
+            this.getListHouseBill(this.jobIdSelected, -2);
         }
-      );
-  }
-
-  gotoCreateJob() {
-    this._router.navigate(['home/documentation/air-export/new']);
-  }
-
-  loadListHouseBillExpanding(){ 
-    this.tmpIndex = -1; 
-    if(this.jobIdSelected !== null){
-        this.getListHouseBill(this.jobIdSelected,-2);
-    }         
-  }
+    }
 }

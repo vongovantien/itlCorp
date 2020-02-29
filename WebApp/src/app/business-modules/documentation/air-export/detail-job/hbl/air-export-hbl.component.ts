@@ -7,10 +7,10 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
 import { getParamsRouterState } from 'src/app/store';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransactionDetail, HouseBill } from 'src/app/shared/models';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { CsTransactionDetail, HouseBill, CsTransaction } from 'src/app/shared/models';
+import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 
-import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, take, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../share-business/store';
 import { ReportPreviewComponent } from 'src/app/shared/common';
@@ -27,10 +27,12 @@ export class AirExportHBLComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteHBLPopup: ConfirmPopupComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
 
     jobId: string;
     headers: CommonInterface.IHeaderTable[];
     houseBills: HouseBill[] = [];
+    shipmentDetail: CsTransaction;
 
     selectedHbl: CsTransactionDetail;
     selectedIndexHBL: number = -1;
@@ -63,6 +65,7 @@ export class AirExportHBLComponent extends AppList implements OnInit {
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
+                    this.getDetailShipment();
 
                     this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
                     this.getHouseBills(this.jobId);
@@ -112,6 +115,21 @@ export class AirExportHBLComponent extends AppList implements OnInit {
                         this.selectedHbl = null;
                     }
                 }
+            );
+    }
+
+    getDetailShipment() {
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(
+                skip(1),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.shipmentDetail = res;
+                    }
+                },
             );
     }
 
@@ -188,7 +206,7 @@ export class AirExportHBLComponent extends AppList implements OnInit {
     }
 
     gotoDetail(id: string) {
-        this._documentRepo.checkViewDetailHblPermission(id)
+        this._documentRepo.checkDetailShippmentPermission(this.shipmentDetail.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -197,7 +215,7 @@ export class AirExportHBLComponent extends AppList implements OnInit {
                     if (res) {
                         this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${id}`]);
                     } else {
-                        this._toastService.error("You don't have permission to view detail");
+                        this.info403Popup.show();
                     }
                 },
             );
