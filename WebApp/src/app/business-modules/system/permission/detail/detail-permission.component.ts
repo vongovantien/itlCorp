@@ -4,7 +4,7 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { tap, switchMap, catchError, finalize } from 'rxjs/operators';
+import { tap, switchMap, catchError } from 'rxjs/operators';
 import { PermissionSample } from 'src/app/shared/models';
 
 @Component({
@@ -54,48 +54,6 @@ export class PermissionDetailComponent extends PermissionCreateComponent {
     updatePermission(formDataCreate: { roleName: string; name: string; type: string; roleId: any; active: boolean }) {
         this.updatePermissionModel(formDataCreate);
 
-        // this._systemRepo.updatePermissionGeneral(this.permissionSample)
-        //     .pipe(
-        //         catchError(this.catchError),
-        //         finalize(() => this._progressRef.complete()),
-        //     )
-        //     .subscribe(
-        //         (res: CommonInterface.IResult) => {
-        //             if (res.status) {
-        //                 this._toastService.success(res.message);
-
-        //                 // * get detail
-        //                 this._systemRepo.getPermissionSample(this.permissionId)
-        //                     .subscribe(
-        //                         (res: any) => {
-        //                             this.permissionSample = new PermissionSample(res);
-        //                         }
-        //                     )
-        //             } else {
-        //                 this._toastService.error(res.message);
-        //             }
-        //         }
-        //     );
     }
-
-    // onSavePermissionSample() {
-    //     this.confirmPopup.hide();
-
-    //     this.formCreateComponent.isSubmitted = true;
-    //     if (this.formCreateComponent.formCreate.valid && !!this.formCreateComponent.role.value) {
-    //         const body: any = {
-    //             roleName: this.formCreateComponent.formCreate.value.permissionName,
-    //             name: this.formCreateComponent.formCreate.value.permissionName,
-    //             roleId: !!this.formCreateComponent.formCreate.value.role ? this.formCreateComponent.formCreate.value.role.id : null,
-    //             active: this.formCreateComponent.formCreate.value.status.value,
-    //             type: this.formCreateComponent.formCreate.value.type.value
-
-    //         };
-    //         this.updatePermission(body);
-    //     }
-    // }
-
-
-
 
 }

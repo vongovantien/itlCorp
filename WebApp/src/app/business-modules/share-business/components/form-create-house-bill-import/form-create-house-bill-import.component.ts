@@ -471,6 +471,9 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 break;
             case 'PortOfLoading':
                 this.pol.setValue(data.id);
+
+                // * Update default value for sentTo delivery order.
+                this._dataService.setDataService("polName", data.warehouseName || "");
                 break;
             case 'PortOfDischarge':
                 this.pod.setValue(data.id);

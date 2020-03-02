@@ -83,7 +83,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     configHeader() {
         this.headers = [
-            { title: 'Cont Type', field: 'containerTypeId', sortable: true, required: true },
+            { title: 'Cont Type', field: 'containerTypeId', sortable: true, required: true, width: 200 },
             { title: 'Cont Q`Ty', field: 'quantity', required: true, sortable: true },
             { title: 'G.W', field: 'gw', sortable: true, },
             { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
@@ -105,6 +105,15 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         this.isDuplicateContPakage = false;
         this.initContainers = [...this.initContainers, new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: this.defaultWeightUnit.id, unitOfMeasureName: this.defaultWeightUnit.unitNameEn })];
         // this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
+    }
+
+    duplicate(index: number) {
+        this.isSubmitted = false;
+        this.isDuplicateContPakage = false;
+
+        const duplicatedContainer = cloneDeep(this.initContainers[index]);
+        this.initContainers = [...this.initContainers, duplicatedContainer];
+
     }
 
     deleteContainerItem(index: number, container: Container) {
