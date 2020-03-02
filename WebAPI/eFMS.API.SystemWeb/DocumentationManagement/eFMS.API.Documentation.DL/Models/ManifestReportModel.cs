@@ -10,6 +10,5 @@ namespace eFMS.API.Documentation.DL.Models
         public string NumberContainerTypes { get; set; }
 
         public List<CsTransactionDetailModel> CsTransactionDetails { get; set; }
-        //public List<CsMawbcontainerModel> CsMawbcontainers { get; set; }
     }
 }

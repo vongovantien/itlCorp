@@ -8,7 +8,6 @@ namespace eFMS.API.Documentation.Service.Models
         public SysOffice()
         {
             CatDepartment = new HashSet<CatDepartment>();
-            SysUserOtherWorkPlace = new HashSet<SysUserOtherWorkPlace>();
         }
 
         public Guid Id { get; set; }
@@ -45,6 +44,5 @@ namespace eFMS.API.Documentation.Service.Models
 
         public virtual SysCompany Bu { get; set; }
         public virtual ICollection<CatDepartment> CatDepartment { get; set; }
-        public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
     }
 }

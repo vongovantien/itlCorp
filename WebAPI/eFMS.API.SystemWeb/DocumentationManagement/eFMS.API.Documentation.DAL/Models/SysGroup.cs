@@ -7,7 +7,7 @@ namespace eFMS.API.Documentation.Service.Models
     {
         public SysGroup()
         {
-            SysGroupRole = new HashSet<SysGroupRole>();
+            //SysGroupRole = new HashSet<SysGroupRole>();
         }
 
         public short Id { get; set; }
@@ -26,7 +26,7 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public virtual CatDepartment Department { get; set; }
-        public virtual ICollection<SysGroupRole> SysGroupRole { get; set; }
+        //public virtual CatDepartment Department { get; set; }
+        //public virtual ICollection<SysGroupRole> SysGroupRole { get; set; }
     }
 }
