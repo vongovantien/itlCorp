@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
@@ -62,5 +63,7 @@ namespace eFMS.API.Accounting.DL.IService
         bool CheckDeletePermissionByAdvanceId(Guid advanceId);
 
         bool CheckUpdatePermissionByAdvanceId(Guid advanceId);
+
+        AdvanceExport AdvancePaymentExport(Guid advanceId);
     }
 }

@@ -27,7 +27,7 @@
                             <div class="col-md-12">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (gw === null || gw < 0) }">
-                                    <label required>Total Gross Weight </label>
+                                    <label required>Total Gross Weight (GW) </label>
                                     <input type="number" class="form-control" [(ngModel)]="gw" name="gw" min="0" numeric
                                         [decimals]="digitDecimal">
                                 </div>

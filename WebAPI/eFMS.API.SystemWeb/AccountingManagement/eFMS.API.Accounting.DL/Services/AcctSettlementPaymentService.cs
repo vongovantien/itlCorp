@@ -323,7 +323,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     JobId = ops.JobNo,
                                     HBL = ops.Hwbno,
                                     MBL = ops.Mblno,
-                                    Amount = sur.Total != null ? sur.Total : 0,
+                                    Amount = sur.Total,
                                     ChargeCurrency = sur.CurrencyId,
                                     SettlementCurrency = set.SettlementCurrency
                                 };
@@ -341,7 +341,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    JobId = cst.JobNo,
                                    HBL = cstd.Hwbno,
                                    MBL = cst.Mawb,
-                                   Amount = sur.Total != null ? sur.Total : 0,
+                                   Amount = sur.Total,
                                    ChargeCurrency = sur.CurrencyId,
                                    SettlementCurrency = set.SettlementCurrency
                                };
@@ -476,7 +476,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     HBL = opst.Hwbno,
                                     MBL = opst.Mblno,
                                     CurrencyShipment = settle.SettlementCurrency,
-                                    TotalAmount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
+                                    TotalAmount = sur.Total * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
                                 };
             var dataDocument = from sur in surcharge
                                join cstd in csTransD on sur.Hblid equals cstd.Id //into cstd2
@@ -493,7 +493,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    HBL = cstd.Hwbno,
                                    MBL = cst.Mawb,
                                    CurrencyShipment = settle.SettlementCurrency,
-                                   TotalAmount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
+                                   TotalAmount = sur.Total * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
                                };
             var dataQuery = dataOperation.Union(dataDocument);
 
@@ -572,7 +572,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     UnitPrice = sur.UnitPrice,
                                     CurrencyId = sur.CurrencyId,
                                     Vatrate = sur.Vatrate,
-                                    Total = sur.Total != null ? sur.Total : 0,
+                                    Total = sur.Total,
                                     PayerId = sur.PayerId,
                                     Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
@@ -623,7 +623,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    UnitPrice = sur.UnitPrice,
                                    CurrencyId = sur.CurrencyId,
                                    Vatrate = sur.Vatrate,
-                                   Total = sur.Total != null ? sur.Total : 0,
+                                   Total = sur.Total,
                                    PayerId = sur.PayerId,
                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                    PaymentObjectId = sur.PaymentObjectId,
@@ -683,7 +683,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     UnitPrice = sur.UnitPrice,
                                     CurrencyId = sur.CurrencyId,
                                     Vatrate = sur.Vatrate,
-                                    Total = sur.Total != null ? sur.Total : 0,
+                                    Total = sur.Total,
                                     PayerId = sur.PayerId,
                                     Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
@@ -731,7 +731,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    UnitPrice = sur.UnitPrice,
                                    CurrencyId = sur.CurrencyId,
                                    Vatrate = sur.Vatrate,
-                                   Total = sur.Total != null ? sur.Total : 0,
+                                   Total = sur.Total,
                                    PayerId = sur.PayerId,
                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                    PaymentObjectId = sur.PaymentObjectId,
@@ -828,7 +828,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 select new SettlementPaymentMngt
                                 {
                                     SettlementNo = settle.SettlementNo,
-                                    TotalAmount = sur.Total != null ? sur.Total : 0,
+                                    TotalAmount = sur.Total,
                                     SettlementCurrency = settle.SettlementCurrency,
                                     ChargeCurrency = sur.CurrencyId,
                                     SettlementDate = settle.DatetimeCreated
@@ -850,7 +850,7 @@ namespace eFMS.API.Accounting.DL.Services
                                select new SettlementPaymentMngt
                                {
                                    SettlementNo = settle.SettlementNo,
-                                   TotalAmount = sur.Total != null ? sur.Total : 0,
+                                   TotalAmount = sur.Total,
                                    SettlementCurrency = settle.SettlementCurrency,
                                    ChargeCurrency = sur.CurrencyId,
                                    SettlementDate = settle.DatetimeCreated
@@ -909,7 +909,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     SettlementNo = settlementNo,
                                     ChargeName = cc.ChargeNameEn,
-                                    TotalAmount = sur.Total != null ? sur.Total : 0,
+                                    TotalAmount = sur.Total,
                                     SettlementCurrency = sur.CurrencyId,
                                     OBHPartner = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
                                     Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
@@ -934,7 +934,7 @@ namespace eFMS.API.Accounting.DL.Services
                                {
                                    SettlementNo = settlementNo,
                                    ChargeName = cc.ChargeNameEn,
-                                   TotalAmount = sur.Total != null ? sur.Total : 0,
+                                   TotalAmount = sur.Total,
                                    SettlementCurrency = sur.CurrencyId,
                                    OBHPartner = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
@@ -1004,7 +1004,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     UnitPrice = sur.UnitPrice,
                                     CurrencyId = sur.CurrencyId,
                                     Vatrate = sur.Vatrate,
-                                    Total = sur.Total != null ? sur.Total : 0,
+                                    Total = sur.Total,
                                     PayerId = sur.PayerId,
                                     Payer = par.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
@@ -1046,7 +1046,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    UnitPrice = sur.UnitPrice,
                                    CurrencyId = sur.CurrencyId,
                                    Vatrate = sur.Vatrate,
-                                   Total = sur.Total != null ? sur.Total : 0,
+                                   Total = sur.Total,
                                    PayerId = sur.PayerId,
                                    Payer = par.ShortName,
                                    PaymentObjectId = sur.PaymentObjectId,
@@ -1519,7 +1519,7 @@ namespace eFMS.API.Accounting.DL.Services
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
                            Description = cat.ChargeNameEn,
                            InvoiceNo = sur.InvoiceNo == null ? string.Empty : sur.InvoiceNo,
-                           Amount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, currency),
+                           Amount = sur.Total * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, currency),
                            Debt = false,
                            Currency = string.Empty,
                            Note = sur.Notes,

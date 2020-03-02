@@ -47,6 +47,45 @@ namespace eFMS.API.Documentation.DL.Services
             return results;
         }
 
+        public HandleState UpdateAirWayBill(List<CsDimensionDetailModel> dimensionDetails, Guid airbillId)
+        {
+            try
+            {
+                var listIdOfDimension = dimensionDetails.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
+                var idContainersNeedRemove = DataContext.Get(x => x.AirWayBillId == airbillId && !listIdOfDimension.Contains(x.Id)).Select(s => s.Id);
+                //Delete item of List Container MBL
+                if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
+                {
+                    var hsDelContHBL = DataContext.Delete(x => idContainersNeedRemove.Contains(x.Id));
+                }
+
+                foreach (var dimesion in dimensionDetails)
+                {
+                    //Insert & Update List Container MBL
+                    if (dimesion.Id == Guid.Empty)
+                    {
+                        dimesion.Id = Guid.NewGuid();
+                        dimesion.AirWayBillId = airbillId;
+                        dimesion.UserModified = currentUser.UserID;
+                        dimesion.DatetimeModified = DateTime.Now;
+                        var hsAddDemension = Add(dimesion);
+                    }
+                    else
+                    {
+                        dimesion.AirWayBillId = airbillId;
+                        dimesion.UserModified = currentUser.UserID;
+                        dimesion.DatetimeModified = DateTime.Now;
+                        var hsUpdateContMBL = Update(dimesion, x => x.Id == dimesion.Id);
+                    }
+                }
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
         public HandleState UpdateHouseBill(List<CsDimensionDetailModel> dimensionDetails, Guid housebillId)
         {
             try

@@ -591,5 +591,18 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctAdvancePaymentService.UnLock(advancePayments);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Export advance payment by advance id
+        /// </summary>
+        /// <param name="advanceId">Id of advance payment</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("DetailAdvancePaymentExport")]
+        public IActionResult DetailAdvancePaymentExport(Guid advanceId)
+        {
+            var result = acctAdvancePaymentService.AdvancePaymentExport(advanceId);
+            return Ok(result);
+        }
     }
 }

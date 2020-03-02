@@ -9,7 +9,7 @@
         </member>
         <member name="T:eFMS.API.ReportData.Controllers.AccountingReportController">
             <summary>
-            
+            Accounting Report Controller
             </summary>
         </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
