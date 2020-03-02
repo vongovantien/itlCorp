@@ -17,6 +17,7 @@ using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
+using eFMS.API.Accounting.DL.Models.ExportResults;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -37,6 +38,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
+        readonly IContextBase<CatPartner> catPartnerRepo;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -54,7 +56,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysGroup> sysGroup,
             IContextBase<SysOffice> sysOffice,
             IContextBase<OpsStageAssigned> opsStageAssigned,
-            IContextBase<CsShipmentSurcharge> csShipmentSurcharge) : base(repository, mapper)
+            IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
+            IContextBase<CatPartner> catPartner) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = url;
@@ -71,6 +74,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysOfficeRepo = sysOffice;
             opsStageAssignedRepo = opsStageAssigned;
             csShipmentSurchargeRepo = csShipmentSurcharge;
+            catPartnerRepo = catPartner;
         }
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
@@ -1253,8 +1257,6 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion PREVIEW ADVANCE PAYMENT
 
-
-
         #region APPROVAL ADVANCE PAYMENT
         //Lấy ra groupId của User
         private int? GetGroupIdOfUser(string userId)
@@ -2362,5 +2364,128 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return result;
         }
+
+        #region --- EXPORT ADVANCE ---
+        public AdvanceExport AdvancePaymentExport(Guid advanceId)
+        {
+            AdvanceExport dataExport = new AdvanceExport();
+            var advancePayment = GetAdvancePaymentByAdvanceId(advanceId);
+            if (advancePayment == null) return null;
+          
+            dataExport.InfoAdvance = GetInfoAdvanceExport(advancePayment);           
+            dataExport.ShipmentsAdvance = GetListShipmentAdvanceExport(advancePayment);
+            return dataExport;
+        }
+
+        private InfoAdvanceExport GetInfoAdvanceExport(AcctAdvancePaymentModel advancePayment)
+        {
+            string _requester = string.IsNullOrEmpty(advancePayment.Requester) ? string.Empty : GetEmployeeByUserId(advancePayment.Requester)?.EmployeeNameVn;
+            
+            #region -- Advance Amount & Sayword --
+            var _advanceAmount = advancePayment.AdvanceRequests.Select(s => s.Amount).Sum();
+            var _sayWordAmount = string.Empty;
+            var _currencyAdvance = advancePayment.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL && _advanceAmount >= 1 ?
+                       (_advanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
+                    :
+                    "U.S. dollar(s)";
+            _sayWordAmount = advancePayment.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL && _advanceAmount >= 1 ?
+                        InWordCurrency.ConvertNumberCurrencyToString(_advanceAmount.Value, _currencyAdvance)
+                    :
+                        InWordCurrency.ConvertNumberCurrencyToStringUSD(_advanceAmount.Value, _currencyAdvance);
+            #endregion -- Advance Amount & Sayword --
+
+            #region -- Info Manager, Accoutant & Departmenr --
+            var _advanceApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advancePayment.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+            string _manager = string.Empty;
+            string _accountant = string.Empty;
+            if (_advanceApprove != null)
+            {
+                _manager = string.IsNullOrEmpty(_advanceApprove.Manager) ? string.Empty : GetEmployeeByUserId(_advanceApprove.Manager)?.EmployeeNameVn;
+                _accountant = string.IsNullOrEmpty(_advanceApprove.Accountant) ? string.Empty : GetEmployeeByUserId(_advanceApprove.Accountant)?.EmployeeNameVn;
+            }
+
+            var _department = catDepartmentRepo.Get(x => x.Id == advancePayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
+            #endregion -- Info Manager, Accoutant & Departmenr --
+
+            var infoAdvance = new InfoAdvanceExport
+            {
+                Requester = _requester,
+                RequestDate = advancePayment.RequestDate,
+                Department = _department,
+                AdvanceNo = advancePayment.AdvanceNo,
+                AdvanceAmount = _advanceAmount,
+                AdvanceAmountWord = _sayWordAmount,
+                AdvanceReason = advancePayment.AdvanceNote,
+                DealinePayment = advancePayment.DeadlinePayment,
+                Manager = _manager,
+                Accountant = _accountant
+            };
+            return infoAdvance;
+        }
+
+        private List<InfoShipmentAdvanceExport> GetListShipmentAdvanceExport(AcctAdvancePaymentModel advancePayment)
+        {
+            var shipmentsAdvance = new List<InfoShipmentAdvanceExport>();
+            foreach (var request in advancePayment.AdvanceRequests)
+            {
+                string _customer = string.Empty;
+                string _shipper = string.Empty;
+                string _consignee = string.Empty;
+                string _container = string.Empty;
+                decimal? _cw = 0;
+                decimal? _pcs = 0;
+                decimal? _cbm = 0;
+                if (request.JobId.Contains("LOG"))
+                {
+                    var ops = opsTransactionRepo.Get(x => x.JobNo == request.JobId).FirstOrDefault();
+                    if(ops != null)
+                    {
+                        _customer = catPartnerRepo.Get(x => x.Id == ops.CustomerId).FirstOrDefault()?.PartnerNameVn;
+                        _container = ops.ContainerDescription;
+                        _cw = ops.SumChargeWeight ?? 0;
+                        _pcs = ops.SumPackages ?? 0;
+                        _cbm = ops.SumCbm ?? 0;
+                    }
+                }
+                else
+                {
+                    var trans = csTransactionRepo.Get(x => x.JobNo == request.JobId).FirstOrDefault();
+                    if(trans != null)
+                    {
+                        var tranDetail = csTransactionDetailRepo.Get(x => x.JobId == trans.Id && x.Hwbno == request.Hbl).FirstOrDefault();
+                        if(tranDetail != null)
+                        {
+                            _customer = catPartnerRepo.Get(x => x.Id == tranDetail.CustomerId).FirstOrDefault()?.PartnerNameVn;
+                            _shipper = catPartnerRepo.Get(x => x.Id == tranDetail.ShipperId).FirstOrDefault()?.PartnerNameVn;
+                            _consignee = catPartnerRepo.Get(x => x.Id == tranDetail.ConsigneeId).FirstOrDefault()?.PartnerNameVn;
+                            _container = tranDetail.PackageContainer;
+                            _cw = tranDetail.ChargeWeight;
+                            _pcs = tranDetail.PackageQty;
+                            _cbm = tranDetail.Cbm;
+                        }
+                    }
+                }
+                var shipmentAdvance = new InfoShipmentAdvanceExport
+                {
+                    JobNo = request.JobId,
+                    CustomNo = request.CustomNo,
+                    HBL = request.Hbl,
+                    MBL = request.Mbl,
+                    Customer = _customer,
+                    Shipper = _shipper,
+                    Consignee = _consignee,
+                    Container = _container,
+                    Cw = _cw,
+                    Pcs = _pcs,
+                    Cbm = _cbm,
+                    NormAmount = request.AdvanceType == AccountingConstants.ADVANCE_TYPE_NORM ? request.Amount : 0,
+                    InvoiceAmount = request.AdvanceType == AccountingConstants.ADVANCE_TYPE_INVOICE ? request.Amount : 0,
+                    OtherAmount = request.AdvanceType == AccountingConstants.ADVANCE_TYPE_OTHER ? request.Amount : 0,
+                };
+                shipmentsAdvance.Add(shipmentAdvance);
+            }
+            return shipmentsAdvance;
+        }
+        #endregion --- EXPORT ADVANCE ---
     }
 }
