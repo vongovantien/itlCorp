@@ -93,13 +93,13 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label>Local Vessel & Voy No</label>
+                        <label>Feeder Vessel</label>
                         <input type="text" class="form-control" formControlName="localVoyNo">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !oceanVoyNo.value}">
-                        <label required>Ocean Vessel & Voy No</label>
+                        <label required>Mother Vessel</label>
                         <input type="text" class="form-control" formControlName="oceanVoyNo">
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !pol.value}">
-                        <label required>Port of Loading</label>
+                        <label required>Port of Loading (POL)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                             [currentActiveItemId]="{ field: 'id', value: pol.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"

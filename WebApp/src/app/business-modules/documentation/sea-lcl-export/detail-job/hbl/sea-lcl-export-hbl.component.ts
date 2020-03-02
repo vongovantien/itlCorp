@@ -98,6 +98,7 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
                 }
             }
         );
+        this.getDetailShipment();
     }
 
     getHouseBills(id: string) {
