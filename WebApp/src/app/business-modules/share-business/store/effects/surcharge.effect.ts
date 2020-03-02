@@ -5,7 +5,6 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { map, switchMap, catchError, finalize } from 'rxjs/operators';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SurchargeActionTypes, GetBuyingSurchargeSuccessAction, SurchargeAction, GetBuyingSurchargeFailAction, GetSellingSurchargeSuccessAction, GetSellingSurchargeFailAction, GetOBHSurchargeSuccessAction, GetOBHSurchargeFailAction } from '../actions';
-import { NgxSpinnerService } from 'ngx-spinner';
 
 @Injectable()
 export class SurchargeEffects {
@@ -13,7 +12,6 @@ export class SurchargeEffects {
     constructor(
         private actions$: Actions,
         private _documentRepo: DocumentationRepo,
-        private _spinnerService: NgxSpinnerService
     ) { }
 
     @Effect()

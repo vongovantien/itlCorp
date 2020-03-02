@@ -60,8 +60,8 @@
                                 <label class="form-control-label">
                                     Country <span class="m--font-danger">(*)</span>
                                 </label>
-                                <ng-select [allowClear]="true" [items]="countries" placeholder="Select country"
-                                    formControlName="country">
+                                <ng-select #cty [allowClear]="true" [items]="countries" placeholder="Select country"
+                                    formControlName="country" (opened)="closeOtherSelects(cty)">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !country.value">
                                     Country is required
@@ -73,8 +73,8 @@
                                 <label class="form-control-label">
                                     Zone (Optional)
                                 </label>
-                                <ng-select [allowClear]="true" [items]="areas" placeholder="Select zone"
-                                    formControlName="zone">
+                                <ng-select #z [allowClear]="true" [items]="areas" placeholder="Select zone"
+                                    formControlName="zone" (opened)="closeOtherSelects(z)">
                                 </ng-select>
                             </div>
                         </div>
@@ -84,33 +84,42 @@
                                 <label class="form-control-label">
                                     Mode <span class="m--font-danger">(*)</span>
                                 </label>
-                                <ng-select [allowClear]="true" [items]="modes" placeholder="Select mode"
-                                    formControlName="mode">
+                                <ng-select #md [allowClear]="true" [items]="modes" placeholder="Select mode"
+                                    formControlName="mode" (opened)="closeOtherSelects(md)">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !mode.value">
                                     Mode is required
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group row" *ngIf="isUpdate">
                         <div class="col-lg-4">
-                            <div>
-                                <label class=" form-control-label"> Active </label>
-                                <div class="">
-                                    <app-switch [(toggle)]="active.value" (toggleChange)="active.setValue($event)">
-                                    </app-switch>
-                                </div>
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Warehouse Code
+                                </label>
+                                <ng-select #wh [allowClear]="true" [items]="warehouses" placeholder="Select warehouse"
+                                    formControlName="warehouseId" (opened)="closeOtherSelects(wh)">
+                                </ng-select>
                             </div>
                         </div>
+                        <ng-container *ngIf="isUpdate">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class=" form-control-label"> Active </label>
+                                    <div class="">
+                                        <app-switch [(toggle)]="active.value" (toggleChange)="active.setValue($event)">
+                                        </app-switch>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
                     </div>
                 </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <!-- <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button> -->
-
-                <!--* app-default-button -> app-permission-button-->
-                <app-permission-button title="Save" type="save" (click)="onSubmit()"> </app-permission-button>
+                <ng-container *ngIf="isShowUpdate">
+                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+                </ng-container>
 
                 <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
             </div>

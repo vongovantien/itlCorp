@@ -153,7 +153,26 @@ namespace eFMS.API.Catalogue.DL.Services
             var charge = DataContext.Get(x => x.Id == id).FirstOrDefault();
             var listChargeDefault = chargeDefaultRepository.Get(x => x.ChargeId == id).ToList();
             returnCharge.Charge = charge;
+
+            // Update permission
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = returnCharge.Charge.UserCreated,
+                CompanyId = returnCharge.Charge.CompanyId,
+                DepartmentId = returnCharge.Charge.DepartmentId,
+                OfficeId = returnCharge.Charge.OfficeId,
+                GroupId = returnCharge.Charge.GroupId
+            };
+            returnCharge.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = PermissionExtention.GetPermissionDetail(permissionRangeWrite, baseModel, currentUser),
+            };
+
             returnCharge.ListChargeDefaultAccount = listChargeDefault;
+
             return returnCharge;
         }
 

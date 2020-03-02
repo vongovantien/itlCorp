@@ -3,15 +3,10 @@
         <div class="list-voucher m-form m-form--state m--margin-bottom-20">
             <div class="m-form m--margin-bottom-10">
                 <div class="m--align-right">
-                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="addNewChargeDedaultAccount()">
-                        <span>
-                            <i class="la la-plus"></i>
-                            <span>
-                                add new
-                            </span>
-                        </span>
-                    </button>
+                    <ng-container *ngIf="isShowUpdate">
+                        <app-default-button [buttonSetting]="addButtonSetting" (click)="addNewChargeDedaultAccount()">
+                        </app-default-button>
+                    </ng-container>
                 </div>
             </div>
             <div class="table-wrapper table-editable" id="">
@@ -29,11 +24,13 @@
                         && index == ChargeToAdd.listChargeDefaultAccount.length-1}">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 40px">
-                                    <button type="button"
-                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                        (click)="removeDefaultAccount(index)">
-                                        <i class="la la-trash"></i>
-                                    </button>
+                                    <ng-container *ngIf="isShowUpdate">
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            (click)="removeDefaultAccount(index)">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </ng-container>
                                 </div>
                             </td>
                             <td>

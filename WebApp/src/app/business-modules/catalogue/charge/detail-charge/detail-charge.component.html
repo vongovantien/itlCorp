@@ -4,7 +4,9 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-permission-button title="Save" type="save" (click)="updateCharge()"> </app-permission-button>
+            <ng-container *ngIf="!!Charge && Charge.permission.allowUpdate">
+                <app-default-button [buttonSetting]="saveButtonSetting" (click)="updateCharge()"></app-default-button>
+            </ng-container>
             <app-default-button [buttonSetting]="cancelButtonSetting" routerLink="/home/catalogue/charge">
             </app-default-button>
         </div>

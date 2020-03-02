@@ -158,6 +158,8 @@ export class PortIndexComponent extends AppList implements OnInit {
 
                         this.formPopup.code.disable();
                         this.formPopup.portIndex = res as PortIndex;
+                        this.formPopup.isShowUpdate = (res as PortIndex).permission.allowUpdate;
+
                         this.formPopup.setFormValue(res);
                         this.formPopup.show();
                     }

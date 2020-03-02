@@ -4,8 +4,10 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
+import { CommonEnum } from '@enums';
+import { Warehouse, PortIndex } from '@models';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-form-port-index',
@@ -18,9 +20,9 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     countries: any[] = [];
     areas: any[] = [];
     modes: any[] = [];
-    isSubmitted: boolean = false;
-    isUpdate: boolean = false;
+
     portIndex: PortIndex = new PortIndex();
+    warehouses: CommonInterface.INg2Select[] = [];
 
     code: AbstractControl;
     portIndexeNameEN: AbstractControl;
@@ -29,6 +31,11 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     zone: AbstractControl;
     mode: AbstractControl;
     active: AbstractControl;
+    warehouseId: AbstractControl;
+
+    isSubmitted: boolean = false;
+    isUpdate: boolean = false;
+    isShowUpdate: boolean = true;
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -37,6 +44,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     }
 
     ngOnInit() {
+        this.getWarehouse();
         this.initForm();
     }
 
@@ -48,6 +56,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
             country: [null, Validators.required],
             zone: [null, Validators.required],
             mode: [null, Validators.required],
+            warehouseId: [],
             active: [true]
         });
 
@@ -57,6 +66,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.country = this.portindexForm.controls['country'];
         this.zone = this.portindexForm.controls['zone'];
         this.mode = this.portindexForm.controls['mode'];
+        this.warehouseId = this.portindexForm.controls['warehouseId'];
         this.active = this.portindexForm.controls['active'];
     }
 
@@ -66,6 +76,8 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
 
         // Trick to remove validate ng-select
         this.setError(this.zone);
+        this.setError(this.warehouseId);
+
 
         const formData = this.portindexForm.getRawValue();
         this.trimInputForm(formData);
@@ -79,6 +91,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
                         }
                     );
             } else {
+                this.portIndex.id = SystemConstants.EMPTY_GUID;
                 this._catalogueRepo.addPlace(this.portIndex)
                     .subscribe(
                         (res: CommonInterface.IResult) => {
@@ -89,7 +102,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         }
     }
 
-    trimInputForm(formData) {
+    trimInputForm(formData: { code: string; portIndexeNameEN: string; portIndexeNameLocal: string; }) {
         this.trimInputValue(this.code, formData.code);
         this.trimInputValue(this.portIndexeNameEN, formData.portIndexeNameEN);
         this.trimInputValue(this.portIndexeNameLocal, formData.portIndexeNameLocal);
@@ -104,6 +117,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.portIndex.countryID = this.country.value[0].id;
         this.portIndex.modeOfTransport = this.mode.value[0].id;
         this.portIndex.areaID = (this.zone.value !== null && this.zone.value.length > 0) ? this.zone.value[0].id : null;
+        this.portIndex.warehouseId = !!this.warehouseId && !!this.warehouseId.value.length ? this.warehouseId.value[0].id : null;
     }
 
     onHandleResult(res: CommonInterface.IResult) {
@@ -128,7 +142,16 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
             country: [this.countries.find(x => x.id === res.countryId)] || [],
             zone: res.areaId != null ? [this.areas.find(x => x.id === res.areaId)] : [] || [],
             mode: [this.modes.find(x => x.id === res.modeOfTransport)] || [],
+            warehouseId: !!this.warehouses.length && !!res.warehouseId ? [this.warehouses.find(x => x.id === res.warehouseId)] : null,
             active: res.active
         });
+    }
+
+    getWarehouse() {
+        this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse })
+            .subscribe((res) => {
+                this.warehouses = this.utility.prepareNg2SelectData(res, "id", "nameEn");
+                console.log(this.warehouses);
+            });
     }
 }

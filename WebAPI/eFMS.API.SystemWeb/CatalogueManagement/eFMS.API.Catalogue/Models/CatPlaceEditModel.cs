@@ -38,5 +38,7 @@ namespace eFMS.API.Catalogue.Models
         public bool? Active { get; set; }
         public DateTime? InActiveOn { get; set; }
         public string FlightVesselNo { get; set; }
+        public Guid? WarehouseId { get; set; }
+
     }
 }
