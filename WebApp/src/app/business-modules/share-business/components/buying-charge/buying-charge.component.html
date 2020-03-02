@@ -28,16 +28,13 @@
                 </div>
             </div>
         </div>
-
         <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
             <table class="table table-bordered dataTable-edit">
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                    <ng-container *ngIf="(isLocked | async) === false">
-                        <th class="m--w-90 first table-actions-col fixed-side"
-                            *ngIf="(permissionShipments | async)?.allowUpdateCharge">
-                        </th>
-                    </ng-container>
+                    <th class="m--w-90 first table-actions-col fixed-side"
+                        *ngIf="(isLocked | async) === false && (permissionShipments | async)?.allowUpdateCharge === true">
+                    </th>
                 </thead>
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
@@ -45,7 +42,7 @@
                             class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''">
                             <ng-container>
                                 <td class="table-actions-col fixed-side"
-                                    *ngIf="(permissionShipments | async).allowUpdateCharge === true">
+                                    *ngIf="(permissionShipments | async)?.allowUpdateCharge === true">
                                     <div class="table-actions">
                                         <button (click)="duplicate(i,'BUY')"
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
@@ -66,7 +63,6 @@
                                     </div>
                                 </td>
                             </ng-container>
-
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner" dropdown
                                     [tooltip]="charge.partnerName"
