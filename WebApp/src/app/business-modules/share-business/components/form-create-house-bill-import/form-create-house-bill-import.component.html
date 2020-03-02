@@ -146,7 +146,7 @@
                             <div class="form-group row">
                                 <div class="col-lg-6">
                                     <label class="form-control-label" for="">
-                                        ETD
+                                        Estimated Time of Departure (ETD)
                                     </label>
                                     <div class="m-input-icon">
                                         <input type="text" class="form-control m-input m-input--square"
@@ -219,7 +219,7 @@
 
                             <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmited && !pol.value }">
                                 <label class="form-control-label">
-                                    Port of Loading <span class="m--font-danger">(*)</span>
+                                    Port of Loading (POL) <span class="m--font-danger">(*)</span>
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                     [selectedDisplayFields]="configPort.selectedDisplayFields"
@@ -238,7 +238,7 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmited  && (!pod.value || PortChargeLikePortLoading == true) }">
                                 <label class="form-control-label">
-                                    Port of Discharge <span class="m--font-danger">(*)</span>
+                                    Port of Discharge (POD) <span class="m--font-danger">(*)</span>
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                     [selectedDisplayFields]="configPort.selectedDisplayFields"

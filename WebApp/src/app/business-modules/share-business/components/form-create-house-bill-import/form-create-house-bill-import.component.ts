@@ -505,9 +505,21 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     }
 
     getDescription(fullName: string, address: string, tel: string, fax: string) {
-        return `${fullName} \n ${address} \n Tel No: ${!!tel ? tel : ''} \n Fax No: ${!!fax ? fax : ''} \n`;
+        let strDescription: string = '';
+        if (!!fullName) {
+            strDescription += fullName;
+        }
+        if (!!address) {
+            strDescription = strDescription + "\n" + address;
+        }
+        if (!!tel) {
+            strDescription = strDescription + "\nTel No:" + tel;
+        }
+        if (!!fax) {
+            strDescription = strDescription + "\nFax No:" + fax;
+        }
+        return strDescription;
     }
-
     getListShipper() {
         this.isLoading = true;
         this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.SHIPPER })

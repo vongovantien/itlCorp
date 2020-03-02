@@ -106,7 +106,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group" [ngClass]="{'m-form__group has-danger':  isSubmitted && !pol.value}">
-                            <label required>Port of Loading</label>
+                            <label required>Port of Loading (POL)</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                                 [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
@@ -117,7 +117,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>Port of Destination</label>
+                            <label>Port of Destination (POD)</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                                 [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
