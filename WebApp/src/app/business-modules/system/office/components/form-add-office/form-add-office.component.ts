@@ -3,12 +3,9 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { SystemRepo } from '@repositories';
 import { Company, Department } from '@models';
 import { finalize, catchError } from 'rxjs/operators';
-import { Department } from 'src/app/shared/models/system/department';
 import { Router } from '@angular/router';
 
 import { AppForm } from 'src/app/app.form';
-
-import { finalize, catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'form-add-office',
