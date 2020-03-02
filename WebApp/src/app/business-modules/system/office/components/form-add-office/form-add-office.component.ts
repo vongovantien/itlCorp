@@ -7,7 +7,6 @@ import { Router } from '@angular/router';
 
 import { AppForm } from 'src/app/app.form';
 
-import { finalize, catchError } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { checkShareSystemUserLevel, IShareSystemState } from 'src/app/business-modules/share-system/store';
 
