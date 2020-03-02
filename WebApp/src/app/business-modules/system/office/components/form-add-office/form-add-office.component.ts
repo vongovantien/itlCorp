@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 import { AppForm } from 'src/app/app.form';
 
 import { finalize, catchError } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { checkShareSystemUserLevel, IShareSystemState } from 'src/app/business-modules/share-system/store';
 
 @Component({
     selector: 'form-add-office',
@@ -59,11 +61,12 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     isSubmited: boolean = false;
     isDetail: boolean = false;
     isCreate: boolean = false;
+    isReadonly: any = false;
 
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
-
+        private _store: Store<IShareSystemState>,
         private _router: Router
     ) {
         super();
@@ -88,6 +91,8 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             { title: 'Level Permission', field: 'levelPermission', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
+
+        this.isReadonly = this._store.select(checkShareSystemUserLevel);
 
     }
     onSelectDataFormInfo(data: any) {

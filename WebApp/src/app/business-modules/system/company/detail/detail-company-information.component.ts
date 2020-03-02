@@ -2,11 +2,16 @@ import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
+
 import { IFormAddCompany, CompanyInformationFormAddComponent } from '../components/form-add-company/form-add-company.component';
 import { Company, Office } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { AppList } from 'src/app/app.list';
+import { Store } from '@ngrx/store';
+
+import { IShareSystemState, SystemLoadUserLevelAction } from 'src/app/business-modules/share-system/store';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
+
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 
@@ -37,7 +42,8 @@ export class CompanyInformationDetailComponent extends AppList {
         private _router: Router,
         private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _store: Store<IShareSystemState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -53,20 +59,24 @@ export class CompanyInformationDetailComponent extends AppList {
     }
 
     ngOnInit(): void {
+
         this._activedRouter.params
             .pipe(
                 tap(
                     (param: Params) => {
                         if (param.id && isUUID(param.id)) {
                             this.companyId = param.id;
-                        } else { }
+                            this._store.dispatch(new SystemLoadUserLevelAction({ companyId: this.companyId, type: 'company' }));
+                        } else {
+                            // TODO handle error.
+                        }
                     }
                 ),
                 switchMap(
                     (param: Params) => {
                         return forkJoin([
                             this._systemRepo.getDetailCompany(this.companyId),
-                            this._systemRepo.getOfficeByCompany(this.companyId)
+                            this._systemRepo.getOfficeByCompany(this.companyId),
                         ]).pipe(
                             tap((res: any[]) => { this.getDataDetail(res[0]); })
                         );

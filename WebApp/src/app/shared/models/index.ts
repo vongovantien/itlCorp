@@ -43,6 +43,9 @@ export * from './system/permission';
 export * from './system/role';
 export * from './system/menu';
 export * from './system/department';
+export * from './system/userlevel';
+export * from './system/userGroup.model';
+export * from './system/group';
 
 export * from './report/crystal.model';
 

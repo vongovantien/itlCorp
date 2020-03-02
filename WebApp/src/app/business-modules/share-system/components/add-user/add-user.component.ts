@@ -4,13 +4,14 @@ import { SystemRepo } from "@repositories";
 import { ConfirmPopupComponent } from "@common";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
+import { Store } from "@ngrx/store";
+import { User, UserLevel } from "@models";
 
 import { AppList } from "src/app/app.list";
-import { UserLevel } from "src/app/shared/models/system/userlevel";
 
-import { catchError, finalize } from "rxjs/operators";
-import { User } from "@models";
+import { catchError, finalize, takeUntil } from "rxjs/operators";
 import cloneDeep from "lodash/cloneDeep";
+import { IShareSystemState, getShareSystemUserLevelState, SystemLoadUserLevelAction } from "../../store";
 
 @Component({
     selector: 'form-user-level',
@@ -42,6 +43,7 @@ export class ShareSystemAddUserComponent extends AppList {
         protected _toastService: ToastrService,
         private _progressService: NgProgress,
         private _router: Router,
+        private _store: Store<IShareSystemState>
 
     ) {
         super();
@@ -69,7 +71,16 @@ export class ShareSystemAddUserComponent extends AppList {
             { title: 'Position', field: 'Position', required: true },
         ];
         this.getUsers();
-        this.queryUserLevel();
+
+        this._store.select(getShareSystemUserLevelState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (result: UserLevel[]) => {
+                    this.usersLevels = (result || []).map((lv: UserLevel) => new UserLevel(lv));
+                    this.userLevelTemp = cloneDeep(this.usersLevels);
+                }
+            );
+        // this.queryUserLevel();
     }
 
     getUsers() {
@@ -255,15 +266,16 @@ export class ShareSystemAddUserComponent extends AppList {
             this.criteria.groupId = this.object.id;
             this.criteria.type = this.type;
         }
-        this._systemRepo.queryUserLevels(this.criteria).pipe(catchError(this.catchError))
-            .subscribe(
-                (data: any) => {
-                    if (!!data) {
-                        this.usersLevels = data.map((lv: UserLevel) => new UserLevel(lv));
-                        this.userLevelTemp = cloneDeep(this.usersLevels);
-                    }
-                },
-            );
+        this._store.dispatch(new SystemLoadUserLevelAction(this.criteria));
+        // this._systemRepo.queryUserLevels(this.criteria).pipe(catchError(this.catchError))
+        //     .subscribe(
+        //         (data: any) => {
+        //             if (!!data) {
+        //                 this.usersLevels = data.map((lv: UserLevel) => new UserLevel(lv));
+        //                 this.userLevelTemp = cloneDeep(this.usersLevels);
+        //             }
+        //         },
+        //     );
     }
 
     gotoUserPermission(id: string, officeId: string) {
