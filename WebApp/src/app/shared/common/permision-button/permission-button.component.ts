@@ -1,8 +1,9 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { IAppState, getMenuUserPermissionState } from '@store';
-import { takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
+import { Observable } from 'rxjs';
+
 
 @Component({
     selector: 'app-permission-button',
@@ -12,7 +13,7 @@ export class AppPermissionButtonComponent extends AppForm implements OnInit {
     @Input() title: string = 'new';
     @Input() type: string = 'add';
 
-    menuPermission: SystemInterface.IUserPermission;
+    menuPermission: Observable<SystemInterface.IUserPermission>;
 
     constructor(
         private _store: Store<IAppState>
@@ -22,14 +23,6 @@ export class AppPermissionButtonComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
-        this._store.select(getMenuUserPermissionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: SystemInterface.IUserPermission) => {
-                    if (res !== null && res !== undefined) {
-                        this.menuPermission = res;
-                    }
-                }
-            );
+        this.menuPermission = this._store.select(getMenuUserPermissionState);
     }
 }

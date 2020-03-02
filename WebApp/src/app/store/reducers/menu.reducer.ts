@@ -2,22 +2,11 @@ import { MenuActions, MenuActionTypes } from "../actions";
 
 
 export interface IMenuState {
-    permission: SystemInterface.IUserPermission;
+    permission: any;
 }
 
 const initialState: IMenuState = {
-    permission: {
-        allowAdd: true,
-        access: true,
-        export: true,
-        menuId: null,
-        detail: null,
-        delete: null,
-        list: null,
-        import: true,
-        write: null,
-        speacialActions: []
-    }
+    permission: {}
 };
 
 export function menuReducer(state: IMenuState = initialState, action: MenuActions): IMenuState {
@@ -31,6 +20,6 @@ export function menuReducer(state: IMenuState = initialState, action: MenuAction
                 ...state, permission: action.payload
             };
         default:
-            break;
+            return state;
     }
 };

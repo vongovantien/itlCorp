@@ -2,16 +2,9 @@
     <app-sub-header>
         <div class="c-button-actions">
             <ng-container *ngIf="!!shipmentDetail && !shipmentDetail.isLocked">
-                <button type="button"
-                    class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                    (click)="lockShipment()" *ngIf="!!shipmentDetail && shipmentDetail.permission.allowLock">
-                    <span>
-                        <i class="la la-lock"></i>
-                        <span>
-                            Lock
-                        </span>
-                    </span>
-                </button>
+                <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()"
+                    *ngIf="!!shipmentDetail && shipmentDetail.permission.allowLock">
+                </app-default-button>
             </ng-container>
             <span *ngIf="!!shipmentDetail && !!shipmentDetail.isLocked" class="m--margin-right-10 align-middle">
                 <i class="fa fa-lock text-danger fa-3x"></i>
@@ -68,9 +61,9 @@
                     <form-create-sea-import>
                         <ng-container *ngIf="!!shipmentDetail">
                             <date-time-modified [timeCreated]="shipmentDetail.datetimeCreated"
-                                [userCreated]="shipmentDetail.userCreated"
+                                [userCreated]="shipmentDetail.userNameCreated"
                                 [timeModified]="shipmentDetail.datetimeModified"
-                                [userModified]="shipmentDetail.userModified">
+                                [userModified]="shipmentDetail.userNameModified">
                             </date-time-modified>
                         </ng-container>
                     </form-create-sea-import>

@@ -38,14 +38,12 @@ const routes: Routes = [
         path: 'air-export', loadChildren: () => import('./air-export/air-export.module').then(m => m.AirExportModule),
         data: {
             name: 'Air Export',
-            path: '/'
         }
     },
     {
         path: 'air-import', loadChildren: () => import('./air-import/air-import.module').then(m => m.AirImportModule),
         data: {
             name: 'Air Import',
-            path: '/'
         }
     },
     {

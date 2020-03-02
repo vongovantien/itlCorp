@@ -16,30 +16,33 @@ import { AirImportDetailJobComponent } from './detail-job/detail-job-air-import.
 
 const routing: Routes = [
     {
-        path: '', component: AirImportComponent, data: {
-            name: "",
-        },
-    },
-    {
-        path: 'new', component: AirImportCreateJobComponent,
-        data: { name: "Create New Job" }
-    },
-    {
-        path: ':jobId',
-        data: { transactionType: CommonEnum.TransactionTypeEnum.AirImport, name: "Job Detail" },
-        children: [
+        path: '', data: { name: "" }, children: [
             {
-                path: '', component: AirImportDetailJobComponent, data: { name: "" }
+                path: '', component: AirImportComponent
             },
             {
-                path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-import-hbl.module').then(m => m.AirImportHBLModule),
-                data: {
-                    name: "House Bill",
-                },
+                path: 'new', component: AirImportCreateJobComponent,
+                data: { name: "Create New Job" }
             },
+            {
+                path: ':jobId',
+                data: { transactionType: CommonEnum.TransactionTypeEnum.AirImport, name: "Job Detail" },
+                children: [
+                    {
+                        path: '', component: AirImportDetailJobComponent, data: { name: "" }
+                    },
+                    {
+                        path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-import-hbl.module').then(m => m.AirImportHBLModule),
+                        data: {
+                            name: "House Bill",
+                        },
+                    },
 
+                ]
+            },
         ]
     },
+
 ];
 
 const LIB = [

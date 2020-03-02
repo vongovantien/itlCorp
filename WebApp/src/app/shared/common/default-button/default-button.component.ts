@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ButtonModalSetting, ButtonAttributeSetting } from '../../models/layout/button-modal-setting.model';
 import { ButtonType } from '../../enums/type-button.enum';
-import { AddDefaultButton, EditDefaultButton, DeleteDefaultButton, ImportDefaultButton, ExportDefaultButton, SaveDefaultButton, CancelDefaultButton, ResetDefaultButton, DetailDefaultButton, SearchDefaultButton, PreviewDefaultButton } from '../../enums/default-button-enum';
+import { AddDefaultButton, EditDefaultButton, DeleteDefaultButton, ImportDefaultButton, ExportDefaultButton, SaveDefaultButton, CancelDefaultButton, ResetDefaultButton, DetailDefaultButton, SearchDefaultButton, PreviewDefaultButton, LockDefaultButton } from '../../enums/default-button-enum';
 
 @Component({
     selector: 'app-default-button',
@@ -13,7 +13,7 @@ export class DefaultButtonComponent implements OnInit {
     @Input() buttonSetting: ButtonModalSetting;
     @Input() dataTarget: string;
     @Input() disabled: boolean = false;
-    
+
     isAdd: boolean = false;
     isEdit: boolean = false;
     isDelete: boolean = false;
@@ -24,6 +24,7 @@ export class DefaultButtonComponent implements OnInit {
     isDetail: boolean = false;
     isSearch: boolean = false;
     isPreview: boolean = false;
+    isLock: boolean = false;
     buttonAttribute: ButtonAttributeSetting;
 
 
@@ -77,6 +78,10 @@ export class DefaultButtonComponent implements OnInit {
             this.isPreview = true;
             this.setSyleButton(PreviewDefaultButton);
         }
+        if (typeButton === ButtonType.lock) {
+            this.isPreview = true;
+            this.setSyleButton(LockDefaultButton);
+        }
     }
     setSyleButton(DefaultButton: ButtonAttributeSetting): any {
         if (this.buttonAttribute == null) {
@@ -84,7 +89,7 @@ export class DefaultButtonComponent implements OnInit {
         }
     }
 
-    onClickButton() {   
+    onClickButton() {
         this.onClick.emit();
     }
 }

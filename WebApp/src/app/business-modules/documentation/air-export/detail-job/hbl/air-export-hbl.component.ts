@@ -121,7 +121,6 @@ export class AirExportHBLComponent extends AppList implements OnInit {
     getDetailShipment() {
         this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
             .pipe(
-                skip(1),
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
