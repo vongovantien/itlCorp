@@ -94,7 +94,7 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': (department.dirty && !department.valid) || (isSubmitted && !department.valid)}">
                                 <label for="">Department <span class="text-danger">(*)</span></label>
-                                <select formControlName="department" class="form-control">
+                                <select formControlName="department" class="form-control" [disabled]="isReadonly">
                                     <option *ngFor="let department of departments" [ngValue]="department">
                                         {{department.deptNameEn}}
                                     </option>

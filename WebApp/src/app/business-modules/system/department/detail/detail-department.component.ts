@@ -9,6 +9,9 @@ import { Department } from 'src/app/shared/models/system/department';
 import { Group } from 'src/app/shared/models/system/group';
 import { SortService } from 'src/app/shared/services';
 import { AppList } from 'src/app/app.list';
+import { SystemLoadUserLevelAction, IShareSystemState, checkShareSystemUserLevel } from 'src/app/business-modules/share-system/store';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-department-detail',
@@ -37,7 +40,9 @@ export class DepartmentDetailComponent extends AppList {
     userHeaders: CommonInterface.IHeaderTable[];
 
     groups: Group[] = [];
-    SelectedDepartment: any ;
+    SelectedDepartment: any;
+
+    isReadonly: Observable<boolean>;
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -47,6 +52,7 @@ export class DepartmentDetailComponent extends AppList {
         private _fb: FormBuilder,
         private _progressService: NgProgress,
         private _sortService: SortService,
+        private _store: Store<IShareSystemState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -78,6 +84,7 @@ export class DepartmentDetailComponent extends AppList {
                 ];
             }
         });
+        this.isReadonly = this._store.select(checkShareSystemUserLevel);
     }
 
     initForm() {
@@ -145,7 +152,7 @@ export class DepartmentDetailComponent extends AppList {
                 userNameModified: ''
             };
             this._progressRef.start();
-            //Update Info Department
+            // Update Info Department
             this._systemRepo.updateDepartment(dept)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
@@ -166,21 +173,21 @@ export class DepartmentDetailComponent extends AppList {
         this._router.navigate(['home/system/department']);
     }
 
-   
+
     getDetail() {
         this._progressRef.start();
         this._systemRepo.getAllOffice()
             .pipe(
                 catchError(this.catchError),
                 tap(data => {
-                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));                    
+                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));
                 }),
                 switchMap(() => this._systemRepo.getDetailDepartment(this.departmentId).pipe(
                     catchError(this.catchError),
                     finalize(() => {
                         this._progressRef.complete();
-                    }),tap(data =>{
-                        this.SelectedDepartment = data;                                                
+                    }), tap(data => {
+                        this.SelectedDepartment = data;
                     })
                 ))
             )
@@ -188,8 +195,9 @@ export class DepartmentDetailComponent extends AppList {
                 (res: any) => {
                     if (res.id !== 0) {
                         this.department = new Department(res);
+                        this._store.dispatch(new SystemLoadUserLevelAction({ companyId: this.department.companyId, officeId: this.department.branchId, departmentId: this.department.id, type: 'department' }));
 
-                        let index = this.officeList.findIndex(x => x.id == res.branchId);
+                        const index = this.officeList.findIndex(x => x.id === res.branchId);
                         if (index > -1) {
                             this.officeActive = [this.officeList[index]];
                         }
@@ -203,10 +211,10 @@ export class DepartmentDetailComponent extends AppList {
                             company: res.companyName,
                             status: res.active,
                         });
-                        
-                       
+
+
                     } else {
-                        //Reset 
+                        // Reset 
                         this.formDetail.reset();
                         this._toastService.error("Not found data");
                     }
@@ -221,7 +229,7 @@ export class DepartmentDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (data: any) => {          
+                (data: any) => {
                     this.groups = data;
                 },
             );

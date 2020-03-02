@@ -8,6 +8,8 @@ import { AppPage } from 'src/app/app.base';
 import { SystemRepo } from '@repositories';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { SystemLoadUserLevelAction, IShareSystemState } from 'src/app/business-modules/share-system/store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-office-details',
@@ -56,7 +58,8 @@ export class OfficeDetailsComponent extends AppPage {
         private _router: Router,
         private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _store: Store<IShareSystemState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -66,6 +69,7 @@ export class OfficeDetailsComponent extends AppPage {
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.officeId = param.id;
+
                 this.getDetailOffice(this.officeId);
             } else {
                 this._router.navigate(["home/system/office"]);
@@ -152,6 +156,9 @@ export class OfficeDetailsComponent extends AppPage {
                             this.formAdd.SelectedOffice = new Office(res.data);
                             this.formData.company = res.data.buid;
                             this.formData.active = res.data.active;
+
+                            this._store.dispatch(new SystemLoadUserLevelAction({ companyId: this.formData.company, officeId: this.office.id, type: 'office' }));
+
                             setTimeout(() => {
                                 this.formAdd.update(this.formData, res.data.active);
                             }, 300);

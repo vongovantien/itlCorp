@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
@@ -7,13 +6,14 @@ import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { Department } from 'src/app/shared/models/system/department';
+import { AppForm } from 'src/app/app.form';
 
 @Component({
     selector: 'app-department-new',
     templateUrl: './add-department.component.html'
 })
 
-export class DepartmentAddNewComponent extends AppPage {
+export class DepartmentAddNewComponent extends AppForm {
     formAdd: FormGroup;
     departmentCode: AbstractControl;
     nameEn: AbstractControl;
@@ -108,10 +108,10 @@ export class DepartmentAddNewComponent extends AppPage {
                 inactiveOn: '',
                 companyId: null,
                 userNameCreated: '',
-                userNameModified:''
+                userNameModified: ''
             };
             this._progressRef.start();
-            //Add new Department
+            // Add new Department
             this._systemRepo.addNewDepartment(dept)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
@@ -135,7 +135,7 @@ export class DepartmentAddNewComponent extends AppPage {
             )
             .subscribe(
                 (data: any) => {
-                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));                    
+                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));
                 },
             );
     }
