@@ -50,5 +50,8 @@ namespace eFMS.API.Accounting.DL.IService
         bool CheckDeletePermission(string soaNo);
 
         bool CheckUpdatePermission(string soaNo);
+
+        IQueryable<ExportImportBravoFromSOAResult> GetDataExportImportBravoFromSOA(string soaNo);
+
     }
 }

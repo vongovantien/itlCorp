@@ -300,6 +300,18 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
+        /// Export Import Bravo From SOA
+        /// </summary>
+        /// <param name="soaNo">soaNo that want to retrieve SOA</param>
+        /// <returns></returns>
+        [HttpGet("GetDataExportImportBravoSFromOA")]
+        public IActionResult GetDataExportImportBravoFromSOA(string soaNo)
+        {
+            var data = acctSOAService.GetDataExportImportBravoFromSOA(soaNo);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// Data Export Details SOA
         /// </summary>
         /// <param name="criteria"></param>

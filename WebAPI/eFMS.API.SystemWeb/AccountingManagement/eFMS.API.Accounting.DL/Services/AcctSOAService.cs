@@ -32,6 +32,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<AcctCdnote> acctCdnoteRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<SysUser> sysUserRepo;
+        readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepo;
+
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -46,7 +48,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CustomsDeclaration> customsDeclaration,
             IContextBase<AcctCdnote> acctCdnote,
             IContextBase<CatPartner> catPartner,
-            IContextBase<SysUser> sysUser) : base(repository, mapper)
+            IContextBase<SysUser> sysUser,
+            IContextBase<CatChargeDefaultAccount> chargeDefault ) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -60,6 +63,7 @@ namespace eFMS.API.Accounting.DL.Services
             acctCdnoteRepo = acctCdnote;
             catPartnerRepo = catPartner;
             sysUserRepo = sysUser;
+            chargeDefaultRepo = chargeDefault;
         }
 
         #region -- Insert & Update SOA
@@ -1711,7 +1715,69 @@ namespace eFMS.API.Accounting.DL.Services
             };
             return result;
         }
+
         #endregion -- Data Export Details --
+
+        public IQueryable<ExportImportBravoFromSOAResult> GetDataExportImportBravoFromSOA(string soaNo)
+        {
+            //Lấy danh sách Currency Exchange của ngày hiện tại
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var soa = DataContext.Get(x => x.Soano == soaNo);
+            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var chargeDefaults = chargeDefaultRepo.Get();
+            var charge = GetChargeShipmentDocAndOperation(query);
+            var partner = catPartnerRepo.Get();
+            var dataResult = from s in soa
+                             join chg in charge on s.Soano equals chg.SOANo into chg2
+                             from chg in chg2.DefaultIfEmpty()
+                             join pat in partner on s.Customer equals pat.Id into pat2
+                             from pat in pat2.DefaultIfEmpty()
+                             join cd in chargeDefaults on chg.ID equals cd.ChargeId  into defaults
+                             from cd in defaults.DefaultIfEmpty()
+                             where cd.Type == "Công Nợ"
+                             select new ExportImportBravoFromSOAResult
+                             {
+                                 ServiceDate = chg.ServiceDate,
+                                 SOANo = s.Soano,
+                                 Service = GetServiceNameOfSoa(s.ServiceTypeId).ToString(),
+                                 CustomerName = pat.PartnerNameEn,
+                                 PartnerCode = pat.Id,
+                                 Debit = chg.Debit,
+                                 Credit = chg.Credit,
+                                 ChargeCode = chg.ChargeCode,
+                                 OriginalCurrency = chg.Currency,
+                                 OriginalAmount = chg.Debit - chg.Credit,
+                                 CreditExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
+                                 ?
+                                     GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
+                                 :
+                                     GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
+                                 AmountVND = chg.Credit * (chg.Debit - chg.Credit),
+                                 VAT = chg.VATRate,
+                                 AccountDebitNoVAT = cd.DebitAccountNo,
+                                 TaxCode = pat.TaxCode,
+                                 CustomerAddress = pat.AddressEn,
+                                 JobId = chg.JobId,
+                                 HBL = chg.HBL,
+                                 MBL = chg.MBL,
+                                 CustomNo = chg.CustomNo,
+                                 ChargeName = chg.ChargeName,
+                                 CreditDebitNo = chg.CreditDebitNo,
+                                 CurrencySOA = s.Currency,
+
+                             
+                                 DebitExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
+                                 ?
+                                     GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
+                                 :
+                                     GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),
+             
+
+                             };
+
+
+            return dataResult;
+        }
 
     }
 }
