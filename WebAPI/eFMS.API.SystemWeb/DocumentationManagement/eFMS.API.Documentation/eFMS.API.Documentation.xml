@@ -53,6 +53,38 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CsAirWayBillController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsAirWayBillController.#ctor(eFMS.API.Documentation.DL.IService.ICsAirWayBillService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
+            <summary>
+            constructor
+            </summary>
+            <param name="wayBillService"></param>
+            <param name="localizer"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsAirWayBillController.Get(System.Guid)">
+            <summary>
+            get
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsAirWayBillController.Add(eFMS.API.Documentation.DL.Models.CsAirWayBillModel)">
+            <summary>
+            add an air way bill
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsAirWayBillController.Update(eFMS.API.Documentation.DL.Models.CsAirWayBillModel)">
+            <summary>
+            update an air way bill
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController">
             <summary>
             

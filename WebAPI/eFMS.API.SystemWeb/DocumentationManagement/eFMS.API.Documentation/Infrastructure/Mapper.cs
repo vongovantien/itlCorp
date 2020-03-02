@@ -24,7 +24,9 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsTransactionDetail, CsTransactionDetailAddManifest>();
             CreateMap<CsDimensionDetail, CsDimensionDetailModel>();
             CreateMap<SysImage, SysImageModel>();
-
+            CreateMap<CsAirWayBill, CsAirWayBillModel>().ForMember(x => x.DimensionDetails, opt => opt.Ignore())
+                .ForMember(x => x.OtherCharges, opt => opt.Ignore());
+            CreateMap<CsAirWayBillModel, CsAirWayBill>();
 
 
             CreateMap<CsTransactionEditModel, CsTransaction>();
