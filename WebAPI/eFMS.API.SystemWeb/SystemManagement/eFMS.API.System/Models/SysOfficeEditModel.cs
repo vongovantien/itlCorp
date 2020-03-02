@@ -36,5 +36,6 @@ namespace eFMS.API.System.Models
         public string SwiftCode { get; set; }
  
         public bool? Active { get; set; }
+        public string Location { get; set; }
     }
 }

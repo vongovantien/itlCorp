@@ -66,5 +66,9 @@ namespace eFMS.API.Catalogue.Models
         public string CoLoaderCode { get; set; }
         public string WorkPhoneEx { get; set; }
         public List<CatSaleManEditModel> SaleMans { get; set; }
+        public short? GroupId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
+
     }
 }

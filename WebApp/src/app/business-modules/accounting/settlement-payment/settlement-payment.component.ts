@@ -7,7 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, map, } from 'rxjs/operators';
 import { User, SettlementPayment } from 'src/app/shared/models';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { SystemConstants } from 'src/constants/system.const';
 
@@ -19,7 +19,8 @@ export class SettlementPaymentComponent extends AppList {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    
     headers: CommonInterface.IHeaderTable[];
     settlements: SettlementPayment[] = [];
     selectedSettlement: SettlementPayment;
@@ -130,10 +131,22 @@ export class SettlementPaymentComponent extends AppList {
             );
     }
 
-    showDeletePopup(settlement: SettlementPayment) {
-        this.selectedSettlement = settlement;
-        this.confirmDeletePopup.show();
+    prepareDeleteAdvance(settlement: SettlementPayment){
+        this._accoutingRepo.checkAllowDeleteSettlement(settlement.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.selectedSettlement = settlement;
+                    this.confirmDeletePopup.show();
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
+
+    // showDeletePopup(settlement: SettlementPayment) {
+    //     this.selectedSettlement = settlement;
+    //     this.confirmDeletePopup.show();
+    // }
 
     onDeleteSettlemenPayment() {
         this.confirmDeletePopup.hide();
@@ -163,18 +176,37 @@ export class SettlementPaymentComponent extends AppList {
         this.settlements = this._sortService.sort(this.settlements, sort, this.order);
     }
 
-    gotoDetailSettlement(settlement: SettlementPayment) {
-        switch (settlement.statusApproval) {
-            case 'New':
-            case 'Denied':
-                this._router.navigate([`home/accounting/settlement-payment/${settlement.id}`]);
-                break;
-            default:
-                this._router.navigate([`home/accounting/settlement-payment/${settlement.id}/approve`]);
-                break;
-        }
-
+    viewDetail(settlement: SettlementPayment){
+        this._accoutingRepo.checkAllowGetDetailSettlement(settlement.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    switch (settlement.statusApproval) {
+                        case 'New':
+                        case 'Denied':
+                            this._router.navigate([`home/accounting/settlement-payment/${settlement.id}`]);
+                            break;
+                        default:
+                            this._router.navigate([`home/accounting/settlement-payment/${settlement.id}/approve`]);
+                            break;
+                    }
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
+
+    // gotoDetailSettlement(settlement: SettlementPayment) {
+    //     switch (settlement.statusApproval) {
+    //         case 'New':
+    //         case 'Denied':
+    //             this._router.navigate([`home/accounting/settlement-payment/${settlement.id}`]);
+    //             break;
+    //         default:
+    //             this._router.navigate([`home/accounting/settlement-payment/${settlement.id}/approve`]);
+    //             break;
+    //     }
+
+    // }
 
     printSettlement(settlementNo: string) {
         this._accoutingRepo.previewSettlementPayment(settlementNo)

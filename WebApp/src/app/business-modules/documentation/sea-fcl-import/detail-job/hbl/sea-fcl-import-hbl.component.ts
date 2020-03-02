@@ -8,14 +8,14 @@ import { AppList } from 'src/app/app.list';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
-import { CsShipmentSurcharge, HouseBill } from 'src/app/shared/models';
+import { CsShipmentSurcharge, HouseBill, CsTransaction } from 'src/app/shared/models';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import * as fromShareBussiness from './../../../../share-business/store';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { NgxSpinnerService } from 'ngx-spinner';
 
@@ -28,7 +28,7 @@ export class SeaFCLImportHBLComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-
+    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
     houseBill: HouseBill[] = [];
@@ -36,6 +36,7 @@ export class SeaFCLImportHBLComponent extends AppList {
     containers: Observable<Container[]>;
     selectedShipment: Observable<any>; // TODO model.
     selectedHbl: HouseBill;
+    shipmentDetail: CsTransaction;
 
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
 
@@ -160,8 +161,23 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.deleteHbl(this.selectedHbl.id);
     }
 
+    getDetailShipment() {
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(
+                skip(1),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.shipmentDetail = res;
+                    }
+                },
+            );
+    }
+
     gotoDetail(id: string) {
-        this._documentRepo.checkViewDetailHblPermission(id)
+        this._documentRepo.checkDetailShippmentPermission(this.shipmentDetail.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -170,11 +186,12 @@ export class SeaFCLImportHBLComponent extends AppList {
                     if (res) {
                         this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl/${id}`]);
                     } else {
-                        this._toastService.error("You don't have permission to view detail");
+                        this.info403Popup.show();
                     }
                 },
             );
     }
+
 
 
     getHourseBill(id: string) {

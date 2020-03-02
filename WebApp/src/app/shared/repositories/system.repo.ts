@@ -164,6 +164,15 @@ export class SystemRepo {
         );
     }
 
+    getListUsersBylevel(body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser/GetUserByLevel`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
     getSystemUsers(body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser/Query`, body).pipe(
             catchError((error) => throwError(error)),
@@ -281,6 +290,12 @@ export class SystemRepo {
 
     getOfficeByCompany(id: string) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetByCompany/${id}`).pipe(
+            map((data: CommonInterface.IResult) => data)
+        );
+    }
+
+    getLocationOfficeById(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetLocationOfficeById/${id}`).pipe(
             map((data: CommonInterface.IResult) => data)
         );
     }

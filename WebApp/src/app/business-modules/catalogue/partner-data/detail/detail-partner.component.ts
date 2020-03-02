@@ -53,7 +53,7 @@ export class PartnerDetailComponent extends AppList {
     isShowSaleMan: boolean = false;
     index: number = 0;
     isExistedTaxcode: boolean = false;
-
+    currenctUser: any = '';
 
     list: any[] = [];
 
@@ -83,6 +83,8 @@ export class PartnerDetailComponent extends AppList {
             }
         });
         this.getDataCombobox();
+        const claim = localStorage.getItem('id_token_claims_obj');
+        this.currenctUser = JSON.parse(claim)["id"];
     }
 
     RequireSaleman(partnerGroup: string): boolean {
@@ -519,6 +521,7 @@ export class PartnerDetailComponent extends AppList {
             freightPayment: saleman.freightPayment,
             serviceName: saleman.serviceName
         };
+        this.poupSaleman.allowDelete = this.partner.permission.allowDelete;
         this.poupSaleman.showSaleman(saleMane);
         this.poupSaleman.show();
     }

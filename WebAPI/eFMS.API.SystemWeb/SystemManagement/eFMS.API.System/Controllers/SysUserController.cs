@@ -74,6 +74,14 @@ namespace eFMS.API.System.Controllers
             return Ok(results);
         }
 
+        [HttpPost]
+        [Route("GetUserByLevel")]
+        public IActionResult GetUserByLevel(SysUserCriteria criteria)
+        {
+            var results = sysUserService.QueryPermission(criteria);
+            return Ok(results);
+        }
+
         /// <summary>
         /// add new group
         /// </summary>

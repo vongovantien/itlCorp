@@ -103,12 +103,13 @@
                                                         <td class="table-actions-col">
                                                             <div class="table-actions" style="width: 70px">
                                                                 <button type="button"
+                                                                    *ngIf="shipmentDetail.permission.allowUpdate"
                                                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                                     (click)="gotoDetail(house.id)" title="Detail">
                                                                     <i class="la la-edit"></i>
                                                                 </button>
                                                                 <button type="button"
-                                                                    *ngIf="!(selectedShipment | async)?.isLocked"
+                                                                    *ngIf="!(selectedShipment | async)?.isLocked && shipmentDetail.permission.allowUpdate"
                                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                                     title="Remove"
                                                                     (click)="showDeletePopup(house,$event)">
@@ -116,7 +117,8 @@
                                                                 </button>
                                                             </div>
                                                         </td>
-                                                        <td class=" text-primary pointer"><a [routerLink]="house.id">
+                                                        <td class=" text-primary pointer"><a
+                                                                (click)="gotoDetail(house.id)">
                                                                 {{house.hwbno}}</a>
                                                         </td>
                                                         <td>{{house.customerName}}</td>

@@ -4,7 +4,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { SeaLCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 import { CsTransactionDetail } from 'src/app/shared/models';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
@@ -41,6 +41,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _cd: ChangeDetectorRef
+
 
     ) {
         super(

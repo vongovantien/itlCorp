@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePayment, AdvancePaymentRequest, User } from 'src/app/shared/models';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
 import { SystemConstants } from 'src/constants/system.const';
@@ -18,7 +18,8 @@ import { SystemConstants } from 'src/constants/system.const';
 export class AdvancePaymentComponent extends AppList {
     @ViewChild(AdvancePaymentFormsearchComponent, { static: false }) formSearch: AdvancePaymentFormsearchComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
 
@@ -117,7 +118,7 @@ export class AdvancePaymentComponent extends AppList {
                 catchError(this.catchError),
                 finalize(() => {
                     this.confirmDeletePopup.hide();
-                    finalize(() => this._progressRef.complete());
+                    this._progressRef.complete();
                 })
             )
             .subscribe(
@@ -130,10 +131,22 @@ export class AdvancePaymentComponent extends AppList {
             );
     }
 
-    deleteAdvancePayment(selectedAdv: AdvancePayment) {
-        this.confirmDeletePopup.show();
-        this.selectedAdv = new AdvancePayment(selectedAdv);
+    prepareDeleteAdvance(selectedAdv: AdvancePayment){
+        this._accoutingRepo.checkAllowDeleteAdvance(selectedAdv.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.selectedAdv = new AdvancePayment(selectedAdv);
+                    this.confirmDeletePopup.show();
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
+
+    // deleteAdvancePayment(selectedAdv: AdvancePayment) {
+    //     this.confirmDeletePopup.show();
+    //     this.selectedAdv = new AdvancePayment(selectedAdv);
+    // }
 
     getRequestAdvancePaymentGroup(advanceNo: string, index: number) {
         if (!!this.advancePayments[index].advanceRequests.length) {
@@ -159,17 +172,36 @@ export class AdvancePaymentComponent extends AppList {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
     }
 
-    gotoDetailAdvPayment(adv: AdvancePayment) {
-        switch (adv.statusApproval) {
-            case 'New':
-            case 'Denied':
-                this._router.navigate([`home/accounting/advance-payment/${adv.id}`]);
-                break;
-            default:
-                this._router.navigate([`home/accounting/advance-payment/${adv.id}/approve`]);
-                break;
-        }
+    viewDetail(adv: AdvancePayment){
+        this._accoutingRepo.checkAllowGetDetailAdvance(adv.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    switch (adv.statusApproval) {
+                        case 'New':
+                        case 'Denied':
+                            this._router.navigate([`home/accounting/advance-payment/${adv.id}`]);
+                            break;
+                        default:
+                            this._router.navigate([`home/accounting/advance-payment/${adv.id}/approve`]);
+                            break;
+                    }
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
+
+    // gotoDetailAdvPayment(adv: AdvancePayment) {
+    //     switch (adv.statusApproval) {
+    //         case 'New':
+    //         case 'Denied':
+    //             this._router.navigate([`home/accounting/advance-payment/${adv.id}`]);
+    //             break;
+    //         default:
+    //             this._router.navigate([`home/accounting/advance-payment/${adv.id}/approve`]);
+    //             break;
+    //     }
+    // }
 
     export() {
         console.log('Export');

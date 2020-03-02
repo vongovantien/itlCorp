@@ -13,6 +13,7 @@ namespace eFMS.API.System.DL.Models.Criteria
 
         public string UserType { get; set; }
         public bool? Active { get; set; }
+        public string CompanyId { get; set; }
         //public string 
     }
 }

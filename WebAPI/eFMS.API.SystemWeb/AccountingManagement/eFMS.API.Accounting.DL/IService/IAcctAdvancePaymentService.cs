@@ -1,7 +1,6 @@
 ﻿using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
-using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -44,7 +43,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState InsertOrUpdateApprovalAdvance(AcctApproveAdvanceModel approve);
 
-        HandleState UpdateApproval(Guid addvanceId);
+        HandleState UpdateApproval(Guid advanceId);
 
         HandleState DeniedApprove(Guid advanceId, string comment);
 
@@ -53,5 +52,15 @@ namespace eFMS.API.Accounting.DL.IService
         List<AcctAdvanceRequestModel> GetAdvancesOfShipment();
         LockedLogResultModel GetAdvanceToUnlock(List<string> keyWords);
         HandleState UnLock(List<LockedLogModel> advancePayments);
+
+        bool CheckDetailPermissionByAdvanceNo(string advanceNo);
+
+        bool CheckDetailPermissionByAdvanceId(Guid advanceId);
+
+        bool CheckDeletePermissionByAdvanceNo(string advanceNo);
+
+        bool CheckDeletePermissionByAdvanceId(Guid advanceId);
+
+        bool CheckUpdatePermissionByAdvanceId(Guid advanceId);
     }
 }

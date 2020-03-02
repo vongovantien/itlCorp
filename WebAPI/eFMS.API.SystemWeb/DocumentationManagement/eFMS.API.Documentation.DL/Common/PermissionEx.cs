@@ -22,14 +22,14 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.BillingOpsId != currentUser.UserID && (model.GroupId != currentUser.GroupId && model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID)
+                    if (model.BillingOpsId != currentUser.UserID && (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
                         && !authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.BillingOpsId != currentUser.UserID && model.DepartmentId != currentUser.DepartmentId && model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.BillingOpsId))
+                    if (model.BillingOpsId != currentUser.UserID && model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID && !authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 403;
                     }
@@ -65,13 +65,13 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId)
+                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
                     {
                         code = 403;
                     }
@@ -103,15 +103,15 @@ namespace eFMS.API.Documentation.DL.Common
                         code = 403;
                     }
                     break;
-                case PermissionRange.Group:
-                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                case PermissionRange.Group: 
+                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
                         && !authorizeUserIds.Contains(model.PersonInCharge))
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && !authorizeUserIds.Contains(model.PersonInCharge))
+                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID && !authorizeUserIds.Contains(model.PersonInCharge))
                     {
                         code = 403;
                     }
@@ -147,13 +147,13 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId)
+                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
                     {
                         code = 403;
                     }
@@ -189,13 +189,13 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId)
+                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
                     {
                         code = 403;
                     }
@@ -231,14 +231,14 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Group:
-                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
                         && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
+                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
                     {
                         code = 403;
                     }

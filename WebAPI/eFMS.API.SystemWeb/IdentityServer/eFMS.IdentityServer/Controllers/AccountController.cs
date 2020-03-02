@@ -8,6 +8,7 @@ using eFMS.IdentityServer.DL.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -27,7 +28,7 @@ namespace eFMS.IdentityServer.Controllers
         }
 
         [HttpGet("Signout")]
-        public IActionResult SignoutAsync()
+        public async Task<IActionResult> SignoutAsync()
         {
             var userId = User.Claims.FirstOrDefault(wh => wh.Type == "id")?.Value;
             var uLogs = userLogService.Get(x => x.UserId == userId && x.LoggedOffOn == null).OrderByDescending(x => x.LoggedInOn);
@@ -40,6 +41,7 @@ namespace eFMS.IdentityServer.Controllers
                 }
                 userLogService.SubmitChanges();
             }
+            await HttpContext.SignOutAsync();
             return Ok();
         }
     }

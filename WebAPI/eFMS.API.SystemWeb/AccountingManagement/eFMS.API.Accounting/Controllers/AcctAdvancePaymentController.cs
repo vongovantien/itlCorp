@@ -15,7 +15,6 @@ using Microsoft.Extensions.Localization;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using System.Collections.Generic;
 using eFMS.API.Common.Infrastructure.Common;
-using eFMS.API.Infrastructure.Extensions;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -69,7 +68,6 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("QueryData")]
-        [Authorize]
         public IActionResult QueryData(AcctAdvancePaymentCriteria criteria)
         {
             var data = acctAdvancePaymentService.QueryData(criteria);
@@ -161,7 +159,10 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             var hs = acctAdvancePaymentService.AddAdvancePayment(model);
-            if (hs.Code == 403) return Forbid();
+            if (hs.Code == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -195,11 +196,41 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult CheckAllowDelete(Guid id)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
-            if (permissionRange == PermissionRange.None)
-                return Ok(false);
-            return Ok(true);
+            var result = acctAdvancePaymentService.CheckDeletePermissionByAdvanceId(id);
+            return Ok(result);
+        }
+        
+        /// <summary>
+        /// delete an advance payment existed item
+        /// </summary>
+        /// <param name="advanceNo">advanceNo of existed item that want to delete</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpDelete]
+        [Route("Delete")]
+        public IActionResult Delete(string advanceNo)
+        {
+            var isAllowDelete = acctAdvancePaymentService.CheckDeletePermissionByAdvanceNo(advanceNo);
+            if (isAllowDelete == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+
+            HandleState hs = acctAdvancePaymentService.DeleteAdvancePayment(advanceNo);
+            if (hs.Code == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
         /// <summary>
@@ -211,34 +242,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult CheckAllowDetail(Guid id)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            if (permissionRange == PermissionRange.None)
-                return Ok(false);
-            return Ok(true);
-        }
-
-        /// <summary>
-        /// delete an advance payment existed item
-        /// </summary>
-        /// <param name="advanceNo">advanceNo of existed item that want to delete</param>
-        /// <returns></returns>
-        [Authorize]
-        [HttpDelete]
-        [Route("Delete")]
-        public IActionResult Delete(string advanceNo)
-        {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
-
-            HandleState hs = acctAdvancePaymentService.DeleteAdvancePayment(advanceNo);
-            if (hs.Code == 403) return Forbid();
-
-            var message = HandleError.GetMessage(hs, Crud.Delete);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
+            var result = acctAdvancePaymentService.CheckDetailPermissionByAdvanceId(id);
             return Ok(result);
         }
 
@@ -252,9 +256,11 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult GetAdvancePaymentByAdvanceNo(string advanceNo)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            if (permissionRange == PermissionRange.None) return Forbid();
+            var isAllowViewDetail = acctAdvancePaymentService.CheckDetailPermissionByAdvanceNo(advanceNo);
+            if (isAllowViewDetail == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceNo(advanceNo);
             return Ok(data);
@@ -270,9 +276,11 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult GetAdvancePaymentByAdvanceId(Guid advanceId)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            if (permissionRange == PermissionRange.None) return Forbid();
+            var isAllowViewDetail = acctAdvancePaymentService.CheckDetailPermissionByAdvanceId(advanceId);
+            if (isAllowViewDetail == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceId(advanceId);
             return Ok(data);
@@ -289,6 +297,12 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Update(AcctAdvancePaymentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+
+            var isAllowUpdate = acctAdvancePaymentService.CheckUpdatePermissionByAdvanceId(model.Id);
+            if(isAllowUpdate == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             //Đã check bên trong function UpdateAdvancePayment
             //if (!model.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
@@ -330,7 +344,10 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             var hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
-            if (hs.Code == 403) return Forbid();
+            if (hs.Code == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -378,7 +395,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult SaveAndSendRequest(AcctAdvancePaymentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-
+            
             if (model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
@@ -428,10 +445,19 @@ namespace eFMS.API.Accounting.Controllers
             {
                 model.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctAdvancePaymentService.AddAdvancePayment(model);
-                if (hs.Code == 403) return Forbid();
+                if (hs.Code == 403)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+                }
             }
             else //Update Advance Payment
             {
+                var isAllowUpdate = acctAdvancePaymentService.CheckUpdatePermissionByAdvanceId(model.Id);
+                if (isAllowUpdate == false)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+                }
+
                 if (!model.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
@@ -440,7 +466,10 @@ namespace eFMS.API.Accounting.Controllers
 
                 model.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
-                if (hs.Code == 403) return Forbid();
+                if (hs.Code == 403)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+                }
             }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
