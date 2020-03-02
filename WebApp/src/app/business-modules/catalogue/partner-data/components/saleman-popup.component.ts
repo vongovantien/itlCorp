@@ -5,6 +5,7 @@ import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { PopupBase } from 'src/app/popup.base';
 import { formatDate } from '@angular/common';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
+import { User } from '@models';
 
 @Component({
     selector: 'app-saleman-popup',
@@ -43,6 +44,8 @@ export class SalemanPopupComponent extends PopupBase {
     description: AbstractControl;
     freightPayment: AbstractControl;
     termTypes: CommonInterface.INg2Select[];
+    allowDelete: boolean = false;
+    userLogged: User;
 
     @Input() popupData: Saleman;
     constructor(
@@ -164,7 +167,13 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     getSalemans() {
-        this._systemRepo.getListSystemUser({})
+        const claim = localStorage.getItem('id_token_claims_obj');
+        const currenctUser = JSON.parse(claim)["companyId"];
+        const body: any = {
+            companyId: currenctUser,
+            active: true
+        };
+        this._systemRepo.getListUsersBylevel(body)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {

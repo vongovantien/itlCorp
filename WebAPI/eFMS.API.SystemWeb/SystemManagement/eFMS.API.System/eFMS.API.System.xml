@@ -281,6 +281,7 @@
             <returns></returns>
         </member>
         <!-- Badly formed XML comment ignored for member "M:eFMS.API.System.Controllers.SysOfficeController.GetBy(System.Guid)" -->
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.System.Controllers.SysOfficeController.GetLocationById(System.Guid)" -->
         <member name="T:eFMS.API.System.Controllers.SysPermissionGeneralController">
             <summary>
             

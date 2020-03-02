@@ -21,6 +21,7 @@ import { ToastrService } from 'ngx-toastr';
 
 type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
 
+
 enum PartnerDataTab {
     ALL = 'allTab',
     CUSTOMER = 'Customer',
@@ -29,6 +30,8 @@ enum PartnerDataTab {
     CONSIGNEE = 'Consignee',
     SHIPPER = 'Shipper'
 }
+
+
 
 @Component({
     selector: 'app-partner',
@@ -68,6 +71,8 @@ export class PartnerComponent extends AppList implements OnInit {
     activeTab: string = this.tabName.allTab;
 
     selectedTab: PARTNERDATA_TAB = PartnerDataTab.ALL; // Default tab.
+
+    allowDelete: boolean = false;
 
     constructor(private router: Router,
         private _ngProgressService: NgProgress,
@@ -166,7 +171,6 @@ export class PartnerComponent extends AppList implements OnInit {
     }
 
     onDelete() {
-        let allowDelete = false;
         this._catalogueRepo.checkDeletePartnerPermission(this.partner.id)
             .pipe(
                 catchError(this.catchError),
@@ -176,33 +180,29 @@ export class PartnerComponent extends AppList implements OnInit {
                     if (!res) {
                         this.info403Popup.show();
                         this.confirmDeletePopup.hide();
-                        allowDelete = false;
                         return;
                     } else {
-                        allowDelete = true;
+                        this.confirmDeletePopup.hide();
                         this._progressRef.start();
+                        this._catalogueRepo.deletePartner(this.partner.id)
+                            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                            .subscribe(
+                                (res: CommonInterface.IResult) => {
+                                    if (res.status) {
+                                        this._toastService.success(res.message);
+
+                                        this.allPartnerComponent.dataSearch = this.criteria;
+                                        this.allPartnerComponent.getPartners();
+                                        this.confirmDeletePopup.hide();
+                                    } else {
+                                        this._toastService.error(res.message);
+                                    }
+                                }
+                            );
+
                     }
                 },
             );
-        if (allowDelete) {
-            this.confirmDeletePopup.hide();
-            this._catalogueRepo.deletePartner(this.partner.id)
-                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this._toastService.success(res.message);
-
-                            this.allPartnerComponent.dataSearch = this.criteria;
-                            this.allPartnerComponent.getPartners();
-                            this.confirmDeletePopup.hide();
-                        } else {
-                            this._toastService.error(res.message);
-                        }
-                    }
-                );
-        }
-
     }
 
     addPartner() {

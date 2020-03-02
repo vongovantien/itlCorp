@@ -41,7 +41,8 @@ export class OfficeDetailsComponent extends AppPage {
         datetimeModified: '',
         active: true,
         company: '',
-        bankAddress_En: ''
+        bankAddress_En: '',
+        location: ''
     };
     officeId: string = '';
 
@@ -97,7 +98,8 @@ export class OfficeDetailsComponent extends AppPage {
                 bankAddressLocal: this.formAdd.bankAddress_Local.value,
                 bankAddressEn: this.formAdd.bankAddress_En.value,
                 active: this.formAdd.active.value,
-                swiftCode: this.formAdd.swiftCode.value
+                swiftCode: this.formAdd.swiftCode.value,
+                location: this.formAdd.location.value
 
             };
             this._systemRepo.updateOffice(body)
@@ -146,7 +148,7 @@ export class OfficeDetailsComponent extends AppPage {
                             this.formData.bankAccountUSD = res.data.bankAccountUsd;
                             this.formData.bankAccountName_VN = res.data.bankAccountNameVn;
                             this.formData.bankAccountName_EN = res.data.bankAccountNameEn;
-
+                            this.formData.location = res.data.location;
                             this.formAdd.SelectedOffice = new Office(res.data);
                             this.formData.company = res.data.buid;
                             this.formData.active = res.data.active;

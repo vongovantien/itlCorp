@@ -13,6 +13,7 @@ namespace eFMS.API.System.DL.IService
     {
         List<SysUserViewModel> GetAll();
         SysUserViewModel GetUserById(string Id);
+        IQueryable<SysUserViewModel> QueryPermission(SysUserCriteria criteria);
         HandleState Insert(SysUserModel sysUserModel);
         HandleState Update(SysUserModel sysUserModel);
         IQueryable<SysUserViewModel> Paging(SysUserCriteria criteria, int page, int size, out int? rowsCount);

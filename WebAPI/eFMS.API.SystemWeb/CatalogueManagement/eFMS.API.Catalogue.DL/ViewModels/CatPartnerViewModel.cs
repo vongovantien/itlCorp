@@ -1,10 +1,11 @@
-﻿using System;
+﻿using eFMS.API.Catalogue.Service.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace eFMS.API.Catalogue.DL.ViewModels
 {
-    public class CatPartnerViewModel
+    public class CatPartnerViewModel : CatPartner
     {
         public string Id { get; set; }
         public string PartnerGroup { get; set; }

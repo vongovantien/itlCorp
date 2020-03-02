@@ -50,6 +50,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     dimensionDetails: FormArray;
     hwbno: AbstractControl;
     mawb: AbstractControl;
+    issueHblplace: AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: Observable<User[]>;
@@ -154,6 +155,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         );
 
 
+
         if (this.isUpdate) {
             this._store.select(getDetailHBlState)
                 .pipe(takeUntil(this.ngUnsubscribe))
@@ -196,6 +198,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     });
 
         } else {
+            const claim = localStorage.getItem('id_token_claims_obj');
+            const currenctUser = JSON.parse(claim)["officeId"];
+            this.getDetailOffice(currenctUser);
             // * get detail shipment from store.
             this._store.select(getTransactionDetailCsTransactionState)
                 .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
@@ -326,7 +331,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.consigneeDescription = this.formCreate.controls["consigneeDescription"];
         this.forwardingAgentDescription = this.formCreate.controls["forwardingAgentDescription"];
         this.dimensionDetails = <FormArray>this.formCreate.controls["dimensionDetails"];
-
+        this.issueHblplace = this.formCreate.controls["issueHblplace"];
         this.formCreate.get('dimensionDetails')
             .valueChanges
             .pipe(
@@ -419,6 +424,21 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     getDescription(fullName: string, address: string, tel: string, fax: string) {
         return `${fullName} \n${address} \nTel No: ${!!tel ? tel : ''} \nFax No: ${!!fax ? fax : ''} \n`;
+    }
+
+    getDetailOffice(id: string) {
+        this._systemRepo.getLocationOfficeById(id)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this.issueHblplace.setValue(res.data);
+                    }
+                },
+            );
+
     }
 
     createDIMItem(): FormGroup {

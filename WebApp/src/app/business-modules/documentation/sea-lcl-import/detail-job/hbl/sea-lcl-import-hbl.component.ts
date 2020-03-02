@@ -5,14 +5,14 @@ import { ToastrService } from 'ngx-toastr';
 
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { HouseBill } from 'src/app/shared/models';
+import { HouseBill, CsTransaction } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/share-business';
 import { getParamsRouterState } from 'src/app/store';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 
-import { takeUntil, take, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, take, catchError, finalize, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../share-business/store';
 import { SortService } from '@services';
@@ -28,11 +28,12 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteHBLPopup: ConfirmPopupComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-
+    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
     jobId: string;
 
     houseBills: HouseBill[] = [];
     selectedHbl: HouseBill;
+    shipmentDetail: CsTransaction;
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -193,8 +194,23 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
             );
     }
 
+    getDetailShipment() {
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(
+                skip(1),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.shipmentDetail = res;
+                    }
+                },
+            );
+    }
+
     gotoDetail(id: string) {
-        this._documentRepo.checkViewDetailHblPermission(id)
+        this._documentRepo.checkDetailShippmentPermission(this.shipmentDetail.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -203,11 +219,12 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
                     if (res) {
                         this._router.navigate([`/home/documentation/sea-lcl-import/${this.jobId}/hbl/${id}`]);
                     } else {
-                        this._toastService.error("You don't have permission to view detail");
+                        this.info403Popup.show();
                     }
                 },
             );
     }
+
 
     deleteJob() {
         this.confirmDeleteJobPopup.show();

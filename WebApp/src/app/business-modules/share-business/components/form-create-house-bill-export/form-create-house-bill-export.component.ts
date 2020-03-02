@@ -54,6 +54,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     originBlnumber: AbstractControl;
     moveType: AbstractControl;
     issueHbldate: AbstractControl;
+    issueHblplace: AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: User[];
@@ -204,7 +205,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             forwardingAgentDescription: [],
             placeFreightPay: [null, Validators.required],
             originBlnumber: [],
-            issueHblplace: ['Ho Chi Minh, Viet Nam'],
+            issueHblplace: [],
             referenceNo: [],
             exportReferenceNo: [],
             moveType: [],
@@ -245,6 +246,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.originBlnumber = this.formCreate.controls["originBlnumber"];
         this.moveType = this.formCreate.controls["moveType"];
         this.issueHbldate = this.formCreate.controls["issueHbldate"];
+        this.issueHblplace = this.formCreate.controls["issueHblplace"];
     }
 
     updateFormValue(data: CsTransactionDetail) {
@@ -432,4 +434,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         }
 
     }
+
+
 }

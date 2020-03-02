@@ -123,6 +123,14 @@ export class DocumentationRepo {
         );
     }
 
+    checkDetailShippmentPermission(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/CheckPermission/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+
     deleteShipment(id: string) {
         return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Delete/${id}`).pipe(
             catchError((error) => throwError(error)),

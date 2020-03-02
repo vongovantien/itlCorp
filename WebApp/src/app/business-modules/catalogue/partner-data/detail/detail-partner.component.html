@@ -89,7 +89,7 @@
                                     *ngFor="let sale of saleMandetail | filter : keyword : ['username','serviceName','office','company']; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 50px">
-                                            <button type="button"
+                                            <button type="button" *ngIf="partner.permission.allowDelete"
                                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                 title="Remove" data-toggle="modal" (click)="deleteSaleman(i)">
                                                 <i class="la la-trash"></i>
