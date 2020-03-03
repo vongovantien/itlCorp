@@ -95,5 +95,28 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        /// <summary>
+        /// Export Advance Payment
+        /// </summary>
+        /// <param name="advancePaymentCriteria"></param>
+        /// <returns></returns>
+        [Route("ExportBravoSOA")]
+        [HttpPost]
+        public async Task<IActionResult> ExportBravoSOA(string soaNo)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi( aPis.HostStaging + Urls.Accounting.GetDataBravoSOAUrl + soaNo) ;
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<ExportBravoSOAModel>>();
+
+            var stream = new AccountingHelper().GenerateBravoSOAExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Advance Payment List.xlsx");
+
+            return fileContent;
+        }
     }
 }

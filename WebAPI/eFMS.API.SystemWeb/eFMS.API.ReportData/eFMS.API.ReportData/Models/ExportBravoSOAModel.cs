@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
-namespace eFMS.API.Accounting.DL.Models
+namespace eFMS.API.ReportData.Models
 {
-    public class ExportImportBravoFromSOAResult
+    public class ExportBravoSOAModel
     {
         public string SOANo { get; set; }
         public string TaxCode { get; set; }
@@ -41,8 +41,5 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? Quantity { get; set; }
         public string Email { get; set; }
         public string TaxCodeOBH { get; set; }
-
-
-
     }
 }

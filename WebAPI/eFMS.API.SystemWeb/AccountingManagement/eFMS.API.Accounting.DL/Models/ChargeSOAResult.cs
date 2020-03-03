@@ -41,7 +41,7 @@ namespace eFMS.API.Accounting.DL.Models
 
         public string Service { get; set; }
         public string CDNote { get; set; }
-        public string AddressPartnerVN { get; set; }
+        public string TaxCodeOBH { get; set; }
 
     }
 }

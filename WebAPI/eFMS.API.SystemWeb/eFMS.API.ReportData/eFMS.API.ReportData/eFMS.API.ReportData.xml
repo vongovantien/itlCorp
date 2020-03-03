@@ -32,6 +32,13 @@
             <param name="settlementPaymentCriteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportBravoSOA(System.String)">
+            <summary>
+            Export Advance Payment
+            </summary>
+            <param name="advancePaymentCriteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
             <summary>
             A base class for an MVC controller without view support.

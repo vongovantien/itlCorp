@@ -680,6 +680,8 @@ namespace eFMS.API.Accounting.DL.Services
             var csTransDe = csTransactionDetailRepo.Get();
             var debitNote = acctCdnoteRepo.Get();
             var charge = catChargeRepo.Get();
+            var partner = catPartnerRepo.Get();
+
             //OBH Receiver (SELL - Credit)
             var queryObhSellOperation = from sur in surcharge
                                         join ops in opst on sur.Hblid equals ops.Hblid
@@ -687,6 +689,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         from debitN in debitN2.DefaultIfEmpty()
                                         join chg in charge on sur.ChargeId equals chg.Id into chg2
                                         from chg in chg2.DefaultIfEmpty()
+                                        join pat in partner on sur.PaymentObjectId equals pat.Id into pat2
+                                        from pat in pat2.DefaultIfEmpty()
                                         select new ChargeSOAResult
                                         {
                                             ID = sur.Id,
@@ -719,7 +723,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             DatetimeModified = sur.DatetimeModified,
                                             CommodityGroupID = ops.CommodityGroupId,
                                             Service = "CL",
-                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                                            TaxCodeOBH  = pat.TaxCode
                                         };
             queryObhSellOperation = queryObhSellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -1728,7 +1733,7 @@ namespace eFMS.API.Accounting.DL.Services
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var soa = DataContext.Get(x => x.Soano == soaNo);
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var chargeDefaults = chargeDefaultRepo.Get();
+            var chargeDefaults = chargeDefaultRepo.Get(x=>x.Type =="Công Nợ");
             var charge = GetChargeShipmentDocAndOperation(query);
             var partner = catPartnerRepo.Get();
             var dataResult = from s in soa
@@ -1738,13 +1743,13 @@ namespace eFMS.API.Accounting.DL.Services
                              from pat in pat2.DefaultIfEmpty()
                              join cd in chargeDefaults on chg.ID equals cd.ChargeId into defaults
                              from cd in defaults.DefaultIfEmpty()
-                             where cd.Type.Contains("Công Nợ")
+          
                              select new ExportImportBravoFromSOAResult
                              {
                                  ServiceDate = chg.ServiceDate,
                                  SOANo = s.Soano,
                                  Service = GetServiceNameOfSoa(s.ServiceTypeId).ToString(),
-                                 PartnerCode = pat.Id,
+                                 PartnerCode = pat.TaxCode,
                                  Debit = chg.Debit,
                                  Credit = chg.Credit,
                                  ChargeCode = chg.ChargeCode,
@@ -1774,7 +1779,8 @@ namespace eFMS.API.Accounting.DL.Services
                                  CustomerAddress = pat.AddressVn,
                                  MBL = chg.MBL,
                                  Email = pat.Email,
-
+                                 TaxCodeOBH = chg.TaxCodeOBH,
+                                 CustomNo = chg.CustomNo
                                  //CustomNo = chg.CustomNo,
                                  //CreditDebitNo = chg.CreditDebitNo,
                                  //CurrencySOA = s.Currency,
