@@ -172,11 +172,12 @@
             <param name="advancePayments"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.DetailAdvancePaymentExport(System.Guid)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.DetailAdvancePaymentExport(System.Guid,System.String)">
             <summary>
             Export advance payment by advance id
             </summary>
             <param name="advanceId">Id of advance payment</param>
+            <param name="language"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController">

@@ -78,15 +78,21 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+        /// <summary>
+        /// Export detail advance payment
+        /// </summary>
+        /// <param name="advanceId">Id of advance payment</param>
+        /// <param name="language">VN (Việt Nam) or ENG (English)</param>
+        /// <returns></returns>
         [Route("ExportDetailAdvancePayment")]
         [HttpGet]
-        public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId)
+        public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string language)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.DetailAdvancePaymentExportUrl + advanceId);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.DetailAdvancePaymentExportUrl + "?advanceId=" + advanceId + "&&language=" + language);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<AdvanceExport>();
 
-            var stream = new AccountingHelper().GenerateDetailAdvancePaymentExcel(dataObjects.Result);
+            var stream = new AccountingHelper().GenerateDetailAdvancePaymentExcel(dataObjects.Result, language);
             if (stream == null)
             {
                 return null;

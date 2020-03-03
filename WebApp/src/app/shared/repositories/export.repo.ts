@@ -153,5 +153,19 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportAdvancePaymentDetail(advanceId: string, language: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}`).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
+
+    exportSettlementPaymentDetail(settlementId: string, language: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailSettlementPayment?settlementId=${settlementId}&language=${language}`).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
 }
 

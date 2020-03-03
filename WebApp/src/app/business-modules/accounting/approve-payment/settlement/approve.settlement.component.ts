@@ -6,7 +6,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ISettlementPaymentData } from '../../settlement-payment/detail/detail-settlement-payment.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
@@ -45,7 +45,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
         private _router: Router,
         private _progressService: NgProgress,
         private _modalService: BsModalService,
-
+        private _exportRepo: ExportRepo,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -181,7 +181,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             );
     }
 
-    preview() {
+    previewSettlementPayment() {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
@@ -200,6 +200,15 @@ export class ApporveSettlementPaymentComponent extends AppPage {
 
                 },
             );
+    }
+
+    exportSettlementPayment(language: string) {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+
+        //this._progressRef.start();
     }
 }
 

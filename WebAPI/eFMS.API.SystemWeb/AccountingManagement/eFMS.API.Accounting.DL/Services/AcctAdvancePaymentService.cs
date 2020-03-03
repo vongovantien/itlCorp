@@ -2366,29 +2366,29 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         #region --- EXPORT ADVANCE ---
-        public AdvanceExport AdvancePaymentExport(Guid advanceId)
+        public AdvanceExport AdvancePaymentExport(Guid advanceId, string language)
         {
             AdvanceExport dataExport = new AdvanceExport();
             var advancePayment = GetAdvancePaymentByAdvanceId(advanceId);
             if (advancePayment == null) return null;
           
-            dataExport.InfoAdvance = GetInfoAdvanceExport(advancePayment);           
+            dataExport.InfoAdvance = GetInfoAdvanceExport(advancePayment, language);           
             dataExport.ShipmentsAdvance = GetListShipmentAdvanceExport(advancePayment);
             return dataExport;
         }
 
-        private InfoAdvanceExport GetInfoAdvanceExport(AcctAdvancePaymentModel advancePayment)
+        private InfoAdvanceExport GetInfoAdvanceExport(AcctAdvancePaymentModel advancePayment, string language)
         {
             string _requester = string.IsNullOrEmpty(advancePayment.Requester) ? string.Empty : GetEmployeeByUserId(advancePayment.Requester)?.EmployeeNameVn;
             
             #region -- Advance Amount & Sayword --
             var _advanceAmount = advancePayment.AdvanceRequests.Select(s => s.Amount).Sum();
             var _sayWordAmount = string.Empty;
-            var _currencyAdvance = advancePayment.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL && _advanceAmount >= 1 ?
+            var _currencyAdvance = (language == "VN" && _advanceAmount >= 1) ?
                        (_advanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                     :
-                    "U.S. dollar(s)";
-            _sayWordAmount = advancePayment.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL && _advanceAmount >= 1 ?
+                    advancePayment.AdvanceCurrency;
+            _sayWordAmount = (language == "VN" && _advanceAmount >= 1) ?
                         InWordCurrency.ConvertNumberCurrencyToString(_advanceAmount.Value, _currencyAdvance)
                     :
                         InWordCurrency.ConvertNumberCurrencyToStringUSD(_advanceAmount.Value, _currencyAdvance);
