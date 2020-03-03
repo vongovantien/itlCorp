@@ -457,6 +457,7 @@
             </summary>
             <param name="soaNo">soaNo that want to retrieve SOA</param>
             <returns></returns>
+            
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.ExportDetailSOA(eFMS.API.Accounting.DL.Models.Criteria.ExportDetailSOACriteria)">
             <summary>

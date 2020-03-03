@@ -304,7 +304,9 @@ namespace eFMS.API.Accounting.Controllers
         /// </summary>
         /// <param name="soaNo">soaNo that want to retrieve SOA</param>
         /// <returns></returns>
-        [HttpGet("GetDataExportImportBravoSFromOA")]
+        /// 
+        [HttpGet]
+        [Route("GetDataExporttBravoFromSOA")]
         public IActionResult GetDataExportImportBravoFromSOA(string soaNo)
         {
             var data = acctSOAService.GetDataExportImportBravoFromSOA(soaNo);
