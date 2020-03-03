@@ -860,4 +860,16 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    getPartnerCharge(partnerId: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerCharge/${partnerId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updatePartnerCharge(body: any[]) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerCharge/AddAndUpdate`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }

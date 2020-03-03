@@ -141,13 +141,14 @@
                         <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmited && !company.value}">
                             <label class="form-control-label">
                                 Company <span class="m--font-danger">(*)</span>
+                                {{isReadonly | async}}
                             </label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: company.value}"
                                 (itemSelected)="onSelectDataFormInfo($event)"
                                 [selectedDisplayFields]="configOffice.selectedDisplayFields"
                                 [dataSources]="configOffice.dataSource" (remove)="resetFormControl(company)"
                                 [displayFields]="configOffice.displayFields" [height]="200" placeholder="Select Company"
-                                [disabled]="isReadonly">
+                                [disabled]="isReadonly | async">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback" *ngIf="isSubmited && !company.value ">
                                 Company is required!

@@ -27,7 +27,7 @@ export abstract class PopupBase extends AppPage {
     requestSort: any = null;
 
     isSubmitted: boolean = false;
-
+    headers: CommonInterface.IHeaderTable[];
     constructor() {
         super();
 
