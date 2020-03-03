@@ -16,7 +16,18 @@ namespace eFMS.API.Common.Globals
             }
             return folderResult;
         }
-        
+
+        public static string GetLogoITL()
+        {
+            string folderReportPreview = GetFolderReportPreview().FirstOrDefault();
+            string folderResult = string.Empty;
+            if (folderReportPreview.Count() > 0)
+            {
+                folderResult = Directory.GetDirectories(folderReportPreview).Where(s => s.Contains("Images")).FirstOrDefault() + "\\logo-ITL.png";
+            }
+            return folderResult;
+        }
+
         public static string GetFolderDownloadReports()
         {
             string folderReportPreview = GetFolderReportPreview().FirstOrDefault();

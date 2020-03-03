@@ -307,9 +307,21 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             });
     }
 
-
     getDescription(fullName: string, address: string, tel: string, fax: string) {
-        return `${fullName} \n${address} \nTel No: ${!!tel ? tel : ''} \nFax No: ${!!fax ? fax : ''} \n`;
+        let strDescription: string = '';
+        if (!!fullName) {
+            strDescription += fullName;
+        }
+        if (!!address) {
+            strDescription = strDescription + "\n" + address;
+        }
+        if (!!tel) {
+            strDescription = strDescription + "\nTel No:" + tel;
+        }
+        if (!!fax) {
+            strDescription = strDescription + "\nFax No:" + fax;
+        }
+        return strDescription;
     }
 
     getDropdownData() {

@@ -29,7 +29,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     containerDescription: string = '';
 
-    packages: Unit[];
+    packages: Unit[] = [];
     selectedPackage: any;
 
     constructor(
@@ -81,13 +81,11 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
                         this.totalChargeWeight = res.chargeWeight;
                         this.grossWeight = res.grossWeight;
                         this.containerDetail = res.packageContainer;
-                        console.log(this.containerDetail);
                         this.commodities = res.commodity;
                         this.description = res.desOfGoods;
-                        this.selectedPackage = [this.packages.find(p => p.id === res.packageType)];
+                        this.selectedPackage = !!this.packages.length ? [this.packages.find(p => p.id === res.packageType)] : null;
                         this.packageQty = res.packageQty;
                         this.selectedPackage = res.packageType;
-                        console.log(this.totalCBM);
                     }
                 }
             );

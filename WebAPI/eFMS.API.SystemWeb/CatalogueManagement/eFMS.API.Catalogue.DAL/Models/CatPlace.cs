@@ -32,5 +32,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
         public Guid? WarehouseId { get; set; }
+        public string WarehouseName { get; set; }
     }
 }

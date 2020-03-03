@@ -16,6 +16,8 @@ export abstract class AppForm extends AppPage {
     isDisabled: boolean = null;
     isSubmitted: boolean = false;
     isCollapsed: boolean = true;
+    isReadonly: any = false;
+
     selectedRange: any;
 
     resetButtonSetting: ButtonModalSetting = {

@@ -9,7 +9,8 @@
             <span class="e--combogrid_icon__dropdown">
                 <i class="fa fa-angle-down" aria-hidden="true"></i>
             </span>
-            <span class="e--combogrid_icon__clear" (click)="removeCurrenActiveItem()" *ngIf="!!displaySelectedStr">
+            <span class="e--combogrid_icon__clear" (click)="removeCurrenActiveItem()"
+                *ngIf="!!displaySelectedStr && !Disabled">
                 <i class="la la-times" aria-hidden="true"></i>
             </span>
         </div>

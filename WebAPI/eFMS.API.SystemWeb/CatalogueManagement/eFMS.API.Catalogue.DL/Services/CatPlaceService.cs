@@ -347,6 +347,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 new SqlParameter(){ ParameterName="@placeTypeID", Value = placeTypeID }
             };
             var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetCatPlace>(parameters);
+            
             return list;
         }
 
@@ -900,7 +901,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
             var list = GetBy(placetype);
-
+            
             if (criteria.All == null)
             {
                 list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1)
@@ -941,6 +942,15 @@ namespace eFMS.API.Catalogue.DL.Services
                                    )
                                    && (x.Active == criteria.Active || criteria.Active == null)
                                    ).AsQueryable();
+            }
+
+            foreach (var item in list)
+            {
+                if(item.WarehouseId != null)
+                {
+                    var place = DataContext.First(x => x.Id == item.WarehouseId);
+                    item.WarehouseName = place.NameEn;
+                }
             }
             return list;
         }

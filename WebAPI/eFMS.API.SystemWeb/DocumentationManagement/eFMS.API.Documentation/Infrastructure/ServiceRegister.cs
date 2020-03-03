@@ -40,7 +40,9 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<IShipmentService, ShipmentService>();
             services.AddTransient<ICsArrivalFrieghtChargeService, CsArrivalFrieghtChargeService>();
             services.AddTransient<ICsDimensionDetailService, CsDimensionDetailService>();
-            services.AddSingleton<ISysImageService, SysImageService>();
+            services.AddTransient<ISysImageService, SysImageService>();
+            services.AddTransient<ICsAirWayBillService, CsAirWayBillService>();
+            services.AddTransient<ICsShipmentOtherChargeService, CsShipmentOtherChargeService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

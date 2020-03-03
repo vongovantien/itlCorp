@@ -6,6 +6,7 @@ namespace eFMS.API.Documentation.Service.Models
     public partial class CsDimensionDetail
     {
         public Guid Id { get; set; }
+        public Guid? AirWayBillId { get; set; }
         public Guid? Mblid { get; set; }
         public Guid? Hblid { get; set; }
         public decimal? Length { get; set; }

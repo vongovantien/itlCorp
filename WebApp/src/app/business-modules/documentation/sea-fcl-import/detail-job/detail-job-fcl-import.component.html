@@ -2,16 +2,9 @@
     <app-sub-header>
         <div class="c-button-actions">
             <ng-container *ngIf="!!fclImportDetail && !fclImportDetail.isLocked">
-                <button type="button"
-                    class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                    (click)="lockShipment()" *ngIf="!!fclImportDetail && fclImportDetail.permission.allowLock">
-                    <span>
-                        <i class="la la-lock"></i>
-                        <span>
-                            Lock
-                        </span>
-                    </span>
-                </button>
+                <app-default-button [buttonSetting]="lockButtonSetting" (click)="lockShipment()"
+                    *ngIf="!!fclImportDetail && fclImportDetail.permission.allowLock">
+                </app-default-button>
             </ng-container>
             <span *ngIf="!!fclImportDetail && !!fclImportDetail.isLocked" class="m--margin-right-10 align-middle">
                 <i class="fa fa-lock text-danger fa-3x"></i>
@@ -69,9 +62,9 @@
                     <form-create-sea-import>
                         <ng-container *ngIf="!!fclImportDetail">
                             <date-time-modified [timeCreated]="fclImportDetail.datetimeCreated"
-                                [userCreated]="fclImportDetail.userCreated"
+                                [userCreated]="fclImportDetail.userNameCreated"
                                 [timeModified]="fclImportDetail.datetimeModified"
-                                [userModified]="fclImportDetail.userModified">
+                                [userModified]="fclImportDetail.userNameModified">
                             </date-time-modified>
                         </ng-container>
 

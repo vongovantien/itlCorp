@@ -198,6 +198,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 || charge.unitPrice < 0
                 || charge.quantity < 0
                 || charge.vatrate > 100
+                || charge.paymentObjectId === charge.payerId
             ) {
                 valid = false;
                 break;

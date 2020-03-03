@@ -172,6 +172,13 @@
             <param name="advancePayments"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.DetailAdvancePaymentExport(System.Guid)">
+            <summary>
+            Export advance payment by advance id
+            </summary>
+            <param name="advanceId">Id of advance payment</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController">
             <summary>
             A base class for an MVC controller without view support.

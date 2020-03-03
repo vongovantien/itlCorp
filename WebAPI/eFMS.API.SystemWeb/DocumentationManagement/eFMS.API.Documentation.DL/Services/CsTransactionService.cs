@@ -292,7 +292,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         if (model.DimensionDetails != null)
                         {
-                            var hscontainers = dimensionDetailService.UpdateMasterBill(model.DimensionDetails, transaction.Id);
+                            var hsdimensions = dimensionDetailService.UpdateMasterBill(model.DimensionDetails, transaction.Id);
                         }
                         else
                         {

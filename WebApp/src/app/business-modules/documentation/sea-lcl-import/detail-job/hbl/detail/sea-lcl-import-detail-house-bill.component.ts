@@ -16,6 +16,7 @@ import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 import * as fromShareBussiness from '../../../../../share-business/store';
 import { ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBussinessHBLGoodSummaryLCLComponent, getDetailHBlPermissionState } from 'src/app/business-modules/share-business';
 import isUUID from 'validator/lib/isUUID';
+import { DataService } from '@services';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -57,10 +58,11 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         protected _router: Router,
         protected _store: Store<fromShareBussiness.ITransactionState>,
         private _exportRepository: ExportRepo,
-        protected _cd: ChangeDetectorRef
+        protected _cd: ChangeDetectorRef,
+        protected _dataService: DataService,
 
     ) {
-        super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd);
+        super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
     }
 
     ngOnInit() {

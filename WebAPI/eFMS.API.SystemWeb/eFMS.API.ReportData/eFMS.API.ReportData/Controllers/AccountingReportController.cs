@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using eFMS.API.ReportData.FormatExcel;
 using eFMS.API.ReportData.Helpers;
 using eFMS.API.ReportData.HttpServices;
 using eFMS.API.ReportData.Models;
+using eFMS.API.ReportData.Models.Accounting;
 using eFMS.API.ReportData.Models.Criteria;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -11,7 +14,7 @@ using Microsoft.Extensions.Options;
 namespace eFMS.API.ReportData.Controllers
 {
     /// <summary>
-    /// 
+    /// Accounting Report Controller
     /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
@@ -42,7 +45,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AdvancePaymentModel>>();
 
-            var stream = new Helper().GenerateAdvancePaymentExcel(dataObjects.Result);
+            var stream = new AccountingHelper().GenerateAdvancePaymentExcel(dataObjects.Result);
             if (stream == null)
             {
                 return null;
@@ -65,12 +68,30 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SettlementPaymentModel>>();
 
-            var stream = new Helper().GenerateSettlementPaymentExcel(dataObjects.Result);
+            var stream = new AccountingHelper().GenerateSettlementPaymentExcel(dataObjects.Result);
             if (stream == null)
             {
                 return null;
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Payment List.xlsx");
+
+            return fileContent;
+        }
+
+        [Route("ExportDetailAdvancePayment")]
+        [HttpGet]
+        public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.DetailAdvancePaymentExportUrl + advanceId);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<AdvanceExport>();
+
+            var stream = new AccountingHelper().GenerateDetailAdvancePaymentExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Advance Form - eFMS.xlsx");
 
             return fileContent;
         }

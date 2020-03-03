@@ -5,6 +5,7 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class CsAirWayBill
     {
+        public Guid Id { get; set; }
         public Guid JobId { get; set; }
         public string Mblno1 { get; set; }
         public string Mblno2 { get; set; }
@@ -43,5 +44,38 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Notify { get; set; }
         public string IssuedPlace { get; set; }
         public DateTime? IssuedDate { get; set; }
+        public int? PackageQty { get; set; }
+        public decimal? GrossWeight { get; set; }
+        public string Rclass { get; set; }
+        public string ComItemNo { get; set; }
+        public decimal? ChargeWeight { get; set; }
+        public decimal? RateCharge { get; set; }
+        public bool? Min { get; set; }
+        public decimal? Total { get; set; }
+        public int? SeaAir { get; set; }
+        public decimal? Hw { get; set; }
+        public decimal? Cbm { get; set; }
+        public string VolumeField { get; set; }
+        public string DesOfGoods { get; set; }
+        public string OtherCharges { get; set; }
+        public string Wtpp { get; set; }
+        public string Valpp { get; set; }
+        public string Taxpp { get; set; }
+        public string DueAgentPp { get; set; }
+        public string DueCarrierPp { get; set; }
+        public string TotalPp { get; set; }
+        public string Wtcll { get; set; }
+        public string Valcll { get; set; }
+        public string Taxcll { get; set; }
+        public string DueAgentCll { get; set; }
+        public string DueCarrierCll { get; set; }
+        public string TotalCll { get; set; }
+        public string ShippingMark { get; set; }
+        public string IssuedBy { get; set; }
+        public string CurrConvertRate { get; set; }
+        public string Sci { get; set; }
+        public string CcchargeInDrc { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? DatetimeModified { get; set; }
     }
 }

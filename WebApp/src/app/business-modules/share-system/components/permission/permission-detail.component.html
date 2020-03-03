@@ -16,7 +16,6 @@
         </div>
     </div>
 </form-create-permission>
-
 <div class="m-content">
     <div class="m-portlet">
         <div class="m-portlet__body">
@@ -52,12 +51,9 @@
                         Office: <span class="text-success">{{permissionSample.officeName}}</span>
                     </div>
                     <div class="col-3">
-
                         Permission Name: <span class="text-success">{{permissionSample.permissionName}}</span>
-
                     </div>
                 </div>
-
             </div>
             <div class="form-group">
                 <div class="row"
@@ -65,24 +61,17 @@
                     <div class="col-6">
                         Created: {{permissionSample.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
                             class="text-success">{{permissionSample.nameUserCreated}}</span>
-
-
                     </div>
                     <div class="col-6">
                         Modified: {{permissionSample.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
                             class="text-success">{{permissionSample.nameUserModified}} </span>
-
-
                     </div>
                 </div>
             </div>
-
-
-
             <tabset>
                 <tab heading="General Permission">
                     <div class="general-wrapper">
-                        <div class="header-permission row">
+                        <div class="header-permission row" #stickyMenu [class.sticky]="isSticky">
                             <div class="p-2 col m-w-100">Module</div>
                             <div class="p-2 col">Function</div>
                             <div class="p-2 col">Access</div>
@@ -214,8 +203,6 @@
         </div>
     </div>
 </div>
-
-
 
 <confirm-popup (onSubmit)="onSavePermissionSample()" [body]="'Do you want to save this permission ?'"
     [labelConfirm]="'Yes'">

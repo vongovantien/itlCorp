@@ -58,23 +58,35 @@
                                     *ngFor="let container of initContainers | filter: keyword: ['containerTypeId','seaNo','markNo']; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col fixed-side">
                                         <div class="table-actions">
+                                            <button (click)="duplicate(i)"
+                                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
+                                                title="Duplicate"><i class="la la-copy"></i>
+                                            </button>
                                             <button type="button" (click)="deleteContainerItem(i,container)"
                                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                 title="Remove">
                                                 <i class="la la-trash"></i>
                                             </button>
+
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-group "
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && (!container.containerTypeId || isDuplicateContPakage )}">
-                                            <select class="form-control" [(ngModel)]="container.containerTypeId"
+                                            <!-- <select class="form-control" [(ngModel)]="container.containerTypeId"
                                                 (ngModelChange)="onChangeDataFormTable()" name=containerTypeId>
                                                 <option [ngValue]="null">Please select</option>
                                                 <option *ngFor="let unit of containerUnits" [ngValue]="unit.id">
                                                     {{unit.unitNameEn}}
                                                 </option>
-                                            </select>
+                                            </select> -->
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field: 'id', value: container.containerTypeId}"
+                                                (itemSelected)="onChangeDataFormTable();container.containerTypeId = $event.id"
+                                                [selectedDisplayFields]="['unitNameEn']" [dataSources]="containerUnits"
+                                                [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'descriptionEn','label':'Descriptiton'}]"
+                                                placeholder="Please select">
+                                            </app-combo-grid-virtual-scroll>
                                         </div>
                                     </td>
                                     <td>
@@ -174,7 +186,8 @@
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.nw && container.nw < 0}">
                                             <input type="number" class="form-control" [(ngModel)]="container.nw"
-                                                name="nw" min="0" step=".10" numeric [decimals]="digitDecimal">
+                                                name="nw" min="0" step=".10" numeric [decimals]="digitDecimal"
+                                                autoFormatCurrency>
                                         </div>
                                     </td>
 

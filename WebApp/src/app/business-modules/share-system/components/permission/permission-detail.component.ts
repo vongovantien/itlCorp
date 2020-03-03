@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
@@ -7,8 +7,6 @@ import { tap, switchMap, catchError, finalize } from 'rxjs/operators';
 import { PermissionSample } from 'src/app/shared/models';
 import { AppPage } from 'src/app/app.base';
 import { ConfirmPopupComponent } from '@common';
-import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { PermissionFormCreateComponent } from 'src/app/business-modules/system/permission/components/form-create-permission/form-create-permission.component';
 
 @Component({
@@ -19,6 +17,7 @@ import { PermissionFormCreateComponent } from 'src/app/business-modules/system/p
 export class ShareSystemDetailPermissionComponent extends AppPage {
     @ViewChild(PermissionFormCreateComponent, { static: false }) formCreateComponent: PermissionFormCreateComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
+    @ViewChild('stickyMenu', { static: false }) menuElement: ElementRef;
 
     permissionId: string = '';
 
@@ -26,25 +25,24 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
     permissionSample: PermissionSample;
 
-
     type: string = '';
-
     userId: string = '';
-
     id: string = '';
-
     ids: string = '';
-
-
     idUserPermission: string = '';
 
-    cancelButtonSetting: ButtonModalSetting = {
-        typeButton: ButtonType.cancel
-    };
-    addButtonSetting: ButtonModalSetting = {
-        typeButton: ButtonType.add
-    };
+    menuPosition: number = 0;
+    isSticky: boolean = false;
 
+    @HostListener('window:scroll', ['$event'])
+    handleScroll() {
+        const windowScroll = window.pageYOffset;
+        if (windowScroll + 70 >= this.menuPosition + 42) {
+            this.isSticky = true;
+        } else {
+            this.isSticky = false;
+        }
+    }
     constructor(
         protected _systemRepo: SystemRepo,
         protected _progressService: NgProgress,
@@ -105,14 +103,12 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                     } else {
                         this.permissionSample = new PermissionSample();
                     }
-                    // if (this.permissionSample.id === "" && this.type === 'office') {
-                    //     this._router.navigate([`home/system/office/${this.id}`]);
-                    //     this._toastService.error('This user does not have permission' || 'This user does not have permission', '');
-                    // }
-
-
                 }
             );
+    }
+
+    ngAfterViewInit() {
+        this.menuPosition = this.menuElement.nativeElement.offsetTop;
     }
 
     updateUsersPermission() {

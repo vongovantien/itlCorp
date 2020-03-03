@@ -28,6 +28,7 @@ import isUUID from 'validator/lib/isUUID';
 
 
 import { forkJoin } from 'rxjs';
+import { DataService } from '@services';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -64,7 +65,8 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _store: Store<fromShareBussiness.ITransactionState>,
-        protected _cd: ChangeDetectorRef
+        protected _cd: ChangeDetectorRef,
+        protected _dataService: DataService
 
 
     ) {
@@ -307,6 +309,11 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             dosentTo2: null,
         };
         return body;
+    }
+
+    onSelectTabDO() {
+        const warehouseName = this._dataService.getDataByKey("polName");
+        this.deliveryComponent.deliveryOrder.doheader1 = warehouseName || "";
     }
 }
 

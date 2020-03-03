@@ -288,7 +288,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             agentId: [],
             pol: [],
             pod: [null, Validators.required],
-            coloaderId: [],
+            coloaderId: [null, Validators.required],
 
         }, { validator: FormValidators.comparePort });
 

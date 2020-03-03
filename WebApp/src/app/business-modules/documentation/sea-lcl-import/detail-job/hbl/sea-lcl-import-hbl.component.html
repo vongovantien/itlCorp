@@ -13,34 +13,38 @@
                     <a class="dropdown-item pointer" (click)="previewPLsheet('VND')">Preview with VND</a>
                 </div>
             </div>
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="duplicateConfirm()">
-                <span>
-                    <i class="la la-search-plus"></i>
-                    <span>
-                        Duplicate
-                    </span>
-                </span>
-            </button>
 
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="deleteJob()" *ngIf="!(isLocked | async)">
-                <span>
-                    <i class="la la-trash"></i>
+            <ng-container *ngIf="(isLocked | async) === false">
+                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="duplicateConfirm()">
                     <span>
-                        Delete
+                        <i class="la la-search-plus"></i>
+                        <span>
+                            Duplicate
+                        </span>
                     </span>
-                </span>
-            </button>
+                </button>
 
-            <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase" disabled>
-                <span>
-                    <i class="la la-save"></i>
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="deleteJob()" *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete">
                     <span>
-                        save
+                        <i class="la la-trash"></i>
+                        <span>
+                            Delete
+                        </span>
                     </span>
-                </span>
-            </button>
+                </button>
+
+                <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase" disabled>
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+
+            </ng-container>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>
@@ -98,17 +102,18 @@
                                                 *ngFor="let house of houseBills | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions" style="width: 70px">
-                                                        <button type="button"
-                                                            *ngIf="this.shipmentDetail.permission.allowUpdate"
-                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            (click)="gotoDetail(house.id)" title="Detail">
-                                                            <i class="la la-edit"></i>
-                                                        </button>
-                                                        <button type="button"
-                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Remove" (click)="showDeletePopup(house, $event)">
-                                                            <i class="la la-trash"></i>
-                                                        </button>
+                                                        <app-permission-button type="detail"
+                                                            (click)="gotoDetail(house.id)">
+                                                        </app-permission-button>
+                                                        <ng-container *ngIf="(isLocked | async) === false">
+                                                            <ng-container
+                                                                *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
+                                                                <app-permission-button
+                                                                    (click)="showDeletePopup(house, $event)"
+                                                                    type="delete">
+                                                                </app-permission-button>
+                                                            </ng-container>
+                                                        </ng-container>
                                                     </div>
                                                 </td>
                                                 <td class=" text-primary pointer">

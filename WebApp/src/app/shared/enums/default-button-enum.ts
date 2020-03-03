@@ -69,3 +69,10 @@ export const PreviewDefaultButton: ButtonAttributeSetting = {
     classStyle: "btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase",
     icon: "la la-print"
 };
+
+
+export const LockDefaultButton: ButtonAttributeSetting = {
+    titleButton: "Lock",
+    classStyle: "btn btn-warning m-btn--square m-btn--icon m-btn--uppercase",
+    icon: "la la-lock"
+};
