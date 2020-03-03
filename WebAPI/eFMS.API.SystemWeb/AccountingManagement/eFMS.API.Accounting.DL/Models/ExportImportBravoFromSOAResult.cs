@@ -22,6 +22,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string ChargeCode { get; set; }
         public string ChargeName { get; set; }
         public string CreditDebitNo { get; set; }
+        public string TransationType { get; set; }
         public Nullable<decimal> Debit { get; set; }
         public Nullable<decimal> Credit { get; set; }
         public string CurrencySOA { get; set; }
@@ -30,10 +31,18 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? AmountVND { get; set; }
         public decimal? VAT { get; set; }
         public string AccountDebitNoVAT { get; set; }
-
-
+        public string AccountCreditNoVAT { get; set; }
+        public decimal? AmountVAT { get; set; }
+        public decimal? AmountVNDVAT { get; set; }
+        public string Commodity { get; set; }
         public Nullable<decimal> DebitExchange { get; set; }
         public Nullable<decimal> CreditExchange { get; set; }
+        public string Unit { get; set; }
+        public string Payment { get; set; }
+        public decimal? Quantity { get; set; }
+        public string Email { get; set; }
+
+
 
 
     }
