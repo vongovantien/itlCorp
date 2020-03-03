@@ -109,9 +109,9 @@
                         <label class="form-control-label" for="">
                             Internal Reference No
                         </label>
-                        <input type="text" name="internalReferenceNo" class="form-control"
+                        <input type="text" name="internalReferenceNo" class="form-control" minlength="3"
                             formControlName="internalReferenceNo" />
-                        <div class="form-control-feedback" *ngIf="isSubmitted  && isExistedTaxcode ">
+                        <div class="form-control-feedback" *ngIf="isSubmitted  && internalReferenceNo.invalid ">
                             Internal Reference No required least 3 characters
                         </div>
                     </div>

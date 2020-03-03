@@ -481,7 +481,7 @@ export class PartnerDetailComponent extends AppList {
                     if (!!res) {
                         console.log(res);
                         this.formPartnerComponent.isExistedTaxcode = true;
-                        this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fill info to Internal Reference Info.`;
+                        this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
                         this.confirmTaxcode.show();
                     } else {
                         this.onSave();
