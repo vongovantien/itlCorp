@@ -79,7 +79,8 @@
                                                 <div class="float-right">
                                                     <ng-container *ngIf="(isLocked | async) === false">
                                                         <app-permission-button title="Add New House Bill"
-                                                            (click)="gotoCreate()">
+                                                            (click)="gotoCreate()"
+                                                            *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                         </app-permission-button>
                                                     </ng-container>
                                                 </div>

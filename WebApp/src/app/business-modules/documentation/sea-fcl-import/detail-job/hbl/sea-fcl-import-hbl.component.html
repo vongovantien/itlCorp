@@ -82,9 +82,10 @@
                                             <div class="form-group">
                                                 <div class="float-right">
                                                     <ng-container
-                                                        *ngIf="(selectedShipment | async)?.isLocked === false">
+                                                        *ngIf="!!shipmentDetail && shipmentDetail.isLocked === false">
                                                         <app-permission-button title="Add New House Bill"
-                                                            (click)="gotoCreateHouseBill()">
+                                                            (click)="gotoCreateHouseBill()"
+                                                            *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                         </app-permission-button>
                                                     </ng-container>
                                                 </div>
