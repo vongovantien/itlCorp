@@ -264,7 +264,7 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("CheckDeletePermission")]
+        [HttpGet("CheckDeletePermission/{id}")]
         [Authorize]
         public IActionResult CheckDeletePermission(Guid id)
         {
