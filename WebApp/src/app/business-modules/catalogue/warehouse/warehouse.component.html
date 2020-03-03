@@ -5,8 +5,9 @@
         </div>
         <div class="c-button-actions">
             <app-permission-button (click)="showAdd()" type="add" title="Add New"></app-permission-button>
-            <app-permission-button (click)="export()" type="export" title="Export"></app-permission-button>
             <app-permission-button [routerLink]="['/home/catalogue/ware-house/import']" type="import" title="Import">
+            </app-permission-button>
+            <app-permission-button type="export" (click)="export()" title="Export">
             </app-permission-button>
         </div>
     </div>

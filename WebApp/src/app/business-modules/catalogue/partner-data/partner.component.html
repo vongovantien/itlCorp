@@ -6,15 +6,15 @@
         </div>
         <div class="c-button-actions">
             <app-permission-button title="add new" (click)=addPartner()></app-permission-button>
+            <app-permission-button title="Import" [routerLink]="['/home/catalogue/partner-data/import']" type="import">
+            </app-permission-button>
+            <app-permission-button title="Export" (click)="export()" type="export"></app-permission-button>
+
             <!-- <app-default-button [buttonSetting]="addButtonSetting" href="javascript:void(0)" (click)=addPartner()>
             </app-default-button> -->
             <!-- <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button> -->
             <!-- <app-default-button [buttonSetting]="importButtonSetting"
                 [routerLink]="['/home/catalogue/partner-data/import']"></app-default-button> -->
-
-            <app-permission-button title="Export" (click)="export()" type="export"></app-permission-button>
-            <app-permission-button title="Import" [routerLink]="['/home/catalogue/partner-data/import']" type="import">
-            </app-permission-button>
         </div>
     </div>
 </div>

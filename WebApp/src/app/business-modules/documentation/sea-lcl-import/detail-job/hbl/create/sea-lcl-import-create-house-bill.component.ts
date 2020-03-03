@@ -311,7 +311,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         return body;
     }
 
-    onSelectTabDO() {
+    onSelectTabDO(event) {
         const warehouseName = this._dataService.getDataByKey("polName");
         this.deliveryComponent.deliveryOrder.doheader1 = warehouseName || "";
     }
