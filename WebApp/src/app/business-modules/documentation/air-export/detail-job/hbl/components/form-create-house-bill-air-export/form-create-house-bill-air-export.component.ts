@@ -278,6 +278,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             total: [{ value: null, disabled: true }],
             seaAir: [],
             route: [],
+            min: [false],
 
             // * Combogrid
             customerId: [null, Validators.required],
@@ -621,7 +622,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     onChangeMin(value: any) {
         if (value.target.checked) {
             this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
+        } else {
+            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - this.formCreate.controls['seaAir'].value);
         }
     }
-
 }

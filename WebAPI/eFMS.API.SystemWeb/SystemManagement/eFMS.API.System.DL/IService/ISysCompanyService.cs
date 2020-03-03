@@ -12,7 +12,7 @@ namespace eFMS.API.System.DL.IService
     public interface ISysCompanyService : IRepositoryBase<SysCompany, SysCompanyModel>
     {
         SysCompanyModel Get(Guid id);
-        List<SysCompanyModel> Query(SysCompanyCriteria criteria);
+        IQueryable<SysCompanyModel> Query(SysCompanyCriteria criteria);
         List<SysCompanyModel> Paging(SysCompanyCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<SysCompanyModel> GetAll();
         HandleState Add(SysCompanyAddModel sysBuModel);

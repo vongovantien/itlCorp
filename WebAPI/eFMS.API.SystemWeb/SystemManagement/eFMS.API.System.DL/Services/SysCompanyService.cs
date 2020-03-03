@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using eFMS.API.Common;
@@ -67,46 +68,46 @@ namespace eFMS.API.System.DL.Services
 
         public List<SysCompanyModel> Paging(SysCompanyCriteria criteria, int page, int size, out int rowsCount)
         {
+            List<SysCompanyModel> results = null;
             var data = Query(criteria);
-
-            rowsCount = (data.Count() > 0) ? data.Count() : 0;
+            if (data == null) {
+                rowsCount = 0;
+                results = null;
+            }
+            rowsCount = data.Select(x => x.Id).Count();
             if (size > 0)
             {
                 if (page < 1)
                 {
                     page = 1;
                 }
-                data = data.Skip((page - 1) * size).Take(size).ToList();
+                results = data.OrderByDescending(x => x.DatetimeModified).Skip((page - 1) * size).Take(size).ToList();
             }
-            return data;
+            return results;
         }
 
-        public List<SysCompanyModel> Query(SysCompanyCriteria criteria)
+        public IQueryable<SysCompanyModel> Query(SysCompanyCriteria criteria)
         {
-
-            var bu = DataContext.Get(); // tạo đối tượng context cho table SysCompany.
-
+            Expression<Func<SysCompany, bool>> query = null;
             if (criteria.All == null)
             {
-                bu = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.BunameAbbr ?? "").IndexOf(criteria.BuNameAbbr ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                );
+                query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            && (x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            && (x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            && (x.BunameAbbr ?? "").IndexOf(criteria.BuNameAbbr ?? "", StringComparison.OrdinalIgnoreCase) > -1;
             }
             else
             {
-                bu = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                || ((x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                || ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                || ((x.BunameAbbr ?? "").IndexOf(criteria.BuNameAbbr ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                );
+                query = x => (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.BunameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.BunameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                            || (x.BunameAbbr ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1;
             }
 
-
-            var responseData = mapper.Map<List<SysCompanyModel>>(bu).ToList(); // maping BU sang SysCompanyModel ( hoặc object # => define trong Mapper.cs);
-            var result = responseData.OrderByDescending(x => x.DatetimeModified).ToList();
-            return result;
+            var bus = DataContext.Get(query);
+            if (bus == null) return null;
+            var results = bus.ProjectTo<SysCompanyModel>(mapper.ConfigurationProvider); // maping BU sang SysCompanyModel ( hoặc object # => define trong Mapper.cs);
+            return results;
         }
 
         public HandleState Update(Guid id, SysCompanyAddModel model)
