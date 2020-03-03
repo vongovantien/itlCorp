@@ -5,7 +5,7 @@ import { formatDate } from '@angular/common';
 import { ActionsSubject, Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo } from 'src/app/shared/repositories';
 import { AppForm } from 'src/app/app.form';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
@@ -22,6 +22,7 @@ import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 
 import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent } from 'src/app/business-modules/share-business';
+import groupBy from 'lodash/groupBy';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -71,6 +72,9 @@ export class CreateHouseBillComponent extends AppForm {
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
+
+                        // * Update field inword with container data.
+                        this.formHouseBill.formGroup.controls["warehousenotice"].setValue(this.updateInwordField(this.containers));
                     }
                 });
     }
@@ -286,6 +290,36 @@ export class CreateHouseBillComponent extends AppForm {
             dosentTo2: null
         };
         return body;
+    }
+
+    updateInwordField(containers: Container[]): string {
+        let containerDetail = '';
+
+        const contObject = (containers || []).map((container: Container) => ({
+            contType: container.containerTypeId,
+            contName: container.containerTypeName || '',
+            quantity: container.quantity,
+            isPartContainer: container.isPartOfContainer || false
+        }));
+        const contData = [];
+        for (const keyName of Object.keys(groupBy(contObject, 'contName'))) {
+            contData.push({
+                contName: keyName,
+                quantity: groupBy(contObject, 'contName')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+            });
+        }
+
+        for (const item of contData) {
+            containerDetail += this.handleStringCont(item);
+        }
+        containerDetail = containerDetail.trim().replace(/\&$/, "");
+        containerDetail += " Container Onlys.THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
+
+        return containerDetail || '';
+    }
+
+    handleStringCont(contOb: { contName: string, quantity: number }) {
+        return this.utility.convertNumberToWords(contOb.quantity) + '' + contOb.contName + ' & ';
     }
 }
 

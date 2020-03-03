@@ -20,6 +20,7 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
+import groupBy from 'lodash/groupBy';
 
 @Component({
     selector: 'app-create-hbl-fcl-export',
@@ -61,9 +62,11 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
+
+                        // * Update field inword with container data.
+                        this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
                     }
                 });
-
     }
 
     ngOnInit() {
@@ -179,7 +182,6 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         }
     }
 
-
     showImportPopup() {
         const dataSearch = { jobId: this.jobId };
         dataSearch.jobId = this.jobId;
@@ -190,7 +192,6 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         this.importHouseBillPopup.show();
 
     }
-
 
     checkValidateForm() {
         let valid: boolean = true;
@@ -218,14 +219,43 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                         this._toastService.success(res.message, '');
                         this.gotoList();
                     } else {
-
                     }
                 }
             );
+    }
 
+    updateInwordField(containers: Container[]): string {
+        let containerDetail = '';
+
+        const contObject = (containers || []).map((container: Container) => ({
+            contType: container.containerTypeId,
+            contName: container.containerTypeName || '',
+            quantity: container.quantity,
+            isPartContainer: container.isPartOfContainer || false
+        }));
+        const contData = [];
+        for (const keyName of Object.keys(groupBy(contObject, 'contName'))) {
+            contData.push({
+                contName: keyName,
+                quantity: groupBy(contObject, 'contName')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+            });
+        }
+
+        for (const item of contData) {
+            containerDetail += this.handleStringCont(item);
+        }
+        containerDetail = containerDetail.trim().replace(/\&$/, "");
+        containerDetail += " Container Onlys.THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
+
+        return containerDetail || '';
+    }
+
+    handleStringCont(contOb: { contName: string, quantity: number }) {
+        return this.utility.convertNumberToWords(contOb.quantity) + '' + contOb.contName + ' & ';
     }
 
     gotoList() {
         this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
     }
+
 }
