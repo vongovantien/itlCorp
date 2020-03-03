@@ -3,6 +3,7 @@ using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -104,20 +105,19 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Group: 
-                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
-                        && !authorizeUserIds.Contains(model.PersonInCharge))
+                    if (model.GroupId != currentUser.GroupId && model.GroupId != null && !authorizeUserIds.Contains(model.PersonInCharge))
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID && !authorizeUserIds.Contains(model.PersonInCharge))
+                    if (model.DepartmentId != currentUser.DepartmentId && model.DepartmentId != null && !authorizeUserIds.Contains(model.PersonInCharge))
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.PersonInCharge))
+                    if (model.OfficeId != currentUser.OfficeID && model.OfficeId != null && !authorizeUserIds.Contains(model.PersonInCharge))
                     {
                         code = 403;
                     }
@@ -147,19 +147,19 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
+                    if (model.GroupId != currentUser.GroupId && model.GroupId != null)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
+                    if (model.DepartmentId != currentUser.DepartmentId && model.DepartmentId != null)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID)
+                    if (model.OfficeId != currentUser.OfficeID && model.OfficeId != Guid.Empty)
                     {
                         code = 403;
                     }
