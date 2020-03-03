@@ -120,6 +120,9 @@
                             Airline Code/Co-Loader Code
                         </label>
                         <input type="text" name="coLoaderCode" class="form-control" formControlName="coLoaderCode" />
+                        <div class="text-center text-underline m--margin-top-10" *ngIf="isUpdate">
+                            <a (click)="showOtherCharge()" class="pointer">Other Charge</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -434,3 +437,5 @@
     </div>
     <!--end::m-portlet -->
 </form>
+
+<partner-other-charge-popup></partner-other-charge-popup>

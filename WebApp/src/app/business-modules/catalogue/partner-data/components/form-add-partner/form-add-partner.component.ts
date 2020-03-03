@@ -6,6 +6,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { SalemanPopupComponent } from '../saleman-popup.component';
 import { Partner } from 'src/app/shared/models';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
+import { PartnerOtherChargePopupComponent } from '../other-charge/partner-other-charge.popup';
 
 @Component({
     selector: 'form-add-partner',
@@ -13,7 +14,10 @@ import { FormValidators } from 'src/app/shared/validators/form.validator';
 })
 
 export class FormAddPartnerComponent extends AppForm {
+
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
+    @ViewChild(PartnerOtherChargePopupComponent, { static: false }) otherChargePopup: PartnerOtherChargePopupComponent;
+
     @Output() requireSaleman = new EventEmitter<boolean>();
     @Input() isUpdate: true;
     parentCustomers: any[] = [];
@@ -341,9 +345,14 @@ export class FormAddPartnerComponent extends AppForm {
         }
         return partnerGroupActives;
     }
+
     showPopupSaleman() {
         this.poupSaleman.isSave = false;
         this.poupSaleman.isDetail = false;
         this.poupSaleman.show();
+    }
+
+    showOtherCharge() {
+        this.otherChargePopup.show();
     }
 }

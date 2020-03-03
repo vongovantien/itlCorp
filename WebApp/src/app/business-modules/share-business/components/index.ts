@@ -11,6 +11,7 @@ export * from './container-import/container-import.component';
 export * from './container-list/container-list.popup';
 export * from './container-import/container-import.component';
 export * from './goods-list/goods-list.popup';
+export * from './hbl-fcl-container/hbl-fcl-container.popup';
 
 export * from './grant-total-profit/grant-total-profit.component';
 export * from './profit-summary/profit-summary.component';
@@ -22,6 +23,7 @@ export * from './shipment-good-summary/shipment-good-summary.component';
 export * from './shipment-good-summary-lcl/shipment-good-summary-lcl.component';
 export * from './hbl-good-summary-lcl/hbl-good-summary-lcl.component';
 export * from './hbl-good-summary-fcl/hbl-good-summary-fcl.component';
+export * from './hbl-fcl-container/hbl-fcl-container.popup';
 
 export * from './form-create-sea-import/form-create-sea-import.component';
 export * from './form-search-sea/form-search-sea.component';

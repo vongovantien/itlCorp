@@ -157,13 +157,13 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
     }
 
     getUserPassword() {
-        const pass_encypt = this.cookieService.get("_p");
+        const pass_encypt = this.cookieService.get("__p");
         const bytes = crypto_js.AES.decrypt(pass_encypt, SystemConstants.SECRET_KEY);
         return bytes.toString(crypto_js.enc.Utf8);
     }
 
     getUserName() {
-        const username_encypt = this.cookieService.get("_u");
+        const username_encypt = this.cookieService.get("__u");
         const bytes = crypto_js.AES.decrypt(username_encypt, SystemConstants.SECRET_KEY);
         return bytes.toString(crypto_js.enc.Utf8);
     }

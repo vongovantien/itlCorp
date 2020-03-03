@@ -68,7 +68,7 @@ export class AddPartnerDataComponent extends AppList {
 
         this.getComboboxData();
         this.initHeaderSalemanTable();
-        this.route.params.subscribe(prams => {
+        this.route.queryParams.subscribe(prams => {
             if (prams.partnerType !== undefined) {
                 this.partnerType = Number(prams.partnerType);
                 if (this.partnerType === '3') {

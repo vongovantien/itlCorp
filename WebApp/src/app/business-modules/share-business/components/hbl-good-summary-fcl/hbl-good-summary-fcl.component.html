@@ -36,7 +36,7 @@
                                     [(ngModel)]="description"></textarea>
                             </div>
                             <div class="col-md-6">
-                                <label for="">Container No/Container Type/Seal No/Marks No:</label>
+                                <label for="">Container No/Container Type/Seal No</label>
                                 <textarea name="" id="" cols="30" rows="6" class="form-control" name="v"
                                     [(ngModel)]="containerDescription"></textarea>
                             </div>
@@ -102,7 +102,7 @@
     </div>
 </div>
 
-<container-list-popup></container-list-popup>
+<hbl-fcl-container-popup [type]="type"></hbl-fcl-container-popup>
 
 <confirm-popup [body]="'All manually entered data will be refresh, are you sure you want to perform this action ?'"
     [labelConfirm]="'Yes'" [labelConfirm]="'No'" (onSubmit)="onRefresh()" [title]="'Alert'"

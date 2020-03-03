@@ -16,6 +16,7 @@ export * from './catalogue/commodity.model';
 export * from './catalogue/commonity-group.model';
 export * from './catalogue/country.model';
 export * from './catalogue/ware-house.model';
+export * from './catalogue//catPartnerCharge.model';
 
 export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
@@ -32,6 +33,7 @@ export * from './document/house-bill';
 export * from './document/dimension';
 export * from './document/OpsTransaction.model';
 export * from './document/permissionShipment';
+export * from './document/container.model';
 
 export * from './tool-setting/tariff';
 

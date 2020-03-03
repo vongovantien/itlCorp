@@ -174,25 +174,14 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="m--align-center m--margin-top-20">
-                            <button
-                                class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save" (click)="onSaveContainerList()">
-                                <span>
-                                    <i class="la la-save"></i>
-                                    <span>
-                                        Save
-                                    </span>
-                                </span>
-                            </button>
-                            <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel"
-                                (click)="confirmCancel.show()">
-                                <span>
-                                    <i class="la la-ban"></i>
-                                    <span>
-                                        Cancel
-                                    </span>
-                                </span>
-                            </button>
+                            <div class="c-button-actions">
+                                <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSaveContainerList()">
+                                </app-default-button>
+
+                                <app-default-button [buttonSetting]="cancelButtonSetting"
+                                    (click)="confirmCancel.show()">
+                                </app-default-button>
+                            </div>
                         </div>
                     </div>
                 </div>
