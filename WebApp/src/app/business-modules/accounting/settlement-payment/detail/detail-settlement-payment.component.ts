@@ -4,7 +4,7 @@ import { SettlementListChargeComponent } from '../components/list-charge-settlem
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
 import { Currency, Surcharge } from 'src/app/shared/models';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
@@ -33,7 +33,8 @@ export class SettlementPaymentDetailComponent extends AppPage {
         private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
-        private _progressService: NgProgress
+        private _progressService: NgProgress,
+        private _exportRepo: ExportRepo,
     ) {
         super();
 
@@ -91,7 +92,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId, 'GROUP');
                     } else {
-                        this._toastService.warning(res.message, '', {enableHtml: true});
+                        this._toastService.warning(res.message, '', { enableHtml: true });
                     }
                 }
             );
@@ -188,7 +189,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
             );
     }
 
-    preview() {
+    previewSettlementPayment() {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
@@ -210,6 +211,15 @@ export class SettlementPaymentDetailComponent extends AppPage {
 
     back() {
         this._router.navigate(['home/accounting/settlement-payment']);
+    }
+
+    exportSettlementPayment(language: string) {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+
+        //this._progressRef.start();
     }
 }
 

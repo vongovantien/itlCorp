@@ -37,7 +37,7 @@ namespace eFMS.API.ReportData.Models
         {
             public const string AdvancePaymentUrl = "/Accounting/api/v1/en-US/AcctAdvancePayment/QueryData";
             public const string SettlementPaymentUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/QueryData";
-            public const string DetailAdvancePaymentExportUrl = "/api/v1/en-US/AcctAdvancePayment/DetailAdvancePaymentExport?advanceId=";//"/Accounting/api/v1/en-US/AcctAdvancePayment/DetailAdvancePaymentExport?advanceId=";
+            public const string DetailAdvancePaymentExportUrl = "/Accounting/api/v1/en-US/AcctAdvancePayment/DetailAdvancePaymentExport";
         }
 
         public class Documentation

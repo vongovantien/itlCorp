@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { AdvancePayment, Currency } from 'src/app/shared/models';
 import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
@@ -33,7 +33,8 @@ export class AdvancePaymentDetailComponent extends AppPage {
         private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
-        private _progressService: NgProgress
+        private _progressService: NgProgress,
+        private _exportRepo: ExportRepo,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -104,11 +105,11 @@ export class AdvancePaymentDetailComponent extends AppPage {
                     this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
                 },
                 (error: any) => {
-                   console.log(error);
+                    console.log(error);
                 },
                 () => { }
             );
-           
+
     }
 
     updateAdvPayment() {
@@ -221,6 +222,20 @@ export class AdvancePaymentDetailComponent extends AppPage {
                             this._toastService.error(data.message, data.title);
                         });
                     }
+                },
+            );
+    }
+
+    exportAdvPayment(lang: string) {
+        this._progressRef.start();
+        this._exportRepo.exportAdvancePaymentDetail(this.advId, lang)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'Advance Form - eFMS.xlsx');
                 },
             );
     }
