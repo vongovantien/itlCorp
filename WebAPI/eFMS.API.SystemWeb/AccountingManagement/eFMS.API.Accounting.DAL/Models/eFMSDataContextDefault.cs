@@ -23,6 +23,7 @@ namespace eFMS.API.Accounting.Service.Models
         public virtual DbSet<AcctSettlementPayment> AcctSettlementPayment { get; set; }
         public virtual DbSet<AcctSoa> AcctSoa { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }
+        public virtual DbSet<CatChargeDefaultAccount> CatChargeDefaultAccount { get; set; }
         public virtual DbSet<CatCountry> CatCountry { get; set; }
         public virtual DbSet<CatCurrency> CatCurrency { get; set; }
         public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
@@ -571,6 +572,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.CurrencyId)
                     .HasColumnName("CurrencyID")
                     .HasMaxLength(30)
@@ -584,9 +587,15 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.IncludedVat).HasColumnName("IncludedVAT");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.ServiceTypeId)
                     .HasColumnName("ServiceTypeID")
@@ -612,6 +621,49 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")
                     .HasColumnType("decimal(18, 4)");
+            });
+
+            modelBuilder.Entity<CatChargeDefaultAccount>(entity =>
+            {
+                entity.ToTable("catChargeDefaultAccount");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
+
+                entity.Property(e => e.CreditAccountNo).HasMaxLength(800);
+
+                entity.Property(e => e.CreditVat)
+                    .HasColumnName("CreditVAT")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DebitAccountNo).HasMaxLength(800);
+
+                entity.Property(e => e.DebitVat)
+                    .HasColumnName("DebitVAT")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.Type).HasMaxLength(800);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<CatCountry>(entity =>
@@ -771,6 +823,11 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Branch)
+                    .WithMany(p => p.CatDepartment)
+                    .HasForeignKey(d => d.BranchId)
+                    .HasConstraintName("FK_catDepartment_sysBranch");
             });
 
             modelBuilder.Entity<CatPartner>(entity =>
@@ -967,6 +1024,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.CountryId).HasColumnName("CountryID");
 
                 entity.Property(e => e.DatetimeCreated)
@@ -977,13 +1036,19 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
                 entity.Property(e => e.DisplayName).HasMaxLength(4000);
 
                 entity.Property(e => e.DistrictId).HasColumnName("DistrictID");
 
+                entity.Property(e => e.FlightVesselNo).HasMaxLength(50);
+
                 entity.Property(e => e.GeoCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
@@ -1006,6 +1071,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Note).HasMaxLength(4000);
 
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
                 entity.Property(e => e.PlaceTypeId)
                     .HasColumnName("PlaceTypeID")
                     .HasMaxLength(50)
@@ -1020,6 +1087,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
+
+                entity.Property(e => e.WarehouseName).HasMaxLength(50);
             });
 
             modelBuilder.Entity<CatUnit>(entity =>
@@ -1837,6 +1908,12 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Wtpp)
                     .HasColumnName("WTPP")
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.CsTransactionDetail)
+                    .HasForeignKey(d => d.JobId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>
@@ -2386,6 +2463,11 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Department)
+                    .WithMany(p => p.SysGroup)
+                    .HasForeignKey(d => d.DepartmentId)
+                    .HasConstraintName("FK_sysGroup_catDepartment");
             });
 
             modelBuilder.Entity<SysOffice>(entity =>
@@ -2456,6 +2538,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
+                entity.Property(e => e.Location).HasMaxLength(4000);
+
                 entity.Property(e => e.Logo).HasColumnType("image");
 
                 entity.Property(e => e.ManagerId)
@@ -2486,6 +2570,12 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Website)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Bu)
+                    .WithMany(p => p.SysOffice)
+                    .HasForeignKey(d => d.Buid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_sysBranch_sysBU");
             });
 
             modelBuilder.Entity<SysUser>(entity =>

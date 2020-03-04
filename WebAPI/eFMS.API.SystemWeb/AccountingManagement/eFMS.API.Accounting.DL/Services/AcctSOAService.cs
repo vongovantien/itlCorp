@@ -32,6 +32,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<AcctCdnote> acctCdnoteRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<SysUser> sysUserRepo;
+        readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepo;
+
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -46,7 +48,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CustomsDeclaration> customsDeclaration,
             IContextBase<AcctCdnote> acctCdnote,
             IContextBase<CatPartner> catPartner,
-            IContextBase<SysUser> sysUser) : base(repository, mapper)
+            IContextBase<SysUser> sysUser,
+            IContextBase<CatChargeDefaultAccount> chargeDefault ) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -60,6 +63,7 @@ namespace eFMS.API.Accounting.DL.Services
             acctCdnoteRepo = acctCdnote;
             catPartnerRepo = catPartner;
             sysUserRepo = sysUser;
+            chargeDefaultRepo = chargeDefault;
         }
 
         #region -- Insert & Update SOA
@@ -611,6 +615,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
                                             DatetimeModified = sur.DatetimeModified,
                                             CommodityGroupID = ops.CommodityGroupId,
+
                                             Service = "CL",
                                             CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
                                         };
@@ -657,7 +662,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            DatetimeModified = sur.DatetimeModified,
                                            CommodityGroupID = null,
                                            Service = cst.TransactionType,
-                                           CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                           CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                                           Commodity = cst.Commodity
                                        };
             queryBuySellDocument = queryBuySellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -674,6 +680,8 @@ namespace eFMS.API.Accounting.DL.Services
             var csTransDe = csTransactionDetailRepo.Get();
             var debitNote = acctCdnoteRepo.Get();
             var charge = catChargeRepo.Get();
+            var partner = catPartnerRepo.Get();
+
             //OBH Receiver (SELL - Credit)
             var queryObhSellOperation = from sur in surcharge
                                         join ops in opst on sur.Hblid equals ops.Hblid
@@ -681,6 +689,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         from debitN in debitN2.DefaultIfEmpty()
                                         join chg in charge on sur.ChargeId equals chg.Id into chg2
                                         from chg in chg2.DefaultIfEmpty()
+                                        join pat in partner on sur.PaymentObjectId equals pat.Id into pat2
+                                        from pat in pat2.DefaultIfEmpty()
                                         select new ChargeSOAResult
                                         {
                                             ID = sur.Id,
@@ -713,7 +723,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             DatetimeModified = sur.DatetimeModified,
                                             CommodityGroupID = ops.CommodityGroupId,
                                             Service = "CL",
-                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                                            TaxCodeOBH  = pat.TaxCode
                                         };
             queryObhSellOperation = queryObhSellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -756,7 +767,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            DatetimeModified = sur.DatetimeModified,
                                            CommodityGroupID = null,
                                            Service = cst.TransactionType,
-                                           CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                           CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                                           Commodity = cst.Commodity
                                        };
             queryObhSellDocument = queryObhSellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -856,7 +868,8 @@ namespace eFMS.API.Accounting.DL.Services
                                           DatetimeModified = sur.DatetimeModified,
                                           CommodityGroupID = null,
                                           Service = cst.TransactionType,
-                                          CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                          CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                                          Commodity = cst.Commodity
                                       };
             queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -1711,7 +1724,78 @@ namespace eFMS.API.Accounting.DL.Services
             };
             return result;
         }
+
         #endregion -- Data Export Details --
+
+        public IQueryable<ExportImportBravoFromSOAResult> GetDataExportImportBravoFromSOA(string soaNo)
+        {
+            //Lấy danh sách Currency Exchange của ngày hiện tại
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var soa = DataContext.Get(x => x.Soano == soaNo);
+            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var chargeDefaults = chargeDefaultRepo.Get(x=>x.Type =="Công Nợ");
+            var charge = GetChargeShipmentDocAndOperation(query);
+            var partner = catPartnerRepo.Get();
+            var dataResult = from s in soa
+                             join chg in charge on s.Soano equals chg.SOANo into chg2
+                             from chg in chg2.DefaultIfEmpty()
+                             join pat in partner on s.Customer equals pat.Id into pat2
+                             from pat in pat2.DefaultIfEmpty()
+                             join cd in chargeDefaults on chg.ID equals cd.ChargeId into defaults
+                             from cd in defaults.DefaultIfEmpty()
+          
+                             select new ExportImportBravoFromSOAResult
+                             {
+                                 ServiceDate = chg.ServiceDate,
+                                 SOANo = s.Soano,
+                                 Service = GetServiceNameOfSoa(s.ServiceTypeId).ToString(),
+                                 PartnerCode = pat.TaxCode,
+                                 Debit = chg.Debit,
+                                 Credit = chg.Credit,
+                                 ChargeCode = chg.ChargeCode,
+                                 OriginalCurrency = chg.Currency,
+                                 OriginalAmount = chg.Debit - chg.Credit,
+                                 CreditExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
+                                 ?
+                                     GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
+                                 :
+                                     GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
+                                 AmountVND = chg.Credit * (chg.Debit - chg.Credit),
+                                 VAT = chg.VATRate,
+                                 AccountDebitNoVAT = cd.DebitAccountNo,
+                                 AccountCreditNoVAT = cd.CreditAccountNo,
+                                 AmountVAT = (chg.Debit - chg.Credit) * chg.VATRate,
+                                 AmountVNDVAT = (chg.Credit * (chg.Debit - chg.Credit)) * chg.VATRate,
+                                 Commodity = chg.Commodity,
+                                 CustomerName = pat.PartnerNameVn,
+                                 TaxCode = pat.TaxCode,
+                                 JobId = chg.JobId,
+                                 ChargeName = chg.ChargeName,
+                                 TransationType = chg.TransactionType == "AI" || chg.TransactionType =="AE" ? "AIR":
+                                 chg.TransactionType=="SLE" || chg.TransactionType == "SFE" ||
+                                 chg.TransactionType == "SFE" || chg.TransactionType == "SFI"? "SEA":"OPS",
+                                 HBL = chg.HBL,
+                                 Unit = chg.Unit,
+                                 Payment = "TM/CK",
+                                 Quantity = chg.Quantity,
+                                 CustomerAddress = pat.AddressVn,
+                                 MBL = chg.MBL,
+                                 Email = pat.Email,
+                                 TaxCodeOBH = chg.TaxCodeOBH,
+                                 CustomNo = chg.CustomNo
+                                 //CustomNo = chg.CustomNo,
+                                 //CreditDebitNo = chg.CreditDebitNo,
+                                 //CurrencySOA = s.Currency,
+                                 //DebitExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
+                                 //?
+                                 //    GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
+                                 //:
+                                 //    GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),
+                             };
+
+
+            return dataResult;
+        }
 
     }
 }

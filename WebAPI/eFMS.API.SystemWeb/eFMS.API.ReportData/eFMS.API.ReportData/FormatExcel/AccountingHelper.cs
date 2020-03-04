@@ -392,23 +392,23 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[8, 4, 8, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[8, 4, 8, 7].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            for(int x = 4; x < 8; x++)
+            for (int x = 4; x < 8; x++)
             {
                 workSheet.Cells[9, x].Style.WrapText = true;
                 workSheet.Cells[9, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                workSheet.Cells[9, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;                
+                workSheet.Cells[9, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
-            workSheet.Cells[9,4].Value = headers[10]; //Số cont - Loại cont           
-            workSheet.Cells[9,5].Value = headers[11]; // C.W           
-            workSheet.Cells[9,6].Value = headers[12]; //Số kiện            
-            workSheet.Cells[9,7].Value = headers[13]; //số CBM
-            
+            workSheet.Cells[9, 4].Value = headers[10]; //Số cont - Loại cont           
+            workSheet.Cells[9, 5].Value = headers[11]; // C.W           
+            workSheet.Cells[9, 6].Value = headers[12]; //Số kiện            
+            workSheet.Cells[9, 7].Value = headers[13]; //số CBM
+
             workSheet.Cells[8, 8, 8, 11].Merge = true;
             workSheet.Cells[8, 8, 8, 11].Value = headers[9];//Số tiến tạm ứng           
             workSheet.Cells[8, 8, 8, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[8, 8, 8, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            for(int x = 8; x < 12; x++)
+            for (int x = 8; x < 12; x++)
             {
                 workSheet.Cells[9, x].Style.WrapText = true;
                 workSheet.Cells[9, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -418,7 +418,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[9, 9].Value = headers[15]; // Chi phí có hóa đơn           
             workSheet.Cells[9, 10].Value = headers[16]; //Chi phí khác            
             workSheet.Cells[9, 11].Value = headers[17]; //Tổng cộng
-            
+
             int p = 10;
             int j = 10;
             for (int i = 0; i < advanceExport.ShipmentsAdvance.Count; i++)
@@ -591,6 +591,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             p = p + 5; //Bỏ trống 5 row
 
+
             for (int x = 2; x < 5; x++)
             {
                 workSheet.Cells[p, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -612,5 +613,121 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[8, 1, p, 11].Style.Font.Size = 10;
         }
         #endregion --- ADVANCE PAYMENT ---
+        public Stream GenerateBravoSOAExcel(List<ExportBravoSOAModel> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+                "Ngày chứng từ",
+                "Số chứng từ",
+                "Mã chứng từ",
+                "Diễn giải",
+                "Mã khách hàng",
+                "TK Nợ",
+                "TK Có",
+                "Mã loại",
+                "Mã tiền tệ",
+                "Số tiền",
+                "Tỷ giá",
+                "Tiền VND",
+                "% VAT",
+                "TK Nợ VAT",
+                "TK Có VAT",
+                "Tiền VAT",
+                "Tiền VND VAT",
+                "Số hóa đơn VAT",
+                "Ngày hóa đơn VAT",
+                "Số Seri VAT",
+                "Tên đối tượng VAT",
+                "Mã số thuế ĐT VAT",
+                "Mã Job",
+                "Mã Job",
+                "Diễn giải",
+                "Đánh dấu",
+                "Thời hạn T/T",
+                "Mã BP",
+                "Số TK",
+                "Số H-B/L",
+                "ĐVT",
+                "Hình thức T/T",
+                "Mã ĐT CH",
+                "Số Lượng",
+                "Mã HĐ",
+                "Địa chỉ đối tượng VAT",
+                "Số M-B/L",
+                "Tình trạng hóa đơn",
+                "Email",
+                "Ngày phát hành E-Invoice"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("SOA");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "SOA");
+
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = item.ServiceDate;
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.SOANo;
+                        worksheet.Cells[i + addressStartContent, 3].Value = string.Empty; // tạm thời để trống
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.Service;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.PartnerCode;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.Debit;
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.Credit;
+                        worksheet.Cells[i + addressStartContent, 8].Value = item.ChargeCode;
+                        worksheet.Cells[i + addressStartContent, 9].Value = item.OriginalCurrency;
+                        worksheet.Cells[i + addressStartContent, 10].Value = item.OriginalAmount;
+                        worksheet.Cells[i + addressStartContent, 11].Value = item.CreditExchange;
+                        worksheet.Cells[i + addressStartContent, 12].Value = item.AmountVND;
+                        worksheet.Cells[i + addressStartContent, 13].Value = item.VAT;
+                        worksheet.Cells[i + addressStartContent, 14].Value = item.AccountDebitNoVAT;
+                        worksheet.Cells[i + addressStartContent, 15].Value = item.AccountCreditNoVAT;
+                        worksheet.Cells[i + addressStartContent, 16].Value = item.AmountVAT;
+                        worksheet.Cells[i + addressStartContent, 17].Value = item.AmountVNDVAT;
+                        worksheet.Cells[i + addressStartContent, 18].Value = string.Empty; // tạm thời để trống
+                        worksheet.Cells[i + addressStartContent, 19].Value = string.Empty; // tạm thời để trống
+                        worksheet.Cells[i + addressStartContent, 20].Value = string.Empty; // tạm thời để trống
+                        worksheet.Cells[i + addressStartContent, 21].Value = item.Commodity;
+                        worksheet.Cells[i + addressStartContent, 22].Value = item.CustomerName;
+                        worksheet.Cells[i + addressStartContent, 23].Value = item.TaxCode;
+                        worksheet.Cells[i + addressStartContent, 24].Value = item.JobId;
+                        worksheet.Cells[i + addressStartContent, 25].Value = item.ChargeName;
+                        worksheet.Cells[i + addressStartContent, 26].Value = string.Empty; // tạm thời để trống
+                        worksheet.Cells[i + addressStartContent, 27].Value = string.Empty; // tạm thời để trống
+                        worksheet.Cells[i + addressStartContent, 28].Value = item.TransationType;
+                        worksheet.Cells[i + addressStartContent, 29].Value = item.CustomNo;
+                        worksheet.Cells[i + addressStartContent, 30].Value = item.HBL;
+                        worksheet.Cells[i + addressStartContent, 31].Value = item.Unit;
+                        worksheet.Cells[i + addressStartContent, 32].Value = item.Payment;
+                        worksheet.Cells[i + addressStartContent, 33].Value = item.TaxCodeOBH;
+                        worksheet.Cells[i + addressStartContent, 34].Value = item.Quantity;
+                        worksheet.Cells[i + addressStartContent, 35].Value = string.Empty; // tạm thời để trống;
+                        worksheet.Cells[i + addressStartContent, 36].Value = item.CustomerAddress;
+                        worksheet.Cells[i + addressStartContent, 37].Value = item.MBL;
+                        worksheet.Cells[i + addressStartContent, 38].Value = string.Empty; // tạm thời để trống;
+                        worksheet.Cells[i + addressStartContent, 49].Value = item.Email;
+                        worksheet.Cells[i + addressStartContent, 40].Value = string.Empty; // tạm thời để trống;
+
+                        //Add border left right for cells
+                        AddBorderLeftRightCell(worksheet, headers, addressStartContent, i);
+
+                        //Add border bottom for last cells
+                        AddBorderBottomLastCell(worksheet, headers, addressStartContent, i, listObj.Count);
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
     }
 }

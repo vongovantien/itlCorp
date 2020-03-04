@@ -37,7 +37,11 @@ namespace eFMS.API.Accounting.DL.Models
         public string CreditDebitNo { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public short? CommodityGroupID { get; set; }
+        public string Commodity { get; set; }
+
         public string Service { get; set; }
         public string CDNote { get; set; }
+        public string TaxCodeOBH { get; set; }
+
     }
 }

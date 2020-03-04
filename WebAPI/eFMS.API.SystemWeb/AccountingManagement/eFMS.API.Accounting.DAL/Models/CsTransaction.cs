@@ -5,6 +5,11 @@ namespace eFMS.API.Accounting.Service.Models
 {
     public partial class CsTransaction
     {
+        public CsTransaction()
+        {
+            CsTransactionDetail = new HashSet<CsTransactionDetail>();
+        }
+
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
         public string JobNo { get; set; }
@@ -57,5 +62,7 @@ namespace eFMS.API.Accounting.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+
+        public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
 }

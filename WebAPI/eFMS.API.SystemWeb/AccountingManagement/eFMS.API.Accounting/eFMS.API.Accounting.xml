@@ -452,6 +452,14 @@
             <param name="currencyLocal">currencyLocal that want to retrieve SOA</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetDataExportImportBravoFromSOA(System.String)">
+            <summary>
+            Export Import Bravo From SOA
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <returns></returns>
+            
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.ExportDetailSOA(eFMS.API.Accounting.DL.Models.Criteria.ExportDetailSOACriteria)">
             <summary>
             Data Export Details SOA
