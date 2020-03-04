@@ -74,11 +74,12 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     getCharge() {
-        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.DEBIT }).subscribe(
-            (charges: Charge[]) => {
-                this.listCharges = charges;
-            }
-        );
+        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.DEBIT })
+            .subscribe(
+                (charges: Charge[]) => {
+                    this.listCharges = charges;
+                }
+            );
     }
 
     saveSellingSurCharge() {
@@ -162,10 +163,15 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         c.chargeId = c.debitCharge;
                         c.id = SystemConstants.EMPTY_GUID;
                         c.type = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+
+                        this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
+
                     });
 
-                    this.charges = [...this.charges, ...buyingCharges];
+                    // this.charges = [...this.charges, ...buyingCharges];
                 }
             );
     }
+
+
 }

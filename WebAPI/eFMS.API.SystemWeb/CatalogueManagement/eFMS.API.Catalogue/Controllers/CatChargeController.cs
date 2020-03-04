@@ -91,10 +91,10 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
-        [HttpPost("GetByPartnerCodes")]
-        public IActionResult GetDefaultByPartnerCodes(List<string> partnerCodes)
+        [HttpPost("GetDefaultByChargeCodes")]
+        public IActionResult GetDefaultByChargeCodes(List<string> chargeCodes)
         {
-            var results = catChargeService.Get(x => partnerCodes.Contains(x.Code));
+            var results = catChargeService.Get(x => chargeCodes.Contains(x.Code));
             return Ok(results);
         }
 

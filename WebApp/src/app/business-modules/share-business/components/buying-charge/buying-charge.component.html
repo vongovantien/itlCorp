@@ -14,17 +14,25 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-md-8" *ngIf="(isLocked | async) === false">
-                <div class="m--align-right">
-                    <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="saveBuyingCharge('BUY')" *ngIf="(permissionShipments | async)?.allowUpdateCharge">
-                        <span>
-                            <i class="la la-save"></i>
-                            <span>
-                                save
-                            </span>
-                        </span>
-                    </button>
+                <div class="m--align-right c-button-actions">
+                    <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
+                        <div class="dropdown m-dropdown m-dropdown--inline">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <i class="la la-download"></i> Get Charge<span class="caret"></span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item pointer" (click)="getStandardCharge()">Standard</a>
+                                <a class="dropdown-item pointer" (click)="getOtherCharge()"
+                                    *ngIf="showSyncOtherCharge">Other Charge</a>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="(permissionShipments | async)?.allowUpdateCharge">
+                            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveBuyingCharge('BUY')">
+                            </app-default-button>
+                        </ng-container>
+                    </ng-container>
                 </div>
             </div>
         </div>

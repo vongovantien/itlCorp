@@ -1,23 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
 import { CatPartnerCharge, Charge, Unit, Currency } from '@models';
-import { Observable } from 'rxjs';
 import { GetCatalogueCurrencyAction, GetCatalogueUnitAction, getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
 import { Store } from '@ngrx/store';
 import { IShareBussinessState } from '@share-bussiness';
-import { finalize, catchError } from 'rxjs/operators';
 import { CatalogueRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { ToastrService } from 'ngx-toastr';
+import { ActivatedRoute, Params } from '@angular/router';
+
+import { PopupBase } from 'src/app/popup.base';
+
+import { Observable } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
+import { finalize, catchError } from 'rxjs/operators';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 @Component({
     selector: 'partner-other-charge-popup',
     templateUrl: './partner-other-charge.popup.html',
-    styleUrls: ['./partner-other-charge.popup.scss']
+    styleUrls: ['./partner-other-charge.popup.scss'],
 })
 export class PartnerOtherChargePopupComponent extends PopupBase implements OnInit {
-
 
     charges: CatPartnerCharge[] = [];
     initCharges: CatPartnerCharge[] = [];
@@ -36,10 +39,13 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
     ];
     configComboGridCharge: Partial<CommonInterface.IComboGirdConfig> = {};
 
+    partnerId: string;
+
     constructor(
         private _store: Store<IShareBussinessState>,
         private _catalogueRepo: CatalogueRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _activedRoute: ActivatedRoute,
     ) {
         super();
     }
@@ -75,10 +81,16 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
                 }
             );
 
+        this._activedRoute.params.subscribe((params: Params) => {
+            if (params.id) {
+                this.partnerId = params.id;
+            }
+        });
     }
 
     getCharge() {
-        this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.CREDIT })
+        const serviceTypeId: string = `;${ChargeConstants.AI_CODE};${ChargeConstants.AE_CODE}`;
+        this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId })
             .subscribe(
                 (charges: Charge[]) => {
                     this.listCharges = charges;
@@ -87,7 +99,7 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
     }
 
     addCharge() {
-        this.initCharges = [...this.initCharges, new CatPartnerCharge()];
+        this.initCharges = [...this.initCharges, new CatPartnerCharge({ partnerId: this.partnerId })];
     }
 
     deleteCharge(charge: CatPartnerCharge, index: number) {
@@ -100,19 +112,17 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
     }
 
     onSavePartnerCharge() {
-        if (this.charges.length) {
+        if (!this.initCharges.length) {
             this._toastService.warning("Please input charge");
         }
+        this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;
         }
         this.charges = cloneDeep(this.initCharges);
-        this.charges.forEach(c => {
-            c.partnerId = '65794475-2cc8-48bd-a272-cf4a07c1131c';
-        });
-        console.log(this.charges);
 
-        this._catalogueRepo.updatePartnerCharge(this.charges)
+
+        this._catalogueRepo.updatePartnerCharge(this.partnerId, this.charges)
             .pipe()
             .subscribe((res: CommonInterface.IResult) => {
                 if (res.status) {
@@ -122,7 +132,6 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
                 }
                 this.isSubmitted = false;
                 this.hide();
-                console.log(res);
             });
     }
 
