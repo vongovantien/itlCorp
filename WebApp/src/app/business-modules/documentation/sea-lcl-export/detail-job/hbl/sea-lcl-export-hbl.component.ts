@@ -72,6 +72,9 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
                     this.jobId = param.jobId;
 
                     this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
+                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
+                    this.getDetailShipment();
                     this.getHouseBills(this.jobId);
                 }
             });
@@ -107,7 +110,6 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
             .subscribe(
                 (hbls: any[]) => {
                     this.houseBills = hbls;
-                    console.log(this.houseBills);
                     if (!!this.houseBills.length) {
                         this.totalGW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
                         this.totalCBM = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
@@ -230,7 +232,6 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
             // * Get container, Job detail, Surcharge with hbl id, JobId.
             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
             this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
-            this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
             switch (this.selectedTabSurcharge) {

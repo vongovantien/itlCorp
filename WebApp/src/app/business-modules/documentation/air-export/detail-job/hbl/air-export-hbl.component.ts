@@ -65,9 +65,11 @@ export class AirExportHBLComponent extends AppList implements OnInit {
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
-                    this.getDetailShipment();
 
                     this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
+                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
+                    this.getDetailShipment();
                     this.getHouseBills(this.jobId);
                 }
             });
@@ -227,7 +229,6 @@ export class AirExportHBLComponent extends AppList implements OnInit {
             // * Get container, Job detail, Surcharge with hbl id, JobId.
             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
             this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
-            this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
             switch (this.selectedTabSurcharge) {
