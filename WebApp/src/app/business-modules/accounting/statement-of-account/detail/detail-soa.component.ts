@@ -303,13 +303,14 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     export() {
         this._exportRepo.exportBravoSOA(this.soaNO)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
             .subscribe(
                 (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'bravoSOA.xlsx');
+                    this.downLoadFile(response, "application/ms-excel", 'Advance Form - eFMS.xlsx');
                 },
-                (errors: any) => {
-                },
-                () => { }
             );
     }
 

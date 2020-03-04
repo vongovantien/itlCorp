@@ -156,7 +156,7 @@ export class ExportRepo {
 
 
     exportBravoSOA(soaNo: string) {
-        this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportBravoSOA`, null, { soaNo: soaNo }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportBravoSOA`, null, { soaNo: soaNo }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
