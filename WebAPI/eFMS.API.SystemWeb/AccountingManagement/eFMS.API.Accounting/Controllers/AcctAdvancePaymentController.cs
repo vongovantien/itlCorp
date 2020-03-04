@@ -596,12 +596,13 @@ namespace eFMS.API.Accounting.Controllers
         /// Export advance payment by advance id
         /// </summary>
         /// <param name="advanceId">Id of advance payment</param>
+        /// <param name="language"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("DetailAdvancePaymentExport")]
-        public IActionResult DetailAdvancePaymentExport(Guid advanceId)
+        public IActionResult DetailAdvancePaymentExport(Guid advanceId, string language)
         {
-            var result = acctAdvancePaymentService.AdvancePaymentExport(advanceId);
+            var result = acctAdvancePaymentService.AdvancePaymentExport(advanceId, language);
             return Ok(result);
         }
     }

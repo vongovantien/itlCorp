@@ -143,6 +143,7 @@ export class HouseBill extends BaseModel {
     total: number = null;
     seaAir: number = null;
     rateCharge: number = null;
+    min: boolean = false;
     kgIb: number = null;
     rclass: number = null;
     comItemNo: number = null;

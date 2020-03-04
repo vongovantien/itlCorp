@@ -47,9 +47,22 @@
                                             Deny
                                         </span>
                                     </span>
-                                </button>                                
-                                <app-default-button [buttonSetting]="previewButtonSetting" (onClick)="preview()">
-                                </app-default-button>
+                                </button>
+                                <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
+                                    <app-default-button data-toggle="dropdown" aria-haspopup="true"
+                                        aria-expanded="false" [buttonSetting]="previewButtonSetting">
+                                    </app-default-button>
+                                    <div class="dropdown-menu" aria-labelledby="">
+                                        <a class="dropdown-item" href="javascript:void(0)"
+                                            (click)="previewAdvPayment()">Preview single</a>
+                                        <a class="dropdown-item" href="javascript:void(0)"
+                                            (click)="exportAdvPayment('VN')">Print multiple
+                                            (VN)</a>
+                                        <a class="dropdown-item" href="javascript:void(0)"
+                                            (click)="exportAdvPayment('ENG')">Print multiple
+                                            (ENG)</a>
+                                    </div>
+                                </div>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
                                 </app-default-button>
                             </div>

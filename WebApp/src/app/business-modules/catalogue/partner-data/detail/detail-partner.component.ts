@@ -17,6 +17,7 @@ import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { NgProgress } from '@ngx-progressbar/core';
 import { formatDate } from '@angular/common';
+import { SystemConstants } from 'src/constants/system.const';
 
 
 @Component({
@@ -83,7 +84,7 @@ export class PartnerDetailComponent extends AppList {
             }
         });
         this.getDataCombobox();
-        const claim = localStorage.getItem('id_token_claims_obj');
+        const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
         this.currenctUser = JSON.parse(claim)["id"];
     }
 
@@ -262,11 +263,12 @@ export class PartnerDetailComponent extends AppList {
             this._catalogueRepo.getProvinces(),
             this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CUSTOMER),
             this._catalogueRepo.getPartnerGroup(),
-            this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Branch })
+            this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Branch }),
+            this._catalogueRepo.getPartnerCharge(this.partner.id)
         ])
             .pipe(catchError(this.catchError))
             .subscribe(
-                ([countries, provinces, customers, partnerGroups, workPlaces]) => {
+                ([countries, provinces, customers, partnerGroups, workPlaces, partnerCharge]) => {
                     this.formPartnerComponent.countries = this.utility.prepareNg2SelectData(countries || [], 'id', 'name');
                     this.formPartnerComponent.billingProvinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
                     this.formPartnerComponent.shippingProvinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
@@ -275,6 +277,9 @@ export class PartnerDetailComponent extends AppList {
                     this.getPartnerGroupActive(this.partnerType);
                     this.formPartnerComponent.workPlaces = this.utility.prepareNg2SelectData(workPlaces || [], 'id', 'nameVn');
                     this.getParnerDetails();
+
+                    console.log(partnerCharge);
+                    this.formPartnerComponent.otherChargePopup.initCharges = partnerCharge || [];
                 },
                 () => { },
 
@@ -476,7 +481,7 @@ export class PartnerDetailComponent extends AppList {
                     if (!!res) {
                         console.log(res);
                         this.formPartnerComponent.isExistedTaxcode = true;
-                        this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fill info to Internal Reference Info.`;
+                        this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
                         this.confirmTaxcode.show();
                     } else {
                         this.onSave();

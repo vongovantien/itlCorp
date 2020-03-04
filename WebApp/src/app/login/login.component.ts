@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgForm } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -42,6 +42,8 @@ export class LoginComponent {
         }
 
         this.getLoginData();
+        this._cd.detectChanges();
+
     }
 
     constructor(
@@ -51,6 +53,7 @@ export class LoginComponent {
         private oauthService: OAuthService,
         private cookieService: CookieService,
         private _systemRepo: SystemRepo,
+        private _cd: ChangeDetectorRef,
         private _spinner: NgxSpinnerService
     ) {
         this.oauthService.setStorage(localStorage);
@@ -98,6 +101,8 @@ export class LoginComponent {
                             this.setupLocalInfo();
                             this.rememberMe();
 
+
+
                             // * CURRENT_URL: url before into auth guard.
                             if (this.currenURL.includes("login")) {
                                 this.currenURL = "home/dashboard";
@@ -106,9 +111,9 @@ export class LoginComponent {
                             this._spinner.hide();
 
                             // save username & password into cookies.
-                            const uf = this.encryptUserInfo(this.username, this.password);
-                            this.cookieService.set("_u", uf.username_encrypt, null, "/", window.location.hostname);
-                            this.cookieService.set("_p", uf.password_encrypt, null, "/", location.hostname);
+                            const userInfoEncrypted = this.encryptUserInfo(this.username, this.password);
+                            this.cookieService.set("__u", userInfoEncrypted.username_encrypt, null, "/", window.location.hostname);
+                            this.cookieService.set("__p", userInfoEncrypted.password_encrypt, null, "/", location.hostname);
 
                             this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
                         }
@@ -163,7 +168,7 @@ export class LoginComponent {
     private getLoginData() {
         this.username = this.getUserName();
         this.password = this.getUserPassword();
-        this.remember_me = (this.username != '' || this.password != '');
+        this.remember_me = (this.username !== '' || this.password !== '');
     }
 
     changeLanguage(lang: string) {

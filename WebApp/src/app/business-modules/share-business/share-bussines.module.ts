@@ -12,7 +12,6 @@ import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
-import { ShareContainerImportComponent } from './components/container-import/container-import.component';
 
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import {
@@ -56,7 +55,8 @@ import {
     ShareBussinessFilesAttachComponent,
     ShareBusinessHousebillsInManifestComponent,
     ShareBusinessArrivalNoteAirComponent,
-    ShareBussinessDateTimeModifiedComponent
+    ShareBussinessDateTimeModifiedComponent,
+    ShareContainerImportComponent,
 
 } from './components';
 
@@ -64,6 +64,7 @@ import {
 import { reducers, effects } from './store';
 import { ShareGoodsImportComponent } from './components/goods-import/goods-import.component';
 import { ValidatorModule } from 'src/app/shared/validators/validator.module';
+import { ShareBussinessHBLFCLContainerPopupComponent } from './components/hbl-fcl-container/hbl-fcl-container.popup';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -108,8 +109,11 @@ const COMPONENTS = [
     ShareBussinessFilesAttachComponent,
     ShareBusinessHousebillsInManifestComponent,
     ShareBusinessArrivalNoteAirComponent,
-    ShareBussinessDateTimeModifiedComponent
+    ShareBussinessDateTimeModifiedComponent,
+    ShareBussinessHBLFCLContainerPopupComponent
+
 ];
+
 
 
 const customCurrencyMaskConfig = {

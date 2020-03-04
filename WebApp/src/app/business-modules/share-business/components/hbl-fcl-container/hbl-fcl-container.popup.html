@@ -1,4 +1,5 @@
-<div class="modal m-animate-fade-in container-list-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+<div class="modal m-animate-fade-in hbl-fcl-container-list-popup" role="dialog" bsModal #popup="bs-modal"
+    aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -154,6 +155,13 @@
                                         <div class="form-group">
                                             <input type="text" class="form-control" [(ngModel)]="container.sealNo"
                                                 name="sealNo">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <div class="text-center">
+                                                <app-switch [(toggle)]="container.isPartOfContainer"></app-switch>
+                                            </div>
                                         </div>
                                     </td>
                                     <td>

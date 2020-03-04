@@ -64,6 +64,6 @@ namespace eFMS.API.Accounting.DL.IService
 
         bool CheckUpdatePermissionByAdvanceId(Guid advanceId);
 
-        AdvanceExport AdvancePaymentExport(Guid advanceId);
+        AdvanceExport AdvancePaymentExport(Guid advanceId, string language);
     }
 }

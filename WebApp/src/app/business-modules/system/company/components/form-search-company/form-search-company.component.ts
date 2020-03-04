@@ -33,15 +33,7 @@ export class CompanyInformationFormSearchComponent extends AppForm {
     }
 
     searchData(searchObject: ISearchObject) {
-        switch (searchObject.field || "All") {
-            case "All":
-                this.searchObject[searchObject.field] = null;
-                break;
-            default:
-                this.searchObject[searchObject.field] = searchObject.searchString;
-                break;
-        }
-
+        this.searchObject[searchObject.field] = searchObject.searchString;
         this.onSearch.emit(this.searchObject);
         this.searchObject = {};
     }

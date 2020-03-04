@@ -34,39 +34,39 @@ export class DefaultButtonComponent implements OnInit {
     }
 
     setMode(typeButton: ButtonType): any {
-        if (typeButton == ButtonType.add) {
+        if (typeButton === ButtonType.add) {
             this.isAdd = true;
             this.setSyleButton(AddDefaultButton);
         }
-        if (typeButton == ButtonType.edit) {
+        if (typeButton === ButtonType.edit) {
             this.isEdit = true;
             this.setSyleButton(EditDefaultButton);
         }
-        if (typeButton == ButtonType.delete) {
+        if (typeButton === ButtonType.delete) {
             this.isDelete = true;
             this.setSyleButton(DeleteDefaultButton);
         }
-        if (typeButton == ButtonType.import) {
+        if (typeButton === ButtonType.import) {
             this.isImport = true;
             this.setSyleButton(ImportDefaultButton);
         }
-        if (typeButton == ButtonType.export) {
+        if (typeButton === ButtonType.export) {
             this.isExport = true;
             this.setSyleButton(ExportDefaultButton);
         }
-        if (typeButton == ButtonType.save) {
+        if (typeButton === ButtonType.save) {
             this.isSave = true;
             this.setSyleButton(SaveDefaultButton);
         }
-        if (typeButton == ButtonType.cancel) {
+        if (typeButton === ButtonType.cancel) {
             this.isCancel = true;
             this.setSyleButton(CancelDefaultButton);
         }
-        if (typeButton == ButtonType.reset) {
+        if (typeButton === ButtonType.reset) {
             this.isCancel = true;
             this.setSyleButton(ResetDefaultButton);
         }
-        if (typeButton == ButtonType.detail) {
+        if (typeButton === ButtonType.detail) {
             this.isDetail = true;
             this.setSyleButton(DetailDefaultButton);
         }

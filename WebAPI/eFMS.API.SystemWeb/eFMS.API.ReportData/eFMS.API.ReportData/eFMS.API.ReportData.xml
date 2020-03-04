@@ -32,6 +32,14 @@
             <param name="settlementPaymentCriteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailAdvancePayment(System.Guid,System.String)">
+            <summary>
+            Export detail advance payment
+            </summary>
+            <param name="advanceId">Id of advance payment</param>
+            <param name="language">VN (Việt Nam) or ENG (English)</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportBravoSOA(System.String)">
             <summary>
             Export Bravo SOA
@@ -201,6 +209,44 @@
             Export User
             </summary>
             <param name="sysUserCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.ReportData.FormatExcel.AccountingHelper">
+            <summary>
+            Accountant
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateAdvancePaymentExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.AdvancePaymentModel},System.IO.Stream)">
+            <summary>
+            Generate advance payment excel
+            </summary>
+            <param name="listObj"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateSettlementPaymentExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.SettlementPaymentModel},System.IO.Stream)">
+            <summary>
+            Generate settlement payment excel
+            </summary>
+            <param name="listObj"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.BuildHeader(OfficeOpenXml.ExcelWorksheet,System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Build header
+            </summary>
+            <param name="worksheet"></param>
+            <param name="headers"></param>
+            <param name="title"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateDetailAdvancePaymentExcel(eFMS.API.ReportData.Models.Accounting.AdvanceExport,System.String,System.IO.Stream)">
+            <summary>
+            Generate detail advance payment excel
+            </summary>
+            <param name="advanceExport"></param>
+            <param name="language"></param>
+            <param name="stream"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">

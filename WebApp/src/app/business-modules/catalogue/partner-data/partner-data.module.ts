@@ -16,6 +16,7 @@ import { FormAddPartnerComponent } from './components/form-add-partner/form-add-
 import { AddPartnerDataComponent } from './add/add-partner.component';
 import { PartnerListComponent } from './components/partner-list/partner-list.component';
 import { PartnerDetailComponent } from './detail/detail-partner.component';
+import { PartnerOtherChargePopupComponent } from './components/other-charge/partner-other-charge.popup';
 
 const routing: Routes = [
     {
@@ -60,7 +61,8 @@ const routing: Routes = [
         FormAddPartnerComponent,
         AddPartnerDataComponent,
         PartnerDetailComponent,
-        PartnerListComponent
+        PartnerListComponent,
+        PartnerOtherChargePopupComponent
 
     ],
     providers: [],

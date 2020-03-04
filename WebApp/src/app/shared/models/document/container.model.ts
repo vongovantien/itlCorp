@@ -28,6 +28,9 @@ export class Container {
   commodityName: string = null;
   packageTypeName: string;
 
+  // * Custom
+  isPartOfContainer: boolean = false; // để generate vào inWord HBL hàng FCL.
+
   constructor(object?: any) {
     const self = this;
     for (const key in object) {

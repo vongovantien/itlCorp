@@ -206,7 +206,7 @@ export class PartnerComponent extends AppList implements OnInit {
     }
 
     addPartner() {
-        this.router.navigate(["/home/catalogue/partner-data/add", { partnerType: this.criteria.partnerGroup }]);
+        this.router.navigate(["/home/catalogue/partner-data/add"], { queryParams: { partnerType: this.criteria.partnerGroup } });
     }
 
     export() {

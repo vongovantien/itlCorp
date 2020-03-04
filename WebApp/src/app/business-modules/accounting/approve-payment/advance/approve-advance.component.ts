@@ -1,7 +1,7 @@
 import { Component, ViewChild, TemplateRef } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { AdvancePaymentListRequestComponent } from '../../advance-payment/components/list-advance-payment-request/list-advance-payment-request.component';
-import { AccountingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -39,7 +39,8 @@ export class ApproveAdvancePaymentComponent extends AppPage {
         private _ngProgressService: NgProgress,
         private _activedRouter: ActivatedRoute,
         private _modalService: BsModalService,
-        private _router: Router
+        private _router: Router,
+        private _exportRepo: ExportRepo,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -158,7 +159,8 @@ export class ApproveAdvancePaymentComponent extends AppPage {
             );
     }
 
-    preview() {
+    previewAdvPayment() {
+        this._progressRef.start();
         this._accoutingRepo.previewAdvancePayment(this.idAdvPayment)
             .pipe(
                 catchError(this.catchError),
@@ -196,4 +198,17 @@ export class ApproveAdvancePaymentComponent extends AppPage {
         this.listRequestAdvancePaymentComponent.currency = currency.id;
     }
 
+    exportAdvPayment(lang: string) {
+        this._progressRef.start();
+        this._exportRepo.exportAdvancePaymentDetail(this.idAdvPayment, lang)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'Advance Form - eFMS.xlsx');
+                },
+            );
+    }
 }

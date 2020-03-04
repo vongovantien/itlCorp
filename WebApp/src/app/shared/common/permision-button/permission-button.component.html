@@ -1,6 +1,6 @@
 <ng-container [ngSwitch]="type">
     <ng-container *ngSwitchCase="'import'">
-        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
             *ngIf="(menuPermission | async)?.import === true">
             <span>
                 <i class="la la-upload"></i>
@@ -11,7 +11,7 @@
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'export'">
-        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase"
             *ngIf="(menuPermission | async)?.export === true">
             <span>
                 <i class="la la-download"></i>
