@@ -27,23 +27,22 @@
                                                     title="Collapse" (click)="getListHouseBill(item.id, i)">
                                                     <i class="la la-angle-up"></i>
                                                 </button>
-                                                <app-permission-button
-                                                    [routerLink]="['/home/documentation/sea-fcl-import/' + item.id]"
-                                                    type="detail">
+                                                <app-permission-button (click)="viewDetail(item.id)" type="detail">
                                                 </app-permission-button>
                                                 <button type="button" *ngIf="item.isLocked"
                                                     class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                     <i class="fa fa-lock"></i>
                                                 </button>
                                                 <ng-container *ngIf="!item.isLocked">
-                                                    <app-permission-button (click)="checkDeleteMasterBill(item)"
+                                                    <app-permission-button (click)="prepareDeleteShipment(item)"
                                                         type="delete">
                                                     </app-permission-button>
                                                 </ng-container>
                                             </div>
                                         </td>
                                         <td>
-                                            <a [routerLink]="['/home/documentation/sea-fcl-import/' + item.id]">{{item.jobNo}}
+                                            <a class="text-underline pointer"
+                                                (click)="viewDetail(item.id)">{{item.jobNo}}
                                             </a>
                                         </td>
                                         <td>
@@ -167,3 +166,5 @@
 <confirm-popup (onSubmit)="onDeleteMasterBill()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
 <info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+
+<permission-403-popup></permission-403-popup>

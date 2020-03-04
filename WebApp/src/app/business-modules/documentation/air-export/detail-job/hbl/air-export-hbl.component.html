@@ -24,7 +24,7 @@
                     </span>
                 </button>
                 <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="deleteJob()" *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete">
+                    (click)="prepareDeleteJob()" *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete">
                     <span>
                         <i class="la la-trash"></i>
                         <span>
@@ -216,3 +216,6 @@
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
+
+<info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+<permission-403-popup></permission-403-popup>

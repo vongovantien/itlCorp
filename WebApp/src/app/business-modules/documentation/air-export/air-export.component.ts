@@ -9,7 +9,7 @@ import { Store } from '@ngrx/store';
 import * as fromShare from './../../share-business/store';
 import { CommonEnum } from '@enums';
 import { CsTransactionDetail } from '@models';
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
 @Component({
@@ -19,7 +19,7 @@ import { takeUntil, catchError, finalize } from 'rxjs/operators';
 export class AirExportComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
     headers: CommonInterface.IHeaderTable[];
     headersHBL: CommonInterface.IHeaderTable[];
 
@@ -146,6 +146,17 @@ export class AirExportComponent extends AppList {
         this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
+    prepareDeleteShipment(shipment) {
+        this._documentRepo.checkPermissionAllowDeleteShipment(shipment.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.confirmDelete(shipment);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
+
     confirmDelete(item: { id: string; }) {
         this.itemToDelete = item;
         this._progressRef.start();
@@ -190,5 +201,16 @@ export class AirExportComponent extends AppList {
         if (this.jobIdSelected !== null) {
             this.getListHouseBill(this.jobIdSelected, -2);
         }
+    }
+
+    viewDetail(id: string): void {
+        this._documentRepo.checkDetailShippmentPermission(id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate(["/home/documentation/air-export", id]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 }

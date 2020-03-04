@@ -6,8 +6,8 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 import { SeaLCLImportCreateJobComponent } from '../create-job/create-job-lcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransactionDetail, CsTransaction } from 'src/app/shared/models';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { CsTransaction } from 'src/app/shared/models';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
 
 import { combineLatest, of } from 'rxjs';
@@ -30,6 +30,8 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
 
     jobId: string;
 
@@ -192,8 +194,32 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         }
     }
 
+    prepareDeleteJob() {
+        this._documenRepo.checkPermissionAllowDeleteShipment(this.jobId)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.deleteJob();
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
+
     deleteJob() {
-        this.confirmDeletePopup.show();
+        this._progressRef.start();
+        this._documenRepo.checkMasterBillAllowToDelete(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.confirmDeletePopup.show();
+                    } else {
+                        this.canNotDeleteJobPopup.show();
+                    }
+                },
+            );
     }
 
     onDeleteJob() {

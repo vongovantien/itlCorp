@@ -32,7 +32,7 @@
                 </button>
 
                 <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="deleteJob()" [disabled]="ACTION === 'COPY'"
+                    (click)="prepareDeleteJob()" [disabled]="ACTION === 'COPY'"
                     *ngIf="!!fclImportDetail && fclImportDetail.permission.allowDelete">
                     <span>
                         <i class="la la-trash"></i>
@@ -118,3 +118,6 @@
 
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
     (onSubmit)="gotoList()"></confirm-popup>
+
+<info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+<permission-403-popup></permission-403-popup>

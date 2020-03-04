@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 
 import { AppList } from 'src/app/app.list';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { CsTransaction, CsTransactionDetail } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
@@ -22,7 +22,7 @@ import * as fromShare from './../../share-business/store';
 export class SeaLCLImportComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
-
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
     headers: CommonInterface.IHeaderTable[];
     headerHouseBills: CommonInterface.IHeaderTable[];
 
@@ -39,7 +39,7 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
     _toDate: Date = this.createMoment().endOf('month').toDate();
 
     jobIdSelected: string = null;
-    
+
     constructor(
         private _router: Router,
         private _documentationRepo: DocumentationRepo,
@@ -167,6 +167,17 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
         }
     }
 
+    prepareDeleteShipment(masterbill: CsTransaction) {
+        this._documentationRepo.checkPermissionAllowDeleteShipment(masterbill.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.checkDeleteMasterBill(masterbill);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
+
     checkDeleteMasterBill(masterbill: CsTransaction) {
         this._progressRef.start();
         this._documentationRepo.checkMasterBillAllowToDelete(masterbill.id)
@@ -205,10 +216,21 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
             );
     }
 
-    loadListHouseBillExpanding(){ 
-        this.tmpIndex = -1; 
-        if(this.jobIdSelected !== null){
-            this.getListHouseBill(this.jobIdSelected,-2);
-        }         
+    loadListHouseBillExpanding() {
+        this.tmpIndex = -1;
+        if (this.jobIdSelected !== null) {
+            this.getListHouseBill(this.jobIdSelected, -2);
+        }
+    }
+
+    viewDetail(id: string): void {
+        this._documentationRepo.checkDetailShippmentPermission(id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate(["/home/documentation/sea-lcl-import", id]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 }
