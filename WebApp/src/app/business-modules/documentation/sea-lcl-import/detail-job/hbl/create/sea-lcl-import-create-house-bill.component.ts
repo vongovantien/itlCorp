@@ -56,6 +56,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     containers: Container[] = [];
     selectedTab: string = HBL_TAB.DETAIL;
     hblDetail: any = {};
+    allowAdd: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -91,6 +92,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             if (param.jobId && isUUID(param.jobId)) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                this.getDetailShipmentPermission();
             } else {
                 this.combackToHBLList();
             }
@@ -248,6 +250,21 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                 );
         }
     }
+
+    getDetailShipmentPermission() {
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.allowAdd = res.allowUpdate;
+                    }
+                },
+            );
+    }
+
 
     onsubmitData() {
         const body: ITransactionDetail = {

@@ -1,8 +1,10 @@
 <div class="sea-fcl-create-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <app-default-button (click)="showImportPopup()" [buttonSetting]="importButtonSetting"></app-default-button>
-            <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
+            <app-default-button (click)="showImportPopup()" *ngIf="allowAdd" [buttonSetting]="importButtonSetting">
+            </app-default-button>
+            <app-default-button (click)="showCreatepoup()" *ngIf="allowAdd" [buttonSetting]="saveButtonSetting">
+            </app-default-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>
     </app-sub-header>

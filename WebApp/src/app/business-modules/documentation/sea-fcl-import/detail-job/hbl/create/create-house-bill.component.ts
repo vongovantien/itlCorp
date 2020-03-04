@@ -49,6 +49,7 @@ export class CreateHouseBillComponent extends AppForm {
     containers: Container[] = [];
     selectedTab: string = HBL_TAB.DETAIL;
     hblDetail: any = {};
+    allowAdd: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -84,7 +85,7 @@ export class CreateHouseBillComponent extends AppForm {
             if (param.jobId && isUUID(param.jobId)) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-
+                this.getDetailShipmentPermission();
                 // * Get default containers from masterbill.
                 this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
 
@@ -195,6 +196,20 @@ export class CreateHouseBillComponent extends AppForm {
         this.importHouseBillPopup.selected = - 1;
         this.importHouseBillPopup.getHourseBill(dataSearch);
         this.importHouseBillPopup.show();
+    }
+
+    getDetailShipmentPermission() {
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.allowAdd = res.allowUpdate;
+                    }
+                },
+            );
     }
 
     combackToHBLList() {

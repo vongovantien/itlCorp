@@ -58,6 +58,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
 
     }
 
+
     ngAfterViewInit() {
         combineLatest([
             this._activedRoute.params,
