@@ -17,6 +17,7 @@ import * as fromStore from './../../store/index';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
+import { SystemRepo } from '@repositories';
 
 
 @Component({
@@ -66,6 +67,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     ports: Observable<PortIndex[]>;
     units: CommonInterface.INg2Select[];
     commodities: CommonInterface.INg2Select[];
+    listUsers: Observable<User[]>;
 
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name Abbr' },
@@ -98,7 +100,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         private _fb: FormBuilder,
         private _store: Store<fromStore.IShareBussinessState>,
         private _route: ActivatedRoute,
-        private _actionSubject: ActionsSubject
+        private _actionSubject: ActionsSubject,
+        private _systemRepo: SystemRepo
 
     ) {
         super();
@@ -136,12 +139,15 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             takeUntil(this.ngUnsubscribe)
         );
 
+        this.listUsers = this._systemRepo.getSystemUsers();
+
         this.getUserLogged();
         this.initForm();
         this.getCarriers();
         this.getAgents();
         this.getPorts();
         this.getUnits();
+
         this.getCommodities();
 
         this._store.select(fromStore.getTransactionDetailCsTransactionState)
@@ -245,7 +251,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     initForm() {
         this.formGroup = this._fb.group({
             jobNo: [{ value: null, disabled: true }],
-            personIncharge: [{ value: this.userLogged.userName, disabled: true }],
+            personIncharge: [{ value: this.userLogged.id, disabled: true }],
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
@@ -334,7 +340,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        console.log(this.userLogged);
     }
 
     getCarriers() {
