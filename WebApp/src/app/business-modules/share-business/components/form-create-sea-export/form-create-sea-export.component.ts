@@ -5,7 +5,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 
 import { AppForm } from 'src/app/app.form';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
-import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { User, CsTransactionDetail } from 'src/app/shared/models';
@@ -42,6 +42,8 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
+    listUsers: Observable<User[]>;
+
     minDateETA: any;
 
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
@@ -83,7 +85,8 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         private _documentRepo: DocumentationRepo,
         private _fb: FormBuilder,
         private _store: Store<fromShare.IShareBussinessState>,
-        private _route: ActivatedRoute
+        private _route: ActivatedRoute,
+        private _systemRepo: SystemRepo
 
     ) {
         super();
@@ -99,6 +102,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
         this.ports = this._store.select(getCataloguePortState);
+        this.listUsers = this._systemRepo.getListSystemUser();
 
         this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
         this.isLoadingAgent = this._store.select(getCatalogueAgentLoadingState);
@@ -228,7 +232,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
-        this.personalIncharge.setValue(this.userLogged.userName);
+        this.personalIncharge.setValue(this.userLogged.id);
         this.personalIncharge.disable();
     }
 

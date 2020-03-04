@@ -215,7 +215,6 @@ export class AddRoleUserComponent extends AppList {
                                 res.data.forEach(item => {
                                     this.listRoles.forEach(element => {
                                         if (item.officeId === element.officeId
-                                            && item.permissionSampleId === element.permissionSampleId
                                         ) {
                                             element.isDup = true;
                                         } else {

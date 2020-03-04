@@ -1,6 +1,7 @@
 import { BaseModel } from "../base.model";
 import { Container } from "./container.model";
 import { CommonEnum } from "../../enums/common.enum";
+import { SystemConstants } from "src/constants/system.const";
 
 export class FCLImportAddModel extends BaseModel {
     transactionTypeEnum: CommonEnum.TransactionTypeEnum = 7;
@@ -50,6 +51,8 @@ export class FCLImportAddModel extends BaseModel {
         for (const key in object) {
             if (self.hasOwnProperty(key.toString())) {
                 self[key] = object[key];
+
+                self.personIncharge = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS)).id;
             }
         }
     }

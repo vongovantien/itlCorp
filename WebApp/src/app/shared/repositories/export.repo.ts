@@ -154,6 +154,14 @@ export class ExportRepo {
         );
     }
 
+
+    exportBravoSOA(soaNo: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportBravoSOA`, null, { soaNo: soaNo }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     exportAdvancePaymentDetail(advanceId: string, language: string) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}`).pipe(
             catchError((error) => throwError(error)),

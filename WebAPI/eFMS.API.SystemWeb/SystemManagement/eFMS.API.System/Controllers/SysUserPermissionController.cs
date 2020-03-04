@@ -101,7 +101,7 @@ namespace eFMS.API.System.Controllers
         public IActionResult Add(List<SysUserPermissionEditModel> list)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkDupRole = list.GroupBy(x => new { x.PermissionSampleId, x.OfficeId })
+            var checkDupRole = list.GroupBy(x => new { x.OfficeId })
                                 .Where(t => t.Count() > 1)
                                 .Select(y => y.Key)
                                 .ToList();

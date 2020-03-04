@@ -10,6 +10,7 @@ import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SystemLoadUserLevelAction, IShareSystemState } from 'src/app/business-modules/share-system/store';
 import { Store } from '@ngrx/store';
+import { PreviousRouteService } from 'src/app/shared/services/previous-route';
 
 @Component({
     selector: 'app-office-details',
@@ -17,6 +18,7 @@ import { Store } from '@ngrx/store';
 })
 export class OfficeDetailsComponent extends AppPage {
     @ViewChild(OfficeFormAddComponent, { static: false }) formAdd: OfficeFormAddComponent;
+    previousUrl: string;
     formData: IFormAddOffice = {
         id: '',
         branchNameVn: '',
@@ -55,14 +57,16 @@ export class OfficeDetailsComponent extends AppPage {
 
     constructor(
         private _activedRouter: ActivatedRoute,
-        private _router: Router,
         private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
         private _toastService: ToastrService,
-        private _store: Store<IShareSystemState>
+        private _store: Store<IShareSystemState>,
+        private _previousRouteService: PreviousRouteService,
+        private _router: Router
     ) {
         super();
         this._progressRef = this._progressService.ref();
+        this.previousUrl = this._previousRouteService.getPreviousUrl();
     }
 
     ngOnInit() {
@@ -174,5 +178,12 @@ export class OfficeDetailsComponent extends AppPage {
                     console.log(this.departments);
                 },
             );
+    }
+    cancel() {
+        if (this.previousUrl.includes('office')) {
+            this._router.navigate(['/home/system/office']);
+        } else {
+            this.back();
+        }
     }
 }

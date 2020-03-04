@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, AbstractControl } from '@angular/forms';
 import { SystemRepo } from '@repositories';
-import { Params, ActivatedRoute } from '@angular/router';
+import { Params, ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ConfirmPopupComponent } from '@common';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -13,6 +13,7 @@ import { AppForm } from 'src/app/app.form';
 
 import { catchError, finalize } from 'rxjs/operators';
 import { IShareSystemState, checkShareSystemUserLevel, SystemLoadUserLevelAction } from 'src/app/business-modules/share-system/store';
+import { PreviousRouteService } from 'src/app/shared/services/previous-route';
 
 
 @Component({
@@ -50,9 +51,12 @@ export class GroupDetailComponent extends AppForm implements OnInit {
         private _toastService: ToastrService,
         private _location: Location,
         private _store: Store<IShareSystemState>,
+        private previousRouteService: PreviousRouteService,
+        private router: Router
     ) {
         super();
         this._progressRef = this._progressService.ref();
+        this.previousUrl = this.previousRouteService.getPreviousUrl();
     }
 
     ngOnInit() {
@@ -159,13 +163,11 @@ export class GroupDetailComponent extends AppForm implements OnInit {
     }
 
     cancel() {
-        // if (this.previousUrl === '/home/system/department') {
-        //     this._location.back();
-        // } else {
-        //     this.router.navigate(['/home/system/group']);
-        // }
-        this._location.back();
-
+        if (this.previousUrl.includes('group')) {
+            this.router.navigate(['/home/system/group']);
+        } else {
+            this._location.back();
+        }
     }
 
     update() {

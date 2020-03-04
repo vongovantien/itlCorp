@@ -188,7 +188,10 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger':  isSubmitted && !personalIncharge.value}">
                             <label required>Personal In Charge</label>
-                            <input type="text" class="form-control" formControlName="personalIncharge">
+                            <select formControlName="personalIncharge" disabled class="form-control">
+                                <option *ngFor="let item of (listUsers | async)" [value]="item.id">{{item.username}}
+                                </option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-12">
