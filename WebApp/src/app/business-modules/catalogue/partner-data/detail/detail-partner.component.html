@@ -128,46 +128,6 @@
                 <!--end: Datatable -->
             </div>
         </div>
-        <!--begin:: form-actions-->
-        <div class="form-actions">
-            <div class="row">
-                <div class="col-6">
-
-                </div>
-                <div class="col-6 m--align-right">
-                    <button *ngIf="partner.permission.allowDelete" type="button"
-                        class="btn btn-danger m-btn--square  m-btn--icon  m-btn--uppercase"
-                        (click)="showConfirmDelete()">
-                        <span>
-                            <i class="la la-trash"></i>
-                            <span>
-                                Delete
-                            </span>
-                        </span>
-                    </button>
-                    <button *ngIf="partner.permission.allowUpdate"
-                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSubmit()">
-                        <span>
-                            <i class="la la-save"></i>
-                            <span>
-                                Save
-                            </span>
-                        </span>
-                    </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-                        routerLink="/home/catalogue/partner-data">
-                        <span>
-                            <i class="la la-ban"></i>
-                            <span>
-                                cancel
-                            </span>
-                        </span>
-                    </button>
-                </div>
-            </div>
-
-        </div>
-        <!--end:: form-actions-->
     </div>
     <!--end::m-content of Partner-data-addnew-->
 </form>

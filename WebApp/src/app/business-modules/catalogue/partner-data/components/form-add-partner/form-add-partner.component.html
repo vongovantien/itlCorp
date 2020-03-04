@@ -121,7 +121,7 @@
                         </label>
                         <input type="text" name="coLoaderCode" class="form-control" formControlName="coLoaderCode" />
                         <div class="text-center text-underline m--margin-top-10" *ngIf="isUpdate">
-                            <a (click)="showOtherCharge()" class="pointer">Other Charge</a>
+                            <a (click)="showOtherCharge()" class="pointer font-weight-bold">Other Charge</a>
                         </div>
                     </div>
                 </div>
@@ -141,7 +141,7 @@
                 <h3 class="c-block-title">Shipping Address</h3>
                 <hr>
                 <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group"
@@ -186,7 +186,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <div class="form-group"
                             [ngClass]="{ 'm-form__group has-danger': isSubmitted && shippingAddressEN.invalid }">
                             <label class="form-control-label">
@@ -199,7 +199,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <div class="form-group"
                             [ngClass]="{ 'm-form__group has-danger': isSubmitted && shippingAddressVN.invalid }">
                             <label class="form-control-label">
@@ -215,10 +215,21 @@
                 </div>
             </div>
             <div class="div-inside bg-secondary m--margin-bottom-15">
-                <h3 class="c-block-title">Billing Address</h3>
+                <div class="d-flex align-items-center">
+                    <h3 class="c-block-title">Billing Address</h3>
+                    <button type="button" (click)="copyShippingAddress()"
+                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-left-20">
+                        <span>
+                            <i class="la la-download"></i>
+                            <span>
+                                Copy Shipping Address
+                            </span>
+                        </span>
+                    </button>
+                </div>
                 <hr>
                 <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group"
@@ -263,7 +274,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <div class="form-group"
                             [ngClass]="{ 'm-form__group has-danger': isSubmitted && billingAddressEN.invalid }">
                             <label class="form-control-label">
@@ -277,7 +288,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <div class="form-group"
                             [ngClass]="{ 'm-form__group has-danger': isSubmitted && billingAddressLocal.invalid }">
                             <label class="form-control-label">

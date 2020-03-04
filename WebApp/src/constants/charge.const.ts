@@ -20,4 +20,11 @@ export class ChargeConstants {
     public static readonly SCE_DES: string = "Sea Consol Export";
     public static readonly SCI_DES: string = "Sea Consol Import";
     public static readonly CL_DES: string = "Custom Logistic";
+
+
+    public static readonly DEFAULT_AIR = ["BA_A_F_Air", "BA_SCR_Air", "BA_AMS_Air"];
+    public static readonly DEFAULT_FCL_EXPORT = ["BS_OCF_Sea", "BS_BL_Sea", "BS_SEL_Sea", "BS_THCF_Sea"];
+    public static readonly DEFAULT_LCL_EXPORT = ["BS_OCF_Sea", "BS_BL_Sea", "BS_SEL_Sea", "BS_THCL_Sea"];
+    public static readonly DEFAULT_FCL_IMPORT = ["BS_OCF_Sea", "BS_D_O_Sea", "BS_CIC_Sea", "BS_THCF_Sea", "BS_CCF1_Sea"];
+    public static readonly DEFAULT_LCL_IMPORT = ["BS_OCF_Sea", "BS_D_O_Sea", "BS_CIC_Sea", "BS_THCL_Sea", "BS_CCF1_Sea"];
 }

@@ -17,15 +17,8 @@
             <div class="col-md-8" *ngIf="(isLocked | async) === false">
                 <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                     <div class="m--align-right">
-                        <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="saveOBHSurCharge()">
-                            <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    save
-                                </span>
-                            </span>
-                        </button>
+                        <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveOBHSurCharge()">
+                        </app-default-button>
                     </div>
                 </ng-container>
             </div>

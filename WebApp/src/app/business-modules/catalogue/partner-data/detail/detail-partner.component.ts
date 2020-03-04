@@ -278,8 +278,10 @@ export class PartnerDetailComponent extends AppList {
                     this.formPartnerComponent.workPlaces = this.utility.prepareNg2SelectData(workPlaces || [], 'id', 'nameVn');
                     this.getParnerDetails();
 
-                    console.log(partnerCharge);
+                    // * Update other charge.
                     this.formPartnerComponent.otherChargePopup.initCharges = partnerCharge || [];
+                    this.formPartnerComponent.otherChargePopup.charges = partnerCharge || [];
+
                 },
                 () => { },
 
