@@ -309,7 +309,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Advance Form - eFMS.xlsx');
+                    this.downLoadFile(response, "application/ms-excel", 'Bravo SOA.xlsx');
                 },
             );
     }
