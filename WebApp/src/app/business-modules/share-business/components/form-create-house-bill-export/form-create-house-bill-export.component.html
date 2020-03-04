@@ -78,7 +78,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !hbltype.value}">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':  (hbltype.dirty && !hbltype.valid) || (isSubmitted && !hbltype.valid)}">
                         <label required>HBL Type</label>
                         <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
                             formControlName="hbltype" (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">

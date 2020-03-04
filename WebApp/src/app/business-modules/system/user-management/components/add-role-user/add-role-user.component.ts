@@ -39,9 +39,9 @@ export class AddRoleUserComponent extends AppList {
     }
     ngOnInit() {
         this.headers = [
-            { title: 'Role Name', field: 'name', },
-            { title: 'Company', field: '' },
-            { title: 'Office', field: 'officeId' },
+            { title: 'Role Name', field: 'name', required: true },
+            { title: 'Company', field: '', required: true },
+            { title: 'Office', field: 'officeId', required: true },
         ];
         this.getDataCombobox();
         this.getCompanies();
