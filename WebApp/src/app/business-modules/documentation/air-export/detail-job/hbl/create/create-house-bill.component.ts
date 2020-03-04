@@ -39,6 +39,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     jobId: string;
     selectedHbl: any = {}; // TODO model.
+    allowAdd: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -63,6 +64,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     this.jobId = param.jobId;
                     this.generateHblNo(CommonEnum.TransactionTypeEnum.AirExport);
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                    this.getDetailShipmentPermission();
                 } else {
                     this.gotoList();
                 }
@@ -218,5 +220,20 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     gotoList() {
         this._router.navigate([`home/documentation/air-export/${this.jobId}/hbl`]);
     }
+
+    getDetailShipmentPermission() {
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.allowAdd = res.allowUpdate;
+                    }
+                },
+            );
+    }
+
 
 }

@@ -37,6 +37,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
     jobId: string;
     containers: Container[] = [];
+    allowAdd: boolean = false;
 
     selectedHbl: any = {}; // TODO model.
 
@@ -78,6 +79,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
                     // * Get default containers from masterbill.
                     this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+                    this.getDetailShipmentPermission();
                 } else {
                     this.gotoList();
                 }
@@ -258,4 +260,17 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
     }
 
+    getDetailShipmentPermission() {
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.allowAdd = res.allowUpdate;
+                    }
+                },
+            );
+    }
 }
