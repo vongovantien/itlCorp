@@ -284,7 +284,7 @@ export class DocumentationRepo {
     }
 
     checkMasterBillAllowToDelete(id: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/CheckDeletePermission/${id}`).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/CheckAllowDelete/${id}`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -670,8 +670,10 @@ export class DocumentationRepo {
         );
     }
 
-
-
-
+    checkPermissionAllowDeleteShipment(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/CheckDeletePermission/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 
 }

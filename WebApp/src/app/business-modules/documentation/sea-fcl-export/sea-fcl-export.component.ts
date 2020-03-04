@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
 import { SortService } from 'src/app/shared/services/sort.service';
-import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { InfoPopupComponent, ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CsTransactionDetail } from 'src/app/shared/models';
@@ -24,6 +24,7 @@ export class SeaFCLExportComponent extends AppList {
 
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     headersHBL: CommonInterface.IHeaderTable[];
@@ -38,7 +39,7 @@ export class SeaFCLExportComponent extends AppList {
 
     _fromDate: Date = this.createMoment().startOf('month').toDate();
     _toDate: Date = this.createMoment().endOf('month').toDate();
-    
+
     jobIdSelected: string = null;
 
     constructor(
@@ -158,6 +159,17 @@ export class SeaFCLExportComponent extends AppList {
         this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
+    prepareDeleteShipment(item) {
+        this._documentRepo.checkPermissionAllowDeleteShipment(item.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.confirmDelete(item);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
+
     confirmDelete(item: { id: string; }) {
         this.itemToDelete = item;
         this._progressRef.start();
@@ -197,10 +209,21 @@ export class SeaFCLExportComponent extends AppList {
         this._router.navigate(['home/documentation/sea-fcl-export/new']);
     }
 
-    loadListHouseBillExpanding(){ 
-        this.tmpIndex = -1; 
-        if(this.jobIdSelected !== null){
-            this.getListHouseBill(this.jobIdSelected,-2);
-        }         
+    loadListHouseBillExpanding() {
+        this.tmpIndex = -1;
+        if (this.jobIdSelected !== null) {
+            this.getListHouseBill(this.jobIdSelected, -2);
+        }
+    }
+
+    viewDetail(id: string): void {
+        this._documentRepo.checkDetailShippmentPermission(id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate(["/home/documentation/sea-fcl-export", id]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 }

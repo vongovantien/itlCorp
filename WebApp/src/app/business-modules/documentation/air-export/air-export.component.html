@@ -28,9 +28,7 @@
                                                 title="Collapse" (click)="getListHouseBill(shipment.id,i)">
                                                 <i class="la la-angle-up"></i>
                                             </button>
-                                            <app-permission-button
-                                                [routerLink]="['/home/documentation/air-export/' + shipment.id]"
-                                                type="detail">
+                                            <app-permission-button (click)="viewDetail(shipment.id)" type="detail">
                                             </app-permission-button>
 
                                             <button type="button" *ngIf="shipment.isLocked"
@@ -39,14 +37,15 @@
                                             </button>
 
                                             <ng-container *ngIf="!shipment.isLocked">
-                                                <app-permission-button (click)="confirmDelete(shipment)" type="delete">
+                                                <app-permission-button (click)="prepareDeleteShipment(shipment)"
+                                                    type="delete">
                                                 </app-permission-button>
                                             </ng-container>
                                         </div>
                                     </td>
                                     <td>
                                         <a class="text-underline pointer"
-                                            [routerLink]="shipment.id">{{shipment.jobNo}}</a>
+                                            (click)="viewDetail(shipment.id)">{{shipment.jobNo}}</a>
                                     </td>
                                     <td>{{shipment.mawb}}</td>
                                     <td>{{shipment.etd | date: 'dd/MM/yyyy'}}</td>
@@ -131,3 +130,4 @@
 </confirm-popup>
 
 <info-popup [body]="'You are not allow to delete this job'" [title]="'Alert'"></info-popup>
+<permission-403-popup></permission-403-popup>

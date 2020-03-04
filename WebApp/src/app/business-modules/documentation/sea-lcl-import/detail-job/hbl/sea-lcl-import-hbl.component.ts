@@ -9,7 +9,7 @@ import { HouseBill, CsTransaction } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/share-business';
 import { getParamsRouterState } from 'src/app/store';
-import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import { takeUntil, take, catchError, finalize, skip } from 'rxjs/operators';
@@ -29,6 +29,8 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+
     jobId: string;
 
     houseBills: HouseBill[] = [];
@@ -225,9 +227,32 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
             );
     }
 
+    prepareDeleteJob() {
+        this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.deleteJob();
+                } else {
+                    this.info403Popup.show();
+                }
+            });
+    }
 
     deleteJob() {
-        this.confirmDeleteJobPopup.show();
+        this._progressRef.start();
+        this._documentRepo.checkMasterBillAllowToDelete(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.confirmDeleteJobPopup.show();
+                    } else {
+                        this.canNotDeleteJobPopup.show();
+                    }
+                },
+            );
     }
 
     onDeleteJob() {

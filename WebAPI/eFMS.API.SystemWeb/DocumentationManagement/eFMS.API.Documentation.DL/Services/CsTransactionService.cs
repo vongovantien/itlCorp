@@ -149,9 +149,7 @@ namespace eFMS.API.Documentation.DL.Services
         public object AddCSTransaction(CsTransactionEditModel model)
         {
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
-            var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
-
+            
             var transaction = mapper.Map<CsTransaction>(model);
             transaction.Id = Guid.NewGuid();
             if (model.CsMawbcontainers != null)
@@ -517,7 +515,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Group:
-                    if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID)
+                    if ((detail.GroupId == currentUser.GroupId && detail.GroupId != null)
                         || authorizeUserIds.Contains(detail.PersonIncharge))
                     {
                         result = true;
@@ -528,7 +526,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Department:
-                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.PersonIncharge))
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.DepartmentId != null) || authorizeUserIds.Contains(detail.PersonIncharge))
                     {
                         result = true;
                     }
@@ -538,7 +536,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Office:
-                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.PersonIncharge))
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.OfficeId != null) || authorizeUserIds.Contains(detail.PersonIncharge))
                     {
                         result = true;
                     }

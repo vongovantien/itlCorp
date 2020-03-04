@@ -7,7 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { AirExportCreateJobComponent } from '../create-job/create-job-air-export.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { DIM, CsTransaction } from '@models';
 
 import { combineLatest, of, forkJoin } from 'rxjs';
@@ -30,6 +30,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
     @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
@@ -225,8 +227,32 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         this._router.navigate(["home/documentation/air-export"]);
     }
 
+    prepareDeleteJob() {
+        this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.deleteJob();
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
+
     deleteJob() {
-        this.confirmDeleteJobPopup.show();
+        this._progressRef.start();
+        this._documenRepo.checkMasterBillAllowToDelete(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.confirmDeleteJobPopup.show();
+                    } else {
+                        this.canNotDeleteJobPopup.show();
+                    }
+                },
+            );
     }
 
     onDeleteJob() {
