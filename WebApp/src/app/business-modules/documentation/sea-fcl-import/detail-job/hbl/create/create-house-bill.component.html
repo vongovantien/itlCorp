@@ -2,9 +2,11 @@
     <app-sub-header>
         <div class="c-button-actions">
 
-            <app-default-button (click)="showImportPopup()" [buttonSetting]="importButtonSetting"></app-default-button>
+            <app-default-button *ngIf="allowAdd" (click)="showImportPopup()" [buttonSetting]="importButtonSetting">
+            </app-default-button>
 
-            <app-default-button (click)="showCreatePpoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
+            <app-default-button *ngIf="allowAdd" (click)="showCreatePpoup()" [buttonSetting]="saveButtonSetting">
+            </app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
 
         </div>

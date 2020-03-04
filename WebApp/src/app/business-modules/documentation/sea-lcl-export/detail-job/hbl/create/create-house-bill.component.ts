@@ -41,6 +41,8 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
 
     selectedHbl: any = {}; // TODO model.
 
+    allowAdd: boolean = false;
+
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -73,6 +75,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                 if (param.jobId && isUUID(param.jobId)) {
                     this.jobId = param.jobId;
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                    this.getDetailShipmentPermission();
                 } else {
                     this.gotoList();
                 }
@@ -249,4 +252,19 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     gotoList() {
         this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}/hbl`]);
     }
+
+    getDetailShipmentPermission() {
+        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.allowAdd = res.allowUpdate;
+                    }
+                },
+            );
+    }
+
 }

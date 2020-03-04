@@ -66,6 +66,8 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
+                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                    this.getDetailShipment();
                     this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 

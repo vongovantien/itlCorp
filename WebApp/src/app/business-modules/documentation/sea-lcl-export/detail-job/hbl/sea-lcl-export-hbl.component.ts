@@ -70,10 +70,8 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
-
-                    this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-
+                    this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
                     this.getDetailShipment();
                     this.getHouseBills(this.jobId);
                 }
@@ -101,7 +99,6 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
                 }
             }
         );
-        this.getDetailShipment();
     }
 
     getHouseBills(id: string) {
