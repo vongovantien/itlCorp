@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 
 import { AppForm } from 'src/app/app.form';
-import { DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { User } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
@@ -52,6 +52,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
+    listUsers: Observable<User[]>;
 
     formCreate: FormGroup;
     etd: AbstractControl;
@@ -82,7 +83,8 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         protected _catalogueRepo: CatalogueRepo,
         protected _fb: FormBuilder,
         private _store: Store<fromShare.ITransactionState>,
-        private _route: ActivatedRoute
+        private _route: ActivatedRoute,
+        private _systemRepo: SystemRepo
 
     ) {
         super();
@@ -97,6 +99,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
         this.ports = this._store.select(getCataloguePortState);
+        this.listUsers = this._systemRepo.getListSystemUser();
 
         this.initForm();
         this.getUserLogged();
@@ -237,7 +240,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
-        this.personIncharge.setValue(this.userLogged.userName);
+        this.personIncharge.setValue(this.userLogged.id);
         this.personIncharge.disable();
     }
 

@@ -5,7 +5,7 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
 import { AppForm } from 'src/app/app.form';
-import { FCLImportAddModel } from 'src/app/shared/models';
+import { FCLImportAddModel, CsTransaction } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
 
@@ -104,7 +104,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
         };
 
 
-        const fclImportAddModel = new FCLImportAddModel(formData);
+        const fclImportAddModel = new CsTransaction(formData);
         fclImportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaFCLImport;
 
         return fclImportAddModel;
