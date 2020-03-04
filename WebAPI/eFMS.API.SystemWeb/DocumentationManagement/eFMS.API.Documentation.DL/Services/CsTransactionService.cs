@@ -1603,27 +1603,21 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.UserModified = model.UserCreated;
                 transaction.Active = true;
                 var hsTrans = transactionRepository.Add(transaction, false);
+                List<CsMawbcontainer> containers = null;
+                List<CsDimensionDetail> dimensionDetails = null;
                 if (model.CsMawbcontainers != null)
                 {
-                    model.CsMawbcontainers.ForEach(x =>
-                    {
-                        x.Id = Guid.NewGuid();
-                        x.Mblid = transaction.Id;
-                        x.UserModified = transaction.UserCreated;
-                        x.DatetimeModified = DateTime.Now;
-                    });
-                    var hsCont = containerService.Add(model.CsMawbcontainers, false);
+                    containers = new List<CsMawbcontainer>();
+                    var masterContainers = GetMasterBillcontainer(transaction.Id, model.CsMawbcontainers);
+                    containers.AddRange(masterContainers);
+                    //var hsCont = containerService.Add(model.CsMawbcontainers, false);
                 }
                 if (model.DimensionDetails != null)
                 {
-                    model.DimensionDetails.ForEach(x =>
-                    {
-                        x.Id = Guid.NewGuid();
-                        x.Mblid = transaction.Id;
-                        x.UserCreated = transaction.UserCreated;
-                        x.DatetimeCreated = DateTime.Now;
-                    });
-                    dimensionDetailService.Add(model.DimensionDetails, false);
+                    dimensionDetails = new List<CsDimensionDetail>();
+                    var masterDimensionDetails = GetMasterDimensiondetails(transaction.Id, model.DimensionDetails);
+                    dimensionDetails.AddRange(masterDimensionDetails);
+                    //dimensionDetailService.Add(model.DimensionDetails, false);
                 }
                 IQueryable<CsTransactionDetail> detailTrans = null;
                 if (model.TransactionType == "AI" || model.TransactionType == "AE")
@@ -1648,7 +1642,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     foreach (var item in detailTrans)
                     {
-                        var houseId = item.Id;
+                        var oldHouseId = item.Id;
                         item.Id = Guid.NewGuid();
                         item.JobId = transaction.Id;
                         item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
@@ -1657,52 +1651,37 @@ namespace eFMS.API.Documentation.DL.Services
                         item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
                         item.DatetimeCreated = DateTime.Now;
                         csTransactionDetailRepo.Add(item, false);
-                        var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == houseId);
-                        if (houseContainers != null)
-                        {
-                            foreach (var x in houseContainers)
-                            {
-                                x.Id = Guid.NewGuid();
-                                x.Hblid = item.Id;
-                                x.ContainerNo = string.Empty;
-                                x.SealNo = string.Empty;
-                                x.MarkNo = string.Empty;
-                                x.UserModified = transaction.UserCreated;
-                                x.DatetimeModified = DateTime.Now;
-                                csMawbcontainerRepo.Add(x, false);
-                            }
-                        }
-                        var houseDimensions = dimensionDetailRepository.Get(x => x.Hblid == item.Id);
-                        if (houseDimensions != null)
-                        {
-                            foreach (var x in houseDimensions)
-                            {
-                                x.Id = Guid.NewGuid();
-                                x.Hblid = item.Id;
-                                x.UserCreated = transaction.UserCreated;
-                                x.DatetimeCreated = DateTime.Now;
-                                dimensionDetailRepository.Add(x, false);
-                            }
-                        }
-                        var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == houseId);
-                        if (charges != null)
-                        {
-                            foreach (var charge in charges)
-                            {
-                                charge.Id = Guid.NewGuid();
-                                charge.UserCreated = transaction.UserCreated;
-                                charge.DatetimeCreated = DateTime.Now;
-                                charge.Hblid = item.Id;
-                                charge.Soano = null;
-                                charge.PaySoano = null;
-                                charge.CreditNo = null;
-                                charge.DebitNo = null;
-                                charge.Soaclosed = null;
-                                charge.SettlementCode = null;
-                                csShipmentSurchargeRepo.Add(charge, false);
-                            }
-                        }
-                        var freightCharge = csArrivalFrieghtChargeService.Get(x => x.Hblid == houseId);
+                        var housebillcontainers = GetHouseBillContainers(oldHouseId, item.Id);
+                        //var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == houseId);
+                        //if (houseContainers != null)
+                        //{
+                        //    foreach (var x in houseContainers)
+                        //    {
+                        //        x.Id = Guid.NewGuid();
+                        //        x.Hblid = item.Id;
+                        //        x.ContainerNo = string.Empty;
+                        //        x.SealNo = string.Empty;
+                        //        x.MarkNo = string.Empty;
+                        //        x.UserModified = transaction.UserCreated;
+                        //        x.DatetimeModified = DateTime.Now;
+                        //        csMawbcontainerRepo.Add(x, false);
+                        //    }
+                        //}
+                        var housebillDimensions = GetHouseBillDimensions(oldHouseId, item.Id);
+                        //var houseDimensions = dimensionDetailRepository.Get(x => x.Hblid == item.Id);
+                        //if (houseDimensions != null)
+                        //{
+                        //    foreach (var x in houseDimensions)
+                        //    {
+                        //        x.Id = Guid.NewGuid();
+                        //        x.Hblid = item.Id;
+                        //        x.UserCreated = transaction.UserCreated;
+                        //        x.DatetimeCreated = DateTime.Now;
+                        //        dimensionDetailRepository.Add(x, false);
+                        //    }
+                        //}
+                        var housebillCharges = GetCharges(oldHouseId, item.Id);
+                        var freightCharge = csArrivalFrieghtChargeService.Get(x => x.Hblid == oldHouseId);
                         if (freightCharge != null)
                         {
                             foreach (var freight in freightCharge)
@@ -1729,6 +1708,108 @@ namespace eFMS.API.Documentation.DL.Services
                 var result = new HandleState(ex.Message);
                 return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
             }
+        }
+
+        private List<CsShipmentSurcharge> GetCharges(Guid oldHouseId, Guid newHouseId)
+        {
+            List<CsShipmentSurcharge> surCharges = new List<CsShipmentSurcharge>();
+            var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == oldHouseId);
+            if (charges != null)
+            {
+                foreach (var item in charges)
+                {
+                    var charge = new CsShipmentSurcharge();
+                    charge.Id = Guid.NewGuid();
+                    charge.UserCreated = currentUser.UserID;
+                    charge.DatetimeCreated = DateTime.Now;
+                    charge.Hblid = newHouseId;
+                    charge.Soano = null;
+                    charge.PaySoano = null;
+                    charge.CreditNo = null;
+                    charge.DebitNo = null;
+                    charge.Soaclosed = null;
+                    charge.SettlementCode = null;
+                    surCharges.Add(charge);
+                    //csShipmentSurchargeRepo.Add(charge, false);
+                }
+            }
+            return surCharges;
+        }
+
+        private List<CsDimensionDetail> GetHouseBillDimensions(Guid oldHouseId, Guid newHouseId)
+        {
+            List<CsDimensionDetail> dimensionDetails = null;
+            var houseDimensions = dimensionDetailRepository.Get(x => x.Hblid == oldHouseId);
+            if (houseDimensions != null)
+            {
+                dimensionDetails = new List<CsDimensionDetail>();
+                foreach (var x in houseDimensions)
+                {
+                    var dimension = new CsDimensionDetail
+                    {
+                        Id = Guid.NewGuid(),
+                        Hblid = newHouseId,
+                        UserCreated = currentUser.UserID,
+                        DatetimeCreated = DateTime.Now
+                    };
+                    dimensionDetails.Add(dimension);
+                }
+            }
+            return dimensionDetails;
+        }
+
+        private List<CsMawbcontainer> GetHouseBillContainers(Guid oldHouseId, Guid newHouseId)
+        {
+            List<CsMawbcontainer> containers = null;
+            var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == oldHouseId);
+            if (houseContainers != null)
+            {
+                containers = new List<CsMawbcontainer>();
+                foreach (var x in houseContainers)
+                {
+                    x.Id = Guid.NewGuid();
+                    x.Hblid = newHouseId;
+                    x.ContainerNo = string.Empty;
+                    x.SealNo = string.Empty;
+                    x.MarkNo = string.Empty;
+                    x.UserModified = currentUser.UserID;
+                    x.DatetimeModified = DateTime.Now;
+                    containers.Add(x);
+                }
+            }
+            return containers;
+        }
+
+        private List<CsDimensionDetail> GetMasterDimensiondetails(Guid jobId, List<CsDimensionDetailModel> dimensionDetails)
+        {
+            List<CsDimensionDetail> dimensions = new List<CsDimensionDetail>();
+            foreach(var item in dimensionDetails)
+            {
+                var dimension = new CsDimensionDetail {
+                    Id = Guid.NewGuid(),
+                    Mblid = jobId,
+                    UserCreated = currentUser.UserID,
+                    DatetimeCreated = DateTime.Now
+                };
+                dimensions.Add(dimension);
+            }
+            return dimensions;
+        }
+
+        private List<CsMawbcontainer> GetMasterBillcontainer(Guid jobId, List<CsMawbcontainerModel> csMawbcontainers)
+        {
+            var containers = new List<CsMawbcontainer>();
+            foreach(var item in csMawbcontainers)
+            {
+                var container = new CsMawbcontainer {
+                    Id = Guid.NewGuid(),
+                    Mblid = jobId,
+                    UserModified = currentUser.UserID,
+                    DatetimeModified = DateTime.Now
+                };
+                containers.Add(container);
+            }
+            return containers;
         }
 
         #region -- PREVIEW --
