@@ -1771,7 +1771,9 @@ namespace eFMS.API.Accounting.DL.Services
                                  TaxCode = pat.TaxCode,
                                  JobId = chg.JobId,
                                  ChargeName = chg.ChargeName,
-                                 TransationType = chg.TransactionType,
+                                 TransationType = chg.TransactionType == "AI" || chg.TransactionType =="AE" ? "AIR":
+                                 chg.TransactionType=="SLE" || chg.TransactionType == "SFE" ||
+                                 chg.TransactionType == "SFE" || chg.TransactionType == "SFI"? "SEA":"OPS",
                                  HBL = chg.HBL,
                                  Unit = chg.Unit,
                                  Payment = "TM/CK",

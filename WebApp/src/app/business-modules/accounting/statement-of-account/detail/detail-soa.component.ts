@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SOA } from 'src/app/shared/models';
@@ -32,7 +32,7 @@ export class StatementOfAccountDetailComponent extends AppList {
         private _sortService: SortService,
         private _router: Router,
         private _progressService: NgProgress,
-
+        private _exportRepo: ExportRepo
     ) {
         super();
         this.requestSort = this.sortChargeList;
@@ -301,7 +301,17 @@ export class StatementOfAccountDetailComponent extends AppList {
         this._router.navigate(['home/accounting/statement-of-account']);
     }
 
-
+    export() {
+        this._exportRepo.exportBravoSOA(this.soaNO)
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'bravoSOA.xlsx');
+                },
+                (errors: any) => {
+                },
+                () => { }
+            );
+    }
 
 }
 

@@ -34,9 +34,9 @@
         </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportBravoSOA(System.String)">
             <summary>
-            Export Advance Payment
+            Export Bravo SOA
             </summary>
-            <param name="advancePaymentCriteria"></param>
+            <param name="soaNo"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">

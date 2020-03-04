@@ -97,12 +97,12 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
-        /// Export Advance Payment
+        /// Export Bravo SOA
         /// </summary>
-        /// <param name="advancePaymentCriteria"></param>
+        /// <param name="soaNo"></param>
         /// <returns></returns>
         [Route("ExportBravoSOA")]
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> ExportBravoSOA(string soaNo)
         {
             var responseFromApi = await HttpServiceExtension.GetApi( aPis.HostStaging + Urls.Accounting.GetDataBravoSOAUrl + soaNo) ;
@@ -114,7 +114,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Advance Payment List.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "SOA Bravo List.xlsx");
 
             return fileContent;
         }
