@@ -179,7 +179,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
             // * Combogrid.
             agentId: [],
             pol: [],
-            pod: [],
+            pod: [null, Validators.required],
             coloader: [],
             deliveryPlace: [],
         });
