@@ -149,7 +149,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this._toastService.success(res.message);
+                        this._toastService.success("Duplicate data successfully");
                         this.jobId = res.data.id;
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
