@@ -637,9 +637,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Số hóa đơn VAT",
                 "Ngày hóa đơn VAT",
                 "Số Seri VAT",
+                "Mặt hàng VAT",
                 "Tên đối tượng VAT",
                 "Mã số thuế ĐT VAT",
-                "Mã Job",
                 "Mã Job",
                 "Diễn giải",
                 "Đánh dấu",
@@ -709,7 +709,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 36].Value = item.CustomerAddress;
                         worksheet.Cells[i + addressStartContent, 37].Value = item.MBL;
                         worksheet.Cells[i + addressStartContent, 38].Value = string.Empty; // tạm thời để trống;
-                        worksheet.Cells[i + addressStartContent, 49].Value = item.Email;
+                        worksheet.Cells[i + addressStartContent, 39].Value = item.Email;
                         worksheet.Cells[i + addressStartContent, 40].Value = string.Empty; // tạm thời để trống;
 
                         //Add border left right for cells
