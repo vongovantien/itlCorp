@@ -12,9 +12,8 @@ using eFMS.IdentityServer.DL.Helpers;
 using eFMS.IdentityServer.DL.Infrastructure;
 using Microsoft.Extensions.Options;
 using System.DirectoryServices;
-using System.Security.Cryptography;
-using System.IO;
 using System.Net;
+using ITL.NetCore.Common;
 
 namespace eFMS.IdentityServer.DL.Services
 {
@@ -32,7 +31,6 @@ namespace eFMS.IdentityServer.DL.Services
             ISysUserLogService logService,
             IOptions<LDAPConfig> ldapConfig,
             IContextBase<SysUserLevel> userLevelRepo,
-            IContextBase<SysUser> sysUserRepo,
             IContextBase<SysEmployee> employeeRepo) : base(repository, mapper)
         {
             userLogService = logService;
@@ -71,32 +69,10 @@ namespace eFMS.IdentityServer.DL.Services
             result.Active = active;
             return result;
         }
-        private string Signature(string password)
-        {
-            AesManaged aes = new AesManaged();
-            byte[] cipherBytes = Convert.FromBase64String("ITL-$EFMS-&SECRET_KEY001");
-            byte[] rgbIV = Convert.FromBase64String("0000000000000000");
-            using (var rijndaelManaged = new RijndaelManaged { Key = cipherBytes, IV = rgbIV, Mode = CipherMode.CBC })
-            {
-                rijndaelManaged.BlockSize = 128;
-                rijndaelManaged.KeySize = 256;
-                using (var memoryStream =
-                       new MemoryStream(Convert.FromBase64String(password)))
-                using (var cryptoStream =
-                       new CryptoStream(memoryStream,
-                           rijndaelManaged.CreateDecryptor(cipherBytes, rgbIV),
-                           CryptoStreamMode.Read))
-                {
-                    return new StreamReader(cryptoStream).ReadToEnd();
-                }
-            }
-        }
         public int Login(string username, string password, Guid companyId, out LoginReturnModel modelReturn, PermissionInfo permissionInfo)
         {
-            LdapAuthentication Ldap = new LdapAuthentication();
             SearchResult ldapInfo = null;
             bool isAuthenticated = false;
-            SysEmployee employee;
 
             var sysUser = DataContext.Get(x => x.Username == username).FirstOrDefault();
             if (sysUser == null)
@@ -109,8 +85,9 @@ namespace eFMS.IdentityServer.DL.Services
                 // Nếu có sysUser có password LDAP.
                 if (sysUser.PasswordLdap != null)
                 {
+                    isAuthenticated = CheckLdapInfo(username, password, out ldapInfo);
                     // Check password - passwordLDAP.
-                    if (BCrypt.Net.BCrypt.Verify(password, sysUser.PasswordLdap))
+                    if (isAuthenticated && BCrypt.Net.BCrypt.Verify(password, sysUser.PasswordLdap))
                     {
                         if (!ValidateCompany(sysUser.Id, companyId))
                         {
@@ -125,23 +102,8 @@ namespace eFMS.IdentityServer.DL.Services
 
                         // Get danh sách level office của user.
                         var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.CompanyId == companyId && lv.OfficeId != null)?.FirstOrDefault();
-
-                        employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId)?.FirstOrDefault();
-                        modelReturn = SetLoginReturnModel(sysUser, employee);
+                        modelReturn = SetLoginReturnModel(sysUser, levelOffice, permissionInfo);
                         modelReturn.companyId = companyId;
-
-                        if (permissionInfo == null)
-                        {
-                            modelReturn.officeId = levelOffice.OfficeId;
-                            modelReturn.departmentId = levelOffice.DepartmentId;
-                            modelReturn.groupId = levelOffice?.GroupId;
-                        }
-                        else
-                        {
-                            modelReturn.officeId = permissionInfo.OfficeID;
-                            modelReturn.departmentId = permissionInfo.DepartmentID;
-                            modelReturn.groupId = permissionInfo?.GroupID;
-                        }
 
                         LogUserLogin(sysUser, companyId);
                         return 1;
@@ -155,18 +117,7 @@ namespace eFMS.IdentityServer.DL.Services
                 else
                 {
                     // Check username are login using LDAP.
-                    foreach (var path in ldap.LdapPaths)
-                    {
-                        Ldap.Path = path;
-                        isAuthenticated = Ldap.IsAuthenticated(ldap.Domain, username, password);
-
-                        // if username login using LDAP -> get ldapInfo.
-                        if (isAuthenticated)
-                        {
-                            ldapInfo = Ldap.GetNodeInfomation(ldap.Domain, username, password);
-                            break;
-                        }
-                    }
+                    isAuthenticated = CheckLdapInfo(username, password,out ldapInfo);
 
                     if (isAuthenticated && sysUser.PasswordLdap == null)
                     {
@@ -181,23 +132,9 @@ namespace eFMS.IdentityServer.DL.Services
                             return -4;
                         }
                         var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
-                        employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId).FirstOrDefault();
-                                              
-                        modelReturn = UpdateUserInfoFromLDAP(ldapInfo, sysUser, password, employee);
+                        var hs = UpdateUserInfoFromLDAP(ldapInfo, sysUser, password);
+                        modelReturn = SetLoginReturnModel(sysUser, levelOffice, permissionInfo);
                         modelReturn.companyId = companyId;
-
-                        if (permissionInfo == null)
-                        {
-                            modelReturn.officeId = levelOffice.OfficeId;
-                            modelReturn.departmentId = levelOffice.DepartmentId;
-                            modelReturn.groupId = levelOffice?.GroupId;
-                        }
-                        else
-                        {
-                            modelReturn.officeId = permissionInfo.OfficeID;
-                            modelReturn.departmentId = permissionInfo.DepartmentID;
-                            modelReturn.groupId = permissionInfo?.GroupID;
-                        }
                         // Update Log
                         LogUserLogin(sysUser, companyId);
                         return 1;
@@ -225,26 +162,9 @@ namespace eFMS.IdentityServer.DL.Services
                         return -4;
                     }
                     var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null && lv.CompanyId == companyId)?.FirstOrDefault();
-                                   
-                    employee = employeeRepository.Get(x => x.Id == sysUser.EmployeeId)?.FirstOrDefault();
-                    modelReturn = SetLoginReturnModel(sysUser, employee);
+                    modelReturn = SetLoginReturnModel(sysUser, levelOffice, permissionInfo);
 
                     modelReturn.companyId = companyId;
-                    if(permissionInfo == null)
-                    {
-                        modelReturn.officeId = levelOffice.OfficeId;
-                        modelReturn.departmentId = levelOffice.DepartmentId;
-                        modelReturn.groupId = levelOffice?.GroupId;
-                    }
-                    else
-                    {
-                        modelReturn.officeId = permissionInfo.OfficeID;
-                        modelReturn.departmentId = permissionInfo.DepartmentID;
-                        modelReturn.groupId = permissionInfo?.GroupID;
-
-                    }
-                   
-
                     // Update Log
                     LogUserLogin(sysUser, companyId);
                     return 1;
@@ -259,19 +179,52 @@ namespace eFMS.IdentityServer.DL.Services
             modelReturn = null;
             return -2;
         }
-        private LoginReturnModel SetLoginReturnModel(SysUser user, SysEmployee employee)
+
+        private bool CheckLdapInfo(string username, string password, out SearchResult ldapInfo)
         {
-            var userInfo = new LoginReturnModel
+            bool isAuthenticated = false;
+            LdapAuthentication Ldap = new LdapAuthentication();
+            ldapInfo = null;
+            foreach (var path in ldap.LdapPaths)
             {
-                userName = user.Username,
-                email = employee?.Email,
-                idUser = user.Id,
-                companyId = employee?.CompanyId,
-                status = true,
-                message = "Login successfull !"
-            };
+                Ldap.Path = path;
+                isAuthenticated = Ldap.IsAuthenticated(ldap.Domain, username, password);
+
+                // if username login using LDAP -> get ldapInfo.
+                if (isAuthenticated)
+                {
+                    ldapInfo = Ldap.GetNodeInfomation(ldap.Domain, username, password);
+                    break;
+                }
+            }
+            return isAuthenticated;
+        }
+
+        private LoginReturnModel SetLoginReturnModel(SysUser user, SysUserLevel levelOffice, PermissionInfo permissionInfo)
+        {
+            var employee = employeeRepository.Get(x => x.Id == user.EmployeeId)?.FirstOrDefault();
+            var userInfo = new LoginReturnModel();
+            userInfo.userName = user.Username;
+            userInfo.email = employee?.Email;
+            userInfo.idUser = user.Id;
+            userInfo.status = true;
+            userInfo.message = "Login successfull !";
+
+            if (permissionInfo == null)
+            {
+                userInfo.officeId = levelOffice.OfficeId;
+                userInfo.departmentId = levelOffice.DepartmentId;
+                userInfo.groupId = levelOffice?.GroupId;
+            }
+            else
+            {
+                userInfo.officeId = permissionInfo.OfficeID;
+                userInfo.departmentId = permissionInfo.DepartmentID;
+                userInfo.groupId = permissionInfo?.GroupID;
+            }
             return userInfo;
         }
+
         private SysEmployee MapUserInfoFromLDAP(SearchResult ldapInfo)
         {
             var ldapProperties = ldapInfo.Properties;
@@ -294,10 +247,11 @@ namespace eFMS.IdentityServer.DL.Services
             };
             return sysEmployee;
         }
-        private LoginReturnModel UpdateUserInfoFromLDAP(SearchResult ldapInfo, SysUser user, string password, SysEmployee employee = null)
+        private HandleState UpdateUserInfoFromLDAP(SearchResult ldapInfo, SysUser user, string password)
         {
-            LoginReturnModel modelReturn = null;
+            //LoginReturnModel modelReturn = null;
 
+            var employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
             var sysEmployee = MapUserInfoFromLDAP(ldapInfo);
 
             user.LdapObjectGuid = sysEmployee.LdapObjectGuid;
@@ -308,9 +262,9 @@ namespace eFMS.IdentityServer.DL.Services
             user.PasswordLdap = BCrypt.Net.BCrypt.HashPassword(password);
 
             DataContext.Update(user, x => x.Id == user.Id);
-            employeeRepository.Update(sysEmployee, x => x.Id == employee.Id);
-            modelReturn = new LoginReturnModel { idUser = user.Id, userName = user.Username, email = sysEmployee.Email };
-            return modelReturn;
+            var hs = employeeRepository.Update(sysEmployee, x => x.Id == employee.Id);
+            //modelReturn = new LoginReturnModel { idUser = user.Id, userName = user.Username, email = sysEmployee.Email };
+            return hs;
         }
         private void LogUserLogin(SysUser user, Guid? workplaceId)
         {
@@ -346,7 +300,5 @@ namespace eFMS.IdentityServer.DL.Services
             }
             return true;
         }
-
-        
     }
 }

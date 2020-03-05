@@ -11,6 +11,7 @@ namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatPartnerChargeService : IRepositoryBase<CatPartnerCharge, CatPartnerChargeModel>
     {
+        IQueryable<CatPartnerChargeModel> GetBy(string partnerId);
         HandleState AddAndUpdate(string partnerId, List<CatPartnerChargeModel> charges);
     }
 }

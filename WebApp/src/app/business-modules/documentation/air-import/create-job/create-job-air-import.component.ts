@@ -157,7 +157,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
                         // TODO goto detail.
                         this._router.navigate([`home/documentation/air-import/${res.data.id}`]);
                     } else {
-                        this._toastService.error("Opps", "Something getting error!");
+                        this._toastService.error(res.message);
                     }
                 }
             );

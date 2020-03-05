@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { SeaLCLExportCreateJobComponent } from '../create-job/create-job-lcl-export.component';
 
 import { combineLatest, of } from 'rxjs';
@@ -29,6 +29,8 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
@@ -141,7 +143,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this._toastService.success(res.message);
+                        this._toastService.success("Duplicate data successfully");
                         this.jobId = res.data.id;
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
@@ -216,8 +218,32 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         this._router.navigate(["home/documentation/sea-lcl-export"]);
     }
 
+    prepareDeleteJob() {
+        this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.deleteJob();
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
+
     deleteJob() {
-        this.confirmDeleteJobPopup.show();
+        this._progressRef.start();
+        this._documenRepo.checkMasterBillAllowToDelete(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.confirmDeleteJobPopup.show();
+                    } else {
+                        this.canNotDeleteJobPopup.show();
+                    }
+                },
+            );
     }
 
     onDeleteJob() {

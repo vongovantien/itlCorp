@@ -867,8 +867,14 @@ export class CatalogueRepo {
         );
     }
 
-    updatePartnerCharge(body: any[]) {
-        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerCharge/AddAndUpdate`, body).pipe(
+    updatePartnerCharge(partnerId: string, body: any[]) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerCharge/AddAndUpdate`, body, { partnerId: partnerId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getChargeByCodes(chargeCodes: string[]) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/GetDefaultByChargeCodes`, chargeCodes).pipe(
             map((data: any) => data)
         );
     }

@@ -44,42 +44,48 @@ namespace eFMS.API.Infrastructure.Extensions
         }
         public static int GetPermissionCommonItem(BaseUpdateModel model, PermissionRange permissionRange, ICurrentUser currentUser)
         {
-            int code = 200;
+            int code = 403;
             switch (permissionRange)
             {
-                case PermissionRange.None:
-                    code = 403;
+                case PermissionRange.All:
+                    code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.UserCreated != currentUser.UserID)
+                    if (model.UserCreated == currentUser.UserID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
+                    if (model.GroupId == currentUser.GroupId 
+                        && model.DepartmentId == currentUser.DepartmentId 
+                        && model.OfficeId == currentUser.OfficeID 
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
+                    if (model.DepartmentId == currentUser.DepartmentId 
+                        && model.OfficeId == currentUser.OfficeID 
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID)
+                    if (model.OfficeId == currentUser.OfficeID 
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Company:
-                    if (model.CompanyId != currentUser.CompanyID)
+                    if (model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
-                    break;
+                    break;                
             }
             return code;
         }

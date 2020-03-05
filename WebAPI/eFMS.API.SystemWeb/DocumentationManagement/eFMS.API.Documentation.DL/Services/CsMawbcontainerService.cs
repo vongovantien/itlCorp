@@ -67,34 +67,46 @@ namespace eFMS.API.Documentation.DL.Services
 
         public IQueryable<CsMawbcontainerModel> Query(CsMawbcontainerCriteria criteria)
         {
-            var data = GetView();
-            var results = data.Where(x => (x.MBLID == criteria.Mblid || criteria.Mblid == null)
-                                && (x.HBLID == criteria.Hblid || criteria.Hblid == null)
-                                 ).Select(x => new CsMawbcontainerModel { Id = x.ID,
-                                 Mblid = x.MBLID,
-                                 Hblid = x.HBLID,
-                                 ContainerTypeId = x.ContainerTypeID,
-                                 ContainerTypeName = x.ContainerTypeName,
-                                 Quantity = x.Quantity,
-                                 ContainerNo = x.ContainerNo,
-                                 SealNo = x.SealNo,
-                                 MarkNo = x.MarkNo,
-                                 UnitOfMeasureId = x.UnitOfMeasureID,
-                                 UnitOfMeasureName = x.UnitOfMeasureName,
-                                 CommodityId = x.CommodityId,
-                                 CommodityName = x.CommodityName,
-                                 PackageTypeId = x.PackageTypeId,
-                                 PackageTypeName = x.PackageTypeName,
-                                 PackageQuantity = x.PackageQuantity,
-                                 Description = x.Description,
-                                 Gw = x.GW,
-                                 Nw = x.NW,
-                                 Cbm = x.CBM,
-                                 ChargeAbleWeight = x.ChargeAbleWeight,
-                                 UserModified = x.UserModified,
-                                 DatetimeModified = x.DatetimeModified
-                                 }).AsQueryable();
-            
+            var containers = DataContext.Get(x => (x.Mblid == criteria.Mblid || criteria.Mblid == null)
+                                               && (x.Hblid == criteria.Hblid || criteria.Hblid == null));
+            var containerTypes = catUnitRepository.Get(x => x.UnitType == "Container");
+            var unitOfMeasures = catUnitRepository.Get(x => x.UnitType == "WeightMeasurement");
+            var packageTypes = catUnitRepository.Get(x => x.UnitType == "Package");
+            var commodities = catCommodityRepository.Get();
+            var results = (from container in containers
+                           join unitOfMeasure in unitOfMeasures on container.UnitOfMeasureId equals unitOfMeasure.Id into grpUnitOfMeasures
+                           from uOfMeasure in grpUnitOfMeasures.DefaultIfEmpty()
+                           join containerType in containerTypes on container.ContainerTypeId equals containerType.Id into grpContainerTypes
+                           from conType in grpContainerTypes.DefaultIfEmpty()
+                           join packageType in packageTypes on container.PackageTypeId equals packageType.Id into grpPackageTypes
+                           from packType in grpPackageTypes.DefaultIfEmpty()
+                           join commodity in commodities on container.CommodityId equals commodity.Id into grpCommodities
+                           from com in grpCommodities.DefaultIfEmpty()
+                           select new CsMawbcontainerModel {
+                               Id = container.Id,
+                               Mblid = container.Mblid,
+                               Hblid = container.Hblid,
+                               ContainerTypeId = container.ContainerTypeId,
+                               ContainerTypeName = conType.UnitNameEn,
+                               Quantity = container.Quantity,
+                               ContainerNo = container.ContainerNo,
+                               SealNo = container.SealNo,
+                               MarkNo = container.MarkNo,
+                               UnitOfMeasureId = container.UnitOfMeasureId,
+                               UnitOfMeasureName = uOfMeasure.UnitNameEn,
+                               CommodityId = container.CommodityId,
+                               CommodityName = com.CommodityNameEn,
+                               PackageTypeId = container.PackageTypeId,
+                               PackageTypeName = packType.UnitNameEn,
+                               PackageQuantity = container.PackageQuantity,
+                               Description = container.Description,
+                               Gw = container.Gw,
+                               Nw = container.Nw,
+                               Cbm = container.Cbm,
+                               ChargeAbleWeight = container.ChargeAbleWeight,
+                               UserModified = container.UserModified,
+                               DatetimeModified = container.DatetimeModified
+                           });
             return results;
         }
 
@@ -270,7 +282,7 @@ namespace eFMS.API.Documentation.DL.Services
             var commodities = catCommodityRepository.Get();
             var containers = units.Where(x => x.UnitType == "Container");
             var packages = units.Where(x => x.UnitType == "Package");
-            var unitOfMeasures = units.Where(x => x.UnitType == "Weight Measurement");
+            var unitOfMeasures = units.Where(x => x.UnitType == "WeightMeasurement");
             var containerShipments = DataContext.Get().ToList();
             list.ForEach(item => {
                 if (string.IsNullOrEmpty(item.ContainerTypeName))
@@ -553,7 +565,7 @@ namespace eFMS.API.Documentation.DL.Services
             var commodities = catCommodityRepository.Get();
             var containers = units.Where(x => x.UnitType == "Container");
             var packages = units.Where(x => x.UnitType == "Package");
-            var unitOfMeasures = units.Where(x => x.UnitType == "Weight Measurement");
+            var unitOfMeasures = units.Where(x => x.UnitType == "WeightMeasurement");
             var containerShipments = DataContext.Get().ToList();
             list.ForEach(item => {
                 var container = containers.FirstOrDefault(x => x.UnitNameEn == item.ContainerTypeName);

@@ -190,7 +190,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
                         // TODO goto detail.
                         this._router.navigate([`home/documentation/sea-fcl-import/${res.model.id}`]);
                     } else {
-                        this._toastService.error("Opps", "Something getting error!");
+                        this._toastService.error(res.message);
                     }
                 }
             );

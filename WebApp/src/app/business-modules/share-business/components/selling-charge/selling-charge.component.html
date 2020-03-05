@@ -41,15 +41,8 @@
                                 </span>
                             </button>
                         </ng-container>
-                        <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase "
-                            (click)="saveSellingSurCharge()">
-                            <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    save
-                                </span>
-                            </span>
-                        </button>
+                        <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveSellingSurCharge()">
+                        </app-default-button>
                     </ng-container>
                 </div>
             </div>

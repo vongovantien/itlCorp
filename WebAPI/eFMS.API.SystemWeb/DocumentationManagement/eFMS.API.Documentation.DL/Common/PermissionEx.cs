@@ -13,38 +13,55 @@ namespace eFMS.API.Documentation.DL.Common
     {
         public static int GetPermissionItemOpsToUpdate(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser, List<string> authorizeUserIds)
         {
-            int code = 200;
+            int code = 403;
             switch (permissionRange)
             {
+                case PermissionRange.All:
+                    code = 200;
+                    break;
                 case PermissionRange.Owner:
-                    if (model.BillingOpsId != currentUser.UserID && !authorizeUserIds.Contains(model.BillingOpsId))
+                    if (model.BillingOpsId == currentUser.UserID 
+                        || authorizeUserIds.Contains(model.BillingOpsId))
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.BillingOpsId != currentUser.UserID && (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
-                        && !authorizeUserIds.Contains(model.BillingOpsId))
+                    if (model.BillingOpsId == currentUser.UserID
+                        || (model.GroupId == currentUser.GroupId
+                            && model.DepartmentId == currentUser.DepartmentId
+                            && model.OfficeId == currentUser.OfficeID
+                            && model.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(model.BillingOpsId))
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.BillingOpsId != currentUser.UserID && model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID && !authorizeUserIds.Contains(model.BillingOpsId))
+                    if (model.BillingOpsId == currentUser.UserID
+                        || (model.DepartmentId == currentUser.DepartmentId 
+                            && model.OfficeId == currentUser.OfficeID 
+                            && model.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(model.BillingOpsId))
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.BillingOpsId != currentUser.UserID && model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.BillingOpsId))
+                    if (model.BillingOpsId == currentUser.UserID
+                        || (model.OfficeId == currentUser.OfficeID 
+                            && model.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(model.BillingOpsId))
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Company:
-                    if (model.BillingOpsId != currentUser.UserID && model.CompanyId != currentUser.CompanyID && !authorizeUserIds.Contains(model.BillingOpsId))
+                    if (model.BillingOpsId == currentUser.UserID
+                        || model.CompanyId == currentUser.CompanyID
+                        || authorizeUserIds.Contains(model.BillingOpsId))
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
             }
@@ -53,40 +70,46 @@ namespace eFMS.API.Documentation.DL.Common
 
         public static int GetPermissionToDelete(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser)
         {
-            int code = 0;
+            int code = 403;
             switch (permissionRange)
             {
-                case PermissionRange.None:
-                    code = 403;
+                case PermissionRange.All:
+                    code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.BillingOpsId != currentUser.UserID)
+                    if (model.BillingOpsId == currentUser.UserID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
+                    if (model.GroupId == currentUser.GroupId
+                        && model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
+                    if (model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID)
+                    if (model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Company:
-                    if (model.CompanyId != currentUser.CompanyID)
+                    if (model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
             }
@@ -95,37 +118,52 @@ namespace eFMS.API.Documentation.DL.Common
 
         public static int GetPermissionToUpdateShipmentDocumentation(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser, List<string> authorizeUserIds)
         {
-            int code = 0;
+            int code = 403;
             switch (permissionRange)
             {
+                case PermissionRange.All:
+                    code = 200;
+                    break;
                 case PermissionRange.Owner:
-                    if (model.PersonInCharge != currentUser.UserID && !authorizeUserIds.Contains(model.PersonInCharge))
+                    if (model.PersonInCharge == currentUser.UserID
+                        || model.UserCreated == currentUser.UserID
+                        || authorizeUserIds.Contains(model.PersonInCharge))
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
-                case PermissionRange.Group: 
-                    if (model.GroupId != currentUser.GroupId && model.GroupId != null && !authorizeUserIds.Contains(model.PersonInCharge))
+                case PermissionRange.Group:
+                    if ((model.GroupId == currentUser.GroupId
+                        && model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(model.PersonInCharge))
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && model.DepartmentId != null && !authorizeUserIds.Contains(model.PersonInCharge))
+                    if ((model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(model.PersonInCharge))
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID && model.OfficeId != null && !authorizeUserIds.Contains(model.PersonInCharge))
+                    if ((model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(model.PersonInCharge))
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Company:
-                    if (model.CompanyId != currentUser.CompanyID && !authorizeUserIds.Contains(model.PersonInCharge))
+                    if (model.CompanyId == currentUser.CompanyID
+                        || authorizeUserIds.Contains(model.PersonInCharge))
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
             }
@@ -134,40 +172,47 @@ namespace eFMS.API.Documentation.DL.Common
 
         public static int GetPermissionToDeleteShipmentDocumentation(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser)
         {
-            int code = 0;
+            int code = 403;
             switch (permissionRange)
             {
-                case PermissionRange.None:
-                    code = 403;
+                case PermissionRange.All:
+                    code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.PersonInCharge != currentUser.UserID)
+                    if (model.PersonInCharge == currentUser.UserID 
+                        || model.UserCreated == currentUser.UserID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.GroupId != null)
+                    if (model.GroupId == currentUser.GroupId
+                        && model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && model.DepartmentId != null)
+                    if (model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID && model.OfficeId != Guid.Empty)
+                    if (model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Company:
-                    if (model.CompanyId != currentUser.CompanyID)
+                    if (model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
             }
@@ -176,40 +221,46 @@ namespace eFMS.API.Documentation.DL.Common
 
         public static int GetPermissionToDeleteHbl(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser)
         {
-            int code = 0;
+            int code = 403;
             switch (permissionRange)
             {
-                case PermissionRange.None:
-                    code = 403;
+                case PermissionRange.All:
+                    code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.SaleManId != currentUser.UserID)
+                    if (model.SaleManId == currentUser.UserID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
+                    if (model.GroupId == currentUser.GroupId
+                        && model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
+                    if (model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID)
+                    if (model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Company:
-                    if (model.CompanyId != currentUser.CompanyID)
+                    if (model.CompanyId == currentUser.CompanyID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
             }
@@ -218,48 +269,61 @@ namespace eFMS.API.Documentation.DL.Common
 
         public static int GetPermissionToUpdateHbl(ModelUpdate model, PermissionRange permissionRange, ICurrentUser currentUser, List<string> authorizeUserIds)
         {
-            int code = 0;
+            int code = 403;
             switch (permissionRange)
             {
-                case PermissionRange.None:
-                    code = 403;
+                case PermissionRange.All:
+                    code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.SaleManId != currentUser.UserID && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
+                    if (model.SaleManId == currentUser.UserID
+                        || authorizeUserIds.Contains(model.SaleManId)
+                        || model.UserCreated == currentUser.UserID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Group:
-                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID)
-                        && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
+                    if ((model.GroupId == currentUser.GroupId
+                        && model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(model.SaleManId)
+                        || model.UserCreated == currentUser.UserID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId != currentUser.DepartmentId && model.OfficeId == currentUser.OfficeID && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
+                    if ((model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(model.SaleManId)
+                        || model.UserCreated == currentUser.UserID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId != currentUser.OfficeID && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
+                    if ((model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
+                        || authorizeUserIds.Contains(model.SaleManId)
+                        || model.UserCreated == currentUser.UserID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
                 case PermissionRange.Company:
-                    if (model.CompanyId != currentUser.CompanyID && !authorizeUserIds.Contains(model.SaleManId) && model.UserCreated != currentUser.UserID)
+                    if (model.CompanyId == currentUser.CompanyID
+                        || authorizeUserIds.Contains(model.SaleManId)
+                        || model.UserCreated == currentUser.UserID)
                     {
-                        code = 403;
+                        code = 200;
                     }
                     break;
             }
             return code;
         }
-
-
 
         public static ICurrentUser GetUserMenuPermissionTransaction(string transactionType, ICurrentUser currentUser)
         {

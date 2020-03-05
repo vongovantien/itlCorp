@@ -33,6 +33,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
         readonly IContextBase<CsTransaction> transactionRepository;
+        readonly IContextBase<CsArrivalFrieghtCharge> freighchargesRepository;
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatCountry> catCountryRepo;
@@ -66,7 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsArrivalFrieghtChargeService arrivalFrieghtChargeService,
             ICsDimensionDetailService dimensionService,
             IContextBase<CsDimensionDetail> dimensionDetailRepo,
-            IUserPermissionService perService) : base(repository, mapper)
+            IUserPermissionService perService,
+            IContextBase<CsArrivalFrieghtCharge> freighchargesRepo) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -88,6 +90,7 @@ namespace eFMS.API.Documentation.DL.Services
             dimensionDetailService = dimensionService;
             dimensionDetailRepository = dimensionDetailRepo;
             permissionService = perService;
+            freighchargesRepository = freighchargesRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -149,9 +152,7 @@ namespace eFMS.API.Documentation.DL.Services
         public object AddCSTransaction(CsTransactionEditModel model)
         {
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
-            var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403);
-
+            
             var transaction = mapper.Map<CsTransaction>(model);
             transaction.Id = Guid.NewGuid();
             if (model.CsMawbcontainers != null)
@@ -517,7 +518,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Group:
-                    if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID)
+                    if ((detail.GroupId == currentUser.GroupId && detail.GroupId != null)
                         || authorizeUserIds.Contains(detail.PersonIncharge))
                     {
                         result = true;
@@ -528,7 +529,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Department:
-                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.PersonIncharge))
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.DepartmentId != null) || authorizeUserIds.Contains(detail.PersonIncharge))
                     {
                         result = true;
                     }
@@ -538,7 +539,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Office:
-                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.PersonIncharge))
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.OfficeId != null) || authorizeUserIds.Contains(detail.PersonIncharge))
                     {
                         result = true;
                     }
@@ -1593,144 +1594,142 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public ResultHandle ImportCSTransaction(CsTransactionEditModel model)
         {
+            var transaction = mapper.Map<CsTransaction>(model);
+            transaction.Id = Guid.NewGuid();
+            IQueryable<CsTransactionDetail> detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
+            if (string.IsNullOrEmpty(model.Mawb) && detailTrans.Select(x => x.Id).Count() > 0)
+                return new ResultHandle { Status = false, Message = "This shipment did't have MBL No. You can't import or duplicate it." };
+            transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
+            transaction.UserCreated = currentUser.UserID;
+            transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
+            transaction.UserModified = model.UserCreated;
+            transaction.Active = true;
+            List<CsMawbcontainer> containers = null;
+            List<CsDimensionDetail> dimensionDetails = null;
+            List<CsShipmentSurcharge> surcharges = null;
+            List<CsArrivalFrieghtCharge> freightCharges = null;
+            if (model.CsMawbcontainers != null)
+            {
+                containers = new List<CsMawbcontainer>();
+                var masterContainers = GetMasterBillcontainer(transaction.Id, model.CsMawbcontainers);
+                containers.AddRange(masterContainers);
+            }
+            if (model.DimensionDetails != null)
+            {
+                dimensionDetails = new List<CsDimensionDetail>();
+                var masterDimensionDetails = GetMasterDimensiondetails(transaction.Id, model.DimensionDetails);
+                dimensionDetails.AddRange(masterDimensionDetails);
+            }
+            if (model.TransactionType == "AI" || model.TransactionType == "AE")
+            {
+                detailTrans = detailTrans.Where(x => x.JobId == model.Id && x.ParentId == null);
+            }
+            if (detailTrans != null)
+            {
+                int countDetail = csTransactionDetailRepo.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                                    && x.DatetimeCreated.Value.Day == DateTime.Now.Day);
+                string generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
+
+                if (csTransactionDetailRepo.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    generatePrefixHouse = DocumentConstants.SEF_HBL
+                        + GenerateID.GeneratePrefixHousbillNo();
+                }
+                freightCharges = new List<CsArrivalFrieghtCharge>();
+                surcharges = new List<CsShipmentSurcharge>();
+                foreach (var item in detailTrans)
+                {
+                    var oldHouseId = item.Id;
+                    item.Id = Guid.NewGuid();
+                    item.JobId = transaction.Id;
+                    item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
+                    countDetail = countDetail + 1;
+                    item.Active = true;
+                    item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
+                    item.DatetimeCreated = DateTime.Now;
+                    var housebillcontainers = GetHouseBillContainers(oldHouseId, item.Id);
+                    if (housebillcontainers != null) containers.AddRange(housebillcontainers);
+                    var housebillDimensions = GetHouseBillDimensions(oldHouseId, item.Id);
+                    if (housebillDimensions != null) dimensionDetails.AddRange(housebillDimensions);
+                    var houseSurcharges = GetCharges(oldHouseId, item.Id);
+                    if (houseSurcharges != null)
+                    {
+                        surcharges.AddRange(houseSurcharges);
+                    }
+                    var houseFreigcharges = GetFreightCharges(oldHouseId, item.Id);
+                    if (houseFreigcharges != null) {
+                        freightCharges.AddRange(houseFreigcharges);
+                    } 
+                }
+            }
             try
             {
-                var transaction = mapper.Map<CsTransaction>(model);
-                transaction.Id = Guid.NewGuid();
-                transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
-                transaction.UserCreated = currentUser.UserID;
-                transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
-                transaction.UserModified = model.UserCreated;
-                transaction.Active = true;
                 var hsTrans = transactionRepository.Add(transaction, false);
-                List<CsMawbcontainer> containers = null;
-                List<CsDimensionDetail> dimensionDetails = null;
-                if (model.CsMawbcontainers != null)
+                if (hsTrans.Success)
                 {
-                    containers = new List<CsMawbcontainer>();
-                    var masterContainers = GetMasterBillcontainer(transaction.Id, model.CsMawbcontainers);
-                    containers.AddRange(masterContainers);
-                    //var hsCont = containerService.Add(model.CsMawbcontainers, false);
-                }
-                if (model.DimensionDetails != null)
-                {
-                    dimensionDetails = new List<CsDimensionDetail>();
-                    var masterDimensionDetails = GetMasterDimensiondetails(transaction.Id, model.DimensionDetails);
-                    dimensionDetails.AddRange(masterDimensionDetails);
-                    //dimensionDetailService.Add(model.DimensionDetails, false);
-                }
-                IQueryable<CsTransactionDetail> detailTrans = null;
-                if (model.TransactionType == "AI" || model.TransactionType == "AE")
-                {
-                    detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id && x.ParentId != null);
+                    var hsTransDetails = csTransactionDetailRepo.Add(detailTrans, false);
+                    var hsContainers = csMawbcontainerRepo.Add(containers, false);
+                    var hsDimentions = dimensionDetailRepository.Add(dimensionDetails, false);
+                    var hsSurcharges = csShipmentSurchargeRepo.Add(surcharges, false);
+                    var hsFreighcharges = freighchargesRepository.Add(freightCharges, false);
+                    transactionRepository.SubmitChanges();
+                    csTransactionDetailRepo.SubmitChanges();
+                    csMawbcontainerRepo.SubmitChanges();
+                    dimensionDetailRepository.SubmitChanges();
+                    csShipmentSurchargeRepo.SubmitChanges();
+                    freighchargesRepository.SubmitChanges();
+                    return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
                 }
                 else
                 {
-                    detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
+                    return new ResultHandle { Status = hsTrans.Success, Message = hsTrans.Message.ToString()};
                 }
-                if (detailTrans != null)
-                {
-                    int countDetail = csTransactionDetailRepo.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                                        && x.DatetimeCreated.Value.Day == DateTime.Now.Day);
-                    string generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
-
-                    if (csTransactionDetailRepo.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
-                    {
-                        generatePrefixHouse = DocumentConstants.SEF_HBL
-                            + GenerateID.GeneratePrefixHousbillNo();
-                    }
-                    foreach (var item in detailTrans)
-                    {
-                        var oldHouseId = item.Id;
-                        item.Id = Guid.NewGuid();
-                        item.JobId = transaction.Id;
-                        item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
-                        countDetail = countDetail + 1;
-                        item.Active = true;
-                        item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
-                        item.DatetimeCreated = DateTime.Now;
-                        csTransactionDetailRepo.Add(item, false);
-                        var housebillcontainers = GetHouseBillContainers(oldHouseId, item.Id);
-                        //var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == houseId);
-                        //if (houseContainers != null)
-                        //{
-                        //    foreach (var x in houseContainers)
-                        //    {
-                        //        x.Id = Guid.NewGuid();
-                        //        x.Hblid = item.Id;
-                        //        x.ContainerNo = string.Empty;
-                        //        x.SealNo = string.Empty;
-                        //        x.MarkNo = string.Empty;
-                        //        x.UserModified = transaction.UserCreated;
-                        //        x.DatetimeModified = DateTime.Now;
-                        //        csMawbcontainerRepo.Add(x, false);
-                        //    }
-                        //}
-                        var housebillDimensions = GetHouseBillDimensions(oldHouseId, item.Id);
-                        //var houseDimensions = dimensionDetailRepository.Get(x => x.Hblid == item.Id);
-                        //if (houseDimensions != null)
-                        //{
-                        //    foreach (var x in houseDimensions)
-                        //    {
-                        //        x.Id = Guid.NewGuid();
-                        //        x.Hblid = item.Id;
-                        //        x.UserCreated = transaction.UserCreated;
-                        //        x.DatetimeCreated = DateTime.Now;
-                        //        dimensionDetailRepository.Add(x, false);
-                        //    }
-                        //}
-                        var housebillCharges = GetCharges(oldHouseId, item.Id);
-                        var freightCharge = csArrivalFrieghtChargeService.Get(x => x.Hblid == oldHouseId);
-                        if (freightCharge != null)
-                        {
-                            foreach (var freight in freightCharge)
-                            {
-                                freight.Id = Guid.NewGuid();
-                                freight.UserCreated = transaction.UserCreated;
-                                freight.Hblid = item.Id;
-                                csArrivalFrieghtChargeService.Add(freight, false);
-                            }
-                        }
-                    }
-                }
-                transactionRepository.SubmitChanges();
-                csTransactionDetailRepo.SubmitChanges();
-                csMawbcontainerRepo.SubmitChanges();
-                containerService.SubmitChanges();
-                csShipmentSurchargeRepo.SubmitChanges();
-                csArrivalFrieghtChargeService.SubmitChanges();
-                dimensionDetailRepository.SubmitChanges();
-                return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
             }
             catch (Exception ex)
             {
-                var result = new HandleState(ex.Message);
-                return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
+                return new ResultHandle { Status = false, Message = ex.Message };
             }
+        }
+
+        private List<CsArrivalFrieghtCharge> GetFreightCharges(Guid oldHouseId, Guid newHouseId)
+        {
+            List<CsArrivalFrieghtCharge> charges = null;
+            var freightCharge = csArrivalFrieghtChargeService.Get(x => x.Hblid == oldHouseId);
+            if (freightCharge.Select(x => x.Id).Count() != 0)
+            {
+                charges = new List<CsArrivalFrieghtCharge>();
+                foreach (var item in freightCharge)
+                {
+                    item.Id = Guid.NewGuid();
+                    item.UserCreated = currentUser.UserID;
+                    item.Hblid = newHouseId;
+                    charges.Add(item);
+                }
+            }
+            return charges;
         }
 
         private List<CsShipmentSurcharge> GetCharges(Guid oldHouseId, Guid newHouseId)
         {
-            List<CsShipmentSurcharge> surCharges = new List<CsShipmentSurcharge>();
+            List<CsShipmentSurcharge> surCharges = null;
             var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == oldHouseId);
-            if (charges != null)
+            if (charges.Select(x => x.Id).Count() != 0)
             {
+                surCharges = new List<CsShipmentSurcharge>();
                 foreach (var item in charges)
                 {
-                    var charge = new CsShipmentSurcharge();
-                    charge.Id = Guid.NewGuid();
-                    charge.UserCreated = currentUser.UserID;
-                    charge.DatetimeCreated = DateTime.Now;
-                    charge.Hblid = newHouseId;
-                    charge.Soano = null;
-                    charge.PaySoano = null;
-                    charge.CreditNo = null;
-                    charge.DebitNo = null;
-                    charge.Soaclosed = null;
-                    charge.SettlementCode = null;
-                    surCharges.Add(charge);
-                    //csShipmentSurchargeRepo.Add(charge, false);
+                    item.Id = Guid.NewGuid();
+                    item.UserCreated = currentUser.UserID;
+                    item.DatetimeCreated = DateTime.Now;
+                    item.Hblid = newHouseId;
+                    item.Soano = null;
+                    item.PaySoano = null;
+                    item.CreditNo = null;
+                    item.DebitNo = null;
+                    item.Soaclosed = null;
+                    item.SettlementCode = null;
+                    surCharges.Add(item);
                 }
             }
             return surCharges;
@@ -1740,19 +1739,18 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsDimensionDetail> dimensionDetails = null;
             var houseDimensions = dimensionDetailRepository.Get(x => x.Hblid == oldHouseId);
-            if (houseDimensions != null)
+            if (houseDimensions.Select(x => x.Id).Count() != 0)
             {
                 dimensionDetails = new List<CsDimensionDetail>();
-                foreach (var x in houseDimensions)
+                foreach (var item in houseDimensions)
                 {
-                    var dimension = new CsDimensionDetail
-                    {
-                        Id = Guid.NewGuid(),
-                        Hblid = newHouseId,
-                        UserCreated = currentUser.UserID,
-                        DatetimeCreated = DateTime.Now
-                    };
-                    dimensionDetails.Add(dimension);
+                    item.Id = Guid.NewGuid();
+                    item.Mblid = null;
+                    item.AirWayBillId = null;
+                    item.Hblid = newHouseId;
+                    item.UserCreated = currentUser.UserID;
+                    item.DatetimeCreated = DateTime.Now;
+                    dimensionDetails.Add(item);
                 }
             }
             return dimensionDetails;
@@ -1762,12 +1760,13 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsMawbcontainer> containers = null;
             var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == oldHouseId);
-            if (houseContainers != null)
+            if (houseContainers.Select(x => x.Id).Count() != 0)
             {
                 containers = new List<CsMawbcontainer>();
                 foreach (var x in houseContainers)
                 {
                     x.Id = Guid.NewGuid();
+                    x.Mblid = null;
                     x.Hblid = newHouseId;
                     x.ContainerNo = string.Empty;
                     x.SealNo = string.Empty;
@@ -1785,13 +1784,12 @@ namespace eFMS.API.Documentation.DL.Services
             List<CsDimensionDetail> dimensions = new List<CsDimensionDetail>();
             foreach(var item in dimensionDetails)
             {
-                var dimension = new CsDimensionDetail {
-                    Id = Guid.NewGuid(),
-                    Mblid = jobId,
-                    UserCreated = currentUser.UserID,
-                    DatetimeCreated = DateTime.Now
-                };
-                dimensions.Add(dimension);
+                item.Id = Guid.NewGuid();
+                item.Mblid = jobId;
+                item.Hblid = null;
+                item.UserCreated = currentUser.UserID;
+                item.DatetimeCreated = DateTime.Now;
+                dimensions.Add(item);
             }
             return dimensions;
         }
@@ -1801,13 +1799,12 @@ namespace eFMS.API.Documentation.DL.Services
             var containers = new List<CsMawbcontainer>();
             foreach(var item in csMawbcontainers)
             {
-                var container = new CsMawbcontainer {
-                    Id = Guid.NewGuid(),
-                    Mblid = jobId,
-                    UserModified = currentUser.UserID,
-                    DatetimeModified = DateTime.Now
-                };
-                containers.Add(container);
+                item.Id = Guid.NewGuid();
+                item.Mblid = jobId;
+                item.Hblid = null;
+                item.UserModified = currentUser.UserID;
+                item.DatetimeModified = DateTime.Now;
+                containers.Add(item);
             }
             return containers;
         }

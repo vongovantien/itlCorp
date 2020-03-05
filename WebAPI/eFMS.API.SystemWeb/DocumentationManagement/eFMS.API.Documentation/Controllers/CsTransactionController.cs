@@ -9,6 +9,7 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -43,8 +44,8 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="service">inject ICsTransactionService</param>
         /// <param name="user">inject ICurrentUser</param>
         /// <param name="serviceSurcharge">inject ICsShipmentSurchargeService</param>
-        public CsTransactionController(IStringLocalizer<DocumentationLanguageSub> localizer, 
-            ICsTransactionService service, 
+        public CsTransactionController(IStringLocalizer<DocumentationLanguageSub> localizer,
+            ICsTransactionService service,
             ICurrentUser user,
             ICsShipmentSurchargeService serviceSurcharge,
             ISysImageService imageService)
@@ -137,7 +138,10 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Get(Guid id)
         {
             var statusCode = csTransactionService.CheckDetailPermission(id);
-            if (statusCode == 403) return Forbid();
+            if (statusCode == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             var data = csTransactionService.GetDetails(id);//csTransactionService.GetById(id);
             return Ok(data);
@@ -152,9 +156,17 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost]
         [Authorize]
         public IActionResult Post(CsTransactionEditModel model)
-        {
+        {            
             if (!ModelState.IsValid) return BadRequest();
             string checkExistMessage = CheckExist(model.Id, model);
+
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
+            var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
@@ -186,7 +198,10 @@ namespace eFMS.API.Documentation.Controllers
             }
             model.UserModified = currentUser.UserID;
             var hs = csTransactionService.UpdateCSTransaction(model);
-            if (hs.Code == 403) return Forbid();
+            if (hs.Code == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -269,7 +284,10 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult CheckDeletePermission(Guid id)
         {
             var result = csTransactionService.CheckDeletePermission(id);
-            if (result == 403) return Forbid();
+            if (result == 403)
+            {
+                return Ok(false);
+            }
             return Ok(true);
         }
 
@@ -294,7 +312,10 @@ namespace eFMS.API.Documentation.Controllers
             }
 
             var hs = csTransactionService.SoftDeleteJob(id);
-            if (hs.Code == 403) return Forbid();
+            if (hs.Code == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -354,10 +375,10 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost]
         //[Authorize]
         [Route("SyncHBLByShipment/{id}")]
-        public IActionResult SyncHBL(Guid id,CsTransactionSyncHBLCriteria model)
+        public IActionResult SyncHBL(Guid id, CsTransactionSyncHBLCriteria model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var result = csTransactionService.SyncHouseBills(id,model);
+            var result = csTransactionService.SyncHouseBills(id, model);
             return Ok(result);
         }
 
@@ -368,17 +389,17 @@ namespace eFMS.API.Documentation.Controllers
             if (model.TransactionType == string.Empty)
                 return stringLocalizer[DocumentationLanguageSub.MSG_NOT_FOUND_TRANSACTION_TYPE].Value;
             string message = string.Empty;
-            
+
             //model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
             //if (model.TransactionType == string.Empty)
             //    message = "Not found type transaction";
             if (id == Guid.Empty)
             {
                 //Check trùng theo từng service
-                if(model.Mawb != null)
+                if (model.Mawb != null)
                 {
-                    if (csTransactionService.Any(x => (x.Mawb??"").ToLower() == (model.Mawb??"").ToLower() 
-                    && x.TransactionType == model.TransactionType 
+                    if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
+                    && x.TransactionType == model.TransactionType
                     && x.CurrentStatus != TermData.Canceled))
                     {
                         message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
@@ -388,9 +409,9 @@ namespace eFMS.API.Documentation.Controllers
             else
             {
                 //Check trùng theo từng service
-                if(model.Mawb != null)
+                if (model.Mawb != null)
                 {
-                    if (csTransactionService.Any(x => (x.Mawb??"").ToLower() == (model.Mawb ?? "").ToLower()
+                    if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
                         && x.TransactionType == model.TransactionType
                         && x.Id != id
                         && x.CurrentStatus != TermData.Canceled))
@@ -429,7 +450,7 @@ namespace eFMS.API.Documentation.Controllers
         private string CheckExistSFE(CsTransactionEditModel model)
         {
             string message = string.Empty;
-            if(model.Pol == model.Pod && model.Pol != null && model.Pod != null)
+            if (model.Pol == model.Pod && model.Pol != null && model.Pod != null)
             {
                 message = model.Pod == model.Pol ? stringLocalizer[DocumentationLanguageSub.MSG_POD_DIFFERENT_POL].Value : message;
             }
@@ -475,7 +496,7 @@ namespace eFMS.API.Documentation.Controllers
                 message = model.Pod == model.Pol ? stringLocalizer[DocumentationLanguageSub.MSG_POD_DIFFERENT_POL].Value : message;
             }
 
-            if(model.DeliveryPlace != null && model.DeliveryPlace != Guid.Empty)
+            if (model.DeliveryPlace != null && model.DeliveryPlace != Guid.Empty)
             {
                 message = model.DeliveryPlace == model.Pol ? stringLocalizer[DocumentationLanguageSub.MSG_PODELI_DIFFERENT_POL].Value : message;
             }
