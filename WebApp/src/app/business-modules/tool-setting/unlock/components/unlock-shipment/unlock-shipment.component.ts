@@ -88,7 +88,7 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
         }
     }
 
-    unlock() {
+    unlock($event: boolean) {
         let body = {};
         if (this.isSelectOption) {
             if (!this.keyword.trim()) {
@@ -114,13 +114,17 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
                 (res: IShipmentLockInfo) => {
                     if (!!res.logs && !!res.logs.length) {
                         this.lockHistory = (res.logs || []);
+                        this.confirmPopup.show();
                     } else {
                         this.lockHistory = [];
                     }
-                    this.confirmPopup.show();
 
                     if (!!res.lockedLogs) {
                         this.shipmentUnlock = res.lockedLogs;
+                    }
+
+                    if (this.lockHistory.length === 0) {
+                        this.onUnlockShipment($event);
                     }
                 }
             );

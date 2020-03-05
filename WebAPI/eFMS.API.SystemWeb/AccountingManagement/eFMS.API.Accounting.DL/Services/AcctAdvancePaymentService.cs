@@ -2313,7 +2313,7 @@ namespace eFMS.API.Accounting.DL.Services
                             payment.UserModified = currentUser.UserID;
                             payment.DatetimeModified = DateTime.Now;
                             var log = item.AdvanceNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
-                            item.LockedLog = item.LockedLog + log + ";";
+                            payment.LockedLog = item.LockedLog + log + ";";
                             var hs = DataContext.Update(payment, x => x.Id == item.Id);
                             if (hs.Success)
                             {

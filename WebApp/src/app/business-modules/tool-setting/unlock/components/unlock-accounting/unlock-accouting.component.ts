@@ -32,7 +32,7 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
 
     ngOnInit() { }
 
-    unlockPaymentRequest() {
+    unlockPaymentRequest($event: boolean) {
         if (!this.keyword.trim()) {
             this._toastService.warning("Please input keyword");
             return;
@@ -43,12 +43,20 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: IShipmentLockInfo) => {
-                        if (!!res && !!res.logs.length) {
-                            this.lockHistory = res.logs;
+                        if (!!res.logs && !!res.logs.length) {
+                            this.lockHistory = (res.logs || []);
+                            this.confirmPopup.show();
+
+                        } else {
+                            this.lockHistory = [];
+                        }
+                        if (!!res.lockedLogs) {
                             this.selectedDataAccountingToUnlock = res.lockedLogs;
                         }
+                        if (this.lockHistory.length === 0) {
+                            this.onUnlockAccounting($event);
 
-                        this.confirmPopup.show();
+                        }
                     }
                 );
         } else {
@@ -56,12 +64,18 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: IShipmentLockInfo) => {
-                        if (!!res && !!res.logs.length) {
-                            this.lockHistory = res.logs;
+                        if (!!res.logs && !!res.logs.length) {
+                            this.lockHistory = (res.logs || []);
+                            this.confirmPopup.show();
+                        } else {
+                            this.lockHistory = [];
+                        }
+                        if (!!res.lockedLogs) {
                             this.selectedDataAccountingToUnlock = res.lockedLogs;
                         }
-
-                        this.confirmPopup.show();
+                        if (this.lockHistory.length === 0) {
+                            this.onUnlockAccounting($event);
+                        }
                     }
                 );
         }

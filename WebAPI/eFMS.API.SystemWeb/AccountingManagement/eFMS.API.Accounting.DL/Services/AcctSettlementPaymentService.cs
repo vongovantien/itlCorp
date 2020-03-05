@@ -3021,7 +3021,7 @@ namespace eFMS.API.Accounting.DL.Services
                             settle.UserModified = currentUser.UserName;
                             settle.DatetimeModified = DateTime.Now;
                             var log = item.SettlementNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
-                            item.LockedLog = item.LockedLog + log + ";";
+                            settle.LockedLog = item.LockedLog + log + ";";
                             var hs = DataContext.Update(settle, x => x.Id == item.Id);
                             var approveSettles = acctApproveSettlementRepo.Get(x => x.SettlementNo == item.SettlementNo);
                             foreach (var approve in approveSettles)

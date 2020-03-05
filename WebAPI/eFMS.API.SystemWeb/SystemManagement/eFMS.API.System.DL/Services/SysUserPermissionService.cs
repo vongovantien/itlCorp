@@ -204,7 +204,14 @@ namespace eFMS.API.System.DL.Services
                     foreach (var general in list)
                     {
                         general.UserModified = currentUser.UserID;
-                        userPermissionGeneralService.Update(general, x => x.Id == general.Id, false);
+                        if(general.Id != Guid.Empty)
+                        {
+                            userPermissionGeneralService.Update(general, x => x.Id == general.Id, false);
+                        }
+                        else
+                        {
+                            userPermissionGeneralService.Add(general, false);
+                        }
                     }
                 }
                 foreach (var item in entity.SysPermissionSampleSpecials)
