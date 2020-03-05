@@ -327,7 +327,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    onDeleteShipmentSurcharge(type: CommonEnum.SurchargeTypeEnum) {
+    onDeleteShipmentSurcharge(type: CommonEnum.SurchargeTypeEnum | string) {
         this.confirmDeletePopup.hide();
 
         if (!!this.selectedSurcharge && this.selectedSurcharge.id !== SystemConstants.EMPTY_GUID) {
@@ -354,7 +354,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    deleteChargeWithType(type: CommonEnum.SurchargeTypeEnum, index: number) {
+    deleteChargeWithType(type: CommonEnum.SurchargeTypeEnum | any, index: number) {
         switch (type) {
             case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
                 this._store.dispatch(new fromStore.DeleteBuyingSurchargeAction(index));
@@ -663,10 +663,18 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
                         c.quantity = 1;
                     }
-
                 });
                 break;
             case ChargeConstants.SFE_CODE:
+                shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                    if (c.chargeCode === ChargeConstants.DEFAULT_FCL_EXPORT[0]) {
+                        const unit: Unit = this.listUnits.find(u => u.code === 'kgs' || u.code === 'KGS');
+                        c.unitId = !!unit ? unit.id : null;
+
+                        c.quantityType = CommonEnum.QUANTITY_TYPE.CW;
+                    }
+                });
+                break;
             case ChargeConstants.SLE_CODE:
             case ChargeConstants.SFI_CODE:
             case ChargeConstants.SLI_CODE:
