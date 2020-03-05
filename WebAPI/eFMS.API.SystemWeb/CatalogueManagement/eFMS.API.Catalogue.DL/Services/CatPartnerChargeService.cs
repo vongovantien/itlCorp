@@ -15,15 +15,21 @@ namespace eFMS.API.Catalogue.DL.Services
     public class CatPartnerChargeService : RepositoryBase<CatPartnerCharge, CatPartnerChargeModel>, ICatPartnerChargeService
     {
         private ICurrentUser currentUser;
-        public CatPartnerChargeService(IContextBase<CatPartnerCharge> repository, IMapper mapper, ICurrentUser currtUser) : base(repository, mapper)
+        private readonly IContextBase<CatPartner> catPartnerRepository;
+        public CatPartnerChargeService(IContextBase<CatPartnerCharge> repository,
+            IMapper mapper,
+            IContextBase<CatPartner> catPartnerRepo,
+            ICurrentUser currtUser) : base(repository, mapper)
         {
             currentUser = currtUser;
+            catPartnerRepository = catPartnerRepo;
         }
 
         public HandleState AddAndUpdate(string partnerId, List<CatPartnerChargeModel> charges)
         {
             DataContext.Delete(x => x.PartnerId == partnerId, false);
-            charges.ForEach(x => {
+            charges.ForEach(x =>
+            {
                 x.PartnerId = partnerId;
                 x.Id = Guid.NewGuid();
                 x.DatetimeModified = DateTime.Now;
@@ -36,6 +42,35 @@ namespace eFMS.API.Catalogue.DL.Services
                 SubmitChanges();
             }
             return hs;
+        }
+
+        public IQueryable<CatPartnerChargeModel> GetBy(string partnerId)
+        {
+            IQueryable<CatPartnerCharge> data = null;
+            CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
+
+            data = DataContext.Get(x => x.PartnerId == partnerId);
+            IQueryable<CatPartnerChargeModel> catPartnerChargeModel = data?.Select(x => mapper.Map<CatPartnerChargeModel>(x));
+
+            IQueryable<CatPartnerChargeModel> result = catPartnerChargeModel.Select(x => new CatPartnerChargeModel
+            {
+                partnerName = partner.PartnerNameEn,
+                partnerShortName = partner.ShortName,
+                PartnerId = x.PartnerId,
+                Id = x.Id,
+                UnitId = x.UnitId,
+                ChargeId = x.ChargeId,
+                Quantity = x.Quantity,
+                QuantityType = x.QuantityType,
+                UnitPrice = x.UnitPrice,
+                CurrencyId = x.CurrencyId,
+                Vatrate = x.Vatrate,
+                UserModified = x.UserModified,
+                DatetimeModified = x.DatetimeModified,
+            });
+
+
+            return result;
         }
     }
 }

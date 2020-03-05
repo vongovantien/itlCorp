@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { AppList } from 'src/app/app.list';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -24,6 +24,7 @@ export class SeaFCLImportManagementComponent extends AppList {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     headerHouseBills: CommonInterface.IHeaderTable[];
@@ -169,6 +170,17 @@ export class SeaFCLImportManagementComponent extends AppList {
         }
     }
 
+    prepareDeleteShipment(masterbill: CsTransaction) {
+        this._documentationRepo.checkPermissionAllowDeleteShipment(masterbill.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.checkDeleteMasterBill(masterbill);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
+
     checkDeleteMasterBill(masterbill: CsTransaction) {
         this._progressRef.start();
         this._documentationRepo.checkMasterBillAllowToDelete(masterbill.id)
@@ -207,10 +219,21 @@ export class SeaFCLImportManagementComponent extends AppList {
             );
     }
 
-    loadListHouseBillExpanding(){ 
-        this.tmpIndex = -1; 
-        if(this.jobIdSelected !== null){
-            this.getListHouseBill(this.jobIdSelected,-2);
-        }         
+    loadListHouseBillExpanding() {
+        this.tmpIndex = -1;
+        if (this.jobIdSelected !== null) {
+            this.getListHouseBill(this.jobIdSelected, -2);
+        }
+    }
+
+    viewDetail(id: string): void {
+        this._documentationRepo.checkDetailShippmentPermission(id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate(["/home/documentation/sea-fcl-import", id]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 }

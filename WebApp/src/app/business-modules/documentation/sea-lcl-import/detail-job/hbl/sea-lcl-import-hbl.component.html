@@ -26,7 +26,7 @@
                 </button>
 
                 <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="deleteJob()" *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete">
+                    (click)="prepareDeleteJob()" *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete">
                     <span>
                         <i class="la la-trash"></i>
                         <span>
@@ -168,7 +168,7 @@
                                 </tab>
                                 <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
                                     <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
-                                        <selling-charge></selling-charge>
+                                        <selling-charge *ngIf="selectedTabSurcharge === 'SELL'"></selling-charge>
                                     </ng-container>
 
                                 </tab>
@@ -211,3 +211,6 @@
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
+
+<info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+<permission-403-popup></permission-403-popup>

@@ -355,4 +355,12 @@ export class FormAddPartnerComponent extends AppForm {
     showOtherCharge() {
         this.otherChargePopup.show();
     }
+
+    copyShippingAddress() {
+        this.billingCountry.setValue(this.shippingCountry.value);
+        this.billingProvince.setValue(this.shippingProvince.value);
+        this.billingZipcode.setValue(this.zipCodeShipping.value);
+        this.billingAddressEN.setValue(this.shippingAddressEN.value);
+        this.billingAddressLocal.setValue(this.shippingAddressVN.value);
+    }
 }

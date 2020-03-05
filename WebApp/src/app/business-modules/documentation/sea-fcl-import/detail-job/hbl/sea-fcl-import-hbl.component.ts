@@ -8,7 +8,7 @@ import { AppList } from 'src/app/app.list';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
-import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CsShipmentSurcharge, HouseBill, CsTransaction } from 'src/app/shared/models';
 import { ReportPreviewComponent } from 'src/app/shared/common';
@@ -29,6 +29,8 @@ export class SeaFCLImportHBLComponent extends AppList {
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
     houseBill: HouseBill[] = [];
@@ -272,8 +274,32 @@ export class SeaFCLImportHBLComponent extends AppList {
         this._router.navigate(["home/documentation/sea-fcl-import"]);
     }
 
+    prepareDeleteJob() {
+        this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.deleteJob();
+                } else {
+                    this.info403Popup.show();
+                }
+            });
+    }
+
     deleteJob() {
-        this.confirmDeleteJobPopup.show();
+        this._progressRef.start();
+        this._documentRepo.checkMasterBillAllowToDelete(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.confirmDeleteJobPopup.show();
+                    } else {
+                        this.canNotDeleteJobPopup.show();
+                    }
+                },
+            );
     }
 
     onDeleteJob() {

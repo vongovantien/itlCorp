@@ -47,7 +47,8 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("{partnerId}")]
         public IActionResult Get(string partnerId)
         {
-            var results = catPartnerChargeService.Get(x => x.PartnerId == partnerId);
+            //var results = catPartnerChargeService.Get(x => x.PartnerId == partnerId);
+            var results = catPartnerChargeService.GetBy(partnerId);
             return Ok(results);
         }
 

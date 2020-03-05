@@ -9,7 +9,7 @@ import { Store } from '@ngrx/store';
 import * as fromShare from './../../share-business/store';
 import { CommonEnum } from '@enums';
 import { CsTransactionDetail } from '@models';
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
 @Component({
@@ -19,7 +19,7 @@ import { takeUntil, catchError, finalize } from 'rxjs/operators';
 export class AirImportComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
     headers: CommonInterface.IHeaderTable[];
     headersHBL: CommonInterface.IHeaderTable[];
 
@@ -33,7 +33,7 @@ export class AirImportComponent extends AppList {
 
     _fromDate: Date = this.createMoment().startOf('month').toDate();
     _toDate: Date = this.createMoment().endOf('month').toDate();
-    
+
     jobIdSelected: string = null;
 
     constructor(
@@ -107,9 +107,9 @@ export class AirImportComponent extends AppList {
         this.houseBills = this._sortService.sort(this.houseBills, sortField, order);
     }
 
-    getListHouseBill(jobId: any, index: number) { 
+    getListHouseBill(jobId: any, index: number) {
         this.jobIdSelected = jobId;
-        if (this.tmpIndex === index) {            
+        if (this.tmpIndex === index) {
             this.houseBills = this.tmpHouseBills;
         } else {
             this._progressRef.start();
@@ -128,22 +128,33 @@ export class AirImportComponent extends AppList {
     onSearchShipment($event: any) {
         $event.transactionType = this.transactionService;
         this.dataSearch = $event;
-        this.requestSearchShipment();        
-        this.loadListHouseBillExpanding();      
+        this.requestSearchShipment();
+        this.loadListHouseBillExpanding();
     }
 
-    onResetShipment($event: any){              
+    onResetShipment($event: any) {
         this.page = 1;
         $event.transactionType = this.transactionService;
         $event.fromDate = this._fromDate;
         $event.toDate = this._toDate;
         this.dataSearch = $event;
         this.requestSearchShipment();
-        this.loadListHouseBillExpanding(); 
+        this.loadListHouseBillExpanding();
     }
 
     requestSearchShipment() {
         this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
+
+    prepareDeleteShipment(shipment) {
+        this._documentRepo.checkPermissionAllowDeleteShipment(shipment.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.confirmDelete(shipment);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 
     confirmDelete(item: { id: string; }) {
@@ -184,11 +195,22 @@ export class AirImportComponent extends AppList {
     gotoCreateJob() {
         this._router.navigate(['home/documentation/air-import/new']);
     }
-    
-    loadListHouseBillExpanding(){ 
-        this.tmpIndex = -1; 
-        if(this.jobIdSelected !== null){
-            this.getListHouseBill(this.jobIdSelected,-2);
-        }         
+
+    loadListHouseBillExpanding() {
+        this.tmpIndex = -1;
+        if (this.jobIdSelected !== null) {
+            this.getListHouseBill(this.jobIdSelected, -2);
+        }
+    }
+
+    viewDetail(id: string): void {
+        this._documentRepo.checkDetailShippmentPermission(id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate(["/home/documentation/air-import", id]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 }

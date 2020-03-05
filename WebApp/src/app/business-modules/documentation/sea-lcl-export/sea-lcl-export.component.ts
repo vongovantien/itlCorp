@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { InfoPopupComponent, ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { CsTransactionDetail } from 'src/app/shared/models';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -18,7 +18,7 @@ import { takeUntil, finalize, catchError } from 'rxjs/operators';
 export class SeaLCLExportComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
     headers: CommonInterface.IHeaderTable[];
     headersHBL: CommonInterface.IHeaderTable[];
 
@@ -35,7 +35,7 @@ export class SeaLCLExportComponent extends AppList {
     _toDate: Date = this.createMoment().endOf('month').toDate();
 
     jobIdSelected: string = null;
-    
+
     constructor(
         private _router: Router,
         private _toastService: ToastrService,
@@ -149,6 +149,17 @@ export class SeaLCLExportComponent extends AppList {
         this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
+    prepareDeleteShipment(shipment) {
+        this._documentRepo.checkPermissionAllowDeleteShipment(shipment.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.confirmDelete(shipment);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
+
     confirmDelete(item: { id: string; }) {
         this.itemToDelete = item;
         this._progressRef.start();
@@ -188,10 +199,21 @@ export class SeaLCLExportComponent extends AppList {
         this._router.navigate(['home/documentation/sea-lcl-export/new']);
     }
 
-    loadListHouseBillExpanding(){ 
-        this.tmpIndex = -1; 
-        if(this.jobIdSelected !== null){
-            this.getListHouseBill(this.jobIdSelected,-2);
-        }         
+    loadListHouseBillExpanding() {
+        this.tmpIndex = -1;
+        if (this.jobIdSelected !== null) {
+            this.getListHouseBill(this.jobIdSelected, -2);
+        }
+    }
+
+    viewDetail(id: string): void {
+        this._documentRepo.checkDetailShippmentPermission(id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate(["/home/documentation/sea-lcl-export", id]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 }
