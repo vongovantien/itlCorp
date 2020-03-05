@@ -20,7 +20,6 @@ import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
 
 import { getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCatalogueUnitState, GetCatalogueUnitAction } from 'src/app/store';
-import cloneDeep from 'lodash/cloneDeep';
 import { ChargeConstants } from 'src/constants/charge.const';
 
 @Component({
@@ -37,6 +36,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     serviceTypeId: string;
     containers: Container[] = [];
+    shipmentContainers: Container[] = [];
+
     shipment: CsTransaction;
     hbl: HouseBill;
 
@@ -145,6 +146,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this.getPartner();
         this.getCharge();
         this.getShipmentContainer();
+        this.getHBLContainer();
         this.getShipmentDetail();
         this.getDetailHBL();
 
@@ -200,11 +202,23 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getShipmentContainer() {
+        this._store.select(fromStore.getContainerSaveState)
+            .pipe(catchError(this.catchError), takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (containers: Container[]) => {
+                    this.shipmentContainers = containers;
+                    console.log("shipment container", this.shipmentContainers);
+                }
+            );
+    }
+
+    getHBLContainer() {
         this._store.select(fromStore.getHBLContainersState)
             .pipe(catchError(this.catchError), takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (containers: any[]) => {
+                (containers: Container[]) => {
                     this.containers = containers;
+                    console.log("hbl container", this.containers);
                 }
             );
     }
@@ -213,7 +227,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this._store.select(fromStore.getTransactionDetailCsTransactionState)
             .pipe(catchError(this.catchError), takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (shipment: any) => {
+                (shipment: CsTransaction) => {
                     this.shipment = shipment;
                 }
             );
@@ -442,21 +456,21 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         switch (hintType) {
             case CommonEnum.QUANTITY_TYPE.GW:
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
-                    chargeItem.quantity = this.hbl.grossWeight || 0;
+                    chargeItem.quantity = this.shipment.grossWeight || 0;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW);
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.NW:
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
-                    chargeItem.quantity = this.hbl.netWeight || 0;
+                    chargeItem.quantity = this.shipment.netWeight || 0;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.CBM:
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
-                    chargeItem.quantity = this.hbl.cbm || 0;
+                    chargeItem.quantity = this.shipment.cbm || 0;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
                 }
@@ -466,14 +480,14 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 break;
             case CommonEnum.QUANTITY_TYPE.CW:
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
-                    chargeItem.quantity = this.hbl.chargeWeight || 0;
+                    chargeItem.quantity = this.shipment.chargeWeight || 0;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, 'chargeAbleWeight');
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.PACKAGE:
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
-                    chargeItem.quantity = this.hbl.packageQty || 0;
+                    chargeItem.quantity = this.shipment.packageQty || 0;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
                 }
@@ -599,19 +613,25 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    getStandardCharge() {
-        const chargeCodes: string[] = this.detectDefaultCode(this.serviceTypeId);
+    getStandardCharge(type: CommonEnum.SurchargeTypeEnum | string = CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+        const chargeCodes: string[] = this.detectDefaultCode(this.serviceTypeId, type);
 
         this._catalogueRepo.getChargeByCodes(chargeCodes)
             .pipe(catchError(this.catchError))
             .subscribe((charges: Charge[]) => {
                 if (charges && !!charges.length) {
-                    const csShipmentSurcharge: CsShipmentSurcharge[] = this.updateDefaultChargeCode(charges, this.serviceTypeId);
+                    const csShipmentSurcharge: CsShipmentSurcharge[] = this.updateDefaultChargeCode(charges, this.serviceTypeId, type);
 
                     if (!!csShipmentSurcharge.length) {
-                        csShipmentSurcharge.forEach((c: CsShipmentSurcharge) => {
-                            this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
-                        });
+                        if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                            csShipmentSurcharge.forEach((c: CsShipmentSurcharge) => {
+                                this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
+                            });
+                        } else {
+                            csShipmentSurcharge.forEach((c: CsShipmentSurcharge) => {
+                                this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
+                            });
+                        }
                     }
                 } else {
                     this._toastService.warning("Not found default charge");
@@ -619,70 +639,193 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             });
     }
 
-    detectDefaultCode(serviceTypeId: string) {
-        switch (serviceTypeId) {
-            case ChargeConstants.AE_CODE:
-            case ChargeConstants.AI_CODE:
-                return ChargeConstants.DEFAULT_AIR;
-            case ChargeConstants.SFE_CODE:
-                return ChargeConstants.DEFAULT_FCL_EXPORT;
-            case ChargeConstants.SLE_CODE:
-                return ChargeConstants.DEFAULT_LCL_EXPORT;
-            case ChargeConstants.SFI_CODE:
-                return ChargeConstants.DEFAULT_FCL_IMPORT;
-            case ChargeConstants.SLI_CODE:
-                return ChargeConstants.DEFAULT_LCL_IMPORT;
-            default:
-                return [];
+    detectDefaultCode(serviceTypeId: string, type: CommonEnum.SurchargeTypeEnum | string = CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+        if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+            switch (serviceTypeId) {
+                case ChargeConstants.AE_CODE:
+                case ChargeConstants.AI_CODE:
+                    return ChargeConstants.DEFAULT_AIR;
+                case ChargeConstants.SFE_CODE:
+                    return ChargeConstants.BUYING_DEFAULT_FCL_EXPORT;
+                case ChargeConstants.SLE_CODE:
+                    return ChargeConstants.BUYING_DEFAULT_LCL_EXPORT;
+                case ChargeConstants.SFI_CODE:
+                    return ChargeConstants.BUYING_DEFAULT_FCL_IMPORT;
+                case ChargeConstants.SLI_CODE:
+                    return ChargeConstants.BUYING_DEFAULT_LCL_IMPORT;
+                default:
+                    return [];
+            }
+        } else {
+            switch (serviceTypeId) {
+                case ChargeConstants.SFE_CODE:
+                    return ChargeConstants.SELLING_DEFAULT_FCL_EXPORT;
+                case ChargeConstants.SLE_CODE:
+                    return ChargeConstants.SELLING_DEFAULT_LCL_EXPORT;
+                case ChargeConstants.SFI_CODE:
+                    return ChargeConstants.SELLING_DEFAULT_FCL_IMPORT;
+                case ChargeConstants.SLI_CODE:
+                    return ChargeConstants.SELLING_DEFAULT_LCL_IMPORT;
+                default:
+                    return [];
+            }
         }
     }
 
-    updateDefaultChargeCode(charges: Charge[], serviceTypeId: string): CsShipmentSurcharge[] {
+    updateDefaultChargeCode(charges: Charge[], serviceTypeId: string, type: CommonEnum.SurchargeTypeEnum | string = CommonEnum.SurchargeTypeEnum.BUYING_RATE): CsShipmentSurcharge[] {
         const shipmentSurcharges: CsShipmentSurcharge[] = this.mapChargeToShipmentSurCharge(charges);
+
+        let coloaderPayer = null;
+        let customerPayer = null;
+        // * Find partner with Airlines/Coloader's shipment or HBL's customer.
+        this.listPartner.forEach(p => {
+            if (p.id === this.shipment.coloaderId) {
+                coloaderPayer = p;
+                if (!!customerPayer) {
+                    return false;
+                }
+            }
+            if (p.id === this.hbl.customerId) {
+                customerPayer = p;
+                if (!!coloaderPayer) {
+                    return false;
+                }
+            }
+        });
+
         switch (serviceTypeId) {
             case ChargeConstants.AE_CODE:
             case ChargeConstants.AI_CODE:
                 shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
-                    if (c.chargeCode === ChargeConstants.DEFAULT_AIR[0]) {
-                        const unit: Unit = this.listUnits.find(u => u.code === 'kgs' || u.code === 'KGS');
-                        c.unitId = !!unit ? unit.id : null;
+                    c = this.updatePayer(c, coloaderPayer);
 
+                    if (c.chargeCode === ChargeConstants.DEFAULT_AIR[0]) {
+                        c = this.updateUnitSurcharge(c, 'KGS');
                         c.quantityType = CommonEnum.QUANTITY_TYPE.CW;
                         c.quantity = this.shipment.chargeWeight;
                     }
                     if (c.chargeCode === ChargeConstants.DEFAULT_AIR[1]) {
-                        const unit: Unit = this.listUnits.find(u => u.code === 'kgs' || u.code === 'KGS');
-                        c.unitId = !!unit ? unit.id : null;
-
+                        c = this.updateUnitSurcharge(c, 'KGS');
                         c.quantityType = CommonEnum.QUANTITY_TYPE.GW;
                         c.quantity = this.shipment.grossWeight;
                     }
                     if (c.chargeCode === ChargeConstants.DEFAULT_AIR[2]) {
-                        const unit: Unit = this.listUnits.find(u => u.code === 'SET' || u.code === 'set');
-                        c.unitId = !!unit ? unit.id : null;
-
+                        c = this.updateUnitSurcharge(c, 'SET');
                         c.quantity = 1;
                     }
                 });
                 break;
             case ChargeConstants.SFE_CODE:
-                shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
-                    if (c.chargeCode === ChargeConstants.DEFAULT_FCL_EXPORT[0]) {
-                        const unit: Unit = this.listUnits.find(u => u.code === 'kgs' || u.code === 'KGS');
-                        c.unitId = !!unit ? unit.id : null;
+                if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                        c = this.updatePayer(c, coloaderPayer);
 
-                        c.quantityType = CommonEnum.QUANTITY_TYPE.CW;
-                    }
-                });
+                        if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_FCL_EXPORT[1]) {
+                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            c.quantity = 1;
+                        } else {
+                            c = this.updateUnitSurcharge(c, 'CONT');
+                            c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
+                        }
+                    });
+                } else {
+                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                        c = this.updatePayer(c, customerPayer);
+
+                        if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_FCL_EXPORT[1]) {
+                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            c.quantity = 1;
+                        } else {
+                            c = this.updateUnitSurcharge(c, 'CONT');
+                            c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
+                        }
+                    });
+                }
                 break;
             case ChargeConstants.SLE_CODE:
+                if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                        c = this.updatePayer(c, coloaderPayer);
+
+                        if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_LCL_EXPORT[1]) {
+                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            c.quantity = 1;
+                        } else {
+                            c = this.updateUnitSurcharge(c, 'CONT');
+                            c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
+                        }
+                    });
+                } else {
+                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                        c = this.updatePayer(c, customerPayer);
+
+                        if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_LCL_EXPORT[1]) {
+                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            c.quantity = 1;
+                        } else {
+                            c = this.updateUnitSurcharge(c, 'CONT');
+                            c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
+                        }
+                    });
+                }
+                break;
             case ChargeConstants.SFI_CODE:
+                if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                        c = this.updatePayer(c, coloaderPayer);
+
+                        if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_FCL_IMPORT[1]) {
+                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            c.quantity = 1;
+                        } else {
+                            c = this.updateUnitSurcharge(c, 'CONT');
+                            c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
+                        }
+                    });
+                } else {
+                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                        c = this.updatePayer(c, customerPayer);
+
+                        if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_FCL_IMPORT[1]) {
+                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            c.quantity = 1;
+                        } else {
+                            c = this.updateUnitSurcharge(c, 'CONT');
+                            c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
+                        }
+                    });
+                }
+                break;
             case ChargeConstants.SLI_CODE:
+                if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                        c = this.updatePayer(c, coloaderPayer);
+
+                        if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_LCL_IMPORT[1]) {
+                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            c.quantity = 1;
+                        } else {
+                            c = this.updateUnitSurcharge(c, 'CONT');
+                            c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
+                        }
+                    });
+                } else {
+                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                        c = this.updatePayer(c, customerPayer);
+
+                        if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_LCL_IMPORT[1]) {
+                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            c.quantity = 1;
+                        } else {
+                            c = this.updateUnitSurcharge(c, 'CONT');
+                            c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
+                        }
+                    });
+                }
+                break;
             default:
                 return [];
-
         }
-
         return shipmentSurcharges;
     }
 
@@ -693,9 +836,21 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 type: CommonEnum.SurchargeTypeEnum.BUYING_RATE,
                 chargeId: c.id,
                 id: SystemConstants.EMPTY_GUID,
-                exchangeDate: { startDate: new Date, endDate: new Date() }
+                exchangeDate: { startDate: new Date, endDate: new Date() },
             })));
         return newCsShipmentSurcharge || [];
+    }
+
+    updateUnitSurcharge(charge: CsShipmentSurcharge, code: string) {
+        const unit: Unit = this.listUnits.find(u => u.code.toLowerCase() === code.toLowerCase());
+        charge.unitId = !!unit ? unit.id : null;
+        return charge;
+    }
+
+    updatePayer(charge: CsShipmentSurcharge, partner: Partner) {
+        charge.paymentObjectId = !!partner ? partner.id : null;
+        charge.partnerShortName = !!partner ? partner.shortName : '';
+        return charge;
     }
 
     getOtherCharge() {

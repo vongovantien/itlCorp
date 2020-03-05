@@ -33,6 +33,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? Eta { get; set; }
         public Guid? Pol { get; set; }
         public Guid? Pod { get; set; }
+        public Guid? WarehouseId { get; set; }
         public Guid? FinalPod { get; set; }
         public string DeliveryPlace { get; set; }
         public string FinalDestinationPlace { get; set; }

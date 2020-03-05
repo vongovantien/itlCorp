@@ -651,5 +651,18 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctSettlementPaymentService.UnLock(settlePayments);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Export settlement payment by settlement id
+        /// </summary>
+        /// <param name="settlementId">Id of settlement payment</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("DetailSettlementPaymentExport")]
+        public IActionResult DetailSettlementPaymentExport(Guid settlementId)
+        {
+            var result = acctSettlementPaymentService.SettlementExport(settlementId);
+            return Ok(result);
+        }
     }
 }

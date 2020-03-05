@@ -71,9 +71,7 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     this.getDetailShipment();
                     this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
-                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-                    this.getDetailShipment();
                     this.getHouseBills(this.jobId);
                 }
             });
@@ -130,6 +128,8 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
             // * Get container, Job detail, Surcharge with hbl id, JobId.
             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
             this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
+            this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+
             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
             switch (this.selectedTabSurcharge) {

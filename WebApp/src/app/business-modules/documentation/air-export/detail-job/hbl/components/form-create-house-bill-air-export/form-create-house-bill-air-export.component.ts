@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { Customer, User, PortIndex, Currency, CsTransaction, DIM, HouseBill } from '@models';
+import { Customer, User, PortIndex, Currency, CsTransaction, DIM, HouseBill, Warehouse } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 
@@ -11,7 +11,7 @@ import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState, getDimensionVolumesState } from 'src/app/business-modules/share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { map, tap, takeUntil, catchError, skip, mergeMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
@@ -51,6 +51,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     hwbno: AbstractControl;
     mawb: AbstractControl;
     issueHblplace: AbstractControl;
+    warehouseId: AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: Observable<User[]>;
@@ -59,6 +60,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     countries: Observable<CountryModel[]>;
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
+    warehouses: Observable<Warehouse[]>;
+
     currencies: Observable<CommonInterface.INg2Select[]>;
 
 
@@ -141,6 +144,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
 
         this.ports = this._store.select(getCataloguePortState);
+        this.warehouses = this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse });
 
         this.saleMans = this._systemRepo.getListSystemUser();
 
@@ -198,7 +202,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     });
 
         } else {
-            const claim = localStorage.getItem('id_token_claims_obj');
+            const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
             const currenctUser = JSON.parse(claim)["officeId"];
             this.getDetailOffice(currenctUser);
             // * get detail shipment from store.
@@ -218,7 +222,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 etd: !!shipment.etd ? { startDate: new Date(shipment.etd), endDate: new Date(shipment.etd) } : null,
                                 eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
                                 flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
-                                flightNo: shipment.flightVesselName
+                                flightNo: shipment.flightVesselName,
+                                warehouseId: shipment.warehouseId
                             });
                         }
                     }
@@ -287,6 +292,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             forwardingAgentId: [null, Validators.required],
             pol: [],
             pod: [],
+            warehouseId: [],
 
             // * Select
             hbltype: [],

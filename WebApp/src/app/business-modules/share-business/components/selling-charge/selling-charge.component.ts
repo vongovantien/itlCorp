@@ -25,6 +25,7 @@ import cloneDeep from 'lodash/cloneDeep';
 export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingChargeComponent {
 
     @Input() showSyncFreight: boolean = true;
+    @Input() showGetCharge: boolean = true;
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
