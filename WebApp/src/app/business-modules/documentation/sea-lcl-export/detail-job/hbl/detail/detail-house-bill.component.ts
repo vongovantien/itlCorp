@@ -32,6 +32,8 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
 
     allowUpdate: boolean = false;
 
+
+
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -85,7 +87,6 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
     }
 
     ngAfterViewInit() {
-
     }
 
     getDetailHbl() {
@@ -99,6 +100,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
                 (res: CsTransactionDetail) => {
                     if (!!res) {
                         this.hblDetail = res;
+                        console.log('data here:', this.hblDetail);
                         // * Dispatch to save containers.
                         this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
 

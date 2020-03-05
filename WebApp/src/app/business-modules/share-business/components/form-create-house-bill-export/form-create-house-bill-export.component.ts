@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -71,6 +71,9 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     typeOfMoves: CommonInterface.INg2Select[];
     listSaleMan: any = [];
     type: string = '';
+    @Input() isUpdate: boolean = false;
+
+
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameVn', label: 'Name ABBR' },
@@ -132,39 +135,45 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.ports = this._store.select(getCataloguePortState);
         this.countries = this._store.select(getCatalogueCountryState);
 
-        // * get detail shipment from store.
-        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
-            .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
-            .subscribe(
-                (shipment: CsTransactionDetail) => {
-                    // * set default value for controls from shipment detail.
-                    if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
-                        this.shipmmentDetail = new CsTransaction(shipment);
-                        this.formCreate.patchValue({
-                            bookingNo: this.shipmmentDetail.bookingNo,
-                            mawb: this.shipmmentDetail.mawb,
-                            oceanVoyNo: (!!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '') + ' - ' + (!!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : ''),
-                            pod: this.shipmmentDetail.pod,
-                            pol: this.shipmmentDetail.pol,
-                            serviceType: !!this.shipmmentDetail.typeOfService ? [{ id: this.shipmmentDetail.typeOfService, text: this.shipmmentDetail.typeOfService }] : null,
-                            issueHbldate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null
-                        });
+        if (this.isUpdate) {
+            // * get detail HBL from store.
+            this._store.select(fromShareBussiness.getDetailHBlState)
+                .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
+                .subscribe(
+                    (res: CsTransactionDetail) => {
+                        console.log("detail hbl from store", res);
+                        if (!!res) {
+                            console.log(res);
+                            this.updateFormValue(res);
+                        }
                     }
-                }
-            );
+                );
 
-        // * get detail HBL from store.
-        this._store.select(fromShareBussiness.getDetailHBlState)
-            .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
-            .subscribe(
-                (res: CsTransactionDetail) => {
-                    console.log("detail hbl from store", res);
-                    if (!!res) {
-                        console.log(res);
-                        this.updateFormValue(res);
+
+        } else {
+            // * get detail shipment from store.
+            this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
+                .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
+                .subscribe(
+                    (shipment: CsTransactionDetail) => {
+                        // * set default value for controls from shipment detail.
+                        if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
+                            this.shipmmentDetail = new CsTransaction(shipment);
+                            this.formCreate.patchValue({
+                                bookingNo: this.shipmmentDetail.bookingNo,
+                                mawb: this.shipmmentDetail.mawb,
+                                oceanVoyNo: (!!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '') + ' - ' + (!!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : ''),
+                                pod: this.shipmmentDetail.pod,
+                                pol: this.shipmmentDetail.pol,
+                                serviceType: !!this.shipmmentDetail.typeOfService ? [{ id: this.shipmmentDetail.typeOfService, text: this.shipmmentDetail.typeOfService }] : null,
+                                issueHbldate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null
+                            });
+                        }
                     }
-                }
-            );
+                );
+        }
+
+
     }
 
     initForm() {
