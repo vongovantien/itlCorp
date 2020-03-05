@@ -4,7 +4,7 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
 
 import { CommonEnum } from '@enums';
-import { User, Unit, Customer, PortIndex, DIM, CsTransaction, Commodity } from '@models';
+import { User, Unit, Customer, PortIndex, DIM, CsTransaction, Commodity, Warehouse } from '@models';
 import { FormValidators } from '@validators';
 import { AppForm } from 'src/app/app.form';
 import {
@@ -17,7 +17,7 @@ import * as fromStore from './../../store/index';
 import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
-import { SystemRepo } from '@repositories';
+import { SystemRepo, CatalogueRepo } from '@repositories';
 
 
 @Component({
@@ -42,6 +42,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     pol: AbstractControl;
     pod: AbstractControl;
     agentId: AbstractControl;
+    warehouseId: AbstractControl;
     paymentTerm: AbstractControl; // * Payment Method
     serviceDate: AbstractControl;
     flightDate: AbstractControl;
@@ -68,6 +69,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     units: CommonInterface.INg2Select[];
     commodities: CommonInterface.INg2Select[];
     listUsers: Observable<User[]>;
+    warehouses: Observable<Warehouse[]>;
+
 
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name Abbr' },
@@ -79,6 +82,11 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         { field: 'code', label: 'Port Code' },
         { field: 'nameEn', label: 'Port Name' },
         { field: 'countryNameEN', label: 'Country' },
+    ];
+
+    displayFieldWarehouse: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Code' },
+        { field: 'nameEn', label: 'Name EN' },
     ];
 
     userLogged: User;
@@ -101,7 +109,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         private _store: Store<fromStore.IShareBussinessState>,
         private _route: ActivatedRoute,
         private _actionSubject: ActionsSubject,
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        private _catalogueRepo: CatalogueRepo
 
     ) {
         super();
@@ -140,6 +149,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         );
 
         this.listUsers = this._systemRepo.getSystemUsers();
+        this.warehouses = this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse });
 
         this.getUserLogged();
         this.initForm();
@@ -147,7 +157,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.getAgents();
         this.getPorts();
         this.getUnits();
-
         this.getCommodities();
 
         this._store.select(fromStore.getTransactionDetailCsTransactionState)
@@ -181,6 +190,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                                 pod: res.pod,
                                 agentId: res.agentId,
                                 coloaderId: res.coloaderId,
+                                warehouseId: res.warehouseId,
 
                                 mawb: res.mawb,
                                 jobNo: res.jobNo,
@@ -295,6 +305,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             pol: [],
             pod: [null, Validators.required],
             coloaderId: [null, Validators.required],
+            warehouseId: [],
 
         }, { validator: FormValidators.comparePort });
 
@@ -315,6 +326,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.pol = this.formGroup.controls["pol"];
         this.pod = this.formGroup.controls["pod"];
         this.agentId = this.formGroup.controls["agentId"];
+        this.warehouseId = this.formGroup.controls["warehouseId"];
+
 
         // * Handle etdchange.
         this.formGroup.controls['etd'].valueChanges
@@ -373,6 +386,9 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 break;
             case 'agent':
                 this.agentId.setValue(data.id);
+                break;
+            case 'warehouse':
+                this.warehouseId.setValue(data.id);
                 break;
             default:
                 break;

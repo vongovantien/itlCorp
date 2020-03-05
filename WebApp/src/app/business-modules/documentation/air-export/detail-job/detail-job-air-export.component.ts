@@ -339,7 +339,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             pol: modelAdd.pol,
             pod: modelAdd.pod,
             agentId: modelAdd.agentId,
-            issuedBy: modelAdd.issuedBy
+            issuedBy: modelAdd.issuedBy,
+            warehouseId: modelAdd.warehouseId
         };
 
         this._progressRef.start();
