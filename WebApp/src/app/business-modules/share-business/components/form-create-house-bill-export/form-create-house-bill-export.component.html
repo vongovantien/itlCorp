@@ -135,7 +135,7 @@
                 <div class="col-md-4">
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger': isSubmitted && (!pod.value || (formCreate.errors | equalError:'invalidPort')) }">
-                        <label required>Port of Discharge</label>
+                        <label required>Port of Discharge (POD)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                             [currentActiveItemId]="{ field: 'id', value: pod.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
