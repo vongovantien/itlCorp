@@ -174,7 +174,7 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
                         // TODO goto detail.
                         this._router.navigate([`home/documentation/sea-lcl-export/${res.data.id}`]);
                     } else {
-                        this._toastService.error("Opps", "Something getting error!");
+                        this._toastService.error(res.message);
                     }
                 }
             );

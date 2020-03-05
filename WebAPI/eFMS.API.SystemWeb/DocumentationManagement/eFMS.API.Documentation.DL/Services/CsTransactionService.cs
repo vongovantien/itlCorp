@@ -1596,6 +1596,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var transaction = mapper.Map<CsTransaction>(model);
             transaction.Id = Guid.NewGuid();
+            IQueryable<CsTransactionDetail> detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
+            if (string.IsNullOrEmpty(model.Mawb) && detailTrans.Select(x => x.Id).Count() > 0)
+                return new ResultHandle { Status = false, Message = "This shipment did't have MBL No. You can't import or duplicate it." };
             transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
             transaction.UserCreated = currentUser.UserID;
             transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
@@ -1617,7 +1620,6 @@ namespace eFMS.API.Documentation.DL.Services
                 var masterDimensionDetails = GetMasterDimensiondetails(transaction.Id, model.DimensionDetails);
                 dimensionDetails.AddRange(masterDimensionDetails);
             }
-            IQueryable<CsTransactionDetail> detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
             if (model.TransactionType == "AI" || model.TransactionType == "AE")
             {
                 detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id && x.ParentId != null);
