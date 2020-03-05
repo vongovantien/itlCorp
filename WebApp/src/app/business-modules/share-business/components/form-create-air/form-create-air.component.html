@@ -276,12 +276,28 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Commodities</label>
-                            <ng-select #commoditiy [items]="commodities" (opened)="closeOtherSelects(commoditiy)"
-                                [multiple]="true" formControlName="commodity" [allowClear]="true"
-                                placeholder="Select commodity">
-                            </ng-select>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Warehouse</label>
+                                    <app-combo-grid-virtual-scroll
+                                        (itemSelected)="onSelectDataFormInfo($event, 'warehouse')"
+                                        [currentActiveItemId]="{ field: 'id', value: warehouseId.value}"
+                                        [selectedDisplayFields]="['nameEn']" [dataSources]="warehouses | async"
+                                        [displayFields]="displayFieldPort" placeholder="Select warehouse"
+                                        (remove)="resetFormControl(warehouseId)">
+                                    </app-combo-grid-virtual-scroll>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Commodities</label>
+                                    <ng-select #commoditiy [items]="commodities"
+                                        (opened)="closeOtherSelects(commoditiy)" [multiple]="true"
+                                        formControlName="commodity" [allowClear]="true" placeholder="Select commodity">
+                                    </ng-select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">

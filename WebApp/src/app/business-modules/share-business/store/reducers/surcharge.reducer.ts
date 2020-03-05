@@ -42,10 +42,6 @@ export function SurchargeReducer(state = initialState, action: SurchargeAction):
             };
         }
         case SurchargeActionTypes.ADD_BUYING: {
-            console.log({
-                ...state,
-                buyings: [...state.buyings, action.payload]
-            });
             return {
                 ...state,
                 buyings: [...state.buyings, action.payload]

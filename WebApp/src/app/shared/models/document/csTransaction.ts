@@ -26,6 +26,7 @@ export class CsTransaction extends BaseModel {
     pol: string = null;
     polName: string = null;
     pod: string = null;
+    warehouseId: string = null;
     podName: string = null;
     deliveryPlace: string = null;
     paymentTerm: string = null;

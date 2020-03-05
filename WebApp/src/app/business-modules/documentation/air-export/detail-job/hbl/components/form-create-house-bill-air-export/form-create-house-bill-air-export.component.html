@@ -658,6 +658,13 @@
                                 <input type="text" class="form-control" formControlName="sci">
                             </div>
                         </div>
+                        <div class="col-md-12">
+                            <label>Warehouse</label>
+                            <select class="form-control" formControlName="warehouseId" disabled>
+                                <option *ngFor="let warehouse of (warehouses | async)" [value]="warehouse.id">
+                                    {{warehouse.nameEn}}</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">

@@ -152,7 +152,7 @@ namespace eFMS.API.Documentation.DL.Services
         public object AddCSTransaction(CsTransactionEditModel model)
         {
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
-            
+
             var transaction = mapper.Map<CsTransaction>(model);
             transaction.Id = Guid.NewGuid();
             if (model.CsMawbcontainers != null)
@@ -241,7 +241,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange, job.TransactionType);
-            if (code == 403) return new HandleState(403,"");
+            if (code == 403) return new HandleState(403, "");
 
             //if (model.CsMawbcontainers.Count > 0)
             //{
@@ -400,7 +400,7 @@ namespace eFMS.API.Documentation.DL.Services
                 ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
                 var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
                 int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange);
-                if (code == 403) return new HandleState(403,"");
+                if (code == 403) return new HandleState(403, "");
 
                 if (job == null)
                 {
@@ -468,7 +468,7 @@ namespace eFMS.API.Documentation.DL.Services
                 code = 403;
                 return code;
             }
-                
+
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(transactionType, currentUser);
             code = PermissionEx.GetPermissionToUpdateShipmentDocumentation(model, permissionRange, currentUser, authorizeUserIds);
             return code;
@@ -581,27 +581,27 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.All:
                     break;
                 case PermissionRange.Owner:
-                    masterBills = masterBills.Where(x => x.PersonIncharge == currentUser.UserID 
-                                                || authorizeUserIds.Contains(x.PersonIncharge) 
+                    masterBills = masterBills.Where(x => x.PersonIncharge == currentUser.UserID
+                                                || authorizeUserIds.Contains(x.PersonIncharge)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Group:
-                    masterBills = masterBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
+                    masterBills = masterBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Department:
-                    masterBills = masterBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
+                    masterBills = masterBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Office:
-                    masterBills = masterBills.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
+                    masterBills = masterBills.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Company:
-                    masterBills = masterBills.Where(x => x.CompanyId == currentUser.CompanyID 
+                    masterBills = masterBills.Where(x => x.CompanyId == currentUser.CompanyID
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
                                                 || x.UserCreated == currentUser.UserID);
                     break;
@@ -681,7 +681,7 @@ namespace eFMS.API.Documentation.DL.Services
                     };
 
             return query;
-        }        
+        }
 
         public List<CsTransactionModel> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount)
         {
@@ -1403,7 +1403,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var shipment = DataContext.Get(x => x.Id == JobId).FirstOrDefault();
             var houseBills = transactionDetailService.GetHouseBill(shipment.TransactionType);
-            
+
             List<object> returnList = new List<object>();
             var housebills = houseBills.Where(x => x.JobId == JobId && x.ParentId == null);//csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();
             foreach (var item in housebills)
@@ -1658,10 +1658,11 @@ namespace eFMS.API.Documentation.DL.Services
                         surcharges.AddRange(houseSurcharges);
                     }
                     var houseFreigcharges = GetFreightCharges(oldHouseId, item.Id);
-                    if (houseFreigcharges != null) {
+                    if (houseFreigcharges != null)
+                    {
                         freightCharges.AddRange(houseFreigcharges);
-                    } 
                 }
+            }
             }
             try
             {
@@ -1683,7 +1684,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    return new ResultHandle { Status = hsTrans.Success, Message = hsTrans.Message.ToString()};
+                    return new ResultHandle { Status = hsTrans.Success, Message = hsTrans.Message.ToString() };
                 }
             }
             catch (Exception ex)
@@ -1782,7 +1783,7 @@ namespace eFMS.API.Documentation.DL.Services
         private List<CsDimensionDetail> GetMasterDimensiondetails(Guid jobId, List<CsDimensionDetailModel> dimensionDetails)
         {
             List<CsDimensionDetail> dimensions = new List<CsDimensionDetail>();
-            foreach(var item in dimensionDetails)
+            foreach (var item in dimensionDetails)
             {
                 item.Id = Guid.NewGuid();
                 item.Mblid = jobId;
@@ -1797,7 +1798,7 @@ namespace eFMS.API.Documentation.DL.Services
         private List<CsMawbcontainer> GetMasterBillcontainer(Guid jobId, List<CsMawbcontainerModel> csMawbcontainers)
         {
             var containers = new List<CsMawbcontainer>();
-            foreach(var item in csMawbcontainers)
+            foreach (var item in csMawbcontainers)
             {
                 item.Id = Guid.NewGuid();
                 item.Mblid = jobId;
@@ -2139,7 +2140,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var shipment = DataContext.Get(x => x.Id == JobId).FirstOrDefault();
                 if (shipment == null) return null;
 
-                if (shipment.TransactionType != DocumentConstants.AE_SHIPMENT && shipment.TransactionType != DocumentConstants.AI_SHIPMENT )
+                if (shipment.TransactionType != DocumentConstants.AE_SHIPMENT && shipment.TransactionType != DocumentConstants.AI_SHIPMENT)
                     return null;
                 // Lấy ds HBL
                 var housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();
@@ -2153,7 +2154,7 @@ namespace eFMS.API.Documentation.DL.Services
                     foreach (var hbl in housebills)
                     {
                         hbl.FlightNo = model.FlightVesselName;
-                        hbl.UserModified = "admin";
+                        hbl.UserModified = currentUser.UserID;
                         hbl.Eta = model.Eta;
                         hbl.Etd = model.Etd;
                         hbl.Pod = model.Pod;
@@ -2161,6 +2162,7 @@ namespace eFMS.API.Documentation.DL.Services
                         hbl.IssuedBy = model.IssuedBy;
                         hbl.FlightDate = model.FlightDate;
                         hbl.ForwardingAgentId = model.AgentId;
+                        hbl.WarehouseId = model.WarehouseId;
 
                         string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
                         hbl.ForwardingAgentDescription = agentDescription;
@@ -2168,7 +2170,7 @@ namespace eFMS.API.Documentation.DL.Services
                         csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id);
                     }
 
-                    return new ResultHandle { Status = true, Message ="Sync House Bill " + String.Join(", ",housebills.Select(s => s.Hwbno).Distinct()) + " successfully", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                    return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
                 }
             }
             catch (Exception ex)
@@ -2179,7 +2181,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
     }
 
-   
+
 }
 
 

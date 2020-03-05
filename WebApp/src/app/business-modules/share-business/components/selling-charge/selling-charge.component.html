@@ -17,18 +17,25 @@
             <div class="col-md-8">
                 <div class="m--align-right" *ngIf="!(isLocked | async)">
                     <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
-                        <ng-container>
-                            <button type="button"
-                                class="btn btn-secondary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
-                                (click)="syncBuyingCharge()">
-                                <span>
-                                    <i class="la la-refresh"></i>
-                                    <span>
-                                        Sync Buying
-                                    </span>
-                                </span>
+                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="showGetCharge">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <i class="la la-download"></i> Get Charge<span class="caret"></span>
                             </button>
-                        </ng-container>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item pointer" (click)="getStandardCharge('SELL')">Standard</a>
+                            </div>
+                        </div>
+
+                        <button type="button"
+                            class="btn btn-secondary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
+                            (click)="syncBuyingCharge()">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Sync Buying
+                                </span>
+                            </span>
+                        </button>
                         <ng-container *ngIf="showSyncFreight && !!charges && !charges.length">
                             <button type="button"
                                 class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"

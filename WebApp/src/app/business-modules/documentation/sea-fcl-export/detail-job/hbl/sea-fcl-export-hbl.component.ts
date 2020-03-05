@@ -18,7 +18,6 @@ import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/s
 import { SortService } from '@services';
 import { NgxSpinnerService } from 'ngx-spinner';
 
-
 @Component({
     selector: 'app-sea-fcl-export-hbl',
     templateUrl: './sea-fcl-export-hbl.component.html'
@@ -40,7 +39,6 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
     selectedHbl: CsTransactionDetail;
     shipmentDetail: CsTransaction;
 
-
     selectedTabSurcharge: string = 'BUY';
 
     dataReport: any = null;
@@ -48,8 +46,6 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
     totalCBM: number;
     totalGW: number;
     spinnerSurcharge: string = 'spinnerSurcharge';
-
-
 
     constructor(
         private _router: Router,
@@ -74,7 +70,6 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     this.getDetailShipment();
                     this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
-                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                     this.getDetailShipment();
                     this.getHouseBills(this.jobId);
@@ -257,6 +252,8 @@ export class SeaFCLExportHBLComponent extends AppList implements OnInit {
             // * Get container, Job detail, Surcharge with hbl id, JobId.
             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
             this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
+            this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+
             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
             switch (this.selectedTabSurcharge) {

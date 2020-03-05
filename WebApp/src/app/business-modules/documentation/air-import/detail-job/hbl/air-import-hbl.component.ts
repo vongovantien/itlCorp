@@ -73,8 +73,6 @@ export class AirImportHBLComponent extends AppList implements OnInit {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     this.getDetailShipment();
                     this._store.dispatch(new fromShareBussiness.GetListHBLAction({ jobId: this.jobId }));
-                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-                    this.getDetailShipment();
 
                     this.getHouseBills(this.jobId);
                 } else {
@@ -136,7 +134,6 @@ export class AirImportHBLComponent extends AppList implements OnInit {
                 (res: any) => {
                     if (!!res) {
                         this.shipmentDetail = res;
-                        console.log('day ne:', this.shipmentDetail);
                     }
                 },
             );
