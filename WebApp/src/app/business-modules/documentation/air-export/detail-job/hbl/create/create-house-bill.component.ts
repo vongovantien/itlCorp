@@ -83,8 +83,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             );
     }
 
-
-
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
         const formData = {
