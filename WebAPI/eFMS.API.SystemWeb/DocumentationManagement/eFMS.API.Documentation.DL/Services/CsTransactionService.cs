@@ -1622,7 +1622,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (model.TransactionType == "AI" || model.TransactionType == "AE")
             {
-                detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id && x.ParentId != null);
+                detailTrans = detailTrans.Where(x => x.JobId == model.Id && x.ParentId == null);
             }
             if (detailTrans != null)
             {
@@ -1636,6 +1636,8 @@ namespace eFMS.API.Documentation.DL.Services
                     generatePrefixHouse = DocumentConstants.SEF_HBL
                         + GenerateID.GeneratePrefixHousbillNo();
                 }
+                freightCharges = new List<CsArrivalFrieghtCharge>();
+                surcharges = new List<CsShipmentSurcharge>();
                 foreach (var item in detailTrans)
                 {
                     var oldHouseId = item.Id;
@@ -1653,12 +1655,10 @@ namespace eFMS.API.Documentation.DL.Services
                     var houseSurcharges = GetCharges(oldHouseId, item.Id);
                     if (houseSurcharges != null)
                     {
-                        surcharges = new List<CsShipmentSurcharge>();
                         surcharges.AddRange(houseSurcharges);
                     }
                     var houseFreigcharges = GetFreightCharges(oldHouseId, item.Id);
                     if (houseFreigcharges != null) {
-                        freightCharges = new List<CsArrivalFrieghtCharge>();
                         freightCharges.AddRange(houseFreigcharges);
                     } 
                 }

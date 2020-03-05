@@ -54,9 +54,9 @@ namespace eFMS.API.Catalogue.DL.Common
         {
             new UnitType { Value = "Container", DisplayName = "Container" },
             new UnitType { Value = "Package", DisplayName = "Package" },
-            new UnitType { Value = "Weight Measurement", DisplayName = "Weight Measurement" },
-            new UnitType { Value = "Length Measurement", DisplayName = "Length Measurement" },
-            new UnitType { Value = "Volumn Measurement", DisplayName = "Volumn Measurement" }
+            new UnitType { Value = "WeightMeasurement", DisplayName = "Weight Measurement" },
+            new UnitType { Value = "LengthMeasurement", DisplayName = "Length Measurement" },
+            new UnitType { Value = "VolumnMeasurement", DisplayName = "Volumn Measurement" }
         };
     }
 }
