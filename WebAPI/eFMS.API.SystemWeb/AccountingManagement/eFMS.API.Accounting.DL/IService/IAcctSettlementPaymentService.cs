@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
@@ -65,5 +66,7 @@ namespace eFMS.API.Accounting.DL.IService
         bool CheckDeletePermissionBySettlementId(Guid settlementId);
 
         bool CheckUpdatePermissionBySettlementId(Guid settlementId);
+
+        SettlementExport SettlementExport(Guid settlementId);
     }
 }

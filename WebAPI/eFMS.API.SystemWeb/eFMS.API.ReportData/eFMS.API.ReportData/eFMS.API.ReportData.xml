@@ -47,6 +47,14 @@
             <param name="soaNo"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPayment(System.Guid,System.String)">
+            <summary>
+            Export detail settlement payment
+            </summary>
+            <param name="settlementId">Id of settlement payment</param>
+            <param name="language">VN (Việt Nam) or ENG (English)</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
             <summary>
             A base class for an MVC controller without view support.
@@ -245,6 +253,15 @@
             Generate detail advance payment excel
             </summary>
             <param name="advanceExport"></param>
+            <param name="language"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateDetailSettlementPaymentExcel(eFMS.API.ReportData.Models.Accounting.SettlementExport,System.String,System.IO.Stream)">
+            <summary>
+            Generate detail settlement payment excel
+            </summary>
+            <param name="settlementExport"></param>
             <param name="language"></param>
             <param name="stream"></param>
             <returns></returns>

@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
@@ -3197,5 +3198,177 @@ namespace eFMS.API.Accounting.DL.Services
 
             return true;
         }
+
+        #region --- EXPORT SETTLEMENT ---
+        public SettlementExport SettlementExport(Guid settlementId)
+        {
+            SettlementExport dataExport = new SettlementExport();
+            var settlementPayment = GetSettlementPaymentById(settlementId);
+            if (settlementPayment == null) return null;
+
+            dataExport.InfoSettlement = GetInfoSettlementExport(settlementPayment);
+            dataExport.ShipmentsSettlement = GetListShipmentSettlementExport(settlementPayment);
+            return dataExport;
+        }
+
+        public InfoSettlementExport GetInfoSettlementExport(AcctSettlementPaymentModel settlementPayment)
+        {
+            string _requester = string.IsNullOrEmpty(settlementPayment.Requester) ? string.Empty : GetEmployeeByUserId(settlementPayment.Requester)?.EmployeeNameVn;
+            
+            #region -- Info Manager, Accoutant & Department --
+            var _settlementApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementPayment.SettlementNo && x.IsDeputy == false).FirstOrDefault();
+            string _manager = string.Empty;
+            string _accountant = string.Empty;
+            if (_settlementApprove != null)
+            {
+                _manager = string.IsNullOrEmpty(_settlementApprove.Manager) ? string.Empty : GetEmployeeByUserId(_settlementApprove.Manager)?.EmployeeNameVn;
+                _accountant = string.IsNullOrEmpty(_settlementApprove.Accountant) ? string.Empty : GetEmployeeByUserId(_settlementApprove.Accountant)?.EmployeeNameVn;
+            }
+
+            var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
+            #endregion -- Info Manager, Accoutant & Department --
+
+            var infoSettlement = new InfoSettlementExport
+            {
+                Requester = _requester,
+                RequestDate = settlementPayment.RequestDate,
+                Department = _department,
+                SettlementNo = settlementPayment.SettlementNo,
+                Manager = _manager,
+                Accountant = _accountant
+            };
+            return infoSettlement;
+        }
+
+        public List<InfoShipmentSettlementExport> GetListShipmentSettlementExport(AcctSettlementPaymentModel settlementPayment)
+        {
+            var listData = new List<InfoShipmentSettlementExport>();
+            
+            //Tỷ giá quy đổi lấy theo ngày Request Date của settlement
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlementPayment.RequestDate.Value.Date).ToList();
+
+            var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
+            
+            var houseBillIds = surChargeBySettleCode.Select(s => new { hblId = s.Hblid, customNo = s.ClearanceNo }).Distinct();
+            foreach(var houseBillId in houseBillIds)
+            {
+                var shipmentSettlement = new InfoShipmentSettlementExport();
+                var ops = opsTransactionRepo.Get(x => x.Hblid == houseBillId.hblId).FirstOrDefault();
+                if(ops != null)
+                {
+                    shipmentSettlement.JobNo = ops.JobNo;
+                    shipmentSettlement.CustomNo = houseBillId.customNo;
+                    shipmentSettlement.HBL = ops.Hwbno;
+                    shipmentSettlement.MBL = ops.Mblno;
+                    shipmentSettlement.Customer = catPartnerRepo.Get(x => x.Id == ops.CustomerId).FirstOrDefault()?.PartnerNameVn;
+                    shipmentSettlement.Container = ops.ContainerDescription;
+                    shipmentSettlement.Cw = ops.SumChargeWeight;
+                    shipmentSettlement.Pcs = ops.SumPackages;
+                    shipmentSettlement.Cbm = ops.SumCbm;
+                    var advanceRequests = acctAdvanceRequestRepo.Get(x => x.JobId == shipmentSettlement.JobNo
+                                                                       && x.Mbl == shipmentSettlement.MBL
+                                                                       && x.Hbl == shipmentSettlement.HBL);
+
+                    var advanceRequest = advanceRequests.FirstOrDefault();
+                    if (advanceRequest != null)
+                    {
+                        shipmentSettlement.AdvanceAmount = advanceRequests.Select(s => s.Amount * GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementPayment.SettlementCurrency)).Sum();
+                        shipmentSettlement.AdvanceRequestDate = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceRequest.AdvanceNo).FirstOrDefault().RequestDate;
+                    }
+                    
+                    var list = new List<InfoShipmentChargeSettlementExport>();
+                    var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == houseBillId.hblId);
+                    foreach(var sur in surChargeByHblId)
+                    {
+                        var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
+                        infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
+                        //Quy đổi theo currency của Settlement
+                        infoShipmentCharge.ChargeAmount = sur.Total * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementPayment.SettlementCurrency);
+                        infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
+                        infoShipmentCharge.ChargeNote = sur.Notes;
+                        string _chargeType = string.Empty;
+                        if(sur.Type == "OBH" || (sur.IsFromShipment == false && sur.TypeOfFee == "OBH"))
+                        {
+                            _chargeType = "OBH";
+                        }
+                        else if(sur.TypeOfFee == "Invoice" || (sur.IsFromShipment == true && sur.Type != "OBH"))
+                        {
+                            _chargeType = "INVOICE";
+                        }
+                        else
+                        {
+                            _chargeType = "NO_INVOICE";
+                        }
+                        infoShipmentCharge.ChargeType = _chargeType;
+
+                        list.Add(infoShipmentCharge);
+                    }
+                    shipmentSettlement.ShipmentCharges = list;
+
+                    listData.Add(shipmentSettlement);
+                }
+                else
+                {
+                    var tranDetail = csTransactionDetailRepo.Get(x => x.Id == houseBillId.hblId).FirstOrDefault();
+                    if(tranDetail != null)
+                    {
+                        shipmentSettlement.JobNo = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault().JobNo;
+                        shipmentSettlement.CustomNo = houseBillId.customNo;
+                        shipmentSettlement.HBL = tranDetail.Hwbno;
+                        shipmentSettlement.MBL = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault().Mawb;
+                        shipmentSettlement.Customer = catPartnerRepo.Get(x => x.Id == tranDetail.CustomerId).FirstOrDefault()?.PartnerNameVn;
+                        shipmentSettlement.Shipper = catPartnerRepo.Get(x => x.Id == tranDetail.ShipperId).FirstOrDefault()?.PartnerNameVn;
+                        shipmentSettlement.Consignee = catPartnerRepo.Get(x => x.Id == tranDetail.ConsigneeId).FirstOrDefault()?.PartnerNameVn;
+                        shipmentSettlement.Container = tranDetail.PackageContainer;
+                        shipmentSettlement.Cw = tranDetail.ChargeWeight;
+                        shipmentSettlement.Pcs = tranDetail.PackageQty;
+                        shipmentSettlement.Cbm = tranDetail.Cbm;
+                        var advanceRequests = acctAdvanceRequestRepo.Get(x => x.JobId == shipmentSettlement.JobNo 
+                                                                           && x.Mbl == shipmentSettlement.MBL 
+                                                                           && x.Hbl == shipmentSettlement.HBL);
+                        
+                        var advanceRequest = advanceRequests.FirstOrDefault();
+                        if (advanceRequest != null)
+                        {
+                            shipmentSettlement.AdvanceAmount = advanceRequests.Select(s => s.Amount * GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementPayment.SettlementCurrency)).Sum();
+                            shipmentSettlement.AdvanceRequestDate = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceRequest.AdvanceNo).FirstOrDefault().RequestDate;
+                        }
+
+                        var list = new List<InfoShipmentChargeSettlementExport>();
+                        var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == houseBillId.hblId);
+                        foreach (var sur in surChargeByHblId)
+                        {
+                            var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
+                            infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
+                            //Quy đổi theo currency của Settlement
+                            infoShipmentCharge.ChargeAmount = sur.Total * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementPayment.SettlementCurrency);
+                            infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
+                            infoShipmentCharge.ChargeNote = sur.Notes;
+                            string _chargeType = string.Empty;
+                            if (sur.Type == "OBH" || (sur.IsFromShipment == false && sur.TypeOfFee == "OBH"))
+                            {
+                                _chargeType = "OBH";
+                            }
+                            else if (sur.TypeOfFee == "Invoice" || (sur.IsFromShipment == true && sur.Type != "OBH"))
+                            {
+                                _chargeType = "INVOICE";
+                            }
+                            else
+                            {
+                                _chargeType = "NO_INVOICE";
+                            }
+                            infoShipmentCharge.ChargeType = _chargeType;
+
+                            list.Add(infoShipmentCharge);
+                        }
+                        shipmentSettlement.ShipmentCharges = list;
+
+                        listData.Add(shipmentSettlement);
+                    }
+                }
+            }
+            return listData;
+        }
+        #endregion --- EXPORT SETTLEMENT ---
     }
 }

@@ -2394,7 +2394,7 @@ namespace eFMS.API.Accounting.DL.Services
                         InWordCurrency.ConvertNumberCurrencyToStringUSD(_advanceAmount.Value, _currencyAdvance);
             #endregion -- Advance Amount & Sayword --
 
-            #region -- Info Manager, Accoutant & Departmenr --
+            #region -- Info Manager, Accoutant & Department --
             var _advanceApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advancePayment.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
             string _manager = string.Empty;
             string _accountant = string.Empty;
@@ -2405,7 +2405,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var _department = catDepartmentRepo.Get(x => x.Id == advancePayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
-            #endregion -- Info Manager, Accoutant & Departmenr --
+            #endregion -- Info Manager, Accoutant & Department --
 
             var infoAdvance = new InfoAdvanceExport
             {

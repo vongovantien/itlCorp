@@ -219,7 +219,17 @@ export class SettlementPaymentDetailComponent extends AppPage {
             return;
         }
 
-        //this._progressRef.start();
+        this._progressRef.start();
+        this._exportRepo.exportSettlementPaymentDetail(this.settlementPayment.settlement.id, language)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'Settlement Form - eFMS.xlsx');
+                },
+            );
     }
 }
 

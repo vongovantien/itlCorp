@@ -109,8 +109,8 @@ export class AuthorizationAddPopupComponent extends PopupBase {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (data: any) => {
-                    this.personInChargeList = data.map(x => ({ "text": x.username, "id": x.username }));
-                    this.authorizedPersonList = data.map(x => ({ "text": x.username, "id": x.username }));
+                    this.personInChargeList = data.map(x => ({ "text": x.username, "id": x.id }));
+                    this.authorizedPersonList = data.map(x => ({ "text": x.username, "id": x.id }));
                 },
             );
     }
@@ -119,7 +119,7 @@ export class AuthorizationAddPopupComponent extends PopupBase {
         [this.personInCharge].forEach((control: AbstractControl) => this.setError(control));
         this.isSubmited = true;
         if (this.formAuthorization.valid) {
-            var serviceCode = this.authorizedPerson.value ? (this.authorizedPerson.value.length > 0 ? this.authorizationService.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
+            const serviceCode = this.authorizedPerson.value ? (this.authorizedPerson.value.length > 0 ? this.authorizationService.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
             const _authorization: Authorization = {
                 id: this.authorization.id,
                 userId: this.personInChargeActive[0].id,
@@ -138,7 +138,7 @@ export class AuthorizationAddPopupComponent extends PopupBase {
                 servicesName: this.authorization.servicesName
             };
             this.authorizationToUpdate = _authorization;
-            if (this.action == "create") {
+            if (this.action === "create") {
                 this._systemRepo.addNewAuthorization(_authorization)
                     .pipe(catchError(this.catchError))
                     .subscribe(
@@ -181,12 +181,12 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     }
 
     getDetail() {
-        let indexPIC = this.personInChargeList.findIndex(x => x.id == this.authorization.userId);
+        const indexPIC = this.personInChargeList.findIndex(x => x.id == this.authorization.userId);
         if (indexPIC > -1) {
             this.personInChargeActive = [this.personInChargeList[indexPIC]];
         }
 
-        let indexAP = this.authorizedPersonList.findIndex(x => x.id == this.authorization.assignTo);
+        const indexAP = this.authorizedPersonList.findIndex(x => x.id == this.authorization.assignTo);
         if (indexAP > -1) {
             this.authorizedPersonActive = [this.authorizedPersonList[indexAP]];
         }
@@ -200,7 +200,7 @@ export class AuthorizationAddPopupComponent extends PopupBase {
             expirationDate: !!this.authorization.endDate ? { startDate: new Date(this.authorization.endDate) } : null,
             authorizationNote: this.authorization.description,
             authorizationActive: this.authorization.active
-        });          
+        });
     }
 
     getCurrentActiveService(ChargeService: any) {

@@ -124,5 +124,29 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        /// <summary>
+        /// Export detail settlement payment
+        /// </summary>
+        /// <param name="settlementId">Id of settlement payment</param>
+        /// <param name="language">VN (Việt Nam) or ENG (English)</param>
+        /// <returns></returns>
+        [Route("ExportDetailSettlementPayment")]
+        [HttpGet]
+        public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string language)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
+
+            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, language);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Form - eFMS.xlsx");
+
+            return fileContent;
+        }
     }
 }
