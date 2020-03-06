@@ -24,12 +24,12 @@ export class AuthorizationComponent extends AppList {
   selectedAuthorization: Authorization;
   userLogged: User;
 
-    constructor(
+  constructor(
     private _systemRepo: SystemRepo,
     private _sortService: SortService,
     private _progressService: NgProgress,
     private _toastService: ToastrService,
-    ) {
+  ) {
     super();
     this._progressRef = this._progressService.ref();
     this.requestList = this.searchAuthorization;
@@ -105,15 +105,15 @@ export class AuthorizationComponent extends AppList {
   }
 
   openPopupAddAuthorization() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+    this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
 
     this.authorizationAddPopupComponent.action = 'create';
     this.authorizationAddPopupComponent.authorizationActive.setValue(true);
-    this.authorizationAddPopupComponent.minDateEffective = this.authorizationAddPopupComponent.minDateExpired = this.minDate;   
+    this.authorizationAddPopupComponent.minDateEffective = this.authorizationAddPopupComponent.minDateExpired = this.minDate;
 
-        // this.authorizationAddPopupComponent.getUsers();
-        const indexPIC = this.authorizationAddPopupComponent.personInChargeList.findIndex(x => x.id == this.userLogged.id);
+    // this.authorizationAddPopupComponent.getUsers();
+    const indexPIC = this.authorizationAddPopupComponent.personInChargeList.findIndex(x => x.id == this.userLogged.id);
     if (indexPIC > -1) {
       this.authorizationAddPopupComponent.personInChargeActive = [this.authorizationAddPopupComponent.personInChargeList[indexPIC]];
     }
@@ -129,7 +129,7 @@ export class AuthorizationComponent extends AppList {
     this._systemRepo.getAuthorizationById(authorization.id).subscribe(
       (res: any) => {
         if (res.id !== 0) {
-                    const _authorization = new Authorization(res);
+          const _authorization = new Authorization(res);
           this.authorizationAddPopupComponent.action = "update";
           this.authorizationAddPopupComponent.activeServices = this.authorizationAddPopupComponent.getCurrentActiveService(_authorization.services);
           this.authorizationAddPopupComponent.authorization = _authorization;

@@ -8,5 +8,7 @@ namespace eFMS.API.System.DL.Models
     public class SysAuthorizationModel : SysAuthorization
     {
         public string ServicesName { get; set; }
+        public string UserNameAssign { get; set; }
+        public string UserNameAssignTo { get; set; }
     }
 }

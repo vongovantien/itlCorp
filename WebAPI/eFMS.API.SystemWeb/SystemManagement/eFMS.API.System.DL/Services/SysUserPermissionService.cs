@@ -206,11 +206,11 @@ namespace eFMS.API.System.DL.Services
                         general.UserModified = currentUser.UserID;
                         if(general.Id != Guid.Empty)
                         {
-                            userPermissionGeneralService.Update(general, x => x.Id == general.Id, false);
+                            var hs =userPermissionGeneralService.Update(general, x => x.Id == general.Id, false);
                         }
                         else
                         {
-                            userPermissionGeneralService.Add(general, false);
+                            var hs = userPermissionGeneralService.Add(general, false);
                         }
                     }
                 }
@@ -223,13 +223,13 @@ namespace eFMS.API.System.DL.Services
                             if (s.Id == Guid.Empty)
                             {
                                 var peritem = mapper.Map<SysUserPermissionSpecial>(s);
-                                peritem.Id = s.Id;
+                                peritem.Id = Guid.NewGuid();
                                 peritem.IsAllow = s.IsAllow;
                                 peritem.MenuId = s.MenuId;
                                 peritem.ModuleId = s.ModuleId;
-                                peritem.ActionName = s.NameEn;
+                                peritem.ActionName = s.ActionName;
                                 peritem.UserPermissionId = entity.Id;
-                                userPermissionSpecialRepository.Add(peritem, false);
+                                var hs = userPermissionSpecialRepository.Add(peritem, false);
                             }
                             else
                             {

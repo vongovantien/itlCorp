@@ -30,6 +30,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string MenuId { get; set; }
         public string NameEn { get; set; }
         public string NameVn { get; set; }
+        public string ActionName { get; set; }
         public bool? IsAllow { get; set; }
     }
 }

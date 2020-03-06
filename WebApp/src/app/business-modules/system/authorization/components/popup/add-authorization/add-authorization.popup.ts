@@ -135,7 +135,9 @@ export class AuthorizationAddPopupComponent extends PopupBase {
                 datetimeModified: this.authorization.datetimeModified,
                 active: this.authorizationActive.value,
                 inactiveOn: this.authorization.inactiveOn,
-                servicesName: this.authorization.servicesName
+                servicesName: this.authorization.servicesName,
+                userNameAssign: '',
+                userNameAssignTo: ''
             };
             this.authorizationToUpdate = _authorization;
             if (this.action === "create") {

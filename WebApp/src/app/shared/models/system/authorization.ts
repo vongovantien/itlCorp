@@ -14,6 +14,8 @@ export class Authorization {
     active: boolean = true;
     inactiveOn: string = '';
     servicesName: string = '';
+    userNameAssignTo: string = '';
+    userNameAssign: string = '';
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
