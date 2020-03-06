@@ -80,6 +80,7 @@ export class CsShipmentSurcharge {
     advanceNo: string = null;
 
     debitCharge: string = null;
+    paySoano: string = null;
 
     constructor(object?: any) {
         const self = this;

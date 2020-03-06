@@ -308,15 +308,14 @@ namespace eFMS.API.Accounting.DL.Services
             var opst = opsTransactionRepo.Get();
             var csTrans = csTransactionRepo.Get();
             var csTransDe = csTransactionDetailRepo.Get();
-            //Lấy danh sách Currency Exchange của ngày Modified của Settlement
+            //Quy đổi tỉ giá theo ngày Request Date
             var settle = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settle.DatetimeModified.Value.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settle.RequestDate.Value.Date).ToList();
 
             var dataOperation = from set in settlement
                                 join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
                                 from sur in sc.DefaultIfEmpty()
-                                join ops in opst on sur.Hblid equals ops.Hblid //into op
-                                //from ops in op.DefaultIfEmpty()
+                                join ops in opst on sur.Hblid equals ops.Hblid
                                 where
                                      sur.SettlementCode == settlementNo
                                 select new ShipmentOfSettlementResult
@@ -462,8 +461,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             var settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return null;
-            //Lấy danh sách Currency Exchange của ngày modified của settlement
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settleCurrent.DatetimeModified.Value.Date).ToList();
+            //Quy đổi tỉ giá theo ngày Request Date
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
 
             var dataOperation = from sur in surcharge
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
@@ -480,8 +479,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     TotalAmount = sur.Total * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
                                 };
             var dataDocument = from sur in surcharge
-                               join cstd in csTransD on sur.Hblid equals cstd.Id //into cstd2
-                               //from cstd in cstd2.DefaultIfEmpty()
+                               join cstd in csTransD on sur.Hblid equals cstd.Id
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
                                from cst in cst2.DefaultIfEmpty()
                                join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
@@ -810,7 +808,7 @@ namespace eFMS.API.Accounting.DL.Services
             var opsTrans = opsTransactionRepo.Get();
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
-            //Lấy danh sách Currency Exchange của ngày hiện tại
+            //Quy đổi tỉ giá theo ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
             //Chỉ lấy ra những settlement có status là done     
@@ -819,8 +817,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 from sur in sur2.DefaultIfEmpty()
                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                 from pae in pae2.DefaultIfEmpty()
-                                join opst in opsTrans on sur.Hblid equals opst.Hblid //into opst2
-                                //from opst in opst2.DefaultIfEmpty()
+                                join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 where
                                         settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
                                      && opst.JobNo == jobId
@@ -839,8 +836,7 @@ namespace eFMS.API.Accounting.DL.Services
                                from sur in sur2.DefaultIfEmpty()
                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                from pae in pae2.DefaultIfEmpty()
-                               join cstd in csTransD on sur.Hblid equals cstd.Id //into cstd2
-                               //from cstd in cstd2.DefaultIfEmpty()
+                               join cstd in csTransD on sur.Hblid equals cstd.Id
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
                                from cst in cst2.DefaultIfEmpty()
                                where
@@ -1232,7 +1228,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var charge in model.ShipmentCharge)
                 {
-                    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+                    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == model.Settlement.RequestDate.Value.Date).ToList();
                     var rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, model.Settlement.SettlementCurrency);
                     amount += charge.Total * rate;
                 }
@@ -1408,6 +1404,7 @@ namespace eFMS.API.Accounting.DL.Services
         public decimal GetAdvanceAmountByShipmentAndCurrency(string JobId, string MBL, string HBL, string Currency)
         {
             //Chỉ lấy ra các charge có status advance là done
+            //Quy đổi tỉ giá theo ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var advance = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
             var request = acctAdvanceRequestRepo.Get(x => x.JobId == JobId && x.Mbl == MBL && x.Hbl == HBL);
@@ -1489,7 +1486,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             var settle = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
 
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settle.DatetimeModified.Value.Date).ToList();
+            //Quy đổi tỉ giá theo ngày Request Date
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settle.RequestDate.Value.Date).ToList();
 
             var data = from sur in surcharge
                        join cat in charge on sur.ChargeId equals cat.Id into cat2
@@ -2651,12 +2649,13 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var surcharge = csShipmentSurchargeRepo.Get();
 
-            //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return false;
 
+            //Quy đổi tỉ giá theo ngày Request Date
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlement.RequestDate.Value.Date).ToList();
+            
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
             var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
@@ -2748,12 +2747,13 @@ namespace eFMS.API.Accounting.DL.Services
         private bool SendMailApproved(string settlementNo, DateTime approvedDate)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
-
-            //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return false;
+
+            //Quy đổi tỉ giá theo ngày Request Date
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlement.RequestDate.Value.Date).ToList();
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
@@ -2821,12 +2821,13 @@ namespace eFMS.API.Accounting.DL.Services
         private bool SendMailDeniedApproval(string settlementNo, string comment, DateTime DeniedDate)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
-
-            //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return false;
+
+            //Quy đổi tỉ giá theo ngày Request Date
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlement.RequestDate.Value.Date).ToList();
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
@@ -3243,8 +3244,8 @@ namespace eFMS.API.Accounting.DL.Services
         public List<InfoShipmentSettlementExport> GetListShipmentSettlementExport(AcctSettlementPaymentModel settlementPayment)
         {
             var listData = new List<InfoShipmentSettlementExport>();
-            
-            //Tỷ giá quy đổi lấy theo ngày Request Date của settlement
+
+            //Quy đổi tỉ giá theo ngày Request Date
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlementPayment.RequestDate.Value.Date).ToList();
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
@@ -3270,10 +3271,16 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        && x.Hbl == shipmentSettlement.HBL);
 
                     var advanceRequest = advanceRequests.FirstOrDefault();
+
+                    //Chỉ lấy những advance đã được phê duyệt
                     if (advanceRequest != null)
                     {
-                        shipmentSettlement.AdvanceAmount = advanceRequests.Select(s => s.Amount * GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementPayment.SettlementCurrency)).Sum();
-                        shipmentSettlement.AdvanceRequestDate = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceRequest.AdvanceNo).FirstOrDefault().RequestDate;
+                        var advancePayment = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceRequest.AdvanceNo).FirstOrDefault();
+                        if (advancePayment != null && advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                        {
+                            shipmentSettlement.AdvanceAmount = advanceRequests.Select(s => s.Amount * GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementPayment.SettlementCurrency)).Sum();
+                            shipmentSettlement.AdvanceRequestDate = advancePayment.RequestDate;
+                        }
                     }
                     
                     var list = new List<InfoShipmentChargeSettlementExport>();
@@ -3328,10 +3335,16 @@ namespace eFMS.API.Accounting.DL.Services
                                                                            && x.Hbl == shipmentSettlement.HBL);
                         
                         var advanceRequest = advanceRequests.FirstOrDefault();
+
+                        //Chỉ lấy những advance đã được phê duyệt
                         if (advanceRequest != null)
                         {
-                            shipmentSettlement.AdvanceAmount = advanceRequests.Select(s => s.Amount * GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementPayment.SettlementCurrency)).Sum();
-                            shipmentSettlement.AdvanceRequestDate = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceRequest.AdvanceNo).FirstOrDefault().RequestDate;
+                            var advancePayment = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceRequest.AdvanceNo).FirstOrDefault();
+                            if (advancePayment != null && advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                            {
+                                shipmentSettlement.AdvanceAmount = advanceRequests.Select(s => s.Amount * GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementPayment.SettlementCurrency)).Sum();
+                                shipmentSettlement.AdvanceRequestDate = advancePayment.RequestDate;
+                            }
                         }
 
                         var list = new List<InfoShipmentChargeSettlementExport>();
