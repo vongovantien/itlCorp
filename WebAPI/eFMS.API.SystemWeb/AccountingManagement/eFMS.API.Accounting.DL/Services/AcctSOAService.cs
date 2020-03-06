@@ -956,51 +956,39 @@ namespace eFMS.API.Accounting.DL.Services
 
             Expression<Func<ChargeSOAResult, bool>> query = null;
 
-            //var charge = GetChargeShipmentDocAndOperation().Where(chg =>
-            //        string.IsNullOrEmpty(chg.SOANo)
-            //    && chg.CustomerID == criteria.CustomerID
-            //    && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH)
-            //);
-            //query = chg =>
-            //        string.IsNullOrEmpty(chg.SOANo)
-            //    && chg.CustomerID == criteria.CustomerID
-            //    && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH);
             query = chg =>
                     string.IsNullOrEmpty(chg.SOANo)
-                && chg.CustomerID == criteria.CustomerID
-                && chg.IsOBH == criteria.IsOBH;
+                && chg.CustomerID == criteria.CustomerID;
+                
+            if(criteria.IsOBH == true)
+            {
+                //Lấy thêm những phí OBH
+                query = query.Or(chg => chg.IsOBH == true);
+            }
+            else
+            {
+                //Không lấy những phí OBH
+                query = query.And(chg => chg.IsOBH == false);
+            }
 
             if (string.IsNullOrEmpty(criteria.DateType) || criteria.DateType == "CreatedDate")
             {
-                //charge = charge.Where(chg =>
-                //    chg.CreatedDate.HasValue ? chg.CreatedDate.Value.Date >= criteria.FromDate.Date && chg.CreatedDate.Value.Date <= criteria.ToDate.Date : 1 == 2
-                //);
                 query = query.And(chg =>
                     chg.CreatedDate.HasValue ? chg.CreatedDate.Value.Date >= criteria.FromDate.Date && chg.CreatedDate.Value.Date <= criteria.ToDate.Date : false);
             }
             else if (criteria.DateType == "ServiceDate")
             {
-                //charge = charge.Where(chg =>
-                //    chg.ServiceDate.HasValue ? chg.ServiceDate.Value.Date >= criteria.FromDate.Date && chg.ServiceDate.Value.Date <= criteria.ToDate.Date : 1 == 2
-                //);
                 query = query.And(chg =>
                     chg.ServiceDate.HasValue ? chg.ServiceDate.Value.Date >= criteria.FromDate.Date && chg.ServiceDate.Value.Date <= criteria.ToDate.Date : false);
             }
             else if (criteria.DateType == "InvoiceIssuedDate")
             {
-                //charge = charge.Where(chg =>
-                //    chg.InvoiceIssuedDate.HasValue ? chg.InvoiceIssuedDate.Value.Date >= criteria.FromDate.Date && chg.InvoiceIssuedDate.Value.Date <= criteria.ToDate.Date : 1 == 2
-                //);
                 query = query.And(chg =>
                     chg.InvoiceIssuedDate.HasValue ? chg.InvoiceIssuedDate.Value.Date >= criteria.FromDate.Date && chg.InvoiceIssuedDate.Value.Date <= criteria.ToDate.Date : false);
             }
 
             if (!string.IsNullOrEmpty(criteria.Type))
             {
-                //charge = charge.Where(chg =>
-                //       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
-                //       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
-                //);
                 if (criteria.Type == "Debit")
                 {
                     query = query.And(chg => chg.Debit.HasValue);
@@ -1014,45 +1002,38 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.StrCreators) && criteria.StrCreators != "All")
             {
                 var listCreator = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                //charge = charge.Where(chg => listCreator.Contains(chg.UserCreated));
                 query = query.And(chg => listCreator.Contains(chg.UserCreated));
             }
 
             if (!string.IsNullOrEmpty(criteria.StrCharges) && criteria.StrCharges != "All")
             {
                 var listCharge = criteria.StrCharges.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                //charge = charge.Where(chg => listCharge.Contains(chg.ChargeCode));
                 query = query.And(chg => listCharge.Contains(chg.ChargeCode));
             }
 
             if (!string.IsNullOrEmpty(criteria.StrServices) && criteria.StrServices != "All")
             {
                 var listService = criteria.StrServices.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                //charge = charge.Where(chg => listService.Contains(chg.Service));
                 query = query.And(chg => listService.Contains(chg.Service));
             }
 
             if (criteria.CommodityGroupID != null)
             {
-                //charge = charge.Where(chg => criteria.CommodityGroupID == chg.CommodityGroupID);
                 query = query.And(chg => criteria.CommodityGroupID == chg.CommodityGroupID);
             }
 
             if (criteria.JobIds != null && criteria.JobIds.Count > 0)
             {
-                //charge = charge.Where(chg => criteria.JobIds.Contains(chg.JobId));
                 query = query.And(chg => criteria.JobIds.Contains(chg.JobId));
             }
 
             if (criteria.Hbls != null && criteria.Hbls.Count > 0)
             {
-                //charge = charge.Where(chg => criteria.Hbls.Contains(chg.HBL));
                 query = query.And(chg => criteria.Hbls.Contains(chg.HBL));
             }
 
             if (criteria.Mbls != null && criteria.Mbls.Count > 0)
             {
-                //charge = charge.Where(chg => criteria.Mbls.Contains(chg.MBL));
                 query = query.And(chg => criteria.Mbls.Contains(chg.MBL));
             }
 
@@ -1134,19 +1115,22 @@ namespace eFMS.API.Accounting.DL.Services
 
             Expression<Func<ChargeSOAResult, bool>> query = null;
 
-            //var charge = GetChargeShipmentDocAndOperation().Where(chg =>
-            //       chg.CustomerID == criteria.CustomerID
-            //    && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH)
-            //    && (criteria.InSoa == true ? !string.IsNullOrEmpty(chg.SOANo) : string.IsNullOrEmpty(chg.SOANo))
-            //);
+            query = chg => chg.CustomerID == criteria.CustomerID;               
 
-            query = chg =>
-                   chg.CustomerID == criteria.CustomerID
-                && chg.IsOBH == criteria.IsOBH;
+            if(criteria.IsOBH == true)
+            {
+                //Lấy thêm những phí OBH
+                query = query.Or(chg => chg.IsOBH == true);
+            }
+            else
+            {
+                //Không lấy những phí OBH
+                query = query.And(chg => chg.IsOBH == false);
+            }
 
             if (criteria.InSoa == true)
             {
-                query = query.Or(chg => !string.IsNullOrEmpty(chg.SOANo));
+                query = query.And(chg => !string.IsNullOrEmpty(chg.SOANo));
             }
             else
             {
@@ -1155,27 +1139,18 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (string.IsNullOrEmpty(criteria.DateType) || criteria.DateType == "CreatedDate")
             {
-                //charge = charge.Where(chg =>
-                //    chg.CreatedDate.HasValue ? chg.CreatedDate.Value.Date >= criteria.FromDate.Date && chg.CreatedDate.Value.Date <= criteria.ToDate.Date : 1 == 2
-                //);
                 query = query.And(chg =>
                     chg.CreatedDate.HasValue ? chg.CreatedDate.Value.Date >= criteria.FromDate.Date && chg.CreatedDate.Value.Date <= criteria.ToDate.Date : 1 == 2
                 );
             }
             else if (criteria.DateType == "ServiceDate")
             {
-                //charge = charge.Where(chg =>
-                //    chg.ServiceDate.HasValue ? chg.ServiceDate.Value.Date >= criteria.FromDate.Date && chg.ServiceDate.Value.Date <= criteria.ToDate.Date : 1 == 2
-                //);
                 query = query.And(chg =>
                     chg.ServiceDate.HasValue ? chg.ServiceDate.Value.Date >= criteria.FromDate.Date && chg.ServiceDate.Value.Date <= criteria.ToDate.Date : 1 == 2
                 );
             }
             else if (criteria.DateType == "InvoiceIssuedDate")
             {
-                //charge = charge.Where(chg =>
-                //    chg.InvoiceIssuedDate.HasValue ? chg.InvoiceIssuedDate.Value.Date >= criteria.FromDate.Date && chg.InvoiceIssuedDate.Value.Date <= criteria.ToDate.Date : 1 == 2
-                //);
                 query = query.And(chg =>
                     chg.InvoiceIssuedDate.HasValue ? chg.InvoiceIssuedDate.Value.Date >= criteria.FromDate.Date && chg.InvoiceIssuedDate.Value.Date <= criteria.ToDate.Date : 1 == 2
                 );
@@ -1183,10 +1158,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (!string.IsNullOrEmpty(criteria.Type))
             {
-                //charge = charge.Where(chg =>
-                //       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
-                //       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
-                //);
                 if (criteria.Type == "Debit")
                 {
                     query = query.And(chg => chg.Debit.HasValue);
@@ -1200,51 +1171,43 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.StrCreators) && criteria.StrCreators != "All")
             {
                 var listCreator = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                //charge = charge.Where(chg => listCreator.Contains(chg.UserCreated));
                 query = query.And(chg => listCreator.Contains(chg.UserCreated));
             }
 
             if (!string.IsNullOrEmpty(criteria.StrCharges) && criteria.StrCharges != "All")
             {
                 var listCharge = criteria.StrCharges.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                //charge = charge.Where(chg => listCharge.Contains(chg.ChargeCode));
                 query = query.And(chg => listCharge.Contains(chg.ChargeCode));
             }
 
             if (!string.IsNullOrEmpty(criteria.JobId))
             {
-                //charge = charge.Where(chg => chg.JobId == criteria.JobId);
                 query = query.And(chg => chg.JobId == criteria.JobId);
             }
 
             if (!string.IsNullOrEmpty(criteria.Hbl))
             {
-                //charge = charge.Where(chg => chg.HBL == criteria.Hbl);
                 query = query.And(chg => chg.HBL == criteria.Hbl);
             }
 
             if (!string.IsNullOrEmpty(criteria.Mbl))
             {
-                //charge = charge.Where(chg => chg.MBL == criteria.Mbl);
                 query = query.And(chg => chg.MBL == criteria.Mbl);
             }
 
             if (!string.IsNullOrEmpty(criteria.CDNote))
             {
-                //charge = charge.Where(chg => chg.CreditDebitNo == criteria.CDNote);
                 query = query.And(chg => chg.CreditDebitNo == criteria.CDNote);
             }
 
             if (!string.IsNullOrEmpty(criteria.StrServices) && criteria.StrServices != "All")
             {
                 var listService = criteria.StrServices.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                //charge = charge.Where(chg => listService.Contains(chg.Service));
                 query = query.And(chg => listService.Contains(chg.Service));
             }
 
             if (criteria.CommodityGroupID != null)
             {
-                //charge = charge.Where(chg => criteria.CommodityGroupID == chg.CommodityGroupID);
                 query = query.And(chg => criteria.CommodityGroupID == chg.CommodityGroupID);
             }
 

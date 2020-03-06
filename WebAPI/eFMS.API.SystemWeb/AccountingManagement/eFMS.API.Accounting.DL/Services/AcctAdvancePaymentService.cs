@@ -385,8 +385,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
             var shipmentsOperation = from ops in opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED)
-                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId //into osa2
-                                     //from osa in osa2.DefaultIfEmpty()
+                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
                                      where osa.MainPersonInCharge == userCurrent
                                      select new Shipments
                                      {
@@ -400,6 +399,7 @@ namespace eFMS.API.Accounting.DL.Services
                 HBL = s.Key.HBL,
                 MBL = s.Key.MBL
             });
+            shipmentsOperation = shipmentsOperation.Distinct();
             //End change request
             var transactions = from cst in csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED)
                                join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
@@ -413,7 +413,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             HBL = td.Hwbno,
                                             MBL = t.Mawb,
                                         });
-
+            shipmentsDocumention = shipmentsDocumention.Distinct();
             var shipments = shipmentsOperation.Union(shipmentsDocumention).ToList();
             return shipments;
         }
