@@ -40,6 +40,7 @@
             <param name="language">VN (Việt Nam) or ENG (English)</param>
             <returns></returns>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSOA(System.String,System.String)" -->
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportBravoSOA(System.String)">
             <summary>
             Export Bravo SOA
