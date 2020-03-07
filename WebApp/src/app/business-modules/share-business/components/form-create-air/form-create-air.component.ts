@@ -14,7 +14,7 @@ import {
 import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.popup';
 
 import * as fromStore from './../../store/index';
-import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip, share, filter, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo, CatalogueRepo } from '@repositories';
@@ -149,7 +149,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         );
 
         this.listUsers = this._systemRepo.getSystemUsers();
-        this.warehouses = this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse });
+        this.warehouses = this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse }).pipe(share());
 
         this.getUserLogged();
         this.initForm();
@@ -413,6 +413,21 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             if (this.dimVolumePopup.isCBMChecked) {
                 this.formGroup.patchValue({ cbm: this.dimVolumePopup.totalCBM });
             }
+        }
+    }
+
+    onBlurGetWarehouseFlightNo(data: any) {
+        if (!!data.target.value) {
+            const flightVesselNo: string = data.target.value.substring(0, 2);
+            // this.warehouses = this.warehouses
+            //     .pipe(
+            //         tap((d: Warehouse[]) => {
+            //             if (d.length > 1) {
+            //                 this.warehouseId.setValue(d[0].id);
+            //             }
+            //         })
+            //         filter((d: any) => d.flightVesselNo !== null)
+            //     );
         }
     }
 }

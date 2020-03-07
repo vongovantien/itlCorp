@@ -420,5 +420,6 @@ namespace eFMS.API.Catalogue.Controllers
             var data = catPartnerService.GetMultiplePartnerGroup(criteria);
             return Ok(data);
         }
+
     }
 }

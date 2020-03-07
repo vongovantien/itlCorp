@@ -155,7 +155,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Flight No</label>
-                                    <input type="text" class="form-control" formControlName="flightVesselName">
+                                    <input type="text" class="form-control" formControlName="flightVesselName"
+                                        (blur)="onBlurGetWarehouseFlightNo($event)">
                                 </div>
                             </div>
                             <div class="col-md-6">
