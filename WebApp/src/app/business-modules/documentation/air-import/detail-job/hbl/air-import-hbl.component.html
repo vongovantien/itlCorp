@@ -99,7 +99,7 @@
                                                         *ngFor="let house of houseBills | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions" style="width: 70px">
-                                                                <app-permission-button type="edit"
+                                                                <app-permission-button type="detail"
                                                                     (click)="gotoDetail(house.id)">
                                                                 </app-permission-button>
                                                                 <ng-container *ngIf="(isLocked | async) === false">

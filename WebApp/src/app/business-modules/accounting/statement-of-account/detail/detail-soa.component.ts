@@ -24,6 +24,8 @@ export class StatementOfAccountDetailComponent extends AppList {
     soa: SOA = new SOA();
     headers: CommonInterface.IHeaderTable[] = [];
 
+    isClickSubMenu: boolean = false;
+
     dataExportSOA: ISOAExport;
     constructor(
         private _activedRoute: ActivatedRoute,
@@ -88,6 +90,7 @@ export class StatementOfAccountDetailComponent extends AppList {
         // if (!!this.dataExportSOA) {
         //     this.exportExcel(this.dataExportSOA);
         // }
+        this.isClickSubMenu = false;
         this._exportRepo.exportDetailSOA(this.soaNO, 'VND')
             .pipe(
                 catchError(this.catchError),
