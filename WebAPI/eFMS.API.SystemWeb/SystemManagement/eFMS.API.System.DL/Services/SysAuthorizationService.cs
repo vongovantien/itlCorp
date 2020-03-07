@@ -17,9 +17,12 @@ namespace eFMS.API.System.DL.Services
     public class SysAuthorizationService : RepositoryBase<SysAuthorization, SysAuthorizationModel>, ISysAuthorizationService
     {
         private readonly ICurrentUser currentUser;
-        public SysAuthorizationService(IContextBase<SysAuthorization> repository, IMapper mapper, ICurrentUser user) : base(repository, mapper)
+        private IContextBase<SysUser> authorizedRepository;
+        public SysAuthorizationService(IContextBase<SysAuthorization> repository, IMapper mapper, ICurrentUser user,
+            IContextBase<SysUser> authorizedRepo) : base(repository, mapper)
         {
             currentUser = user;
+            authorizedRepository = authorizedRepo;
         }
 
         public IQueryable<SysAuthorizationModel> QueryData(SysAuthorizationCriteria criteria)
@@ -64,25 +67,33 @@ namespace eFMS.API.System.DL.Services
                     query = query.And(x => x.Active == criteria.Active);
                 }
             }
-
-            var queryData = from d in DataContext.Get().Where(query)
-                            select new SysAuthorizationModel
+            var authorizeds = DataContext.Get(query);
+            var userAssigns = authorizedRepository.Get();
+            var userAssignTos = authorizedRepository.Get();
+            var queryData = (from authorize in authorizeds
+                             join userAssign in userAssigns on authorize.UserId  equals userAssign.Id into grpUserAssigneds
+                             from assign in grpUserAssigneds.DefaultIfEmpty()
+                             join userAssignTo in userAssignTos on authorize.AssignTo equals userAssignTo.Id into grpUserAssignedTos
+                             from assignedTo in grpUserAssignedTos.DefaultIfEmpty()
+                             select new SysAuthorizationModel
                             {
-                                Id = d.Id,
-                                Name = d.Name,
-                                ServicesName = GetServiceNameOfAuthorization(d.Services),
-                                Description = d.Description,
-                                UserId = d.UserId,
-                                AssignTo = d.AssignTo,
-                                StartDate = d.StartDate,
-                                EndDate = d.EndDate,
-                                UserCreated = d.UserCreated,
-                                DatetimeCreated = d.DatetimeCreated,
-                                UserModified = d.UserModified,
-                                DatetimeModified = d.DatetimeModified,
-                                Active = d.Active,
-                                InactiveOn = d.InactiveOn
-                            };
+                                Id = authorize.Id,
+                                Name = authorize.Name,
+                                ServicesName = GetServiceNameOfAuthorization(authorize.Services),
+                                Description = authorize.Description,
+                                UserId = authorize.UserId,
+                                AssignTo = authorize.AssignTo,
+                                StartDate = authorize.StartDate,
+                                EndDate = authorize.EndDate,
+                                UserCreated = authorize.UserCreated,
+                                DatetimeCreated = authorize.DatetimeCreated,
+                                UserModified = authorize.UserModified,
+                                DatetimeModified = authorize.DatetimeModified,
+                                Active = authorize.Active,
+                                InactiveOn = authorize.InactiveOn,
+                                UserNameAssign = assign.Username,
+                                UserNameAssignTo = assignedTo.Username
+                            });
 
             var result = queryData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
             return result;

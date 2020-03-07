@@ -44,6 +44,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="service">inject ICsTransactionService</param>
         /// <param name="user">inject ICurrentUser</param>
         /// <param name="serviceSurcharge">inject ICsShipmentSurchargeService</param>
+        /// <param name="imageService"></param>
         public CsTransactionController(IStringLocalizer<DocumentationLanguageSub> localizer,
             ICsTransactionService service,
             ICurrentUser user,

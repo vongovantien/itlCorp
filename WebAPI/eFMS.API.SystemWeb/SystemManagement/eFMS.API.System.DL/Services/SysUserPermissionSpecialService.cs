@@ -61,6 +61,7 @@ namespace eFMS.API.System.DL.Services
                             MenuId = x.MenuId,
                             NameEn = x.NameEn,
                             NameVn = x.NameVn,
+                            ActionName = x.ActionName,
                             IsAllow = specialPermissions.FirstOrDefault(s => s.MenuId == x.MenuId && s.ActionName == x.ActionName) != null ? specialPermissions.FirstOrDefault(s => s.MenuId == x.MenuId && s.ActionName == x.ActionName).IsAllow : false,
                             UserPermissionId = id
                         }).ToList();

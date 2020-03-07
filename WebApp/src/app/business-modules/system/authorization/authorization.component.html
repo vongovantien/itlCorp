@@ -2,7 +2,7 @@
     <app-sub-header>
         <div class="c-button-actions">
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="openPopupAddAuthorization()">
+                (click)="openPopupAddAuthorization()">
                 <span>
                     <i class="la la-plus"></i>
                     <span>
@@ -43,8 +43,8 @@
                                             </div>
                                         </td>
                                         <td>{{authorization.servicesName}}</td>
-                                        <td class="text-info">{{authorization.userId}}</td>
-                                        <td class="text-success">{{authorization.assignTo}}</td>
+                                        <td class="text-info">{{authorization.userNameAssign}}</td>
+                                        <td class="text-success">{{authorization.userNameAssignTo}}</td>
                                         <td>{{authorization.name}}</td>
                                         <td>{{authorization.startDate | date: 'dd/MM/yyyy'}}</td>
                                         <td>{{authorization.endDate | date: 'dd/MM/yyyy'}}</td>

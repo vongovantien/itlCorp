@@ -200,7 +200,8 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" [(ngModel)]="charge.soano" disabled>
+                                    <input type="text" class="form-control"
+                                        [(ngModel)]="charge.soano ? charge.soano : charge.paySoano" disabled>
                                 </div>
                             </td>
                             <td>
