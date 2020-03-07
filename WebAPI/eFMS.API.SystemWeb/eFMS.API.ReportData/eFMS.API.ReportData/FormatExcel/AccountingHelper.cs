@@ -1249,14 +1249,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
             for (var col = 1; col < 12; col++)
             {
-<<<<<<< HEAD
-                workSheet.Cells[8, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                workSheet.Cells[8, col].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-=======
                 workSheet.Cells[8,col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[8,col].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[8, col].Style.Border.Right.Style = ExcelBorderStyle.Thin;
->>>>>>> dev
             }
             workSheet.Cells["A8"].Value = headers[7];//STT
 
@@ -1495,12 +1490,6 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 p = j;
                 ////
-<<<<<<< HEAD
-
-
-=======
-                
->>>>>>> dev
                 _sumTotalAmount += (settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeAmount).Sum() ?? 0);
                 _sumTotalAdvancedAmount += (settlementExport.ShipmentsSettlement[i].AdvanceAmount ?? 0);
                 _sumTotalDifference = _sumTotalAmount - _sumTotalAdvancedAmount;
@@ -1536,14 +1525,11 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A" + p + ":K" + p].Style.Border.Top.Style = ExcelBorderStyle.Medium;
             workSheet.Cells["A" + (p + 1) + ":K" + (p + 1)].Style.Border.Top.Style = ExcelBorderStyle.Medium;
 
-<<<<<<< HEAD
             //All border
             workSheet.Cells[8, 1, p, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[8, 1, p, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             //In đậm border Cột 1
-=======
->>>>>>> dev
             for (var i = 8; i < p + 1; i++)
             {
                 //In đậm border Cột 3
@@ -1553,7 +1539,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 //In đậm border Cột 11
                 workSheet.Cells[i, 11].Style.Border.Right.Style = ExcelBorderStyle.Medium;
             }
-<<<<<<< HEAD
 
 
             int r = 9;
@@ -1572,9 +1557,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 l = l + 12;
             }
 
-=======
-                    
->>>>>>> dev
             p = p + 3;
 
             workSheet.Cells[p, 2].Style.WrapText = true;
