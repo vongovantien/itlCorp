@@ -83,11 +83,23 @@ export class StatementOfAccountDetailComponent extends AppList {
         this.soa.chargeShipments = this._sortService.sort(this.soa.chargeShipments, sortField, order);
     }
 
-    async exportExcelSOA() {
-        this.dataExportSOA = await this.getDetailSOAExport(this.soa.soano);
-        if (!!this.dataExportSOA) {
-            this.exportExcel(this.dataExportSOA);
-        }
+    exportExcelSOA() {
+        // this.dataExportSOA = await this.getDetailSOAExport(this.soa.soano);
+        // if (!!this.dataExportSOA) {
+        //     this.exportExcel(this.dataExportSOA);
+        // }
+        this._exportRepo.exportDetailSOA(this.soaNO, 'VND')
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    const fileName = "Export SOA " + this.soaNO + ".xlsx";
+                    this.downLoadFile(response, "application/ms-excel", fileName);
+                },
+            );
+
     }
 
     async getDetailSOAExport(soaNO: string) {

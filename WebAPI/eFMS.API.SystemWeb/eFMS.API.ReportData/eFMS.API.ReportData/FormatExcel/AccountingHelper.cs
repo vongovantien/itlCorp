@@ -867,17 +867,17 @@ namespace eFMS.API.ReportData.FormatExcel
 
             decimal? totalRevenue = 0;
             decimal? totalCost = 0;
-            decimal? totalBalance = 0;
+            decimal? totalBalance = 0M;
             foreach (var item in detailSOAModel.ListCharges)
             {
                 totalRevenue += item.DebitExchange;
                 totalCost += item.CreditExchange;
             }
-            totalBalance = totalRevenue - totalCost;
-            string totalBalanceStr = totalBalance.ToString();
-            totalBalanceStr = totalBalanceStr.Contains("-") ? totalBalanceStr.Replace("-", ""): totalBalanceStr
-            ;
-            if(totalBalance < 0)
+            totalBalance = totalRevenue  - totalCost ;
+            decimal total = totalBalance??0;
+            string totalBalanceStr = total.ToString("N2");
+            totalBalanceStr = totalBalanceStr.Contains("-") ? totalBalanceStr.Replace("-", "") : totalBalanceStr;
+            if (totalBalance < 0)
             {
                 totalBalanceStr = "(" + totalBalanceStr + ")";
             }
@@ -913,6 +913,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[idValueTotalRevenue].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[idValueTotalRevenue].Style.Border.Top.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[idValueTotalRevenue].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+
+            workSheet.Cells[idBalance].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[idBalance].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
 
 
