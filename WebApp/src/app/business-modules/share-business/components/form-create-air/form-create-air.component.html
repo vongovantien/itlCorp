@@ -13,7 +13,7 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid}">
                             <label required>MAWB No </label>
-                            <input class="form-control" formControlName="mawb">
+                            <input class="form-control" formControlName="mawb" (blur)="onBlurGetAirline($event)">
                             <div class="form-control-feedback"
                                 *ngIf="mawb.dirty && (mawb.errors | equalError:'maxlength' || mawb.errors | equalError:'maxlength')">
                                 MAWB invalid
@@ -47,7 +47,7 @@
                             <label required>Airline/Co-Loader</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [currentActiveItemId]="{ field: 'id', value: coloaderId.value}"
-                                [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
+                                [selectedDisplayFields]="['shortName']" [dataSources]="carries"
                                 [displayFields]="displayFieldsSupplier" placeholder="Select airline"
                                 [loading]="isLoadingAirline | async" (remove)="resetFormControl(coloaderId)">
                             </app-combo-grid-virtual-scroll>
@@ -284,9 +284,9 @@
                                     <app-combo-grid-virtual-scroll
                                         (itemSelected)="onSelectDataFormInfo($event, 'warehouse')"
                                         [currentActiveItemId]="{ field: 'id', value: warehouseId.value}"
-                                        [selectedDisplayFields]="['nameEn']" [dataSources]="warehouses | async"
+                                        [selectedDisplayFields]="['nameEn']" [dataSources]="warehouses"
                                         [displayFields]="displayFieldPort" placeholder="Select warehouse"
-                                        (remove)="resetFormControl(warehouseId)">
+                                        (remove)="resetFormControl(warehouseId)" #CombogridWh>
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>

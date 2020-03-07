@@ -18,6 +18,7 @@ import { distinctUntilChanged, takeUntil, skip, share, filter, tap } from 'rxjs/
 import { Observable } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo, CatalogueRepo } from '@repositories';
+import cloneDeep from 'lodash/cloneDeep';
 
 
 @Component({
@@ -63,14 +64,15 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         { id: 'Collect', text: 'Collect' }
     ];
 
-    carries: Observable<Customer[]>;
+    carries: Customer[];
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
     units: CommonInterface.INg2Select[];
     commodities: CommonInterface.INg2Select[];
     listUsers: Observable<User[]>;
-    warehouses: Observable<Warehouse[]>;
-
+    warehouses: Warehouse[];
+    initWarehouses: Warehouse[];
+    initCarriers: Customer[];
 
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name Abbr' },
@@ -149,7 +151,14 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         );
 
         this.listUsers = this._systemRepo.getSystemUsers();
-        this.warehouses = this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse }).pipe(share());
+        this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse }).subscribe(
+            (res: Warehouse[]) => {
+                if (!!res) {
+                    this.warehouses = (res || []).map(w => new Warehouse(w));
+                    this.initWarehouses = cloneDeep(this.warehouses);
+                }
+            }
+        );
 
         this.getUserLogged();
         this.initForm();
@@ -356,9 +365,13 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     getCarriers() {
-        this.carries = this._store.select(getCatalogueCarrierState).pipe(
+        this._store.select(getCatalogueCarrierState).pipe(
             takeUntil(this.ngUnsubscribe)
-        );
+        ).subscribe(
+            (result) => {
+                this.carries = result;
+                this.initCarriers = cloneDeep(result);
+            });
     }
 
     getPorts() {
@@ -419,15 +432,33 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     onBlurGetWarehouseFlightNo(data: any) {
         if (!!data.target.value) {
             const flightVesselNo: string = data.target.value.substring(0, 2);
-            // this.warehouses = this.warehouses
-            //     .pipe(
-            //         tap((d: Warehouse[]) => {
-            //             if (d.length > 1) {
-            //                 this.warehouseId.setValue(d[0].id);
-            //             }
-            //         })
-            //         filter((d: any) => d.flightVesselNo !== null)
-            //     );
+            if (!!flightVesselNo) {
+                this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse, flightVesselNo: flightVesselNo })
+                    .subscribe(
+                        (res: Warehouse[]) => {
+                            if (res.length > 0) {
+                                this.warehouseId.setValue(res[0].id);
+                            }
+                        }
+                    );
+            }
+
         }
+    }
+
+    onBlurGetAirline(data: any) {
+        const hawb: string = data.target.value.substring(0, 3);
+        if (this.mawb.valid && !!hawb) {
+            this._catalogueRepo.getListPartner(null, null, { type: CommonEnum.PartnerGroupEnum.CARRIER, active: true, CoLoaderCode: hawb })
+                .subscribe(
+                    (res: Customer[]) => {
+                        if (!!res && res.length > 0) {
+
+                            this.coloaderId.setValue(res[0].id);
+                        }
+                    }
+                );
+        }
+
     }
 }
