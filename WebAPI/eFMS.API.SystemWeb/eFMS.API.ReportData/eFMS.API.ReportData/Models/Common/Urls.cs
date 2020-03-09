@@ -42,6 +42,7 @@ namespace eFMS.API.ReportData.Models
             public const string SettlementPaymentUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/QueryData";
             public const string DetailAdvancePaymentExportUrl = "/Accounting/api/v1/en-US/AcctAdvancePayment/DetailAdvancePaymentExport";
             public const string DetailSettlementPaymentExportUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/DetailSettlementPaymentExport";
+            public const string DetailSOAExportUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExportSOABySOANo?soaNo=";
         }
 
         public class Documentation

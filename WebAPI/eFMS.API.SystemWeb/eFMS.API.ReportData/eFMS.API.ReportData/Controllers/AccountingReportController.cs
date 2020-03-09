@@ -102,6 +102,29 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+        /// Export detail SOA
+        /// </summary>
+        /// <param name="soaNo">soaNo of SOA</param>
+        /// <param name="currency">currency of SOA</param>
+        /// <returns></returns>
+        [Route("ExportDetailSOA")]
+        [HttpGet]
+        public async Task<IActionResult> ExportDetailSOA(string soaNo, string currency)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.DetailSOAExportUrl + soaNo + "&&currencyLocal="  + currency);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<DetailSOAModel>();
+
+            var stream = new AccountingHelper().GenerateDetailSOAExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            string fileName = "Export SOA " + soaNo + ".xlsx";
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            return fileContent;
+        }
+
         /// <summary>
         /// Export Bravo SOA
         /// </summary>

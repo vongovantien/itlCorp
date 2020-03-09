@@ -7,7 +7,7 @@ import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.compone
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
-import { TabsModule, ModalModule, CollapseModule, PaginationModule } from 'ngx-bootstrap';
+import { TabsModule, ModalModule, CollapseModule, PaginationModule, BsDropdownModule } from 'ngx-bootstrap';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { StatementOfAccountSearchComponent } from './components/search-box-soa/search-box-soa.component';
 import { StatementOfAccountAddChargeComponent } from './components/poup/add-charge/add-charge.popup';
@@ -78,7 +78,10 @@ const COMPONENTS = [
         PaginationModule.forRoot(),
         PerfectScrollbarModule,
         NgProgressModule,
-        ShareAccountingModule
+        ShareAccountingModule,
+        BsDropdownModule.forRoot()
+
+
     ],
     exports: [],
     providers: [

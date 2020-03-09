@@ -10,7 +10,7 @@
                 </span>
             </span>
         </button>
-        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+        <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
             (click)="exportExcelSOA()">
             <span>
                 <i class="la la-upload"></i>
@@ -26,7 +26,20 @@
                     export bravo
                 </span>
             </span>
-        </button>
+        </button> -->
+        <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
+            <button id="button-nested" dropdownToggle type="button" class="btn btn-danger dropdown-toggle"
+                aria-controls="dropdown-nested">
+                <i class="la la-upload"></i>Export<span class="caret"></span>
+            </button>
+            <ul id="dropdown-nested" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-nested">
+                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportExcelSOA()">Export SOA</a></li>
+                <li role="menuitem"><a class="dropdown-item pointer" (click)="export()">Export Bravo SOA</a></li>
+            </ul>
+        </div>
+
+
+
     </div>
 </app-sub-header>
 
