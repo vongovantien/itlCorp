@@ -129,7 +129,7 @@ namespace eFMS.API.System.Controllers
         public IActionResult Delete(Guid id)
         {
             var hs = userPermissionService.Delete(id);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
