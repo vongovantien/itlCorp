@@ -88,7 +88,8 @@ export namespace CommonEnum {
         CW = 'cw',
         CBM = 'cbm',
         PACKAGE = 'package',
-        CONT = 'cont'
+        CONT = 'cont',
+        HW = 'hw'
     }
 
     export enum CHARGE_TYPE {

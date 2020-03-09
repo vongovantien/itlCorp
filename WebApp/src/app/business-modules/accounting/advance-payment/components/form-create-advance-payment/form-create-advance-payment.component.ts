@@ -1,11 +1,12 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { User, Currency } from 'src/app/shared/models';
 import { DataService } from 'src/app/shared/services';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'adv-payment-form-create',
@@ -19,6 +20,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     methods: CommonInterface.ICommonTitleValue[];
     currencyList: Currency[] = [];
     userLogged: User;
+    users: Observable<User[]>;
 
     formCreate: FormGroup;
     advanceNo: AbstractControl;
@@ -35,6 +37,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _dataService: DataService,
+        private _systemRepo: SystemRepo
     ) {
         super();
 
@@ -116,6 +119,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     getUserLogged() {
+        this.users = this._systemRepo.getListSystemUser();
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
         this.requester.setValue(this.userLogged.id);

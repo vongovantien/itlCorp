@@ -98,6 +98,7 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
 
     checkValidateForm() {
         let valid: boolean = true;
+        this.setError(this.formCreateComponent.mbltype);
         if (
             !this.formCreateComponent.formCreate.valid
             || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)

@@ -15,8 +15,9 @@
                     <label class="form-control-label">
                         Requester:
                     </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Requester"
-                        [value]="userLogged.id" formControlName="requester">
+                    <select class="form-control" formControlName="requester">
+                        <option *ngFor="let user of (users | async)" [ngValue]="user.id">{{user.username}}</option>
+                    </select>
                 </div>
             </div>
             <div class="col-4">
@@ -28,7 +29,7 @@
                         <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                             name="daterange" placeholder="Select request date" [autoApply]="true"
-                            formControlName="requestDate" [attr.disabled]="isDisabled" [maxDate]="maxDate"/>
+                            formControlName="requestDate" [attr.disabled]="isDisabled" [maxDate]="maxDate" />
                         <span class="m-input-icon__icon m-input-icon__icon--right">
                             <span>
                                 <i class="la la-calendar"></i>
@@ -67,9 +68,8 @@
                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                         <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                            name="daterange" [minDate]="minDate" placeholder="Select Deadline Date"
-                            [autoApply]="true" formControlName="deadLine"
-                            [attr.disabled]="isDisabled"/>
+                            name="daterange" [minDate]="minDate" placeholder="Select Deadline Date" [autoApply]="true"
+                            formControlName="deadLine" [attr.disabled]="isDisabled" />
                         <span class="m-input-icon__icon m-input-icon__icon--right">
                             <span>
                                 <i class="la la-calendar"></i>
@@ -94,8 +94,8 @@
                     <label class="form-control-label" for="">
                         Currency:
                     </label>
-                    <select class="form-control" formControlName="currency"
-                        name="currency" (ngModelChange)="changeCurrency($event)">
+                    <select class="form-control" formControlName="currency" name="currency"
+                        (ngModelChange)="changeCurrency($event)">
                         <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}</option>
                     </select>
                 </div>

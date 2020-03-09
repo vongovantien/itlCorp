@@ -30,5 +30,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string ProvinceNameEN { get; set; }
         public string ProvinceNAmeVN { get; set; }
         public bool? Active { get; set; }
+        public string FlightVesselNo { get; set; }
     }
 }
