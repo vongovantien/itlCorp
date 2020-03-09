@@ -114,6 +114,8 @@ export class DetailChargeComponent extends AddChargeComponent {
                         }
                     );
             }
+        } else {
+            this._toastService.error("Please add voucher charge");
         }
     }
 
