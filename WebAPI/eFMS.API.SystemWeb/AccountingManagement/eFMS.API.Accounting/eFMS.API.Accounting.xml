@@ -467,6 +467,13 @@
             <returns></returns>
             
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetDataExportAirFrieghtBySOANo(System.String)">
+            <summary>
+            Export SOA detail by SOANo
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.ExportDetailSOA(eFMS.API.Accounting.DL.Models.Criteria.ExportDetailSOACriteria)">
             <summary>
             Data Export Details SOA

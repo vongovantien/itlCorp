@@ -33,6 +33,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepo;
+        readonly IContextBase<CatPlace> catPlaceRepo;
+
 
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
@@ -49,7 +51,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctCdnote> acctCdnote,
             IContextBase<CatPartner> catPartner,
             IContextBase<SysUser> sysUser,
-            IContextBase<CatChargeDefaultAccount> chargeDefault ) : base(repository, mapper)
+            IContextBase<CatPlace> catplace,
+            IContextBase<CatChargeDefaultAccount> chargeDefault) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -64,6 +67,7 @@ namespace eFMS.API.Accounting.DL.Services
             catPartnerRepo = catPartner;
             sysUserRepo = sysUser;
             chargeDefaultRepo = chargeDefault;
+            catPlaceRepo = catplace;
         }
 
         #region -- Insert & Update SOA
@@ -663,7 +667,14 @@ namespace eFMS.API.Accounting.DL.Services
                                            CommodityGroupID = null,
                                            Service = cst.TransactionType,
                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
-                                           Commodity = cst.Commodity
+                                           Commodity = cst.Commodity,
+                                           FlightNo = cstd.FlightNo,
+                                           ShippmentDate = cst.TransactionType == "AE" ? cstd.Etd : cst.TransactionType =="AI" ? cstd.Eta : null , 
+                                           AOL = cst.Pol,
+                                           AOD = cst.Pod,
+                                           PackageQty = cstd.PackageQty,
+                                           GrossWeight = cstd.GrossWeight,
+                                           ChargeWeight = cstd.ChargeWeight
                                        };
             queryBuySellDocument = queryBuySellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -724,7 +735,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             CommodityGroupID = ops.CommodityGroupId,
                                             Service = "CL",
                                             CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
-                                            TaxCodeOBH  = pat.TaxCode
+                                            TaxCodeOBH = pat.TaxCode,
+
                                         };
             queryObhSellOperation = queryObhSellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -768,7 +780,14 @@ namespace eFMS.API.Accounting.DL.Services
                                            CommodityGroupID = null,
                                            Service = cst.TransactionType,
                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
-                                           Commodity = cst.Commodity
+                                           Commodity = cst.Commodity,
+                                           FlightNo = cstd.FlightNo,
+                                           ShippmentDate = cst.TransactionType == "AE" ? cstd.Etd : cst.TransactionType == "AI" ? cstd.Eta : null,
+                                           AOL = cst.Pol,
+                                           AOD = cst.Pod,
+                                           PackageQty = cstd.PackageQty,
+                                           GrossWeight = cstd.GrossWeight,
+                                           ChargeWeight = cstd.ChargeWeight
                                        };
             queryObhSellDocument = queryObhSellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -869,7 +888,14 @@ namespace eFMS.API.Accounting.DL.Services
                                           CommodityGroupID = null,
                                           Service = cst.TransactionType,
                                           CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
-                                          Commodity = cst.Commodity
+                                          Commodity = cst.Commodity,
+                                          FlightNo = cstd.FlightNo,
+                                          ShippmentDate = cst.TransactionType == "AE" ? cstd.Etd : cst.TransactionType == "AI" ? cstd.Eta : null,
+                                          AOL = cst.Pol,
+                                          AOD = cst.Pod,
+                                          PackageQty = cstd.PackageQty,
+                                          GrossWeight = cstd.GrossWeight,
+                                          ChargeWeight = cstd.ChargeWeight
                                       };
             queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -941,7 +967,14 @@ namespace eFMS.API.Accounting.DL.Services
                                 CommodityGroupID = data.CommodityGroupID,
                                 Service = data.Service,
                                 CustomNo = GetTopClearanceNoByJobNo(data.JobId),
-                                CDNote = data.CDNote
+                                CDNote = data.CDNote,
+                                FlightNo = data.FlightNo,
+                                ShippmentDate = data.ShippmentDate,
+                                AOL = data.AOL,
+                                AOD = data.AOD,
+                                PackageQty = data.PackageQty,
+                                GrossWeight = data.GrossWeight,
+                                ChargeWeight = data.ChargeWeight
                             };
             queryData = queryData.ToArray().OrderBy(x => x.Service).AsQueryable();
             return queryData;
@@ -959,8 +992,8 @@ namespace eFMS.API.Accounting.DL.Services
             query = chg =>
                     string.IsNullOrEmpty(chg.SOANo)
                 && chg.CustomerID == criteria.CustomerID;
-                
-            if(criteria.IsOBH == true)
+
+            if (criteria.IsOBH == true)
             {
                 //Lấy thêm những phí OBH
                 query = query.Or(chg => chg.IsOBH == true);
@@ -1115,9 +1148,9 @@ namespace eFMS.API.Accounting.DL.Services
 
             Expression<Func<ChargeSOAResult, bool>> query = null;
 
-            query = chg => chg.CustomerID == criteria.CustomerID;               
+            query = chg => chg.CustomerID == criteria.CustomerID;
 
-            if(criteria.IsOBH == true)
+            if (criteria.IsOBH == true)
             {
                 //Lấy thêm những phí OBH
                 query = query.Or(chg => chg.IsOBH == true);
@@ -1676,6 +1709,61 @@ namespace eFMS.API.Accounting.DL.Services
             return dataResult;
         }
 
+
+
+        public ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo)
+        {
+            var soa = DataContext.Get(x => x.Soano == soaNo);
+            var partner = catPartnerRepo.Get();
+            var port = catPlaceRepo.Get();
+            var resultData = from s in soa
+                             join pat in partner on s.Customer equals pat.Id into pat2
+                             from pat in pat2.DefaultIfEmpty()
+                             select new ExportSOAAirfreightModel
+                             {
+                                 PartnerNameEn = pat.PartnerNameEn,
+                                 PartnerBillingAddress = pat.AddressEn,
+                                 PartnerTaxCode = pat.TaxCode,
+                                 SoaNo = s.Soano,
+                                 DateSOA = s.DatetimeCreated,
+                                 IssuedBy = s.UserCreated,
+
+                             };
+            //infomation Partner
+            var result = resultData.FirstOrDefault();
+            if (result != null)
+            {
+                result.IssuedBy = sysUserRepo.Get(x => x.Id == result.IssuedBy).FirstOrDefault()?.Username;
+            }
+
+            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var charge = GetChargeShipmentDocAndOperation(query).Where(x=>x.TransactionType == "AI" || x.TransactionType =="AE" );
+            var results = charge.GroupBy(x => x.HBL).AsQueryable();
+
+            if (results.Select(x => x.Key).Count() > 0)
+            {
+                foreach(var item in results.Select(x=>x.Key))
+                {
+                    var chargeData = charge.Where(x => x.HBL == item).FirstOrDefault();
+                    HawbAirFrieghtModel air = new HawbAirFrieghtModel();
+                    air.JobNo = chargeData.JobId;
+                    air.FlightNo = chargeData.FlightNo;
+                    air.ShippmentDate = chargeData.ShippmentDate;
+                    air.AOL = chargeData.MBL.Substring(1,3) + port.Where(x=>x.Id  == chargeData.AOL).Select(t=>t.Code).FirstOrDefault();
+                    air.Mawb = chargeData.MBL.Substring(chargeData.MBL.Length - 8);
+                    air.AOD = port.Where(x => x.Id == chargeData.AOD).Select(t => t.Code).FirstOrDefault();
+                    air.Service = "Normal"; // tạm thời hardecode;
+                    air.Pcs = chargeData.PackageQty;
+                    result.HawbAirFrieghts = new List<HawbAirFrieghtModel>();
+                    result.HawbAirFrieghts.Add(air);
+                }
+            }
+
+
+
+            return result;
+        }
+
         public ExportSOADetailResult GetDataExportSOABySOANo(string soaNo, string currencyLocal)
         {
             var data = GetDateExportDetailSOA(soaNo);
@@ -1696,7 +1784,7 @@ namespace eFMS.API.Accounting.DL.Services
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var soa = DataContext.Get(x => x.Soano == soaNo);
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var chargeDefaults = chargeDefaultRepo.Get(x=>x.Type =="Công Nợ");
+            var chargeDefaults = chargeDefaultRepo.Get(x => x.Type == "Công Nợ");
             var charge = GetChargeShipmentDocAndOperation(query);
             var partner = catPartnerRepo.Get();
             var dataResult = from s in soa
@@ -1706,7 +1794,7 @@ namespace eFMS.API.Accounting.DL.Services
                              from pat in pat2.DefaultIfEmpty()
                              join cd in chargeDefaults on chg.ID equals cd.ChargeId into defaults
                              from cd in defaults.DefaultIfEmpty()
-          
+
                              select new ExportImportBravoFromSOAResult
                              {
                                  ServiceDate = chg.ServiceDate,
@@ -1734,9 +1822,9 @@ namespace eFMS.API.Accounting.DL.Services
                                  TaxCode = pat.TaxCode,
                                  JobId = chg.JobId,
                                  ChargeName = chg.ChargeName,
-                                 TransationType = chg.TransactionType == "AI" || chg.TransactionType =="AE" ? "AIR":
-                                 chg.TransactionType=="SLE" || chg.TransactionType == "SFE" ||
-                                 chg.TransactionType == "SFE" || chg.TransactionType == "SFI"? "SEA":"OPS",
+                                 TransationType = chg.TransactionType == "AI" || chg.TransactionType == "AE" ? "AIR" :
+                                 chg.TransactionType == "SLE" || chg.TransactionType == "SFE" ||
+                                 chg.TransactionType == "SFE" || chg.TransactionType == "SFI" ? "SEA" : "OPS",
                                  HBL = chg.HBL,
                                  Unit = chg.Unit,
                                  Payment = "TM/CK",
