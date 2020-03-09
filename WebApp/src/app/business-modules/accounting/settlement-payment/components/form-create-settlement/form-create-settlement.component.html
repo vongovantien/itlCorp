@@ -15,20 +15,21 @@
                     <label class="form-control-label">
                         Requester:
                     </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Requester"
-                        [value]="userLogged.id" formControlName="requester">
+                    <select class="form-control" formControlName="requester">
+                        <option *ngFor="let user of (users | async)" [ngValue]="user.id">{{user.username}}</option>
+                    </select>
                 </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
-                    <label class="form-control-label">
+                    <label class="form-control-label" required>
                         Request Date:
                     </label>
                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                         <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                             name="daterange" placeholder="Select request date" [autoApply]="true"
-                            formControlName="requestDate" [attr.disabled]="isDisabled"/>
+                            formControlName="requestDate" [attr.disabled]="isDisabled" />
                         <span class="m-input-icon__icon m-input-icon__icon--right">
                             <span>
                                 <i class="la la-calendar"></i>
@@ -56,7 +57,7 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>Currency</label>
-                    <select formControlName="currency" class="form-control" >
+                    <select formControlName="currency" class="form-control">
                         <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}</option>
                     </select>
                 </div>

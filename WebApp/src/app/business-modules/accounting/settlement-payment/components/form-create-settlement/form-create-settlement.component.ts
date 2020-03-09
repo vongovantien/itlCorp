@@ -1,11 +1,14 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { User, Currency } from 'src/app/shared/models';
-import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
+import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
 import { Store } from '@ngrx/store';
 
 import { catchError, map } from 'rxjs/operators';
+import { SystemRepo } from '@repositories';
+import { Observable } from 'rxjs';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'settle-payment-form-create',
@@ -16,6 +19,7 @@ export class SettlementFormCreateComponent extends AppForm {
 
     @Output() onChangeCurrency: EventEmitter<Currency> = new EventEmitter<Currency>();
 
+    users: Observable<User[]>;
     userLogged: User;
 
     form: FormGroup;
@@ -32,7 +36,8 @@ export class SettlementFormCreateComponent extends AppForm {
 
     constructor(
         private _fb: FormBuilder,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private _systemRepo: SystemRepo
     ) {
         super();
     }
@@ -44,6 +49,7 @@ export class SettlementFormCreateComponent extends AppForm {
         this.initBasicData();
         this.getUserLogged();
         this.getCurrency();
+        this.getSystemUser();
 
     }
 
@@ -51,7 +57,7 @@ export class SettlementFormCreateComponent extends AppForm {
         this.form = this._fb.group({
             'settlementNo': [{ value: null, disabled: true }],
             'requester': [{ value: null, disabled: true }],
-            'requestDate': [{ startDate: new Date(), endDate: new Date() }],
+            'requestDate': [{ startDate: new Date(), endDate: new Date() }, Validators.required],
             'paymentMethod': [],
             'amount': [{ value: null, disabled: true }],
             'currency': [],
@@ -77,7 +83,7 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getUserLogged() {
-        this.userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.requester.setValue(this.userLogged.id);
     }
 
@@ -90,6 +96,10 @@ export class SettlementFormCreateComponent extends AppForm {
                     this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
                 },
             );
+    }
+
+    getSystemUser() {
+        this.users = this._systemRepo.getListSystemUser({ active: true });
     }
 
     initBasicData() {

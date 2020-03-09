@@ -6,8 +6,8 @@ import { ToastrService } from 'ngx-toastr';
 
 import { AppList } from 'src/app/app.list';
 import { ArrivalFreightCharge, User } from 'src/app/shared/models';
-import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { DataService, SortService } from 'src/app/shared/services';
+import { DocumentationRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
@@ -37,8 +37,6 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
     isSubmitted: boolean = false;
 
     constructor(
-        private _catalogueRepo: CatalogueRepo,
-        private _dataService: DataService,
         private _store: Store<any>,
         private _documentRepo: DocumentationRepo,
         private _sortService: SortService,
@@ -72,7 +70,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
                     if (!!res) {
                         if (!!res.hblid && res.arrivalNo !== null) {
                             this.hblArrivalNote = res;
-                            this.hblArrivalNote.arrivalFirstNotice = !!res.arrivalFirstNotice ? { startDate: new Date(res.arrivalFirstNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
+                            this.hblArrivalNote.arrivalFirstNotice = !!res.arrivalFirstNotice ? { startDate: new Date(res.arrivalFirstNotice), endDate: new Date(res.arrivalSecondNotice) } : { startDate: new Date(), endDate: new Date() };
                             this.hblArrivalNote.arrivalSecondNotice = !!res.arrivalSecondNotice ? { startDate: new Date(res.arrivalSecondNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
                         }
                     }
@@ -219,14 +217,14 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
 }
 
 
-interface IArrivalDefault {
+export interface IArrivalDefault {
     transactionType: number;
     userDefault: string;
     arrivalHeader: string;
     arrivalFooter: string;
 }
 
-interface IArrivalFreightChargeDefault {
+export interface IArrivalFreightChargeDefault {
     transactionType: number;
     userDefault: string;
     csArrivalFrieghtChargeDefaults: ArrivalFreightCharge[];
