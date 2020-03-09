@@ -23,6 +23,7 @@ import isUUID from 'validator/lib/isUUID';
 
 import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent } from 'src/app/business-modules/share-business';
 import groupBy from 'lodash/groupBy';
+import { DataService } from '@services';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -59,7 +60,8 @@ export class CreateHouseBillComponent extends AppForm {
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _store: Store<fromShareBussiness.ITransactionState>,
-        protected _cd: ChangeDetectorRef
+        protected _cd: ChangeDetectorRef,
+        protected _dataService: DataService
 
     ) {
         super();
@@ -335,6 +337,10 @@ export class CreateHouseBillComponent extends AppForm {
 
     handleStringCont(contOb: { contName: string, quantity: number }) {
         return this.utility.convertNumberToWords(contOb.quantity) + '' + contOb.contName + ' & ';
+    }
+
+    onSelectTabDO() {
+        this.deliveryComponent.deliveryOrder.doheader1 = this._dataService.getDataByKey('polName') || "";
     }
 }
 

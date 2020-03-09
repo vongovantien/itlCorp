@@ -124,7 +124,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     isLoadingPort: any;
 
     isSeparate: boolean = false;
-
+    isCollapsed: boolean = false;
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
@@ -283,7 +283,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             seaAir: [],
             route: [],
             min: [false],
-
+            showDim: [true],
             // * Combogrid
             customerId: [null, Validators.required],
             saleManId: [null, Validators.required],

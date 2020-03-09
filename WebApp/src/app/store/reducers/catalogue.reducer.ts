@@ -83,16 +83,6 @@ export function catalogueReducer(state = initialState, action: CatalogueActions)
             return { ...state, isLoading: false, };
         }
 
-        case CatalogueActionTypes.GET_CUSTOMER: {
-            return { ...state, isLoading: true };
-        }
-        case CatalogueActionTypes.GET_CUSTOMER_SUCCESS: {
-            return { ...state, isLoading: false, customers: action.payload };
-        }
-        case CatalogueActionTypes.GET_CUSTOMER_FAIL: {
-            return { ...state, isLoading: false, };
-        }
-
         case CatalogueActionTypes.GET_COUNTRY: {
             return { ...state, isLoading: true };
         }

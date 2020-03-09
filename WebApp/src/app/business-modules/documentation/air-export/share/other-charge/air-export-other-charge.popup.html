@@ -1,0 +1,60 @@
+<div class="modal m-animate-fade-in container-list-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Other Charge</h5>
+                <button type="button" (click)="closePopup()" class="close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row align-items-center m--margin-bottom-10">
+                    <div class="col-md-4">Charge Name</div>
+                    <div class="col-md-3">Amount</div>
+                    <div class="col-md-4">Due To</div>
+                    <div class="col-md-1 pointer text-center"></div>
+                </div>
+                <div class="row m--align-center m--margin-bottom-20 m-form m-form--state">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <input type="number" class="form-control" numeric [decimals]="digitDecimal"
+                                autoFormatCurrency placeholder="Charge name">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <input type="number" class="form-control" numeric [decimals]="digitDecimal"
+                                autoFormatCurrency placeholder="Amount">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <input type="number" class="form-control" numeric [decimals]="digitDecimal"
+                                autoFormatCurrency placeholder="charge name">
+                        </div>
+                    </div>
+                    <div class="col-md-1 pointer text-center">
+                        <a title="Delete" (click)="delete(item,i)">
+                            <i class="fa fa-times fa-2x text-danger"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center m--margin-top-10">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="m--align-center m--margin-top-20">
+                            <div class="c-button-actions">
+                                <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSave()">
+                                </app-default-button>
+
+                                <app-default-button [buttonSetting]="cancelButtonSetting" (click)="closePopup()">
+                                </app-default-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

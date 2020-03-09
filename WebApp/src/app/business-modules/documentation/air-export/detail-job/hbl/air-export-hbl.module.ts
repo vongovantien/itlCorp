@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { PaginationModule, TabsModule, ModalModule } from 'ngx-bootstrap';
+import { PaginationModule, TabsModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
@@ -49,6 +49,7 @@ const LIB = [
     NgxDaterangepickerMd.forRoot(),
     PerfectScrollbarModule,
     FroalaEditorModule.forRoot(),
+    CollapseModule,
     NgxCurrencyModule.forRoot({
         align: "right",
         allowNegative: true,
