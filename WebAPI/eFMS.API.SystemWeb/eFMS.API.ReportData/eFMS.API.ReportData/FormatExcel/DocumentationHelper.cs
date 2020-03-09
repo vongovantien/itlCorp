@@ -402,5 +402,91 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[address].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells[address].Style.WrapText = true;
         }
+
+        #region --- MAWB and HAWB Air Export Excel ---
+        /// <summary>
+        /// Generate MAWB Air Export Excel
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public Stream GenerateMAWBAirExportExcel(Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("MAWB");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    //BindingDataDetailSettlementPaymentExcel(workSheet, settlementExport, language);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        private void SetWidthColumnExcelMAWBAirExport(ExcelWorksheet workSheet)
+        {
+            workSheet.Column(1); //Cột A
+            workSheet.Column(2); //Cột B
+            workSheet.Column(3); //Cột C
+            workSheet.Column(4); //Cột D
+            workSheet.Column(5); //Cột E
+            workSheet.Column(6); //Cột F
+            workSheet.Column(7); //Cột G
+            workSheet.Column(8); //Cột H
+            workSheet.Column(9); //Cột I
+            workSheet.Column(10); //Cột J
+            workSheet.Column(11); //Cột K
+            workSheet.Column(12); //Cột L
+            workSheet.Column(13); //Cột M
+            workSheet.Column(14); //Cột N
+        }
+
+        private void BindingDataMAWBAirExportExcel(ExcelWorksheet workSheet)
+        {
+            SetWidthColumnExcelMAWBAirExport(workSheet);
+        }
+
+        /// <summary>
+        /// Generate HAWBW Air Export Excel
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public Stream GenerateHAWBAirExportExcel(Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("HAWB");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    //BindingDataDetailSettlementPaymentExcel(workSheet, settlementExport, language);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        private void SetWidthColumnExcelHAWBAirExport(ExcelWorksheet workSheet)
+        {
+
+        }
+
+        private void BindingDataHAWBAirExportExcel(ExcelWorksheet workSheet)
+        {
+            SetWidthColumnExcelHAWBAirExport(workSheet);
+        }
+        #endregion --- MAWB and HAWB Air Export Excel ---
+
     }
 }
