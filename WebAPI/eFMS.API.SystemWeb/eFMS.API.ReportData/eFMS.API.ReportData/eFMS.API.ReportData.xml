@@ -185,6 +185,18 @@
             <param name="hblid"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportMAWBAirExport">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportHAWBAirExport(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             
@@ -274,10 +286,11 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateHAWBAirExportExcel(System.IO.Stream)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateHAWBAirExportExcel(eFMS.API.ReportData.Models.Documentation.CsTransactionDetailModel,System.IO.Stream)">
             <summary>
             Generate HAWBW Air Export Excel
             </summary>
+            <param name="transactionDetail"></param>
             <param name="stream"></param>
             <returns></returns>
         </member>

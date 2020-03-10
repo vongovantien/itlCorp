@@ -332,5 +332,12 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.PreviewAirImptAuthorisedLetterConsign(housbillId);
             return Ok(result);
         }
+
+        [HttpGet("NeutralHawbExport")]
+        public IActionResult NeutralHawbExport(Guid housebillId, Guid officeId)
+        {
+            var result = csTransactionDetailService.NeutralHawbExport(housebillId, officeId);
+            return Ok(result);
+        }
     }
 }

@@ -1,18 +1,18 @@
 ﻿using eFMS.API.ReportData.Models.Documentation;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using OfficeOpenXml.Table;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace eFMS.API.ReportData.FormatExcel
 {
     public class DocumentationHelper
     {
+        const string numberFormat = "#,##0.00";
+        const string numberFormatKgs = "#,##0 \"KGS\"";
+
         public Stream CreateEManifestExcelFile(CsTransactionDetailModel transactionDetail, Stream stream = null)
         {
             try
@@ -417,7 +417,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     excelPackage.Workbook.Worksheets.Add("MAWB");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    //BindingDataDetailSettlementPaymentExcel(workSheet, settlementExport, language);
+                    BindingDataMAWBAirExportExcel(workSheet);
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -431,33 +431,163 @@ namespace eFMS.API.ReportData.FormatExcel
 
         private void SetWidthColumnExcelMAWBAirExport(ExcelWorksheet workSheet)
         {
-            workSheet.Column(1); //Cột A
-            workSheet.Column(2); //Cột B
-            workSheet.Column(3); //Cột C
-            workSheet.Column(4); //Cột D
-            workSheet.Column(5); //Cột E
-            workSheet.Column(6); //Cột F
-            workSheet.Column(7); //Cột G
-            workSheet.Column(8); //Cột H
-            workSheet.Column(9); //Cột I
-            workSheet.Column(10); //Cột J
-            workSheet.Column(11); //Cột K
-            workSheet.Column(12); //Cột L
-            workSheet.Column(13); //Cột M
-            workSheet.Column(14); //Cột N
+            workSheet.Column(1).Width = 4.29 + 0.72; //Cột A
+            workSheet.Column(2).Width = 7.29 + 0.72; //Cột B
+            workSheet.Column(3).Width = 5.43 + 0.72; //Cột C
+            workSheet.Column(4).Width = 3.86 + 0.72; //Cột D
+            workSheet.Column(5).Width = 8.86 + 0.72; //Cột E
+            workSheet.Column(6).Width = 5.57 + 0.72; //Cột F
+            workSheet.Column(7).Width = 3.86 + 0.72; //Cột G
+            workSheet.Column(8).Width = 6.29 + 0.72; //Cột H
+            workSheet.Column(9).Width = 4 + 0.72; //Cột I
+            workSheet.Column(10).Width = 9.57 + 0.72; //Cột J
+            workSheet.Column(11).Width = 6.71 + 0.72; //Cột K
+            workSheet.Column(12).Width = 5.43 + 0.72; //Cột L
+            workSheet.Column(13).Width = 15.86 + 0.72; //Cột M
+            workSheet.Column(14).Width = 4.14 + 0.72; //Cột N
         }
 
         private void BindingDataMAWBAirExportExcel(ExcelWorksheet workSheet)
         {
+            workSheet.View.ShowGridLines = false;
+
             SetWidthColumnExcelMAWBAirExport(workSheet);
+            workSheet.Cells[1, 1, 100000, 14].Style.Font.SetFromFont(new Font("Arial", 10));
+
+            workSheet.Cells["A1:N1"].Style.Font.SetFromFont(new Font("Arial", 12));
+            workSheet.Cells["A1:N1"].Style.Font.Bold = true;
+            workSheet.Cells["A1"].Value = "157";
+            workSheet.Cells["B1"].Value = "SGN";
+            workSheet.Cells["C1:E1"].Merge = true;
+            workSheet.Cells["C1"].Value = "4591 2506";
+            workSheet.Cells["L1"].Value = "157-";
+            workSheet.Cells["M1"].Value = "4591 2506";
+
+            workSheet.Cells["A3:A12"].Style.Font.Color.SetColor(Color.DarkBlue);
+
+            workSheet.Cells["A3:A5"].Style.Font.Bold = true;            
+            workSheet.Cells["A3"].Value = "INDO TRANS LOGISTICS CORPORATION";
+            workSheet.Cells["A4"].Value = "52-54-56 TRUONG SON STR., TAN BINH DIST,";
+            workSheet.Cells["A5"].Value = "HOCHIMINH CITY, VIETNAM.";
+            workSheet.Cells["A6"].Value = "TEL: +84 8 39486888 FAX: +84 8 8488593";
+
+            workSheet.Cells["K4:N5"].Merge = true;            
+            workSheet.Cells["K4"].Style.Font.SetFromFont(new Font("Arial", 12));
+            workSheet.Cells["K4"].Value = "QATAR AIRWAYS CARGO";
+            workSheet.Cells["K4"].Style.Font.Bold = true;
+            workSheet.Cells["K4:N5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["K4:N5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            workSheet.Cells["A9:A12"].Style.Font.Bold = true;
+            workSheet.Cells["A9"].Value = "BENDIX TRANSPORT DANMARK A/S";
+            workSheet.Cells["A10"].Value = "39 JERNHOLMEN, DK-2650 HVIDOVRE, DENMARK";
+            workSheet.Cells["A11"].Value = "TEL: +45 36772244";
+            workSheet.Cells["A12"].Value = "ATTN: MICHAEL BOMARK";
+
+            workSheet.Cells["J17:M17"].Merge = true;
+            workSheet.Cells["J17"].Value = "PP IN SGN";
+
+            workSheet.Cells["A19"].Style.Font.SetFromFont(new Font("Calibri", 12));
+            workSheet.Cells["A19"].Style.Font.Bold = true;
+            workSheet.Cells["A19"].Value = "373-0118";
+
+            workSheet.Cells["A21"].Value = "HOCHIMINH AIRPORT";
+            workSheet.Cells["A21"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Row(21).Height = 24.75;
+
+            workSheet.Cells["A22"].Value = "DOH";
+            workSheet.Cells["B22"].Value = "QR";
+            workSheet.Cells["F22:G22"].Merge = true;
+            workSheet.Cells["F22"].Value = "CPH QR";
+            workSheet.Cells["I22"].Value = "USD";
+            workSheet.Cells["L22"].Value = "NVD";
+            workSheet.Cells["M22"].Value = "NVC";
+            workSheet.Cells["M22"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+
+            workSheet.Cells["A24"].Value = "COPENHAGEN";
+            workSheet.Cells["E24"].Value = "QR0971";
+            workSheet.Cells["F24:H24"].Merge = true;
+            workSheet.Cells["F24"].Value = "23/01/2020";
+            workSheet.Cells["I24"].Value = "NIL";
+
+            workSheet.Cells["A27"].Style.Font.Color.SetColor(Color.Red);
+            workSheet.Cells["A27"].Style.Font.Bold = true;
+            workSheet.Cells["A27"].Value = 1;
+            workSheet.Cells["B27"].Value = "HAWB";
+
+            workSheet.Cells["A30:I30"].Style.Font.Bold = true;
+            workSheet.Cells["A30:E30"].Style.Font.Color.SetColor(Color.Red);
+            workSheet.Cells["A30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            workSheet.Cells["A30"].Value = 1;
+            workSheet.Cells["B30:C30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["B30:C30"].Merge = true;
+            workSheet.Cells["B30"].Value = 118;
+            workSheet.Cells["B30"].Style.Numberformat.Format = numberFormatKgs;
+            workSheet.Cells["E30:F30"].Merge = true;
+            workSheet.Cells["E30"].Value = 209;
+            workSheet.Cells["E30"].Style.Numberformat.Format = numberFormatKgs;
+            workSheet.Cells["G30:J30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["G30:H30"].Merge = true;
+            workSheet.Cells["G30"].Value = 9.85;
+            workSheet.Cells["G30"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["I30"].Style.Font.Color.SetColor(Color.Red);
+            workSheet.Cells["I30:J30"].Merge = true;
+            workSheet.Cells["I30"].Value = 2058.65;
+            workSheet.Cells["I30"].Style.Numberformat.Format = numberFormat;
+
+            workSheet.Cells["A31"].Value = "PCS";
+            workSheet.Cells["L31:N39"].Merge = true;
+            workSheet.Cells["L31:N39"].Style.WrapText = true;
+            workSheet.Cells["L31:N39"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["L31"].Value = "CONSOL CARGO AND DOCS ATT´D";
+
+            workSheet.Cells["A40"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            workSheet.Cells["A40"].Value = 1;
+            workSheet.Cells["B40"].Value = 118;
+
+            workSheet.Cells["A44:B44"].Merge = true;
+            workSheet.Cells["A44:B44"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A44"].Value = 2058.65;
+            workSheet.Cells["A44"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["H44"].Value = "AWB";
+            workSheet.Cells["J44"].Value = 5.00;
+            workSheet.Cells["J44"].Style.Numberformat.Format = numberFormat;
+
+            workSheet.Cells["H45"].Value = "MCC";
+            workSheet.Cells["J45"].Value = 2.01;
+            workSheet.Cells["J45"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["H46"].Value = "CGC";
+            workSheet.Cells["J46"].Value = 5.00;
+            workSheet.Cells["J46"].Style.Numberformat.Format = numberFormat;
+
+            workSheet.Cells["A51:B51"].Merge = true;
+            workSheet.Cells["A51:B51"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A51"].Value = 12.01;
+            workSheet.Cells["A51"].Style.Numberformat.Format = numberFormat;
+
+            workSheet.Cells["A55:B55"].Merge = true;
+            workSheet.Cells["A55"].Value = 2070.66;
+            workSheet.Cells["A55"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A55"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Cells["G55:L55"].Merge = true;
+            workSheet.Cells["G55"].Value = "HOCHIMINH CITY 21 JAN 2020";
+            workSheet.Cells["G55:L55"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Row(57).Height = 42.75;
+            workSheet.Cells["L57:M57"].Style.Font.Bold = true;
+            workSheet.Cells["L57:M57"].Style.Font.Size = 12;
+            workSheet.Cells["L57"].Value = "157-";
+            workSheet.Cells["M57"].Value = "4591 2506";
         }
 
         /// <summary>
         /// Generate HAWBW Air Export Excel
         /// </summary>
+        /// <param name="transactionDetail"></param>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public Stream GenerateHAWBAirExportExcel(Stream stream = null)
+        public Stream GenerateHAWBAirExportExcel(CsTransactionDetailModel transactionDetail, Stream stream = null)
         {
             try
             {
@@ -465,7 +595,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     excelPackage.Workbook.Worksheets.Add("HAWB");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    //BindingDataDetailSettlementPaymentExcel(workSheet, settlementExport, language);
+                    BindingDataHAWBAirExportExcel(workSheet, transactionDetail);
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -479,12 +609,140 @@ namespace eFMS.API.ReportData.FormatExcel
 
         private void SetWidthColumnExcelHAWBAirExport(ExcelWorksheet workSheet)
         {
-
+            workSheet.Column(1).Width = 4.29 + 0.72; //Cột A
+            workSheet.Column(2).Width = 7.29 + 0.72; //Cột B
+            workSheet.Column(3).Width = 5.43 + 0.72; //Cột C
+            workSheet.Column(4).Width = 3.86 + 0.72; //Cột D
+            workSheet.Column(5).Width = 8.86 + 0.72; //Cột E
+            workSheet.Column(6).Width = 5.57 + 0.72; //Cột F
+            workSheet.Column(7).Width = 3.86 + 0.72; //Cột G
+            workSheet.Column(8).Width = 6.29 + 0.72; //Cột H
+            workSheet.Column(9).Width = 4 + 0.72; //Cột I
+            workSheet.Column(10).Width = 9.57 + 0.72; //Cột J
+            workSheet.Column(11).Width = 6.71 + 0.72; //Cột K
+            workSheet.Column(12).Width = 5.43 + 0.72; //Cột L
+            workSheet.Column(13).Width = 15.86 + 0.72; //Cột M
+            workSheet.Column(14).Width = 4.14 + 0.72; //Cột N
         }
 
-        private void BindingDataHAWBAirExportExcel(ExcelWorksheet workSheet)
+        private void BindingDataHAWBAirExportExcel(ExcelWorksheet workSheet, CsTransactionDetailModel transactionDetail)
         {
+            workSheet.View.ShowGridLines = false;
+
             SetWidthColumnExcelHAWBAirExport(workSheet);
+
+            workSheet.Cells[1, 1, 100000, 14].Style.Font.SetFromFont(new Font("Arial", 10));
+
+            workSheet.Cells["A1:N1"].Style.Font.SetFromFont(new Font("Arial", 12));
+            workSheet.Cells["A1:N1"].Style.Font.Bold = true;
+            workSheet.Cells["A1"].Value = "157";
+            workSheet.Cells["B1"].Value = "SGN";
+            workSheet.Cells["C1:E1"].Merge = true;
+            workSheet.Cells["C1"].Value = "4591 2506";
+            workSheet.Cells["L1"].Value = "ITL";
+            workSheet.Cells["M1"].Value = "79398049";
+
+            workSheet.Cells["A3:A12"].Style.Font.Color.SetColor(Color.DarkBlue);
+
+            workSheet.Cells["A3:A5"].Style.Font.Bold = true;
+            workSheet.Cells["A3"].Value = "SHIPPER";
+            workSheet.Cells["A4"].Value = "52-54-56 TRUONG SON STR., TAN BINH DIST,";
+            workSheet.Cells["A5"].Value = "HOCHIMINH CITY, VIETNAM.";
+            workSheet.Cells["A6"].Value = "TEL: +84 8 39486888 FAX: +84 8 8488593";
+
+            workSheet.Cells["K4:N5"].Merge = true;
+            workSheet.Cells["K4"].Style.Font.SetFromFont(new Font("Arial", 12));
+            workSheet.Cells["K4"].Value = "IN DO TRANS LOGISTICS";
+            workSheet.Cells["K4"].Style.Font.Bold = true;
+            workSheet.Cells["K4:N5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["K4:N5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            workSheet.Cells["A9:A12"].Style.Font.Bold = true;
+            workSheet.Cells["A9"].Value = "CNEE";
+            workSheet.Cells["A10"].Value = "39 JERNHOLMEN, DK-2650 HVIDOVRE, DENMARK";
+            workSheet.Cells["A11"].Value = "TEL: +45 36772244";
+            workSheet.Cells["A12"].Value = "ATTN: MICHAEL BOMARK";
+
+            workSheet.Cells["J17:M17"].Merge = true;
+            workSheet.Cells["J17"].Style.Font.Color.SetColor(Color.Red);
+            workSheet.Cells["J17"].Value = "PP IN SGN";
+
+            workSheet.Cells["A19"].Style.Font.SetFromFont(new Font("Calibri", 12));
+            workSheet.Cells["A19"].Style.Font.Bold = true;
+            workSheet.Cells["A19"].Value = "373-0118";
+
+            workSheet.Cells["A21"].Value = "HOCHIMINH AIRPORT";
+            workSheet.Cells["A21"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Row(21).Height = 24.75;
+
+            workSheet.Cells["A22"].Value = "DOH";
+            workSheet.Cells["B22"].Value = "QR";
+            workSheet.Cells["F22:G22"].Merge = true;
+            workSheet.Cells["F22"].Value = "CPH QR";
+            workSheet.Cells["I22"].Value = "USD";
+            workSheet.Cells["L22"].Value = "NVD";
+            workSheet.Cells["M22"].Value = "NVC";
+            workSheet.Cells["M22"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+
+            workSheet.Cells["A24"].Value = "COPENHAGEN";
+            workSheet.Cells["E24"].Value = "QR0971";
+            workSheet.Cells["F24:H24"].Merge = true;
+            workSheet.Cells["F24"].Value = "23/01/2020";
+            workSheet.Cells["I24"].Value = "NIL";
+            
+            workSheet.Cells["A30:I30"].Style.Font.Bold = true;
+            workSheet.Cells["A30:E30"].Style.Font.Color.SetColor(Color.Red);
+            workSheet.Cells["A30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            workSheet.Cells["A30"].Value = 1;
+            workSheet.Cells["B30:C30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["B30:C30"].Merge = true;
+            workSheet.Cells["B30"].Value = 118;
+            workSheet.Cells["B30"].Style.Numberformat.Format = numberFormatKgs;
+            workSheet.Cells["E30:F30"].Merge = true;
+            workSheet.Cells["E30"].Value = 209;
+            workSheet.Cells["E30"].Style.Numberformat.Format = numberFormatKgs;
+            workSheet.Cells["G30:J30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["G30:H30"].Merge = true;
+            workSheet.Cells["G30"].Value = "AS AGREED";
+            workSheet.Cells["G30"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["I30"].Style.Font.Color.SetColor(Color.Red);
+            workSheet.Cells["I30:J30"].Merge = true;
+            workSheet.Cells["I30"].Value = "AS AGREED";
+            workSheet.Cells["I30"].Style.Numberformat.Format = numberFormat;
+
+            workSheet.Cells["A31"].Value = "PCS";
+            workSheet.Cells["L31:N39"].Merge = true;
+            workSheet.Cells["L31:N39"].Style.WrapText = true;
+            workSheet.Cells["L31:N39"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["L31"].Value = "INJECTION MOULD";
+
+            workSheet.Cells["A40"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            workSheet.Cells["A40"].Value = 1;
+            workSheet.Cells["B40"].Value = 118;
+
+            workSheet.Cells["A44:B44"].Merge = true;
+            workSheet.Cells["A44:B44"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A44"].Value = "AS AGREED";
+            workSheet.Cells["A44"].Style.Numberformat.Format = numberFormat;            
+
+            workSheet.Cells["A51:B51"].Merge = true;
+            workSheet.Cells["A51:B51"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A51"].Value = 0;
+
+            workSheet.Cells["A55:B55"].Merge = true;
+            workSheet.Cells["A55"].Value = "AS AGREED";
+            workSheet.Cells["A55"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A55"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Cells["G55:L55"].Merge = true;
+            workSheet.Cells["G55"].Value = "HOCHIMINH CITY 21 JAN 2020";
+            workSheet.Cells["G55:L55"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Row(57).Height = 42.75;
+            workSheet.Cells["L57:M57"].Style.Font.Bold = true;
+            workSheet.Cells["L57:M57"].Style.Font.Size = 12;
+            workSheet.Cells["L57"].Value = "ITL";
+            workSheet.Cells["M57"].Value = "79398049";
         }
         #endregion --- MAWB and HAWB Air Export Excel ---
 

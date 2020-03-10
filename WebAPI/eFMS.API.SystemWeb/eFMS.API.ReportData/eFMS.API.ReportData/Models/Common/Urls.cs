@@ -48,6 +48,7 @@ namespace eFMS.API.ReportData.Models
         public class Documentation
         {
             public const string HouseBillDetailUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/GetById?Id=";
+            public const string NeutralHawbExportUrl = "/api/v1/en-US/CsTransactionDetail/NeutralHawbExport";
         }
     }
 }

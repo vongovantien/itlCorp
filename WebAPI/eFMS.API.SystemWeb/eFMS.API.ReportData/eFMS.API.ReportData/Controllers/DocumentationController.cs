@@ -102,5 +102,49 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [Route("ExportMAWBAirExport")]
+        [HttpGet]
+        public async Task<IActionResult> ExportMAWBAirExport()
+        {
+            //var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid);
+
+            //var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
+
+            var stream = new DocumentationHelper().GenerateMAWBAirExportExcel();
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - MAWB.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [Route("ExportHAWBAirExport")]
+        [HttpGet]
+        public async Task<IActionResult> ExportHAWBAirExport(string hblid, string officeId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.NeutralHawbExportUrl + "?housebillId=" + hblid + "&officeId=" + officeId);
+
+            var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
+
+            var stream = new DocumentationHelper().GenerateHAWBAirExportExcel(dataObject.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - NEUTRAL HAWB.xlsx");
+
+            return fileContent;
+        }
     }
 }
