@@ -946,14 +946,14 @@ namespace eFMS.API.Catalogue.DL.Services
                                    ).AsQueryable();
             }
 
-            foreach (var item in list)
-            {
-                if(item.WarehouseId != null)
-                {
-                    var place = DataContext.First(x => x.Id == item.WarehouseId);
-                    item.WarehouseName = place.NameEn;
-                }
-            }
+            //foreach (var item in list)
+            //{
+            //    if(item.WarehouseId != null)
+            //    {
+            //        var place = DataContext.First(x => x.Id == item.WarehouseId);
+            //        item.WarehouseName = place.NameEn;
+            //    }
+            //}
             return list;
         }
 

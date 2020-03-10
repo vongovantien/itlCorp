@@ -239,7 +239,7 @@ namespace eFMS.API.Catalogue.Controllers
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
             PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
 
-            if(catChargeService.CheckAllowPermissionAction(id, permissionRange))
+            if(!catChargeService.CheckAllowPermissionAction(id, permissionRange))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
@@ -435,6 +435,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
         public IActionResult CheckAllowDetail(Guid id)
         {
             var charge = catChargeService.First(x => x.Id == id);
@@ -450,6 +451,8 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
+
         public IActionResult CheckAllowDelete(Guid id)
         {
             var charge = catChargeService.First(x => x.Id == id);

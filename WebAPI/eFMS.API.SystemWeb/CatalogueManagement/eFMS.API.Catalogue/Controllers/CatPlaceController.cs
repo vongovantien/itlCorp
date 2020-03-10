@@ -115,6 +115,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
         public IActionResult CheckAllowDetail(Guid id)
         {
             PermissionRange permissionRange;
@@ -322,6 +323,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that want to delete</param>
         /// <returns></returns>
         [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
         public IActionResult CheckAllowDelete(Guid id)
         {
             PermissionRange permissionRange;
