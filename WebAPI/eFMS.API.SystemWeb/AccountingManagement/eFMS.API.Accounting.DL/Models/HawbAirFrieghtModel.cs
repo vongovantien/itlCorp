@@ -12,16 +12,16 @@ namespace eFMS.API.Accounting.DL.Models
         public string AOD { get; set; }
         public string Service { get; set; }
         public int? Pcs { get; set; }
-        public double? GW { get; set; }
-        public double? CW { get; set; }
-        public double? Rate { get; set; }
-        public double? AirFreight { get; set; }
-        public double? FuelSurcharge { get; set; }
-        public double? WarriskSurcharge { get; set; }
-        public double? ScreeningFee { get; set; }
-        public double? AWB { get; set; }
-        public double? HandlingFee { get; set; }
-        public double? NetAmount { get; set; }
+        public decimal? GW { get; set; }
+        public decimal? CW { get; set; }
+        public decimal? Rate { get; set; }
+        public decimal? AirFreight { get; set; }
+        public decimal? FuelSurcharge { get; set; }
+        public decimal? WarriskSurcharge { get; set; }
+        public decimal? ScreeningFee { get; set; }
+        public decimal? AWB { get; set; }
+        public decimal? HandlingFee { get; set; }
+        public decimal? NetAmount { get; set; }
         public double? ExchangeRate { get; set; }
         public double? TotalAmount { get; set; }
     }

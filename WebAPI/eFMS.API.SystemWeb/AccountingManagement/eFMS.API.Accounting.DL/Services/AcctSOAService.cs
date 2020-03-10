@@ -1727,7 +1727,6 @@ namespace eFMS.API.Accounting.DL.Services
                                  SoaNo = s.Soano,
                                  DateSOA = s.DatetimeCreated,
                                  IssuedBy = s.UserCreated,
-
                              };
             //infomation Partner
             var result = resultData.FirstOrDefault();
@@ -1752,12 +1751,34 @@ namespace eFMS.API.Accounting.DL.Services
                     air.AOL = chargeData.MBL.Substring(1,3) + port.Where(x=>x.Id  == chargeData.AOL).Select(t=>t.Code).FirstOrDefault();
                     air.Mawb = chargeData.MBL.Substring(chargeData.MBL.Length - 8);
                     air.AOD = port.Where(x => x.Id == chargeData.AOD).Select(t => t.Code).FirstOrDefault();
-                    air.Service = "Normal"; // tạm thời hardecode;
+                    air.Service = "Normal"; // tạm thời hardcode;
                     air.Pcs = chargeData.PackageQty;
+                    air.CW = chargeData.ChargeWeight;
+                    air.GW = chargeData.GrossWeight;
+                    air.Rate = chargeData.ChargeName == AccountingConstants.CHARGE_AIR_FREIGHT ? chargeData.UnitPrice : null;
+                    var lstAirfrieght = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+                    air.AirFreight = lstAirfrieght.Count() > 0 ? lstAirfrieght.Select(t => t.Debit).Sum() : null;
+                    var lstFuelSurcharge = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+                    air.FuelSurcharge = lstFuelSurcharge.Count() > 0 ? lstFuelSurcharge.Select(t => t.Debit).Sum() : null;
+                    var lstWariskSurcharge = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+                    air.WarriskSurcharge = lstWariskSurcharge.Count() > 0 ? lstWariskSurcharge.Select(t => t.Debit).Sum() : null;
+
+                    var lstScreeningFee = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+                    air.ScreeningFee = lstScreeningFee.Count() > 0 ? lstScreeningFee.Select(t => t.Debit).Sum() : null;
+
+                    var lstAWBFee = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB_FEE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+                    air.AWB = lstAWBFee.Count() > 0 ? lstAWBFee.Select(t => t.Debit).Sum() : null;
+
+                    var lstHandlingFee = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_HANDLING_FEE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+                    air.HandlingFee = lstHandlingFee.Count() > 0 ? lstHandlingFee.Select(t => t.Debit).Sum() : null;
+
+                    air.NetAmount = air.AirFreight + air.FuelSurcharge + air.WarriskSurcharge + air.ScreeningFee + air.HandlingFee;
+
                     result.HawbAirFrieghts = new List<HawbAirFrieghtModel>();
                     result.HawbAirFrieghts.Add(air);
                 }
             }
+        
 
 
 
