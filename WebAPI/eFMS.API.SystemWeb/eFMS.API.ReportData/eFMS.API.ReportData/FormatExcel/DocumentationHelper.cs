@@ -77,18 +77,18 @@ namespace eFMS.API.ReportData.FormatExcel
                 foreach (var item in transactionDetail.CsMawbcontainers)
                 {
                     numberPackage = (short?)(numberPackage + item.PackageQuantity);
-                    kindOfPackages = item.PackageTypeName != null?(kindOfPackages + item.PackageTypeName + "; "): string.Empty;
+                    kindOfPackages = item.PackageTypeName != null ? (kindOfPackages + item.PackageTypeName + "; ") : string.Empty;
                     workSheet.Cells[addressStartContent, 1].Value = item.CommodityName;
                     workSheet.Cells[addressStartContent, 2].Value = item.Description;
                     workSheet.Cells[addressStartContent, 3].Value = item.Gw;
                     workSheet.Cells[addressStartContent, 4].Value = item.Gw;
                     workSheet.Cells[addressStartContent, 5].Value = item.ContainerNo;
                     workSheet.Cells[addressStartContent, 6].Value = item.SealNo;
-                    for(int i=0; i<containerHeaders.Count; i++)
+                    for (int i = 0; i < containerHeaders.Count; i++)
                     {
                         BorderThinItem(workSheet, addressStartContent, i + 1);
                         workSheet.Cells[addressStartContent, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                        if(i==2|| i == 3)
+                        if (i == 2 || i == 3)
                         {
                             workSheet.Cells[addressStartContent, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                         }
@@ -224,12 +224,12 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[addressStartContent, 9].Value = string.Empty;
                     workSheet.Cells[addressStartContent, 10].Value = string.Empty;
                     workSheet.Cells[addressStartContent, 11].Value = string.Empty;
-                    workSheet.Cells[addressStartContent, 12].Value = (item.Gw != null && item.Nw!= null)? (item.Gw/item.Nw): null; 
+                    workSheet.Cells[addressStartContent, 12].Value = (item.Gw != null && item.Nw != null) ? (item.Gw / item.Nw) : null;
                     workSheet.Cells[addressStartContent, 13].Value = string.Empty;
                     workSheet.Cells[addressStartContent, 14].Value = item.ContainerNo;
                     workSheet.Cells[addressStartContent, 15].Value = item.SealNo;
                     workSheet.Cells[addressStartContent, 16].Value = item.Quantity;
-                    
+
                     for (int i = 0; i < goodsInfos.Count; i++)
                     {
                         BorderThinItem(workSheet, addressStartContent, i + 1);
@@ -366,7 +366,7 @@ namespace eFMS.API.ReportData.FormatExcel
             addressStartContent = 3;
             WriteGeneralManifestInfo(workSheet, itemInHouses, addressStartContent);
         }
-        
+
         private void WriteGeneralManifestInfo(ExcelWorksheet workSheet, List<ManifestModel> itemInHouses, int addressStartContent)
         {
             for (int i = 0; i < itemInHouses.Count; i++)
@@ -407,9 +407,10 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <summary>
         /// Generate MAWB Air Export Excel
         /// </summary>
+        /// <param name="airwayBillExport"></param>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public Stream GenerateMAWBAirExportExcel(Stream stream = null)
+        public Stream GenerateMAWBAirExportExcel(AirwayBillExportResult airwayBillExport, Stream stream = null)
         {
             try
             {
@@ -417,7 +418,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     excelPackage.Workbook.Worksheets.Add("MAWB");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    BindingDataMAWBAirExportExcel(workSheet);
+                    BindingDataMAWBAirExportExcel(workSheet, airwayBillExport);
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -447,147 +448,172 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(14).Width = 4.14 + 0.72; //Cột N
         }
 
-        private void BindingDataMAWBAirExportExcel(ExcelWorksheet workSheet)
+        private void BindingDataMAWBAirExportExcel(ExcelWorksheet workSheet, AirwayBillExportResult airwayBillExport)
         {
             workSheet.View.ShowGridLines = false;
 
             SetWidthColumnExcelMAWBAirExport(workSheet);
             workSheet.Cells[1, 1, 100000, 14].Style.Font.SetFromFont(new Font("Arial", 10));
 
+            var _mawb1 = airwayBillExport.MawbNo.Substring(0, 3).ToUpper(); //3 ký tự đầu của MAWB
+            var _mawb2 = airwayBillExport.MawbNo.Substring(3, airwayBillExport.MawbNo.Length - 3).ToUpper(); //Các ký tự cuối của MAWB
+
             workSheet.Cells["A1:N1"].Style.Font.SetFromFont(new Font("Arial", 12));
             workSheet.Cells["A1:N1"].Style.Font.Bold = true;
-            workSheet.Cells["A1"].Value = "157";
-            workSheet.Cells["B1"].Value = "SGN";
+            workSheet.Cells["A1"].Value = _mawb1; //3 ký tự đầu của MAWB
+            workSheet.Cells["B1"].Value = airwayBillExport.AolCode?.ToUpper(); //Mã cảng đi
             workSheet.Cells["C1:E1"].Merge = true;
-            workSheet.Cells["C1"].Value = "4591 2506";
-            workSheet.Cells["L1"].Value = "157-";
-            workSheet.Cells["M1"].Value = "4591 2506";
+            workSheet.Cells["C1"].Value = _mawb2; //Các ký tự cuối của MAWB
+            workSheet.Cells["L1"].Value = _mawb1 + "-"; //3 ký tự đầu của MAWB
+            workSheet.Cells["M1"].Value = _mawb2; //Các ký tự cuối của MAWB
 
             workSheet.Cells["A3:A12"].Style.Font.Color.SetColor(Color.DarkBlue);
 
-            workSheet.Cells["A3:A5"].Style.Font.Bold = true;            
-            workSheet.Cells["A3"].Value = "INDO TRANS LOGISTICS CORPORATION";
-            workSheet.Cells["A4"].Value = "52-54-56 TRUONG SON STR., TAN BINH DIST,";
-            workSheet.Cells["A5"].Value = "HOCHIMINH CITY, VIETNAM.";
-            workSheet.Cells["A6"].Value = "TEL: +84 8 39486888 FAX: +84 8 8488593";
+            workSheet.Cells["A3:H6"].Style.Font.Bold = true;
+            workSheet.Cells["A3:H6"].Merge = true;
+            workSheet.Cells["A3:H6"].Style.WrapText = true;
+            workSheet.Cells["A3:H6"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["A3"].Value = airwayBillExport.Shipper?.ToUpper(); //Thông tin Shipper
 
-            workSheet.Cells["K4:N5"].Merge = true;            
+            workSheet.Cells["K4:N5"].Merge = true;
             workSheet.Cells["K4"].Style.Font.SetFromFont(new Font("Arial", 12));
-            workSheet.Cells["K4"].Value = "QATAR AIRWAYS CARGO";
+            workSheet.Cells["K4"].Value = airwayBillExport.AirlineNameEn?.ToUpper(); //Airline
             workSheet.Cells["K4"].Style.Font.Bold = true;
             workSheet.Cells["K4:N5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["K4:N5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            workSheet.Cells["A9:A12"].Style.Font.Bold = true;
-            workSheet.Cells["A9"].Value = "BENDIX TRANSPORT DANMARK A/S";
-            workSheet.Cells["A10"].Value = "39 JERNHOLMEN, DK-2650 HVIDOVRE, DENMARK";
-            workSheet.Cells["A11"].Value = "TEL: +45 36772244";
-            workSheet.Cells["A12"].Value = "ATTN: MICHAEL BOMARK";
+            workSheet.Cells["A9:H12"].Style.Font.Bold = true;
+            workSheet.Cells["A9:H12"].Merge = true;
+            workSheet.Cells["A9:H12"].Style.WrapText = true;
+            workSheet.Cells["A9:H12"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["A9"].Value = airwayBillExport.Consignee?.ToUpper(); //Thông tin consignee            
 
             workSheet.Cells["J17:M17"].Merge = true;
-            workSheet.Cells["J17"].Value = "PP IN SGN";
+            workSheet.Cells["J17"].Value = airwayBillExport.AirFrieghtDa?.ToUpper();
 
             workSheet.Cells["A19"].Style.Font.SetFromFont(new Font("Calibri", 12));
             workSheet.Cells["A19"].Style.Font.Bold = true;
-            workSheet.Cells["A19"].Value = "373-0118";
+            workSheet.Cells["A19"].Value = "373-0118"; //Default
 
-            workSheet.Cells["A21"].Value = "HOCHIMINH AIRPORT";
+            workSheet.Cells["A21"].Value = airwayBillExport.DepartureAirport?.ToUpper(); //Tên cảng đi
             workSheet.Cells["A21"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            workSheet.Row(21).Height = 24.75;
+            //workSheet.Row(21).Height = 24.75;
 
-            workSheet.Cells["A22"].Value = "DOH";
-            workSheet.Cells["B22"].Value = "QR";
+            workSheet.Cells["A22"].Value = airwayBillExport.FirstTo?.ToUpper();
+            workSheet.Cells["B22"].Value = airwayBillExport.FirstCarrier?.ToUpper();
             workSheet.Cells["F22:G22"].Merge = true;
-            workSheet.Cells["F22"].Value = "CPH QR";
-            workSheet.Cells["I22"].Value = "USD";
-            workSheet.Cells["L22"].Value = "NVD";
-            workSheet.Cells["M22"].Value = "NVC";
+            workSheet.Cells["F22"].Value = (airwayBillExport.SecondTo + " " + airwayBillExport.SecondBy)?.ToUpper();
+            workSheet.Cells["I22"].Value = airwayBillExport.Currency?.ToUpper();
+            workSheet.Cells["L22"].Value = airwayBillExport.Dclrca?.ToUpper();
+            workSheet.Cells["M22"].Value = airwayBillExport.Dclrcus?.ToUpper();
             workSheet.Cells["M22"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 
-            workSheet.Cells["A24"].Value = "COPENHAGEN";
-            workSheet.Cells["E24"].Value = "QR0971";
+            workSheet.Cells["A24"].Value = airwayBillExport.DestinationAirport?.ToUpper(); //Tên cảng đến
+            workSheet.Cells["E24"].Value = airwayBillExport.FlightNo.ToUpper() ?? string.Empty; //Tên chuyến bay
             workSheet.Cells["F24:H24"].Merge = true;
-            workSheet.Cells["F24"].Value = "23/01/2020";
-            workSheet.Cells["I24"].Value = "NIL";
+            workSheet.Cells["F24:H24"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["F24"].Value = airwayBillExport.FlightDate; //Ngày bay
+            workSheet.Cells["F24"].Style.Numberformat.Format = "dd-MMM-yyyy";
+            workSheet.Cells["I24"].Value = airwayBillExport.IssuranceAmount?.ToUpper();
 
             workSheet.Cells["A27"].Style.Font.Color.SetColor(Color.Red);
             workSheet.Cells["A27"].Style.Font.Bold = true;
             workSheet.Cells["A27"].Value = 1;
-            workSheet.Cells["B27"].Value = "HAWB";
+            workSheet.Cells["B27"].Value = airwayBillExport.HandingInfo?.ToUpper(); //Handing Info
 
             workSheet.Cells["A30:I30"].Style.Font.Bold = true;
             workSheet.Cells["A30:E30"].Style.Font.Color.SetColor(Color.Red);
             workSheet.Cells["A30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-            workSheet.Cells["A30"].Value = 1;
+            workSheet.Cells["A30"].Value = airwayBillExport.Pieces;
             workSheet.Cells["B30:C30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["B30:C30"].Merge = true;
-            workSheet.Cells["B30"].Value = 118;
+            workSheet.Cells["B30"].Value = airwayBillExport.Gw;
             workSheet.Cells["B30"].Style.Numberformat.Format = numberFormatKgs;
             workSheet.Cells["E30:F30"].Merge = true;
-            workSheet.Cells["E30"].Value = 209;
+            workSheet.Cells["E30"].Value = airwayBillExport.Cw;
             workSheet.Cells["E30"].Style.Numberformat.Format = numberFormatKgs;
             workSheet.Cells["G30:J30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["G30:H30"].Merge = true;
-            workSheet.Cells["G30"].Value = 9.85;
-            workSheet.Cells["G30"].Style.Numberformat.Format = numberFormat;
+            if (airwayBillExport.RateCharge != null && airwayBillExport.RateCharge != 0)
+            {
+                workSheet.Cells["G30"].Value = airwayBillExport.RateCharge;
+                workSheet.Cells["G30"].Style.Numberformat.Format = numberFormat;
+            }
             workSheet.Cells["I30"].Style.Font.Color.SetColor(Color.Red);
             workSheet.Cells["I30:J30"].Merge = true;
-            workSheet.Cells["I30"].Value = 2058.65;
+            workSheet.Cells["I30"].Value = airwayBillExport.Total;
             workSheet.Cells["I30"].Style.Numberformat.Format = numberFormat;
 
-            workSheet.Cells["A31"].Value = "PCS";
+            workSheet.Cells["A31"].Value = "PCS"; //Default
             workSheet.Cells["L31:N39"].Merge = true;
             workSheet.Cells["L31:N39"].Style.WrapText = true;
             workSheet.Cells["L31:N39"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            workSheet.Cells["L31"].Value = "CONSOL CARGO AND DOCS ATT´D";
+            workSheet.Cells["L31"].Value = (airwayBillExport.DesOfGood + "\r\n" + airwayBillExport.VolumeField)?.ToUpper();
 
             workSheet.Cells["A40"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-            workSheet.Cells["A40"].Value = 1;
-            workSheet.Cells["B40"].Value = 118;
+            workSheet.Cells["A40"].Value = airwayBillExport.Pieces;
+            workSheet.Cells["B40"].Value = airwayBillExport.Gw;
+            workSheet.Cells["B40"].Style.Numberformat.Format = numberFormatKgs;
 
             workSheet.Cells["A44:B44"].Merge = true;
             workSheet.Cells["A44:B44"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A44"].Value = 2058.65;
-            workSheet.Cells["A44"].Style.Numberformat.Format = numberFormat;
-            workSheet.Cells["H44"].Value = "AWB";
-            workSheet.Cells["J44"].Value = 5.00;
-            workSheet.Cells["J44"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A44"].Value = airwayBillExport.PrepaidWt?.ToUpper();
+            //workSheet.Cells["A44"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["D44"].Value = airwayBillExport.CollectWt?.ToUpper();
 
-            workSheet.Cells["H45"].Value = "MCC";
-            workSheet.Cells["J45"].Value = 2.01;
-            workSheet.Cells["J45"].Style.Numberformat.Format = numberFormat;
-            workSheet.Cells["H46"].Value = "CGC";
-            workSheet.Cells["J46"].Value = 5.00;
-            workSheet.Cells["J46"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A46:B46"].Merge = true;
+            workSheet.Cells["A46:B46"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A46"].Value = airwayBillExport.PrepaidVal?.ToUpper();
+            workSheet.Cells["D46"].Value = airwayBillExport.CollectVal?.ToUpper();
+
+            workSheet.Cells["A48:B48"].Merge = true;
+            workSheet.Cells["A48:B48"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A48"].Value = airwayBillExport.PrepaidTax?.ToUpper();
+            workSheet.Cells["D48"].Value = airwayBillExport.CollectTax?.ToUpper();
 
             workSheet.Cells["A51:B51"].Merge = true;
             workSheet.Cells["A51:B51"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A51"].Value = 12.01;
-            workSheet.Cells["A51"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A51"].Value = airwayBillExport.PrepaidDueToCarrier?.ToUpper();
+            workSheet.Cells["D51"].Value = airwayBillExport.CollectDueToCarrier?.ToUpper();
 
             workSheet.Cells["A55:B55"].Merge = true;
-            workSheet.Cells["A55"].Value = 2070.66;
-            workSheet.Cells["A55"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A55"].Value = airwayBillExport.PrepaidTotal?.ToUpper();
             workSheet.Cells["A55"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["D55"].Value = airwayBillExport.CollectTotal?.ToUpper();
 
-            workSheet.Cells["G55:L55"].Merge = true;
-            workSheet.Cells["G55"].Value = "HOCHIMINH CITY 21 JAN 2020";
-            workSheet.Cells["G55:L55"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            //Other Charges
+            int k = 44;
+            for (var i = 0; i < airwayBillExport.OtherCharges.Count; i++)
+            {
+                workSheet.Cells["H" + (k + i)].Value = airwayBillExport.OtherCharges[i].ChargeName?.ToUpper();
+                workSheet.Cells["J" + (k + i)].Value = airwayBillExport.OtherCharges[i].Amount;
+                workSheet.Cells["J" + (k + i)].Style.Numberformat.Format = numberFormat;
+                k = k + 1;
+            }
 
-            workSheet.Row(57).Height = 42.75;
-            workSheet.Cells["L57:M57"].Style.Font.Bold = true;
-            workSheet.Cells["L57:M57"].Style.Font.Size = 12;
-            workSheet.Cells["L57"].Value = "157-";
-            workSheet.Cells["M57"].Value = "4591 2506";
+            if (airwayBillExport.OtherCharges.Count < 12)
+            {
+                k = 55;
+            }
+
+            workSheet.Cells["G" + k + ":L" + k].Merge = true;
+            workSheet.Cells["G" + k].Value = airwayBillExport.IssueOn?.ToUpper() + " " + (airwayBillExport.IssueDate.HasValue ? airwayBillExport.IssueDate.Value.ToString("dd MMM yyyy").ToUpper() : string.Empty);
+            workSheet.Cells["G" + k + ":L" + k].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            //workSheet.Row(57).Height = 42.75;
+            workSheet.Cells["L" + (k + 2) + ":M" + (k + 2)].Style.Font.Bold = true;
+            workSheet.Cells["L" + (k + 2) + ":M" + (k + 2)].Style.Font.Size = 12;
+            workSheet.Cells["L" + (k + 2)].Value = _mawb1 + "-";
+            workSheet.Cells["M" + (k + 2)].Value = _mawb2;
         }
 
         /// <summary>
         /// Generate HAWBW Air Export Excel
         /// </summary>
-        /// <param name="transactionDetail"></param>
+        /// <param name="airwayBillExport"></param>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public Stream GenerateHAWBAirExportExcel(CsTransactionDetailModel transactionDetail, Stream stream = null)
+        public Stream GenerateHAWBAirExportExcel(AirwayBillExportResult airwayBillExport, Stream stream = null)
         {
             try
             {
@@ -595,7 +621,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     excelPackage.Workbook.Worksheets.Add("HAWB");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    BindingDataHAWBAirExportExcel(workSheet, transactionDetail);
+                    BindingDataHAWBAirExportExcel(workSheet, airwayBillExport);
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -625,7 +651,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(14).Width = 4.14 + 0.72; //Cột N
         }
 
-        private void BindingDataHAWBAirExportExcel(ExcelWorksheet workSheet, CsTransactionDetailModel transactionDetail)
+        private void BindingDataHAWBAirExportExcel(ExcelWorksheet workSheet, AirwayBillExportResult airwayBillExport)
         {
             workSheet.View.ShowGridLines = false;
 
@@ -633,116 +659,140 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells[1, 1, 100000, 14].Style.Font.SetFromFont(new Font("Arial", 10));
 
+            var _mawb1 = airwayBillExport.MawbNo.Substring(0, 3).ToUpper(); //3 ký tự đầu của MAWB
+            var _mawb2 = airwayBillExport.MawbNo.Substring(3, airwayBillExport.MawbNo.Length - 3).ToUpper(); //Các ký tự cuối của MAWB
+            var _hawb1 = airwayBillExport.HawbNo.Substring(0, 3).ToUpper(); //3 ký tự đầu của HAWB
+            var _hawb2 = airwayBillExport.HawbNo.Substring(3, airwayBillExport.HawbNo.Length - 3).ToUpper(); //Các ký tự cuối của HAWB
+
             workSheet.Cells["A1:N1"].Style.Font.SetFromFont(new Font("Arial", 12));
             workSheet.Cells["A1:N1"].Style.Font.Bold = true;
-            workSheet.Cells["A1"].Value = "157";
-            workSheet.Cells["B1"].Value = "SGN";
+            workSheet.Cells["A1"].Value = _mawb1; //3 ký tự đầu của MAWB
+            workSheet.Cells["B1"].Value = airwayBillExport.AolCode?.ToUpper(); //Mã cảng đi
             workSheet.Cells["C1:E1"].Merge = true;
-            workSheet.Cells["C1"].Value = "4591 2506";
-            workSheet.Cells["L1"].Value = "ITL";
-            workSheet.Cells["M1"].Value = "79398049";
+            workSheet.Cells["C1"].Value = _mawb2; //Các ký tự cuối của MAWB
+            workSheet.Cells["L1"].Value = _hawb1; //3 ký tự đầu của HAWB
+            workSheet.Cells["M1"].Value = _hawb2; //Các ký tự cuối của HAWB
 
             workSheet.Cells["A3:A12"].Style.Font.Color.SetColor(Color.DarkBlue);
 
-            workSheet.Cells["A3:A5"].Style.Font.Bold = true;
-            workSheet.Cells["A3"].Value = "SHIPPER";
-            workSheet.Cells["A4"].Value = "52-54-56 TRUONG SON STR., TAN BINH DIST,";
-            workSheet.Cells["A5"].Value = "HOCHIMINH CITY, VIETNAM.";
-            workSheet.Cells["A6"].Value = "TEL: +84 8 39486888 FAX: +84 8 8488593";
+            workSheet.Cells["A3:H6"].Style.Font.Bold = true;
+            workSheet.Cells["A3:H6"].Merge = true;
+            workSheet.Cells["A3:H6"].Style.WrapText = true;
+            workSheet.Cells["A3:H6"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["A3"].Value = airwayBillExport.Shipper?.ToUpper(); //Thông tin Shipper
 
             workSheet.Cells["K4:N5"].Merge = true;
             workSheet.Cells["K4"].Style.Font.SetFromFont(new Font("Arial", 12));
-            workSheet.Cells["K4"].Value = "IN DO TRANS LOGISTICS";
+            workSheet.Cells["K4"].Value = airwayBillExport.OfficeUserCurrent?.ToUpper(); //Office của User Current
             workSheet.Cells["K4"].Style.Font.Bold = true;
             workSheet.Cells["K4:N5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["K4:N5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            workSheet.Cells["A9:A12"].Style.Font.Bold = true;
-            workSheet.Cells["A9"].Value = "CNEE";
-            workSheet.Cells["A10"].Value = "39 JERNHOLMEN, DK-2650 HVIDOVRE, DENMARK";
-            workSheet.Cells["A11"].Value = "TEL: +45 36772244";
-            workSheet.Cells["A12"].Value = "ATTN: MICHAEL BOMARK";
+            workSheet.Cells["A9:H12"].Style.Font.Bold = true;
+            workSheet.Cells["A9:H12"].Merge = true;
+            workSheet.Cells["A9:H12"].Style.WrapText = true;
+            workSheet.Cells["A9:H12"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["A9"].Value = airwayBillExport.Consignee?.ToUpper(); //Thông tin Consignee;
 
             workSheet.Cells["J17:M17"].Merge = true;
             workSheet.Cells["J17"].Style.Font.Color.SetColor(Color.Red);
-            workSheet.Cells["J17"].Value = "PP IN SGN";
+            workSheet.Cells["J17"].Value = airwayBillExport.AirFrieghtDa?.ToUpper();
 
             workSheet.Cells["A19"].Style.Font.SetFromFont(new Font("Calibri", 12));
             workSheet.Cells["A19"].Style.Font.Bold = true;
-            workSheet.Cells["A19"].Value = "373-0118";
+            workSheet.Cells["A19"].Value = "373-0118"; //Default
 
-            workSheet.Cells["A21"].Value = "HOCHIMINH AIRPORT";
+            workSheet.Cells["A21"].Value = airwayBillExport.DepartureAirport?.ToUpper(); //Tên cảng đi
             workSheet.Cells["A21"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            workSheet.Row(21).Height = 24.75;
+            //workSheet.Row(21).Height = 24.75;
 
-            workSheet.Cells["A22"].Value = "DOH";
-            workSheet.Cells["B22"].Value = "QR";
+            workSheet.Cells["A22"].Value = airwayBillExport.FirstTo?.ToUpper();
+            workSheet.Cells["B22"].Value = airwayBillExport.FirstCarrier?.ToUpper();
             workSheet.Cells["F22:G22"].Merge = true;
-            workSheet.Cells["F22"].Value = "CPH QR";
-            workSheet.Cells["I22"].Value = "USD";
-            workSheet.Cells["L22"].Value = "NVD";
-            workSheet.Cells["M22"].Value = "NVC";
+            workSheet.Cells["F22"].Value = (airwayBillExport.SecondTo + " " + airwayBillExport.SecondBy)?.ToUpper();
+            workSheet.Cells["I22"].Value = airwayBillExport.Currency?.ToUpper();
+            workSheet.Cells["L22"].Value = airwayBillExport.Dclrca?.ToUpper();
+            workSheet.Cells["M22"].Value = airwayBillExport.Dclrcus?.ToUpper();
             workSheet.Cells["M22"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 
-            workSheet.Cells["A24"].Value = "COPENHAGEN";
-            workSheet.Cells["E24"].Value = "QR0971";
+            workSheet.Cells["A24"].Value = airwayBillExport.DestinationAirport?.ToUpper(); //Tên cảng đến
+            workSheet.Cells["E24"].Value = airwayBillExport.FlightNo?.ToUpper(); //Tên chuyến bay
             workSheet.Cells["F24:H24"].Merge = true;
-            workSheet.Cells["F24"].Value = "23/01/2020";
-            workSheet.Cells["I24"].Value = "NIL";
-            
+            workSheet.Cells["F24:H24"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["F24"].Value = airwayBillExport.FlightDate; //Ngày bay
+            workSheet.Cells["F24"].Style.Numberformat.Format = "dd-MMM-yyyy";
+            workSheet.Cells["I24"].Value = airwayBillExport.IssuranceAmount?.ToUpper();
+
+            workSheet.Cells["A26"].Value = airwayBillExport.HandingInfo?.ToUpper();
+
             workSheet.Cells["A30:I30"].Style.Font.Bold = true;
             workSheet.Cells["A30:E30"].Style.Font.Color.SetColor(Color.Red);
             workSheet.Cells["A30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-            workSheet.Cells["A30"].Value = 1;
+            workSheet.Cells["A30"].Value = airwayBillExport.Pieces;
             workSheet.Cells["B30:C30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["B30:C30"].Merge = true;
-            workSheet.Cells["B30"].Value = 118;
+            workSheet.Cells["B30"].Value = airwayBillExport.Gw;
             workSheet.Cells["B30"].Style.Numberformat.Format = numberFormatKgs;
             workSheet.Cells["E30:F30"].Merge = true;
-            workSheet.Cells["E30"].Value = 209;
+            workSheet.Cells["E30"].Value = airwayBillExport.Cw;
             workSheet.Cells["E30"].Style.Numberformat.Format = numberFormatKgs;
+
             workSheet.Cells["G30:J30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["G30:H30"].Merge = true;
-            workSheet.Cells["G30"].Value = "AS AGREED";
-            workSheet.Cells["G30"].Style.Numberformat.Format = numberFormat;
+            if (airwayBillExport.RateCharge == null || airwayBillExport.RateCharge == 0)
+            {
+                workSheet.Cells["G30"].Value = "AS AGREED";
+            }
+            else
+            {
+                workSheet.Cells["G30"].Value = airwayBillExport.RateCharge;
+                workSheet.Cells["G30"].Style.Numberformat.Format = numberFormat;
+            }
+
             workSheet.Cells["I30"].Style.Font.Color.SetColor(Color.Red);
             workSheet.Cells["I30:J30"].Merge = true;
-            workSheet.Cells["I30"].Value = "AS AGREED";
-            workSheet.Cells["I30"].Style.Numberformat.Format = numberFormat;
+            if (airwayBillExport.Total == null || airwayBillExport.Total == 0)
+            {
+                workSheet.Cells["I30"].Value = "AS AGREED";
+            }
+            else
+            {
+                workSheet.Cells["I30"].Value = airwayBillExport.Total;
+                workSheet.Cells["I30"].Style.Numberformat.Format = numberFormat;
+            }
 
-            workSheet.Cells["A31"].Value = "PCS";
+            workSheet.Cells["A31"].Value = "PCS"; //Default
             workSheet.Cells["L31:N39"].Merge = true;
             workSheet.Cells["L31:N39"].Style.WrapText = true;
             workSheet.Cells["L31:N39"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            workSheet.Cells["L31"].Value = "INJECTION MOULD";
+            workSheet.Cells["L31"].Value = airwayBillExport.DesOfGood?.ToUpper() + "\r\n" + airwayBillExport.VolumeField;
 
             workSheet.Cells["A40"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-            workSheet.Cells["A40"].Value = 1;
-            workSheet.Cells["B40"].Value = 118;
+            workSheet.Cells["A40"].Value = airwayBillExport.Pieces;
+            workSheet.Cells["B40"].Value = airwayBillExport.Gw;
+            workSheet.Cells["B40"].Style.Numberformat.Format = numberFormatKgs;
 
             workSheet.Cells["A44:B44"].Merge = true;
             workSheet.Cells["A44:B44"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A44"].Value = "AS AGREED";
-            workSheet.Cells["A44"].Style.Numberformat.Format = numberFormat;            
+            workSheet.Cells["A44"].Value = airwayBillExport.PrepaidTotal?.ToUpper(); //Total Prepaid
 
-            workSheet.Cells["A51:B51"].Merge = true;
-            workSheet.Cells["A51:B51"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A51"].Value = 0;
+            //workSheet.Cells["A51:B51"].Merge = true;
+            //workSheet.Cells["A51:B51"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            //workSheet.Cells["A51"].Value = string.Empty;
 
             workSheet.Cells["A55:B55"].Merge = true;
-            workSheet.Cells["A55"].Value = "AS AGREED";
-            workSheet.Cells["A55"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A55"].Value = airwayBillExport.CollectTotal?.ToUpper(); //Total Collect
             workSheet.Cells["A55"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             workSheet.Cells["G55:L55"].Merge = true;
-            workSheet.Cells["G55"].Value = "HOCHIMINH CITY 21 JAN 2020";
+            workSheet.Cells["G55"].Value = airwayBillExport.IssueOn?.ToUpper() + " " + (airwayBillExport.IssueDate.HasValue ? airwayBillExport.IssueDate.Value.ToString("dd MMM yyyy").ToUpper() : string.Empty);
             workSheet.Cells["G55:L55"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-            workSheet.Row(57).Height = 42.75;
+            //workSheet.Row(57).Height = 42.75;
             workSheet.Cells["L57:M57"].Style.Font.Bold = true;
             workSheet.Cells["L57:M57"].Style.Font.Size = 12;
-            workSheet.Cells["L57"].Value = "ITL";
-            workSheet.Cells["M57"].Value = "79398049";
+            workSheet.Cells["L57"].Value = _hawb1; //3 ký tự đầu của HBL
+            workSheet.Cells["M57"].Value = _hawb2; //Các ký tự còn lại của HBL
         }
         #endregion --- MAWB and HAWB Air Export Excel ---
 

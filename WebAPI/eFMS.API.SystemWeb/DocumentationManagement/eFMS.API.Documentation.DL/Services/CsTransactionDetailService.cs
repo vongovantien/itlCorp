@@ -1732,7 +1732,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.Total = hbDetail.Total;
             result.DesOfGood = hbDetail.DesOfGoods;
             var dimHbl = dimensionDetailService.Get(x => x.Hblid == housebillId);
-            string _dimensions = string.Join("\r\n", dimHbl.Select(s => (int)s.Length + "*" + (int)s.Width + "*" + (int)s.Height + "*" + (int)s.Package));
+            string _dimensions = string.Join("\r\n", dimHbl.Select(s => Math.Round(s.Length.Value, 2) + "*" + Math.Round(s.Width.Value, 2) + "*" + Math.Round(s.Height.Value, 2) + "*" + Math.Round(s.Package.Value, 2)));
             result.VolumeField = _dimensions;
             result.PrepaidTotal = hbDetail.TotalPp;
             result.CollectTotal = hbDetail.TotalCll;

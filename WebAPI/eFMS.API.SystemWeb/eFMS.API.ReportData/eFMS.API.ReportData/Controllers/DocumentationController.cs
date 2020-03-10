@@ -106,16 +106,18 @@ namespace eFMS.API.ReportData.Controllers
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="jobId"></param>
         /// <returns></returns>
         [Route("ExportMAWBAirExport")]
         [HttpGet]
-        public async Task<IActionResult> ExportMAWBAirExport()
+        public async Task<IActionResult> ExportMAWBAirExport(string id)
         {
-            //var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.AirwayBillExportUrl + id);
 
-            //var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
+            var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
+            if (dataObject.Result == null) return null;
 
-            var stream = new DocumentationHelper().GenerateMAWBAirExportExcel();
+            var stream = new DocumentationHelper().GenerateMAWBAirExportExcel(dataObject.Result);
             if (stream == null)
             {
                 return null;
@@ -128,6 +130,8 @@ namespace eFMS.API.ReportData.Controllers
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="hblid"></param>
+        /// <param name="officeId"></param>
         /// <returns></returns>
         [Route("ExportHAWBAirExport")]
         [HttpGet]
@@ -135,7 +139,8 @@ namespace eFMS.API.ReportData.Controllers
         {
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.NeutralHawbExportUrl + "?housebillId=" + hblid + "&officeId=" + officeId);
 
-            var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
+            var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
+            if (dataObject.Result == null) return null;
 
             var stream = new DocumentationHelper().GenerateHAWBAirExportExcel(dataObject.Result);
             if (stream == null)

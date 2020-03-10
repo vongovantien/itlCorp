@@ -86,5 +86,12 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        [HttpGet("AirwayBillExport")]
+        public IActionResult AirwayBillExport(Guid id)
+        {
+            var result = airWayBillService.AirwayBillExport(id);
+            return Ok(result);
+        }
     }
 }

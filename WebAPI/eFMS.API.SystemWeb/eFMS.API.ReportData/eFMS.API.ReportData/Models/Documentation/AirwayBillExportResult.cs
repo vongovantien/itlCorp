@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Documentation.DL.Models.Exports
+namespace eFMS.API.ReportData.Models.Documentation
 {
     public class AirwayBillExportResult
     {
@@ -24,7 +24,7 @@ namespace eFMS.API.Documentation.DL.Models.Exports
         public string DestinationAirport { get; set; }
         public string FlightNo { get; set; }
         public DateTime? FlightDate { get; set; }
-        public string IssuranceAmount {get;set;}
+        public string IssuranceAmount { get; set; }
         public string HandingInfo { get; set; }
         public decimal? Pieces { get; set; }
         public decimal? Gw { get; set; }

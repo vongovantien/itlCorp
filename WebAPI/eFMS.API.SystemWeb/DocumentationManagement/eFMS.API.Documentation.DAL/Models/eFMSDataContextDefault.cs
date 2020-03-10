@@ -714,8 +714,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
-
-                entity.Property(e => e.WarehouseName).HasMaxLength(50);
             });
 
             modelBuilder.Entity<CatSaleman>(entity =>
@@ -1348,6 +1346,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
+                entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1775,6 +1775,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.VoyNo).HasMaxLength(1600);
+
+                entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
 
             modelBuilder.Entity<CsTransactionDetail>(entity =>
@@ -2141,6 +2143,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Valpp)
                     .HasColumnName("VALPP")
                     .IsUnicode(false);
+
+                entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
 
                 entity.Property(e => e.WarehouseNotice).HasMaxLength(500);
 
