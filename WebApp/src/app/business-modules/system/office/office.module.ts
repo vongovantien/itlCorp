@@ -12,6 +12,7 @@ import { OfficeFormSearchComponent } from './components/form-search-office/form-
 import { OfficeFormAddComponent } from './components/form-add-office/form-add-office.component';
 import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { ShareSystemModule } from 'src/app/business-modules/share-system/share-system.module';
+import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -26,7 +27,9 @@ const routing: Routes = [
 
                 path: ':id', component: OfficeDetailsComponent, data: { name: "Edit" }
             },
-
+            {
+                path: ':id/:uid/:type', component: ShareSystemDetailPermissionComponent, data: { name: "UserPermission" }
+            }
         ]
     },
 ];

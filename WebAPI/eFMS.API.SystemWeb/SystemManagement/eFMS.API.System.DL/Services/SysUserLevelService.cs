@@ -100,7 +100,7 @@ namespace eFMS.API.System.DL.Services
 
         public IQueryable<SysUserLevelModel> Query(SysUserLevelCriteria criteria)
         {
-            var userLevels = DataContext.Get(x => x.Active == true);
+            var userLevels = DataContext.Get(x => x.Active == true && x.CompanyId == criteria.CompanyId);
             var users = userRepository.Get();
             var employess = employeeRepository.Get();
             var results = userLevels.Join(users, x => x.UserId, y => y.Id, (x, y) => new { User = y, UserLevel = x })
@@ -121,11 +121,11 @@ namespace eFMS.API.System.DL.Services
                             UserModified = x.User.UserLevel.UserModified,
                             Position = x.User.UserLevel.Position
                         });
-            if (criteria.Type == "company")
-            {
-                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.GroupId == SystemConstants.SpecialGroup && x.OfficeId == null && x.DepartmentId == null);
-            }
-            else if (criteria.Type == "office")
+            //if (criteria.Type == "company")
+            //{
+            //    results = results.Where(x => x.CompanyId == criteria.CompanyId && x.GroupId == SystemConstants.SpecialGroup && x.OfficeId == null && x.DepartmentId == null);
+            //}
+            if (criteria.Type == "office")
             {
                 results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.GroupId == SystemConstants.SpecialGroup && x.DepartmentId == null);
             }

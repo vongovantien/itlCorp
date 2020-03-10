@@ -1,6 +1,7 @@
 import { BaseModel } from "../base.model";
 import { DIM } from "./dimension";
 import { PermissionHouseBill } from "./permissionHouseBill";
+import { CsOtherCharge } from "./csOtherCharge";
 
 export class HouseBill extends BaseModel {
     id: string = '00000000-0000-0000-0000-000000000000';
@@ -156,6 +157,7 @@ export class HouseBill extends BaseModel {
     parentId: string = null;
     permission: PermissionHouseBill = new PermissionHouseBill();
     transactionType: string = null;
+    otherCharges: CsOtherCharge[] = [];
 
     constructor(object?: any) {
         super();

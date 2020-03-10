@@ -676,4 +676,16 @@ export class DocumentationRepo {
         );
     }
 
+    getShipmentOtherCharge(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/csShipmentOtherCharge/GetByMasterBill`, { jobId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getHBLOtherCharge(hblId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/csShipmentOtherCharge/GetByHouseBill`, { hblId: hblId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }

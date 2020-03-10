@@ -35,6 +35,7 @@ export * from './document/OpsTransaction.model';
 export * from './document/permissionShipment';
 export * from './document/container.model';
 export * from './document/arrival-freight-charge';
+export * from './document/csOtherCharge';
 
 export * from './tool-setting/tariff';
 

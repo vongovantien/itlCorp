@@ -11,6 +11,7 @@ import { GroupDetailComponent } from './detail/detail-group/detail-group.compone
 import { FormSearchGroupComponent } from './components/form-search-group/form-search-group.component';
 import { FormUserGroupComponent } from './components/form-user-group/form-user-group.component';
 import { ShareSystemModule } from '../../share-system/share-system.module';
+import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
 
 
 const routing: Routes = [
@@ -27,6 +28,9 @@ const routing: Routes = [
             {
                 path: ":id", component: GroupDetailComponent,
                 data: { name: "Detail" }
+            },
+            {
+                path: ':id/:ido/:uid/:type', component: ShareSystemDetailPermissionComponent, data: { name: "UserPermission" }
             }
         ]
     },

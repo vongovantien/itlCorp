@@ -940,7 +940,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || (x.AreaNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.AreaNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || ((x.ModeOfTransport ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                   || (x.FlightVesselNo ?? "").Contains(criteria.FlightVesselNo ?? "", StringComparison.OrdinalIgnoreCase) == true
+                                   || (x.FlightVesselNo ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) == true
                                    )
                                    && (x.Active == criteria.Active || criteria.Active == null)
                                    ).AsQueryable();

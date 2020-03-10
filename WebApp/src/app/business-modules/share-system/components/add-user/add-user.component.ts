@@ -280,7 +280,19 @@ export class ShareSystemAddUserComponent extends AppList {
     }
 
     gotoUserPermission(id: string, officeId: string) {
-        this._router.navigate([`home/system/permission/${this.type}/${this.object.id}/${officeId}/${id}`]);
+        if (this.type === "office") {
+            this._router.navigate([`home/system/office/${officeId}/${id}/${this.type}`]);
+        }
+        if (this.type === "company") {
+            console.log(this.object);
+            this._router.navigate([`home/system/company/${this.object.id}/${officeId}/${id}/${this.type}`]);
+        }
+        if (this.type === "department") {
+            this._router.navigate([`home/system/department/${this.object.id}/${officeId}/${id}/${this.type}`]);
+        }
+        if (this.type === "group") {
+            this._router.navigate([`home/system/group/${this.object.id}/${officeId}/${id}/${this.type}`]);
+        }
     }
 
     addUserToCompany(userLevel: UserLevel[]) {

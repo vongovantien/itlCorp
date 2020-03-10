@@ -23,7 +23,8 @@ namespace eFMS.API.Documentation.DL.Services
             currentUser = currUser;
         }
 
-        public HandleState UpdateAirWayBill(List<CsShipmentOtherChargeModel> otherCharges, Guid jobId)
+
+        public HandleState UpdateOtherCharge(List<CsShipmentOtherChargeModel> otherCharges, Guid jobId, Guid? hblId)
         {
             try
             {
@@ -42,8 +43,94 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         dimesion.Id = Guid.NewGuid();
                         dimesion.JobId = jobId;
+
                         dimesion.UserModified = currentUser.UserID;
                         dimesion.DatetimeModified = DateTime.Now;
+
+                        var hsAddDemension = Add(dimesion);
+                    }
+                    else
+                    {
+                        dimesion.JobId = jobId;
+
+                        dimesion.UserModified = currentUser.UserID;
+                        dimesion.DatetimeModified = DateTime.Now;
+                        var hsUpdateContMBL = Update(dimesion, x => x.Id == dimesion.Id);
+                    }
+                }
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public HandleState UpdateOtherChargeHouseBill(List<CsShipmentOtherChargeModel> otherCharges, Guid hblId)
+        {
+            try
+            {
+                var charges = otherCharges.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
+                var idContainersNeedRemove = DataContext.Get(x => x.Hblid == hblId && !charges.Contains(x.Id)).Select(s => s.Id);
+                //Delete item of List Container MBL
+                if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
+                {
+                    var hsDelContHBL = DataContext.Delete(x => idContainersNeedRemove.Contains(x.Id));
+                }
+
+                foreach (var charge in otherCharges)
+                {
+                    //Insert & Update List Container MBL
+                    if (charge.Id == Guid.Empty)
+                    {
+                        charge.Id = Guid.NewGuid();
+                        charge.Hblid = hblId;
+
+                        charge.UserModified = currentUser.UserID;
+                        charge.DatetimeModified = DateTime.Now;
+
+                        var hsAddDemension = Add(charge);
+                    }
+                    else
+                    {
+                        charge.Hblid = hblId;
+                       
+                        charge.UserModified = currentUser.UserID;
+                        charge.DatetimeModified = DateTime.Now;
+                        var hsUpdateContMBL = Update(charge, x => x.Id == charge.Id);
+                    }
+                }
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public HandleState UpdateOtherChargeMasterBill(List<CsShipmentOtherChargeModel> otherCharges, Guid jobId)
+        {
+            try
+            {
+                var charges = otherCharges.Where(x => x.Id != Guid.Empty).Select(s => s.Id);
+                var idContainersNeedRemove = DataContext.Get(x => x.JobId == jobId && !charges.Contains(x.Id)).Select(s => s.Id);
+                //Delete item of List Container MBL
+                if (idContainersNeedRemove != null && idContainersNeedRemove.Count() > 0)
+                {
+                    var hsDelContHBL = DataContext.Delete(x => idContainersNeedRemove.Contains(x.Id));
+                }
+
+                foreach (var dimesion in otherCharges)
+                {
+                    //Insert & Update List Container MBL
+                    if (dimesion.Id == Guid.Empty)
+                    {
+                        dimesion.Id = Guid.NewGuid();
+                        dimesion.JobId = jobId;
+
+                        dimesion.UserModified = currentUser.UserID;
+                        dimesion.DatetimeModified = DateTime.Now;
+
                         var hsAddDemension = Add(dimesion);
                     }
                     else

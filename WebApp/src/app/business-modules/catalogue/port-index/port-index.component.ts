@@ -230,6 +230,7 @@ export class PortIndexComponent extends AppList implements OnInit {
     }
 
     onDelete(event) {
+        this.confirmDeletePopup.hide();
         if (event) {
             this.catalogueRepo.deletePlace(this.portIndex.id)
                 .pipe(

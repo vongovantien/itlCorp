@@ -12,6 +12,7 @@ import {
 } from "../actions";
 import { ITransactionProfit } from "../reducers";
 import { CsTransaction } from "@models";
+import { OtherChargeActionTypes, GetShipmentOtherChargeSuccessAction, GetShipmentOtherChargeFailAction, GetHBLOtherChargeSuccessAction, GetHBLOtherChargeFailAction } from "../actions/shipment-other-charge.action";
 
 @Injectable()
 export class ShareBussinessEffects {
@@ -170,6 +171,33 @@ export class ShareBussinessEffects {
                     .pipe(
                         map((data: any) => new GetDimensionSuccessAction(data)),
                         catchError(err => of(new GetDimensionFailAction(err)))
+                    ))
+        );
+
+
+    @Effect()
+    getListOtherChargeShipment$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<HBLActions>(OtherChargeActionTypes.GET_OTHER_CHARGE_SHIPMENT),
+            map((payload: any) => payload.payload), // jobId
+            mergeMap(
+                (jobId: string) => this._documentRepo.getShipmentOtherCharge(jobId)
+                    .pipe(
+                        map((data: any) => new GetShipmentOtherChargeSuccessAction(data)),
+                        catchError(err => of(new GetShipmentOtherChargeFailAction(err)))
+                    ))
+        );
+
+    @Effect()
+    getListOtherChargeHBL$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<HBLActions>(OtherChargeActionTypes.GET_OTHER_CHARGE_HBL),
+            map((payload: any) => payload.payload), // jobId
+            mergeMap(
+                (hblId: string) => this._documentRepo.getHBLOtherCharge(hblId)
+                    .pipe(
+                        map((data: any) => new GetHBLOtherChargeSuccessAction(data)),
+                        catchError(err => of(new GetHBLOtherChargeFailAction(err)))
                     ))
         );
 

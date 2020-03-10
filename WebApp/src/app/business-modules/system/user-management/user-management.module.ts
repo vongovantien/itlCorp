@@ -13,6 +13,8 @@ import { FormAddUserComponent } from './components/form-add-user/form-add-user.c
 import { UserDetailsComponent } from './details/user-details.component';
 import { UserManagementImportComponent } from './import/user-management-import.component';
 import { AddRoleUserComponent } from './components/add-role-user/add-role-user.component';
+import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
+import { ShareSystemModule } from '../../share-system/share-system.module';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -29,6 +31,9 @@ const routing: Routes = [
             {
                 path: ':id', component: UserDetailsComponent, data: { name: "Edit User" }
             },
+            {
+                path: ':id/permission/:permissionId/:type', component: ShareSystemDetailPermissionComponent, data: { name: "UserPermission" }
+            }
         ]
     },
 ];
@@ -43,7 +48,8 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         TabsModule.forRoot(),
         ReactiveFormsModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        ShareSystemModule
     ],
     exports: [],
     declarations: [UserManagementComponent, UserFormSearchComponent, FormAddUserComponent, UserAddNewComponent, UserDetailsComponent, UserManagementImportComponent, AddRoleUserComponent],

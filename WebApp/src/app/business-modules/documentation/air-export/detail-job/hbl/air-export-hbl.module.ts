@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { PaginationModule, TabsModule, ModalModule } from 'ngx-bootstrap';
+import { PaginationModule, TabsModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
@@ -21,6 +21,7 @@ import { AirExportDetailHBLComponent } from './detail/detail-house-bill.componen
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SeparateHouseBillComponent } from './components/form-separate-house-bill/form-separate-house-bill.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { ShareAirExportModule } from '../../share-air-export.module';
 
 const routing: Routes = [
     {
@@ -49,6 +50,7 @@ const LIB = [
     NgxDaterangepickerMd.forRoot(),
     PerfectScrollbarModule,
     FroalaEditorModule.forRoot(),
+    CollapseModule,
     NgxCurrencyModule.forRoot({
         align: "right",
         allowNegative: true,
@@ -72,6 +74,7 @@ const LIB = [
         RouterModule.forChild(routing),
         ReactiveFormsModule,
         NgxSpinnerModule,
+        ShareAirExportModule,
         ...LIB
     ],
     exports: [],

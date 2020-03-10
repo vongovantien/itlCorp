@@ -10,6 +10,7 @@ namespace eFMS.API.Documentation.Service.Models
         public Guid? Hblid { get; set; }
         public string ChargeName { get; set; }
         public decimal? Amount { get; set; }
+        public string DueTo { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
     }

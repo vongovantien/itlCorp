@@ -25,6 +25,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string AgentId { get; set; }
         public Guid? Pol { get; set; }
         public Guid? Pod { get; set; }
+        public Guid? WarehouseId { get; set; }
         public Guid? DeliveryPlace { get; set; }
         public string PaymentTerm { get; set; }
         public string FlightVesselName { get; set; }
