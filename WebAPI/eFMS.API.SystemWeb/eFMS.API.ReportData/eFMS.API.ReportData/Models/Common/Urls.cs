@@ -43,6 +43,7 @@ namespace eFMS.API.ReportData.Models
             public const string DetailAdvancePaymentExportUrl = "/Accounting/api/v1/en-US/AcctAdvancePayment/DetailAdvancePaymentExport";
             public const string DetailSettlementPaymentExportUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/DetailSettlementPaymentExport";
             public const string DetailSOAExportUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExportSOABySOANo?soaNo=";
+            public const string GetDataSOAAirfreightExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportAirFrieghtBySOANo?soaNo=";
         }
 
         public class Documentation

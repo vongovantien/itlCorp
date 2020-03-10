@@ -56,6 +56,7 @@
             <param name="language">VN (Việt Nam) or ENG (English)</param>
             <returns></returns>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOAAirfreight(System.String,System.String)" -->
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
             <summary>
             A base class for an MVC controller without view support.
@@ -256,6 +257,9 @@
             <param name="advanceExport"></param>
             <param name="language"></param>
             <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateSOAAirfreightExcel(eFMS.API.ReportData.Models.ExportSOAAirfreightModel,System.IO.Stream)">
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateDetailSettlementPaymentExcel(eFMS.API.ReportData.Models.Accounting.SettlementExport,System.String,System.IO.Stream)">

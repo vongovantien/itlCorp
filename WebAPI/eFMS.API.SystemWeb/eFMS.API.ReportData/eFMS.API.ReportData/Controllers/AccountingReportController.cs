@@ -171,5 +171,28 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        /// Export detail SOA
+        /// </summary>
+        /// <param name="soaNo">soaNo of SOA</param>
+        /// <param name="officeId">officeId of user</param>
+        /// <returns></returns>
+        [Route("ExportSOAAirfreight")]
+        [HttpGet]
+        public async Task<IActionResult> ExportSOAAirfreight(string soaNo, string officeId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.GetDataSOAAirfreightExportUrl + soaNo + "&&officeId=" + officeId);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<ExportSOAAirfreightModel>();
+
+            var stream = new AccountingHelper().GenerateSOAAirfreightExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            string fileName = "Export SOA Air Freight " + soaNo + ".xlsx";
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            return fileContent;
+        }
     }
 }
