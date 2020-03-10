@@ -68,13 +68,27 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                         this.permissionId = param.id;
                     }
                     if (param.type) {
+                        if (param.type === "user") {
+                            this.userId = param.id;
+                        }
+                        if (param.type === "office") {
+                            this.id = param.id;
+                            this.userId = param.uid;
+                        }
+                        if (param.type === "company" || param.type === "department" || param.type === "group") {
+                            this.id = param.ido;
+                            this.userId = param.uid;
+                        }
+
+                        this.idUserPermission = param.permissionId;
+                        this.permissionId = '';
                         console.log(param.type);
                         this.type = param.type;
-                        this.userId = param.idu;
+                        // this.userId = param.idu;
                         console.log('userid here', this.userId);
-                        this.id = param.ido;
-                        this.ids = param.ids;
-                        this.idUserPermission = param.ido;
+                        // this.id = param.ido;
+                        this.ids = param.id;
+                        //this.idUserPermission = param.ido;
                     }
                 }),
                 switchMap(() =>
