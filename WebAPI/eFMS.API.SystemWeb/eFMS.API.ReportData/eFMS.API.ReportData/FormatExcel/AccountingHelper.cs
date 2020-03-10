@@ -1078,6 +1078,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
         public void BinddingDataDetailSOAAirfreight(ExcelWorksheet workSheet, ExportSOAAirfreightModel airfreightObj)
         {
+            SetWidthColumnExcelDetailAdvancePayment(workSheet);
+
             using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
             {
                 var excelImage = workSheet.Drawings.AddPicture("Logo", image);
@@ -1085,7 +1087,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 excelImage.SetPosition(0, 0, 1, 0);
             }
 
-            SetWidthColumnExcelDetailAdvancePayment(workSheet);
 
             List<string> headers = new List<string>()
             {
@@ -1115,6 +1116,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A5:J6"].Style.Font.SetFromFont(new Font("Times New Roman", 11));
             workSheet.Cells["A5:B5"].Merge = true;
             workSheet.Cells["A4:K4"].Merge = true;
+            workSheet.Cells["A5:K5"].Merge = true;
             workSheet.Cells["A4"].Value = airfreightObj.PartnerNameEn;
             workSheet.Cells["A4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["A4"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
