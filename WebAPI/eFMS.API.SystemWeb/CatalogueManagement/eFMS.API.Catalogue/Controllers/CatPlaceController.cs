@@ -120,7 +120,7 @@ namespace eFMS.API.Catalogue.Controllers
         {
             PermissionRange permissionRange;
             ICurrentUser _user = null;
-            CatPlaceModel place = catPlaceService.First(x => x.Id == id);
+            CatPlaceModel place = catPlaceService.Get(x => x.Id == id).FirstOrDefault();
             if (place == null)
             {
                 return Ok(false);
@@ -328,7 +328,7 @@ namespace eFMS.API.Catalogue.Controllers
         {
             PermissionRange permissionRange;
             ICurrentUser _user = null;
-            CatPlaceModel place = catPlaceService.First(x => x.Id == id);
+            CatPlaceModel place = catPlaceService.Get(x => x.Id == id).FirstOrDefault();
             if (place == null)
             {
                 return Ok(false);

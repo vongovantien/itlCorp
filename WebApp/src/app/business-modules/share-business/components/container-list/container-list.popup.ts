@@ -103,7 +103,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
     addNewContainer() {
         this.isSubmitted = false;
         this.isDuplicateContPakage = false;
-        this.initContainers = [...this.initContainers, new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: this.defaultWeightUnit.id, unitOfMeasureName: this.defaultWeightUnit.unitNameEn })];
+        this.initContainers = [...this.initContainers, new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: !!this.defaultWeightUnit ? this.defaultWeightUnit.id : null, unitOfMeasureName: !!this.defaultWeightUnit ? this.defaultWeightUnit.unitNameEn : null })];
         // this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
     }
 
@@ -157,7 +157,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
                     this.packageUnits = res[1];
                     this.weightUnits = res[2];
 
-                    const kgs: Unit = this.weightUnits.find(w => w.code === 'kgs');
+                    const kgs: Unit = this.weightUnits.find(w => w.code === 'kgs' || w.code === 'KGS');
                     if (!!kgs) {
                         this.defaultWeightUnit = kgs;
                     }
