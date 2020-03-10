@@ -9,10 +9,10 @@ import { AirExportCreateHBLComponent } from '../create/create-house-bill.compone
 import { Crystal } from '@models';
 import { ReportPreviewComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
+import { getDetailHBlPermissionState } from '@share-bussiness';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { getDetailHBlPermissionState } from '@share-bussiness';
 
 
 @Component({
@@ -60,6 +60,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                 this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
+                this._store.dispatch(new fromShareBussiness.GetHBLOtherChargeAction(this.hblId));
 
             } else {
                 this.gotoList();
@@ -88,6 +89,13 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         }
 
         const modelUpdate = this.getDataForm();
+        modelUpdate.otherCharges = this.formCreateHBLComponent.otherCharges;
+
+        modelUpdate.otherCharges.forEach(c => {
+            c.jobId = this.jobId;
+            c.hblId = this.hblId;
+        });
+
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
         modelUpdate.transactionType = "AE";

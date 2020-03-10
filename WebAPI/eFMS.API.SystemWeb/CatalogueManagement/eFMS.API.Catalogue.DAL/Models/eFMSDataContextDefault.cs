@@ -31,7 +31,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatCountry> CatCountry { get; set; }
         public virtual DbSet<CatCurrency> CatCurrency { get; set; }
         public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
-        public virtual DbSet<CatCustomerPlace> CatCustomerPlace { get; set; }
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
         public virtual DbSet<CatPartnerCharge> CatPartnerCharge { get; set; }
@@ -989,36 +988,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<CatCustomerPlace>(entity =>
-            {
-                entity.ToTable("catCustomerPlace");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Address).HasMaxLength(4000);
-
-                entity.Property(e => e.ContactNo)
-                    .HasMaxLength(150)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ContactPerson).HasMaxLength(4000);
-
-                entity.Property(e => e.CustomerId)
-                    .HasColumnName("CustomerID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.Note).HasMaxLength(4000);
-
-                entity.Property(e => e.PlaceId).HasColumnName("PlaceID");
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-            });
-
             modelBuilder.Entity<CatDepartment>(entity =>
             {
                 entity.ToTable("catDepartment");
@@ -1515,8 +1484,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
-
-                entity.Property(e => e.WarehouseName).HasMaxLength(50);
             });
 
             modelBuilder.Entity<CatPlaceType>(entity =>
@@ -2309,6 +2276,12 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
+                entity.Property(e => e.DueTo)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2827,6 +2800,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.VoyNo).HasMaxLength(1600);
+
+                entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
 
             modelBuilder.Entity<CsTransactionDetail>(entity =>
@@ -3193,6 +3168,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.Valpp)
                     .HasColumnName("VALPP")
                     .IsUnicode(false);
+
+                entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
 
                 entity.Property(e => e.WarehouseNotice).HasMaxLength(500);
 

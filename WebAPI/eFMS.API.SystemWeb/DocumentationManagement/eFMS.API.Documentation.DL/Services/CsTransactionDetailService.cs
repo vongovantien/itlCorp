@@ -35,6 +35,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
         readonly IContextBase<CatCountry> countryRepository;
         readonly ICsDimensionDetailService dimensionDetailService;
+        readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysAuthorization> authorizationRepository;
         readonly IUserPermissionService permissionService;
@@ -53,9 +54,11 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShipmentSurcharge> surchareRepo,
             IContextBase<CatCountry> countryRepo,
             IContextBase<CsTransactionDetail> csTransactiondetail,
-            ICsMawbcontainerService contService, ICurrentUser user,
+            ICsMawbcontainerService contService, 
+            ICurrentUser user,
             ICsDimensionDetailService dimensionService,
             IContextBase<SysAuthorization> authorizationRepo,
+            ICsShipmentOtherChargeService oChargeService,
             IUserPermissionService perService) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
@@ -68,6 +71,7 @@ namespace eFMS.API.Documentation.DL.Services
             surchareRepository = surchareRepo;
             catSalemanRepo = catSaleman;
             containerService = contService;
+            shipmentOtherChargeService = oChargeService;
             csTransactionDetailRepo = csTransactiondetail;
             currentUser = user;
             countryRepository = countryRepo;
@@ -146,6 +150,17 @@ namespace eFMS.API.Documentation.DL.Services
                             });
                             var d = dimensionDetailService.Add(model.DimensionDetails);
                         }
+                        if (model.OtherCharges != null)
+                        {
+                            model.OtherCharges.ForEach(x =>
+                            {
+                                x.Id = Guid.NewGuid();
+                                x.Hblid = model.Id;
+                                dimensionDetailService.Add(model.DimensionDetails);
+                            });
+                            shipmentOtherChargeService.Add(model.OtherCharges);
+                        }
+
                     }
                     DataContext.SubmitChanges();
                     trans.Commit();
@@ -216,6 +231,10 @@ namespace eFMS.API.Documentation.DL.Services
                         else
                         {
                             var hsDimensionDelete = dimensionDetailService.Delete(x => x.Hblid == model.Id);
+                        }
+                        if(model.OtherCharges != null)
+                        {
+                            var otherCharges = shipmentOtherChargeService.UpdateOtherChargeHouseBill(model.OtherCharges,model.Id);
                         }
                     }
                     trans.Commit();

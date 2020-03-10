@@ -71,6 +71,8 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             });
     }
 
+
+
     generateHblNo(transactionType: number) {
         this._documentationRepo.generateHBLNo(transactionType)
             .pipe(
@@ -129,6 +131,13 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
         const houseBill: HouseBill = this.getDataForm();
         houseBill.jobId = this.jobId;
+
+        houseBill.otherCharges = this.formCreateHBLComponent.otherCharges;
+
+        houseBill.otherCharges.forEach(c => {
+            c.jobId = this.jobId;
+            c.hblId = SystemConstants.EMPTY_GUID;
+        });
 
         this.createHbl(houseBill);
     }

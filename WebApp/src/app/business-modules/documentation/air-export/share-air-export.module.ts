@@ -4,6 +4,7 @@ import { ShareAirExportOtherChargePopupComponent } from './share/other-charge/ai
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { ModalModule } from 'ngx-bootstrap';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
     declarations: [
@@ -13,7 +14,8 @@ import { DirectiveModule } from 'src/app/shared/directives/directive.module';
         CommonModule,
         CommonComponentModule,
         ModalModule,
-        DirectiveModule
+        DirectiveModule,
+        FormsModule
     ],
     exports: [
         ShareAirExportOtherChargePopupComponent

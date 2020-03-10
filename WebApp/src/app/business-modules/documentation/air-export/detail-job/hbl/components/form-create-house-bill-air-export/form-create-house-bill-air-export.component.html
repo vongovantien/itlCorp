@@ -580,7 +580,7 @@
                             <div class="form-group">
                                 <label>
                                     Other Charge
-                                    <a title="Dimension Volume">
+                                    <a title="Other Charge" (click)="showOtherChargePopup()">
                                         <i class="fa fa-pencil fa-lg"></i>
                                     </a>
                                 </label>
@@ -703,3 +703,5 @@
         </form>
     </div>
 </div>
+
+<air-export-other-charge-popup (onUpdate)="updateOtherCharge($event)"></air-export-other-charge-popup>

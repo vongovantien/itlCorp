@@ -8,35 +8,54 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row align-items-center m--margin-bottom-10">
+                <div class="row align-items-center m--margin-bottom-10 font-weight-bold text-center">
                     <div class="col-md-4">Charge Name</div>
                     <div class="col-md-3">Amount</div>
                     <div class="col-md-4">Due To</div>
                     <div class="col-md-1 pointer text-center"></div>
                 </div>
-                <div class="row m--align-center m--margin-bottom-20 m-form m-form--state">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <input type="number" class="form-control" numeric [decimals]="digitDecimal"
-                                autoFormatCurrency placeholder="Charge name">
+                <ng-container *ngIf="!!csOtherChargesTemp; else placeholder">
+                    <ng-container *ngFor="let item of csOtherChargesTemp; let i=index; trackBy: trackByFn">
+                        <div class="row m--align-center m--margin-bottom-20 m-form m-form--state">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" [(ngModel)]="item.chargeName">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="number" class="form-control" numeric [decimals]="digitDecimal"
+                                        autoFormatCurrency placeholder="Amount" [(ngModel)]="item.amount"
+                                        (ngModelChange)="updateDescription()">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <select [(ngModel)]="item.dueTo" class="form-control"
+                                        (ngModelChange)="updateDescription()">
+                                        <option *ngFor="let item of dueToData" [ngValue]="item.value">
+                                            {{item.displayName}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-1 pointer text-center">
+                                <a title="Delete" (click)="delete(item,i)">
+                                    <i class="fa fa-times fa-2x text-danger"></i>
+                                </a>
+                            </div>
                         </div>
+                    </ng-container>
+                </ng-container>
+                <a title="Add" class="pointer" (click)="addOtherCharge()">
+                    <i class="fa fa-plus-circle fa-2x text-success"></i>
+                </a>
+                <div
+                    class="row pt-2  mt-2 align-items-center pb-2 d-flex justify-content-around align-items-center font-weight-bold">
+                    <div>
+                        Due To Agent: <span>{{totalAgent | number : '.0-3'}}</span>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <input type="number" class="form-control" numeric [decimals]="digitDecimal"
-                                autoFormatCurrency placeholder="Amount">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <input type="number" class="form-control" numeric [decimals]="digitDecimal"
-                                autoFormatCurrency placeholder="charge name">
-                        </div>
-                    </div>
-                    <div class="col-md-1 pointer text-center">
-                        <a title="Delete" (click)="delete(item,i)">
-                            <i class="fa fa-times fa-2x text-danger"></i>
-                        </a>
+                    <div>
+                        Due To Carrier: <span>{{totalCarrier| number : '.0-3'}}</span>
                     </div>
                 </div>
             </div>
@@ -58,3 +77,11 @@
         </div>
     </div>
 </div>
+
+
+<ng-template #placeholder>
+    <div class="no-data">
+        <i class="flaticon-coins"></i>
+        <span class="no-data-text">No records found</span>
+    </div>
+</ng-template>

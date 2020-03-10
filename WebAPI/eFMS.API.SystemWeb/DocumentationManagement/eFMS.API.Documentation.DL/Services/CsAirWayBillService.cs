@@ -101,7 +101,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         if(model.OtherCharges != null)
                         {
-                            var hsOtherCharges = shipmentOtherChargeService.UpdateAirWayBill(model.OtherCharges, model.Id);
+                            var hsOtherCharges = shipmentOtherChargeService.UpdateOtherChargeMasterBill(model.OtherCharges, model.Id);
                         }
                     }
                     trans.Commit();
