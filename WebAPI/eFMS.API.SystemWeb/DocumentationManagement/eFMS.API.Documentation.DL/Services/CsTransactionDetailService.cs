@@ -61,7 +61,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsDimensionDetailService dimensionService,
             IContextBase<SysAuthorization> authorizationRepo,
             ICsShipmentOtherChargeService oChargeService,
-            IUserPermissionService perService) : base(repository, mapper)
+            IUserPermissionService perService,
+            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
