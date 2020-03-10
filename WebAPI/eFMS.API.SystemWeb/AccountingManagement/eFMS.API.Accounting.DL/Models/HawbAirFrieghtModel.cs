@@ -22,7 +22,7 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? AWB { get; set; }
         public decimal? HandlingFee { get; set; }
         public decimal? NetAmount { get; set; }
-        public double? ExchangeRate { get; set; }
-        public double? TotalAmount { get; set; }
+        public decimal? ExchangeRate { get; set; }
+        public decimal? TotalAmount { get; set; }
     }
 }

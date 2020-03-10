@@ -53,6 +53,11 @@ namespace eFMS.API.Accounting.DL.Models
         public Guid? AOD { get; set; }
         public int? PackageQty { get; set; }
 
+        public decimal? FinalExchangeRate { get; set; }
+
+        public DateTime? ExchangeDate { get; set; }
+
+
 
 
     }

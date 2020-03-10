@@ -53,7 +53,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         IQueryable<ExportImportBravoFromSOAResult> GetDataExportImportBravoFromSOA(string soaNo);
 
-        ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo);
+        ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo,string officeId);
 
     }
 }

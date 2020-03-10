@@ -34,8 +34,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepo;
         readonly IContextBase<CatPlace> catPlaceRepo;
-
-
+        readonly IContextBase<SysOffice> officeRepo;
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -52,7 +51,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatPartner> catPartner,
             IContextBase<SysUser> sysUser,
             IContextBase<CatPlace> catplace,
-            IContextBase<CatChargeDefaultAccount> chargeDefault) : base(repository, mapper)
+            IContextBase<CatChargeDefaultAccount> chargeDefault,
+            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -68,6 +68,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysUserRepo = sysUser;
             chargeDefaultRepo = chargeDefault;
             catPlaceRepo = catplace;
+            officeRepo = sysOffice;
         }
 
         #region -- Insert & Update SOA
@@ -669,12 +670,14 @@ namespace eFMS.API.Accounting.DL.Services
                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
                                            Commodity = cst.Commodity,
                                            FlightNo = cstd.FlightNo,
-                                           ShippmentDate = cst.TransactionType == "AE" ? cstd.Etd : cst.TransactionType =="AI" ? cstd.Eta : null , 
+                                           ShippmentDate = cst.TransactionType == "AE" ? cstd.Etd : cst.TransactionType == "AI" ? cstd.Eta : null,
                                            AOL = cst.Pol,
                                            AOD = cst.Pod,
                                            PackageQty = cstd.PackageQty,
                                            GrossWeight = cstd.GrossWeight,
-                                           ChargeWeight = cstd.ChargeWeight
+                                           ChargeWeight = cstd.ChargeWeight,
+                                           FinalExchangeRate = sur.FinalExchangeRate,
+                                           ExchangeDate = sur.ExchangeDate
                                        };
             queryBuySellDocument = queryBuySellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -787,7 +790,9 @@ namespace eFMS.API.Accounting.DL.Services
                                            AOD = cst.Pod,
                                            PackageQty = cstd.PackageQty,
                                            GrossWeight = cstd.GrossWeight,
-                                           ChargeWeight = cstd.ChargeWeight
+                                           ChargeWeight = cstd.ChargeWeight,
+                                           FinalExchangeRate = sur.FinalExchangeRate,
+                                           ExchangeDate = sur.ExchangeDate
                                        };
             queryObhSellDocument = queryObhSellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -895,7 +900,9 @@ namespace eFMS.API.Accounting.DL.Services
                                           AOD = cst.Pod,
                                           PackageQty = cstd.PackageQty,
                                           GrossWeight = cstd.GrossWeight,
-                                          ChargeWeight = cstd.ChargeWeight
+                                          ChargeWeight = cstd.ChargeWeight,
+                                          FinalExchangeRate = sur.FinalExchangeRate,
+                                          ExchangeDate = sur.ExchangeDate
                                       };
             queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -974,7 +981,9 @@ namespace eFMS.API.Accounting.DL.Services
                                 AOD = data.AOD,
                                 PackageQty = data.PackageQty,
                                 GrossWeight = data.GrossWeight,
-                                ChargeWeight = data.ChargeWeight
+                                ChargeWeight = data.ChargeWeight,
+                                FinalExchangeRate = data.FinalExchangeRate,
+                                ExchangeDate = data.ExchangeDate
                             };
             queryData = queryData.ToArray().OrderBy(x => x.Service).AsQueryable();
             return queryData;
@@ -1711,7 +1720,7 @@ namespace eFMS.API.Accounting.DL.Services
 
 
 
-        public ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo)
+        public ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo,string officeId)
         {
             var soa = DataContext.Get(x => x.Soano == soaNo);
             var partner = catPartnerRepo.Get();
@@ -1736,19 +1745,20 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query).Where(x=>x.TransactionType == "AI" || x.TransactionType =="AE" );
+            var charge = GetChargeShipmentDocAndOperation(query).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
             var results = charge.GroupBy(x => x.HBL).AsQueryable();
 
             if (results.Select(x => x.Key).Count() > 0)
             {
-                foreach(var item in results.Select(x=>x.Key))
+                result.HawbAirFrieghts = new List<HawbAirFrieghtModel>();
+                foreach (var item in results.Select(x => x.Key))
                 {
                     var chargeData = charge.Where(x => x.HBL == item).FirstOrDefault();
                     HawbAirFrieghtModel air = new HawbAirFrieghtModel();
                     air.JobNo = chargeData.JobId;
                     air.FlightNo = chargeData.FlightNo;
                     air.ShippmentDate = chargeData.ShippmentDate;
-                    air.AOL = chargeData.MBL.Substring(1,3) + port.Where(x=>x.Id  == chargeData.AOL).Select(t=>t.Code).FirstOrDefault();
+                    air.AOL = chargeData.MBL.Substring(1, 3) + port.Where(x => x.Id == chargeData.AOL).Select(t => t.Code).FirstOrDefault();
                     air.Mawb = chargeData.MBL.Substring(chargeData.MBL.Length - 8);
                     air.AOD = port.Where(x => x.Id == chargeData.AOD).Select(t => t.Code).FirstOrDefault();
                     air.Service = "Normal"; // tạm thời hardcode;
@@ -1756,10 +1766,13 @@ namespace eFMS.API.Accounting.DL.Services
                     air.CW = chargeData.ChargeWeight;
                     air.GW = chargeData.GrossWeight;
                     air.Rate = chargeData.ChargeName == AccountingConstants.CHARGE_AIR_FREIGHT ? chargeData.UnitPrice : null;
+
                     var lstAirfrieght = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
                     air.AirFreight = lstAirfrieght.Count() > 0 ? lstAirfrieght.Select(t => t.Debit).Sum() : null;
+
                     var lstFuelSurcharge = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
                     air.FuelSurcharge = lstFuelSurcharge.Count() > 0 ? lstFuelSurcharge.Select(t => t.Debit).Sum() : null;
+
                     var lstWariskSurcharge = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
                     air.WarriskSurcharge = lstWariskSurcharge.Count() > 0 ? lstWariskSurcharge.Select(t => t.Debit).Sum() : null;
 
@@ -1772,16 +1785,53 @@ namespace eFMS.API.Accounting.DL.Services
                     var lstHandlingFee = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_HANDLING_FEE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
                     air.HandlingFee = lstHandlingFee.Count() > 0 ? lstHandlingFee.Select(t => t.Debit).Sum() : null;
 
-                    air.NetAmount = air.AirFreight + air.FuelSurcharge + air.WarriskSurcharge + air.ScreeningFee + air.HandlingFee;
+                    air.NetAmount = 0;
+                    if (air.AirFreight.HasValue)
+                    {
+                        air.NetAmount += air.AirFreight;
+                    }
+                    if (air.WarriskSurcharge.HasValue)
+                    {
+                        air.NetAmount += air.WarriskSurcharge;
+                    }
+                    if (air.ScreeningFee.HasValue)
+                    {
+                        air.NetAmount += air.ScreeningFee;
+                    }
+                    if (air.HandlingFee.HasValue)
+                    {
+                        air.NetAmount += air.HandlingFee;
+                    }
 
-                    result.HawbAirFrieghts = new List<HawbAirFrieghtModel>();
+                    if (chargeData.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower())
+                    {
+                        if (chargeData.FinalExchangeRate != null)
+                        {
+                            air.ExchangeRate = chargeData.FinalExchangeRate;
+                        }
+                        else
+                        {
+                            var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
+                            var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
+                            air.ExchangeRate = dataObjectCurrencyExchange.Rate;
+                        }
+                    }
+                    else
+                    {
+                        air.ExchangeRate = chargeData.FinalExchangeRate;
+                    }
+
+                    air.TotalAmount = air.NetAmount * air.ExchangeRate;
+
                     result.HawbAirFrieghts.Add(air);
                 }
             }
-        
-
-
-
+            var officeData = officeRepo.Get(x => x.Id == new Guid(officeId)).FirstOrDefault();
+            result.OfficeEn = officeData.BranchNameEn;
+            result.BankAccountVND = officeData.BankAccountVnd;
+            result.BankNameEn = officeData.BankName;
+            result.AddressEn = officeData.AddressEn;
+            result.SwiftCode = officeData.SwiftCode;
             return result;
         }
 
