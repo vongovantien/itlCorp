@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { ShareSystemModule } from '../../share-system/share-system.module';
+import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -26,6 +27,9 @@ const routing: Routes = [
                 path: ":id", component: DepartmentDetailComponent,
                 data: { name: "Detail", }
             },
+            {
+                path: ':id/:ido/:uid/:type', component: ShareSystemDetailPermissionComponent, data: { name: "UserPermission" }
+            }
         ]
     },
 ]

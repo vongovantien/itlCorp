@@ -220,6 +220,10 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
             }
+            if (model.PlaceType == CatPlaceTypeEnum.Province || model.PlaceType == CatPlaceTypeEnum.District || model.PlaceType == CatPlaceTypeEnum.Ward)
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catLocation);
+            }
 
             permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None)
@@ -276,6 +280,11 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
             }
+            if (model.PlaceType == CatPlaceTypeEnum.Province || model.PlaceType == CatPlaceTypeEnum.District || model.PlaceType == CatPlaceTypeEnum.Ward)
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catLocation);
+            }
+
 
             permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None)
@@ -296,8 +305,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catPlace = mapper.Map<CatPlaceModel>(model);
-            // catPlace.Id = id;
-            // var hs = catPlaceService.Update(catPlace, x => x.Id == id);
+            catPlace.Id = id;
             var hs = catPlaceService.Update(catPlace);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -330,6 +338,10 @@ namespace eFMS.API.Catalogue.Controllers
             if (place.PlaceTypeId == CatPlaceTypeEnum.Port.ToString())
             {
                 _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
+            }
+            if (place.PlaceTypeId == CatPlaceTypeEnum.Province.ToString() || place.PlaceTypeId == CatPlaceTypeEnum.District.ToString() || place.PlaceTypeId == CatPlaceTypeEnum.Ward.ToString())
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catLocation);
             }
 
             permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);

@@ -227,8 +227,11 @@
     <Content Include="aspnet_client\system_web\4_7_3282\CrystalReportWebFormViewer4\js\strings_ko.js" />
     <Content Include="aspnet_client\system_web\4_7_3282\CrystalReportWebFormViewer4\js\strings_ru.js" />
     <Content Include="Default.aspx" />
+    <Content Include="DownloadReports\New Text Document.txt" />
     <Content Include="ExportCrystal.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Images\logo-eFMS.png" />
+    <Content Include="Images\logo-ITL.png" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

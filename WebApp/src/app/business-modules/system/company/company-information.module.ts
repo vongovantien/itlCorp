@@ -18,6 +18,7 @@ import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
 import { ShareSystemModule } from '../../share-system/share-system.module';
+import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
 
 
 const routing: Routes = [
@@ -34,6 +35,9 @@ const routing: Routes = [
             {
                 path: ":id", component: CompanyInformationDetailComponent,
                 data: { name: "Detail" }
+            },
+            {
+                path: ':id/:ido/:uid/:type', component: ShareSystemDetailPermissionComponent, data: { name: "UserPermission" }
             }
         ]
     },
