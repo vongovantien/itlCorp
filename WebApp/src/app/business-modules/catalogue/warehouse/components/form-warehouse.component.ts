@@ -72,13 +72,13 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
         this.active = this.warehouseForm.controls['active'];
     }
 
-    setFormValue(res: any) {
+    setFormValue(res: Warehouse) {
         let countryActive = [];
         let provinceActive = [];
         let districtActive = [];
-        const indexcountry = this.countries.findIndex(x => x.id === res.countryID);
-        const indexProvince = this.provinces.findIndex(x => x.id === res.provinceID);
-        const indexDistrict = this.districts.findIndex(x => x.id === res.districtID);
+        const indexcountry = this.countries.findIndex(x => x.id === res.countryId);
+        const indexProvince = this.provinces.findIndex(x => x.id === res.provinceId);
+        const indexDistrict = this.districts.findIndex(x => x.id === res.districtId);
 
         if (indexcountry > -1) {
             countryActive = [this.countries[indexcountry]];
@@ -132,9 +132,9 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
         this.warehouse.code = this.code.value;
         this.warehouse.nameEn = this.warehouseNameEN.value;
         this.warehouse.nameVn = this.warehouseNameVN.value;
-        this.warehouse.countryID = this.country.value[0].id;
-        this.warehouse.provinceID = this.province.value[0].id;
-        this.warehouse.districtID = this.district.value[0].id;
+        this.warehouse.countryId = this.country.value[0].id;
+        this.warehouse.provinceId = this.province.value[0].id;
+        this.warehouse.districtId = this.district.value[0].id;
         this.warehouse.address = this.address.value;
         this.warehouse.flightVesselNo = this.flightVesselNo.value;
         this.warehouse.active = !!this.isUpdate ? this.active.value : true;

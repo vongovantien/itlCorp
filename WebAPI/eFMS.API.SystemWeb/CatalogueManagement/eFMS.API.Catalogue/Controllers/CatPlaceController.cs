@@ -106,7 +106,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
-        [AuthorizeEx(Menu.catWarehouse, UserPermission.AllowAccess)]
+
         public IActionResult Get(CatPlaceCriteria criteria, int page, int size)
         {
             var data = catPlaceService.Paging(criteria, page, size, out int rowCount);
@@ -265,7 +265,7 @@ namespace eFMS.API.Catalogue.Controllers
         [AuthorizeEx(Menu.catWarehouse, UserPermission.Update)]
         public IActionResult Put(Guid id, CatPlaceEditModel model)
         {
-        
+
             PermissionRange permissionRange;
             ICurrentUser _user = null;
             if (model.PlaceType == CatPlaceTypeEnum.Warehouse)
@@ -574,20 +574,22 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == Guid.Empty)
             {
-                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower()))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.PlaceTypeId == PlaceTypeEx.GetPlaceType(model.PlaceType)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
+
             }
             else
             {
-                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id != id))
+                if (catPlaceService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id != id && x.PlaceTypeId == PlaceTypeEx.GetPlaceType(model.PlaceType)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             return message;
         }
+
 
 
     }
