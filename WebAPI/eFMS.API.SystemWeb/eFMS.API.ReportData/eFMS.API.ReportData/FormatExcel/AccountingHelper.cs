@@ -799,17 +799,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[row + 2, 10].Value = headers[20]; //Balance
             workSheet.Cells[row + 1, 11].Merge = true;
 
-            string idT = workSheet
-            .Cells[row + 1, 10]
-            .First(c => c.Value.ToString() == "Total")
-            .Start
-            .Address;
-
-            string idT1 = workSheet
-            .Cells[row + 1, 11]
-            .Start
-            .Address;
-
+            string idT = workSheet.Cells[row + 1, 10].First(c => c.Value.ToString() == "Total").Start.Address;
+            string idT1 = workSheet.Cells[row + 1, 11].Start.Address;
             string joinTotal = idT + ":" + idT1;
             workSheet.Cells[joinTotal].Merge = true;
 
