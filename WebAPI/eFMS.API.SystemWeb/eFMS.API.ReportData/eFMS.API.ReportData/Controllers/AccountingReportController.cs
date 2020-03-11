@@ -184,7 +184,10 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.GetDataSOAAirfreightExportUrl + soaNo + "&&officeId=" + officeId);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<ExportSOAAirfreightModel>();
-
+            if(dataObjects.Result.HawbAirFrieghts == null)
+            {
+                return null;
+            }
             var stream = new AccountingHelper().GenerateSOAAirfreightExcel(dataObjects.Result);
             if (stream == null)
             {

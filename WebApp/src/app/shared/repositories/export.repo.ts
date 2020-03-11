@@ -169,6 +169,13 @@ export class ExportRepo {
         );
     }
 
+    exportSOAAirFreight(soaNo: string, officeId: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOAAirfreight`, null, { soaNo: soaNo, officeId: officeId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     exportSettlementPaymentDetail(settlementId: string, language: string) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailSettlementPayment?settlementId=${settlementId}&language=${language}`).pipe(
             catchError((error) => throwError(error)),
