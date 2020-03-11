@@ -22,5 +22,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public string AccountNo { get; set; }
+        public string CoLoaderCode { get; set; }
     }
 }

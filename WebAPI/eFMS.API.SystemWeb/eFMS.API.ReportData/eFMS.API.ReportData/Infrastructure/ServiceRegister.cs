@@ -1,11 +1,13 @@
 ﻿using eFMS.API.Catalogue.Infrastructure.Filters;
 using eFMS.API.ReportData.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Reflection;
 
@@ -21,6 +23,30 @@ namespace eFMS.API.ReportData.Infrastructure
                     = configuration.GetSection("APIs:HostStating").Value;
             });
             return service;
+        }
+
+        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IConfiguration configuration)
+        {
+            //services.AddUserManager();
+            //services.AddTransient<IClaimsTransformation, ClaimsExtender>();
+
+            services.AddMvcCore()
+                .AddAuthorization();
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.Authority = configuration["Authentication:Authority"];
+                options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
+                options.Audience = configuration["Authentication:ApiName"];
+                options.SaveToken = true;
+            });
+            return services;
         }
         public static IServiceCollection AddSwagger(this IServiceCollection services)
         {
@@ -48,13 +74,26 @@ namespace eFMS.API.ReportData.Infrastructure
                                 Description = "eFMS Report Data API Document"
                             });
                     }
-                    options.DocumentFilter<SwaggerAddEnumDescriptions>();
+                    //options.DocumentFilter<SwaggerAddEnumDescriptions>();
 
-                    options.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                    //options.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                    //{
+                    //    Flow = "implicit", // just get token via browser (suitable for swagger SPA)
+                    //    AuthorizationUrl = "",
+                    //    Scopes = new Dictionary<string, string> { { "apimobile", "Report Data API" } }
+                    //});
+                    //options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
+                    options.DocumentFilter<SwaggerAddEnumDescriptions>();
+                    var security = new Dictionary<string, IEnumerable<string>>{
+                        { "Bearer", new string[] { }},
+                    };
+
+                    options.AddSecurityDefinition("Bearer", new ApiKeyScheme
                     {
-                        Flow = "implicit", // just get token via browser (suitable for swagger SPA)
-                        AuthorizationUrl = "",
-                        Scopes = new Dictionary<string, string> { { "apimobile", "Report Data API" } }
+                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                        Name = "Authorization",
+                        In = "header",
+                        Type = "apiKey"
                     });
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });

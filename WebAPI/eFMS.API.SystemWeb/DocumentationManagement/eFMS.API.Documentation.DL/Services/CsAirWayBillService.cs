@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -16,15 +17,25 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICsDimensionDetailService dimensionDetailService;
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private readonly ICurrentUser currentUser;
+        readonly IContextBase<CatPlace> catPlaceRepo;
+        readonly IContextBase<CsTransaction> csTransactionRepo;
+        readonly IContextBase<CatPartner> catPartnerRepo;
+
         public CsAirWayBillService(IContextBase<CsAirWayBill> repository, 
             IMapper mapper,
             ICsDimensionDetailService dimensionService,
             ICsShipmentOtherChargeService otherChargeService,
-            ICurrentUser currUser) : base(repository, mapper)
+            ICurrentUser currUser,
+            IContextBase<CatPlace> catPlace,
+            IContextBase<CsTransaction> csTransaction,
+            IContextBase<CatPartner> catPartner) : base(repository, mapper)
         {
             dimensionDetailService = dimensionService;
             shipmentOtherChargeService = otherChargeService;
             currentUser = currUser;
+            catPlaceRepo = catPlace;
+            csTransactionRepo = csTransaction;
+            catPartnerRepo = catPartner;
         }
 
         public CsAirWayBillModel GetBy(Guid jobId)
@@ -101,7 +112,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         if(model.OtherCharges != null)
                         {
-                            var hsOtherCharges = shipmentOtherChargeService.UpdateAirWayBill(model.OtherCharges, model.Id);
+                            var hsOtherCharges = shipmentOtherChargeService.UpdateOtherChargeMasterBill(model.OtherCharges, model.Id);
                         }
                     }
                     trans.Commit();
@@ -117,6 +128,77 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public AirwayBillExportResult AirwayBillExport(Guid id)
+        {
+            var masterbill = Get(x => x.Id == id).FirstOrDefault();
+            if (masterbill == null) return null;
+            masterbill.OtherCharges = shipmentOtherChargeService.Get(x => x.JobId == id).ToList();
+            
+            var result = new AirwayBillExportResult();
+            result.MawbNo = masterbill.Mblno1 + masterbill.Mblno2 + masterbill.Mblno3;
+            var pol = catPlaceRepo.Get(x => x.Id == masterbill.Pol).FirstOrDefault();
+            var pod = catPlaceRepo.Get(x => x.Id == masterbill.Pod).FirstOrDefault();
+            result.AolCode = pol.Code ?? string.Empty;
+            result.Shipper = masterbill.ShipperDescription;
+
+            //Airline lấy từ Shipment
+            var airlineId = csTransactionRepo.Get(x => x.Id == masterbill.JobId).FirstOrDefault()?.ColoaderId;
+            result.AirlineNameEn = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.PartnerNameEn;
+            result.Consignee = masterbill.ConsigneeDescription;
+
+            var _airFrieghtDa = string.Empty;
+            if (!string.IsNullOrEmpty(masterbill.FreightPayment))
+            {
+                if (masterbill.FreightPayment == "Sea - Air Difference" || masterbill.FreightPayment == "Prepaid")
+                {
+                    _airFrieghtDa = "PP IN " + (pol.Code ?? string.Empty);
+                }
+                else
+                {
+                    _airFrieghtDa = "CLL IN " + (pod.Code ?? string.Empty);
+                }
+            }
+            result.AirFrieghtDa = _airFrieghtDa;
+
+            result.DepartureAirport = pol.NameEn ?? string.Empty;
+            result.FirstTo = masterbill.FirstCarrierTo;
+            result.FirstCarrier = masterbill.FirstCarrierBy;
+            result.SecondTo = masterbill.TransitPlaceTo2;
+            result.SecondBy = masterbill.TransitPlaceBy2;
+            result.Currency = masterbill.CurrencyId;
+            result.Dclrca = masterbill.Dclrca;
+            result.Dclrcus = masterbill.Dclrcus;
+            result.DestinationAirport = pod.NameEn ?? string.Empty;
+            result.FlightNo = masterbill.FlightNo;
+            result.FlightDate = masterbill.FlightDate;
+            result.IssuranceAmount = masterbill.IssuranceAmount;
+            result.HandingInfo = masterbill.HandingInformation;
+            result.Pieces = masterbill.PackageQty;
+            result.Gw = masterbill.GrossWeight;
+            result.Cw = masterbill.ChargeWeight;
+            result.RateCharge = masterbill.RateCharge;
+            result.Total = masterbill.Total;
+            result.DesOfGood = masterbill.DesOfGoods;
+            result.VolumeField = masterbill.VolumeField;
+
+            result.PrepaidWt = masterbill.Wtpp;
+            result.CollectWt = masterbill.Wtcll;
+            result.PrepaidVal = masterbill.Valpp;
+            result.CollectVal = masterbill.Valcll;
+            result.PrepaidTax = masterbill.Taxpp;
+            result.CollectTax = masterbill.Taxcll;
+            result.PrepaidDueToCarrier = masterbill.DueCarrierPp;
+            result.CollectDueToCarrier = masterbill.DueCarrierCll;
+
+            result.OtherCharges = masterbill.OtherCharges;
+
+            result.PrepaidTotal = masterbill.TotalPp;
+            result.CollectTotal = masterbill.TotalCll;
+            result.IssueOn = masterbill.IssuedPlace;
+            result.IssueDate = masterbill.IssuedDate;
+            return result;                 
         }
     }
 }

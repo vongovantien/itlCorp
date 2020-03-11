@@ -392,14 +392,14 @@
             <div class="row div-inside bg-secondary">
                 <div class="col-md-4">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Pieces</label>
                                 <input type="number" class="form-control" formControlName="packageQty" integer>
 
                             </div>
                         </div>
-                        <div class="col pl-0">
+                        <div class="col-md-6">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && (formCreate.errors | equalError:'invalidGW') }">
                                 <label>GW</label>
@@ -411,14 +411,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col pl-0">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Kg Ib</label>
                                 <input type="text" class="form-control" formControlName="kgIb">
 
                             </div>
                         </div>
-                        <div class="col pl-0">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>R.Class</label>
                                 <input type="text" class="form-control" formControlName="rclass">
@@ -428,25 +428,17 @@
                 </div>
                 <div class="col-md-4">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label>Com Item. No</label>
                                 <input type="text" class="form-control" formControlName="comItemNo">
 
                             </div>
                         </div>
-                        <div class="col pl-0">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label>C.W</label>
                                 <input type="number" class="form-control" formControlName="chargeWeight"
-                                    [decimals]="digitDecimal" numeric>
-
-                            </div>
-                        </div>
-                        <div class="col pl-0">
-                            <div class="form-group">
-                                <label>Rate Charge</label>
-                                <input type="number" class="form-control" formControlName="rateCharge"
                                     [decimals]="digitDecimal" numeric>
                             </div>
                         </div>
@@ -454,7 +446,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="row">
-                        <div class="col d-flex align-items-end" style="max-width: 80px">
+                        <div class="col-md-6 d-flex align-items-end">
                             <div class="form-group">
                                 <label class="m-checkbox m-checkbox--bold">
                                     <input type="checkbox" (change)="onChangeMin($event)" formControlName="min"> Min
@@ -462,13 +454,20 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="col pl-0">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Total</label>
                                 <input currencyMask type="text" class="form-control" formControlName="total">
                             </div>
                         </div>
-                        <div class="col pl-0">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Rate Charge</label>
+                                <input type="number" class="form-control" formControlName="rateCharge"
+                                    [decimals]="digitDecimal" numeric>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Sea-Air</label>
                                 <input type="number" class="form-control" formControlName="seaAir">
@@ -476,98 +475,115 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-8">
-                    <div class="row">
-                        <div class="col">Volume</div>
-                        <div class="col text-center">
+                <div class="col-md-12" [class.opacity-5]="!formCreate.controls['showDim'].value">
+                    <div class="row align-items-center bg-white p-2 m-0">
+                        <div class="col-md-2 font-weight-bold">Volume</div>
+                        <div class="col-md-4 text-center font-weight-bold">
                             HW: &nbsp;
                             <span class="text-primary">{{totalHeightWeight | number: '.0-3'}}</span>
                         </div>
-                        <div class="col text-right">
+                        <div
+                            class="col-md-6 text-right d-flex justify-content-between align-items-center font-weight-bold">
                             CBM:&nbsp;
                             <span class="text-primary">{{totalCBM | number: '.0-3'}}</span>
+                            <span>
+                                <app-switch size="sm" [toggle]="formCreate.controls['showDim'].value"
+                                    (toggleChange)="formCreate.controls['showDim'].setValue($event)"></app-switch>
+                            </span>
+                            <span class="pointer" (click)="isCollapsed = !isCollapsed">
+                                <i class="la la-angle-double-down" aria-hidden="true"></i>
+                            </span>
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="tabel-wrapper table-fixed w-100">
-                            <div class="table-head-fixed">
-                                <div class="table-header">
-                                    <table class="table table-bordered bg-white">
-                                        <thead class="table-borderless text-center">
-                                            <tr>
-                                                <th>L</th>
-                                                <th>W</th>
-                                                <th>H</th>
-                                                <th>PCS</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+                    <div class="row" [collapse]="isCollapsed" [isAnimated]="true">
+                        <div class="col-md-12">
+                            <div class="tabel-wrapper table-fixed w-100">
+                                <div class="table-head-fixed">
+                                    <div class="table-header">
+                                        <table class="table table-bordered bg-white">
+                                            <thead class="table-borderless text-center">
+                                                <tr>
+                                                    <th>L</th>
+                                                    <th>W</th>
+                                                    <th>H</th>
+                                                    <th>PCS</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="table-dims-wrapper" (clickOutside)="selectedIndexDIM = -1">
-                            <table class="table table-bordered bg-white table-prepaid-collect">
-                                <tbody>
-                                    <ng-container formArrayName="dimensionDetails"
-                                        *ngFor="let item of formCreate?.get('dimensionDetails')['controls']; let j = index;">
-                                        <ng-container [formGroupName]="j">
-                                            <tr (click)="selectDIM(j)" [class.selected-row]="selectedIndexDIM === j">
-                                                <td>
-                                                    <input type="number" class="form-control" formControlName="length"
-                                                        numeric [decimals]="digitDecimal">
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control" formControlName="width"
-                                                        [decimals]="digitDecimal" numeric>
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control" formControlName="height"
-                                                        [decimals]="digitDecimal" numeric>
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control" formControlName="package"
-                                                        integer>
-                                                </td>
-                                                <td>
-                                                    <a class="btn m-btn--icon m-btn--icon-only m--font-danger"
-                                                        title="Delete" (click)="deleteDIM(j)">
-                                                        <i class="fa fa-times fa-lg"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
+                            <div class="table-dims-wrapper" (clickOutside)="selectedIndexDIM = -1">
+                                <table class="table table-bordered bg-white table-prepaid-collect">
+                                    <tbody>
+                                        <ng-container formArrayName="dimensionDetails"
+                                            *ngFor="let item of formCreate?.get('dimensionDetails')['controls']; let j = index;">
+                                            <ng-container [formGroupName]="j">
+                                                <tr (click)="selectDIM(j)"
+                                                    [class.selected-row]="selectedIndexDIM === j">
+                                                    <td>
+                                                        <input type="number" class="form-control"
+                                                            formControlName="length" numeric [decimals]="digitDecimal">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="form-control"
+                                                            formControlName="width" [decimals]="digitDecimal" numeric>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="form-control"
+                                                            formControlName="height" [decimals]="digitDecimal" numeric>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="form-control"
+                                                            formControlName="package" integer>
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn m-btn--icon m-btn--icon-only m--font-danger"
+                                                            title="Delete" (click)="deleteDIM(j)">
+                                                            <i class="fa fa-times fa-lg"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </ng-container>
                                         </ng-container>
-                                    </ng-container>
-                                    <tr app-table-none-record
-                                        *ngIf="!formCreate?.get('dimensionDetails')['controls'].length">
-                                    </tr>
-                                    <tr>
-                                        <td colspan=1>
-                                            <a class="btn m-btn--icon m-btn--icon-only m--font-success" title="Add"
-                                                (click)="addDIM()">
-                                                <i class="fa fa-plus-circle fa-2x"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                        <tr app-table-none-record
+                                            *ngIf="!formCreate?.get('dimensionDetails')['controls'].length">
+                                        </tr>
+                                        <tr>
+                                            <td colspan=1>
+                                                <a class="btn m-btn--icon m-btn--icon-only m--font-success" title="Add"
+                                                    (click)="addDIM()">
+                                                    <i class="fa fa-plus-circle fa-2x"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+
                     </div>
                 </div>
                 <!-- * /DIM -->
 
-                <div class="col-md-4">
+                <div class="col-md-12 m--margin-top-10">
                     <div class="row">
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-group">
                                 <label>Nature and Quality of Goods</label>
-                                <textarea cols="30" rows="4" class="form-control"
+                                <textarea cols="30" rows="5" class="form-control"
                                     formControlName="desOfGoods"></textarea>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-group">
-                                <label>Other Charge</label>
+                                <label>
+                                    Other Charge
+                                    <a title="Other Charge" (click)="showOtherChargePopup()">
+                                        <i class="fa fa-pencil fa-lg"></i>
+                                    </a>
+                                </label>
                                 <textarea cols="30" rows="5" class="form-control"
                                     formControlName="otherCharge"></textarea>
                             </div>
@@ -641,7 +657,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Shipping Mark</label>
-                        <textarea cols="30" rows="5" class="form-control" formControlName="shippingMark"></textarea>
+                        <textarea cols="30" rows="9" class="form-control" formControlName="shippingMark"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -687,3 +703,5 @@
         </form>
     </div>
 </div>
+
+<air-export-other-charge-popup (onUpdate)="updateOtherCharge($event)"></air-export-other-charge-popup>

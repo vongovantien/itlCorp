@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { ArrivalFreightCharge, User, Charge, Unit, Currency } from '@models';
+import { ArrivalFreightCharge, User, Charge, Unit, Currency, CsTransactionDetail } from '@models';
 import { ConfirmPopupComponent } from '@common';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { Observable } from 'rxjs';
 import { Container } from '@angular/compiler/src/i18n/i18n_ast';
 import { CatalogueRepo, DocumentationRepo } from '@repositories';
-import { DataService, SortService } from '@services';
+import { SortService } from '@services';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
@@ -15,7 +15,8 @@ import { catchError, takeUntil, switchMap, finalize, tap } from 'rxjs/operators'
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from '@enums';
 import { ChargeConstants } from 'src/constants/charge.const';
-import { getContainerSaveState, getDetailHBlState, getTransactionLocked, GetDetailHBLAction } from '../../store';
+import { getDetailHBlState, getTransactionLocked, GetDetailHBLAction } from '../../store';
+import { IArrivalFreightChargeDefault, IArrivalDefault } from '../hbl/arrival-note/arrival-note.component';
 
 @Component({
     selector: 'arrival-note-air',
@@ -31,6 +32,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     headers: CommonInterface.IHeaderTable[];
 
     userLogged: User = new User();
+    hbl: CsTransactionDetail;
 
     listCharges: Charge[] = [];
     listUnits: Observable<Unit[]>;
@@ -38,9 +40,6 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
 
     headerCharge: CommonInterface.IHeaderTable[];
     quantityTypes: CommonInterface.IValueDisplay[];
-    containersShipment: Container[] = [];
-    containersHBL: Container[] = [];
-
 
     defaultExchangeRate: number;
     selectedIndexFreightCharge: number = -1;
@@ -49,7 +48,6 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
-        private _dataService: DataService,
         private _store: Store<any>,
         private _documentRepo: DocumentationRepo,
         private _sortService: SortService,
@@ -62,7 +60,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
 
         this.requestSort = this.sortFreightCharge;
 
-        this.userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
     }
 
 
@@ -81,20 +79,14 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             }
         );
 
-        // * Get container's shipment from Store.
-        this._store.select(getContainerSaveState).subscribe(
-            (res: Container[] | any[]) => {
-                this.containersShipment = res || [];
-            }
-        );
-
         this._store.select(getDetailHBlState)
             .pipe(
                 catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
                 tap((res: any) => {
+                    this.hbl = res;
                     this.hblArrivalNote.hblid = res.id || SystemConstants.EMPTY_GUID;
-                    this.containersHBL = res.csMawbcontainers || []; // * Get container from HBL detail.
+                    // this.containersHBL = res.csMawbcontainers || []; // * Get container from HBL detail.
                 }),
                 switchMap(() => this._documentRepo.getArrivalInfo(this.hblArrivalNote.hblid, CommonEnum.TransactionTypeEnum.SeaFCLImport)) // * Get arrival info.
             )
@@ -103,7 +95,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                     if (!!res) {
                         if (!!res.hblid && res.arrivalNo !== null) {
                             this.hblArrivalNote = res;
-                            this.hblArrivalNote.arrivalFirstNotice = !!res.arrivalFirstNotice ? { startDate: new Date(res.arrivalFirstNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
+                            this.hblArrivalNote.arrivalFirstNotice = !!res.arrivalFirstNotice ? { startDate: new Date(res.arrivalFirstNotice), endDate: new Date(res.arrivalSecondNotice) } : { startDate: new Date(), endDate: new Date() };
                             this.hblArrivalNote.arrivalSecondNotice = !!res.arrivalSecondNotice ? { startDate: new Date(res.arrivalSecondNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
                         }
                     }
@@ -134,8 +126,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             { displayName: 'C.W', value: CommonEnum.QUANTITY_TYPE.CW },
             { displayName: 'CBM', value: CommonEnum.QUANTITY_TYPE.CBM },
             { displayName: 'P.K', value: CommonEnum.QUANTITY_TYPE.PACKAGE },
-            { displayName: 'Cont', value: CommonEnum.QUANTITY_TYPE.CONT },
-            { displayName: 'N.W', value: CommonEnum.QUANTITY_TYPE.NW },
+            { displayName: 'H.W', value: CommonEnum.QUANTITY_TYPE.HW },
         ];
 
         this.headerCharge = [
@@ -144,7 +135,6 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             { title: 'Unit', field: 'unitId' },
             { title: 'Code', field: 'code' },
         ];
-
     }
 
     addCharge() {
@@ -319,22 +309,17 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     onChangeQuantityType(type: string, chargeItem: ArrivalFreightCharge) {
         switch (type) {
             case CommonEnum.QUANTITY_TYPE.GW:
-                chargeItem.quantity = this.calculateContainer(this.containersHBL, CommonEnum.QUANTITY_TYPE.GW);
+                // chargeItem.quantity = this.calculateContainer(this.containersHBL, CommonEnum.QUANTITY_TYPE.GW);
+                chargeItem.quantity = this.hbl.grossWeight;
                 break;
             case CommonEnum.QUANTITY_TYPE.NW:
-                chargeItem.quantity = this.calculateContainer(this.containersHBL, CommonEnum.QUANTITY_TYPE.NW);
+                // chargeItem.quantity = this.calculateContainer(this.containersHBL, CommonEnum.QUANTITY_TYPE.NW);
+                chargeItem.quantity = this.hbl.netWeight;
+
                 break;
             case CommonEnum.QUANTITY_TYPE.CBM:
-                chargeItem.quantity = this.calculateContainer(this.containersHBL, CommonEnum.QUANTITY_TYPE.CBM);
-                break;
-            case CommonEnum.QUANTITY_TYPE.CONT:
-                chargeItem.quantity = this.calculateContainer(this.containersShipment, 'quantity');
-                break;
-            case CommonEnum.QUANTITY_TYPE.CW:
-                chargeItem.quantity = this.calculateContainer(this.containersShipment, 'chargeAbleWeight');
-                break;
-            case CommonEnum.QUANTITY_TYPE.PACKAGE:
-                chargeItem.quantity = this.calculateContainer(this.containersShipment, 'packageQuantity');
+                // chargeItem.quantity = this.calculateContainer(this.containersHBL, CommonEnum.QUANTITY_TYPE.CBM);
+                chargeItem.quantity = this.hbl.cbm;
                 break;
             default:
                 break;
@@ -349,8 +334,8 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
         chargeItem.chargeId = data.id;
         chargeItem.description = data.chargeNameEn;
 
-        // * Update unit Id.
         chargeItem.unitId = data.unitId;
+        chargeItem.unitPrice = data.unitPrice;
 
         // * Hide combogrid.
         chargeItem.isShowCharge = false;
@@ -386,15 +371,4 @@ interface IExchangeRate {
     rate: number;
     currencyToID: string;
 }
-interface IArrivalDefault {
-    transactionType: number;
-    userDefault: string;
-    arrivalHeader: string;
-    arrivalFooter: string;
-}
 
-interface IArrivalFreightChargeDefault {
-    transactionType: number;
-    userDefault: string;
-    csArrivalFrieghtChargeDefaults: ArrivalFreightCharge[];
-}

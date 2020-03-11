@@ -17,6 +17,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
 using eFMS.IdentityServer.DL.IService;
+using eFMS.API.Documentation.DL.Models.Exports;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -35,9 +36,11 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
         readonly IContextBase<CatCountry> countryRepository;
         readonly ICsDimensionDetailService dimensionDetailService;
+        readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysAuthorization> authorizationRepository;
         readonly IUserPermissionService permissionService;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
 
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
@@ -53,10 +56,13 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShipmentSurcharge> surchareRepo,
             IContextBase<CatCountry> countryRepo,
             IContextBase<CsTransactionDetail> csTransactiondetail,
-            ICsMawbcontainerService contService, ICurrentUser user,
+            ICsMawbcontainerService contService, 
+            ICurrentUser user,
             ICsDimensionDetailService dimensionService,
             IContextBase<SysAuthorization> authorizationRepo,
-            IUserPermissionService perService) : base(repository, mapper)
+            ICsShipmentOtherChargeService oChargeService,
+            IUserPermissionService perService,
+            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -68,12 +74,14 @@ namespace eFMS.API.Documentation.DL.Services
             surchareRepository = surchareRepo;
             catSalemanRepo = catSaleman;
             containerService = contService;
+            shipmentOtherChargeService = oChargeService;
             csTransactionDetailRepo = csTransactiondetail;
             currentUser = user;
             countryRepository = countryRepo;
             dimensionDetailService = dimensionService;
             authorizationRepository = authorizationRepo;
             permissionService = perService;
+            sysOfficeRepo = sysOffice;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -146,6 +154,17 @@ namespace eFMS.API.Documentation.DL.Services
                             });
                             var d = dimensionDetailService.Add(model.DimensionDetails);
                         }
+                        if (model.OtherCharges != null)
+                        {
+                            model.OtherCharges.ForEach(x =>
+                            {
+                                x.Id = Guid.NewGuid();
+                                x.Hblid = model.Id;
+                                dimensionDetailService.Add(model.DimensionDetails);
+                            });
+                            shipmentOtherChargeService.Add(model.OtherCharges);
+                        }
+
                     }
                     DataContext.SubmitChanges();
                     trans.Commit();
@@ -216,6 +235,10 @@ namespace eFMS.API.Documentation.DL.Services
                         else
                         {
                             var hsDimensionDelete = dimensionDetailService.Delete(x => x.Hblid == model.Id);
+                        }
+                        if(model.OtherCharges != null)
+                        {
+                            var otherCharges = shipmentOtherChargeService.UpdateOtherChargeHouseBill(model.OtherCharges,model.Id);
                         }
                     }
                     trans.Commit();
@@ -1676,5 +1699,66 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
         #endregion --- PREVIEW ---
+
+        #region --- Export ---
+        public AirwayBillExportResult NeutralHawbExport(Guid housebillId, Guid officeId)
+        {
+            var hbDetail = GetById(housebillId);
+            if (hbDetail == null) return null;
+
+            var office = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();
+            var result = new AirwayBillExportResult();
+            result.MawbNo = hbDetail.Mawb;
+            var pol = catPlaceRepo.Get(x => x.Id == hbDetail.Pol).FirstOrDefault();
+            var pod = catPlaceRepo.Get(x => x.Id == hbDetail.Pod).FirstOrDefault();
+            result.AolCode = pol.Code ?? string.Empty;
+            result.HawbNo = hbDetail.Hwbno;
+            result.Shipper = hbDetail.ShipperDescription;
+            result.OfficeUserCurrent = office.BranchNameEn ?? string.Empty;
+            result.Consignee = hbDetail.ConsigneeDescription;
+
+            var _airFrieghtDa = string.Empty;
+            if (!string.IsNullOrEmpty(hbDetail.FreightPayment))
+            {
+                if (hbDetail.FreightPayment == "Sea - Air Difference" || hbDetail.FreightPayment == "Prepaid")
+                {
+                    _airFrieghtDa = "PP IN " + (pol.Code ?? string.Empty);
+                }
+                else
+                {
+                    _airFrieghtDa = "CLL IN " + (pod.Code ?? string.Empty);
+                }
+            }            
+            result.AirFrieghtDa = _airFrieghtDa;
+
+            result.DepartureAirport = pol.NameEn ?? string.Empty;
+            result.FirstTo = hbDetail.FirstCarrierTo;
+            result.FirstCarrier = hbDetail.FirstCarrierBy;
+            result.SecondTo = hbDetail.TransitPlaceTo2;
+            result.SecondBy = hbDetail.TransitPlaceBy2;
+            result.Currency = hbDetail.CurrencyId;
+            result.Dclrca = hbDetail.Dclrca;
+            result.Dclrcus = hbDetail.Dclrcus;
+            result.DestinationAirport = pod.NameEn ?? string.Empty;
+            result.FlightNo = hbDetail.FlightNo;
+            result.FlightDate = hbDetail.FlightDate;
+            result.IssuranceAmount = hbDetail.IssuranceAmount;
+            result.HandingInfo = hbDetail.HandingInformation;
+            result.Pieces = hbDetail.PackageQty;
+            result.Gw = hbDetail.GrossWeight;
+            result.Cw = hbDetail.ChargeWeight;
+            result.RateCharge = hbDetail.RateCharge;
+            result.Total = hbDetail.Total;
+            result.DesOfGood = hbDetail.DesOfGoods;
+            var dimHbl = dimensionDetailService.Get(x => x.Hblid == housebillId);
+            string _dimensions = string.Join("\r\n", dimHbl.Select(s => Math.Round(s.Length.Value, 2) + "*" + Math.Round(s.Width.Value, 2) + "*" + Math.Round(s.Height.Value, 2) + "*" + Math.Round(s.Package.Value, 2)));
+            result.VolumeField = _dimensions;
+            result.PrepaidTotal = hbDetail.TotalPp;
+            result.CollectTotal = hbDetail.TotalCll;
+            result.IssueOn = hbDetail.IssueHblplace;
+            result.IssueDate = hbDetail.IssueHbldate;
+            return result;
+        }
+        #endregion --- Export ---
     }
 }

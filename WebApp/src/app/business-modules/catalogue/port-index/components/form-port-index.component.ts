@@ -71,7 +71,6 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     }
 
     onSubmit() {
-        this.hide();
         this.isSubmitted = true;
 
         // Trick to remove validate ng-select
@@ -82,6 +81,8 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         const formData = this.portindexForm.getRawValue();
         this.trimInputForm(formData);
         if (this.portindexForm.valid) {
+            this.hide();
+
             this.setPortIndexModel();
             if (this.isUpdate) {
                 this._catalogueRepo.updatePlace(this.portIndex.id, this.portIndex)
@@ -99,6 +100,8 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
                         }
                     );
             }
+        } else {
+            return;
         }
     }
 
@@ -117,7 +120,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.portIndex.countryID = this.country.value[0].id;
         this.portIndex.modeOfTransport = this.mode.value[0].id;
         this.portIndex.areaID = (this.zone.value !== null && this.zone.value.length > 0) ? this.zone.value[0].id : null;
-        this.portIndex.warehouseId = !!this.warehouseId && !!this.warehouseId.value.length ? this.warehouseId.value[0].id : null;
+        this.portIndex.warehouseId = !!this.warehouseId.value ? this.warehouseId.value[0].id : null;
     }
 
     onHandleResult(res: CommonInterface.IResult) {

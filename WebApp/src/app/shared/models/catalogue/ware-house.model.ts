@@ -6,9 +6,9 @@ export class Warehouse extends BaseModel {
     code: string = null;
     nameEn: string = null;
     nameVn: string = null;
-    countryID?: number = null;
-    districtID?: string = null;
-    provinceID?: string = null;
+    countryId?: number = null;
+    districtId?: string = null;
+    provinceId?: string = null;
     countryName: string = null;
     provinceName: string = null;
     districtName: string = null;

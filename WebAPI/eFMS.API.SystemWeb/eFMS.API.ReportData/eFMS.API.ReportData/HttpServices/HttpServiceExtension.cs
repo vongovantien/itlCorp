@@ -51,5 +51,27 @@ namespace eFMS.API.ReportData.HttpServices
             }
             return null;
         }
+        public async static Task<HttpResponseMessage> GetApi(string url, string token)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+                if (!string.IsNullOrEmpty(token))
+                {
+                    token = token.Split(" ")[1];
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+                HttpResponseMessage response = await client.GetAsync(url);
+                return response;
+            }
+            catch (Exception e)
+            {
+
+            }
+            return null;
+        }
     }
 }

@@ -1,14 +1,14 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { Customer, User, PortIndex, Currency, CsTransaction, DIM, HouseBill, Warehouse } from '@models';
+import { Customer, User, PortIndex, Currency, CsTransaction, DIM, HouseBill, Warehouse, CsOtherCharge } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 
 import { AppForm } from 'src/app/app.form';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
-import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState, getDimensionVolumesState } from 'src/app/business-modules/share-business/store';
+import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState, getDimensionVolumesState, InitShipmentOtherChargeAction } from 'src/app/business-modules/share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -17,6 +17,7 @@ import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
 import { GetCataloguePortAction, getCataloguePortState, getCataloguePortLoadingState } from '@store';
 import { FormValidators } from 'src/app/shared/validators';
+import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
 
 @Component({
     selector: 'air-export-hbl-form-create',
@@ -25,6 +26,7 @@ import { FormValidators } from 'src/app/shared/validators';
 })
 export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
+    @ViewChild(ShareAirExportOtherChargePopupComponent, { static: false }) otherChargePopup: ShareAirExportOtherChargePopupComponent;
 
     formCreate: FormGroup;
     customerId: AbstractControl;
@@ -121,9 +123,12 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     AA: string = 'As Arranged';
 
     dims: DIM[] = []; // * Dimension details.
-    isLoadingPort: any;
+    otherCharges: CsOtherCharge[] = [];
 
+    isLoadingPort: any;
     isSeparate: boolean = false;
+    isCollapsed: boolean = false;
+    isUpdateOtherCharge: boolean = false;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -283,7 +288,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             seaAir: [],
             route: [],
             min: [false],
-
+            showDim: [true],
             // * Combogrid
             customerId: [null, Validators.required],
             saleManId: [null, Validators.required],
@@ -630,5 +635,23 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         } else {
             this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - this.formCreate.controls['seaAir'].value);
         }
+    }
+
+    showOtherChargePopup() {
+        if (!this.isUpdate && !this.isUpdateOtherCharge) {
+            this._store.dispatch(new InitShipmentOtherChargeAction([new CsOtherCharge(), new CsOtherCharge(), new CsOtherCharge()]));  // * default = 3
+        }
+        this.otherChargePopup.show();
+    }
+
+    updateOtherCharge(otherCharges: CsOtherCharge[]) {
+        this.isUpdateOtherCharge = true;
+        let text: string = '';
+        otherCharges.forEach((i: CsOtherCharge) => {
+            text += `${i.chargeName}: ${i.amount} \n`;
+        });
+
+        this.formCreate.controls["otherCharge"].setValue(text);
+        this.otherCharges = otherCharges;
     }
 }

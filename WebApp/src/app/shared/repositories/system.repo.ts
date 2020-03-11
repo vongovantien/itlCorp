@@ -155,7 +155,7 @@ export class SystemRepo {
         );
     }
 
-    getListSystemUser(body: any = {}) {
+    getListSystemUser(body: any = { active: true }) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {

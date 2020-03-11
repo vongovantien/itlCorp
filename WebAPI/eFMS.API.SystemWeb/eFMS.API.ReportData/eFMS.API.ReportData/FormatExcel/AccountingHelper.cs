@@ -1978,6 +1978,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 p = j;
                 ////
+
                 _sumTotalAmount += (settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeAmount).Sum() ?? 0);
                 _sumTotalAdvancedAmount += (settlementExport.ShipmentsSettlement[i].AdvanceAmount ?? 0);
                 _sumTotalDifference = _sumTotalAmount - _sumTotalAdvancedAmount;
@@ -2013,11 +2014,6 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A" + p + ":K" + p].Style.Border.Top.Style = ExcelBorderStyle.Medium;
             workSheet.Cells["A" + (p + 1) + ":K" + (p + 1)].Style.Border.Top.Style = ExcelBorderStyle.Medium;
 
-            //All border
-            workSheet.Cells[8, 1, p, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[8, 1, p, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-
-            //In đậm border Cột 1
             for (var i = 8; i < p + 1; i++)
             {
                 //In đậm border Cột 3
@@ -2026,23 +2022,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[i, 8].Style.Border.Right.Style = ExcelBorderStyle.Medium;
                 //In đậm border Cột 11
                 workSheet.Cells[i, 11].Style.Border.Right.Style = ExcelBorderStyle.Medium;
-            }
-
-
-            int r = 9;
-            int c = 19;
-            int l = 18;
-            for (var i = 0; i < settlementExport.ShipmentsSettlement.Count; i++)
-            {
-                //Clear border Shipment
-                workSheet.Cells["B" + r + ":C" + c].Style.Border.Bottom.Style = ExcelBorderStyle.None;//Xóa border bottom
-                workSheet.Cells["B" + r + ":B" + c].Style.Border.Right.Style = ExcelBorderStyle.None;//Xóa border right
-                workSheet.Cells["B" + r + ":B" + (c + 1)].Style.Border.Right.Style = ExcelBorderStyle.None;//Xóa border right (dư)
-                //Change border diễn giải
-                workSheet.Cells["D" + r + ":H" + l].Style.Border.Bottom.Style = ExcelBorderStyle.Dotted;
-                r = r + 12;
-                c = c + 12;
-                l = l + 12;
             }
 
             p = p + 3;
@@ -2097,6 +2076,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 9, p, 11].Merge = true;
             workSheet.Cells[p, 9, p, 11].Value = string.Empty; //Value Giám đốc
         }
+
         #endregion --- SETTLEMENT PAYMENT ---
     }
 }

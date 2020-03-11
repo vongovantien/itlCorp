@@ -16,6 +16,7 @@ import { AirExportLazyLoadModule } from './air-export-lazy-load.module';
 import { AirExportCreateJobComponent } from './create-job/create-job-air-export.component';
 import { AirExportDetailJobComponent } from './detail-job/detail-job-air-export.component';
 import { AirExportManifestComponent } from './detail-job/manifest/air-export-manifest.component';
+import { AirExportMAWBFormComponent } from './detail-job/mawb/air-export-mawb.component';
 
 const routing: Routes = [
     {
@@ -79,7 +80,8 @@ const LIB = [
         AirExportComponent,
         AirExportCreateJobComponent,
         AirExportDetailJobComponent,
-        AirExportManifestComponent
+        AirExportManifestComponent,
+        AirExportMAWBFormComponent
     ],
     providers: [],
 })

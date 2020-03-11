@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace eFMS.API.ReportData.Models
+﻿namespace eFMS.API.ReportData.Models
 {
     public class Urls
     {
         public class Catelogue
         {
-            public const string CountryUrl = "/api/v1/en-US/CatCountry/query";//"/Catalogue/api/v1/en-US/CatCountry/query";
+            public const string CountryUrl = "/Catalogue/api/v1/en-US/CatCountry/query";
             public const string CatplaceUrl = "/Catalogue/api/v1/en-US/CatPlace/query";
             public const string CatPartnerUrl = "/Catalogue/api/v1/en-US/CatPartner/query";
             public const string CatCommodityUrl = "/Catalogue/api/v1/en-US/CatCommonity/query";
@@ -49,6 +44,8 @@ namespace eFMS.API.ReportData.Models
         public class Documentation
         {
             public const string HouseBillDetailUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/GetById?Id=";
+            public const string NeutralHawbExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/NeutralHawbExport";
+            public const string AirwayBillExportUrl = "/Documentation/api/v1/en-US/CsAirWayBill/AirwayBillExport?id=";
         }
     }
 }

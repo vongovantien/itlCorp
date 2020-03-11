@@ -5,7 +5,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { map, catchError, withLatestFrom, switchMap } from 'rxjs/operators';
 import { CatalogueRepo } from '@repositories';
 import {
-    CatalogueActions, CatalogueActionTypes, GetCataloguePortSuccessAction, GetCataloguePortFailAction, GetCatalogueCarrierSuccessAction, GetCatalogueCarrierFailAction, GetCatalogueAgentSuccessAction, GetCatalogueAgentFailAction, GetCatalogueUnitSuccessAction, GetCatalogueUnitFailAction, GetCatalogueCommoditySuccessAction, GetCatalogueCommodityFailAction, GetCatalogueCurrencyFailAction, GetCatalogueCustomerSuccessAction, GetCatalogueCustomerFailAction, GetCatalogueCountrySuccessAction, GetCatalogueCountryFailAction, GetCatalogueCurrencySuccessAction
+    CatalogueActions, CatalogueActionTypes, GetCataloguePortSuccessAction, GetCataloguePortFailAction, GetCatalogueCarrierSuccessAction, GetCatalogueCarrierFailAction, GetCatalogueAgentSuccessAction, GetCatalogueAgentFailAction, GetCatalogueUnitSuccessAction, GetCatalogueUnitFailAction, GetCatalogueCommoditySuccessAction, GetCatalogueCommodityFailAction, GetCatalogueCurrencyFailAction, GetCatalogueCountrySuccessAction, GetCatalogueCountryFailAction, GetCatalogueCurrencySuccessAction
 } from '../actions';
 import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, getCatalogueUnitState, getCatalogueCommodityState, getCatalogueCustomerState, getCatalogueCountryState, getCatalogueCurrencyState } from '../reducers';
 import { Commodity, Unit, Customer, PortIndex, CountryModel, Currency } from '@models';
@@ -116,25 +116,6 @@ export class CatalogueEffect {
                 return this._catalogueRepo.getCommondity(data.action.payload).pipe(
                     map((response: Commodity[]) => new GetCatalogueCommoditySuccessAction(response)),
                     catchError(err => of(new GetCatalogueCommodityFailAction(err)))
-                );
-            })
-        );
-
-    @Effect()
-    getCutomer$: Observable<Action> = this.actions$
-        .pipe(
-            ofType<CatalogueActions>(CatalogueActionTypes.GET_CUSTOMER),
-            withLatestFrom(
-                this._store.select(getCatalogueCustomerState),
-                (action: CatalogueActions, customers: Customer[]) => ({ data: customers, action: action })),
-            switchMap((data: { data: Customer[], action: CatalogueActions }) => {
-                // * Check carriers in redux store.
-                if (!!data && data.data && data.data.length) {
-                    return of(new GetCatalogueCustomerSuccessAction(data.data));
-                }
-                return this._catalogueRepo.getPartnersByType(data.action.payload).pipe(
-                    map((response: Customer[]) => new GetCatalogueCustomerSuccessAction(response)),
-                    catchError(err => of(new GetCatalogueCustomerFailAction(err)))
                 );
             })
         );

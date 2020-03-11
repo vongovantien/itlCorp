@@ -91,7 +91,9 @@ export class CsTransaction extends BaseModel {
         for (const key in object) {
             if (self.hasOwnProperty(key.toString())) {
                 self[key] = object[key];
-                self.personIncharge = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS)).id;
+                // if (!object.personIncharge) {
+                //     self.personIncharge = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS)).id;
+                // }
             }
 
         }

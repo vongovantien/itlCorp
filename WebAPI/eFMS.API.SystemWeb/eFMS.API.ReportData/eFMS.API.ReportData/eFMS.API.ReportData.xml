@@ -186,6 +186,21 @@
             <param name="hblid"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportMAWBAirExport(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportHAWBAirExport(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="hblid"></param>
+            <param name="officeId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             
@@ -268,6 +283,22 @@
             </summary>
             <param name="settlementExport"></param>
             <param name="language"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateMAWBAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.IO.Stream)">
+            <summary>
+            Generate MAWB Air Export Excel
+            </summary>
+            <param name="airwayBillExport"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateHAWBAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.IO.Stream)">
+            <summary>
+            Generate HAWBW Air Export Excel
+            </summary>
+            <param name="airwayBillExport"></param>
             <param name="stream"></param>
             <returns></returns>
         </member>

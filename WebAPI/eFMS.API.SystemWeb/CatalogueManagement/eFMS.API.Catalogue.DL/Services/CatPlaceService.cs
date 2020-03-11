@@ -920,6 +920,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                     && (x.AreaNameEN ?? "").IndexOf(criteria.AreaNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.AreaNameVN ?? "").IndexOf(criteria.AreaNameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.FlightVesselNo ?? "").Contains(criteria.FlightVesselNo ?? "", StringComparison.OrdinalIgnoreCase) == true
                                     && (x.Active == criteria.Active || criteria.Active == null)
                     ).AsQueryable();
             }
@@ -939,6 +940,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || (x.AreaNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.AreaNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || ((x.ModeOfTransport ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || (x.FlightVesselNo ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) == true
                                    )
                                    && (x.Active == criteria.Active || criteria.Active == null)
                                    ).AsQueryable();
