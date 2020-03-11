@@ -59,7 +59,7 @@ namespace eFMS.API.ReportData.HttpServices
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
-                if (string.IsNullOrEmpty(token))
+                if (!string.IsNullOrEmpty(token))
                 {
                     token = token.Split(" ")[1];
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
