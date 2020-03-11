@@ -1698,6 +1698,55 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             return result;
         }
+        
+        public Crystal PreviewBookingNote(BookingNoteCriteria criteria)
+        {
+            Crystal result = null;
+            var data = GetById(criteria.HblId);
+            var bookingNotes = new List<BookingNoteReport>();
+            if(data != null)
+            {
+                var bookingNote = new BookingNoteReport();
+                bookingNote.FlexId = criteria.FlexId?.ToUpper();
+                bookingNote.Shipper = catPartnerRepo.Get(x => x.Id == data.ShipperId).FirstOrDefault()?.ShortName.ToUpper();
+                bookingNote.Consignee = catPartnerRepo.Get(x => x.Id == data.ConsigneeId).FirstOrDefault()?.ShortName.ToUpper();
+                bookingNote.HawbNo = data.Hwbno?.ToUpper();
+                bookingNote.MawbNo = data.Mawb?.ToUpper();
+                var _pol = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
+                var _pod = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
+                var _airportOfDischarge = !string.IsNullOrEmpty(data.FirstCarrierTo) ? data.FirstCarrierTo : _pod?.Code;
+                var _flightNo = _pol?.Code + "-" + _airportOfDischarge + ":" +data.FlightNo + "/" + data.Etd.Value.ToString("dd MMM").ToUpper();
+                bookingNote.FlightNo1 = _flightNo.ToUpper();
+                bookingNote.FlightNo2 = criteria.FlightNo2?.ToUpper();
+                bookingNote.DepartureAirport = _pol?.Code.ToUpper(); //Lấy Code
+                bookingNote.PlaceOfReceipt = data.PickupPlace?.ToUpper();
+                bookingNote.AirportOfDischarge = _airportOfDischarge.ToUpper();
+                bookingNote.DestinationAirport = (_pod?.NameEn + "-" + _pod?.Code)?.ToUpper(); //Lấy Name - Code
+                bookingNote.TotalCollect = data.TotalCll?.ToUpper();
+                bookingNote.TotalPrepaid = data.TotalPp?.ToUpper();
+                bookingNote.ShippingMark = data.ShippingMark?.ToUpper();
+                bookingNote.Pieces = data.PackageQty;
+                bookingNote.DesOfGood = data.DesOfGoods?.ToUpper();
+                bookingNote.Gw = data.GrossWeight;
+                bookingNote.Cbm = data.Cbm;
+                bookingNote.ContactPerson = criteria.ContactPerson;
+                bookingNote.ClosingTime = criteria.ClosingTime?.ToUpper();
+                bookingNote.CurrentUser = currentUser.UserName?.ToUpper();
+                bookingNote.CurrentDate = DateTime.Now.ToString("dd MMM yyyy").ToUpper();
+
+                bookingNotes.Add(bookingNote);
+            }
+            result = new Crystal
+            {
+                ReportName = criteria.ReportType == "BN_SCSC" ? "BookingNoteAir_SCSC.rpt" : "BookingNoteAir_TSC.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(bookingNotes);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            return result;
+
+        }
         #endregion --- PREVIEW ---
 
         #region --- Export ---
