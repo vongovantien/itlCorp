@@ -102,5 +102,54 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [Route("ExportMAWBAirExport")]
+        [HttpGet]
+        public async Task<IActionResult> ExportMAWBAirExport(string id)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.AirwayBillExportUrl + id);
+
+            var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
+            if (dataObject.Result == null) return null;
+
+            var stream = new DocumentationHelper().GenerateMAWBAirExportExcel(dataObject.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - MAWB.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <param name="officeId"></param>
+        /// <returns></returns>
+        [Route("ExportHAWBAirExport")]
+        [HttpGet]
+        public async Task<IActionResult> ExportHAWBAirExport(string hblid, string officeId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.NeutralHawbExportUrl + "?housebillId=" + hblid + "&officeId=" + officeId);
+
+            var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
+            if (dataObject.Result == null) return null;
+
+            var stream = new DocumentationHelper().GenerateHAWBAirExportExcel(dataObject.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - NEUTRAL HAWB.xlsx");
+
+            return fileContent;
+        }
     }
 }

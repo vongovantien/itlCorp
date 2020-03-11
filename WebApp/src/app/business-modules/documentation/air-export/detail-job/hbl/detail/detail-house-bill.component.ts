@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
 import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
@@ -13,6 +13,8 @@ import { getDetailHBlPermissionState } from '@share-bussiness';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { getDetailHBlPermissionState } from '@share-bussiness';
+import { SystemConstants } from 'src/constants/system.const';
 
 
 @Component({
@@ -36,8 +38,8 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _cd: ChangeDetectorRef
-
+        protected _cd: ChangeDetectorRef,
+        private _exportRepo: ExportRepo,
     ) {
         super(
             _progressService,
@@ -168,6 +170,21 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
+                },
+            );
+    }
+
+    exportNeutralHawb() {
+        const userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this._progressRef.start();
+        this._exportRepo.exportHawbAirwayBill(this.hblId, userLogged.officeId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'Air Export - NEUTRAL HAWB.xlsx');
                 },
             );
     }

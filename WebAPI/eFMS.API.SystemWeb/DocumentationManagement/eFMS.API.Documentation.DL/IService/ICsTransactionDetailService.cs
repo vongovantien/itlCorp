@@ -2,6 +2,7 @@
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -54,5 +55,6 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewAirImptAuthorisedLetterConsign(Guid housbillId);
 
         CsTransactionDetailModel GetDetails(Guid id);
+        AirwayBillExportResult NeutralHawbExport(Guid housebillId, Guid officeId);
     }
 }
