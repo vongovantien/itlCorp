@@ -8,6 +8,7 @@ using eFMS.API.ReportData.Helpers;
 using eFMS.API.ReportData.HttpServices;
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Documentation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -64,9 +65,11 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportGoodsDeclare")]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> ExportGoodsDeclare(string hblid)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid);
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid, accessToken);
 
             var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
 
