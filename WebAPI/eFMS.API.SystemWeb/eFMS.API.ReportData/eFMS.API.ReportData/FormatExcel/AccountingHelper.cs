@@ -746,6 +746,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["F8"].Style.Font.Bold = true;
             workSheet.Cells["G8"].Value = headers[12]; //Description
             workSheet.Cells["G8"].Style.Font.Bold = true;
+            workSheet.Cells["G8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["G8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["H8"].Value = headers[13]; //Invoice No
             workSheet.Cells["H8"].Style.Font.Bold = true;
             workSheet.Cells["I8"].Value = headers[14]; //Total Amount
@@ -756,12 +758,20 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["L8"].Style.Font.Bold = true;
             workSheet.Cells["I9"].Value = headers[17]; //Revenue
             workSheet.Cells["I9"].Style.Font.Bold = true;
+            workSheet.Cells["I9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["I9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["J9"].Style.Font.Bold = true;
             workSheet.Cells["J9"].Value = headers[18]; //Cost
+            workSheet.Cells["J9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["J9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["L9"].Value = headers[17]; //Revenue
             workSheet.Cells["L9"].Style.Font.Bold = true;
+            workSheet.Cells["L9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["L9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["M9"].Value = headers[18]; //Cost
             workSheet.Cells["M9"].Style.Font.Bold = true;
+            workSheet.Cells["M9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["M9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             //workSheet.Cells["J12"].Value = headers[19]; //Total
             //workSheet.Cells["J12"].Style.Font.Bold = true;
             //workSheet.Cells["J13"].Value = headers[20]; //Balance
@@ -772,19 +782,24 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 var item = detailSOAModel.ListCharges[i];
                 workSheet.Cells[i + addressStartContent, 1].Value = item.ServiceDate;
-                workSheet.Cells[i + addressStartContent, 1].Style.Numberformat.Format = "dd-mm-yyyy";
+                workSheet.Cells[i + addressStartContent, 1].Style.Numberformat.Format = "dd/MM/yyyy";
                 workSheet.Cells[i + addressStartContent, 2].Value = item.JobId;
                 workSheet.Cells[i + addressStartContent, 3].Value = item.MBL;
                 workSheet.Cells[i + addressStartContent, 4].Value = item.HBL;
                 workSheet.Cells[i + addressStartContent, 5].Value = item.CustomNo;
                 workSheet.Cells[i + addressStartContent, 6].Value = item.ChargeCode;
                 workSheet.Cells[i + addressStartContent, 7].Value = item.ChargeName;
+                workSheet.Cells[i + addressStartContent, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[i + addressStartContent, 7].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[i + addressStartContent, 8].Value = item.CreditDebitNo;
                 workSheet.Cells[i + addressStartContent, 9].Value = item.Debit;
                 workSheet.Cells[i + addressStartContent, 9].Style.Numberformat.Format = numberFormat;
                 workSheet.Cells[i + addressStartContent, 10].Value = item.Credit;
                 workSheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
                 workSheet.Cells[i + addressStartContent, 11].Value = item.CurrencyCharge;
+                workSheet.Cells[i + addressStartContent, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[i + addressStartContent, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
                 workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormat;
                 workSheet.Cells[i + addressStartContent, 12].Value = item.DebitExchange;
                 workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
@@ -798,7 +813,6 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[row + 1, 10].Value = headers[19]; //Total
             workSheet.Cells[row + 2, 10].Value = headers[20]; //Balance
             workSheet.Cells[row + 1, 11].Merge = true;
-
             string idT = workSheet.Cells[row + 1, 10].First(c => c.Value.ToString() == "Total").Start.Address;
             string idT1 = workSheet.Cells[row + 1, 11].Start.Address;
             string joinTotal = idT + ":" + idT1;
