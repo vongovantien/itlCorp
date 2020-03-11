@@ -1,4 +1,7 @@
-﻿using eFMS.API.ReportData.Infrastructure;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure;
+using eFMS.API.ReportData.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace eFMS.API.ReportData
 {
@@ -41,8 +45,10 @@ namespace eFMS.API.ReportData
                 config.DefaultApiVersion = new ApiVersion(1, 0);
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
+
             services.AddCrossOrigin();
             services.AddSwagger();
+            services.AddCustomAuthentication(Configuration);
             services.AddConfigureSetting(Configuration);
         
         }
@@ -75,6 +81,7 @@ namespace eFMS.API.ReportData
 
                 app.UseCors("AllowAllOrigins");
 
+                app.UseAuthentication();
                 app.UseMvc();
             }
     }

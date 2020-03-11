@@ -25,7 +25,7 @@ namespace eFMS.API.Catalogue.Infrastructure.Filters
                 operation.Security = new List<IDictionary<string, IEnumerable<string>>>();
                 operation.Security.Add(new Dictionary<string, IEnumerable<string>>
                 {
-                    { "oauth2", new [] { "systemmanagementapi" } }
+                    { "Bearer", new string[] { } }
                 });
             }
         }
