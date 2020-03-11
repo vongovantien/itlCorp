@@ -6,7 +6,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import * as fromShareBussiness from '@share-bussiness';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { AirExportHBLFormCreateComponent } from '../form-create-house-bill-air-export/form-create-house-bill-air-export.component';
 import { HouseBill, DIM } from '@models';
@@ -37,7 +37,8 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _cd: ChangeDetectorRef
+        protected _cd: ChangeDetectorRef,
+        protected _exportRepo: ExportRepo
     ) {
         super(_progressService,
             _activedRoute,
@@ -46,7 +47,8 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             _toastService,
             _actionStoreSubject,
             _router,
-            _cd);
+            _cd,
+            _exportRepo);
     }
 
     ngOnInit() {

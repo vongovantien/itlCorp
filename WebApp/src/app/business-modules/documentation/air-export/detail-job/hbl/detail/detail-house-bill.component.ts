@@ -9,7 +9,6 @@ import { AirExportCreateHBLComponent } from '../create/create-house-bill.compone
 import { Crystal } from '@models';
 import { ReportPreviewComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
-import { getDetailHBlPermissionState } from '@share-bussiness';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
@@ -39,7 +38,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _cd: ChangeDetectorRef,
-        private _exportRepo: ExportRepo,
+        protected _exportRepo: ExportRepo,
     ) {
         super(
             _progressService,
