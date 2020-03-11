@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { CsOtherCharge } from '@models';
 import { IAppState } from '@store';
@@ -68,8 +68,6 @@ export class ShareAirExportOtherChargePopupComponent extends PopupBase implement
 
             this.csOtherCharges = cloneDeep(this.csOtherChargesTemp);
 
-            console.log(this.csOtherCharges);
-
             this.onUpdate.emit(this.csOtherCharges);
             this.hide();
         }
@@ -77,9 +75,11 @@ export class ShareAirExportOtherChargePopupComponent extends PopupBase implement
 
     checkValidate() {
         let valid: boolean = true;
-        for (const item of this.csOtherCharges) {
+        for (const item of this.csOtherChargesTemp) {
             if (
-                item.amount < 0
+                item.amount === null
+                || item.dueTo === null
+                || item.chargeName === null
             ) {
                 valid = false;
                 break;

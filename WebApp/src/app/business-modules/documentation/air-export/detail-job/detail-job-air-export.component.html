@@ -110,9 +110,9 @@
         <li class="m-nav-sticky__item">
             <a title="Preview Manifest" [routerLink]="['./manifest']">MNF</a>
         </li>
-        <!-- <li class="m-nav-sticky__item">
-            <a title="Preview Shipping Instruction" [routerLink]="['./si']">SI</a>
-        </li> -->
+        <li class="m-nav-sticky__item">
+            <a title="Open MAWB Detail Form" [routerLink]="['./mawb']">MAWB</a>
+        </li>
     </ul>
 </div>
 
@@ -128,7 +128,7 @@
     [title]="'Duplicate job detail'" [labelConfirm]="'Yes'" (onSubmit)="duplicateConfirm()"></confirm-popup>
 
 <confirm-popup #confirmDeleteJob [body]="'You you sure you want to delete this Job'" [title]="'Alert'"
-    [labelConfirm]="'Yes'" (onSubmit)="onDeleteJob()"></confirm-popup>
+    [labelConfirm]="'Yes'" (onSubmit)="confirmDeleteJob.show(); onDeleteJob()"></confirm-popup>
 
 <confirm-popup #confirmLockShipment (onSubmit)="onLockShipment()" [body]="'Do you want to lock this shipment ?'"
     [labelConfirm]="'Yes'"></confirm-popup>
@@ -140,7 +140,7 @@
 </confirm-popup>
 
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
-    (onSubmit)="gotoList()"></confirm-popup>
+    (onSubmit)="confirmCancelPopup.hide(); gotoList()"></confirm-popup>
 
 <info-popup [body]="'You are not allowed to delete this job'"></info-popup>
 <permission-403-popup></permission-403-popup>

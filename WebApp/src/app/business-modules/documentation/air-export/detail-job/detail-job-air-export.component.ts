@@ -126,6 +126,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
         for (const item of modelAdd.dimensionDetails) {
             item.mblId = this.shipmentDetail.id;
+            item.airWayBillId = null;
+            item.hblId = null;
         }
         //  * Update field
         modelAdd.id = this.jobId;
@@ -134,6 +136,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         modelAdd.jobNo = this.shipmentDetail.jobNo;
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
+
         if (this.ACTION === 'COPY') {
             this.duplicateJob(modelAdd);
         } else {

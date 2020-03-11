@@ -9,7 +9,7 @@ export class DIM {
     hw: number = null;
     mblId: string = SystemConstants.EMPTY_GUID;
     hblId: string = SystemConstants.EMPTY_GUID;
-
+    airWayBillId: string = SystemConstants.EMPTY_GUID;
 
     // * Custom
     cbm: number = null;

@@ -688,4 +688,22 @@ export class DocumentationRepo {
         );
     }
 
+    createAirwayBill(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsAirWayBill`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateAirwayBill(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsAirWayBill`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getAirwayBill(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsAirWayBill/GetBy/${jobId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }

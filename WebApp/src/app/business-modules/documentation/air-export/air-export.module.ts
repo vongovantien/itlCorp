@@ -17,6 +17,7 @@ import { AirExportCreateJobComponent } from './create-job/create-job-air-export.
 import { AirExportDetailJobComponent } from './detail-job/detail-job-air-export.component';
 import { AirExportManifestComponent } from './detail-job/manifest/air-export-manifest.component';
 import { AirExportMAWBFormComponent } from './detail-job/mawb/air-export-mawb.component';
+import { ShareAirExportModule } from './share-air-export.module';
 
 const routing: Routes = [
     {
@@ -44,6 +45,10 @@ const routing: Routes = [
                     {
                         path: 'manifest', component: AirExportManifestComponent,
                         data: { name: "Manifest", },
+                    },
+                    {
+                        path: 'mawb', component: AirExportMAWBFormComponent,
+                        data: { name: "MAWB Detail", },
                     },
 
                 ]
@@ -73,6 +78,7 @@ const LIB = [
         SharedModule,
         ShareBussinessModule,
         AirExportLazyLoadModule,
+        ShareAirExportModule,
         ...LIB,
     ],
     exports: [],
