@@ -42,12 +42,14 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportEManifest")]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> ExportEManifest(Guid hblid)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid);
+
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid, accessToken);
 
             var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
-
             var stream = new DocumentationHelper().CreateEManifestExcelFile(dataObject.Result);
             if (stream == null)
             {
