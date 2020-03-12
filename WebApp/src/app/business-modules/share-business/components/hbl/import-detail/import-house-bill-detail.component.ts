@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
@@ -10,17 +10,17 @@ import { formatDate } from '@angular/common';
 })
 export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
     @Output() onImport: EventEmitter<any> = new EventEmitter<any>();
+    @Input() jobId: string = '';
 
     headers: CommonInterface.IHeaderTable[];
     dataSearch: any = {};
     houseBill: any = [];
-    jobId: string = '';
     selected = -1;
     selectedHbl: any = {};
     isCheckHbl: boolean = false;
     pageChecked: number = 0;
     typeFCL: string = '';
-    typeTransaction: number = null;
+    @Input() typeTransaction: number = null;
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -37,13 +37,24 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
 
     ngOnInit() {
         this.dataSearch.jobId = this.jobId;
-        this.headers = [
-            { title: 'HBL No', field: 'hwbno', sortable: true },
-            { title: 'MBL No', field: 'mawb', sortable: true },
-            { title: 'Customer', field: 'customerName', sortable: true },
-            { title: 'SaleMan', field: 'saleManName', sortable: true },
-            { title: 'Shipment Date', field: this.typeFCL === 'Export' ? 'etd' : 'eta', sortable: true }
-        ];
+        if (this.typeTransaction === 2 || this.typeTransaction === 3) {
+            this.headers = [
+                { title: 'HBL No', field: 'hwbno', sortable: true },
+                { title: 'Mawb No', field: 'mawb', sortable: true },
+                { title: 'Customer', field: 'customerName', sortable: true },
+                { title: 'Salemans', field: 'saleManName', sortable: true },
+                { title: 'Shipment Date', field: this.typeFCL === 'Export' ? 'etd' : 'eta', sortable: true }
+            ];
+        } else {
+            this.headers = [
+                { title: 'HBL No', field: 'hwbno', sortable: true },
+                { title: 'MBL No', field: 'mawb', sortable: true },
+                { title: 'Customer', field: 'customerName', sortable: true },
+                { title: 'Salemans', field: 'saleManName', sortable: true },
+                { title: 'Shipment Date', field: this.typeFCL === 'Export' ? 'etd' : 'eta', sortable: true }
+            ];
+        }
+
 
     }
 
@@ -67,6 +78,7 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
         if (this.typeTransaction !== null) {
             data.transactionType = this.typeTransaction;
         }
+        data.jobId = this.jobId;
         this._documentRepo.getListHblPaging(this.page, this.pageSize, data).pipe(
             catchError(this.catchError),
             finalize(() => { this.isLoading = false; }),

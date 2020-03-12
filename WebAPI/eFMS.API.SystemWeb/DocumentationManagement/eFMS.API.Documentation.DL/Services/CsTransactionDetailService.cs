@@ -593,8 +593,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (criteria.TypeFCL == "Export")
                 {
-                    query = query.Where(x => x.detail.JobId == criteria.JobId //|| criteria.JobId == null
-                 && ((x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                    query = query.Where(x => (x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                  && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
@@ -603,10 +602,21 @@ namespace eFMS.API.Documentation.DL.Services
                  && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                  );
                 }
+                else if(criteria.TypeFCL == "Import")
+                {
+                        query = query.Where(x => (x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                  && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                  && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                  && (x.tran.Eta >= criteria.FromDate || criteria.FromDate == null)
+                  && (x.tran.Eta <= criteria.ToDate || criteria.ToDate == null)
+                  && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                  && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
+                  );
+                }
                 else
                 {
-                    query = query.Where(x => x.detail.JobId == criteria.JobId //|| criteria.JobId == null
-                                         && ((x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                    query = query.Where(x => x.detail.JobId == criteria.JobId
+                                         && ((x.detail.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                          && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                          && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                          && (x.tran.Eta >= criteria.FromDate || criteria.FromDate == null)
@@ -704,6 +714,9 @@ namespace eFMS.API.Documentation.DL.Services
                           DatetimeCreated = detail.DatetimeCreated,
                           DatetimeModified = detail.DatetimeModified,
                           ParentId = detail.ParentId,
+                          ShipmentEta = tran.Eta,
+                          ShipmentEtd = tran.Etd,
+                          ShipmentMawb = tran.Mawb
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             if (res.Count() > 0)

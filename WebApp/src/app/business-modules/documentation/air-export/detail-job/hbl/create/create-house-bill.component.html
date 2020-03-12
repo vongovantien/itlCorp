@@ -29,4 +29,5 @@ Are you sure all entered details are correct?" (onSubmit)="saveHBL()" title="Cre
 <info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Update HB'"></info-popup>
 
-<import-house-bill-detail (onImport)="onImport($event)"> </import-house-bill-detail>
+<import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="2">
+</import-house-bill-detail>

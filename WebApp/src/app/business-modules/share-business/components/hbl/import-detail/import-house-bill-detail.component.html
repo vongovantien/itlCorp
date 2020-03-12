@@ -36,12 +36,12 @@
                                         </div>
                                     </td>
                                     <td>{{hbl.hwbno}}</td>
-                                    <td>{{hbl.mawb}}</td>
+                                    <td>{{hbl.shipmentMawb}}</td>
                                     <td>{{hbl.customerName}}</td>
                                     <td>{{hbl.saleManName}}</td>
-                                    <!-- <td>{{typeFCL === 'Export' ? (hbl.etd | date : 'dd/MM/yyyy') : (hbl.eta | date : 'dd/MM/yyyy') }}
-                                    </td> -->
-                                    <td>{{ hbl.eta | date :'dd/MM/yyyy'}}</td>
+                                    <td>{{typeFCL === 'Export' ? (hbl.shipmentEtd | date : 'dd/MM/yyyy') : (hbl.shipmentEta | date : 'dd/MM/yyyy') }}
+                                    </td>
+                                    <!-- <td>  {{ hbl.eta | date :'dd/MM/yyyy'}}</td> -->
 
                                 </tr>
 

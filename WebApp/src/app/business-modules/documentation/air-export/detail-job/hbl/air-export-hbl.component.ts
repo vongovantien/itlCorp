@@ -15,6 +15,7 @@ import { catchError, finalize, takeUntil, take, skip } from 'rxjs/operators';
 import * as fromShareBussiness from '../../../../share-business/store';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { SortService } from '@services';
 
 
 @Component({
@@ -54,10 +55,16 @@ export class AirExportHBLComponent extends AppList implements OnInit {
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
-        private _spinner: NgxSpinnerService
+        private _spinner: NgxSpinnerService,
+        private _sortService: SortService
     ) {
         super();
         this._progressRef = this._progressService.ref();
+        this.requestSort = this.sortLocal;
+    }
+
+    sortLocal(sort: string): void {
+        this.houseBills = this._sortService.sort(this.houseBills, sort, this.order);
     }
 
     ngOnInit() {

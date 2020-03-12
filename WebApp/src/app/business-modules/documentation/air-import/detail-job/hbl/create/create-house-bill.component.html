@@ -28,7 +28,8 @@
         </tabset>
     </div>
 </div>
-<import-house-bill-detail (onImport)="onImport($event)"> </import-house-bill-detail>
+<import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="3">
+</import-house-bill-detail>
 <confirm-popup #confirmSave body="You are about to create a new HAWB.
 Are you sure all entered details are correct?" (onSubmit)="saveHBL()"></confirm-popup>
 
