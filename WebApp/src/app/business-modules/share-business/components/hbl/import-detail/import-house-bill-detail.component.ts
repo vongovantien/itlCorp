@@ -42,7 +42,7 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
                 { title: 'HBL No', field: 'hwbno', sortable: true },
                 { title: 'Mawb No', field: 'mawb', sortable: true },
                 { title: 'Customer', field: 'customerName', sortable: true },
-                { title: 'Salemans', field: 'saleManName', sortable: true },
+                { title: 'Salesman', field: 'saleManName', sortable: true },
                 { title: 'Shipment Date', field: this.typeFCL === 'Export' ? 'etd' : 'eta', sortable: true }
             ];
         } else {
@@ -50,7 +50,7 @@ export class ShareBusinessImportHouseBillDetailComponent extends PopupBase {
                 { title: 'HBL No', field: 'hwbno', sortable: true },
                 { title: 'MBL No', field: 'mawb', sortable: true },
                 { title: 'Customer', field: 'customerName', sortable: true },
-                { title: 'Salemans', field: 'saleManName', sortable: true },
+                { title: 'Salesman', field: 'saleManName', sortable: true },
                 { title: 'Shipment Date', field: this.typeFCL === 'Export' ? 'etd' : 'eta', sortable: true }
             ];
         }
