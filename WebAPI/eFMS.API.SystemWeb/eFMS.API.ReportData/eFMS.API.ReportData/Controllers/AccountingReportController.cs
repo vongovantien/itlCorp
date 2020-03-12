@@ -186,7 +186,7 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<ExportSOAAirfreightModel>();
             if(dataObjects.Result.HawbAirFrieghts == null)
             {
-                return null;
+                return Ok();
             }
             var stream = new AccountingHelper().GenerateSOAAirfreightExcel(dataObjects.Result);
             if (stream == null)
