@@ -4,6 +4,9 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
+            <button class="btn btn-default" type="button" (click)="exportMawb()">
+                <i class="la la-print"></i>Print MAWB
+            </button>
             <span *ngIf="(isLocked | async) === true" class="m--margin-right-10 align-middle">
                 <i class="fa fa-lock text-danger fa-3x"></i>
             </span>

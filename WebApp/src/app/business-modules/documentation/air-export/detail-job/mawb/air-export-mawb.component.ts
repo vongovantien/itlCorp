@@ -5,7 +5,7 @@ import { IAppState, getCataloguePortState, GetCataloguePortAction } from '@store
 import { getTransactionLocked, getTransactionPermission, ShareBusinessDIMVolumePopupComponent, GetDimensionAction, GetShipmentOtherChargeAction, getOtherChargeState, getDimensionVolumesState, GetShipmentOtherChargeSuccessAction, GetDimensionSuccessAction, getTransactionDetailCsTransactionState, TransactionGetDetailAction, } from '@share-bussiness';
 import { FormGroup, AbstractControl, Validators, FormBuilder, } from '@angular/forms';
 import { CommonEnum } from '@enums';
-import { CatalogueRepo, DocumentationRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, ExportRepo } from '@repositories';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Customer, PortIndex, Currency, Warehouse, DIM, CsOtherCharge, AirwayBill, CsTransaction } from '@models';
 import { formatDate } from '@angular/common';
@@ -131,7 +131,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         private _toastService: ToastrService,
         private _router: Router,
         private _progressService: NgProgress,
-
+        private _exportRepo: ExportRepo,
 
     ) {
         super();
@@ -658,6 +658,25 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
 
         this.formMAWB.controls["otherCharge"].setValue(text);
         this.otherCharges = otherCharges;
+    }
+
+    exportMawb() {
+        console.log(this.jobId);
+        this._progressRef.start();
+        this._exportRepo.exportMawbAirwayBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Air Export - MAWB.xlsx');
+                    } else {
+                        this._toastService.warning('There is no mawb data to print', '');
+                    }
+                },
+            );
     }
 
 }

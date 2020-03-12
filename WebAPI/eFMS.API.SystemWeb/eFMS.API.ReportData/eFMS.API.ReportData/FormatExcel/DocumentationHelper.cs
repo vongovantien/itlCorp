@@ -509,7 +509,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["M22"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 
             workSheet.Cells["A24"].Value = airwayBillExport.DestinationAirport?.ToUpper(); //Tên cảng đến
-            workSheet.Cells["E24"].Value = airwayBillExport.FlightNo.ToUpper() ?? string.Empty; //Tên chuyến bay
+            workSheet.Cells["E24"].Value = airwayBillExport.FlightNo?.ToUpper(); //Tên chuyến bay
             workSheet.Cells["F24:H24"].Merge = true;
             workSheet.Cells["F24:H24"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["F24"].Value = airwayBillExport.FlightDate; //Ngày bay
@@ -765,7 +765,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["L31:N39"].Merge = true;
             workSheet.Cells["L31:N39"].Style.WrapText = true;
             workSheet.Cells["L31:N39"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            workSheet.Cells["L31"].Value = airwayBillExport.DesOfGood?.ToUpper() + "\r\n" + airwayBillExport.VolumeField;
+            workSheet.Cells["L31"].Value = airwayBillExport.DesOfGood?.ToUpper() + "\r\n" + airwayBillExport.VolumeField?.ToUpper();
 
             workSheet.Cells["A40"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
             workSheet.Cells["A40"].Value = airwayBillExport.Pieces;

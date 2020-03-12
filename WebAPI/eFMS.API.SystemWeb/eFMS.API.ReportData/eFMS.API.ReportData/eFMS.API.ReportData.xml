@@ -188,14 +188,14 @@
         </member>
         <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportMAWBAirExport(System.String)">
             <summary>
-            
+            Export MAWB Air Export
             </summary>
             <param name="jobId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportHAWBAirExport(System.String,System.String)">
             <summary>
-            
+            Export HAWB Air Export
             </summary>
             <param name="hblid"></param>
             <param name="officeId"></param>

@@ -14,6 +14,7 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { getDetailHBlPermissionState } from '@share-bussiness';
 import { SystemConstants } from 'src/constants/system.const';
+import { InputBookingNotePopupComponent } from '../components/input-booking-note/input-booking-note.popup';
 
 
 @Component({
@@ -22,6 +23,7 @@ import { SystemConstants } from 'src/constants/system.const';
 })
 export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent implements OnInit {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(InputBookingNotePopupComponent, { static: false }) inputBookingNotePopupComponent: InputBookingNotePopupComponent;
 
     hblId: string;
 
@@ -183,7 +185,11 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             )
             .subscribe(
                 (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Air Export - NEUTRAL HAWB.xlsx');
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Air Export - NEUTRAL HAWB.xlsx');
+                    } else {
+                        this._toastService.warning('There is no neutral hawb data to print', '');
+                    }
                 },
             );
     }
@@ -192,4 +198,9 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}/separate`]);
     }
 
+    openInputBookingNote(reportType: string) {
+        this.inputBookingNotePopupComponent.reportType = reportType;
+        this.inputBookingNotePopupComponent.hblId = this.hblId;
+        this.inputBookingNotePopupComponent.show();
+    }
 }
