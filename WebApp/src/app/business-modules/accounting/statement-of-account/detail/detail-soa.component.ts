@@ -105,6 +105,20 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     }
 
+    exportSOAAF() {
+        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this._exportRepo.exportSOAAirFreight(this.soaNO, userLogged.officeId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight.xlsx');
+                },
+            );
+    }
+
     async getDetailSOAExport(soaNO: string) {
         this._progressRef.start();
         try {

@@ -746,6 +746,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["F8"].Style.Font.Bold = true;
             workSheet.Cells["G8"].Value = headers[12]; //Description
             workSheet.Cells["G8"].Style.Font.Bold = true;
+            workSheet.Cells["G8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["G8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["H8"].Value = headers[13]; //Invoice No
             workSheet.Cells["H8"].Style.Font.Bold = true;
             workSheet.Cells["I8"].Value = headers[14]; //Total Amount
@@ -756,12 +758,20 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["L8"].Style.Font.Bold = true;
             workSheet.Cells["I9"].Value = headers[17]; //Revenue
             workSheet.Cells["I9"].Style.Font.Bold = true;
+            workSheet.Cells["I9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["I9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["J9"].Style.Font.Bold = true;
             workSheet.Cells["J9"].Value = headers[18]; //Cost
+            workSheet.Cells["J9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["J9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["L9"].Value = headers[17]; //Revenue
             workSheet.Cells["L9"].Style.Font.Bold = true;
+            workSheet.Cells["L9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["L9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["M9"].Value = headers[18]; //Cost
             workSheet.Cells["M9"].Style.Font.Bold = true;
+            workSheet.Cells["M9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["M9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             //workSheet.Cells["J12"].Value = headers[19]; //Total
             //workSheet.Cells["J12"].Style.Font.Bold = true;
             //workSheet.Cells["J13"].Value = headers[20]; //Balance
@@ -772,19 +782,24 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 var item = detailSOAModel.ListCharges[i];
                 workSheet.Cells[i + addressStartContent, 1].Value = item.ServiceDate;
-                workSheet.Cells[i + addressStartContent, 1].Style.Numberformat.Format = "dd-mm-yyyy";
+                workSheet.Cells[i + addressStartContent, 1].Style.Numberformat.Format = "dd/MM/yyyy";
                 workSheet.Cells[i + addressStartContent, 2].Value = item.JobId;
                 workSheet.Cells[i + addressStartContent, 3].Value = item.MBL;
                 workSheet.Cells[i + addressStartContent, 4].Value = item.HBL;
                 workSheet.Cells[i + addressStartContent, 5].Value = item.CustomNo;
                 workSheet.Cells[i + addressStartContent, 6].Value = item.ChargeCode;
                 workSheet.Cells[i + addressStartContent, 7].Value = item.ChargeName;
+                workSheet.Cells[i + addressStartContent, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[i + addressStartContent, 7].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[i + addressStartContent, 8].Value = item.CreditDebitNo;
                 workSheet.Cells[i + addressStartContent, 9].Value = item.Debit;
                 workSheet.Cells[i + addressStartContent, 9].Style.Numberformat.Format = numberFormat;
                 workSheet.Cells[i + addressStartContent, 10].Value = item.Credit;
                 workSheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
                 workSheet.Cells[i + addressStartContent, 11].Value = item.CurrencyCharge;
+                workSheet.Cells[i + addressStartContent, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[i + addressStartContent, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
                 workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormat;
                 workSheet.Cells[i + addressStartContent, 12].Value = item.DebitExchange;
                 workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
@@ -798,18 +813,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[row + 1, 10].Value = headers[19]; //Total
             workSheet.Cells[row + 2, 10].Value = headers[20]; //Balance
             workSheet.Cells[row + 1, 11].Merge = true;
-
-            string idT = workSheet
-            .Cells[row + 1, 10]
-            .First(c => c.Value.ToString() == "Total")
-            .Start
-            .Address;
-
-            string idT1 = workSheet
-            .Cells[row + 1, 11]
-            .Start
-            .Address;
-
+            string idT = workSheet.Cells[row + 1, 10].First(c => c.Value.ToString() == "Total").Start.Address;
+            string idT1 = workSheet.Cells[row + 1, 11].Start.Address;
             string joinTotal = idT + ":" + idT1;
             workSheet.Cells[joinTotal].Merge = true;
 
@@ -873,8 +878,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 totalRevenue += item.DebitExchange;
                 totalCost += item.CreditExchange;
             }
-            totalBalance = totalRevenue  - totalCost ;
-            decimal total = totalBalance??0;
+            totalBalance = totalRevenue - totalCost;
+            decimal total = totalBalance ?? 0;
             string totalBalanceStr = total.ToString("N2");
             totalBalanceStr = totalBalanceStr.Contains("-") ? totalBalanceStr.Replace("-", "") : totalBalanceStr;
             if (totalBalance < 0)
@@ -916,9 +921,6 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells[idBalance].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells[idBalance].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-
-
-
 
             workSheet.Cells.AutoFitColumns();
 
@@ -1056,6 +1058,492 @@ namespace eFMS.API.ReportData.FormatExcel
                 return null;
             }
         }
+
+        /// <returns></returns>
+        public Stream GenerateSOAAirfreightExcel(ExportSOAAirfreightModel soaAir, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Air freight");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BinddingDataDetailSOAAirfreight(workSheet, soaAir);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+
+        public void BinddingDataDetailSOAAirfreight(ExcelWorksheet workSheet, ExportSOAAirfreightModel airfreightObj)
+        {
+
+
+            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            {
+                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                //add the image to row 1, column B
+                excelImage.SetPosition(0, 0, 1, 0);
+            }
+
+            List<string> headers = new List<string>()
+            {
+               "INDO TRANS LOGISTICS CORPORATION", //0
+               "52-54-56 Truong Son St. Tan Binh Dist. HCM City. Vietnam\nTel: (84-8) 3948 6888  Fax: +84 8 38488 570\nE-mail:\nWebsite: www.itlvn.com", //1
+               "DEBIT NOTE IN OCT 2019 ( BẢNG KÊ CƯỚC VCQT)", //2
+               "TOTAL", //3
+            };
+
+            List<string> headerTable = new List<string>()
+            {
+                "No", //3
+               "Job No", //4
+               "Flight No", //5
+               "Shippment Date", //6
+               "MAWB#", //7
+               "Dest", //8
+               "Service", //9
+               "Air PCS", //10
+               "Gross Weight(KG)", //11
+               "Chargeable Weight(KG)", //12
+               "Rate(USD)", //13
+               "AirFreight(USD)", //14
+               "Fuel Surcharge(USD)", //15
+               "Warisk Surcharge(USD)", //16
+               "Screening Surcharge(USD)", //17
+               "AWB(USD)", //18
+               "Handling fee(USD)", //19
+               "Net Amount(USD)", //20
+               "Exchange Rate(VND/USD)", //21
+               "Total Amount(VND)", //21
+            };
+
+            workSheet.Cells["H1:U1"].Merge = true;
+            workSheet.Cells["H1"].Value = headers[0];
+            workSheet.Cells["H1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+            workSheet.Cells["H1"].Style.Font.SetFromFont(new Font("Arial Black", 13));
+            workSheet.Cells["H1"].Style.Font.Italic = true;
+            workSheet.Cells["P2:U2"].Merge = true;
+            workSheet.Cells["P2:U2"].Style.WrapText = true;
+            workSheet.Cells["P2"].Value = headers[1];
+            workSheet.Cells["P2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10));
+            workSheet.Row(2).Height = 50;
+            //Title
+            workSheet.Cells["A3:U3"].Merge = true;
+            workSheet.Cells["A3"].Style.Font.SetFromFont(new Font("Times New Roman", 16));
+            workSheet.Cells["A3"].Value = headers[2];
+            workSheet.Cells["A3"].Style.Font.Size = 16;
+            workSheet.Cells["A3"].Style.Font.Bold = true;
+
+            workSheet.Cells["A5:J6"].Style.Font.SetFromFont(new Font("Times New Roman", 11));
+            workSheet.Cells["A5:B5"].Merge = true;
+            workSheet.Cells["A4:U6"].Merge = true;
+            workSheet.Cells["A4:U6"].Style.WrapText = true;
+
+            // Tạo header
+            for (int i = 0; i < headerTable.Count; i++)
+            {
+                if (i == 5)
+                {
+                    workSheet.Cells[8, i + 2].Value = headerTable[i];
+                }
+                if (i < 5)
+                {
+                    workSheet.Cells[8, i + 1].Value = headerTable[i];
+                }
+                if (i > 5)
+                {
+                    workSheet.Cells[8, i + 2].Value = headerTable[i];
+                    workSheet.Cells[8, i + 2].Style.Font.Bold = true;
+
+                }
+
+                workSheet.Cells[8, i + 1].Style.Font.Bold = true;
+                workSheet.Cells[8, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[8, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            }
+            workSheet.Cells["A8:A9"].Merge = true;
+            workSheet.Cells["A8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["B8:B9"].Merge = true;
+            workSheet.Cells["B8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["B8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["C8:C9"].Merge = true;
+            workSheet.Cells["C8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["C8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["D8:D9"].Merge = true;
+            workSheet.Cells["D8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["D8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            //workSheet.Cells["E8:E9"].Merge = true;
+            workSheet.Cells["E8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["E8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            //workSheet.Cells["F8:F9"].Merge = true;
+            workSheet.Cells["F8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["F8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["G8:G9"].Merge = true;
+            workSheet.Cells["G8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["G8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["H8:H9"].Merge = true;
+            workSheet.Cells["H8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["H8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["I8:I9"].Merge = true;
+            workSheet.Cells["I8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["I8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["J8:J9"].Merge = true;
+            workSheet.Cells["J8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["J8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["J8:J9"].Style.WrapText = true;
+            workSheet.Cells["K8:K9"].Merge = true;
+            workSheet.Cells["K8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["K8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["K8:K9"].Style.WrapText = true;
+
+            workSheet.Cells["L8:L9"].Merge = true;
+            workSheet.Cells["L8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["L8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["M8:M9"].Merge = true;
+            workSheet.Cells["M8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["M8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["M8:M9"].Style.WrapText = true;
+
+            workSheet.Cells["N8:N9"].Merge = true;
+            workSheet.Cells["N8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["N8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["N8:N9"].Style.WrapText = true;
+
+            workSheet.Cells["O8:O9"].Merge = true;
+            workSheet.Cells["O8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["O8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["O8:O9"].Style.WrapText = true;
+
+
+            workSheet.Cells["P8:P9"].Merge = true;
+            workSheet.Cells["P8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["P8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["P8:P9"].Style.WrapText = true;
+
+
+            workSheet.Cells["Q8:Q9"].Merge = true;
+            workSheet.Cells["Q8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["Q8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["Q8:Q9"].Style.WrapText = true;
+
+            workSheet.Cells["R8:R9"].Merge = true;
+            workSheet.Cells["R8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["R8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["R8:R9"].Style.WrapText = true;
+
+            workSheet.Cells["S8:S9"].Merge = true;
+            workSheet.Cells["S8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["S8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["S8:S9"].Style.WrapText = true;
+
+
+            workSheet.Cells["T8:T9"].Merge = true;
+            workSheet.Cells["T8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["T8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["T8:T9"].Style.WrapText = true;
+            workSheet.Cells["U8:U9"].Merge = true;
+            workSheet.Cells["U8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["U8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["U8:U9"].Style.WrapText = true;
+
+            workSheet.Cells["E8:F9"].Merge = true;
+
+
+            string textHead = string.Empty;
+            if (!string.IsNullOrEmpty(airfreightObj.PartnerNameEn))
+            {
+                textHead = textHead + airfreightObj.PartnerNameEn + "\n";
+            }
+            if (!string.IsNullOrEmpty(airfreightObj.PartnerBillingAddress))
+            {
+                textHead = textHead + airfreightObj.PartnerBillingAddress + "\n";
+            }
+            if (!string.IsNullOrEmpty(airfreightObj.PartnerTaxCode))
+            {
+                textHead = textHead + "Tax code: " + airfreightObj.PartnerTaxCode;
+            }
+            workSheet.Cells["A4"].Value = textHead;
+
+            workSheet.Cells["A7:U7"].Merge = true;
+
+            string textSOA = string.Empty;
+            if (!string.IsNullOrEmpty(airfreightObj.SoaNo))
+            {
+                textSOA = textSOA + "Bảng kê số: " + airfreightObj.SoaNo + " đính kèm hóa đơn số: ";
+            }
+            if (airfreightObj.DateSOA != null)
+            {
+                DateTime dateSOA = airfreightObj.DateSOA ?? DateTime.Now;
+                textSOA = textSOA + dateSOA.ToString("dd/MM/yyyy");
+            }
+            workSheet.Cells["A7"].Value = textSOA;
+
+            int addressStartContent = 10;
+            int row = addressStartContent - 1;
+            int row1 = addressStartContent - 1;
+
+            for (int i = 0; i < airfreightObj.HawbAirFrieghts.Count; i++)
+            {
+                var item = airfreightObj.HawbAirFrieghts[i];
+                workSheet.Cells[i + addressStartContent, 1].Value = i + 1;
+                workSheet.Cells[i + addressStartContent, 2].Value = item.JobNo;
+                workSheet.Cells[i + addressStartContent, 3].Value = item.FlightNo;
+                workSheet.Cells[i + addressStartContent, 4].Value = item.ShippmentDate;
+                workSheet.Cells[i + addressStartContent, 4].Style.Numberformat.Format = "dd/MM/yyyy";
+
+                workSheet.Cells[i + addressStartContent, 5].Value = item.AOL;
+                workSheet.Cells[i + addressStartContent, 6].Value = item.Mawb;
+                workSheet.Cells[i + addressStartContent, 7].Value = item.AOD;
+                workSheet.Cells[i + addressStartContent, 8].Value = item.Service;
+                workSheet.Cells[i + addressStartContent, 9].Value = item.Pcs;
+                workSheet.Cells[i + addressStartContent, 9].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[i + addressStartContent, 10].Value = item.GW;
+                workSheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[i + addressStartContent, 11].Value = item.CW;
+                workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[i + addressStartContent, 12].Value = item.Rate;
+                workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 13].Value = item.AirFreight;
+                workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 14].Value = item.FuelSurcharge;
+                workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 15].Value = item.WarriskSurcharge;
+                workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 16].Value = item.ScreeningFee;
+                workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 17].Value = item.AWB;
+                workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 18].Value = item.HandlingFee;
+                workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 19].Value = item.NetAmount;
+                workSheet.Cells[i + addressStartContent, 19].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 20].Value = item.ExchangeRate;
+                workSheet.Cells[i + addressStartContent, 20].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 21].Value = item.TotalAmount;
+                workSheet.Cells[i + addressStartContent, 21].Style.Numberformat.Format = numberFormat;
+
+
+                row1++;
+
+            }
+            workSheet.Cells[8, 1, row1 + 1, 21].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[8, 1, row1, 21].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[8, 1, row1, 21].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[row + 3, 1].Value = headers[3]; //Total
+
+
+            string idT = workSheet
+            .Cells[row + 3, 1]
+            .First(c => c.Value.ToString() == "TOTAL")
+            .Start
+            .Address;
+
+            string idT1 = workSheet
+            .Cells[row + 3, 8]
+            .Start
+            .Address;
+            string totalStr = idT + ":" + idT1;
+
+            workSheet.Cells[totalStr].Merge = true;
+            workSheet.Cells[idT].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[idT].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[idT].Style.Font.Bold = true;
+
+            string idPCS = workSheet
+           .Cells[row + 3, 9]
+           .Start
+           .Address;
+            workSheet.Cells[idPCS].Value = airfreightObj.HawbAirFrieghts.Select(t => t.Pcs).Sum();
+            workSheet.Cells[idPCS].Style.Numberformat.Format = numberFormat;
+
+
+            string idGW = workSheet
+            .Cells[row + 3, 10]
+            .Start
+            .Address;
+            workSheet.Cells[idGW].Value = airfreightObj.HawbAirFrieghts.Select(t => t.GW).Sum();
+            workSheet.Cells[idGW].Style.Numberformat.Format = numberFormat;
+
+
+            string idCW = workSheet
+            .Cells[row + 3, 11]
+            .Start
+            .Address;
+            workSheet.Cells[idCW].Value = airfreightObj.HawbAirFrieghts.Select(t => t.CW).Sum();
+            workSheet.Cells[idCW].Style.Numberformat.Format = numberFormat;
+
+
+            string idAF = workSheet
+              .Cells[row + 3, 13]
+              .Start
+              .Address;
+            workSheet.Cells[idAF].Value = airfreightObj.HawbAirFrieghts.Select(t => t.AirFreight).Sum();
+            workSheet.Cells[idAF].Style.Numberformat.Format = numberFormat;
+
+
+            string idHF = workSheet
+             .Cells[row + 3, 18]
+             .Start
+             .Address;
+            workSheet.Cells[idHF].Value = airfreightObj.HawbAirFrieghts.Select(t => t.HandlingFee).Sum();
+            workSheet.Cells[idHF].Style.Numberformat.Format = numberFormat;
+
+            string idNA = workSheet
+             .Cells[row + 3, 19]
+             .Start
+             .Address;
+            workSheet.Cells[idNA].Value = airfreightObj.HawbAirFrieghts.Select(t => t.NetAmount).Sum();
+            workSheet.Cells[idNA].Style.Numberformat.Format = numberFormat;
+
+            string idTT = workSheet
+             .Cells[row + 3, 21]
+             .Start
+             .Address;
+            workSheet.Cells[idTT].Value = airfreightObj.HawbAirFrieghts.Select(t => t.TotalAmount).Sum();
+            workSheet.Cells[idTT].Style.Numberformat.Format = numberFormat;
+
+            //format
+            workSheet.Cells["A3"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A3"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A4"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A3"].Style.Font.Bold = true;
+            workSheet.Cells["A4"].Style.Font.Bold = true;
+            workSheet.Cells["A7"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7"].Style.Font.Bold = true;
+
+            workSheet.Cells[idPCS].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[idPCS].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[idPCS].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[idPCS].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+
+            string idToBoder = workSheet
+             .Cells[row + 3, 10]
+             .Start
+             .Address;
+
+            string idToborder1 = workSheet
+            .Cells[row + 3, 21]
+            .Start
+            .Address;
+            string addressBorderRight = idToBoder + ":" + idToborder1;
+            workSheet.Cells[addressBorderRight].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+            string addressTextCenter = "A8" + ":" + idToborder1;
+
+            workSheet.Cells[addressTextCenter].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[addressTextCenter].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            workSheet.Cells["A7"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            workSheet.Cells[row + 4, 4].Value = "Issued by";
+            workSheet.Cells[row + 4, 4].Style.Font.SetFromFont(new Font("Times New Roman", 13));
+
+            workSheet.Cells[row + 4, 7].Value = "Approved by";
+            workSheet.Cells[row + 4, 7].Style.Font.SetFromFont(new Font("Times New Roman", 13));
+
+            workSheet.Cells[row + 4, 13].Value = "Account";
+            workSheet.Cells[row + 4, 13].Style.Font.SetFromFont(new Font("Times New Roman", 13));
+
+
+            //Bôi đen header
+            workSheet.Cells["A8:K8"].Style.Font.Bold = true;
+            workSheet.Column(1).Width = 8; //Cột A
+            workSheet.Column(2).Width = 15; //Cột B
+            workSheet.Column(3).Width = 15; //Cột C
+            workSheet.Column(4).Width = 15; //Cột D
+            workSheet.Column(5).Width = 17; //Cột E
+            workSheet.Column(6).Width = 17; //Cột F
+            workSheet.Column(10).Width = 15;//Cột J
+            workSheet.Column(11).Width = 15;//Cột K
+            workSheet.Column(12).Width = 15;//Cột L
+            workSheet.Column(13).Width = 15;//Cột M
+            workSheet.Column(14).Width = 15;//Cột M
+            workSheet.Column(15).Width = 15; //Cột N
+            workSheet.Column(16).Width = 15;  //Cột O
+            workSheet.Column(17).Width = 15;   //Cột P
+            workSheet.Column(18).Width = 15;     //Cột Q
+            workSheet.Column(19).Width = 15;  //Cột R
+            workSheet.Column(20).Width = 15;   //Cột S
+            workSheet.Column(21).Width = 20;   //Cột T
+            workSheet.Column(22).Width = 25;   //Cột U
+
+            workSheet.Cells[row + 6, 3].Value = "Kindly arrange the payment to: ";
+            string textBottom = workSheet.Cells[row + 6, 3].Value.ToString();
+
+            if (!string.IsNullOrEmpty(airfreightObj.OfficeEn))
+            {
+                textBottom = textBottom + "\n" + airfreightObj.OfficeEn;
+            }
+
+            if (!string.IsNullOrEmpty(airfreightObj.BankAccountVND))
+            {
+                textBottom = textBottom + "\n" +"A/C: " + airfreightObj.BankAccountVND;
+            }
+
+            if (!string.IsNullOrEmpty(airfreightObj.BankNameEn))
+            {
+                textBottom = textBottom + "\n" + "Via: " + airfreightObj.BankNameEn;
+            }
+
+            if (!string.IsNullOrEmpty(airfreightObj.AddressEn))
+            {
+                textBottom = textBottom + "\n" + airfreightObj.AddressEn;
+            }
+
+            if (!string.IsNullOrEmpty(airfreightObj.SwiftCode))
+            {
+                textBottom = textBottom + "\n" + "SWIFT Code: "+ airfreightObj.SwiftCode;
+            }
+            textBottom = textBottom + "\n" + "Thanks for your kind co-operation.";
+
+            string idTexRoot = workSheet
+           .Cells[row + 6, 3]
+           .First(c => c.Value.ToString() == "Kindly arrange the payment to: ")
+           .Start
+           .Address;
+
+            string idTexBottom = workSheet
+            .Cells[row + 12, 9]
+            .Start
+            .Address;
+
+            workSheet.Cells[row + 6, 3].Value = textBottom;
+
+            string addressTextBottom = idTexRoot + ":" + idTexBottom;
+            workSheet.Cells[idTexRoot].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[idTexRoot].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[addressTextBottom].Merge = true;
+            workSheet.Cells[addressTextBottom].Style.WrapText = true;
+            workSheet.Column(4).Width = 20; //Cột D
+            //workSheet.Cells.AutoFitColumns();
+
+        }
+
+
+
+
+
         #endregion
 
         #region --- SETTLEMENT PAYMENT ---

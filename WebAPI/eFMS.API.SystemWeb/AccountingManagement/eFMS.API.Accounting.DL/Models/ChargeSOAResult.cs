@@ -43,5 +43,22 @@ namespace eFMS.API.Accounting.DL.Models
         public string CDNote { get; set; }
         public string TaxCodeOBH { get; set; }
 
+        public decimal? GrossWeight { get; set; }
+        public decimal? ChargeWeight { get; set; }
+
+        public string FlightNo { get; set; }
+        public DateTime? ShippmentDate { get; set; }
+
+        public Guid? AOL { get; set; }
+        public Guid? AOD { get; set; }
+        public int? PackageQty { get; set; }
+
+        public decimal? FinalExchangeRate { get; set; }
+
+        public DateTime? ExchangeDate { get; set; }
+
+
+
+
     }
 }
