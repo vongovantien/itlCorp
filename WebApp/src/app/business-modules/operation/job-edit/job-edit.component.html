@@ -619,13 +619,14 @@
                                     <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <buying-charge></buying-charge>
+                                            <buying-charge [showGetCharge]="false"></buying-charge>
                                         </ng-container>
                                     </tab>
                                     <tab heading="Selling" (selectTab)="getSurCharges('SELL')">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <selling-charge [showSyncFreight]="false"></selling-charge>
+                                            <selling-charge [showSyncFreight]="false" [showGetCharge]="false">
+                                            </selling-charge>
                                         </ng-container>
                                     </tab>
                                     <tab heading="OBH" (selectTab)="getSurCharges('OBH')">

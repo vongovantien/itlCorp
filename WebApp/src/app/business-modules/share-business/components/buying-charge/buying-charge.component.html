@@ -18,7 +18,7 @@
             <div class="col-md-8" *ngIf="(isLocked | async) === false">
                 <div class="m--align-right c-button-actions">
                     <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
-                        <div class="dropdown m-dropdown m-dropdown--inline">
+                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="showGetCharge">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                 <i class="la la-download"></i> Get Charge<span class="caret"></span>
                             </button>
@@ -203,8 +203,8 @@
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
-                                            [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                            name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true"
                                             [(ngModel)]="charge.invoiceDate"
                                             [attr.disabled]="!!charge.creditNo || !charge.isFromShipment ? true : null" />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -220,8 +220,8 @@
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
-                                            [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                            name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true"
                                             [(ngModel)]="charge.exchangeDate"
                                             [attr.disabled]="!!charge.creditNo || !charge.isFromShipment ? true : null" />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">

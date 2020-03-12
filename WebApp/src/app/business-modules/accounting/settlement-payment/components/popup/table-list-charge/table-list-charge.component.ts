@@ -390,7 +390,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     duplicateCharge(index: number) {
         this.isSubmitted = false;
 
-        const newCharge = this.charges[index];
+        const newCharge = cloneDeep(this.charges[index]);
 
         newCharge.currencyId = this.currencyId;
         newCharge.id = SystemConstants.EMPTY_GUID;
@@ -402,11 +402,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         newCharge.advanceNo = !!this.selectedAdvance ? this.selectedAdvance.advanceNo : null;
         newCharge.clearanceNo = !!this.selectedCD ? this.selectedCD.clearanceNo : null;
         newCharge.settlementCode = this.settlementCode;
-
-        if (!this.charges[index].invoiceDate || !!this.charges[index].invoiceDate && !this.charges[index].invoiceDate.startDate) {
+        if (!newCharge.invoiceDate || !newCharge.invoiceDate.startDate) {
             newCharge.invoiceDate = null;
         }
+
         this.charges.push(new Surcharge(newCharge));
+        // this.charges = [...this.charges, new Surcharge(newCharge)];
     }
 
     deleteCharge(index: number) {
@@ -440,15 +441,18 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             if (typeof date !== 'string') {
                 if (!!date && !!date.startDate) {
                     charge.invoiceDate = new Date(date.startDate);
+                } else {
+                    charge.invoiceDate = null
                 }
             }
         }
+        console.log(listChargesToSave);
+
         if (this.isUpdate) {
             this.onUpdate.emit(listChargesToSave);
         } else {
             this.onChange.emit(listChargesToSave);
         }
-
         this.hide();
     }
 
@@ -518,7 +522,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             case CommonEnum.CHARGE_TYPE.DEBIT:
                 return CommonEnum.SurchargeTypeEnum.SELLING_RATE;
             default:
-                break;
+                return CommonEnum.SurchargeTypeEnum.OBH;
         }
     }
 
