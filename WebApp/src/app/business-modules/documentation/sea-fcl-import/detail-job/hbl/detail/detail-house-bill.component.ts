@@ -139,7 +139,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             this.infoPopup.show();
             return;
         }
-        const modelUpdate = this.onsubmitData();
+        const modelUpdate: any = this.onsubmitData();
         modelUpdate.jobId = this.hblDetail.jobId;
         modelUpdate.id = this.hblDetail.id;
 
@@ -158,6 +158,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         modelUpdate.dofooter = this.hblDetail.dofooter;
         modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
+        modelUpdate.userCreated = this.hblDetail.userCreated;
+
         this.updateHbl(modelUpdate);
     }
 

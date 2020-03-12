@@ -15,6 +15,7 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 
 import isUUID from 'validator/lib/isUUID';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -167,7 +168,9 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
         modelUpdate.subAbbr = this.hblDetail.subAbbr;
-        modelUpdate.transactionType = "AI";
+        modelUpdate.transactionType = ChargeConstants.AI_CODE;
+
+        modelUpdate.userCreated = this.hblDetail.userCreated;
 
         this.updateHbl(modelUpdate);
     }

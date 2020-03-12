@@ -6,14 +6,15 @@ import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
 import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
-import { Crystal } from '@models';
+import { Crystal, CsTransactionDetail } from '@models';
 import { ReportPreviewComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { getDetailHBlPermissionState } from '@share-bussiness';
 import { SystemConstants } from 'src/constants/system.const';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 
 @Component({
@@ -24,6 +25,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     hblId: string;
+    hblDetail: CsTransactionDetail;
 
     dataReport: Crystal;
 
@@ -63,6 +65,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.GetHBLOtherChargeAction(this.hblId));
 
+                this.getDetailHbl();
             } else {
                 this.gotoList();
             }
@@ -77,6 +80,22 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                         this.allowUpdate = res.allowUpdate;
                     }
                 }
+            );
+    }
+
+    getDetailHbl() {
+        this._store.select(fromShareBussiness.getDetailHBlState)
+            .pipe(
+                skip(1),
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CsTransactionDetail) => {
+                    if (!!res) {
+                        this.hblDetail = res;
+                    }
+                },
             );
     }
 
@@ -99,7 +118,9 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
-        modelUpdate.transactionType = "AE";
+        modelUpdate.transactionType = ChargeConstants.AI_CODE;
+        modelUpdate.userCreated = this.hblDetail.userCreated;
+
         for (const dim of modelUpdate.dimensionDetails) {
             dim.hblId = this.hblId;
             // dim.mblId = this.jobId;
