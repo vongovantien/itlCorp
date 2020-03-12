@@ -68,19 +68,27 @@ namespace eFMS.API.ReportData.Controllers
         [Authorize]
         public async Task<IActionResult> ExportGoodsDeclare(string hblid)
         {
-            var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid, accessToken);
-
-            var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
-
-            var stream = new DocumentationHelper().CreateGoodsDeclare(dataObject.Result);
-            if (stream == null)
+            try
             {
-                return null;
-            }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Import Goods Declare.xlsx");
+                var accessToken = Request.Headers["Authorization"].ToString();
+                var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid, accessToken);
 
-            return fileContent;
+                var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
+
+                var stream = new DocumentationHelper().CreateGoodsDeclare(dataObject.Result);
+                if (stream == null)
+                {
+                    return null;
+                }
+                FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Import Goods Declare.xlsx");
+
+                return fileContent;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         /// <summary>
