@@ -86,7 +86,7 @@ export class DetailChargeComponent extends AddChargeComponent {
                 this.voucherList.ChargeToAdd.listChargeDefaultAccount = this.Charge.listChargeDefaultAccount;
                 this.voucherList.isShowUpdate = this.Charge.permission.allowUpdate;
 
-                this.Charge.charge.userCreated = res.userCreated;
+                this.Charge.charge.userCreated = res.charge.userCreated;
             }
         });
     }
@@ -98,6 +98,7 @@ export class DetailChargeComponent extends AddChargeComponent {
             const modeltoUpdate = this.onsubmitData();
             if (modeltoUpdate !== null) {
                 modeltoUpdate.charge.id = this.id;
+                modeltoUpdate.charge.userCreated = this.Charge.charge.userCreated;
                 this._catalogueRepo.updateCharge(modeltoUpdate)
                     .pipe(
                         catchError(this.catchError),

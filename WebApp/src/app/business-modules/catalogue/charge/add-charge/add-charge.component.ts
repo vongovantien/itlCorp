@@ -13,6 +13,7 @@ import { SystemConstants } from 'src/constants/system.const';
 @Component({
     selector: 'add-charge',
     templateUrl: './add-charge.component.html',
+    styleUrls: ['./../detail-charge/detail-charge.component.scss']
 })
 export class AddChargeComponent extends AppPage {
 
