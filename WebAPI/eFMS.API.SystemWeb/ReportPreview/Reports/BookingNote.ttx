@@ -1,0 +1,22 @@
+FlexId	String	255	
+Shipper	String	255	
+Consignee	String	255	
+HawbNo	String	50	
+MawbNo	String	50	
+FlightNo1	String	255	
+FlightNo2	String	255	
+DepartureAirport	String	50	
+PlaceOfReceipt	String	100	
+AirportOfDischarge	String	100	
+DestinationAirport	String	100	
+TotalCollect	String	50	
+TotalPrepaid	String	50	
+ShippingMark	String	100	
+Pieces	Number		
+DesOfGood	String	255	
+Gw	Number		
+Cbm	Number		
+ContactPerson	String	100	
+ClosingTime	String	100	
+CurrentUser	String	50	
+CurrentDate	String	100	
