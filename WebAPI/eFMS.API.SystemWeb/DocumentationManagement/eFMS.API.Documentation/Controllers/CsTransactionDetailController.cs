@@ -333,10 +333,29 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get data neutral hawb export
+        /// </summary>
+        /// <param name="housebillId"></param>
+        /// <param name="officeId"></param>
+        /// <returns></returns>
         [HttpGet("NeutralHawbExport")]
         public IActionResult NeutralHawbExport(Guid housebillId, Guid officeId)
         {
             var result = csTransactionDetailService.NeutralHawbExport(housebillId, officeId);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Preview Booking Note
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("PreviewBookingNote")]
+        [Authorize]
+        public IActionResult PreviewBookingNote(BookingNoteCriteria criteria)
+        {
+            var result = csTransactionDetailService.PreviewBookingNote(criteria);
             return Ok(result);
         }
     }

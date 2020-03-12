@@ -6,8 +6,9 @@ import { ToastrService } from 'ngx-toastr';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
 import { CommonEnum } from '@enums';
-import { Warehouse, PortIndex } from '@models';
+import { PortIndex } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
+import { finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-form-port-index',
@@ -81,11 +82,11 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         const formData = this.portindexForm.getRawValue();
         this.trimInputForm(formData);
         if (this.portindexForm.valid) {
-            this.hide();
 
             this.setPortIndexModel();
             if (this.isUpdate) {
                 this._catalogueRepo.updatePlace(this.portIndex.id, this.portIndex)
+                    .pipe(finalize(() => this.hide()))
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             this.onHandleResult(res);
@@ -94,6 +95,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
             } else {
                 this.portIndex.id = SystemConstants.EMPTY_GUID;
                 this._catalogueRepo.addPlace(this.portIndex)
+                    .pipe(finalize(() => this.hide()))
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             this.onHandleResult(res);
@@ -120,7 +122,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.portIndex.countryID = this.country.value[0].id;
         this.portIndex.modeOfTransport = this.mode.value[0].id;
         this.portIndex.areaID = (this.zone.value !== null && this.zone.value.length > 0) ? this.zone.value[0].id : null;
-        this.portIndex.warehouseId = !!this.warehouseId.value ? this.warehouseId.value[0].id : null;
+        this.portIndex.warehouseId = !!this.warehouseId && !!this.warehouseId.value ? this.warehouseId.value[0].id : null;
     }
 
     onHandleResult(res: CommonInterface.IResult) {

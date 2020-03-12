@@ -52,12 +52,13 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? RateCharge { get; set; }
         public bool? Min { get; set; }
         public decimal? Total { get; set; }
+        public string KgIb { get; set; }
         public int? SeaAir { get; set; }
         public decimal? Hw { get; set; }
         public decimal? Cbm { get; set; }
         public string VolumeField { get; set; }
         public string DesOfGoods { get; set; }
-        public string OtherCharges { get; set; }
+        public string OtherCharge { get; set; }
         public string Wtpp { get; set; }
         public string Valpp { get; set; }
         public string Taxpp { get; set; }

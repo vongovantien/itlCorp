@@ -176,8 +176,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
                             this.hwconstant = hbl.hwConstant;
-                            console.log("cbm from store", hbl.cbm);
-                            console.log("hw from store", hbl.hw);
+
                             this.updateFormValue(hbl);
                         }
                     });
@@ -201,7 +200,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 // distinctUntilChanged(),
                             )
                             .subscribe(changes => {
-                                console.log("caculating from store");
                                 this.updateHeightWeight(changes);
                             });
                     });
@@ -351,7 +349,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 distinctUntilChanged(),
             )
             .subscribe(changes => {
-                console.log("caculating from form");
                 this.updateHeightWeight(changes);
             });
 
@@ -504,10 +501,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             });
             this.totalHeightWeight = this.updateTotalHeightWeight(dims);
             this.totalCBM = this.updateCBM(dims);
-
-            console.log("after caculate");
-            console.log(this.totalCBM);
-            console.log(this.totalHeightWeight);
         }
     }
 

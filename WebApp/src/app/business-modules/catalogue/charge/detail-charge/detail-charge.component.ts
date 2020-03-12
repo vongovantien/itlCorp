@@ -98,7 +98,7 @@ export class DetailChargeComponent extends AddChargeComponent {
             const modeltoUpdate = this.onsubmitData();
             if (modeltoUpdate !== null) {
                 modeltoUpdate.charge.id = this.id;
-                this._catalogueRepo.updateCharge(this.ChargeToAdd)
+                this._catalogueRepo.updateCharge(modeltoUpdate)
                     .pipe(
                         catchError(this.catchError),
                         finalize(() => this._progressRef.complete())

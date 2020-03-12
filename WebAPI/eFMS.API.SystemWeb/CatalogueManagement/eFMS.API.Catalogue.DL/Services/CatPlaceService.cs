@@ -946,19 +946,20 @@ namespace eFMS.API.Catalogue.DL.Services
                                    ).AsQueryable();
             }
 
-            foreach (var item in list)
-            {
-                if(item.WarehouseId != null)
-                {
-                    var place = DataContext.First(x => x.Id == item.WarehouseId);
-                    item.WarehouseName = place.NameEn;
-                }
-            }
+            //foreach (var item in list)
+            //{
+            //    if(item.WarehouseId != null)
+            //    {
+            //        var place = DataContext.First(x => x.Id == item.WarehouseId);
+            //        item.WarehouseName = place.NameEn;
+            //    }
+            //}
             return list;
         }
 
         public CatPlaceModel GetDetail(Guid id)
         {
+            ICurrentUser _user = null;
             CatPlace data = DataContext.First(x => x.Id == id);
             if (data == null)
             {
@@ -967,7 +968,21 @@ namespace eFMS.API.Catalogue.DL.Services
 
             CatPlaceModel result =  mapper.Map<CatPlaceModel>(data);
 
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
+            if (data.PlaceTypeId == CatPlaceTypeEnum.Warehouse.ToString())
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
+            }
+            if (data.PlaceTypeId == CatPlaceTypeEnum.Port.ToString())
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
+            }
+            if (data.PlaceTypeId == CatPlaceTypeEnum.Province.ToString() 
+                || data.PlaceTypeId == CatPlaceTypeEnum.District.ToString() 
+                || data.PlaceTypeId == CatPlaceTypeEnum.Ward.ToString())
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catLocation);
+            }
+
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
 
             BaseUpdateModel baseModel = new BaseUpdateModel

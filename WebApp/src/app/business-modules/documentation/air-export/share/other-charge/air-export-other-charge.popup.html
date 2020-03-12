@@ -9,28 +9,31 @@
             </div>
             <div class="modal-body">
                 <div class="row align-items-center m--margin-bottom-10 font-weight-bold text-center">
-                    <div class="col-md-4">Charge Name</div>
-                    <div class="col-md-3">Amount</div>
-                    <div class="col-md-4">Due To</div>
+                    <div class="col-md-4" required>Charge Name</div>
+                    <div class="col-md-3" required>Amount</div>
+                    <div class="col-md-4" required>Due To</div>
                     <div class="col-md-1 pointer text-center"></div>
                 </div>
                 <ng-container *ngIf="!!csOtherChargesTemp; else placeholder">
                     <ng-container *ngFor="let item of csOtherChargesTemp; let i=index; trackBy: trackByFn">
                         <div class="row m--align-center m--margin-bottom-20 m-form m-form--state">
                             <div class="col-md-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !item.chargeName}">
                                     <input type="text" class="form-control" [(ngModel)]="item.chargeName">
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !item.amount}">
                                     <input type="number" class="form-control" numeric [decimals]="digitDecimal"
                                         autoFormatCurrency placeholder="Amount" [(ngModel)]="item.amount"
                                         (ngModelChange)="updateDescription()">
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !item.dueTo}">
                                     <select [(ngModel)]="item.dueTo" class="form-control"
                                         (ngModelChange)="updateDescription()">
                                         <option *ngFor="let item of dueToData" [ngValue]="item.value">

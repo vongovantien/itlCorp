@@ -589,6 +589,21 @@
             <param name="hblId">Id of Housebill</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.NeutralHawbExport(System.Guid,System.Guid)">
+            <summary>
+            Get data neutral hawb export
+            </summary>
+            <param name="housebillId"></param>
+            <param name="officeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.PreviewBookingNote(eFMS.API.Documentation.DL.Models.Criteria.BookingNoteCriteria)">
+            <summary>
+            Preview Booking Note
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CustomAuthcontroller">
             <summary>
             

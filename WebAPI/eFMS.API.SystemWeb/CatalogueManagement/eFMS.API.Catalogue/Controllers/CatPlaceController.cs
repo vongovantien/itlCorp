@@ -115,11 +115,12 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
         public IActionResult CheckAllowDetail(Guid id)
         {
             PermissionRange permissionRange;
             ICurrentUser _user = null;
-            CatPlaceModel place = catPlaceService.First(x => x.Id == id);
+            CatPlaceModel place = catPlaceService.Get(x => x.Id == id).FirstOrDefault();
             if (place == null)
             {
                 return Ok(false);
@@ -322,11 +323,12 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that want to delete</param>
         /// <returns></returns>
         [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
         public IActionResult CheckAllowDelete(Guid id)
         {
             PermissionRange permissionRange;
             ICurrentUser _user = null;
-            CatPlaceModel place = catPlaceService.First(x => x.Id == id);
+            CatPlaceModel place = catPlaceService.Get(x => x.Id == id).FirstOrDefault();
             if (place == null)
             {
                 return Ok(false);

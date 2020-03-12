@@ -98,6 +98,11 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
         const modelAdd = this.onSubmitData();
         modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
+        modelAdd.dimensionDetails.forEach(d => {
+            d.airWayBillId = null;
+            d.hblId = null;
+        });
+
         if (this.isImport === true) {
             modelAdd.id = this.selectedJob.id;
             this.importJob(modelAdd);

@@ -16,7 +16,7 @@ const routing: Routes = [
         path: '', data: { name: "" },
         children: [
             {
-                path: '', component: PortIndexComponent, data: { reuse: true }
+                path: '', component: PortIndexComponent
             },
             {
                 path: 'import', component: PortIndexImportComponent, data: { name: "Import" }

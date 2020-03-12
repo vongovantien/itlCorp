@@ -919,6 +919,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
+                entity.Property(e => e.KgIb).HasMaxLength(250);
+
                 entity.Property(e => e.Mblno1)
                     .HasColumnName("MBLNo1")
                     .HasMaxLength(50)
@@ -1346,7 +1348,9 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.DueTo).HasMaxLength(10);
+                entity.Property(e => e.DueTo)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
