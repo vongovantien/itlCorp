@@ -22,11 +22,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
     selector: 'app-master-page',
     templateUrl: './master-page.component.html',
 })
-export class MasterPageComponent implements OnInit, AfterViewInit {
-
-    @ViewChild(PageSidebarComponent, { static: false }) Page_side_bar: { Page_Info: {}; };
-    Page_Info = {};
-    Component_name: "no-name";
+export class MasterPageComponent implements OnInit {
 
     selectedOffice: Office;
     selectedDepartGroup: SystemInterface.IDepartmentGroup;
@@ -35,10 +31,6 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
     username: string;
     isChangeOffice: boolean = false;
     isChangeDepartgroup: boolean = false;
-
-    ngAfterViewInit(): void {
-        this.Page_Info = this.Page_side_bar.Page_Info;
-    }
 
     constructor(
         private baseServices: BaseService,
@@ -63,11 +55,6 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
         this.password = this.getUserPassword();
         this.username = this.getUserName();
 
-    }
-
-    MenuChanged(event: any) {
-        this.Page_Info = event;
-        this.Component_name = event.children;
     }
 
     logout() {

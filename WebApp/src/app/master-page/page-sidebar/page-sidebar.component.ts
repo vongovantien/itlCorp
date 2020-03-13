@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd, NavigationStart, NavigationCancel, NavigationError, Event } from '@angular/router';
 import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo } from '@repositories';
 import { Menu } from '@models';
@@ -11,7 +11,6 @@ import { IAppState, getClaimUserOfficeState } from '@store';
     templateUrl: './page-sidebar.component.html',
 })
 export class PageSidebarComponent implements OnInit, AfterViewInit {
-    @Output() Page_Information = new EventEmitter<any>();
 
     index_parrent_menu = 0;
     index_sub_menu = 0;
@@ -40,14 +39,48 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.getMenu(this.userLogged.officeId);
 
-        this._store.select(getClaimUserOfficeState)
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.getMenu(res);
+        this._store.select(getClaimUserOfficeState).subscribe((res: any) => {
+            if (!!res) {
+                this.getMenu(res);
+            }
+        });
+
+        this.router.events.subscribe((event: Event) => {
+            switch (true) {
+                case event instanceof NavigationEnd:
+                    const router = this.router.url.split('/');
+                    let parentInd = null;
+                    let childInd = null;
+                    let child_name = null;
+                    for (let i = 0; i < this.Menu.length; i++) {
+                        for (let j = 0; j < this.Menu[i].subMenus.length; j++) {
+                            if (router.includes(this.Menu[i].subMenus[j].route)) {
+                                this.Page_Info.parent = this.Menu[i].nameEn;
+                                this.Page_Info.children = this.Menu[i].subMenus[j].nameEn;
+
+                                this.Menu[i].displayChild = true;
+                                parentInd = i;
+                                childInd = j;
+                                child_name = this.Menu[i].subMenus[j].nameEn;
+                            }
+                        }
                     }
+                    if (parentInd != null && childInd != null) {
+                        setTimeout(() => {
+                            this.sub_menu_click(child_name, parentInd, childInd);
+                        }, 100);
+                    }
+                    break;
+                case event instanceof NavigationStart:
+                case event instanceof NavigationCancel:
+                case event instanceof NavigationError: {
+                    break;
                 }
-            );
+                default: {
+                    break;
+                }
+            }
+        });
 
     }
 
@@ -57,14 +90,13 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
                 .subscribe(
                     (res: Menu[]) => {
                         this.Menu = res.map((m: Menu) => new Menu(m));
-                        this.highLightMenu();
+                        // this.highLightMenu();
                     }
                 );
         }
     }
 
     ngAfterViewInit(): void {
-        // TODO khi nhấn back thì gọi lại fn HightlightMenu();
     }
 
     highLightMenu() {
@@ -77,7 +109,6 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
                 if (router.includes(this.Menu[i].subMenus[j].route)) {
                     this.Page_Info.parent = this.Menu[i].nameEn;
                     this.Page_Info.children = this.Menu[i].subMenus[j].nameEn;
-                    this.Page_Information.emit(this.Page_Info);
 
                     this.open_sub_menu(i);
 
@@ -149,7 +180,6 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
                 if (this.Menu[i].subMenus[j].nameEn === sub_menu_name) {
                     this.Page_Info.parent = this.Menu[i].nameEn;
                     this.Page_Info.children = this.Menu[i].subMenus[j].nameEn;
-                    this.Page_Information.emit(this.Page_Info);
                     break;
                 }
             }
