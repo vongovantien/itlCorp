@@ -28,11 +28,30 @@ export class FormValidators extends Validators {
         }
         return null;
     }
+
     static required(control: FormControl): ValidationErrors {
         if (control.value !== null) {
             return control.value.trim() === "" ? { "required": true } : null;
         }
         return { "required": true };
     }
+
+
+    public static compareETA_ETD(controls: AbstractControl | FormControl | FormGroup): ValidationErrors | any {
+        const eta: any = controls.get('eta').value;
+        const etd: any = controls.get('etd').value;
+
+        if (!eta || !etd) {
+            return null;
+        }
+        const etaTime = new Date(eta.startDate).getTime();
+        const etdTime = new Date(etd.startDate).getTime();
+
+        return (etaTime >= etdTime) ? null : {
+            validateEta_Etd: true
+        };
+
+    }
+
     // TODO Custom validator Fn here !
 }

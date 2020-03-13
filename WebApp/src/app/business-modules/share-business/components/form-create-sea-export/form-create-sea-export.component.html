@@ -31,13 +31,14 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':(isSubmitted && formGroup.errors | equalError:'validateEta_Etd') }">
                             <label>ETA</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                    [minDate]="minDateETA" [alwaysShowCalendars]="true" name="daterange"
-                                    placeholder="Select" readonly formControlName="eta" />
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
+                                    formControlName="eta" />
                                 <span class="m-input-icon_clear" (click)="resetFormControl(eta)"
                                     *ngIf="!!eta.value && !!eta.value.startDate">
                                     <i class="la la-times"></i>
@@ -47,6 +48,10 @@
                                         <i class="la la-calendar"></i>
                                     </span>
                                 </span>
+                            </div>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && formGroup.errors | equalError:'validateEta_Etd'">ETA must
+                                greater than or equal ETD
                             </div>
                         </div>
                     </div>
@@ -116,7 +121,8 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':  isSubmitted && formGroup.errors | equalError:'invalidPort'}">
                             <label>Port of Destination (POD)</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                                 [currentActiveItemId]="{ field: 'id', value: pod.value}"
@@ -124,6 +130,10 @@
                                 [displayFields]="displayFieldPort" (remove)="resetFormControl(pod)"
                                 [loading]="isLoadingPort | async">
                             </app-combo-grid-virtual-scroll>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && formGroup.errors | equalError:'invalidPort'">
+                                Port of Destination must be different from Port of Loading
+                            </div>
                         </div>
                     </div>
 
