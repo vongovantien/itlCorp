@@ -163,6 +163,12 @@ export class DocumentationRepo {
         );
     }
     convertClearanceToJob(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ConvertClearanceToJob`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    convertExistedClearanceToJob(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ConvertExistedClearancesToJobs`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)

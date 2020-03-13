@@ -127,7 +127,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
                 this._location.back();
             } else {
                 this.isConvertJob = true;
-                this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+                // this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
             }
         }
     }

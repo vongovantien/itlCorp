@@ -143,7 +143,7 @@ export class CustomClearanceEditComponent implements OnInit {
             this.customDeclaration.unitCode = this.strUnitCurrent;
 
             const shipment = this.mapClearanceToShipment();
-            const response = await this._documentation.convertClearanceToJob([{ opsTransaction: shipment, customsDeclaration: this.customDeclaration }]).toPromise();
+            const response = await this._documentation.convertExistedClearanceToJob([{ opsTransaction: shipment, customsDeclaration: this.customDeclaration }]).toPromise();
             if (response.status) {
                 this.getCustomCleanranceById(this.customDeclaration.id);
             } else {
