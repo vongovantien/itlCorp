@@ -9,8 +9,5 @@ namespace eFMS.API.ReportData.Models.Documentation
     {
         public string VNTitle { get; set; }
         public string ENTitle { get; set; }
-        public string VNTitleColor { get; set; }
-        public string ENTitleColor { get; set; }
-        public string BackgroundColor { get; set; }
     }
 }

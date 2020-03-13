@@ -65,62 +65,48 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A2"].Style.WrapText = true;
             workSheet.Cells["A2"].AutoFitColumns();
 
-            List<string> houseTitles = new List<string>()
-            {
-                "STT",
-                "No",
-                "Số hồ sơ ",
-                "Document's No",
-                "Năm đăng ký hồ sơ ",
-                "Document's Year",
-                "Chức năng của chứng từ ",
-                "Document's function",
-                "Người gửi hàng* ",
-                "Shipper",
-                "Người nhận hàng* ",
-                "Consignee",
-                "Người được thông báo 1",
-                "Notify Party 1",
-                "Người được thông báo 2",
-                "Notify Party 2",
-                "Mã Cảng chuyển tải/ quá cảnh"
+            List<TitleModel> houseTitles = new List<TitleModel>()
+            { 
+                new TitleModel { VNTitle = "STT", ENTitle = "No"},
+                new TitleModel { VNTitle = "Số hồ sơ ", ENTitle =  "Document's No"},
+                new TitleModel { VNTitle = "Năm đăng ký hồ sơ ", ENTitle = "Document's Year"},
+                new TitleModel { VNTitle = "Chức năng của chứng từ ", ENTitle = "Document's function"},
+                new TitleModel { VNTitle = "Người gửi hàng* ", ENTitle = "Shipper"},
+                new TitleModel { VNTitle = "Người nhận hàng* ", ENTitle = "Consignee"},
+                new TitleModel { VNTitle = "Người được thông báo 1", ENTitle = "Notify Party 1"},
+                new TitleModel { VNTitle = "Người được thông báo 2", ENTitle = "Notify Party 2"},
+                new TitleModel { VNTitle = "Mã Cảng chuyển tải/ quá cảnh", ENTitle = "Code of Port of transhipment/transit"}
             };
             int addressStartContent = 3;
-            int k = 0;
-            for (int i = 0; i < houseTitles.Count - 1; i = i + 2)
+            for (int i = 0; i < houseTitles.Count; i++)
             {
-                int indexColAddress = 0;
-                if (i == 0)
-                {
-                    indexColAddress = 1;
-                }
-                if (i > 0)
-                {
-                    indexColAddress = i - k;
-                    k = k + 1;
-                }
-                workSheet.Cells[addressStartContent, indexColAddress].Style.WrapText = true;
-                workSheet.Cells[addressStartContent, indexColAddress].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                workSheet.Cells[addressStartContent, indexColAddress].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                workSheet.Cells[addressStartContent, indexColAddress].Style.Font.SetFromFont(new Font("Times New Roman", 12));
-                workSheet.Cells[addressStartContent, indexColAddress].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                workSheet.Cells[addressStartContent, indexColAddress].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#d9e1f2"));
-                BorderDashItem(workSheet, addressStartContent, indexColAddress);
+                workSheet.Cells[addressStartContent, i + 1].Style.WrapText = true;
+                workSheet.Cells[addressStartContent, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[addressStartContent, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheet.Cells[addressStartContent, i + 1].Style.Font.SetFromFont(new Font("Times New Roman", 12));
+                workSheet.Cells[addressStartContent, i + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[addressStartContent, i + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#d9e1f2"));
+                BorderDashItem(workSheet, addressStartContent, i + 1);
 
-                ExcelRichText ert = workSheet.Cells[addressStartContent, indexColAddress].RichText.Add(houseTitles[i]);
+                ExcelRichText ert = workSheet.Cells[addressStartContent, i + 1].RichText.Add(houseTitles[i].VNTitle);
                 ert.Color = System.Drawing.Color.Red;
-                ert = workSheet.Cells[addressStartContent, indexColAddress].RichText.Add(" \n" + houseTitles[i + 1]);
+                ert = workSheet.Cells[addressStartContent, i+1].RichText.Add(" \n" + houseTitles[i].ENTitle);
                 ert.Color = System.Drawing.Color.Black;
-                workSheet.Column(indexColAddress).Width = 25;
+                workSheet.Column(i + 1).Width = 25;
             }
 
+            workSheet.Cells[4, 1, 4, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            workSheet.Cells[4, 1, 4, 9].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#ffff00"));
             workSheet.Cells[4, 1].Value = 01;
+            workSheet.Cells[4, 2].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#ffd966"));
+            workSheet.Cells[4, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
             workSheet.Cells[4, 3].Value = DateTime.Now.Year;
             workSheet.Cells[4, 4].Value = "CN01";
             workSheet.Cells[4, 5].Value = transactionDetail.ShipperDescription;
             workSheet.Cells[4, 6].Value = transactionDetail.ConsigneeDescription;
             workSheet.Cells[4, 7].Value = transactionDetail.NotifyPartyDescription;
             workSheet.Cells[4, 8].Value = transactionDetail.AlsoNotifyPartyDescription;
+            workSheet.Cells[4, 9].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#ffd966"));
             List<TitleModel> containerTitles = new List<TitleModel>()
             {
                 new TitleModel { VNTitle = "Mã hàng", ENTitle = "HS code if avail" },
@@ -130,75 +116,45 @@ namespace eFMS.API.ReportData.FormatExcel
                 new TitleModel { VNTitle = "Số hiệu cont", ENTitle = "Cont. number"},
                 new TitleModel { VNTitle = "Số seal cont", ENTitle = "Seal number"}
             };
-            //for (int i = 0; i < containerHeaders.Count; i++)
-            //{
-            //    workSheet.Cells[25, i + 1].Value = containerHeaders[i];
-            //    workSheet.Cells[25, i + 1].Style.WrapText = true;
-            //    BorderThinItem(workSheet, 25, i + 1);
+            addressStartContent = 6;
+            for (int i = 0; i< containerTitles.Count; i++)
+            {
+                workSheet.Cells[addressStartContent, i + 2].Style.WrapText = true;
+                workSheet.Cells[addressStartContent, i + 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[addressStartContent, i + 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheet.Cells[addressStartContent, i + 2].Style.Font.SetFromFont(new Font("Times New Roman", 12));
+                workSheet.Cells[addressStartContent, i + 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[addressStartContent, i + 2].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#d9e1f2"));
+                BorderDashItem(workSheet, addressStartContent, i + 2);
 
-            //    workSheet.Cells[25, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-            //    workSheet.Cells[25, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            //    workSheet.Column(i + 1).Width = 32.18;
-            //}
-            //short? numberPackage = 0;
-            //string kindOfPackages = string.Empty;
+                ExcelRichText ert = workSheet.Cells[addressStartContent, i + 2].RichText.Add(containerTitles[i].VNTitle);
+                ert.Color = System.Drawing.Color.Red;
+                ert = workSheet.Cells[addressStartContent, i + 2].RichText.Add(" \n" + containerTitles[i].ENTitle);
+                ert.Color = System.Drawing.Color.Black;
+                workSheet.Column(i + 2).Width = 25;
+            }
+            addressStartContent = 7;
+            if(transactionDetail.CsMawbcontainers != null)
+            {
+                foreach (var item in transactionDetail.CsMawbcontainers)
+                {
+                    workSheet.Cells[addressStartContent, 2].Value = item.CommodityName;
+                    workSheet.Cells[addressStartContent, 3].Value = item.Description;
+                    workSheet.Cells[addressStartContent, 4].Value = item.Gw;
+                    workSheet.Cells[addressStartContent, 5].Value = item.Cbm;
+                    workSheet.Cells[addressStartContent, 6].Value = item.ContainerNo;
+                    workSheet.Cells[addressStartContent, 7].Value = item.SealNo;
 
-            //int addressStartContent = 26;
-            //if (transactionDetail.CsMawbcontainers.Count > 0)
-            //{
-            //    foreach (var item in transactionDetail.CsMawbcontainers)
-            //    {
-            //        numberPackage = (short?)(numberPackage + item.PackageQuantity);
-            //        kindOfPackages = item.PackageTypeName != null ? (kindOfPackages + item.PackageTypeName + "; ") : string.Empty;
-            //        workSheet.Cells[addressStartContent, 1].Value = item.CommodityName;
-            //        workSheet.Cells[addressStartContent, 2].Value = item.Description;
-            //        workSheet.Cells[addressStartContent, 3].Value = item.Gw;
-            //        workSheet.Cells[addressStartContent, 4].Value = item.Gw;
-            //        workSheet.Cells[addressStartContent, 5].Value = item.ContainerNo;
-            //        workSheet.Cells[addressStartContent, 6].Value = item.SealNo;
-            //        for (int i = 0; i < containerHeaders.Count; i++)
-            //        {
-            //            BorderThinItem(workSheet, addressStartContent, i + 1);
-            //            workSheet.Cells[addressStartContent, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            //            if (i == 2 || i == 3)
-            //            {
-            //                workSheet.Cells[addressStartContent, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-            //            }
-            //            else
-            //            {
-            //                workSheet.Cells[addressStartContent, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-            //            }
-            //        }
-            //        addressStartContent = addressStartContent + 1;
-            //    }
-            //}
-            //List<ManifestModel> itemInHouses = new List<ManifestModel>()
-            //{
-            //    new ManifestModel { Title = "Số hồ sơ \nDocument's No", Value = string.Empty },
-            //    new ManifestModel { Title = "Năm đăng ký hồ sơ \nDocument's Year", Value = "2019" },
-            //    new ManifestModel { Title = "Chức năng của chứng từ \nDocument's function", Value = "CN01" },
-            //    new ManifestModel { Title = "Người gửi hàng* \nShipper", Value = transactionDetail.ShipperDescription },
-            //    new ManifestModel { Title = "Người nhận hàng* \nConsignee", Value = transactionDetail.ConsigneeDescription },
-            //    new ManifestModel { Title = "Người được thông báo 1 \nNotify Party 1", Value = transactionDetail.NotifyPartyDescription },
-            //    new ManifestModel { Title = "Người được thông báo 2 \nNotify Party 2", Value = string.Empty },
-            //    new ManifestModel { Title = "Mã Cảng chuyển tải/quá cảnh \nCode of Port of transhipment/transit", Value = string.Empty },
-            //    new ManifestModel { Title = "Mã Cảng giao hàng/cảng đích \nFinal destination", Value = transactionDetail.PODName },
-            //    new ManifestModel { Title = "Mã Cảng xếp hàng \nCode of Port of Loading", Value = transactionDetail.POLName },
-            //    new ManifestModel { Title = "Mã Cảng dỡ hàng \nPort of unloading/discharging", Value = transactionDetail.PODName },
-            //    new ManifestModel { Title = "Địa điểm giao hàng* \nPlace of Delivery", Value = transactionDetail.FinalDestinationPlace },
-            //    new ManifestModel { Title = "Loại hàng* \nCargo Type/Terms of Shipment", Value = transactionDetail.ServiceType },
-            //    new ManifestModel { Title = "Số vận đơn * \nBill of lading number", Value = transactionDetail.Hwbno },
-            //    new ManifestModel { Title = "Ngày phát hành vận đơn* \nDate of house bill of lading", Value = transactionDetail.Eta?.ToShortDateString() },
-            //    new ManifestModel { Title = "Số vận đơn gốc* \nMaster bill of lading number", Value = transactionDetail.Mawb },
-            //    new ManifestModel { Title = "Ngày phát hành vận đơn gốc* \nDate of master bill of lading", Value = transactionDetail.ShipmentEta?.ToShortDateString() },
-            //    new ManifestModel { Title = "Ngày khởi hành* \nDeparture date", Value = transactionDetail.Etd?.ToShortDateString() },
-            //    new ManifestModel { Title = "Tổng số kiện* \nNumber of packages", Value = numberPackage },
-            //    new ManifestModel { Title = "Loại kiện* \nKind of packages", Value = kindOfPackages.Length>0? kindOfPackages.Substring(0, kindOfPackages.Length -2): string.Empty },
-            //    new ManifestModel { Title = "Ghi chú \nRemark", Value = transactionDetail.Remark },
-            //};
-
-            //addressStartContent = 3;
-            //WriteGeneralManifestInfo(workSheet, itemInHouses, addressStartContent);
+                    for (int i = 1; i < containerTitles.Count + 1; i++)
+                    {
+                        BorderThinItem(workSheet, addressStartContent, i + 1);
+                        workSheet.Cells[addressStartContent, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                        workSheet.Cells[addressStartContent, i + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        workSheet.Cells[addressStartContent, i + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#ffff00"));
+                    }
+                    addressStartContent = addressStartContent + 1;
+                }
+            }
         }
 
         internal Stream CreateDangerousGoods(CsTransactionDetailModel transactionDetail, Stream stream = null)
@@ -302,7 +258,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[addressStartContent, 15].Value = item.SealNo;
                     workSheet.Cells[addressStartContent, 16].Value = item.Quantity;
 
-                    for (int i = 0; i < goodsInfos.Count; i++)
+                    for (int i = 0; i < goodsInfos.Count + 1; i++)
                     {
                         BorderThinItem(workSheet, addressStartContent, i + 1);
                         workSheet.Cells[addressStartContent, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -354,60 +310,46 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[2, 1, 2, 13].Style.Fill.BackgroundColor.SetColor(colTitleFromHex);
             workSheet.Cells[2, 1, 2, 13].Merge = true;
             workSheet.Cells["A2"].Style.WrapText = true;
-            List<ManifestModel> itemInHouses = new List<ManifestModel>()
+            List<TitleModel> itemInHouses = new List<TitleModel>()
             {
-                new ManifestModel { Title = "Số hồ sơ "},
-                new ManifestModel { Title = "\nDocument's No"},
-                new ManifestModel { Title = "Năm đăng ký hồ sơ "},
-                new ManifestModel { Title = "\nDocument's Year"},
-                new ManifestModel { Title = "Chức năng của chứng từ "},
-                new ManifestModel { Title = "\nDocument's function"},
-                new ManifestModel { Title = "Tổng số kiện* "},
-                new ManifestModel { Title = "\nNumber of packages"},
-                new ManifestModel { Title = "Loại kiện* "},
-                new ManifestModel { Title = "\nKind of packages"}
+                new TitleModel { VNTitle = "Số hồ sơ", ENTitle = "\nDocument's No" },
+                new TitleModel { VNTitle = "Năm đăng ký hồ sơ", ENTitle = "Document's Year" },
+                new TitleModel { VNTitle = "Chức năng của chứng từ", ENTitle = "Document's function" },
+                new TitleModel { VNTitle = "Tổng số kiện*", ENTitle = "Number of packages" },
+                new TitleModel { VNTitle = "Loại kiện*", ENTitle = "Kind of packages"}
             };
             int addressStartContent = 3;
-            for (int i = 0; i < itemInHouses.Count -1; i = i +2)
+            for (int i = 0; i < itemInHouses.Count; i++)
             {
-                int indexAddress = 0;
-                if(i == 0)
-                {
-                    indexAddress = i + addressStartContent;
-                }
-                else
-                {
-                    indexAddress = i - (i / 2) + addressStartContent;
-                }
                 workSheet.Column(1).Width = 25;
-                workSheet.Cells[indexAddress, 1].Style.Font.SetFromFont(new Font("Times New Roman", 12));
-                workSheet.Cells[indexAddress, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                workSheet.Cells[indexAddress, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#d9e1f2"));
-                workSheet.Cells[indexAddress, 1].IsRichText = true;
-                workSheet.Cells[indexAddress, 1].Style.Font.Color.SetColor(Color.Red);
-                ExcelRichText ert = workSheet.Cells[indexAddress, 1].RichText.Add(itemInHouses[i].Title);
+                workSheet.Cells[i + addressStartContent, 1].Style.Font.SetFromFont(new Font("Times New Roman", 12));
+                workSheet.Cells[i + addressStartContent, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#d9e1f2"));
+                workSheet.Cells[i + addressStartContent, 1].IsRichText = true;
+                workSheet.Cells[i + addressStartContent, 1].Style.Font.Color.SetColor(Color.Red);
+                ExcelRichText ert = workSheet.Cells[i + addressStartContent, 1].RichText.Add(itemInHouses[i].VNTitle);
                 ert.Color = System.Drawing.Color.Red;
-                ert = workSheet.Cells[indexAddress, 1].RichText.Add(itemInHouses[i + 1].Title);
+                ert = workSheet.Cells[i + addressStartContent, 1].RichText.Add(" \n" + itemInHouses[i].ENTitle);
                 ert.Color = System.Drawing.Color.Black;
-                workSheet.Cells[indexAddress, 1].Style.WrapText = true;
-                BorderThinItem(workSheet, indexAddress, 1);
+                workSheet.Cells[i + addressStartContent, 1].Style.WrapText = true;
+                BorderThinItem(workSheet, i + addressStartContent, 1);
 
-                workSheet.Cells[indexAddress, 2].Style.Font.SetFromFont(new Font("Times New Roman", 12));
+                workSheet.Cells[i + addressStartContent, 2].Style.Font.SetFromFont(new Font("Times New Roman", 12));
                 Color coVlauelFromHex = System.Drawing.ColorTranslator.FromHtml("#ffff00");
-                if (i == 4 || i == 8)
+                if (i == 2 || i == 4)
                 {
                     coVlauelFromHex = System.Drawing.ColorTranslator.FromHtml("#ffd966");
                 }
                 else
                 {
-                    if(i == 2)
+                    if(i == 1)
                     {
-                        workSheet.Cells[indexAddress, 2].Value = DateTime.Now.Year;
+                        workSheet.Cells[i + addressStartContent, 2].Value = DateTime.Now.Year;
                     }
                 }
-                workSheet.Cells[indexAddress, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                workSheet.Cells[indexAddress, 2].Style.Fill.BackgroundColor.SetColor(coVlauelFromHex);
-                BorderThinItem(workSheet, indexAddress, 2);
+                workSheet.Cells[i + addressStartContent, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 2].Style.Fill.BackgroundColor.SetColor(coVlauelFromHex);
+                BorderThinItem(workSheet, i + addressStartContent, 2);
             }
             workSheet.Cells["A8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["A8"].Value = headers[1];
@@ -532,6 +474,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[addressStartContent, 21].Value = transactionDetail.FinalDestinationPlace;
                 workSheet.Cells[addressStartContent, 22].Value = item.ContainerTypeName;
                 workSheet.Cells[addressStartContent, 23].Value = item.PackageTypeName;
+                Color coVlauelFromHex = System.Drawing.ColorTranslator.FromHtml("#ffff00");
                 addressStartContent = addressStartContent + 1;
             }
             for (int j = 10; j < addressStartContent; j++)
