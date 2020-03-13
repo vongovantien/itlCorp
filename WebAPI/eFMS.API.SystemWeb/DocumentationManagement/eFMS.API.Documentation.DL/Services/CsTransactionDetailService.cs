@@ -1721,14 +1721,14 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var bookingNote = new BookingNoteReport();
                 bookingNote.FlexId = criteria.FlexId?.ToUpper();
-                bookingNote.Shipper = catPartnerRepo.Get(x => x.Id == data.ShipperId).FirstOrDefault()?.ShortName.ToUpper();
-                bookingNote.Consignee = catPartnerRepo.Get(x => x.Id == data.ConsigneeId).FirstOrDefault()?.ShortName.ToUpper();
+                bookingNote.Shipper = catPartnerRepo.Get(x => x.Id == data.ShipperId).FirstOrDefault()?.ShortName?.ToUpper();
+                bookingNote.Consignee = catPartnerRepo.Get(x => x.Id == data.ConsigneeId).FirstOrDefault()?.ShortName?.ToUpper();
                 bookingNote.HawbNo = data.Hwbno?.ToUpper();
                 bookingNote.MawbNo = data.Mawb?.ToUpper();
                 var _pol = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
                 var _pod = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
                 var _airportOfDischarge = !string.IsNullOrEmpty(data.FirstCarrierTo) ? data.FirstCarrierTo : _pod?.Code;
-                var _flightNo = _pol?.Code + "-" + _airportOfDischarge + ":" +data.FlightNo + "/" + data.Etd.Value.ToString("dd MMM").ToUpper();
+                var _flightNo = _pol?.Code + "-" + _airportOfDischarge + ":" +data.FlightNo + "/" + data.Etd.Value.ToString("dd MMM");
                 bookingNote.FlightNo1 = _flightNo.ToUpper();
                 bookingNote.FlightNo2 = criteria.FlightNo2?.ToUpper();
                 bookingNote.DepartureAirport = _pol?.Code.ToUpper(); //Lấy Code

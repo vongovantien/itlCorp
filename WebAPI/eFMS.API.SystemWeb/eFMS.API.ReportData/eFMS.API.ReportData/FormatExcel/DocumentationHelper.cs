@@ -585,9 +585,9 @@ namespace eFMS.API.ReportData.FormatExcel
             int k = 44;
             for (var i = 0; i < airwayBillExport.OtherCharges.Count; i++)
             {
-                workSheet.Cells["H" + (k + i)].Value = airwayBillExport.OtherCharges[i].ChargeName?.ToUpper();
-                workSheet.Cells["J" + (k + i)].Value = airwayBillExport.OtherCharges[i].Amount;
-                workSheet.Cells["J" + (k + i)].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells["H" + k].Value = airwayBillExport.OtherCharges[i].ChargeName?.ToUpper();
+                workSheet.Cells["J" + k].Value = airwayBillExport.OtherCharges[i].Amount;
+                workSheet.Cells["J" + k].Style.Numberformat.Format = numberFormat;
                 k = k + 1;
             }
 

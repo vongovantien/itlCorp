@@ -78,7 +78,7 @@
             </div>
             <div class="modal-body">
                 <form #formPreviewBookingNote method="POST" [action]="scr" (onsubmit)="onSubmitForm()"
-                    (ngSubmit)="onSubmitForm($event)" target="reportFrame">
+                    (ngSubmit)="onSubmitForm()" target="reportFrame">
                     <input name="crystal" [value]="dataReport" type="hidden">
                 </form>
                 <iframe name="reportFrame" src="" type="application/pdf" height="1080px" width="100%" allowfullscreen

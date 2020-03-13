@@ -19,6 +19,7 @@ namespace eFMS.API.ReportData.FormatExcel
         const double minWidth = 0.00;
         const double maxWidth = 500.00;
         const string numberFormat = "_-* #,##0.00_-;-* #,##0.00_-;_-* \"-\"??_-;_-@_-_(_)";
+        const string numberFormatVND = "_-\"VND\"* #,##0.00_-;-\"VND\"* #,##0.00_-;_-\"VND\"* \"-\"??_-;_-@_-_(_)";
 
         /// <summary>
         /// Generate advance payment excel
@@ -348,6 +349,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["H2:K2"].Style.WrapText = true;
             workSheet.Cells["H2"].Value = headers[1];
             workSheet.Cells["H2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10));
+            workSheet.Cells["H2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             workSheet.Row(2).Height = 60;
 
             workSheet.Cells[4, 1, 100000, 11].Style.Font.Name = "Times New Roman";
@@ -368,7 +370,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["J5"].Value = headers[4]; //Ngày
             workSheet.Cells["J5"].Style.Font.Bold = true;
-            workSheet.Cells["K5"].Value = advanceExport.InfoAdvance.RequestDate.Value.ToString("dd/MM/yyyy");
+            workSheet.Cells["K5"].Value = advanceExport.InfoAdvance.RequestDate;
+            workSheet.Cells["K5"].Style.Numberformat.Format = "dd MMM, yyyy";
+            workSheet.Cells["K5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
             workSheet.Cells["J6"].Value = headers[5]; //Bộ phận
             workSheet.Cells["J6"].Style.Font.Bold = true;
@@ -465,6 +469,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[p, 4, j - 1, 4].Value = advanceExport.ShipmentsAdvance[i].Container; //Value Số cont - Loại cont
                 workSheet.Cells[p, 4, j - 1, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 4, j - 1, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheet.Cells[p, 4, j - 1, 4].Style.WrapText = true;
 
                 for (int x = 5; x < 12; x++)
                 {
@@ -550,7 +555,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 1, p, 2].Style.Font.UnderLine = true;
             workSheet.Cells[p, 3, p, 3].Value = totalAmount;
             workSheet.Cells[p, 3, p, 3].Style.Font.Bold = true;
-            workSheet.Cells[p, 3, p, 3].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[p, 3, p, 3].Style.Numberformat.Format = numberFormatVND;
 
             p = p + 1;
             workSheet.Cells[p, 1, p, 2].Merge = true;
@@ -565,7 +570,9 @@ namespace eFMS.API.ReportData.FormatExcel
             p = p + 1;
             workSheet.Cells[p, 1, p, 2].Merge = true;
             workSheet.Cells[p, 1, p, 2].Value = headers[29];
-            workSheet.Cells[p, 3, p, 3].Value = advanceExport.InfoAdvance.DealinePayment.Value.ToString("dd/MM/yyyy"); //Thời hạn thanh toán
+            workSheet.Cells[p, 3, p, 3].Value = advanceExport.InfoAdvance.DealinePayment; //Thời hạn thanh toán
+            workSheet.Cells[p, 3, p, 3].Style.Numberformat.Format = "dd MMM, yyyy";
+            workSheet.Cells[p, 3, p, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
             p = p + 2;
 
@@ -1699,6 +1706,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["H2:K2"].Style.WrapText = true;
             workSheet.Cells["H2"].Value = headers[1];
             workSheet.Cells["H2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 8));
+            workSheet.Cells["H2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             workSheet.Row(2).Height = 50;
 
             //Title
@@ -1719,7 +1727,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["I5"].Value = headers[4]; //Ngày thanh toán
             workSheet.Cells["I5"].Style.Font.Bold = true;
-            workSheet.Cells["J5"].Value = settlementExport.InfoSettlement.RequestDate.Value.ToString("dd/MM/yyyy");
+            workSheet.Cells["J5"].Value = settlementExport.InfoSettlement.RequestDate;
+            workSheet.Cells["J5"].Style.Numberformat.Format = "dd MMM, yyyy";
+            workSheet.Cells["J5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
             workSheet.Cells["A6:B6"].Merge = true;
             workSheet.Cells["A6"].Value = headers[5]; //Bộ phận
