@@ -43,12 +43,14 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportEManifest")]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> ExportEManifest(Guid hblid)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid);
+
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid, accessToken);
 
             var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
-
             var stream = new DocumentationHelper().CreateEManifestExcelFile(dataObject.Result);
             if (stream == null)
             {
@@ -69,19 +71,27 @@ namespace eFMS.API.ReportData.Controllers
         [Authorize]
         public async Task<IActionResult> ExportGoodsDeclare(string hblid)
         {
-            var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid, accessToken);
-
-            var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
-
-            var stream = new DocumentationHelper().CreateGoodsDeclare(dataObject.Result);
-            if (stream == null)
+            try
             {
-                return null;
-            }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Import Goods Declare.xlsx");
+                var accessToken = Request.Headers["Authorization"].ToString();
+                var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid, accessToken);
 
-            return fileContent;
+                var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
+
+                var stream = new DocumentationHelper().CreateGoodsDeclare(dataObject.Result);
+                if (stream == null)
+                {
+                    return null;
+                }
+                FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Import Goods Declare.xlsx");
+
+                return fileContent;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         /// <summary>
@@ -91,9 +101,11 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportDangerousGoods")]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> ExportDangerousGoods(string hblid)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid);
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid, accessToken);
 
             var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
 
