@@ -33,7 +33,7 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && clearance_no.invalid }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && clearance_no.invalid }">
                                 <label class="form-control-label" for="">
                                     Clearance No <span class="m--font-danger">(*)</span>
                                 </label>
@@ -43,14 +43,14 @@
                                     #clearance_no="ngModel" onpaste="return true;"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
                                     name="clearance_no" required placeholder="" autoFocus>
-                                <div class="form-control-feedback" *ngIf="addForm.submitted && clearance_no.invalid">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && clearance_no.invalid">
                                     Clearance No is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && strCustomerCurrent.trim().length==0 }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && strCustomerCurrent.trim().length==0 }">
                                 <label class="form-control-label" for="">
                                     Customer <span class="m--font-danger">(*)</span>
                                 </label>
@@ -61,14 +61,14 @@
                                     [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback"
-                                    *ngIf="addForm.submitted && strCustomerCurrent.trim().length==0">
+                                    *ngIf="isSubmitted && strCustomerCurrent.trim().length==0">
                                     Customer is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && customDeclaration.clearanceDate.endDate == null }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && customDeclaration.clearanceDate.endDate == null }">
                                 <label class="form-control-label" for="">
                                     Clearance Date <span class="m--font-danger">(*)</span>
                                 </label>
@@ -84,7 +84,7 @@
                                         </span>
                                     </span>
                                     <div class="form-control-feedback"
-                                        *ngIf="addForm.submitted && customDeclaration.clearanceDate.endDate == null">
+                                        *ngIf="isSubmitted && customDeclaration.clearanceDate.endDate == null">
                                         Clearance Date is required
                                     </div>
                                 </div>
@@ -94,10 +94,10 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob }">
                                 <label class="form-control-label" for="">
                                     HBL/HAWB <span class="m--font-danger"
-                                        *ngIf="addForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob">(*)</span>
+                                        *ngIf="isSubmitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
                                     autocomplete="nope" [(ngModel)]="customDeclaration.hblid" name="hblid"
@@ -106,17 +106,17 @@
                                     onpaste="return true;"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)">
                                 <div class="form-control-feedback"
-                                    *ngIf="addForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob">
+                                    *ngIf="isSubmitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob">
                                     HBL/HAWB is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob }">
                                 <label class="form-control-label" for="">
                                     MBL/MAWB <span class="m--font-danger"
-                                        *ngIf="addForm.submitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob">(*)</span>
+                                        *ngIf="isSubmitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
                                     autocomplete="nope" [(ngModel)]="customDeclaration.mblid" name="mblid"
@@ -124,7 +124,7 @@
                                     (change)="customDeclaration.mblid=customDeclaration.mblid.trim()"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)">
                                 <div class="form-control-feedback"
-                                    *ngIf="addForm.submitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob">
+                                    *ngIf="isSubmitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob">
                                     MBL/MAWB is required
                                 </div>
                             </div>
@@ -144,7 +144,7 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && strPortCurrent.trim().length==0 }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && strPortCurrent.trim().length==0 }">
                                 <label class="form-control-label" for="">
                                     Clearance Location <span class="m--font-danger">(*)</span>
                                 </label>
@@ -155,24 +155,24 @@
                                     [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name (EN)'},{'field':'countryNameEN','label':'Country Name (EN)'}]">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback"
-                                    *ngIf="addForm.submitted && strPortCurrent.trim().length==0">
+                                    *ngIf="isSubmitted && strPortCurrent.trim().length==0">
                                     Clearance location is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && typeClearanceCurrent.length==0 && isConvertJob }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && typeClearanceCurrent.length==0 && isConvertJob }">
                                 <label class="form-control-label" for="">
                                     Type <span class="m--font-danger"
-                                        *ngIf="addForm.submitted && typeClearanceCurrent.length==0 && isConvertJob">(*)</span>
+                                        *ngIf="isSubmitted && typeClearanceCurrent.length==0 && isConvertJob">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="typeClearance" [disabled]="disabled"
                                     [active]="typeClearanceCurrent" (selected)="selectedTypeClearance($event)"
                                     (removed)="removedTypeClearance()" placeholder="Select type">
                                 </ng-select>
                                 <div class="form-control-feedback"
-                                    *ngIf="addForm.submitted && typeClearanceCurrent.length==0 && isConvertJob">
+                                    *ngIf="isSubmitted && typeClearanceCurrent.length==0 && isConvertJob">
                                     Type is required
                                 </div>
                             </div>
@@ -193,7 +193,7 @@
                         <div class="col-lg-4">
                             <div *ngIf="serviceTypeCurrent[0]!='Air' && serviceTypeCurrent[0]!='Express'; else not_Air_Express"
                                 class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && cargoTypeCurrent.length==0 }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && cargoTypeCurrent.length==0 }">
                                 <label class="form-control-label" for="">
                                     Cargo Type <span class="m--font-danger">(*)</span>
                                 </label>
@@ -201,8 +201,7 @@
                                     [active]="cargoTypeCurrent" (selected)="selectedCargoType($event)"
                                     (removed)="removedCargoType($event)" placeholder="Select filter">
                                 </ng-select>
-                                <div class="form-control-feedback"
-                                    *ngIf="addForm.submitted && cargoTypeCurrent.length==0">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && cargoTypeCurrent.length==0">
                                     Cargo Type is required
                                 </div>
                             </div>
