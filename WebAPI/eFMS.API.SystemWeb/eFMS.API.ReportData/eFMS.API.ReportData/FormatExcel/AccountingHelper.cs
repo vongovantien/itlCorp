@@ -1738,7 +1738,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["I6"].Value = headers[6]; //Số chứng từ
             workSheet.Cells["I6"].Style.Font.Bold = true;
-            workSheet.Cells["J6"].Value = settlementExport.InfoSettlement.Department;
+            workSheet.Cells["J6"].Value = settlementExport.InfoSettlement.SettlementNo;
 
             workSheet.Cells[8, 1, 100000, 11].Style.Font.SetFromFont(new Font("Times New Roman", 10));
 
