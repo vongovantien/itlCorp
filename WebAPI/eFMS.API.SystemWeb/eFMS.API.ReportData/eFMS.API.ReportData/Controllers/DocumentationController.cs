@@ -100,9 +100,11 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportDangerousGoods")]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> ExportDangerousGoods(string hblid)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid);
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid, accessToken);
 
             var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
 

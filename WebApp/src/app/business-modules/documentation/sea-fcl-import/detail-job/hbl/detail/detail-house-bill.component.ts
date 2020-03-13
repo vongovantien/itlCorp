@@ -308,7 +308,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                    this.downLoadFile(res, "application/ms-excel", "Dangerous Goods.xlsx");
                 },
             );
     }
