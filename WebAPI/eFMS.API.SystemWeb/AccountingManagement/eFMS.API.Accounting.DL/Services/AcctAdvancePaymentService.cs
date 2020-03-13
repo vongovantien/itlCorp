@@ -39,6 +39,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
+        readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -57,7 +58,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysOffice> sysOffice,
             IContextBase<OpsStageAssigned> opsStageAssigned,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
-            IContextBase<CatPartner> catPartner) : base(repository, mapper)
+            IContextBase<CatPartner> catPartner,
+            IContextBase<CatCurrencyExchange> catCurrencyExchange) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = url;
@@ -75,6 +77,7 @@ namespace eFMS.API.Accounting.DL.Services
             opsStageAssignedRepo = opsStageAssigned;
             csShipmentSurchargeRepo = csShipmentSurcharge;
             catPartnerRepo = catPartner;
+            catCurrencyExchangeRepo = catCurrencyExchange;
         }
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
@@ -2270,7 +2273,7 @@ namespace eFMS.API.Accounting.DL.Services
                            };
             var mergeAdvRequest = queryOps.Union(queryDoc);
 
-            //Get advance chưa làm settlement
+            //Get advance theo shipment và advance chưa làm settlement
             var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo));
             return data.ToList();
         }
@@ -2380,9 +2383,16 @@ namespace eFMS.API.Accounting.DL.Services
         private InfoAdvanceExport GetInfoAdvanceExport(AcctAdvancePaymentModel advancePayment, string language)
         {
             string _requester = string.IsNullOrEmpty(advancePayment.Requester) ? string.Empty : GetEmployeeByUserId(advancePayment.Requester)?.EmployeeNameVn;
-            
-            #region -- Advance Amount & Sayword --
+
+            #region -- Advance Amount & Sayword --           
             var _advanceAmount = advancePayment.AdvanceRequests.Select(s => s.Amount).Sum();
+            if (advancePayment.AdvanceCurrency != AccountingConstants.CURRENCY_LOCAL)
+            {
+                //Tỉ giá quy đổi theo ngày đề nghị tạm ứng (RequestDate)
+                var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
+                var _rate = GetRateCurrencyExchange(currencyExchange, advancePayment.AdvanceCurrency, AccountingConstants.CURRENCY_LOCAL);
+                _advanceAmount = _advanceAmount * _rate;
+            }
             var _sayWordAmount = string.Empty;
             var _currencyAdvance = (language == "VN" && _advanceAmount >= 1) ?
                        (_advanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
@@ -2391,7 +2401,7 @@ namespace eFMS.API.Accounting.DL.Services
             _sayWordAmount = (language == "VN" && _advanceAmount >= 1) ?
                         InWordCurrency.ConvertNumberCurrencyToString(_advanceAmount.Value, _currencyAdvance)
                     :
-                        InWordCurrency.ConvertNumberCurrencyToStringUSD(_advanceAmount.Value, _currencyAdvance);
+                        InWordCurrency.ConvertNumberCurrencyToStringUSD(_advanceAmount.Value, "") + " " + AccountingConstants.CURRENCY_LOCAL;
             #endregion -- Advance Amount & Sayword --
 
             #region -- Info Manager, Accoutant & Department --
@@ -2426,6 +2436,7 @@ namespace eFMS.API.Accounting.DL.Services
         private List<InfoShipmentAdvanceExport> GetListShipmentAdvanceExport(AcctAdvancePaymentModel advancePayment)
         {
             var shipmentsAdvance = new List<InfoShipmentAdvanceExport>();
+            
             foreach (var request in advancePayment.AdvanceRequests)
             {
                 string _customer = string.Empty;
@@ -2482,10 +2493,65 @@ namespace eFMS.API.Accounting.DL.Services
                     InvoiceAmount = request.AdvanceType == AccountingConstants.ADVANCE_TYPE_INVOICE ? request.Amount : 0,
                     OtherAmount = request.AdvanceType == AccountingConstants.ADVANCE_TYPE_OTHER ? request.Amount : 0,
                 };
+                if(advancePayment.AdvanceCurrency != AccountingConstants.CURRENCY_LOCAL)
+                {
+                    //Tỉ giá quy đổi theo ngày đề nghị tạm ứng (RequestDate)
+                    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
+                    var _rate = GetRateCurrencyExchange(currencyExchange, advancePayment.AdvanceCurrency, AccountingConstants.CURRENCY_LOCAL);
+                    shipmentAdvance.NormAmount = shipmentAdvance.NormAmount * _rate;
+                    shipmentAdvance.InvoiceAmount = shipmentAdvance.InvoiceAmount * _rate;
+                    shipmentAdvance.OtherAmount = shipmentAdvance.OtherAmount * _rate;
+                }
                 shipmentsAdvance.Add(shipmentAdvance);
             }
             return shipmentsAdvance;
         }
         #endregion --- EXPORT ADVANCE ---
+
+        private decimal GetRateCurrencyExchange(List<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
+        {
+            if (currencyExchange.Count == 0 || string.IsNullOrEmpty(currencyFrom)) return 0;
+
+            currencyFrom = currencyFrom.Trim();
+            currencyTo = currencyTo.Trim();
+
+            if (currencyFrom != currencyTo)
+            {
+                var get1 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom && x.CurrencyToId.Trim() == currencyTo).OrderByDescending(x => x.Rate).FirstOrDefault();
+                if (get1 != null)
+                {
+                    return get1.Rate;
+                }
+                else
+                {
+                    var get2 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyTo && x.CurrencyToId.Trim() == currencyFrom).OrderByDescending(x => x.Rate).FirstOrDefault();
+                    if (get2 != null)
+                    {
+                        return 1 / get2.Rate;
+                    }
+                    else
+                    {
+                        var get3 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom || x.CurrencyFromId.Trim() == currencyTo).OrderByDescending(x => x.Rate).ToList();
+                        if (get3.Count > 1)
+                        {
+                            if (get3[0].CurrencyFromId.Trim() == currencyFrom && get3[1].CurrencyFromId.Trim() == currencyTo)
+                            {
+                                return get3[0].Rate / get3[1].Rate;
+                            }
+                            else
+                            {
+                                return get3[1].Rate / get3[0].Rate;
+                            }
+                        }
+                        else
+                        {
+                            //Nến không tồn tại Currency trong Exchange thì return về 0
+                            return 0;
+                        }
+                    }
+                }
+            }
+            return 1;
+        }
     }
 }
