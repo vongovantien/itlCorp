@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -107,31 +108,34 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Export MAWB Air Export
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
         [Route("ExportMAWBAirExport")]
         [HttpGet]
-        public async Task<IActionResult> ExportMAWBAirExport(string id)
+        public async Task<IActionResult> ExportMAWBAirExport(string jobId)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.AirwayBillExportUrl + id);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.AirwayBillExportUrl + jobId);
 
             var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
-            if (dataObject.Result == null) return null;
+            if (dataObject.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
 
             var stream = new DocumentationHelper().GenerateMAWBAirExportExcel(dataObject.Result);
             if (stream == null)
             {
-                return null;
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - MAWB.xlsx");
-
+            
             return fileContent;
         }
 
         /// <summary>
-        /// 
+        /// Export HAWB Air Export
         /// </summary>
         /// <param name="hblid"></param>
         /// <param name="officeId"></param>
@@ -143,12 +147,15 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.NeutralHawbExportUrl + "?housebillId=" + hblid + "&officeId=" + officeId);
 
             var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
-            if (dataObject.Result == null) return null;
+            if (dataObject.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
 
             var stream = new DocumentationHelper().GenerateHAWBAirExportExcel(dataObject.Result);
             if (stream == null)
             {
-                return null;
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - NEUTRAL HAWB.xlsx");
 
