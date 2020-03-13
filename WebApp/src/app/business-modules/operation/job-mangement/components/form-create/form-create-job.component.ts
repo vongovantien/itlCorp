@@ -10,6 +10,7 @@ import { AppForm } from 'src/app/app.form';
 import { map, share, takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
+import { FormValidators } from '@validators';
 
 @Component({
     selector: 'job-mangement-form-create',
@@ -152,7 +153,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             supplierId: [],
             agentId: [],
             billingOpsId: [null, Validators.required],
-        });
+        }, { validator: FormValidators.comparePort });
 
         this.hwbno = this.formCreate.controls['hwbno'];
         this.mblno = this.formCreate.controls['mblno'];

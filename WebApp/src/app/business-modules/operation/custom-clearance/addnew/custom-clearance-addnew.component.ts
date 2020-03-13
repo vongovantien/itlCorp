@@ -1,28 +1,22 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import moment from 'moment/moment';
 import { NgForm } from '@angular/forms';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
-import { Location } from '@angular/common';
+import { Location, formatDate } from '@angular/common';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { CatalogueRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { AppPage } from 'src/app/app.base';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
     templateUrl: './custom-clearance-addnew.component.html',
     styleUrls: ['./custom-clearance-addnew.component.scss']
 })
-export class CustomClearanceAddnewComponent implements OnInit {
-    customDeclaration: CustomClearance = new CustomClearance();
-    listCustomer: any = [];
-    listPort: any = [];
-    listCountry: any = [];
-    listCommodity: any = [];
-    listUnit: any = [];
-    isConvertJob: boolean = false;
+export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
 
     constructor(private _location: Location,
         private cdr: ChangeDetectorRef,
@@ -32,10 +26,44 @@ export class CustomClearanceAddnewComponent implements OnInit {
         private _documentation: DocumentationRepo,
         private toastr: ToastrService
     ) {
+        super();
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
-        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        this.selectedRange = { startDate: this.createMoment().startOf('month'), endDate: this.createMoment().endOf('month') };
     }
+
+
+    customDeclaration: CustomClearance = new CustomClearance();
+    listCustomer: any = [];
+    listPort: any = [];
+    listCountry: any = [];
+    listCommodity: any = [];
+    listUnit: any = [];
+    isConvertJob: boolean = false;
+
+    selectedRange: any;
+    selectedDate: any;
+    keepCalendarOpeningWithRange: true;
+
+    serviceTypes: any = [];
+    typeClearance: any = [];
+    routeClearance: any = [];
+    cargoTypes: any = [];
+
+    strCustomerCurrent: any = '';
+    strPortCurrent: any = '';
+    strCountryImportCurrent: any = '';
+    strCountryExportCurrent: any = '';
+    strCommodityCurrent: any = '';
+    strUnitCurrent: any = '';
+
+    serviceTypeCurrent: any = [];
+    typeClearanceCurrent: any = [];
+    routeClearanceCurrent: any = [];
+    cargoTypeCurrent: any = [];
+
+
+    public disabled: boolean = false;
 
     ngOnInit() {
         this.getClearanceType();
@@ -47,12 +75,12 @@ export class CustomClearanceAddnewComponent implements OnInit {
     }
 
     async addCustomClearance(formAdd: NgForm) {
-        if (this.strCustomerCurrent == '' || this.strPortCurrent == '') return;
-        if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
-            if (this.cargoTypeCurrent.length == 0) return;
+        if (this.strCustomerCurrent === '' || this.strPortCurrent === '') { return; }
+        if (this.serviceTypeCurrent[0] !== 'Air' && this.serviceTypeCurrent[0] !== 'Express') {
+            if (this.cargoTypeCurrent.length === 0) { return; }
         }
 
-        var pattern = /^[a-zA-Z0-9./_-\s]*$/;
+        const pattern = /^[a-zA-Z0-9./_-\s]*$/;
 
         if (!this.customDeclaration.clearanceNo.match(pattern)) {
             this.toastr.warning("Clearance No - Not allowed to enter special characters. Except for characters ./_- and space", '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
@@ -72,32 +100,28 @@ export class CustomClearanceAddnewComponent implements OnInit {
         if (formAdd.form.status != "INVALID" && this.customDeclaration.clearanceDate.endDate != null) {
             this.cdr.detach();
             this.customDeclaration.partnerTaxCode = this.strCustomerCurrent;
-            this.customDeclaration.clearanceDate = moment(this.customDeclaration.clearanceDate.endDate._d).format('YYYY-MM-DD');
+            this.customDeclaration.clearanceDate = formatDate(this.customDeclaration.clearanceDate.startDate, 'yyyy-MM-dd', 'en');
             this.customDeclaration.serviceType = this.serviceTypeCurrent[0];
             this.customDeclaration.gateway = this.strPortCurrent;
             this.customDeclaration.type = this.typeClearanceCurrent[0];
             this.customDeclaration.route = this.routeClearanceCurrent[0];
-            this.customDeclaration.cargoType = (this.serviceTypeCurrent[0] == 'Air' || this.serviceTypeCurrent[0] == 'Express') ? null : this.cargoTypeCurrent[0];
+            this.customDeclaration.cargoType = (this.serviceTypeCurrent[0] == 'Air' || this.serviceTypeCurrent[0] === 'Express') ? null : this.cargoTypeCurrent[0];
             this.customDeclaration.exportCountryCode = this.strCountryExportCurrent;
             this.customDeclaration.importCountryCode = this.strCountryImportCurrent;
             this.customDeclaration.commodityCode = this.strCommodityCurrent;
             this.customDeclaration.unitCode = this.strUnitCurrent;
-            console.log(this.customDeclaration);
 
-            // const respone = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.add, this.customDeclaration, true, true);
             const respone = await this._operationRepo.addCustomDeclaration(this.customDeclaration).toPromise();
-            console.log(respone);
             if (respone['status'] === true) {
                 this.toastr.success(respone['message']);
                 this._location.back();
             } else {
-                // Reset lại clearanceDate
-                this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+                this.customDeclaration.clearanceDate = { startDate: new Date(this.customDeclaration.clearanceDate), endDate: new Date(this.customDeclaration.clearanceDate) };
             }
         }
     }
 
-    async convertClearanceToShipment(formAdd: NgForm) {
+    convertClearanceToShipment(formAdd: NgForm) {
         if (this.strCustomerCurrent === '' || this.strPortCurrent === '' || this.typeClearanceCurrent.length === 0
             || this.customDeclaration.hblid == null || this.customDeclaration.hblid === ''
             || this.customDeclaration.mblid == null || this.customDeclaration.mblid === '') { return; }
@@ -107,7 +131,6 @@ export class CustomClearanceAddnewComponent implements OnInit {
         if (formAdd.form.status !== "INVALID" && this.customDeclaration.clearanceDate.endDate != null) {
             this.cdr.detach();
             this.customDeclaration.partnerTaxCode = this.strCustomerCurrent;
-            this.customDeclaration.clearanceDate = moment(this.customDeclaration.clearanceDate.endDate._d).format('YYYY-MM-DD');
             this.customDeclaration.serviceType = this.serviceTypeCurrent[0];
             this.customDeclaration.gateway = this.strPortCurrent;
             this.customDeclaration.type = this.typeClearanceCurrent[0];
@@ -117,18 +140,19 @@ export class CustomClearanceAddnewComponent implements OnInit {
             this.customDeclaration.importCountryCode = this.strCountryImportCurrent;
             this.customDeclaration.commodityCode = this.strCommodityCurrent;
             this.customDeclaration.unitCode = this.strUnitCurrent;
-            console.log(this.customDeclaration);
-            const shipment = this.mapClearanceToShipment();
-            //const response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertClearanceToJob, { opsTransaction: shipment, customsDeclaration: this.customDeclaration }, true, true);
-            const response = await this._documentation.convertClearanceToJob({ opsTransaction: shipment, customsDeclaration: this.customDeclaration }).toPromise();
 
+            const shipment = this.mapClearanceToShipment();
+            this.customDeclaration.clearanceDate = formatDate(this.customDeclaration.clearanceDate.startDate, 'yyyy-MM-dd', 'en');
+            this._documentation.convertClearanceToJob({ opsTransaction: shipment, customsDeclaration: this.customDeclaration }).subscribe(
+                (response: any) => {
             if (response.status) {
                 this.isConvertJob = false;
                 this._location.back();
             } else {
                 this.isConvertJob = true;
-                // this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+                        this.customDeclaration.clearanceDate = { startDate: new Date(this.customDeclaration.clearanceDate), endDate: new Date(this.customDeclaration.clearanceDate) };
             }
+                });
         }
     }
 
@@ -164,7 +188,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
             shipment.shipmentMode = "External";
             shipment.mblno = this.customDeclaration.mblid;
             shipment.hwbno = this.customDeclaration.hblid;
-            shipment.serviceDate = this.customDeclaration.clearanceDate;
+            shipment.serviceDate = formatDate(this.customDeclaration.clearanceDate.startDate, 'yyy-MM-dd', 'en');
             shipment.sumGrossWeight = this.customDeclaration.grossWeight;
             shipment.sumNetWeight = this.customDeclaration.netWeight;
             shipment.sumCbm = this.customDeclaration.cbm;
@@ -195,10 +219,10 @@ export class CustomClearanceAddnewComponent implements OnInit {
         this._operationRepo.getClearanceType()
             .subscribe(
                 (res: any) => {
-                    this.serviceTypes = res.serviceTypes.map(x => ({ "text": x.displayName, "id": x.value }));
-                    this.typeClearance = res.types.map(x => ({ "text": x.displayName, "id": x.value }));
-                    this.routeClearance = res.routes.map(x => ({ "text": x.displayName, "id": x.value }));
-                    this.cargoTypes = res.cargoTypes.map(x => ({ "text": x.displayName, "id": x.value }));
+                    this.serviceTypes = this.utility.prepareNg2SelectData(res.serviceTypes, 'value', 'displayName');
+                    this.typeClearance = this.utility.prepareNg2SelectData(res.types, 'value', 'displayName');
+                    this.routeClearance = this.utility.prepareNg2SelectData(res.routes, 'value', 'displayName');
+                    this.cargoTypes = this.utility.prepareNg2SelectData(res.cargoTypes, 'value', 'displayName');
                 }
             );
     }
@@ -219,7 +243,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
     }
 
     getListUnit() {
-        this._catalogueRepo.getUnit({ unitType: 'Package' })
+        this._catalogueRepo.getUnit({ unitType: CommonEnum.UnitType.PACKAGE })
             .subscribe((res: any) => {
                 this.listUnit = res;
                 const datasort = this.sortService.sort(res, 'code', true);
@@ -227,83 +251,22 @@ export class CustomClearanceAddnewComponent implements OnInit {
             });
     }
 
-    selectedRange: any;
-    selectedDate: any;
-    keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment();
-    ranges: any = {
-        Today: [moment(), moment()],
-        Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-        'This Month': [moment().startOf('month'), moment().endOf('month')],
-        'Last Month': [
-            moment()
-                .subtract(1, 'month')
-                .startOf('month'),
-            moment()
-                .subtract(1, 'month')
-                .endOf('month')
-        ]
-    };
-
-    /**
-  * ng2-select
-  */
-    serviceTypes: any = [];
-    typeClearance: any = [];
-    routeClearance: any = [];
-    cargoTypes: any = [];
-
-    strCustomerCurrent: any = '';
-    strPortCurrent: any = '';
-    strCountryImportCurrent: any = '';
-    strCountryExportCurrent: any = '';
-    strCommodityCurrent: any = '';
-    strUnitCurrent: any = '';
-
-    serviceTypeCurrent: any = [];
-    typeClearanceCurrent: any = [];
-    routeClearanceCurrent: any = [];
-    cargoTypeCurrent: any = [];
-
-    private _disabledV: string = '0';
-    public disabled: boolean = false;
-
-
-    private set disabledV(value: string) {
-        this._disabledV = value;
-        this.disabled = this._disabledV === '1';
-    }
-
-    public selected(value: any): void {
-        console.log('Selected value is: ', value);
-    }
-
-    public removed(value: any): void {
-        console.log('Removed value is: ', value);
-    }
-
     public selectedServiceType(value: any): void {
-        //console.log('ServiceType: ', value);
         this.serviceTypeCurrent = [value.id];
-        if (this.serviceTypeCurrent[0] == 'Air' || this.serviceTypeCurrent[0] == 'Express') {
+        if (this.serviceTypeCurrent[0] == 'Air' || this.serviceTypeCurrent[0] === 'Express') {
             this.cargoTypeCurrent = [];
         }
     }
 
     public selectedTypeClearance(value: any): void {
-        //console.log('TypeClearance: ', value);
         this.typeClearanceCurrent = [value.id];
     }
 
     public selectedRouteClearance(value: any): void {
-        //console.log('RouteClearance: ', value);
         this.routeClearanceCurrent = [value.id];
     }
 
     public selectedCargoType(value: any): void {
-        //console.log('CargoType: ', value);
         this.cargoTypeCurrent = [value.id];
     }
 

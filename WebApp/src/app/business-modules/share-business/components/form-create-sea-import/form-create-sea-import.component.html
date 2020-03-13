@@ -30,14 +30,16 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) || (isSubmitted && !eta.value) || (isSubmitted && !eta.value.startDate)}">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) 
+                            || (isSubmitted && !eta.value) 
+                            || (isSubmitted && !eta.value.startDate) 
+                            || (isSubmitted && formCreate.errors | equalError:'validateEta_Etd')}">
                             <label required>ETA</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDateETA"
-                                    name="daterange" placeholder="Please Select" readonly [autoApply]="true"
-                                    [singleDatePicker]="true" [alwaysShowCalendars]="true" formControlName="eta" />
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                    placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" formControlName="eta" />
                                 <span class="m-input-icon_clear" (click)="resetFormControl(eta)"
                                     *ngIf="!!eta.value && !!eta.value.startDate">
                                     <i class="la la-times"></i>
@@ -47,6 +49,10 @@
                                         <i class="la la-calendar"></i>
                                     </span>
                                 </span>
+                            </div>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && formCreate.errors | equalError:'validateEta_Etd'">ETA must
+                                greater than or equal ETD
                             </div>
                         </div>
                     </div>
@@ -115,13 +121,18 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !pod.value}">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!pod.value || formCreate.errors | equalError:'invalidPort')}">
                             <label required>Port of Destination (POD)</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: pod.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-destination')"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldsPort" [height]="200" (remove)="resetFormControl(pod)">
                             </app-combo-grid-virtual-scroll>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && formCreate.errors | equalError:'invalidPort'">
+                                Port of Destination must be different from Port of Loading
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">

@@ -5,18 +5,30 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
+
+            <app-default-button [buttonSetting]="saveButtonSetting"
+                (onClick)="isConvertJob = false;addCustomClearance(addForm)"></app-default-button>
+
+            <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                (click)="isConvertJob = true; convertClearanceToShipment(addForm)">
+                <span>
+                    <i class="la la la-save"></i>
+                    <span>
+                        save and convert
+                    </span>
+                </span>
+            </button>
+
+            <app-default-button [buttonSetting]="cancelButtonSetting" routerLink="/home/operation/custom-clearance">
+            </app-default-button>
         </div>
     </div>
 </div>
-<!--end:: subheader-->
 
-<!--begin:: m-content -->
 <div class="m-content">
-    <!--begin::Form-->
     <form name="addForm" #addForm="ngForm" novalidate (ngSubmit)="addForm.form.valid">
         <div class="m-form m-form--state">
-            <!--begin:: m-portlet-->
-            <div class="m-portlet">
+            <div class="m-portlet h-100vh bg-white">
                 <div class="m-portlet__body">
                     <div class="row">
                         <div class="col-lg-4">
@@ -322,41 +334,6 @@
                     </div>
                 </div>
             </div>
-            <!--end::  m-portlet-->
-            <!--begin:: form-actions-->
-            <div class="form-actions m--align-right">
-                <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="isConvertJob = false;addCustomClearance(addForm)">
-                    <span>
-                        <i class="la la la-save"></i>
-                        <span>
-                            save
-                        </span>
-                    </span>
-                </button>
-                <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="isConvertJob = true; convertClearanceToShipment(addForm)">
-                    <span>
-                        <i class="la la la-save"></i>
-                        <span>
-                            save and convert
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    routerLink="/home/operation/custom-clearance">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-            <!--end:: form-actions-->
-
         </div>
     </form>
-    <!--end::Form-->
 </div>
-<!--end:: m-content-->

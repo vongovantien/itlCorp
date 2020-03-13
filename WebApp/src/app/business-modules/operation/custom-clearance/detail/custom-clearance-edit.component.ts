@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
-import find from 'lodash/find';
 import { NgForm } from '@angular/forms';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
@@ -11,12 +9,41 @@ import { OperationRepo, DocumentationRepo, CatalogueRepo } from '@repositories';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { ToastrService } from 'ngx-toastr';
+import { AppPage } from 'src/app/app.base';
+
+import find from 'lodash/find';
+
 
 @Component({
     selector: 'app-custom-clearance-edit',
     templateUrl: './custom-clearance-edit.component.html',
 })
-export class CustomClearanceEditComponent implements OnInit {
+export class CustomClearanceEditComponent extends AppPage implements OnInit {
+
+    selectedRange: any;
+    selectedDate: any;
+    keepCalendarOpeningWithRange: true;
+
+    serviceTypes: any = [];
+    typeClearance: any = [];
+    routeClearance: any = [];
+    cargoTypes: any = [];
+
+    strCustomerCurrent: any = '';
+    strPortCurrent: any = '';
+    strCountryImportCurrent: any = '';
+    strCountryExportCurrent: any = '';
+    strCommodityCurrent: any = '';
+    strUnitCurrent: any = '';
+
+    serviceTypeCurrent: any = [];
+    typeClearanceCurrent: any = [];
+    routeClearanceCurrent: any = [];
+    cargoTypeCurrent: any = [];
+
+    public disabled: boolean = false;
+
+
     customDeclaration: CustomClearance; // = new CustomClearance();
     listCustomer: any[] = [];
     listPort: any = [];
@@ -31,9 +58,12 @@ export class CustomClearanceEditComponent implements OnInit {
         private route: ActivatedRoute,
         private toart: ToastrService,
         private _catalogueRepo: CatalogueRepo) {
+
+        super();
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
-        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        this.selectedRange = { startDate: this.createMoment().startOf('month'), endDate: this.createMoment().endOf('month') };
+
     }
 
     async ngOnInit() {
@@ -41,8 +71,8 @@ export class CustomClearanceEditComponent implements OnInit {
         await this.getListCustomer();
         await this.getListPort();
         this.getListCountry();
-        await this.getListUnit();
-        await this.getListCommodity();
+        this.getListUnit();
+        this.getListCommodity();
 
         this.route.params.subscribe(prams => {
             if (!!prams.id) {
@@ -100,7 +130,7 @@ export class CustomClearanceEditComponent implements OnInit {
         }
         if (formUpdate.form.status !== "INVALID" && this._clearanceDate.endDate != null) {
             this.customDeclaration.partnerTaxCode = this.strCustomerCurrent;
-            this.customDeclaration.clearanceDate = moment(this._clearanceDate.endDate._d).format('YYYY-MM-DD');
+            this.customDeclaration.clearanceDate = formatDate(this._clearanceDate.endDate, 'yyyy-MM-dd', 'en');
             this.customDeclaration.serviceType = this.serviceTypeCurrent[0];
             this.customDeclaration.gateway = this.strPortCurrent;
             this.customDeclaration.type = this.typeClearanceCurrent[0];
@@ -148,7 +178,7 @@ export class CustomClearanceEditComponent implements OnInit {
                 this.getCustomCleanranceById(this.customDeclaration.id);
             } else {
                 // reset lại _clearanceDate
-                this._clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+                this._clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: new Date(this.customDeclaration.clearanceDate.startDate), endDate: new Date(this.customDeclaration.clearanceDate.startDate) };
             }
         }
     }
@@ -228,75 +258,16 @@ export class CustomClearanceEditComponent implements OnInit {
         this._catalogueRepo.getCountry().subscribe((res: any) => { this.listCountry = res; });
     }
 
-    async getListCommodity() {
+    getListCommodity() {
         this._catalogueRepo.getCommondity({}).subscribe((res: any) => { this.listCommodity = res; });
     }
 
-    async getListUnit() {
+    getListUnit() {
         // unitType = Package
         this._catalogueRepo.getUnit({ unitType: 'Package' }).subscribe((res: any) => { this.listUnit = res; });
     }
 
-    /**
-      * Daterange picker
-      */
-    selectedRange: any;
-    selectedDate: any;
-    keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment();
-    ranges: any = {
-        Today: [moment(), moment()],
-        Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-        'This Month': [moment().startOf('month'), moment().endOf('month')],
-        'Last Month': [
-            moment()
-                .subtract(1, 'month')
-                .startOf('month'),
-            moment()
-                .subtract(1, 'month')
-                .endOf('month')
-        ]
-    };
 
-    /**
-  * ng2-select
-  */
-
-    serviceTypes: any = [];
-    typeClearance: any = [];
-    routeClearance: any = [];
-    cargoTypes: any = [];
-
-    strCustomerCurrent: any = '';
-    strPortCurrent: any = '';
-    strCountryImportCurrent: any = '';
-    strCountryExportCurrent: any = '';
-    strCommodityCurrent: any = '';
-    strUnitCurrent: any = '';
-
-    serviceTypeCurrent: any = [];
-    typeClearanceCurrent: any = [];
-    routeClearanceCurrent: any = [];
-    cargoTypeCurrent: any = [];
-
-    private _disabledV: string = '0';
-    public disabled: boolean = false;
-
-
-
-    public selected(value: any): void {
-        console.log('Selected value is: ', value);
-    }
-
-    public removed(value: any): void {
-        console.log('Removed value is: ', value);
-    }
-
-    public typed(value: any): void {
-        console.log('New search input: ', value);
-    }
 
     public selectedServiceType(value: any): void {
         this.serviceTypeCurrent = [value.id];
