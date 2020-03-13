@@ -114,7 +114,11 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight.xlsx');
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight.xlsx');
+                    } else {
+                        this._toastService.warning('No data found');
+                    }
                 },
             );
     }

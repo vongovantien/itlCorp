@@ -103,6 +103,7 @@ export class CreateHouseBillComponent extends AppForm {
     }
 
     ngAfterViewInit() {
+
         this.hblGoodSummaryComponent.initContainer();
 
         this.hblGoodSummaryComponent.containerPopup.isAdd = true;
@@ -113,6 +114,7 @@ export class CreateHouseBillComponent extends AppForm {
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
         this.formHouseBill.type = 'SFI';
         this._cd.detectChanges();
+
 
     }
 
@@ -193,9 +195,8 @@ export class CreateHouseBillComponent extends AppForm {
     showImportPopup() {
         const dataSearch = { jobId: this.jobId };
         dataSearch.jobId = this.jobId;
-        this.importHouseBillPopup.typeFCL = '';
-        this.importHouseBillPopup.typeTransaction = 7;
         this.importHouseBillPopup.selected = - 1;
+        this.importHouseBillPopup.typeFCL = 'Import';
         this.importHouseBillPopup.getHourseBill(dataSearch);
         this.importHouseBillPopup.show();
     }

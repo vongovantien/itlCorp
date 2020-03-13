@@ -30,6 +30,10 @@ namespace eFMS.API.Documentation.DL.Models
         public string Containers { get; set; }
         public DateTime? ShipmentEta { get; set; }
         public string TransactionType { get; set; }
+        public DateTime? ShipmentEtd { get; set; }
+        public string ShipmentMawb { get; set; }
+
+
         public PermissionAllowBase Permission { get; set; }
     }
 }
