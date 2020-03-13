@@ -18,6 +18,10 @@
                     <a class="dropdown-item pointer" (click)="preview('LASTEST_ITL_FRAME')">ITL AWB (Frame) Preview</a>
                     <a class="dropdown-item pointer" (click)="previewAttachList()">Attach List Preview</a>
                     <a class="dropdown-item pointer" (click)="exportNeutralHawb()">Print NEUTRAL HAWB</a>
+                    <a class="dropdown-item pointer" (click)="openInputBookingNote('BN_SCSC')">Booking Note SCSC
+                        Preview</a>
+                    <a class="dropdown-item pointer" (click)="openInputBookingNote('BN_TCS')">Booking Note TCS
+                        Preview</a>
                 </div>
             </div>
             <app-default-button *ngIf="allowUpdate" [buttonSetting]="saveButtonSetting" (onClick)="confirmSave.show()">
@@ -54,3 +58,5 @@ Are you sure all entered details are correct?" (onSubmit)="saveHBL()" title="Upd
 
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
     (onSubmit)="confirmCancelPopup.hide();gotoList()"></confirm-popup>
+
+<input-booking-note-popup></input-booking-note-popup>

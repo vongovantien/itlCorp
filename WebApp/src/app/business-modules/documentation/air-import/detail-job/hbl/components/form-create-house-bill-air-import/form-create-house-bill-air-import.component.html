@@ -134,7 +134,7 @@
                 <div class="col-md-4">
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':isSubmitted && !forwardingAgentId.value}">
-                        <label>Agent</label>
+                        <label required>Agent</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                             [currentActiveItemId]="{ field: 'id', value: forwardingAgentId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="agents | async" [loading]="isLoading"

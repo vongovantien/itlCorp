@@ -191,8 +191,8 @@ export class ExportRepo {
         );
     }
 
-    exportMawbAirwayBill(id: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportMAWBAirExport?id=${id}`).pipe(
+    exportMawbAirwayBill(jobId: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportMAWBAirExport?jobId=${jobId}`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

@@ -38,4 +38,5 @@
     [labelCancel]="'No'" (onSubmit)="oncreate()" title="Save HBL">
 </confirm-popup>
 
-<import-house-bill-detail (onImport)="onImport($event)"> </import-house-bill-detail>
+<import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="7">
+</import-house-bill-detail>

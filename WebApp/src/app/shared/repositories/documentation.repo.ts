@@ -706,4 +706,10 @@ export class DocumentationRepo {
         );
     }
 
+    previewBookingNote(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewBookingNote`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }

@@ -201,6 +201,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         let valid: boolean = true;
         this.setError(this.formCreateHBLComponent.freightPayment);
         this.setError(this.formCreateHBLComponent.packageType);
+        this.setError(this.formCreateHBLComponent.hbltype);
 
         if (!this.formCreateHBLComponent.formCreate.valid) {
             valid = false;

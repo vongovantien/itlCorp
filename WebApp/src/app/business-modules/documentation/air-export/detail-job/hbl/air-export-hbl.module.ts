@@ -22,6 +22,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SeparateHouseBillComponent } from './components/form-separate-house-bill/form-separate-house-bill.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ShareAirExportModule } from '../../share-air-export.module';
+import { InputBookingNotePopupComponent } from './components/input-booking-note/input-booking-note.popup';
 
 const routing: Routes = [
     {
@@ -84,7 +85,8 @@ const LIB = [
         AirExportHBLFormCreateComponent,
         AirExportHBLAttachListComponent,
         AirExportDetailHBLComponent,
-        SeparateHouseBillComponent
+        SeparateHouseBillComponent,
+        InputBookingNotePopupComponent
     ],
     providers: [],
 })

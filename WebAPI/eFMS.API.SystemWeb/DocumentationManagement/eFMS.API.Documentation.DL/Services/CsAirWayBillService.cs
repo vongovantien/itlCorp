@@ -130,17 +130,17 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public AirwayBillExportResult AirwayBillExport(Guid id)
+        public AirwayBillExportResult AirwayBillExport(Guid jobId)
         {
-            var masterbill = Get(x => x.Id == id).FirstOrDefault();
+            var masterbill = Get(x => x.JobId == jobId).FirstOrDefault();
             if (masterbill == null) return null;
-            masterbill.OtherCharges = shipmentOtherChargeService.Get(x => x.JobId == id).ToList();
+            masterbill.OtherCharges = shipmentOtherChargeService.Get(x => x.JobId == jobId).ToList();
             
             var result = new AirwayBillExportResult();
             result.MawbNo = masterbill.Mblno1 + masterbill.Mblno2 + masterbill.Mblno3;
             var pol = catPlaceRepo.Get(x => x.Id == masterbill.Pol).FirstOrDefault();
             var pod = catPlaceRepo.Get(x => x.Id == masterbill.Pod).FirstOrDefault();
-            result.AolCode = pol.Code ?? string.Empty;
+            result.AolCode = pol?.Code;
             result.Shipper = masterbill.ShipperDescription;
 
             //Airline lấy từ Shipment
@@ -153,16 +153,16 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (masterbill.FreightPayment == "Sea - Air Difference" || masterbill.FreightPayment == "Prepaid")
                 {
-                    _airFrieghtDa = "PP IN " + (pol.Code ?? string.Empty);
+                    _airFrieghtDa = "PP IN " + pol?.Code;
                 }
                 else
                 {
-                    _airFrieghtDa = "CLL IN " + (pod.Code ?? string.Empty);
+                    _airFrieghtDa = "CLL IN " + pod?.Code;
                 }
             }
             result.AirFrieghtDa = _airFrieghtDa;
 
-            result.DepartureAirport = pol.NameEn ?? string.Empty;
+            result.DepartureAirport = pol?.NameEn;
             result.FirstTo = masterbill.FirstCarrierTo;
             result.FirstCarrier = masterbill.FirstCarrierBy;
             result.SecondTo = masterbill.TransitPlaceTo2;
@@ -170,7 +170,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.Currency = masterbill.CurrencyId;
             result.Dclrca = masterbill.Dclrca;
             result.Dclrcus = masterbill.Dclrcus;
-            result.DestinationAirport = pod.NameEn ?? string.Empty;
+            result.DestinationAirport = pod?.NameEn;
             result.FlightNo = masterbill.FlightNo;
             result.FlightDate = masterbill.FlightDate;
             result.IssuranceAmount = masterbill.IssuranceAmount;

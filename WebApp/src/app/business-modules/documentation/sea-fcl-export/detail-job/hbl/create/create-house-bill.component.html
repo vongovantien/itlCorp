@@ -15,7 +15,8 @@
 
     <hbl-goods-summary-fcl type="export">HBL Goods Summary</hbl-goods-summary-fcl>
 </div>
-<import-house-bill-detail (onImport)="onImport($event)"> </import-house-bill-detail>
+<import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="6">
+</import-house-bill-detail>
 
 <info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Update HBL'"></info-popup>

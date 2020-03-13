@@ -29,7 +29,8 @@
     </div>
 </div>
 
-<import-house-bill-detail (onImport)="onImport($event)"> </import-house-bill-detail>
+<import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="9">
+</import-house-bill-detail>
 
 <info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Create HBL'"></info-popup>

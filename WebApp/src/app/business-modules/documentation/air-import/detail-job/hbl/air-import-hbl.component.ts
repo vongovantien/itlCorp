@@ -17,6 +17,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/share-business/components/selling-charge/selling-charge.component';
 
 import isUUID from 'validator/lib/isUUID';
+import { SortService } from '@services';
 
 
 @Component({
@@ -57,11 +58,13 @@ export class AirImportHBLComponent extends AppList implements OnInit {
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
-        private _spinner: NgxSpinnerService
+        private _spinner: NgxSpinnerService,
+        private _sortService: SortService
 
     ) {
         super();
         this._progressRef = this._progressService.ref();
+        this.requestSort = this.sortLocal;
     }
 
     ngOnInit() {
@@ -137,6 +140,10 @@ export class AirImportHBLComponent extends AppList implements OnInit {
                     }
                 },
             );
+    }
+
+    sortLocal(sort: string): void {
+        this.houseBills = this._sortService.sort(this.houseBills, sort, this.order);
     }
 
     showDeletePopup(hbl: CsTransactionDetail, event: Event) {
