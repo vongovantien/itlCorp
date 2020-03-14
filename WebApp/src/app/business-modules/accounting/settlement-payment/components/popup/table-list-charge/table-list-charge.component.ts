@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 
 import { CustomDeclaration, Surcharge, Partner, Unit } from '@models';
 import { CatalogueRepo, DocumentationRepo, OperationRepo, AccountingRepo } from '@repositories';
@@ -37,7 +37,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     listUnits: Observable<Unit[]>;
     shipments: OperationInteface.IShipment[];
     cds: CustomDeclaration[] = [];
-    advs: IAdvanceShipment[];
+    advs: IAdvanceShipment[] = [];
     listPartner: Partner[] = [];
 
     selectedShipment: OperationInteface.IShipment;
@@ -180,7 +180,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 })
             ).subscribe(
                 (res: any[] = []) => {
-                    this.advs = res;
+                    this.advs = cloneDeep(res);
                     if (!this.advanceNo.value) {
                         const advance: IAdvanceShipment = this.advs.find(i => i.jobId === this.selectedShipment.jobId);
                         if (!!advance) {
@@ -231,6 +231,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
                 this.shipment.setValue(this.selectedShipment.hblid);
                 this.getMasterCharges(this.serviceTypeId);
+
+                this.advanceNo.reset();
+                this.advs.length = 0;
                 this.getAdvances(this.selectedShipment.jobId);
                 // * FINDING ITEM ADVANCE BELONG TO SELECTED SHIPMENT.
 
