@@ -9,12 +9,11 @@ import { PagingService } from '../../services/paging-service';
 export class AppPaginationComponent implements OnInit {
   @Input() config: PagerSetting = {};
   @Output() pagerObject = new EventEmitter<any[]>();
-  @Input() _pager: any = {};
   count = 0;
 
   selectPageSize() {
     this.pager.totalItems = 0;
-    this.setPage(1);
+    this.pager.setPage(1);
     this.pagerObject.emit(this.pager);
   }
 

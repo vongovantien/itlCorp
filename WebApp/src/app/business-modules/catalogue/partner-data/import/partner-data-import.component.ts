@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgProgress } from '@ngx-progressbar/core';
 import { PagingService } from 'src/app/shared/services/paging-service';
 import { SortService } from 'src/app/shared/services/sort.service';
@@ -18,7 +17,6 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class PartnerDataImportComponent extends AppPage implements OnInit {
     @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
-    @ViewChild(AppPaginationComponent, { static: false }) child;
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];
@@ -26,7 +24,6 @@ export class PartnerDataImportComponent extends AppPage implements OnInit {
     totalRows: number = 0;
     isShowInvalid: boolean = true;
     pager: PagerSetting = PAGINGSETTING;
-    inProgress: boolean = false;
     isDesc = true;
     sortKey: string;
 
@@ -58,11 +55,23 @@ export class PartnerDataImportComponent extends AppPage implements OnInit {
                 this.pager.totalItems = this.data.length;
                 this.totalValidRows = response.totalValidRows;
                 this.totalRows = this.data.length;
+                this.pager.currentPage = 1;
                 this.pagingData(this.data);
             }, () => {
             });
     }
+    selectPageSize() {
+        this.pager.currentPage = 1;
+        if (this.isShowInvalid) {
+            this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
 
+        } else {
+            this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
+            this.pager.totalItems = this.inValidItems.length;
+        }
+    }
     pagingData(data: any[]) {
         this.pager = this.pagingService.getPager(data.length, this.pager.currentPage, this.pager.pageSize);
         this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
@@ -107,11 +116,13 @@ export class PartnerDataImportComponent extends AppPage implements OnInit {
         this.sortKey = '';
         if (this.isShowInvalid) {
             this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
+
         } else {
             this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
             this.pager.totalItems = this.inValidItems.length;
         }
-        this.child.setPage(this.pager.currentPage);
     }
     reset(element) {
         this.data = null;
@@ -119,18 +130,13 @@ export class PartnerDataImportComponent extends AppPage implements OnInit {
         element.value = "";
         this.pager.totalItems = 0;
     }
-    async setPage(pager: PagerSetting) {
-        this.pager.currentPage = pager.currentPage;
-        this.pager.pageSize = pager.pageSize;
-        this.pager.totalPages = pager.totalPages;
-        if (this.isShowInvalid) {
-            this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-        } else {
-            this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
+
+    pageChanged(event: any): void {
+        if (this.pager.currentPage !== event.page || this.pager.pageSize !== event.itemsPerPage) {
+            this.pager.currentPage = event.page;
+            this.pager.pageSize = event.itemsPerPage;
+
+            this.pagingData(this.data);
         }
     }
     downloadSample() {

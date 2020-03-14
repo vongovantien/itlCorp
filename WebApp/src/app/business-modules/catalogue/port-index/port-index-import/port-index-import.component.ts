@@ -20,7 +20,6 @@ import { InfoPopupComponent } from 'src/app/shared/common/popup';
 })
 export class PortIndexImportComponent extends AppPage implements OnInit {
     @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
-    @ViewChild(AppPaginationComponent, { static: false }) child: any;
     isDesc = true;
     sortKey: string;
     data: any[];
@@ -59,6 +58,7 @@ export class PortIndexImportComponent extends AppPage implements OnInit {
                 this.pager.totalItems = this.data.length;
                 this.totalValidRows = response.totalValidRows;
                 this.totalRows = this.data.length;
+                this.pager.currentPage = 1;
                 this.pagingData(this.data);
             }, () => {
             });
@@ -108,31 +108,18 @@ export class PortIndexImportComponent extends AppPage implements OnInit {
         this.sortKey = '';
         if (this.isShowInvalid) {
             this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
         } else {
             this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
             this.pager.totalItems = this.inValidItems.length;
         }
-        this.child.setPage(this.pager.currentPage);
     }
     reset(element) {
         this.data = null;
         this.pagedItems = null;
         element.value = "";
         this.pager.totalItems = 0;
-    }
-    async setPage(pager: PagerSetting) {
-        this.pager.currentPage = pager.currentPage;
-        this.pager.pageSize = pager.pageSize;
-        this.pager.totalPages = pager.totalPages;
-        if (this.isShowInvalid) {
-            this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-        } else {
-            this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
-        }
     }
 
     downloadSample() {
@@ -144,5 +131,24 @@ export class PortIndexImportComponent extends AppPage implements OnInit {
                 },
             );
     }
+    selectPageSize() {
+        this.pager.currentPage = 1;
+        if (this.isShowInvalid) {
+            this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
 
+        } else {
+            this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
+            this.pager.totalItems = this.inValidItems.length;
+        }
+    }
+    pageChanged(event: any): void {
+        if (this.pager.currentPage !== event.page || this.pager.pageSize !== event.itemsPerPage) {
+            this.pager.currentPage = event.page;
+            this.pager.pageSize = event.itemsPerPage;
+
+            this.pagingData(this.data);
+        }
+    }
 }
