@@ -88,7 +88,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
             { title: 'G.W', field: 'gw', sortable: true, },
             { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
             { title: 'CBM', field: 'cbm', sortable: true, },
-            { title: 'Package Q`Ty', field: 'packageQuantity', sortable: true, },
+            { title: 'Package Quantity', field: 'packageQuantity', sortable: true, },
             { title: 'Package Type', field: 'packageTypeId', sortable: true, },
             { title: 'Container No', field: 'containerNo', sortable: true, },
             { title: 'Seal No', field: 'sealNo', sortable: true, },

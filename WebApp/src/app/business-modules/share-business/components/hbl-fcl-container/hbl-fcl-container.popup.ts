@@ -81,11 +81,11 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
     configHeader() {
         this.headers = [
             { title: 'Cont Type', field: 'containerTypeId', sortable: true, required: true, width: 200 },
-            { title: 'Cont Q`Ty', field: 'quantity', required: true, sortable: true },
+            { title: 'Cont Quantity', field: 'quantity', required: true, sortable: true },
             { title: 'G.W', field: 'gw', sortable: true, },
             { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
             { title: 'CBM', field: 'cbm', sortable: true, },
-            { title: 'Package Q`Ty', field: 'packageQuantity', sortable: true, },
+            { title: 'Package Quantity', field: 'packageQuantity', sortable: true, },
             { title: 'Package Type', field: 'packageTypeId', sortable: true, },
             { title: 'Container No', field: 'containerNo', sortable: true, },
             { title: 'Seal No', field: 'sealNo', sortable: true, },

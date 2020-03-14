@@ -426,6 +426,9 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             if (this.dimVolumePopup.isCBMChecked) {
                 this.formGroup.patchValue({ cbm: this.dimVolumePopup.totalCBM });
             }
+        } else {
+            this.formGroup.patchValue({ hw: null });
+
         }
     }
 

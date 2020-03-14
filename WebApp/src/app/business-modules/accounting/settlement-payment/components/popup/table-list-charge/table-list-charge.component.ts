@@ -134,7 +134,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.getMasterCharges();
         this.getShipmentCommonData();
         this.getCustomDecleration();
-        this.getAdvances();
+        // this.getAdvances();
         this.initForm();
         this.getPartner();
         this.getUnits();
@@ -168,8 +168,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             );
     }
 
-    getAdvances() {
-        this._accountingRepo.getAdvanceOfShipment()
+    getAdvances(jobNo: string) {
+        this._accountingRepo.getAdvanceOfShipment(jobNo)
             .pipe(
                 catchError(this.catchError),
                 map((res: IAdvanceShipment[]) => {
@@ -179,8 +179,15 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     return res;
                 })
             ).subscribe(
-                (res: any[]) => {
+                (res: any[] = []) => {
                     this.advs = res;
+                    if (!this.advanceNo.value) {
+                        const advance: IAdvanceShipment = this.advs.find(i => i.jobId === this.selectedShipment.jobId);
+                        if (!!advance) {
+                            this.advanceNo.setValue(advance.advanceNo);
+                            this.selectedAdvance = advance;
+                        }
+                    }
                 }
             );
     }
@@ -224,15 +231,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
                 this.shipment.setValue(this.selectedShipment.hblid);
                 this.getMasterCharges(this.serviceTypeId);
-
+                this.getAdvances(this.selectedShipment.jobId);
                 // * FINDING ITEM ADVANCE BELONG TO SELECTED SHIPMENT.
-                if (!this.advanceNo.value) {
-                    const advance: IAdvanceShipment = this.advs.find(i => i.jobId === this.selectedShipment.jobId);
-                    if (!!advance) {
-                        this.advanceNo.setValue(advance.advanceNo);
-                        this.selectedAdvance = advance;
-                    }
-                }
+
 
                 // * check list charge current => Has charge exist after master charge changed.
                 this.charges.forEach((charge: Surcharge) => {

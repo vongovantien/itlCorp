@@ -64,6 +64,7 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
 
 
     public disabled: boolean = false;
+    isSubmitted: boolean = false;
 
     ngOnInit() {
         this.getClearanceType();
@@ -75,6 +76,8 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
     }
 
     async addCustomClearance(formAdd: NgForm) {
+        this.isSubmitted = true;
+
         if (this.strCustomerCurrent === '' || this.strPortCurrent === '') { return; }
         if (this.serviceTypeCurrent[0] !== 'Air' && this.serviceTypeCurrent[0] !== 'Express') {
             if (this.cargoTypeCurrent.length === 0) { return; }
@@ -122,6 +125,8 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
     }
 
     convertClearanceToShipment(formAdd: NgForm) {
+        this.isSubmitted = true;
+
         if (this.strCustomerCurrent === '' || this.strPortCurrent === '' || this.typeClearanceCurrent.length === 0
             || this.customDeclaration.hblid == null || this.customDeclaration.hblid === ''
             || this.customDeclaration.mblid == null || this.customDeclaration.mblid === '') { return; }
