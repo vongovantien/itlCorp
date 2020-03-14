@@ -1,4 +1,4 @@
-import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit } from "@angular/core";
+import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactoryResolver, ComponentRef, ViewContainerRef } from "@angular/core";
 import { Observable, Subject, throwError, BehaviorSubject } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
@@ -40,6 +40,9 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     $isShowAutoComplete: Observable<boolean> = this._isShowAutoComplete.asObservable();
 
     _progressRef: NgProgressRef;
+
+    componentRef: ComponentRef<any>;
+
 
     cancelButtonSetting: ButtonModalSetting = {
         buttonAttribute: {
@@ -213,6 +216,21 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         } else {
             return moment();
         }
+    }
+
+    renderComponent(component: any, containerRef: ViewContainerRef) {
+        const container = containerRef;
+        container.clear();
+        const injector = container.injector;
+
+        // tslint:disable-next-line: no-any
+        const cfr: ComponentFactoryResolver = injector.get<any>(ComponentFactoryResolver as any);
+
+        const componentFactory = cfr.resolveComponentFactory(component);
+
+        const componentRef = container.createComponent(componentFactory, 0, injector);
+
+        this.componentRef = componentRef;
     }
 }
 
