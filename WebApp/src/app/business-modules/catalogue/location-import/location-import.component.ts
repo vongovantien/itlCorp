@@ -1,12 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NgProgressComponent } from '@ngx-progressbar/core';
+import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { language } from 'src/languages/language.en';
 import { PagingService, SortService } from 'src/app/shared/services';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
@@ -21,9 +20,6 @@ import { catchError, finalize } from 'rxjs/operators';
     templateUrl: './location-import.component.html'
 })
 export class LocationImportComponent extends AppList implements OnInit {
-
-    @ViewChild(AppPaginationComponent, { static: false }) child: any;
-    @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
     @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
 
     data: any[];
@@ -47,9 +43,11 @@ export class LocationImportComponent extends AppList implements OnInit {
         private sortService: SortService,
         private route: ActivatedRoute,
         private _catalogueRepo: CatalogueRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _progressService: NgProgress
     ) {
         super();
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -64,16 +62,16 @@ export class LocationImportComponent extends AppList implements OnInit {
 
     chooseFile(file: Event) {
         if (file.target['files'] == null) { return; }
-
-        this.progressBar.start();
+        this._progressRef.start();
         let placeType: number = CommonEnum.PlaceTypeEnum.Province;
 
         if (this.type === 'country') {
             this._catalogueRepo.uploadCountry(file.target['files'])
-                .pipe(catchError(this.catchError), finalize(() => this.progressBar.complete()))
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: { data: any[], totalValidRows: number }) => {
                         this.data = res.data;
+                        this.pager.currentPage = 1;
                         this.pager.totalItems = this.data.length;
                         this.totalValidRows = res.totalValidRows;
                         this.totalRows = this.data.length;
@@ -95,7 +93,7 @@ export class LocationImportComponent extends AppList implements OnInit {
                     break;
             }
             this._catalogueRepo.upLoadPlaceFile(file.target['files'], placeType)
-                .pipe(catchError(this.catchError), finalize(() => this.progressBar.complete()))
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: { data: any[], totalValidRows: number }) => {
                         this.data = res.data;
@@ -153,39 +151,18 @@ export class LocationImportComponent extends AppList implements OnInit {
                 );
         }
     }
-
-    setPage(pager: PagerSetting) {
-        this.pager.currentPage = pager.currentPage;
-        this.pager.pageSize = pager.pageSize;
-        this.pager.totalPages = pager.totalPages;
-        if (this.isShowInvalid) {
-            this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-        } else {
-            this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
-
-            if (this.inValidItems.length === 0) {
-                this.pager.totalItems = 1;
-            }
-        }
-    }
-
     hideInvalid() {
         if (this.data == null) { return; }
-
         this.isShowInvalid = !this.isShowInvalid;
-
+        this.sortKey = '';
         if (this.isShowInvalid) {
-            this.inValidItems = this.data.filter(x => !x.isValid);
-            this.pager.totalItems = this.inValidItems.length;
+            this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
         } else {
             this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
+            this.pager.totalItems = this.inValidItems.length;
         }
-
-        this.child.setPage(this.pager.currentPage);
     }
 
     import() {
@@ -246,5 +223,25 @@ export class LocationImportComponent extends AppList implements OnInit {
         this.isDesc = !this.isDesc;
         this.sortKey = property;
         this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
+    }
+    selectPageSize() {
+        this.pager.currentPage = 1;
+        if (this.isShowInvalid) {
+            this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
+
+        } else {
+            this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
+            this.pager.totalItems = this.inValidItems.length;
+        }
+    }
+    pageChanged(event: any): void {
+        if (this.pager.currentPage !== event.page || this.pager.pageSize !== event.itemsPerPage) {
+            this.pager.currentPage = event.page;
+            this.pager.pageSize = event.itemsPerPage;
+
+            this.pagingData(this.data);
+        }
     }
 }

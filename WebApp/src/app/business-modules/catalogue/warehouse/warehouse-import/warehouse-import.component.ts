@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { PagingService } from 'src/app/shared/services/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';

@@ -3,8 +3,7 @@ import { SortService, PagingService } from '@services';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
+import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { AppPage } from 'src/app/app.base';
@@ -38,10 +37,6 @@ export class ChargeImportAccountVoucherComponent extends AppPage implements OnIn
         super();
         this._progressRef = this._progressService.ref();
     }
-    @ViewChild(AppPaginationComponent, { static: false }) child: any;
-    @ViewChild('form', { static: false }) form: any;
-    @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
-
     ngOnInit() {
         this.pager.totalItems = 0;
     }
@@ -57,6 +52,7 @@ export class ChargeImportAccountVoucherComponent extends AppPage implements OnIn
                 })
             )
             .subscribe((response: any) => {
+                this.pager.currentPage = 1;
                 this.data = response.data;
                 this.pager.totalItems = this.data.length;
                 this.totalValidRows = response.totalValidRows;
@@ -73,22 +69,6 @@ export class ChargeImportAccountVoucherComponent extends AppPage implements OnIn
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
 
-    setPage(pager: PagerSetting) {
-        this.pager.currentPage = pager.currentPage;
-        this.pager.pageSize = pager.pageSize;
-        this.pager.totalPages = pager.totalPages;
-        if (this.isShowInvalid) {
-            this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-        } else {
-            this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
-        }
-    }
-
-
     sort(property: string) {
         this.isDesc = !this.isDesc;
         this.sortKey = property;
@@ -101,11 +81,12 @@ export class ChargeImportAccountVoucherComponent extends AppPage implements OnIn
         this.sortKey = '';
         if (this.isShowInvalid) {
             this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
         } else {
             this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
             this.pager.totalItems = this.inValidItems.length;
         }
-        this.child.setPage(this.pager.currentPage);
     }
 
 
@@ -152,5 +133,25 @@ export class ChargeImportAccountVoucherComponent extends AppPage implements OnIn
         this.pagedItems = null;
         element.value = "";
         this.pager.totalItems = 0;
+    }
+    selectPageSize() {
+        this.pager.currentPage = 1;
+        if (this.isShowInvalid) {
+            this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
+
+        } else {
+            this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
+            this.pager.totalItems = this.inValidItems.length;
+        }
+    }
+    pageChanged(event: any): void {
+        if (this.pager.currentPage !== event.page || this.pager.pageSize !== event.itemsPerPage) {
+            this.pager.currentPage = event.page;
+            this.pager.pageSize = event.itemsPerPage;
+
+            this.pagingData(this.data);
+        }
     }
 }

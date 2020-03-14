@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
+import { NgProgress } from '@ngx-progressbar/core';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { SystemConstants } from 'src/constants/system.const';
 import { PagingService, SortService } from 'src/app/shared/services';
 import { AppPage } from 'src/app/app.base';
@@ -15,10 +14,9 @@ import { ToastrService } from 'ngx-toastr';
 	selector: 'app-commodity-import',
 	templateUrl: './commodity-import.component.html'
 })
+
 export class CommodityImportComponent extends AppPage implements OnInit {
 	@ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
-	@ViewChild(AppPaginationComponent, { static: false }) child: any;
-	@ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
 	data: any[];
 	pagedItems: any[] = [];
 	inValidItems: any[] = [];
@@ -26,14 +24,15 @@ export class CommodityImportComponent extends AppPage implements OnInit {
 	totalRows: number = 0;
 	isShowInvalid: boolean = true;
 	pager: PagerSetting = PAGINGSETTING;
-	constructor(
-		public ngProgress: NgProgress,
+	isDesc = true;
+	sortKey: string;
+
+	constructor(private ngProgress: NgProgress,
 		private pagingService: PagingService,
 		private sortService: SortService,
 		private _progressService: NgProgress,
 		private catalogueRepo: CatalogueRepo,
-		private _toastService: ToastrService
-	) {
+		private _toastService: ToastrService) {
 		super();
 		this._progressRef = this._progressService.ref();
 	}
@@ -52,6 +51,7 @@ export class CommodityImportComponent extends AppPage implements OnInit {
 			)
 			.subscribe((response: any) => {
 				this.data = response.data;
+				this.pager.currentPage = 1;
 				this.pager.totalItems = this.data.length;
 				this.totalValidRows = response.totalValidRows;
 				this.totalRows = this.data.length;
@@ -65,27 +65,7 @@ export class CommodityImportComponent extends AppPage implements OnInit {
 		this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
 		this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
 		this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-		console.log(this.pagedItems);
 	}
-
-	async setPage(pager: PagerSetting) {
-		this.pager.currentPage = pager.currentPage;
-		this.pager.pageSize = pager.pageSize;
-		this.pager.totalPages = pager.totalPages;
-		if (this.isShowInvalid) {
-			this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-			this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-			this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-		}
-		else {
-			this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-			this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-			this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
-		}
-	}
-
-	isDesc = true;
-	sortKey: string;
 	sort(property: string) {
 		this.isDesc = !this.isDesc;
 		this.sortKey = property;
@@ -98,12 +78,12 @@ export class CommodityImportComponent extends AppPage implements OnInit {
 		this.sortKey = '';
 		if (this.isShowInvalid) {
 			this.pager.totalItems = this.data.length;
-		}
-		else {
+			this.pagingData(this.data);
+		} else {
 			this.inValidItems = this.data.filter(x => !x.isValid);
+			this.pagingData(this.inValidItems);
 			this.pager.totalItems = this.inValidItems.length;
 		}
-		this.child.setPage(this.pager.currentPage);
 	}
 
 
@@ -151,5 +131,24 @@ export class CommodityImportComponent extends AppPage implements OnInit {
 				},
 			);
 	}
+	selectPageSize() {
+		this.pager.currentPage = 1;
+		if (this.isShowInvalid) {
+			this.pager.totalItems = this.data.length;
+			this.pagingData(this.data);
 
+		} else {
+			this.inValidItems = this.data.filter(x => !x.isValid);
+			this.pagingData(this.inValidItems);
+			this.pager.totalItems = this.inValidItems.length;
+		}
+	}
+	pageChanged(event: any): void {
+		if (this.pager.currentPage !== event.page || this.pager.pageSize !== event.itemsPerPage) {
+			this.pager.currentPage = event.page;
+			this.pager.pageSize = event.itemsPerPage;
+
+			this.pagingData(this.data);
+		}
+	}
 }
