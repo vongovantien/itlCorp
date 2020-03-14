@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, Event } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { SystemRepo } from '@repositories';
-import { IAppState, getClaimUserOfficeState, getClaimUserDepartGrouptate } from '@store';
+import { IAppState, getClaimUserOfficeState, getClaimUserDepartGrouptate, getRouterState } from '@store';
 
 import { SystemConstants } from 'src/constants/system.const';
 import { Office } from 'src/app/shared/models';
@@ -15,7 +15,6 @@ import { tap } from 'rxjs/operators';
 })
 export class HeaderComponent implements OnInit, AfterViewInit {
 
-    @Input() Page_Info: String;
     @Output() officeChange: EventEmitter<Office> = new EventEmitter<Office>();
     @Output() groupDepartmentChange: EventEmitter<SystemInterface.IDepartmentGroup> = new EventEmitter<SystemInterface.IDepartmentGroup>();
 
@@ -31,62 +30,97 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     departmentGroups: SystemInterface.IDepartmentGroup[] = [];
     selectedDepartmentGroup: SystemInterface.IDepartmentGroup;
+    pageTitle: string = 'Home';
 
     constructor(
         private router: Router,
         private _systemRepo: SystemRepo,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private _activedRouter: ActivatedRoute,
     ) { }
 
     ngOnInit() {
-        this._store.select(getClaimUserOfficeState)
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.selectedOffice = this.offices.find(o => o.id === res);
-                    }
-                }
-            );
+        this._store.select(getClaimUserOfficeState).subscribe((res: any) => {
+            if (!!res) {
+                this.selectedOffice = this.offices.find(o => o.id === res);
+            }
+        });
 
-        this._store.select(getClaimUserDepartGrouptate)
-            .subscribe(
-                (res: any) => {
-                    if (!!res && res.departmentId && res.groupId) {
-                        this.selectedDepartmentGroup = this.departmentGroups.find(d => d.departmentId === res.departmentId && d.groupId === res.groupId);
-                    }
-                }
-            );
+        this._store.select(getClaimUserDepartGrouptate).subscribe((res: any) => {
+            if (!!res && res.departmentId && res.groupId) {
+                this.selectedDepartmentGroup = this.departmentGroups.find(d => d.departmentId === res.departmentId && d.groupId === res.groupId);
+            }
+        });
 
         this.currenUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         if (!!this.currenUser) {
             forkJoin([
                 this._systemRepo.getOfficePermission(this.currenUser.id, this.currenUser.companyId),
                 this._systemRepo.getDepartmentGroupPermission(this.currenUser.id, this.currenUser.officeId)
-            ]).pipe(
-                tap((res: any) => {
-                    this.offices = res[0] || [];
-                    if (!!this.offices.length) {
-                        if (this.offices.length === 1) {
-                            this.selectedOffice = this.offices[0];
-                        } else {
-                            this.selectedOffice = this.offices.find(o => o.id === this.currenUser.officeId);
-                        }
+            ]).pipe(tap((res: any) => {
+                this.offices = res[0] || [];
+                if (!!this.offices.length) {
+                    if (this.offices.length === 1) {
+                        this.selectedOffice = this.offices[0];
+                    } else {
+                        this.selectedOffice = this.offices.find(o => o.id === this.currenUser.officeId);
                     }
-                })
-            ).subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.departmentGroups = res[1] || [];
-                        if (!!this.departmentGroups.length) {
-                            if (this.departmentGroups.length === 1) {
-                                this.selectedDepartmentGroup = this.departmentGroups[0];
-                            } else {
-                                this.selectedDepartmentGroup = this.departmentGroups.find(d => d.departmentId === +this.currenUser.departmentId && d.groupId === +this.currenUser.groupId);
-                            }
+                }
+            })).subscribe((res: any) => {
+                if (!!res) {
+                    this.departmentGroups = res[1] || [];
+                    if (!!this.departmentGroups.length) {
+                        if (this.departmentGroups.length === 1) {
+                            this.selectedDepartmentGroup = this.departmentGroups[0];
+                        } else {
+                            this.selectedDepartmentGroup = this.departmentGroups.find(d => d.departmentId === +this.currenUser.departmentId && d.groupId === +this.currenUser.groupId);
                         }
                     }
                 }
-            );
+            });
+        }
+
+        this.router.events.subscribe((event: Event) => {
+            switch (true) {
+                case event instanceof NavigationEnd:
+                    const data = this.createBreadcrumbs(this._activedRouter.root);
+                    if (!!data.length) {
+                        this.pageTitle = data[2].name;
+                    }
+                    break;
+                case event instanceof NavigationStart:
+                case event instanceof NavigationCancel:
+                case event instanceof NavigationError: {
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        });
+    }
+
+    createBreadcrumbs(route: ActivatedRoute, path: string = '', breadcrumbs: any[] = []): any[] {
+        const children: ActivatedRoute[] = route.children;
+
+        if (children.length === 0) {
+            return breadcrumbs;
+        }
+
+        for (const child of children) {
+            const routeURL: string = child.snapshot.url.map(segment => segment.path).join('/');
+            if (routeURL !== '') {
+                path += decodeURI(`/${routeURL}`);
+            }
+
+            const label = child.snapshot.data['name'];
+            if (!!(label)) {
+                breadcrumbs.push({
+                    name: label,
+                    path: path
+                });
+            }
+            return this.createBreadcrumbs(child, path, breadcrumbs);
         }
     }
 
