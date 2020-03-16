@@ -14,17 +14,20 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
 
     index_parrent_menu = 0;
     index_sub_menu = 0;
+
     previous_menu_id = null;
     previous_menu_index = null;
+
     previous_parent: HTMLElement = null;
     previous_children: HTMLElement = null;
-    Page_Component = "";
+
     Page_Info = {
         parent: "",
         children: ""
     };
 
     Menu: Menu[] = [];
+
     userLogged: SystemInterface.IClaimUser;
 
     constructor(
@@ -90,7 +93,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
                 .subscribe(
                     (res: Menu[]) => {
                         this.Menu = res.map((m: Menu) => new Menu(m));
-                        // this.highLightMenu();
+                        this.highLightMenu();
                     }
                 );
         }

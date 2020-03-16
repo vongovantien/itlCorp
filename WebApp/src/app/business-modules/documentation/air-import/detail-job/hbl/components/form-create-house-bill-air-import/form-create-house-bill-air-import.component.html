@@ -28,7 +28,7 @@
                             [selectedDisplayFields]="['username']" [dataSources]="saleMans | async"
                             [loading]="isLoading" [displayFields]="[{field: 'username', label: 'User Name'}]"
                             placeholder="Select Salesman" [height]="200" [disabled]="!customerId.value"
-                            (remove)="resetFormControl(saleManId)">
+                            (remove)="resetFormControl(saleManId)" size=30>
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>

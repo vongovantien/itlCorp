@@ -45,8 +45,8 @@
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'saleman')"
                                     [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
                                     [selectedDisplayFields]="['username']" [dataSources]="saleMans"
-                                    [displayFields]="[{field: 'username', label: 'User Name'}]" [height]="150"
-                                    [disabled]="!customer.value" (remove)="resetFormControl(saleMan)"
+                                    [displayFields]="[{field: 'username', label: 'User Name'}]"
+                                    [disabled]="!customer.value" (remove)="resetFormControl(saleMan)" size="15"
                                     placeholder="Select Salemans">
                                 </app-combo-grid-virtual-scroll>
                             </div>

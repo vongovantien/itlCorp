@@ -84,10 +84,10 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             switch (true) {
                 case event instanceof NavigationEnd:
                     const data = this.createBreadcrumbs(this._activedRouter.root);
-                    if (!!data.length && data.length > 3) {
+                    if (!!data.length && data.length > 2) {
                         this.pageTitle = data[2].name;
                     } else {
-                        this.pageTitle = data[0].name;
+                        this.pageTitle = "Home";
                     }
                     break;
                 case event instanceof NavigationStart:

@@ -26,7 +26,7 @@
             </div>
             <app-default-button *ngIf="allowUpdate" [buttonSetting]="saveButtonSetting" (onClick)="confirmSave.show()">
             </app-default-button>
-            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancelPopup.hide()">
+            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancelPopup.show()">
             </app-default-button>
         </div>
     </app-sub-header>

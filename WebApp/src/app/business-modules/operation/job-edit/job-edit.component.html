@@ -35,41 +35,37 @@
             </span>
         </button>
     </div>
-    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmCancelJob()">
-        <span>
-            <i class="la la-ban"></i>
-            <span>
-                cancel
-            </span>
-        </span>
-    </button>
+    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=confirmCancelJob()></app-default-button>
+
 </app-sub-header>
 
 <div class="m-content" *ngIf="opsTransaction">
-    <div class="row">
-        <div class="col-12">
-            <tabset type="tabs">
-                <tab heading="Job detail" (selectTab)="selectTab($event,'job-edit')">
-                    <div *ngIf="tab === 'job-edit'">
-                        <form novalidate #addOpsForm="ngForm" name="addOpsForm" (ngSubmit)="saveShipment(addOpsForm)">
-                            <div class="m-form m-form--state">
-                                <div class="m-portlet">
-                                    <div class="alert-block__heading">
-                                        <h3 class="alert-block__title">Job Information</h3>
-                                    </div>
-                                    <div class="m-portlet__body" id="edit-ops-job-form">
-                                        <div class="form-actions m--align-right" *ngIf="!opsTransaction.isLocked">
-                                            <button type="submit"
-                                                class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                                                *ngIf="opsTransaction.permission.allowUpdate">
-                                                <span>
-                                                    <i class="la la la-save"></i>
+    <div class="m-portlet__body">
+        <div class="row">
+            <div class="col-12">
+                <tabset type="tabs" class="custom-class-tab">
+                    <tab heading="Job detail" (selectTab)="selectTab($event,'job-edit')">
+                        <div *ngIf="tab === 'job-edit'">
+                            <form novalidate #addOpsForm="ngForm" name="addOpsForm"
+                                (ngSubmit)="saveShipment(addOpsForm)">
+                                <div class="m-form m-form--state">
+                                    <div class="m-portlet">
+                                        <div class="alert-block__heading">
+                                            <h3 class="alert-block__title">Job Information</h3>
+                                        </div>
+                                        <div class="m-portlet__body" id="edit-ops-job-form">
+                                            <div class="form-actions m--align-right" *ngIf="!opsTransaction.isLocked">
+                                                <button type="submit"
+                                                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                                    *ngIf="opsTransaction.permission.allowUpdate">
                                                     <span>
-                                                        save detail
+                                                        <i class="la la la-save"></i>
+                                                        <span>
+                                                            save detail
+                                                        </span>
                                                     </span>
-                                                </span>
-                                            </button>
-                                            <!-- <button type="button"
+                                                </button>
+                                                <!-- <button type="button"
                                                 class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
                                                 (click)="confirmCancelJob()">
                                                 <span>
@@ -79,531 +75,543 @@
                                                     </span>
                                                 </span>
                                             </button> -->
-                                        </div>
+                                            </div>
 
-                                        <div class="div-inside bg-secondary m--margin-bottom-15">
-                                            <h3 class="c-block-title">General Information</h3>
-                                            <hr>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="">
-                                                            Job ID
-                                                        </label>
-                                                        <input type="text" required
-                                                            class="form-control m-input m-input--square"
-                                                            placeholder="Enter text" name="jobNo" disabled=true
-                                                            [(ngModel)]="opsTransaction.jobNo" #jobNo="ngModel">
-
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{ 'has-danger': addOpsForm.submitted && serviceDate == null }">
-                                                        <label class="form-control-label" for="">
-                                                            Service Date <span class="m--font-danger">(*)</span>
-                                                        </label>
-                                                        <div class="m-input-icon m-input-icon--right down">
-                                                            <input type="text"
+                                            <div class="div-inside bg-secondary m--margin-bottom-15">
+                                                <h3 class="c-block-title">General Information</h3>
+                                                <hr>
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Job ID
+                                                            </label>
+                                                            <input type="text" required
                                                                 class="form-control m-input m-input--square"
-                                                                ngxDaterangepickerMd [autoApply]="true"
-                                                                [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                                                [(ngModel)]="serviceDate" [singleDatePicker]="true"
-                                                                name="serviceDate" readonly />
-                                                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                                <span>
-                                                                    <i class="la la-calendar"></i>
-                                                                </span>
-                                                            </span>
-                                                        </div>
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && serviceDate == null">
-                                                            Service Date is required!
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{ 'has-danger': addOpsForm.submitted && finishDate != null && this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate)}">
-                                                        <label class="form-control-label" for="">
-                                                            Finish Date
-                                                        </label>
-                                                        <div class="m-input-icon m-input-icon--right down">
-                                                            <input type="text"
-                                                                class="form-control m-input m-input--square"
-                                                                ngxDaterangepickerMd [autoApply]="true"
-                                                                [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                                                [(ngModel)]="finishDate" [singleDatePicker]="true"
-                                                                name="finishDate" readonly />
-                                                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                                <span>
-                                                                    <i class="la la-calendar"></i>
-                                                                </span>
-                                                            </span>
-                                                        </div>
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && finishDate != null && this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate)">
-                                                            Finish Date must more greater or equal Service Date
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.productService == null}">
-                                                        <label class="form-control-label" for="">
-                                                            Product Service <span class="m--font-danger">(*)</span>
-                                                        </label>
-                                                        <ng-select [allowClear]="true" [items]="productServices"
-                                                            [active]="productServiceActive"
-                                                            (selected)="opsTransaction.productService = $event.id"
-                                                            (removed)="opsTransaction.productService = null"
-                                                            placeholder="Please Select">
-                                                        </ng-select>
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && opsTransaction.productService === null">
-                                                            Product Service is required!
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.serviceMode == null}">
-                                                        <label class="form-control-label" for="">
-                                                            Service Mode <span class="m--font-danger">(*)</span>
-                                                        </label>
-                                                        <ng-select [allowClear]="true" [items]="serviceModes"
-                                                            [active]="serviceModeActive"
-                                                            (selected)="opsTransaction.serviceMode = $event.id"
-                                                            (removed)="opsTransaction.serviceMode = null"
-                                                            placeholder="Please Select">
-                                                        </ng-select>
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && opsTransaction.serviceMode === null">
-                                                            Service Mode is required!
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.shipmentMode == null}">
-                                                        <label class="form-control-label" for="">
-                                                            Shipment Mode <span class="m--font-danger">(*)</span>
-                                                        </label>
-                                                        <ng-select [allowClear]="true" [items]="shipmentModes"
-                                                            [active]="shipmentModeActive"
-                                                            (selected)="opsTransaction.shipmentMode = $event.id"
-                                                            (removed)="opsTransaction.shipmentMode = null"
-                                                            placeholder="Please Select">
-                                                        </ng-select>
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && opsTransaction.shipmentMode === null">
-                                                            Shipment Mode is required!
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && hwbno.invalid}">
-                                                        <label class="form-control-label" for="">
-                                                            HBL No <span class="m--font-danger">(*)</span>
-                                                        </label>
-                                                        <input type="text" required
-                                                            class="form-control m-input m-input--square"
-                                                            placeholder="Enter text" name="hwbno"
-                                                            [(ngModel)]="opsTransaction.hwbno" #hwbno="ngModel">
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && hwbno.invalid">
-                                                            HBL No is required!
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && mblno.invalid}">
-                                                        <label class="form-control-label" for="">
-                                                            MBL No <span class="m--font-danger">(*)</span>
-                                                        </label>
-                                                        <input type="text" required
-                                                            class="form-control m-input m-input--square"
-                                                            placeholder="Enter text" name="mblno"
-                                                            [(ngModel)]="opsTransaction.mblno" #mblno="ngModel">
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && mblno.invalid">
-                                                            MBL No is required!
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for=""
-                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.customerId == null}">
-                                                            Customer <span class="m--font-danger">(*)</span>
-                                                        </label>
-                                                        <app-combo-grid-virtual-scroll
-                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.customerId}"
-                                                            (itemSelected)="opsTransaction.customerId = $event.id;opsTransaction.customerName = $event.partnerNameEn"
-                                                            [selectedDisplayFields]="['shortName']"
-                                                            [dataSources]="customers"
-                                                            [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && opsTransaction.customerId == null">
-                                                            Customer is required!
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
+                                                                placeholder="Enter text" name="jobNo" disabled=true
+                                                                [(ngModel)]="opsTransaction.jobNo" #jobNo="ngModel">
 
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)}">
-                                                        <label class="form-control-label" for="">
-                                                            Port of Loading
-                                                        </label>
-                                                        <app-combo-grid-virtual-scroll
-                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.pol}"
-                                                            (itemSelected)="opsTransaction.pol=$event.id"
-                                                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports"
-                                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)">
-                                                            Port of loading is must be different with port of discharge
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)}">
-                                                        <label class="form-control-label" for="">
-                                                            Port of Discharge
-                                                        </label>
-                                                        <app-combo-grid-virtual-scroll
-                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.pod}"
-                                                            (itemSelected)="opsTransaction.pod = $event.id"
-                                                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports"
-                                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)">
-                                                            Port of discharge must be different with port of loading
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="">
-                                                            Supplier
-                                                        </label>
-                                                        <app-combo-grid-virtual-scroll
-                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.supplierId}"
-                                                            (itemSelected)="opsTransaction.supplierId = $event.id"
-                                                            [selectedDisplayFields]="['shortName']"
-                                                            [dataSources]="suppliers"
-                                                            [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="">
-                                                            Vessel/Flight
-                                                        </label>
-                                                        <input type="text" class="form-control m-input m-input--square"
-                                                            placeholder="Enter text" name="flightVessel"
-                                                            [(ngModel)]="opsTransaction.flightVessel"
-                                                            #flightVessel="ngModel">
-
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="">
-                                                            Agent
-                                                        </label>
-                                                        <app-combo-grid-virtual-scroll
-                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.agentId}"
-                                                            (itemSelected)="opsTransaction.agentId = $event.id"
-                                                            [selectedDisplayFields]="['shortName']"
-                                                            [dataSources]="agents"
-                                                            [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="">
-                                                            Warehouse
-                                                        </label>
-                                                        <app-combo-grid-virtual-scroll
-                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.warehouseId}"
-                                                            (itemSelected)="opsTransaction.warehouseId = $event.id"
-                                                            [selectedDisplayFields]="['nameEn']"
-                                                            [dataSources]="warehouses"
-                                                            [displayFields]="[{'field':'code','label':'Code'},{'field':'nameEn','label':'Warehouse Name'},{'field':'countryNameEN','label':'Country'}]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="">
-                                                            Invoice No
-                                                        </label>
-                                                        <input type="text" class="form-control m-input m-input--square"
-                                                            name="invoiceNo" placeholder="Enter text"
-                                                            [(ngModel)]="opsTransaction.invoiceNo" #invoiceNo="ngModel">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="">
-                                                            Purchase Order No
-                                                        </label>
-                                                        <input type="text" class="form-control m-input m-input--square"
-                                                            placeholder="Enter text" name="purchaseOrderNo"
-                                                            [(ngModel)]="opsTransaction.purchaseOrderNo"
-                                                            #purchaseOrderNo="ngModel">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="">
-                                                            Saleman
-                                                        </label>
-                                                        <app-combo-grid-virtual-scroll
-                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.salemanId}"
-                                                            (itemSelected)="opsTransaction.salemanId = $event.id"
-                                                            [selectedDisplayFields]="['employeeNameEn']"
-                                                            [dataSources]="salemans"
-                                                            [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="">
-                                                            Field OPS
-                                                        </label>
-                                                        <app-combo-grid-virtual-scroll
-                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.fieldOpsId}"
-                                                            (itemSelected)="opsTransaction.fieldOpsId = $event.id"
-                                                            [selectedDisplayFields]="['employeeNameEn']"
-                                                            [dataSources]="billingOps"
-                                                            [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.billingOpsId == null}">
-                                                        <label class="form-control-label" for="">
-                                                            Billing OPS <span class="m--font-danger">(*)</span>
-                                                        </label>
-                                                        <app-combo-grid-virtual-scroll
-                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.billingOpsId}"
-                                                            (itemSelected)="opsTransaction.billingOpsId = $event.id"
-                                                            [selectedDisplayFields]="['employeeNameEn']"
-                                                            [dataSources]="billingOps"
-                                                            [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                        <div class="form-control-feedback" style="display: none">
-                                                            Billing OPS is required!
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="">
-                                                            Clearance Location
-                                                        </label>
-                                                        <app-combo-grid-virtual-scroll
-                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.clearanceLocation}"
-                                                            (itemSelected)="opsTransaction.clearanceLocation = $event.id"
-                                                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports"
-                                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
-                                                    <span class="m--font-bolder">Created:</span>
-                                                    <span
-                                                        class="m--font-brand m--margin-left-5">{{ opsTransaction.datetimeCreated | date : "dd/MM/yyyy HH:mm:ss" }}</span>
-                                                    <span class="m--font-bolder m--margin-left-5">by</span>
-                                                    <span
-                                                        class="m--font-brand m--margin-left-5">{{ opsTransaction.userCreatedName }}</span>
-                                                </div>
-                                                <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
-                                                    <span class="m--font-bolder">Modified:</span>
-                                                    <span
-                                                        class="m--font-brand m--margin-left-5">{{ opsTransaction.datetimeModified | date : "dd/MM/yyyy HH:mm:ss" }}</span>
-                                                    <span class="m--font-bolder m--margin-left-5">by</span>
-                                                    <span
-                                                        class="m--font-brand m--margin-left-5">{{ opsTransaction.userModifiedName }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="div-inside bg-secondary">
-                                            <h3 class="c-block-title">Goods Information</h3>
-                                            <hr>
-                                            <div class="row">
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumGrossWeight == 0}">
-                                                        <label class="form-control-label" for="">
-                                                            GW (kg)
-                                                        </label>
-                                                        <input type="number" autocomplete="nope"
-                                                            class="form-control m-input m-input--square"
-                                                            placeholder="Enter number" name="sumGrossWeight"
-                                                            [(ngModel)]="opsTransaction.sumGrossWeight" min="0.01"
-                                                            decimalNumberGreaterThan0 #sumGrossWeight="ngModel">
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && opsTransaction.sumGrossWeight == 0">
-                                                            Sum of gross weight must be greater than 0
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumNetWeight == 0}">
-                                                        <label class="form-control-label" for="">
-                                                            NW (kg)
-                                                        </label>
-                                                        <input type="number" autocomplete="nope"
-                                                            class="form-control m-input m-input--square"
-                                                            placeholder="Enter number" name="sumNetWeight" min="0.01"
-                                                            [(ngModel)]="opsTransaction.sumNetWeight"
-                                                            decimalNumberGreaterThan0 #sumNetWeight="ngModel">
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && opsTransaction.sumNetWeight == 0">
-                                                            Sum of net weight must be greater than 0
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-xl-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumContainers == 0}">
-                                                        <label class="form-control-label" for="">
-                                                            Container Qty
-                                                        </label>
-                                                        <input type="number"
-                                                            class="form-control m-input m-input--square" min="1" integer
-                                                            name="sumContainers" placeholder="Enter number"
-                                                            [(ngModel)]="opsTransaction.sumContainers"
-                                                            #sumContainers="ngModel">
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && opsTransaction.sumContainers == 0">
-                                                            Container Qty must be greater than 0
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-xl-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumPackages == 0}">
-                                                        <label class="form-control-label" for="">
-                                                            Packages Qty
-                                                        </label>
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <input type="number" class="form-control m-input"
-                                                                    min="1" autocomplete="nope" aria-label=""
-                                                                    name="sumPackages" integer
-                                                                    placeholder="Enter number"
-                                                                    [(ngModel)]="opsTransaction.sumPackages"
-                                                                    #sumPackages="ngModel">
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <ng-select [allowClear]="false" [items]="packageTypes"
-                                                                    [active]="packagesUnitActive"
-                                                                    (selected)="opsTransaction.packageTypeId = $event.id"
-                                                                    (removed)="opsTransaction.packageTypeId = null"
-                                                                    placeholder="">
-                                                                </ng-select>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && opsTransaction.sumPackages == 0">
-                                                            Packages Qty must be greater than 0
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-lg-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumCbm == 0}">
-                                                        <label class="form-control-label" for="">
-                                                            CBM
-                                                        </label>
-                                                        <input type="number" autocomplete="nope"
-                                                            class="form-control m-input m-input--square" min="0.01"
-                                                            placeholder="Enter number" name="sumCbm"
-                                                            [(ngModel)]="opsTransaction.sumCbm"
-                                                            decimalNumberGreaterThan0 #sumCbm="ngModel">
-                                                        <div class="form-control-feedback"
-                                                            *ngIf="addOpsForm.submitted && opsTransaction.sumCbm == 0">
-                                                            Sum of CBM must be greater than 0
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-lg-4">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label">
-                                                            Commodity Group
-                                                        </label>
-                                                        <ng-select [allowClear]="true" [items]="commodityGroup"
-                                                            [active]="commodityGroupActive"
-                                                            (selected)="opsTransaction.commodityGroupId = $event.id"
-                                                            (removed)="opsTransaction.commodityGroupId = ''"
-                                                            placeholder="Select Commodity Group">
-                                                        </ng-select>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumCbm == 0}">
-                                                        <label class="form-control-label" for="">
-                                                            Detail of container & Packages
-                                                        </label>
-                                                        <textarea [(ngModel)]="opsTransaction.containerDescription"
-                                                            disabled name="containerDescription"
-                                                            class="form-control">{{opsTransaction.containerDescription}}</textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="col-8">
-                                                    <div class="text-right" *ngIf="!opsTransaction.isLocked">
-                                                        <div class="m--margin-bottom-15 m--margin-top-25"
-                                                            *ngIf="opsTransaction.permission.allowUpdate">
-                                                            <button type="button"
-                                                                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                                                (click)="showListContainer()">
-                                                                <span>
-                                                                    <i class="la la-list"></i>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{ 'has-danger': addOpsForm.submitted && serviceDate == null }">
+                                                            <label class="form-control-label" for="">
+                                                                Service Date <span class="m--font-danger">(*)</span>
+                                                            </label>
+                                                            <div class="m-input-icon m-input-icon--right down">
+                                                                <input type="text"
+                                                                    class="form-control m-input m-input--square"
+                                                                    ngxDaterangepickerMd [autoApply]="true"
+                                                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                                                    [(ngModel)]="serviceDate" [singleDatePicker]="true"
+                                                                    name="serviceDate" readonly />
+                                                                <span
+                                                                    class="m-input-icon__icon m-input-icon__icon--right">
                                                                     <span>
-                                                                        Container list
+                                                                        <i class="la la-calendar"></i>
                                                                     </span>
                                                                 </span>
-                                                            </button>
+                                                            </div>
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && serviceDate == null">
+                                                                Service Date is required!
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{ 'has-danger': addOpsForm.submitted && finishDate != null && this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate)}">
+                                                            <label class="form-control-label" for="">
+                                                                Finish Date
+                                                            </label>
+                                                            <div class="m-input-icon m-input-icon--right down">
+                                                                <input type="text"
+                                                                    class="form-control m-input m-input--square"
+                                                                    ngxDaterangepickerMd [autoApply]="true"
+                                                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                                                    [(ngModel)]="finishDate" [singleDatePicker]="true"
+                                                                    name="finishDate" readonly />
+                                                                <span
+                                                                    class="m-input-icon__icon m-input-icon__icon--right">
+                                                                    <span>
+                                                                        <i class="la la-calendar"></i>
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && finishDate != null && this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate)">
+                                                                Finish Date must more greater or equal Service Date
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.productService == null}">
+                                                            <label class="form-control-label" for="">
+                                                                Product Service <span class="m--font-danger">(*)</span>
+                                                            </label>
+                                                            <ng-select [allowClear]="true" [items]="productServices"
+                                                                [active]="productServiceActive"
+                                                                (selected)="opsTransaction.productService = $event.id"
+                                                                (removed)="opsTransaction.productService = null"
+                                                                placeholder="Please Select">
+                                                            </ng-select>
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && opsTransaction.productService === null">
+                                                                Product Service is required!
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.serviceMode == null}">
+                                                            <label class="form-control-label" for="">
+                                                                Service Mode <span class="m--font-danger">(*)</span>
+                                                            </label>
+                                                            <ng-select [allowClear]="true" [items]="serviceModes"
+                                                                [active]="serviceModeActive"
+                                                                (selected)="opsTransaction.serviceMode = $event.id"
+                                                                (removed)="opsTransaction.serviceMode = null"
+                                                                placeholder="Please Select">
+                                                            </ng-select>
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && opsTransaction.serviceMode === null">
+                                                                Service Mode is required!
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.shipmentMode == null}">
+                                                            <label class="form-control-label" for="">
+                                                                Shipment Mode <span class="m--font-danger">(*)</span>
+                                                            </label>
+                                                            <ng-select [allowClear]="true" [items]="shipmentModes"
+                                                                [active]="shipmentModeActive"
+                                                                (selected)="opsTransaction.shipmentMode = $event.id"
+                                                                (removed)="opsTransaction.shipmentMode = null"
+                                                                placeholder="Please Select">
+                                                            </ng-select>
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && opsTransaction.shipmentMode === null">
+                                                                Shipment Mode is required!
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && hwbno.invalid}">
+                                                            <label class="form-control-label" for="">
+                                                                HBL No <span class="m--font-danger">(*)</span>
+                                                            </label>
+                                                            <input type="text" required
+                                                                class="form-control m-input m-input--square"
+                                                                placeholder="Enter text" name="hwbno"
+                                                                [(ngModel)]="opsTransaction.hwbno" #hwbno="ngModel">
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && hwbno.invalid">
+                                                                HBL No is required!
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && mblno.invalid}">
+                                                            <label class="form-control-label" for="">
+                                                                MBL No <span class="m--font-danger">(*)</span>
+                                                            </label>
+                                                            <input type="text" required
+                                                                class="form-control m-input m-input--square"
+                                                                placeholder="Enter text" name="mblno"
+                                                                [(ngModel)]="opsTransaction.mblno" #mblno="ngModel">
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && mblno.invalid">
+                                                                MBL No is required!
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for=""
+                                                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.customerId == null}">
+                                                                Customer <span class="m--font-danger">(*)</span>
+                                                            </label>
+                                                            <app-combo-grid-virtual-scroll
+                                                                [currentActiveItemId]="{field:'id',value:opsTransaction.customerId}"
+                                                                (itemSelected)="opsTransaction.customerId = $event.id;opsTransaction.customerName = $event.partnerNameEn"
+                                                                [selectedDisplayFields]="['shortName']"
+                                                                [dataSources]="customers"
+                                                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && opsTransaction.customerId == null">
+                                                                Customer is required!
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger': addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)}">
+                                                            <label class="form-control-label" for="">
+                                                                Port of Loading
+                                                            </label>
+                                                            <app-combo-grid-virtual-scroll
+                                                                [currentActiveItemId]="{field:'id',value:opsTransaction.pol}"
+                                                                (itemSelected)="opsTransaction.pol=$event.id"
+                                                                [selectedDisplayFields]="['nameEn']"
+                                                                [dataSources]="ports"
+                                                                [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)">
+                                                                Port of loading is must be different with port of
+                                                                discharge
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger': addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)}">
+                                                            <label class="form-control-label" for="">
+                                                                Port of Discharge
+                                                            </label>
+                                                            <app-combo-grid-virtual-scroll
+                                                                [currentActiveItemId]="{field:'id',value:opsTransaction.pod}"
+                                                                (itemSelected)="opsTransaction.pod = $event.id"
+                                                                [selectedDisplayFields]="['nameEn']"
+                                                                [dataSources]="ports"
+                                                                [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)">
+                                                                Port of discharge must be different with port of loading
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Supplier
+                                                            </label>
+                                                            <app-combo-grid-virtual-scroll
+                                                                [currentActiveItemId]="{field:'id',value:opsTransaction.supplierId}"
+                                                                (itemSelected)="opsTransaction.supplierId = $event.id"
+                                                                [selectedDisplayFields]="['shortName']"
+                                                                [dataSources]="suppliers"
+                                                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Vessel/Flight
+                                                            </label>
+                                                            <input type="text"
+                                                                class="form-control m-input m-input--square"
+                                                                placeholder="Enter text" name="flightVessel"
+                                                                [(ngModel)]="opsTransaction.flightVessel"
+                                                                #flightVessel="ngModel">
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Agent
+                                                            </label>
+                                                            <app-combo-grid-virtual-scroll
+                                                                [currentActiveItemId]="{field:'id',value:opsTransaction.agentId}"
+                                                                (itemSelected)="opsTransaction.agentId = $event.id"
+                                                                [selectedDisplayFields]="['shortName']"
+                                                                [dataSources]="agents"
+                                                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Warehouse
+                                                            </label>
+                                                            <app-combo-grid-virtual-scroll
+                                                                [currentActiveItemId]="{field:'id',value:opsTransaction.warehouseId}"
+                                                                (itemSelected)="opsTransaction.warehouseId = $event.id"
+                                                                [selectedDisplayFields]="['nameEn']"
+                                                                [dataSources]="warehouses"
+                                                                [displayFields]="[{'field':'code','label':'Code'},{'field':'nameEn','label':'Warehouse Name'},{'field':'countryNameEN','label':'Country'}]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Invoice No
+                                                            </label>
+                                                            <input type="text"
+                                                                class="form-control m-input m-input--square"
+                                                                name="invoiceNo" placeholder="Enter text"
+                                                                [(ngModel)]="opsTransaction.invoiceNo"
+                                                                #invoiceNo="ngModel">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Purchase Order No
+                                                            </label>
+                                                            <input type="text"
+                                                                class="form-control m-input m-input--square"
+                                                                placeholder="Enter text" name="purchaseOrderNo"
+                                                                [(ngModel)]="opsTransaction.purchaseOrderNo"
+                                                                #purchaseOrderNo="ngModel">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Saleman
+                                                            </label>
+                                                            <app-combo-grid-virtual-scroll
+                                                                [currentActiveItemId]="{field:'id',value:opsTransaction.salemanId}"
+                                                                (itemSelected)="opsTransaction.salemanId = $event.id"
+                                                                [selectedDisplayFields]="['employeeNameEn']"
+                                                                [dataSources]="salemans"
+                                                                [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Field OPS
+                                                            </label>
+                                                            <app-combo-grid-virtual-scroll
+                                                                [currentActiveItemId]="{field:'id',value:opsTransaction.fieldOpsId}"
+                                                                (itemSelected)="opsTransaction.fieldOpsId = $event.id"
+                                                                [selectedDisplayFields]="['employeeNameEn']"
+                                                                [dataSources]="billingOps"
+                                                                [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.billingOpsId == null}">
+                                                            <label class="form-control-label" for="">
+                                                                Billing OPS <span class="m--font-danger">(*)</span>
+                                                            </label>
+                                                            <app-combo-grid-virtual-scroll
+                                                                [currentActiveItemId]="{field:'id',value:opsTransaction.billingOpsId}"
+                                                                (itemSelected)="opsTransaction.billingOpsId = $event.id"
+                                                                [selectedDisplayFields]="['employeeNameEn']"
+                                                                [dataSources]="billingOps"
+                                                                [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                            <div class="form-control-feedback" style="display: none">
+                                                                Billing OPS is required!
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Clearance Location
+                                                            </label>
+                                                            <app-combo-grid-virtual-scroll
+                                                                [currentActiveItemId]="{field:'id',value:opsTransaction.clearanceLocation}"
+                                                                (itemSelected)="opsTransaction.clearanceLocation = $event.id"
+                                                                [selectedDisplayFields]="['nameEn']"
+                                                                [dataSources]="ports"
+                                                                [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                                                        <span class="m--font-bolder">Created:</span>
+                                                        <span
+                                                            class="m--font-brand m--margin-left-5">{{ opsTransaction.datetimeCreated | date : "dd/MM/yyyy HH:mm:ss" }}</span>
+                                                        <span class="m--font-bolder m--margin-left-5">by</span>
+                                                        <span
+                                                            class="m--font-brand m--margin-left-5">{{ opsTransaction.userCreatedName }}</span>
+                                                    </div>
+                                                    <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+                                                        <span class="m--font-bolder">Modified:</span>
+                                                        <span
+                                                            class="m--font-brand m--margin-left-5">{{ opsTransaction.datetimeModified | date : "dd/MM/yyyy HH:mm:ss" }}</span>
+                                                        <span class="m--font-bolder m--margin-left-5">by</span>
+                                                        <span
+                                                            class="m--font-brand m--margin-left-5">{{ opsTransaction.userModifiedName }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="div-inside bg-secondary">
+                                                <h3 class="c-block-title">Goods Information</h3>
+                                                <hr>
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumGrossWeight == 0}">
+                                                            <label class="form-control-label" for="">
+                                                                GW (kg)
+                                                            </label>
+                                                            <input type="number" autocomplete="nope"
+                                                                class="form-control m-input m-input--square"
+                                                                placeholder="Enter number" name="sumGrossWeight"
+                                                                [(ngModel)]="opsTransaction.sumGrossWeight" min="0.01"
+                                                                decimalNumberGreaterThan0 #sumGrossWeight="ngModel">
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && opsTransaction.sumGrossWeight == 0">
+                                                                Sum of gross weight must be greater than 0
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumNetWeight == 0}">
+                                                            <label class="form-control-label" for="">
+                                                                NW (kg)
+                                                            </label>
+                                                            <input type="number" autocomplete="nope"
+                                                                class="form-control m-input m-input--square"
+                                                                placeholder="Enter number" name="sumNetWeight"
+                                                                min="0.01" [(ngModel)]="opsTransaction.sumNetWeight"
+                                                                decimalNumberGreaterThan0 #sumNetWeight="ngModel">
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && opsTransaction.sumNetWeight == 0">
+                                                                Sum of net weight must be greater than 0
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumContainers == 0}">
+                                                            <label class="form-control-label" for="">
+                                                                Container Qty
+                                                            </label>
+                                                            <input type="number"
+                                                                class="form-control m-input m-input--square" min="1"
+                                                                integer name="sumContainers" placeholder="Enter number"
+                                                                [(ngModel)]="opsTransaction.sumContainers"
+                                                                #sumContainers="ngModel">
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && opsTransaction.sumContainers == 0">
+                                                                Container Qty must be greater than 0
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xl-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumPackages == 0}">
+                                                            <label class="form-control-label" for="">
+                                                                Packages Qty
+                                                            </label>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <input type="number" class="form-control m-input"
+                                                                        min="1" autocomplete="nope" aria-label=""
+                                                                        name="sumPackages" integer
+                                                                        placeholder="Enter number"
+                                                                        [(ngModel)]="opsTransaction.sumPackages"
+                                                                        #sumPackages="ngModel">
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <ng-select [allowClear]="false"
+                                                                        [items]="packageTypes"
+                                                                        [active]="packagesUnitActive"
+                                                                        (selected)="opsTransaction.packageTypeId = $event.id"
+                                                                        (removed)="opsTransaction.packageTypeId = null"
+                                                                        placeholder="">
+                                                                    </ng-select>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && opsTransaction.sumPackages == 0">
+                                                                Packages Qty must be greater than 0
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumCbm == 0}">
+                                                            <label class="form-control-label" for="">
+                                                                CBM
+                                                            </label>
+                                                            <input type="number" autocomplete="nope"
+                                                                class="form-control m-input m-input--square" min="0.01"
+                                                                placeholder="Enter number" name="sumCbm"
+                                                                [(ngModel)]="opsTransaction.sumCbm"
+                                                                decimalNumberGreaterThan0 #sumCbm="ngModel">
+                                                            <div class="form-control-feedback"
+                                                                *ngIf="addOpsForm.submitted && opsTransaction.sumCbm == 0">
+                                                                Sum of CBM must be greater than 0
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">
+                                                                Commodity Group
+                                                            </label>
+                                                            <ng-select [allowClear]="true" [items]="commodityGroup"
+                                                                [active]="commodityGroupActive"
+                                                                (selected)="opsTransaction.commodityGroupId = $event.id"
+                                                                (removed)="opsTransaction.commodityGroupId = ''"
+                                                                placeholder="Select Commodity Group">
+                                                            </ng-select>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumCbm == 0}">
+                                                            <label class="form-control-label" for="">
+                                                                Detail of container & Packages
+                                                            </label>
+                                                            <textarea [(ngModel)]="opsTransaction.containerDescription"
+                                                                disabled name="containerDescription"
+                                                                class="form-control">{{opsTransaction.containerDescription}}</textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <div class="text-right" *ngIf="!opsTransaction.isLocked">
+                                                            <div class="m--margin-bottom-15 m--margin-top-25"
+                                                                *ngIf="opsTransaction.permission.allowUpdate">
+                                                                <button type="button"
+                                                                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                                                    (click)="showListContainer()">
+                                                                    <span>
+                                                                        <i class="la la-list"></i>
+                                                                        <span>
+                                                                            Container list
+                                                                        </span>
+                                                                    </span>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -611,49 +619,49 @@
                                         </div>
                                     </div>
                                 </div>
+                            </form>
+                            <div class="m-portlet">
+                                <div class="m-portlet__body">
+                                    <tabset class="custom-class-tab">
+                                        <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
+                                            <ng-container
+                                                *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
+                                                <buying-charge [showGetCharge]="false"></buying-charge>
+                                            </ng-container>
+                                        </tab>
+                                        <tab heading="Selling" (selectTab)="getSurCharges('SELL')">
+                                            <ng-container
+                                                *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
+                                                <selling-charge [showSyncFreight]="false" [showGetCharge]="false">
+                                                </selling-charge>
+                                            </ng-container>
+                                        </tab>
+                                        <tab heading="OBH" (selectTab)="getSurCharges('OBH')">
+                                            <ng-container
+                                                *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
+                                                <obh-charge></obh-charge>
+                                            </ng-container>
+                                        </tab>
+                                    </tabset>
+                                </div>
                             </div>
-                        </form>
-                        <div class="m-portlet">
-                            <div class="m-portlet__body">
-                                <tabset class="custom-class-tab">
-                                    <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
-                                        <ng-container
-                                            *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <buying-charge [showGetCharge]="false"></buying-charge>
-                                        </ng-container>
-                                    </tab>
-                                    <tab heading="Selling" (selectTab)="getSurCharges('SELL')">
-                                        <ng-container
-                                            *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <selling-charge [showSyncFreight]="false" [showGetCharge]="false">
-                                            </selling-charge>
-                                        </ng-container>
-                                    </tab>
-                                    <tab heading="OBH" (selectTab)="getSurCharges('OBH')">
-                                        <ng-container
-                                            *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <obh-charge></obh-charge>
-                                        </ng-container>
-                                    </tab>
-                                </tabset>
-                            </div>
-                        </div>
 
-                        <hbl-profit-summary></hbl-profit-summary>
-                    </div>
-                </tab>
-                <tab heading="Custom declaration" (selectTab)="selectTab($event,'custom-declaration')">
-                    <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
-                    </ng-container>
-                </tab>
-                <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
-                    <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
-                    </ng-container>
-                </tab>
-                <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab($event, 'stage')">
-                    <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
-                </tab>
-            </tabset>
+                            <hbl-profit-summary></hbl-profit-summary>
+                        </div>
+                    </tab>
+                    <tab heading="Custom declaration" (selectTab)="selectTab($event,'custom-declaration')">
+                        <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
+                        </ng-container>
+                    </tab>
+                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
+                        <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
+                        </ng-container>
+                    </tab>
+                    <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab($event, 'stage')">
+                        <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
+                    </tab>
+                </tabset>
+            </div>
         </div>
     </div>
 </div>
