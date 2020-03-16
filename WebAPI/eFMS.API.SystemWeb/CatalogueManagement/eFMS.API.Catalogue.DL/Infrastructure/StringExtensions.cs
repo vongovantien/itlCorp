@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace eFMS.API.Catalogue.Infrastructure.Common
+namespace eFMS.API.Catalogue.DL.Infrastructure.Common
 {
     public class StringExtensions
     {
+
         public static string RejectMarks(string text)
         {
             string[] pattern = new string[7];
@@ -31,6 +32,13 @@ namespace eFMS.API.Catalogue.Infrastructure.Common
                 }
             }
             return text;
+        }
+
+        public static bool ContainsUnicodeCharacter(string input)
+        {
+            const int MaxAnsiCode = 255;
+
+            return input.Any(c => c > MaxAnsiCode);
         }
     }
 }

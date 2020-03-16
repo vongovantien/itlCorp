@@ -38,6 +38,7 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string MSG_PARTNER_TAXCODE_NOT_NUMBER = "MSG_PARTNER_TAXCODE_NOT_NUMBER";
         public static readonly string MSG_PARTNER_TAXCODE_EXISTED = "MSG_PARTNER_TAXCODE_EXISTED";
         public static readonly string MSG_PARTNER_TAXCODE_DUPLICATED = "MSG_PARTNER_TAXCODE_DUPLICATED";
+        public static readonly string MSG_PARTNER_TAXCODE_INVALID = "MSG_PARTNER_TAXCODE_INVALID";
         public static readonly string MSG_PARTNER_GROUP_EMPTY = "MSG_PARTNER_GROUP_EMPTY";
         public static readonly string MSG_PARTNER_GROUP_NOT_FOUND = "MSG_PARTNER_GROUP_NOT_FOUND";
         public static readonly string MSG_PARTNER_SALEMAN_EMPTY = "MSG_PARTNER_SALEMAN_EMPTY";

@@ -21,6 +21,9 @@ using System.Linq.Expressions;
 using eFMS.API.Common;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
+using eFMS.API.Catalogue.DL.Infrastructure.Common;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -623,6 +626,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var provinces = placeService.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
             var branchs = placeService.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch)).ToList();
             var salemans = sysUserRepository.Get().ToList();
+            var regexItem = new Regex("^[a-zA-Z0-9-]+$");
 
             var allGroup = DataEnums.PARTNER_GROUP;
             var partnerGroups = allGroup.Split(";");
@@ -635,8 +639,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    string taxCode = item.TaxCode.ToLower();
-                    if (list.Count(x => x.TaxCode.ToLower() == taxCode) > 1)
+                    string taxCode = item.TaxCode.ToLower().Replace(" ", "");
+                    var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
+                    var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
+                    if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(taxCode))
+                    {
+                        item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
+                        item.IsValid = false;
+                    }
+                    else if (list.Count(x => x.TaxCode.ToLower() == taxCode) > 1)
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
