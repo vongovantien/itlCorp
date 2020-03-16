@@ -353,6 +353,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                             hbl.id = this.opsTransaction.hblid;
 
                             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
+
+                            // Tricking Update Transation Apply for isLocked..
+                            this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(this.opsTransaction));
+
                             this._store.dispatch(new OPSTransactionGetDetailSuccessAction(this.opsTransaction));
                             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.opsTransaction.hblid));
 
