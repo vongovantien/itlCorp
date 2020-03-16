@@ -716,7 +716,8 @@ namespace eFMS.API.Documentation.DL.Services
                           ParentId = detail.ParentId,
                           ShipmentEta = tran.Eta,
                           ShipmentEtd = tran.Etd,
-                          ShipmentMawb = tran.Mawb
+                          ShipmentMawb = tran.Mawb,
+                          UserCreated = detail.UserCreated
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             if (res.Count() > 0)

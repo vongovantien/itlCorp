@@ -342,7 +342,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     string serviceToAdd = string.Empty;
                     foreach (var service in services)
                     {
-                        var dataService = CustomData.Services.FirstOrDefault(x => x.DisplayName.ToLower() == service.ToLower().Trim());
+                        var dataService = CustomData.Services.FirstOrDefault(x => x.Value.ToLower() == service.ToLower().Trim());
                         if (dataService == null)
                         {
                             item.ServiceNameError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_SERVICE_TYPE_NOT_FOUND, service];
@@ -455,6 +455,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         CurrencyId = item.CurrencyId,
                         Type = item.Type,
                         ServiceTypeId = item.ServiceTypeId,
+                        Vatrate = item.Vatrate,
                         Active = item.Status.Trim().ToLower() == "active",
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,

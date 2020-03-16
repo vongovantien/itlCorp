@@ -37,6 +37,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
             id: "Processing",
             text: "Processing"
         },
+
         {
             id: "Done",
             text: "Done"
@@ -94,6 +95,10 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 {
                     id: "Processing",
                     text: "Processing"
+                },
+                {
+                    id: "Warning",
+                    text: "Warning"
                 },
                 {
                     id: "Done",
