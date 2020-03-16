@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { BaseService } from './base.service';
-import { Location } from '@angular/common';
 import { Observable } from 'rxjs';
+import { JwtService } from './jwt.service';
 
 @Injectable({
     providedIn: 'root'
@@ -10,7 +9,7 @@ import { Observable } from 'rxjs';
 export class AuthGuardService implements CanActivate {
 
     canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-        if (!this._baseService.checkLoginSession()) {
+        if (!this.checkLoginSession()) {
             this._router.navigate(['/login', { url: state.url }]);
             return false;
         } else {
@@ -19,9 +18,18 @@ export class AuthGuardService implements CanActivate {
     }
 
     constructor(
-        private _baseService: BaseService,
+        private _jwt: JwtService,
         private _router: Router,
     ) { }
+
+    checkLoginSession(): boolean {
+        if (this._jwt.hasValidAccessToken() === false) {
+            localStorage.clear();
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 }
 

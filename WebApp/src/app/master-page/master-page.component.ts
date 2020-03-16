@@ -5,7 +5,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { Office } from '@models';
 
-import { BaseService } from 'src/app/shared/services/base.service';
 import { environment } from 'src/environments/environment';
 import { IAppState } from '../store/reducers';
 import { ChangeOfficeClaimUserAction, ChangeDepartGroupClaimUserAction } from '@store';
@@ -18,6 +17,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import crypto_js from 'crypto-js';
 import { interval, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { JwtService } from '../shared/services/jwt.service';
 
 @Component({
     selector: 'app-master-page',
@@ -36,7 +36,7 @@ export class MasterPageComponent implements OnInit {
     ngUnsubscribe: Subject<number> = new Subject();
 
     constructor(
-        private baseServices: BaseService,
+        private _jwtService: JwtService,
         private router: Router,
         private oauthService: OAuthService,
         private http: HttpClient,
@@ -47,11 +47,11 @@ export class MasterPageComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        interval(15000)
+        interval(900000)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 () => {
-                    const remainingMinutes: number = this.baseServices.remainingExpireTimeToken();
+                    const remainingMinutes: number = this._jwtService.remainingExpireTimeToken();
                     if (remainingMinutes <= 3 && remainingMinutes > 0) {
                         this._toastService.warning("Phiên đăng nhập sẽ hết hạn sau " + remainingMinutes + " phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc.", "Cảnh Báo !")
                     }
