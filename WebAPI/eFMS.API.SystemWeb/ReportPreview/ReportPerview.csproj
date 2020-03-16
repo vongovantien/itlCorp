@@ -359,6 +359,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Reports\AirImpDocumentRelease.ttx" />
+    <Content Include="Reports\AirImptDocumentRelease.rpt" />
+    <Content Include="Reports\BookingNote.ttx" />
+    <Content Include="Reports\BookingNoteAir_SCSC.rpt" />
+    <Content Include="Reports\BookingNoteAir_TCS.rpt" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

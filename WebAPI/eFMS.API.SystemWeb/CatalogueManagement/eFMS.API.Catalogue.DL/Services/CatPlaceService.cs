@@ -527,39 +527,42 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName.ToLower());
-                    if (country == null)
+                    if (!string.IsNullOrEmpty(item.CountryName))
                     {
-                        item.CountryNameError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_COUNTRY_NOT_FOUND], item.CountryName);
-                        item.IsValid = false;
-                    }
-                    else
-                    {
-                        item.CountryId = country.Id;
-                        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
-
-                        if (province == null)
+                        var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName.ToLower());
+                        if (country == null)
                         {
-                            item.ProvinceNameError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
+                            item.CountryNameError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_COUNTRY_NOT_FOUND], item.CountryName);
                             item.IsValid = false;
                         }
                         else
                         {
-                            item.ProvinceId = province.Id;
+                            item.CountryId = country.Id;
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
 
-                            var district = districts.FirstOrDefault(i => i.Code.ToLower() == item.Code.ToLower());
-                            if (district != null)
+                            if (province == null)
                             {
-                                item.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_CODE_EXISTED], item.Code);
+                                item.ProvinceNameError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
                                 item.IsValid = false;
                             }
                             else
                             {
-                                var countNew = list.Count(i => i.Code.ToLower() == item.Code.ToLower());
-                                if (countNew > 1)
+                                item.ProvinceId = province.Id;
+
+                                var district = districts.FirstOrDefault(i => i.Code.ToLower() == item.Code.ToLower());
+                                if (district != null)
                                 {
-                                    item.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_CODE_DUPLICATE], item.Code);
+                                    item.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_CODE_EXISTED], item.Code);
                                     item.IsValid = false;
+                                }
+                                else
+                                {
+                                    var countNew = list.Count(i => i.Code.ToLower() == item.Code.ToLower());
+                                    if (countNew > 1)
+                                    {
+                                        item.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_CODE_DUPLICATE], item.Code);
+                                        item.IsValid = false;
+                                    }
                                 }
                             }
                         }
