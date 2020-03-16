@@ -26,7 +26,7 @@
                             [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
                             [selectedDisplayFields]="['username']" [dataSources]="saleMans"
                             [displayFields]="[{field: 'username', label: 'User Name'}]" [disabled]="!customer.value"
-                            (remove)="resetFormControl(saleMan)" placeholder="Select saleman">
+                            (remove)="resetFormControl(saleMan)" placeholder="Select saleman" size="15">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>

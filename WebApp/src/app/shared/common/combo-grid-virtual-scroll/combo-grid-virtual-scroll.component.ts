@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, AfterViewInit, ElementRef, ViewChild, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, AfterViewInit, ElementRef, ViewChild, QueryList, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -6,7 +6,8 @@ import { ListKeyManager } from '@angular/cdk/a11y';
 import { UP_ARROW, DOWN_ARROW, ENTER } from '@angular/cdk/keycodes';
 @Component({
     selector: 'app-combo-grid-virtual-scroll',
-    templateUrl: './combo-grid-virtual-scroll.component.html'
+    templateUrl: './combo-grid-virtual-scroll.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, OnChanges, AfterViewInit {
 
@@ -20,6 +21,8 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Input() isTooltip: boolean = false;
     @Input() loading: boolean = false;
     @Input() placeholder: string = '';
+    @Input() size: number = 25;
+
     @Output() itemSelected = new EventEmitter<any>();
     @Output() remove = new EventEmitter<any>();
 
@@ -231,45 +234,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             });
         }
     }
-
-    // Search(key: string) {
-    //     key = key.toLowerCase().trim();
-    //     const constData = this.ConstDataSources;
-    //     const displayFields = this.DisplayFields;
-    //     const context = this;
-
-    //     const data = constData.filter(o => {
-    //         let matched: boolean = false;
-    //         for (const i of displayFields) {
-    //             const field: string = i.field;
-    //             const value: string = context.getValue(o, field) == null ? "" : context.getValue(o, field);
-    //             const valueType: string = typeof value;
-
-    //             if (valueType === 'boolean' && value === key) {
-    //                 matched = true;
-    //             }
-
-    //             if (valueType === 'string' && value.toLowerCase().includes(key)) {
-    //                 matched = true;
-    //             }
-
-    //             if (valueType === 'number' && +value === +key) {
-    //                 matched = true;
-    //             }
-    //         }
-    //         return matched;
-    //     });
-    //     if (!!data.length) {
-    //         this.DataSources = data;
-    //     } else {
-    //         this.DataSources = constData;
-    //     }
-
-    //     if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
-    //         const _CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = this.CurrentActiveItemIdObj;
-    //         this.indexSelected = this.DataSources.findIndex(o => o[_CurrentActiveItemIdObj.field] === _CurrentActiveItemIdObj.value);
-    //     }
-    // }
 
     getValue(item: any, field: string) {
         return item[field] || null;
