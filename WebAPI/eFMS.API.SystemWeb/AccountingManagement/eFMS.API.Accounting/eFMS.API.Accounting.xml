@@ -152,7 +152,7 @@
             <param name="advanceNo">advanceNo that want to retrieve approve advance</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetAdvancesOfShipment">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetAdvancesOfShipment(System.String)">
             <summary>
             Get list advance of shipment
             </summary>
