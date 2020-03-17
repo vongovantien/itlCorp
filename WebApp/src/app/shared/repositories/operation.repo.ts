@@ -36,6 +36,58 @@ export class OperationRepo {
         );
     }
 
+    getListEcus(page: number, pageSize: number, body: any) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/EcusConnection/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + pageSize
+        }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    checkDeletePermissionEcus(id: number) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/EcusConnection/CheckAllowDelete/${id}`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    checkDetailPermissionEcus(id: number) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/EcusConnection/CheckAllowDetail/${id}`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    addNewEcus(body: any) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/EcusConnection/Add`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    updateEcus(body: any) {
+        return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/EcusConnection/Update`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    deleteEcus(id: number) {
+        return this._api.delete(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/EcusConnection/Delete`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getDetailEcus(id: number) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/EcusConnection/GetDetails`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
     importCustomClearanceFromEcus() {
         return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/ImportClearancesFromEcus`, {}).pipe(
             catchError((error) => throwError(error)),
@@ -72,7 +124,6 @@ export class OperationRepo {
             map((data: any) => data)
         );
     }
-
 
     getListStageOfJob(jobId: string) {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsStageAssigned/GetBy`, { jobId: jobId });
@@ -116,6 +167,7 @@ export class OperationRepo {
     getDetailCustomsDeclaration(id: number) {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetById/${id}`);
     }
+
     checkViewDetailPermission(id: number) {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/CheckPermission/${id}`);
     }
@@ -131,9 +183,11 @@ export class OperationRepo {
     upLoadClearanceFile(files: any) {
         return this._api.postFile(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/uploadFile`, files, "uploadedFile");
     }
+
     getClearanceTypes() {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetClearanceTypes`);
     }
+
     updateJobToClearances(body: any) {
         return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/UpdateJobToClearances`, body).pipe(
             catchError((error) => throwError(error)),

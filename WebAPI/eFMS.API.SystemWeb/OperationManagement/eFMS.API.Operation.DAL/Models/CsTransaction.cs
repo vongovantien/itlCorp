@@ -5,6 +5,10 @@ namespace eFMS.API.Operation.Service.Models
 {
     public partial class CsTransaction
     {
+        public CsTransaction()
+        {
+            CsTransactionDetail = new HashSet<CsTransactionDetail>();
+        }
 
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
@@ -21,6 +25,7 @@ namespace eFMS.API.Operation.Service.Models
         public string AgentId { get; set; }
         public Guid? Pol { get; set; }
         public Guid? Pod { get; set; }
+        public Guid? WarehouseId { get; set; }
         public Guid? DeliveryPlace { get; set; }
         public string PaymentTerm { get; set; }
         public string FlightVesselName { get; set; }
@@ -58,5 +63,7 @@ namespace eFMS.API.Operation.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+
+        public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
 }

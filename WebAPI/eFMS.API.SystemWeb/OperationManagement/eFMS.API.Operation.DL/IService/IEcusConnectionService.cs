@@ -1,4 +1,5 @@
-﻿using eFMS.API.Operation.DL.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.DL.Models.Ecus;
 using eFMS.API.Operation.Service.Models;
@@ -14,5 +15,7 @@ namespace eFMS.API.Operation.DL.IService
         SetEcusConnectionModel GetConnectionDetails(int id);
         List<DTOKHAIMD> GetDataEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string database);
         IQueryable<SetEcusConnectionModel> Paging(SetEcusConnectionCriteria criteria, int page_num, int page_size, out int total_items);
+
+        bool CheckAllowPermissionAction(int id, PermissionRange permissionRange);
     }
 }

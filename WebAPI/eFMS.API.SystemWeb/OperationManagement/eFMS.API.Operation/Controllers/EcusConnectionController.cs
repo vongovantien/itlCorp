@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Common.NoSql;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
@@ -50,16 +52,34 @@ namespace eFMS.API.Operation.Controllers
         [Authorize]
         public IActionResult AddNew(SetEcusConnectionModel model)
         {
+
+            PermissionRange permissionRange;
+            ICurrentUser _user =  PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingEcusConnection);
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             var existedMessage = CheckExist(model);
             if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
+
             model.DatetimeCreated = DateTime.Now;
             model.UserCreated = currentUser.UserID;
+            model.GroupId = currentUser.GroupId;
+            model.DepartmentId = currentUser.DepartmentId;
+            model.OfficeId = currentUser.OfficeID;
+            model.CompanyId = currentUser.CompanyID;
+
             var hs = ecusConnectionService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
+
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -75,18 +95,39 @@ namespace eFMS.API.Operation.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
+        [AuthorizeEx(Menu.settingEcusConnection, UserPermission.Update)]
         public IActionResult Update(SetEcusConnectionModel model)
         {
+
+            PermissionRange permissionRange;
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingEcusConnection);
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+
+            if (permissionRange == PermissionRange.None)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            bool code = ecusConnectionService.CheckAllowPermissionAction(model.Id, permissionRange);
+
+            if (code == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             var existedMessage = CheckExist(model);
             if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
+
             model.DatetimeModified = DateTime.Now;
             model.UserModified = currentUser.UserID;
+
             var hs = ecusConnectionService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -112,6 +153,52 @@ namespace eFMS.API.Operation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Check permission delete ecus
+        /// </summary>
+        /// <param name="id">id of item want to delete</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDelete(int id)
+        {
+            PermissionRange permissionRange;
+            ICurrentUser _user = null;
+
+            SetEcusConnectionModel ecus = ecusConnectionService.Get(x => x.Id == id).FirstOrDefault();
+            if (ecus == null)
+            {
+                return Ok(false);
+            }
+            _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingEcusConnection);
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            return Ok(ecusConnectionService.CheckAllowPermissionAction(id, permissionRange));
+        }
+
+        /// <summary>
+        /// Check permission view detail ecus
+        /// </summary>
+        /// <param name="id">id of item want to delete</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDetail(int id)
+        {
+            PermissionRange permissionRange;
+            ICurrentUser _user = null;
+
+            SetEcusConnectionModel ecus = ecusConnectionService.Get(x => x.Id == id).FirstOrDefault();
+            if (ecus == null)
+            {
+                return Ok(false);
+            }
+            _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingEcusConnection);
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            return Ok(ecusConnectionService.CheckAllowPermissionAction(id, permissionRange));
         }
 
         /// <summary>

@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Operation.DL.Helper;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.DL.Models.Ecus;
 using eFMS.API.Operation.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
@@ -19,25 +23,49 @@ namespace eFMS.API.Operation.DL.Services
     {
         private readonly IContextBase<SysUser> userRepository;
         private readonly IContextBase<SysEmployee> employeeRepository;
+        private readonly ICurrentUser currentUser;
+
         public EcusConnectionService(IContextBase<SetEcusconnection> repository, 
             ICacheServiceBase<SetEcusconnection> cacheService, 
             IMapper mapper,
+            ICurrentUser user,
             IContextBase<SysUser> userRepo,
             IContextBase<SysEmployee> employeeRepo) : base(repository, cacheService, mapper)
         {
             userRepository = userRepo;
             employeeRepository = employeeRepo;
+            currentUser = user;
         }
 
         public SetEcusConnectionModel GetConnectionDetails(int id)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingEcusConnection);
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+
             var data = Get(x => x.Id == id);
             if (data == null) return null;
+
             var result = data.FirstOrDefault();
+
             var users = userRepository.Get();
+
             result.Username = users.FirstOrDefault(x => x.Id == result.UserId)?.Username;
             result.UserCreatedName = users.FirstOrDefault(x => x.Id == result.UserCreated)?.Username;
             result.UserModifiedName = users.FirstOrDefault(x => x.Id == result.UserModified)?.Username;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = result.UserCreated,
+                CompanyId = result.CompanyId,
+                DepartmentId = result.DepartmentId,
+                OfficeId = result.OfficeId,
+                GroupId = result.GroupId
+            };
+            result.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = PermissionExtention.GetPermissionDetail(permissionRangeWrite, baseModel, currentUser),
+            };
+
             return result;
         }
 
@@ -69,8 +97,18 @@ namespace eFMS.API.Operation.DL.Services
 
         public IQueryable<SetEcusConnectionModel> Paging(SetEcusConnectionCriteria criteria, int pageNumber, int pageSize, out int totalItems)
         {
-            var list = Query(criteria);
-            if(list == null)
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingEcusConnection);
+            var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+
+            if(rangeSearch == PermissionRange.None)
+            {
+                totalItems = 0;
+                return null;
+            }
+
+            IQueryable<SetEcusConnectionModel> list = QueryPermission(criteria, rangeSearch);
+
+            if (list == null)
             {
                 totalItems = 0;
                 return null;
@@ -82,16 +120,17 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     pageNumber = 1;
                 }
-                list = list.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+                list = list.Skip((pageNumber - 1) * pageSize).Take(pageSize).OrderByDescending(x => x.DatetimeModified);
             }
             return list;
+
         }
 
         private IQueryable<SetEcusConnectionModel> Query(SetEcusConnectionCriteria criteria)
         {
             IQueryable<SetEcusConnectionModel> results = null;
             var list = GetConnections();
-            if (criteria.All == null)
+            if (string.IsNullOrEmpty(criteria.All))
             {
                 results = list.Where(x => (x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) > -1
                     && (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -110,6 +149,42 @@ namespace eFMS.API.Operation.DL.Services
                     )?.AsQueryable();
             }
             return results;
+        }
+
+        private IQueryable<SetEcusConnectionModel> QueryPermission(SetEcusConnectionCriteria criteria, PermissionRange range)
+        {
+            var list = Query(criteria);
+            IQueryable<SetEcusConnectionModel> data = null;
+
+            switch (range)
+            {
+                case PermissionRange.Owner:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Group:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID
+                    || x.GroupId == currentUser.GroupId
+                    && x.DepartmentId == currentUser.DepartmentId
+                    && x.OfficeId == currentUser.OfficeID
+                    && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Department:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID || x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID
+                    && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Office:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID || x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Company:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID || x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.All:
+                    data = list;
+                    break;
+                default:
+                    break;
+            }
+            return data;
         }
 
         public List<DTOKHAIMD> GetDataEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string database)
@@ -161,6 +236,26 @@ namespace eFMS.API.Operation.DL.Services
                 return null;
             }
             return null;
+        }
+
+        public bool CheckAllowPermissionAction(int id, PermissionRange range)
+        {
+            var detail = DataContext.Get(x => x.Id == id)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, range, currentUser);
+
+            if (code == 403) return false;
+
+            return true;
         }
     }
 }

@@ -1,10 +1,8 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { EcusConnectionComponent } from './ecus-connection/ecus-connection.component';
 import { IDDefinitionComponent } from './id-definition/id-definition.component';
 import { KPIComponent } from './kpi/kpi.component';
 import { SupplierComponent } from './supplier/supplier.component';
-import { TariffComponent } from './tariff/tariff.component';
 import { ExchangeRateComponent } from './exchange-rate/exchange-rate.component';
 import { LogViewerComponent } from './log-viewer/log-viewer.component';
 
@@ -15,12 +13,8 @@ const routes: Routes = [
         pathMatch: 'full'
     },
     {
-        path: 'ecus-connection',
-        component: EcusConnectionComponent,
-        data: {
-            name: "Ecus Connection",
-            level: 2
-        }
+        path: 'ecus-connection', loadChildren: () => import('./ecus-connection/ecus-connection.module').then(m => m.EcusConectionModule),
+        data: { name: 'Ecus Connection' }
     },
     {
         path: 'id-definition',

@@ -39,6 +39,7 @@ export * from './document/csOtherCharge';
 export * from './document/airway-bill';
 
 export * from './tool-setting/tariff';
+export * from './tool-setting/ecus-connection';
 
 export * from './system/user';
 export * from './system/company';
