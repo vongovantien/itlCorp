@@ -34,6 +34,7 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatChargeService catChargeService;
+
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
@@ -48,10 +49,11 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="imapper"></param>
         public CatChargeController(IStringLocalizer<LanguageSub> localizer, 
             ICatChargeService service, 
-            ICatChargeDefaultAccountService catChargeDefaultAccount, 
+            ICatChargeDefaultAccountService catChargeDefaultAccount,
             IMapper imapper,
             ICurrentUser user,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment
+)
         {
             stringLocalizer = localizer;
             catChargeService = service;

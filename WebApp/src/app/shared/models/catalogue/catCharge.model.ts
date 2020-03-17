@@ -16,6 +16,7 @@ export class Charge {
     active: boolean = true;
     inactiveOn: string = '';
     debitCharge: string = null;
+    chargeGroup: string = null;
 
     constructor(data?: any) {
         const self = this;

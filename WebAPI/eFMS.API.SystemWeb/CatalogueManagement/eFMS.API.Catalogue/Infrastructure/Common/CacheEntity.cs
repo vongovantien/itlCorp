@@ -17,6 +17,7 @@ namespace eFMS.API.Catalogue.Infrastructure.Common
         CatChargeDefaultAccount,
         CatPartner,
         CatCommodityGroup,
+        CatChargeGroup,
         CatCommodity,
         CatPlace,
         CatStage,

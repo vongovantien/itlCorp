@@ -7,7 +7,6 @@ namespace eFMS.API.Catalogue.Service.Models
     {
         public SysMenu()
         {
-            InverseParent = new HashSet<SysMenu>();
             SysRoleMenu = new HashSet<SysRoleMenu>();
         }
 
@@ -27,8 +26,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public virtual SysMenu Parent { get; set; }
-        public virtual ICollection<SysMenu> InverseParent { get; set; }
         public virtual ICollection<SysRoleMenu> SysRoleMenu { get; set; }
     }
 }
