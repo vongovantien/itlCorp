@@ -315,7 +315,29 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-12">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Shipper
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                                    min="0" [(ngModel)]="customDeclaration.shipper" name="shipper"
+                                    (change)="customDeclaration.shipper=customDeclaration.shipper.trim()"
+                                    #shipper="ngModel" placeholder="Enter text">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Consignee
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                                    min="0" [(ngModel)]="customDeclaration.consignee" name="consignee"
+                                    (change)="customDeclaration.consignee=customDeclaration.consignee.trim()"
+                                    #consignee="ngModel" placeholder="Enter text">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
                                     Note

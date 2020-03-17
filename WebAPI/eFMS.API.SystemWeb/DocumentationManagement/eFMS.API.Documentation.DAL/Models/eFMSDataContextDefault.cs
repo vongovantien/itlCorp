@@ -61,7 +61,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AcctCdnote>(entity =>
             {
@@ -487,6 +487,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("Address_VN")
                     .HasMaxLength(4000);
 
+                entity.Property(e => e.ApplyDim)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.BankAccountAddress).HasMaxLength(4000);
 
                 entity.Property(e => e.BankAccountName).HasMaxLength(4000);
@@ -567,6 +571,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ProvinceShippingId).HasColumnName("ProvinceShippingID");
 
                 entity.Property(e => e.ReceiveEtaemail).HasColumnName("ReceiveETAEmail");
+
+                entity.Property(e => e.RoundUpMethod)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.RoundedSoamethod)
                     .HasColumnName("RoundedSOAMethod")
@@ -2198,6 +2206,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
+                entity.Property(e => e.Consignee).HasMaxLength(500);
+
                 entity.Property(e => e.ConvertTime).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeCreated)
@@ -2277,6 +2287,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ServiceType)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Shipper).HasMaxLength(500);
 
                 entity.Property(e => e.Source).HasMaxLength(200);
 
@@ -2366,6 +2378,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
+                entity.Property(e => e.Consignee).HasMaxLength(500);
+
                 entity.Property(e => e.ContainerDescription).HasMaxLength(200);
 
                 entity.Property(e => e.CurrentStatus)
@@ -2447,6 +2461,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ShipmentMode)
                     .HasMaxLength(20)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Shipper).HasMaxLength(500);
 
                 entity.Property(e => e.SumCbm)
                     .HasColumnName("SumCBM")
