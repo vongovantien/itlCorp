@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div *ngIf="!!DataSources.length; else placeholders">
-                <cdk-virtual-scroll-viewport [ngStyle]="{'height.px': height}" itemSize="10">
+                <cdk-virtual-scroll-viewport [ngStyle]="{'height.px': height}" [itemSize]="size">
                     <table class="table table-hover">
                         <tbody>
                             <ng-container>
@@ -52,7 +52,7 @@
                                     data-id="{{(i+1)}}" (click)="emitSelected(item,i)"
                                     [class.data-selected]="indexSelected !== -1 && i === indexSelected">
                                     <td *ngFor="let display of DisplayFields; trackBy: trackByFn">
-                                        {{item[display.field]}}
+                                        {{item[display.field] || 'Loading...'}}
                                     </td>
                                 </tr>
                             </ng-container>

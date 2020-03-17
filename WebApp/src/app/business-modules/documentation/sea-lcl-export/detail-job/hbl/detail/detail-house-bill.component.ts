@@ -15,6 +15,7 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { getDetailHBlPermissionState } from './../../../../../share-business/store';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 @Component({
     selector: 'app-detail-hbl-lcl-export',
@@ -100,7 +101,6 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
                 (res: CsTransactionDetail) => {
                     if (!!res) {
                         this.hblDetail = res;
-                        console.log('data here:', this.hblDetail);
                         // * Dispatch to save containers.
                         this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
 
@@ -133,9 +133,10 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
             return;
         }
 
-        const modelUpdate = this.getDataForm();
+        const modelUpdate: any = this.getDataForm();
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
+        modelUpdate.userCreated = this.hblDetail.userCreated;
 
         this.updateHbl(modelUpdate);
     }
@@ -143,6 +144,8 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
     updateHbl(body: any) {
         this._progressRef.start();
         body.transactionType = 'SLE';
+        body.transactionType = body.transactionType = ChargeConstants.SLE_CODE;
+
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),

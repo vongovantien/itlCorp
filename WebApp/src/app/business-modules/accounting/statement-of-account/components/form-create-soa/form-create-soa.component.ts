@@ -138,7 +138,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     getCurrencyUser(data: any) {
         this.users = (data || []).map((item: any) => ({ id: item.id, text: item.username }));
-        this.selectedUser = [this.users.filter((i: any) => i.id === 'admin')[0]];
+
+        this.selectedUser = [this.users.filter((i: any) => i.text === 'admin')[0]];
 
         this.updateDataSearch('strCreators', this.selectedUser.map((item: any) => item.id).toString());
     }
@@ -426,7 +427,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     onShipmentList(data: any) {
         this.shipmentInput = data;
-        if(data){
+        if (data) {
             this.numberOfShipment = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).length;
         } else {
             this.numberOfShipment = 0;

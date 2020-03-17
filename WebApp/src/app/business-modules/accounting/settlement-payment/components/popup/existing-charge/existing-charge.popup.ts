@@ -9,6 +9,7 @@ import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { Surcharge } from 'src/app/shared/models';
 import { ToastrService } from 'ngx-toastr';
 import { ShareAccountingInputShipmentPopupComponent } from 'src/app/business-modules/accounting/components/input-shipment/input-shipment.popup';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
     selector: 'existing-charge-popup',
@@ -119,6 +120,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                     this.initService = data;
                     this.services = (data || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
                     this.selectedServices = this.services;
+
+                    this.getShipment(null, this.selectedServices.map((service: { id: string, text: string }) => service.id));
                 }
             );
     }
@@ -129,7 +132,9 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 this.selectedPartner = { field: 'id', value: data.partnerNameEn };
                 this.selectedPartnerData = data;
 
-                this.resetShipment();
+                // this.resetShipment();
+                this.selectedShipment = {};
+                this.selectedShipmentData = null;
                 this.getShipment(this.selectedPartnerData.id, this.selectedServices.map((service: { id: string, text: string }) => service.id));
                 break;
             case 'service':
@@ -177,7 +182,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             }))
             .subscribe(
                 (res: any) => {
-                    this.configShipment.dataSource = res;
+                    this.configShipment.dataSource.length = 0;
+                    this.configShipment.dataSource = [...this.configShipment.dataSource, ...cloneDeep(res)];
                     this.configShipment.displayFields = [
                         { field: 'jobId', label: 'Job No' },
                         { field: 'mbl', label: 'MBL' },
@@ -313,10 +319,10 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     openInputShipment() {
         this.inputShipmentPopupComponent.show();
     }
-    
+
     onShipmentList(data: any) {
         this.shipmentInput = data;
-        if(data){
+        if (data) {
             this.numberOfShipment = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).length;
             this.resetShipment();
         } else {

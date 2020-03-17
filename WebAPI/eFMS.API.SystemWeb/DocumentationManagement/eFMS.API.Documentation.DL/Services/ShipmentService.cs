@@ -47,8 +47,7 @@ namespace eFMS.API.Documentation.DL.Services
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
             var shipmentsOperation = from ops in opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false)
-                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId //into osa2
-                                     //from osa in osa2.DefaultIfEmpty()
+                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
                                      where osa.MainPersonInCharge == userCurrent
                                      select new Shipments
                                      {
@@ -73,6 +72,8 @@ namespace eFMS.API.Documentation.DL.Services
                 HBLID = s.Key.HBLID,
                 Service = "CL"
             });
+            shipmentsOperation = shipmentsOperation.Distinct();
+
             //End change request
             var transactions = from cst in DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false)
                                join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
@@ -90,6 +91,8 @@ namespace eFMS.API.Documentation.DL.Services
                 HBLID = x.y.Id,
                 Service = x.x.TransactionType
             });
+            shipmentsDocumention = shipmentsDocumention.Distinct();
+
             var shipments = shipmentsOperation.Union(shipmentsDocumention);
             return shipments;
         }
@@ -190,6 +193,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         CustomNo = sur.ClearanceNo,
                                         Service = "CL"
                                     };
+            shipmentOperation = shipmentOperation.Distinct();
             //End change request
 
             var shipmentDoc = from cstd in cstrandel
@@ -217,6 +221,8 @@ namespace eFMS.API.Documentation.DL.Services
                                   CustomNo = sur.ClearanceNo,
                                   Service = cst.TransactionType
                               };
+            shipmentDoc = shipmentDoc.Distinct();
+
             var query = shipmentOperation.Union(shipmentDoc);
             var listShipment = query.Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
                             .GroupBy(x => new { x.JobId, x.Customer, x.MBL, x.HBL, x.HBLID, x.CustomNo, x.Service })

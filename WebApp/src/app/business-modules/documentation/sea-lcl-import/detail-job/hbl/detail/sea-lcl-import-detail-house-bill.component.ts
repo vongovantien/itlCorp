@@ -17,6 +17,7 @@ import * as fromShareBussiness from '../../../../../share-business/store';
 import { ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBussinessHBLGoodSummaryLCLComponent, getDetailHBlPermissionState } from 'src/app/business-modules/share-business';
 import isUUID from 'validator/lib/isUUID';
 import { DataService } from '@services';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -152,7 +153,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
             return;
         }
 
-        const modelUpdate = this.onsubmitData();
+        const modelUpdate: any = this.onsubmitData();
 
         modelUpdate.jobId = this.hblDetail.jobId;
         modelUpdate.id = this.hblDetail.id;
@@ -170,6 +171,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         modelUpdate.dofooter = this.hblDetail.dofooter;
         modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
+        modelUpdate.userCreated = this.hblDetail.userCreated;
 
         // Update field container
         modelUpdate.csMawbcontainers.forEach(c => {
@@ -181,7 +183,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     updateHbl(body: any) {
         this._progressRef.start();
-        body.transactionType = 'SLI';
+        body.transactionType = ChargeConstants.SLI_CODE;
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),

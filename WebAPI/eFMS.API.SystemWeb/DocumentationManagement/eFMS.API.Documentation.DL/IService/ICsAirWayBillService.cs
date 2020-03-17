@@ -11,6 +11,6 @@ namespace eFMS.API.Documentation.DL.IService
     {
         CsAirWayBillModel GetBy(Guid jobId);
         HandleState Update(CsAirWayBillModel model);
-        AirwayBillExportResult AirwayBillExport(Guid id);
+        AirwayBillExportResult AirwayBillExport(Guid jobId);
     }
 }

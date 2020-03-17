@@ -32,7 +32,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @Input() service: string = 'sea';
-    @Input() showSyncOtherCharge: boolean = false; // * Hiển thị sync other charge ở service air.
+    @Input() showSyncOtherCharge: boolean = false; // * show/hide sync other charge in getCharge button.
+    @Input() showGetCharge: boolean = true; // * show/hide getCharge button
 
     serviceTypeId: string;
     containers: Container[] = [];
@@ -385,15 +386,15 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
-        chargeItem.total = this.utility.calculateTotalAmountWithVat(vat, chargeItem.quantity, chargeItem.unitPrice);
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(+vat, +chargeItem.quantity, +chargeItem.unitPrice);
     }
 
     onChangeUnitPrice(unitPrice: number, chargeItem: CsShipmentSurcharge) {
-        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate || 0, chargeItem.quantity, unitPrice);
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +chargeItem.quantity, +unitPrice);
     }
 
     onChangeQuantity(quantity: number, chargeItem: CsShipmentSurcharge) {
-        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate || 0, quantity, chargeItem.unitPrice);
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +quantity, +chargeItem.unitPrice);
     }
 
     updateSurchargeField(type: CommonEnum.SurchargeTypeEnum) {

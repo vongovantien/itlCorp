@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { PagingService } from 'src/app/shared/services/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
@@ -21,7 +20,6 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class WarehouseImportComponent extends AppPage implements OnInit {
     @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
-    @ViewChild(AppPaginationComponent, { static: false }) child: any;
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];
@@ -66,6 +64,7 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
             )
             .subscribe((response: any) => {
                 this.data = response.data;
+                this.pager.currentPage = 1;
                 this.pager.totalItems = this.data.length;
                 this.totalValidRows = response.totalValidRows;
                 this.totalRows = this.data.length;
@@ -79,7 +78,6 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
         this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
         this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-        console.log(this.pager);
     }
 
     downloadSample() {
@@ -98,11 +96,12 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
         this.sortKey = '';
         if (this.isShowInvalid) {
             this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
         } else {
             this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
             this.pager.totalItems = this.inValidItems.length;
         }
-        this.child.setPage(this.pager.currentPage);
     }
 
     import(element) {
@@ -138,28 +137,30 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
         this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
     }
 
-    setPage(pager: PagerSetting) {
-        this.pager.currentPage = pager.currentPage;
-        this.pager.pageSize = pager.pageSize;
-        this.pager.totalPages = pager.totalPages;
-        if (this.isShowInvalid) {
-            this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-        } else {
-            this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
-            if (this.inValidItems.length === 0) {
-                this.pager.totalItems = 1;
-            }
-        }
-    }
-
     reset(element) {
         this.data = null;
         this.pagedItems = null;
         element.value = "";
         this.pager.totalItems = 0;
+    }
+    selectPageSize() {
+        this.pager.currentPage = 1;
+        if (this.isShowInvalid) {
+            this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
+
+        } else {
+            this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
+            this.pager.totalItems = this.inValidItems.length;
+        }
+    }
+    pageChanged(event: any): void {
+        if (this.pager.currentPage !== event.page || this.pager.pageSize !== event.itemsPerPage) {
+            this.pager.currentPage = event.page;
+            this.pager.pageSize = event.itemsPerPage;
+
+            this.pagingData(this.data);
+        }
     }
 }

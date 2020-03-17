@@ -15,6 +15,7 @@ import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
 import { ActivatedRoute, Params } from '@angular/router';
 import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueAgentState, getCataloguePortState } from '@store';
 import { SystemConstants } from 'src/constants/system.const';
+import { FormValidators } from '@validators';
 
 @Component({
     selector: 'form-create-sea-import',
@@ -74,7 +75,6 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
 
 
     fclImportDetail: any; // TODO model;
-    minDateETA: any;
 
     commonData: any;
 
@@ -145,10 +145,6 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                                 coloader: this.fclImportDetail.coloaderId,
                                 deliveryPlace: this.fclImportDetail.deliveryPlace
                             });
-
-                            if (!!this.formCreate.value.etd) {
-                                this.minDateETA = this.createMoment(this.fclImportDetail.etd);
-                            }
                         } catch (error) {
                             console.log(error);
 
@@ -185,7 +181,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
             pod: [null, Validators.required],
             coloader: [],
             deliveryPlace: [],
-        });
+        }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
         this.etd = this.formCreate.controls["etd"];
         this.eta = this.formCreate.controls["eta"];
@@ -212,11 +208,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
                 if (value.startDate !== null) {
-                    this.minDateETA = value.startDate; // * Update min date
-
                     this.isSubmitted = false;
-                    // this.resetFormControl(this.formCreate.controls["eta"]);
-                    // this.formCreate.controls["serviceDate"].setValue(null);
                 }
             });
 

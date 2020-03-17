@@ -5,7 +5,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 
 import { AppForm } from 'src/app/app.form';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
-import { CatalogueRepo, DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { User, CsTransactionDetail } from 'src/app/shared/models';
@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 import * as fromShare from './../../../share-business/store';
 import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, getCatalogueCarrierLoadingState, getCatalogueAgentLoadingState, getCataloguePortLoadingState } from '@store';
 import { SystemConstants } from 'src/constants/system.const';
+import { FormValidators } from '@validators';
 
 @Component({
     selector: 'form-create-sea-export',
@@ -44,7 +45,6 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     ports: Observable<PortIndex[]>;
     listUsers: Observable<User[]>;
 
-    minDateETA: any;
 
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name Abbr' },
@@ -81,7 +81,6 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     isLoadingCarrier: Observable<boolean>;
 
     constructor(
-        private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
         private _fb: FormBuilder,
         private _store: Store<fromShare.IShareBussinessState>,
@@ -153,9 +152,6 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                                 notes: res.notes,
                                 pono: res.pono
                             });
-                            if (!!this.formGroup.value.etd) {
-                                this.minDateETA = this.createMoment(res.etd);
-                            }
                         } catch (error) {
                             console.log(error);
                         }
@@ -189,7 +185,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
             shipmentType: [[this.shipmentTypes[0]]], // * select
             typeOfService: [], // * select
             personalIncharge: [],  // * select
-        });
+        }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
         this.etd = this.formGroup.controls["etd"];
         this.eta = this.formGroup.controls["eta"];
@@ -214,7 +210,6 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
                 if (!!value.startDate) {
-                    // this.minDateETA = value.startDate; // * Update min date
 
                     this.isSubmitted = false;
                     // this.resetFormControl(this.formGroup.controls["eta"]);

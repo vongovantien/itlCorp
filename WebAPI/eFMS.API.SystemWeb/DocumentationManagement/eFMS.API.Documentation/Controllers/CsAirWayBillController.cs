@@ -87,10 +87,15 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Export airway bill
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
         [HttpGet("AirwayBillExport")]
-        public IActionResult AirwayBillExport(Guid id)
+        public IActionResult AirwayBillExport(Guid jobId)
         {
-            var result = airWayBillService.AirwayBillExport(id);
+            var result = airWayBillService.AirwayBillExport(jobId);
             return Ok(result);
         }
     }

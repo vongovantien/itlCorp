@@ -104,13 +104,12 @@ export class FormAddChargeComponent extends AppForm {
             .subscribe(
                 (value: CommonInterface.INg2Select[]) => {
                     if (!!value && !!value.length) {
-                        if (value[0].id === CommonEnum.CHARGE_TYPE.CREDIT) {
+                        if (value[0].id.toLowerCase() === CommonEnum.CHARGE_TYPE.CREDIT.toLowerCase()) {
                             this.isShowMappingSelling = true;
                         } else {
                             this.isShowMappingSelling = false;
                         }
                     }
-                    console.log(value);
                 }
             );
     }

@@ -1,49 +1,43 @@
-import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { PageSidebarComponent } from './page-sidebar/page-sidebar.component';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { Office } from '@models';
 
-import { BaseService } from 'src/app/shared/services/base.service';
 import { environment } from 'src/environments/environment';
 import { IAppState } from '../store/reducers';
 import { ChangeOfficeClaimUserAction, ChangeDepartGroupClaimUserAction } from '@store';
 import { SystemConstants } from 'src/constants/system.const';
 import { RSAHelper } from 'src/helper/RSAHelper';
 import { CookieService } from 'ngx-cookie-service';
-import crypto_js from 'crypto-js';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 
+import crypto_js from 'crypto-js';
+import { interval, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { JwtService } from '../shared/services/jwt.service';
 
 @Component({
     selector: 'app-master-page',
     templateUrl: './master-page.component.html',
 })
-export class MasterPageComponent implements OnInit, AfterViewInit {
-
-    @ViewChild(PageSidebarComponent, { static: false }) Page_side_bar: { Page_Info: {}; };
-    Page_Info = {};
-    Component_name: "no-name";
-
+export class MasterPageComponent implements OnInit {
     selectedOffice: Office;
     selectedDepartGroup: SystemInterface.IDepartmentGroup;
 
     password: string;
     username: string;
+
     isChangeOffice: boolean = false;
     isChangeDepartgroup: boolean = false;
 
-    ngAfterViewInit(): void {
-        this.Page_Info = this.Page_side_bar.Page_Info;
-    }
+    ngUnsubscribe: Subject<number> = new Subject();
 
     constructor(
-        private baseServices: BaseService,
+        private _jwtService: JwtService,
         private router: Router,
-        private cdRef: ChangeDetectorRef,
         private oauthService: OAuthService,
         private http: HttpClient,
         private cookieService: CookieService,
@@ -53,21 +47,21 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
     ) { }
 
     ngOnInit() {
-        this.cdRef.detectChanges();
-        setInterval(() => {
-            const remainingMinutes: number = this.baseServices.remainingExpireTimeToken();
-            if (remainingMinutes <= 3 && remainingMinutes > 0) {
-                this.baseServices.warningToast("Phiên đăng nhập sẽ hết hạn sau " + remainingMinutes + " phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc.", "Cảnh Báo !")
-            }
-        }, 15000);
-        this.password = this.getUserPassword();
-        this.username = this.getUserName();
+        interval(900000)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                () => {
+                    const remainingMinutes: number = this._jwtService.remainingExpireTimeToken();
+                    if (remainingMinutes <= 3 && remainingMinutes > 0) {
+                        this._toastService.warning("Phiên đăng nhập sẽ hết hạn sau " + remainingMinutes + " phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc.", "Cảnh Báo !")
+                    }
+                });
 
     }
 
-    MenuChanged(event: any) {
-        this.Page_Info = event;
-        this.Component_name = event.children;
+    ngOnDestroy(): void {
+        this.ngUnsubscribe.next();
+        this.ngUnsubscribe.complete();
     }
 
     logout() {
@@ -128,6 +122,8 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
                     groupId: '' + groupId,
                     departmentId: '' + departmentId
                 });
+                this.password = this.getUserPassword();
+                this.username = this.getUserName();
 
                 if (!!this.username && !!this.password) {
                     this.oauthService.fetchTokenUsingPasswordFlow(this.username, RSAHelper.serverEncode(this.password), header)
@@ -147,6 +143,8 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
                                 }
                             }
                         });
+                } else {
+                    throw new Error("Not found login information");
                 }
             }).catch(
                 (err) => {

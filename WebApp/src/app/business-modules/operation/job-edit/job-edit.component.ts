@@ -14,7 +14,7 @@ import { SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
 import { DataService } from 'src/app/shared/services';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
-import { CsTransactionDetail } from 'src/app/shared/models';
+import { CsTransactionDetail, Container } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
 import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
@@ -69,6 +69,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     tab: string = '';
     tabCharge: string = '';
     jobId: string = '';
+    hblid: string = '';
+
     deleteMessage: string = '';
 
     packagesUnitActive = [];
@@ -122,6 +124,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.lstMasterContainers = action.payload;
+                        console.log(this.lstMasterContainers);
                         this.updateData(this.lstMasterContainers);
                     }
                 }
@@ -162,7 +165,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getListContainersOfJob() {
-        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblId: this.jobId }));
+        this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: this.opsTransaction.hblid }));
+
         this._store.select<any>(fromShareBussiness.getContainerSaveState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -210,6 +215,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
 
     saveShipment(form: NgForm) {
+        this.lstMasterContainers.forEach((c: Container) => {
+            c.mblid = this.jobId;
+            c.hblid = this.hblid;
+        });
         this.opsTransaction.serviceDate = !!this.serviceDate ? (this.serviceDate.startDate != null ? formatDate(this.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.opsTransaction.finishDate = !!this.finishDate ? (this.finishDate.startDate != null ? formatDate(this.finishDate.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
@@ -320,7 +329,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             ).subscribe(
                 (response: any) => {
                     this.opsTransaction = new OpsTransaction(response);
-                    console.log(response);
+                    this.hblid = this.opsTransaction.hblid;
                     console.log(this.opsTransaction);
 
                     if (this.opsTransaction != null) {
@@ -344,10 +353,16 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                             hbl.id = this.opsTransaction.hblid;
 
                             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
+
+                            // Tricking Update Transation Apply for isLocked..
+                            this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(this.opsTransaction));
+
                             this._store.dispatch(new OPSTransactionGetDetailSuccessAction(this.opsTransaction));
                             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.opsTransaction.hblid));
 
                             this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+                            this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: this.opsTransaction.hblid }));
+
                         } else {
                             this.serviceDate = null;
                             this.finishDate = null;

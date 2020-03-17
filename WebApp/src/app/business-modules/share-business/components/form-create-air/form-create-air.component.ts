@@ -316,7 +316,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             coloaderId: [null, Validators.required],
             warehouseId: [],
 
-        }, { validator: FormValidators.comparePort });
+        }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
         this.mawb = this.formGroup.controls["mawb"];
 
@@ -426,6 +426,9 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             if (this.dimVolumePopup.isCBMChecked) {
                 this.formGroup.patchValue({ cbm: this.dimVolumePopup.totalCBM });
             }
+        } else {
+            this.formGroup.patchValue({ hw: null });
+
         }
     }
 

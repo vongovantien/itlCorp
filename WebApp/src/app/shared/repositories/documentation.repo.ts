@@ -163,6 +163,12 @@ export class DocumentationRepo {
         );
     }
     convertClearanceToJob(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ConvertClearanceToJob`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    convertExistedClearanceToJob(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ConvertExistedClearancesToJobs`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
@@ -702,6 +708,12 @@ export class DocumentationRepo {
 
     getAirwayBill(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsAirWayBill/GetBy/${jobId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    previewBookingNote(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewBookingNote`, body).pipe(
             map((data: any) => data)
         );
     }

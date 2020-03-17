@@ -63,7 +63,6 @@
     </div>
 
     <div class="m-portlet" style="position: relative">
-        <ng-progress [thick]="true" [color]="'#2ea2f4'" [spinner]="true"></ng-progress>
         <div class="m-portlet__body">
             <div class="table-wrapper" id="">
                 <table class="table table-striped table-brand dataTable">
@@ -162,8 +161,29 @@
                 </table>
             </div>
 
-            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)">
-            </app-pagination>
+
+            <div class="pagination-nav">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="select-box" style="max-width: 190px">
+                            <select class="form-control" id="" aria-label="" [(ngModel)]="pager.pageSize"
+                                (change)="selectPageSize()" name="pagesize">
+                                <ng-container *ngFor="let item of pager.numberToShow; index as i; first as isFirst">
+                                    <option [ngValue]="item" [selected]="isFirst">{{item}} entries / page</option>
+                                </ng-container>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6" *ngIf="pager.totalItems > pager.pageSize">
+                        <div class="float-right">
+                            <pagination [boundaryLinks]="true" [totalItems]="pager.totalItems"
+                                [maxSize]="pager.numberPageDisplay" [itemsPerPage]="pager.pageSize"
+                                (pageChanged)="pageChanged($event)" [(ngModel)]="pager.currentPage">
+                            </pagination>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

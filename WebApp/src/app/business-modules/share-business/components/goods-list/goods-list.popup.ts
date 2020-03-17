@@ -35,11 +35,11 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
     configHeader() {
         this.headers = [
             { title: 'Cont Type', field: 'containerTypeId', sortable: true },
-            { title: 'Cont Q`Ty', field: 'quantity', sortable: true },
+            { title: 'Cont Quantity', field: 'quantity', sortable: true },
             { title: 'G.W', field: 'gw', sortable: true, required: true },
             { title: 'CBM', field: 'cbm', sortable: true, required: true },
             { title: 'Package Type', field: 'packageTypeId', sortable: true, required: true },
-            { title: 'Package Q`Ty', field: 'packageQuantity', sortable: true, required: true, width: 175 },
+            { title: 'Package Quantity', field: 'packageQuantity', sortable: true, required: true, width: 175 },
             { title: 'Container No', field: 'containerNo', sortable: true, },
             { title: 'Seal No', field: 'sealNo', sortable: true, },
             { title: 'Mark No', field: 'markNo', sortable: true, },

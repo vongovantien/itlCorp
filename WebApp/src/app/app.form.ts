@@ -38,6 +38,9 @@ export abstract class AppForm extends AppPage {
 
     digitDecimal: number = 5;
 
+    confirmCancelFormText: string = "All entered data will be discarded, <br>Are you sure you want to leave?";
+    invalidFormText: string = 'Opps, It looks like you missed something, Please recheck the highlighted field below.';
+
     @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
         this.reset();
     }

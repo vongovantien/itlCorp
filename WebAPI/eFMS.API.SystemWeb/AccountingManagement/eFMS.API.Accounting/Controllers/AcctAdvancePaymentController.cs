@@ -560,9 +560,9 @@ namespace eFMS.API.Accounting.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetAdvancesOfShipment")]
-        public IActionResult GetAdvancesOfShipment()
+        public IActionResult GetAdvancesOfShipment(string jobId)
         {
-            var data = acctAdvancePaymentService.GetAdvancesOfShipment();
+            var data = acctAdvancePaymentService.GetAdvancesOfShipment().Where(x => x.JobId == jobId);
             return Ok(data);
         }
 

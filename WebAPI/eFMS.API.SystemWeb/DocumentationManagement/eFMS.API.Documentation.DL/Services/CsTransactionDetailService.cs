@@ -1722,14 +1722,14 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var bookingNote = new BookingNoteReport();
                 bookingNote.FlexId = criteria.FlexId?.ToUpper();
-                bookingNote.Shipper = catPartnerRepo.Get(x => x.Id == data.ShipperId).FirstOrDefault()?.ShortName.ToUpper();
-                bookingNote.Consignee = catPartnerRepo.Get(x => x.Id == data.ConsigneeId).FirstOrDefault()?.ShortName.ToUpper();
+                bookingNote.Shipper = catPartnerRepo.Get(x => x.Id == data.ShipperId).FirstOrDefault()?.ShortName?.ToUpper();
+                bookingNote.Consignee = catPartnerRepo.Get(x => x.Id == data.ConsigneeId).FirstOrDefault()?.ShortName?.ToUpper();
                 bookingNote.HawbNo = data.Hwbno?.ToUpper();
                 bookingNote.MawbNo = data.Mawb?.ToUpper();
                 var _pol = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
                 var _pod = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
                 var _airportOfDischarge = !string.IsNullOrEmpty(data.FirstCarrierTo) ? data.FirstCarrierTo : _pod?.Code;
-                var _flightNo = _pol?.Code + "-" + _airportOfDischarge + ":" +data.FlightNo + "/" + data.Etd.Value.ToString("dd MMM").ToUpper();
+                var _flightNo = _pol?.Code + "-" + _airportOfDischarge + ":" +data.FlightNo + "/" + data.Etd.Value.ToString("dd MMM");
                 bookingNote.FlightNo1 = _flightNo.ToUpper();
                 bookingNote.FlightNo2 = criteria.FlightNo2?.ToUpper();
                 bookingNote.DepartureAirport = _pol?.Code.ToUpper(); //Lấy Code
@@ -1752,7 +1752,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             result = new Crystal
             {
-                ReportName = criteria.ReportType == "BN_SCSC" ? "BookingNoteAir_SCSC.rpt" : "BookingNoteAir_TSC.rpt",
+                ReportName = criteria.ReportType == "BN_SCSC" ? "BookingNoteAir_SCSC.rpt" : "BookingNoteAir_TCS.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
@@ -1774,10 +1774,10 @@ namespace eFMS.API.Documentation.DL.Services
             result.MawbNo = hbDetail.Mawb;
             var pol = catPlaceRepo.Get(x => x.Id == hbDetail.Pol).FirstOrDefault();
             var pod = catPlaceRepo.Get(x => x.Id == hbDetail.Pod).FirstOrDefault();
-            result.AolCode = pol.Code ?? string.Empty;
+            result.AolCode = pol?.Code;
             result.HawbNo = hbDetail.Hwbno;
             result.Shipper = hbDetail.ShipperDescription;
-            result.OfficeUserCurrent = office.BranchNameEn ?? string.Empty;
+            result.OfficeUserCurrent = office?.BranchNameEn;
             result.Consignee = hbDetail.ConsigneeDescription;
 
             var _airFrieghtDa = string.Empty;
@@ -1785,16 +1785,16 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (hbDetail.FreightPayment == "Sea - Air Difference" || hbDetail.FreightPayment == "Prepaid")
                 {
-                    _airFrieghtDa = "PP IN " + (pol.Code ?? string.Empty);
+                    _airFrieghtDa = "PP IN " + pol?.Code;
                 }
                 else
                 {
-                    _airFrieghtDa = "CLL IN " + (pod.Code ?? string.Empty);
+                    _airFrieghtDa = "CLL IN " + pod?.Code;
                 }
             }            
             result.AirFrieghtDa = _airFrieghtDa;
 
-            result.DepartureAirport = pol.NameEn ?? string.Empty;
+            result.DepartureAirport = pol?.NameEn;
             result.FirstTo = hbDetail.FirstCarrierTo;
             result.FirstCarrier = hbDetail.FirstCarrierBy;
             result.SecondTo = hbDetail.TransitPlaceTo2;
@@ -1802,7 +1802,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.Currency = hbDetail.CurrencyId;
             result.Dclrca = hbDetail.Dclrca;
             result.Dclrcus = hbDetail.Dclrcus;
-            result.DestinationAirport = pod.NameEn ?? string.Empty;
+            result.DestinationAirport = pod?.NameEn;
             result.FlightNo = hbDetail.FlightNo;
             result.FlightDate = hbDetail.FlightDate;
             result.IssuranceAmount = hbDetail.IssuranceAmount;

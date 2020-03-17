@@ -1,12 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PagingService } from 'src/app/shared/services/paging-service';
-
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
+import { NgProgress } from '@ngx-progressbar/core';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { AppPage } from 'src/app/app.base';
 import { CatalogueRepo } from 'src/app/shared/repositories';
@@ -29,7 +27,6 @@ export class ChargeImportComponent extends AppPage implements OnInit {
     isDesc = true;
     sortKey: string = 'code';
 
-
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private pagingService: PagingService,
@@ -40,9 +37,6 @@ export class ChargeImportComponent extends AppPage implements OnInit {
         super();
         this._progressRef = this._progressService.ref();
     }
-    @ViewChild(AppPaginationComponent, { static: false }) child: any;
-    @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
 
     ngOnInit() {
         this.pager.totalItems = 0;
@@ -61,6 +55,7 @@ export class ChargeImportComponent extends AppPage implements OnInit {
             )
             .subscribe((response: any) => {
                 this.data = response.data;
+                this.pager.currentPage = 1;
                 this.pager.totalItems = this.data.length;
                 this.totalValidRows = response.totalValidRows;
                 this.totalRows = this.data.length;
@@ -76,24 +71,6 @@ export class ChargeImportComponent extends AppPage implements OnInit {
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
 
-    setPage(pager: PagerSetting) {
-        this.pager.currentPage = pager.currentPage;
-        this.pager.pageSize = pager.pageSize;
-        this.pager.totalPages = pager.totalPages;
-        if (this.isShowInvalid) {
-            this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-        } else {
-            this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
-            this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-            this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
-            if (this.inValidItems.length === 0) {
-                this.pager.totalItems = 1;
-            }
-        }
-    }
-
     sort(property: string) {
         this.isDesc = !this.isDesc;
         this.sortKey = property;
@@ -103,21 +80,22 @@ export class ChargeImportComponent extends AppPage implements OnInit {
     hideInvalid() {
         if (this.data == null) { return; }
         this.isShowInvalid = !this.isShowInvalid;
+        this.sortKey = '';
         if (this.isShowInvalid) {
+            this.pager.totalItems = this.data.length;
             this.pagingData(this.data);
         } else {
             this.inValidItems = this.data.filter(x => !x.isValid);
-            this.pager.totalItems = this.inValidItems.length;
             this.pagingData(this.inValidItems);
+            this.pager.totalItems = this.inValidItems.length;
         }
-        // this.child.setPage(this.pager.currentPage);
     }
 
 
     import(element) {
         if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {
-            this.importAlert.show();
+            this.invaliDataAlert.show();
             this._progressRef.complete();
         } else {
             const data = this.data.filter(x => x.isValid);
@@ -157,5 +135,24 @@ export class ChargeImportComponent extends AppPage implements OnInit {
         element.value = "";
         this.pager.totalItems = 0;
     }
+    selectPageSize() {
+        this.pager.currentPage = 1;
+        if (this.isShowInvalid) {
+            this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
 
+        } else {
+            this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
+            this.pager.totalItems = this.inValidItems.length;
+        }
+    }
+    pageChanged(event: any): void {
+        if (this.pager.currentPage !== event.page || this.pager.pageSize !== event.itemsPerPage) {
+            this.pager.currentPage = event.page;
+            this.pager.pageSize = event.itemsPerPage;
+
+            this.pagingData(this.data);
+        }
+    }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 
 import { CustomDeclaration, Surcharge, Partner, Unit } from '@models';
 import { CatalogueRepo, DocumentationRepo, OperationRepo, AccountingRepo } from '@repositories';
@@ -37,7 +37,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     listUnits: Observable<Unit[]>;
     shipments: OperationInteface.IShipment[];
     cds: CustomDeclaration[] = [];
-    advs: IAdvanceShipment[];
+    advs: IAdvanceShipment[] = [];
     listPartner: Partner[] = [];
 
     selectedShipment: OperationInteface.IShipment;
@@ -134,7 +134,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.getMasterCharges();
         this.getShipmentCommonData();
         this.getCustomDecleration();
-        this.getAdvances();
+        // this.getAdvances();
         this.initForm();
         this.getPartner();
         this.getUnits();
@@ -168,8 +168,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             );
     }
 
-    getAdvances() {
-        this._accountingRepo.getAdvanceOfShipment()
+    getAdvances(jobNo: string) {
+        this._accountingRepo.getAdvanceOfShipment(jobNo)
             .pipe(
                 catchError(this.catchError),
                 map((res: IAdvanceShipment[]) => {
@@ -179,8 +179,15 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     return res;
                 })
             ).subscribe(
-                (res: any[]) => {
-                    this.advs = res;
+                (res: any[] = []) => {
+                    this.advs = cloneDeep(res);
+                    if (!this.advanceNo.value) {
+                        const advance: IAdvanceShipment = this.advs.find(i => i.jobId === this.selectedShipment.jobId);
+                        if (!!advance) {
+                            this.advanceNo.setValue(advance.advanceNo);
+                            this.selectedAdvance = advance;
+                        }
+                    }
                 }
             );
     }
@@ -225,14 +232,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 this.shipment.setValue(this.selectedShipment.hblid);
                 this.getMasterCharges(this.serviceTypeId);
 
+                this.advanceNo.reset();
+                this.advs.length = 0;
+                this.getAdvances(this.selectedShipment.jobId);
                 // * FINDING ITEM ADVANCE BELONG TO SELECTED SHIPMENT.
-                if (!this.advanceNo.value) {
-                    const advance: IAdvanceShipment = this.advs.find(i => i.jobId === this.selectedShipment.jobId);
-                    if (!!advance) {
-                        this.advanceNo.setValue(advance.advanceNo);
-                        this.selectedAdvance = advance;
-                    }
-                }
+
 
                 // * check list charge current => Has charge exist after master charge changed.
                 this.charges.forEach((charge: Surcharge) => {
@@ -390,7 +394,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     duplicateCharge(index: number) {
         this.isSubmitted = false;
 
-        const newCharge = this.charges[index];
+        const newCharge = cloneDeep(this.charges[index]);
 
         newCharge.currencyId = this.currencyId;
         newCharge.id = SystemConstants.EMPTY_GUID;
@@ -402,11 +406,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         newCharge.advanceNo = !!this.selectedAdvance ? this.selectedAdvance.advanceNo : null;
         newCharge.clearanceNo = !!this.selectedCD ? this.selectedCD.clearanceNo : null;
         newCharge.settlementCode = this.settlementCode;
-
-        if (!this.charges[index].invoiceDate || !!this.charges[index].invoiceDate && !this.charges[index].invoiceDate.startDate) {
+        if (!newCharge.invoiceDate || !newCharge.invoiceDate.startDate) {
             newCharge.invoiceDate = null;
         }
+
         this.charges.push(new Surcharge(newCharge));
+        // this.charges = [...this.charges, new Surcharge(newCharge)];
     }
 
     deleteCharge(index: number) {
@@ -440,15 +445,18 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             if (typeof date !== 'string') {
                 if (!!date && !!date.startDate) {
                     charge.invoiceDate = new Date(date.startDate);
+                } else {
+                    charge.invoiceDate = null
                 }
             }
         }
+        console.log(listChargesToSave);
+
         if (this.isUpdate) {
             this.onUpdate.emit(listChargesToSave);
         } else {
             this.onChange.emit(listChargesToSave);
         }
-
         this.hide();
     }
 
@@ -518,7 +526,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             case CommonEnum.CHARGE_TYPE.DEBIT:
                 return CommonEnum.SurchargeTypeEnum.SELLING_RATE;
             default:
-                break;
+                return CommonEnum.SurchargeTypeEnum.OBH;
         }
     }
 

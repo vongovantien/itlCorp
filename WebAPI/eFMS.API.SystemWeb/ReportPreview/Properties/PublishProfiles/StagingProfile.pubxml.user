@@ -469,10 +469,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/28/2016 14:22:24</publishTime>
     </File>
     <File Include="bin/ReportPerview.dll">
-      <publishTime>03/10/2020 12:02:48</publishTime>
+      <publishTime>03/16/2020 09:19:15</publishTime>
     </File>
     <File Include="bin/ReportPerview.pdb">
-      <publishTime>03/10/2020 12:02:48</publishTime>
+      <publishTime>03/16/2020 09:19:15</publishTime>
     </File>
     <File Include="bin/Reports/AcsSettlementPaymentRequest.rpt">
       <publishTime>09/24/2019 09:35:32</publishTime>
@@ -741,11 +741,23 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Reports/AirImptAuthorisedLetter_Consign.ttx">
       <publishTime>02/25/2020 08:56:16</publishTime>
     </File>
+    <File Include="Reports/AirImptDocumentRelease.rpt">
+      <publishTime>02/25/2020 08:56:16</publishTime>
+    </File>
     <File Include="Reports/AirShipperDebitNew.ttx">
       <publishTime>02/25/2020 08:56:16</publishTime>
     </File>
     <File Include="Reports/AirShipperDebitNewVND.rpt">
       <publishTime>02/25/2020 08:56:16</publishTime>
+    </File>
+    <File Include="Reports/BookingNote.ttx">
+      <publishTime>03/13/2020 10:24:48</publishTime>
+    </File>
+    <File Include="Reports/BookingNoteAir_SCSC.rpt">
+      <publishTime>03/13/2020 10:24:48</publishTime>
+    </File>
+    <File Include="Reports/BookingNoteAir_TCS.rpt">
+      <publishTime>03/13/2020 10:24:48</publishTime>
     </File>
     <File Include="Reports/FormPLsheet.rpt">
       <publishTime>02/25/2020 08:56:16</publishTime>

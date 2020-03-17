@@ -29,7 +29,7 @@
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (gw === null || gw < 0) }">
                                     <label required>Total Gross Weight (GW) </label>
                                     <input type="number" class="form-control" [(ngModel)]="gw" name="gw" min="0" numeric
-                                        [decimals]="digitDecimal">
+                                        [decimals]="digitDecimal" autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -37,7 +37,7 @@
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (cbm === null || cbm < 0) }">
                                     <label required>Total CBM </label>
                                     <input type="number" class="form-control" [(ngModel)]="cbm" name="cbm" min="0"
-                                        numeric [decimals]="digitDecimal">
+                                        numeric [decimals]="digitDecimal" autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -45,7 +45,7 @@
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (packageQuantity === null || packageQuantity < 0) }">
                                     <label required>Total Package Quantity </label>
                                     <input type="number" class="form-control" [(ngModel)]="packageQuantity" min="0"
-                                        name="packageQuantity" integer>
+                                        name="packageQuantity" integer autoFormatCurrency>
                                 </div>
                             </div>
                         </div>

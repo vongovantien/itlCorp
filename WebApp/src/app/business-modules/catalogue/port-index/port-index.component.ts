@@ -131,6 +131,7 @@ export class PortIndexComponent extends AppList implements OnInit {
 
     showAdd() {
         this.formPopup.portindexForm.reset();
+        this.formPopup.isShowUpdate = true;
         [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [false, false];
         this.formPopup.title = "Add Port Index";
         this.formPopup.code.enable();

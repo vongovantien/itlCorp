@@ -91,7 +91,7 @@
                             </div>
                             <div class="col-md-6 eta-date-picker">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) || (isSubmitted && type === 'import' && !eta.value) || (isSubmitted && !!eta.value && !eta.value.startDate && type === 'import')}">
+                                    [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) || (isSubmitted && type === 'import' && !eta.value) || (isSubmitted && !!eta.value && !eta.value.startDate && type === 'import') || (isSubmitted && formGroup.errors | equalError:'validateEta_Etd')}">
                                     <label>ETA
                                         <span class="text-danger" *ngIf="type === 'import'">(*)</span>
                                     </label>
@@ -110,6 +110,10 @@
                                                 <i class="la la-calendar"></i>
                                             </span>
                                         </span>
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && formGroup.errors | equalError:'validateEta_Etd'">ETA must
+                                        greater than or equal ETD
                                     </div>
                                 </div>
                             </div>
