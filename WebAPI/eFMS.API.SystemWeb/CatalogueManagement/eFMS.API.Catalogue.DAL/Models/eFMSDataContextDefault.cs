@@ -1071,6 +1071,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("Address_VN")
                     .HasMaxLength(4000);
 
+                entity.Property(e => e.ApplyDim)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.BankAccountAddress).HasMaxLength(4000);
 
                 entity.Property(e => e.BankAccountName).HasMaxLength(4000);
@@ -1151,6 +1155,10 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.ProvinceShippingId).HasColumnName("ProvinceShippingID");
 
                 entity.Property(e => e.ReceiveEtaemail).HasColumnName("ReceiveETAEmail");
+
+                entity.Property(e => e.RoundUpMethod)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.RoundedSoamethod)
                     .HasColumnName("RoundedSOAMethod")
@@ -1848,6 +1856,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.IssuranceAmount).HasMaxLength(250);
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.Property(e => e.KgIb).HasMaxLength(250);
 
                 entity.Property(e => e.Mblno1)
                     .HasColumnName("MBLNo1")
@@ -3217,6 +3227,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
+                entity.Property(e => e.Consignee).HasMaxLength(500);
+
                 entity.Property(e => e.ConvertTime).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeCreated)
@@ -3296,6 +3308,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.ServiceType)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Shipper).HasMaxLength(500);
 
                 entity.Property(e => e.Source).HasMaxLength(200);
 
@@ -3385,6 +3399,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
+                entity.Property(e => e.Consignee).HasMaxLength(500);
+
                 entity.Property(e => e.ContainerDescription).HasMaxLength(200);
 
                 entity.Property(e => e.CurrentStatus)
@@ -3466,6 +3482,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.ShipmentMode)
                     .HasMaxLength(20)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Shipper).HasMaxLength(500);
 
                 entity.Property(e => e.SumCbm)
                     .HasColumnName("SumCBM")

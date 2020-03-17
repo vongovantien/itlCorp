@@ -57,6 +57,9 @@ export class Partner {
     internalReferenceNo: string = '';
     coLoaderCode: string = '';
     workPhoneEx: string = '';
+    roundUpMethod: string = '';
+    applyDim: string = '';
+
     saleManRequests: SaleManRequest[] = [];
     saleMans: SaleManRequest[] = [];
 

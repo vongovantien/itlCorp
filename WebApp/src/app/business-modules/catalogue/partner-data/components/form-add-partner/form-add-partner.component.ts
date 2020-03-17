@@ -63,6 +63,20 @@ export class FormAddPartnerComponent extends AppForm {
     note: AbstractControl;
     isPublic: boolean = false;
     coLoaderCode: AbstractControl;
+    roundUp: AbstractControl;
+    applyDim: AbstractControl;
+
+    roundMethods: CommonInterface.INg2Select[] = [
+        { id: 'Standard', text: 'Standard' },
+        { id: 'Round 0.5', text: 'Round 0.5' },
+        { id: 'Round 1.0', text: 'Round 1.0' },
+    ];
+
+    applyDims: CommonInterface.INg2Select[] = [
+        { id: 'Single Dim', text: 'Single Dim' },
+        { id: 'Total Dim', text: 'Total Dim' }
+    ];
+
 
     constructor(
         private _fb: FormBuilder,
@@ -226,7 +240,9 @@ export class FormAddPartnerComponent extends AppForm {
             partnerWorkPlace: [null],
             active: [true],
             note: [null],
-            coLoaderCode: [null]
+            coLoaderCode: [null],
+            applyDim: [null],
+            roundUp: [null]
         });
 
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
@@ -261,6 +277,8 @@ export class FormAddPartnerComponent extends AppForm {
         this.active = this.partnerForm.controls['active'];
         this.coLoaderCode = this.partnerForm.controls['coLoaderCode'];
         this.note = this.partnerForm.controls['note'];
+        this.applyDim = this.partnerForm.controls['applyDim'];
+        this.roundUp = this.partnerForm.controls['roundUp'];
     }
 
     setFormData(partner: Partner) {
@@ -330,7 +348,9 @@ export class FormAddPartnerComponent extends AppForm {
             partnerWorkPlace: workPlaceActive,
             active: partner.active === null ? false : partner.active,
             note: partner.note,
-            coLoaderCode: partner.coLoaderCode
+            coLoaderCode: partner.coLoaderCode,
+            roundUp: [<CommonInterface.INg2Select>{ id: partner.roundUpMethod, text: partner.roundUpMethod }],
+            applyDim: [<CommonInterface.INg2Select>{ id: partner.applyDim, text: partner.applyDim }]
         });
     }
     getPartnerGroupActives(arg0: string[]): any {

@@ -450,6 +450,8 @@ export class PartnerDetailComponent extends AppList {
         this.partner.active = this.formPartnerComponent.active.value;
         this.partner.internalReferenceNo = this.formPartnerComponent.internalReferenceNo.value;
         this.partner.coLoaderCode = this.formPartnerComponent.coLoaderCode.value;
+        this.partner.roundUpMethod = this.formPartnerComponent.roundUp.value[0].id;
+        this.partner.applyDim = this.formPartnerComponent.applyDim.value[0].id;
     }
     trimInputForm(formBody: any) {
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.nameENFull, formBody.nameENFull);
