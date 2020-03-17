@@ -141,6 +141,8 @@ namespace eFMS.API.Operation.DL.Services
                                   ,[SO_CONTAINER]
                                   ,[PLUONG]
 	                              ,DTOKHAIMD_VNACCS2.[MA_HIEU_PTVC]
+                                  ,DV_DT
+                                  ,_Ten_DV_L1
                               FROM " + database + @".[dbo].[DTOKHAIMD]
                                     INNER JOIN " + database + @".[dbo].[DTOKHAIMD_VNACCS2]
                                     ON DTOKHAIMD._DToKhaiMDID = DTOKHAIMD_VNACCS2._DTOKHAIMDID
