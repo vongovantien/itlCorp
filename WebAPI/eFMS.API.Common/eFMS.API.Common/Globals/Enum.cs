@@ -148,6 +148,8 @@
         reportPerformanceReport,
         reportPL,
         reportShipmentOverview,
+        reportGeneral,
+        reportSale,
         setting,
         settingCatalogLogViewer,
         settingEcusConnection,
