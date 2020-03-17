@@ -15,10 +15,8 @@ const routing: Routes = [
             {
                 path: '', component: EcusConnectionComponent
             },
-
         ]
     },
-
 ];
 
 @NgModule({

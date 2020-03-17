@@ -3,7 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { IDDefinitionComponent } from './id-definition/id-definition.component';
 import { KPIComponent } from './kpi/kpi.component';
 import { SupplierComponent } from './supplier/supplier.component';
-import { ExchangeRateComponent } from './exchange-rate/exchange-rate.component';
 import { LogViewerComponent } from './log-viewer/log-viewer.component';
 
 const routes: Routes = [
@@ -15,6 +14,28 @@ const routes: Routes = [
     {
         path: 'ecus-connection', loadChildren: () => import('./ecus-connection/ecus-connection.module').then(m => m.EcusConectionModule),
         data: { name: 'Ecus Connection' }
+    },
+    {
+        path: 'tariff', loadChildren: () => import('./tariff/tariff.module').then(m => m.TariffModule),
+        data: { name: 'Tariff' }
+    },
+    {
+        path: 'exchange-rate', loadChildren: () => import('./exchange-rate/exchange-rate.module').then(m => m.ExchangeRateModule),
+        data: {
+            name: "Exchange Rate",
+        }
+    },
+    {
+        path: 'unlock', loadChildren: () => import('./unlock/unlock.module').then(m => m.UnlockModule),
+        data: { name: 'Unlock' }
+    },
+    {
+        path: 'log-viewer',
+        component: LogViewerComponent,
+        data: {
+            name: "Log Viewer",
+            level: 2
+        }
     },
     {
         path: 'id-definition',
@@ -40,27 +61,6 @@ const routes: Routes = [
             level: 2
         }
     },
-    {
-        path: 'tariff', loadChildren: () => import('./tariff/tariff.module').then(m => m.TariffModule),
-        data: { name: 'Tariff' }
-    },
-    {
-        path: 'exchange-rate',
-        component: ExchangeRateComponent,
-        data: {
-            name: "Exchange Rate",
-            level: 2
-        }
-    },
-    {
-        path: 'log-viewer',
-        component: LogViewerComponent,
-        data: {
-            name: "Log Viewer",
-            level: 2
-        }
-    },
-    { path: 'unlock', loadChildren: () => import('./unlock/unlock.module').then(m => m.UnlockModule), data: { name: 'Unlock' } }
 ];
 
 @NgModule({

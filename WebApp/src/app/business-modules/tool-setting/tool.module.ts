@@ -6,7 +6,6 @@ import { IDDefinitionComponent } from './id-definition/id-definition.component';
 import { KPIComponent } from './kpi/kpi.component';
 import { SupplierComponent } from './supplier/supplier.component';
 import { SharedModule } from '../../shared/shared.module';
-import { ExchangeRateComponent } from './exchange-rate/exchange-rate.component';
 import { SelectModule } from 'ng2-select';
 import { FormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -22,6 +21,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     NgxDaterangepickerMd,
     DragDropModule
   ],
-  declarations: [IDDefinitionComponent, KPIComponent, SupplierComponent, ExchangeRateComponent, LogViewerComponent]
+  declarations: [IDDefinitionComponent, KPIComponent, SupplierComponent, LogViewerComponent]
 })
 export class ToolModule { }
