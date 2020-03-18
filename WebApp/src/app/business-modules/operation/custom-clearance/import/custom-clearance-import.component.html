@@ -12,8 +12,8 @@
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
-                        <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder=""
-                            (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
+                        <input type="file" #fileInput id="inputFile" class="form-control m-input m-input--square"
+                            placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                         <span class="m-form__help">
                             <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
                         </span>
@@ -51,7 +51,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="import()">
+                        (click)="import(fileInput)">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -171,6 +171,16 @@
                                 (click)="sort('exportCountryName')">
                                 <span>Export Country</span>
                             </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'shipper'), 'sorting_desc': (!isDesc && sortKey == 'shipper') }"
+                                (click)="sort('shipper')">
+                                <span>Shipper (consigner)</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'consignee'), 'sorting_desc': (!isDesc && sortKey == 'consignee') }"
+                                (click)="sort('consignee')">
+                                <span>Consignee</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody *ngFor="let item of pagedItems; let i = index">
@@ -241,12 +251,38 @@
                                 <span
                                     [ngClass]="{'m--font-danger' : !item.exportCountryCodeValid}">{{item.exportCountryName}}</span>
                             </td>
+                            <td>
+                                <span>{{item.shipper}}</span>
+                            </td>
+                            <td>
+                                <span>{{item.consignee}}</span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
-                (pagerObject)="setPage($event)"></app-pagination>
+            <div class="pagination-nav">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="select-box" style="max-width: 190px">
+                            <select class="form-control" id="" aria-label="" [(ngModel)]="pager.pageSize"
+                                (change)="selectPageSize()" name="pagesize">
+                                <ng-container *ngFor="let item of pager.numberToShow; index as i; first as isFirst">
+                                    <option [ngValue]="item" [selected]="isFirst">{{item}} entries / page</option>
+                                </ng-container>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6" *ngIf="pager.totalItems > pager.pageSize">
+                        <div class="float-right">
+                            <pagination [boundaryLinks]="true" [totalItems]="pager.totalItems"
+                                [maxSize]="pager.numberPageDisplay" [itemsPerPage]="pager.pageSize"
+                                (pageChanged)="pageChanged($event)" [(ngModel)]="pager.currentPage">
+                            </pagination>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

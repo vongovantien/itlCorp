@@ -184,6 +184,17 @@ export class OperationRepo {
         return this._api.postFile(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/uploadFile`, files, "uploadedFile");
     }
 
+    downloadCustomClearanceExcel() {
+        return this._api.downloadfile(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/DownloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    importCustomClearance(body: any) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/Import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
     getClearanceTypes() {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetClearanceTypes`);
     }

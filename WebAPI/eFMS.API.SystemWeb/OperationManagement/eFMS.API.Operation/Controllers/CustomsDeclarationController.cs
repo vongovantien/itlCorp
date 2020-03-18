@@ -16,6 +16,7 @@ using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -36,6 +37,7 @@ namespace eFMS.API.Operation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICustomsDeclarationService customsDeclarationService;
         private readonly ICurrentUser currentUser;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// constructor
@@ -43,11 +45,12 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICustomsDeclarationService</param>
         /// <param name="distributedCache"></param>
-        public CustomsDeclarationController(IStringLocalizer<LanguageSub> localizer, ICustomsDeclarationService service, IDistributedCache distributedCache, ICurrentUser user)
+        public CustomsDeclarationController(IStringLocalizer<LanguageSub> localizer, ICustomsDeclarationService service, IHostingEnvironment hostingEnvironment, ICurrentUser user)
         {
             stringLocalizer = localizer;
             customsDeclarationService = service;
             currentUser = user;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -287,10 +290,6 @@ namespace eFMS.API.Operation.Controllers
         [AuthorizeEx(Menu.opsCustomClearance, UserPermission.Detail)]
         public IActionResult GetById(int id)
         {
-            //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
-            //var statusCode = customsDeclarationService.CheckDetailPermission(id);
-            //if (statusCode == 403) return Forbid();
-
             var results = customsDeclarationService.GetDetail(id);
             return Ok(results);
         }
@@ -364,8 +363,9 @@ namespace eFMS.API.Operation.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            string templateName = Templates.CustomDeclaration.ExelImportFileName + Templates.ExelImportEx;
-            var result = await new FileHelper().ExportExcel(templateName);
+            string fileName = Templates.CustomDeclaration.ExelImportFileName + Templates.ExelImportEx;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)
             {
                 return result;
@@ -431,7 +431,9 @@ namespace eFMS.API.Operation.Controllers
                         DatetimeModified = DateTime.Now,
                         UserModified = currentUser.UserID,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated = currentUser.UserID
+                        UserCreated = currentUser.UserID,
+                         Shipper = worksheet.Cells[row, 22].Value?.ToString(),
+                         Consignee = worksheet.Cells[row, 23].Value?.ToString()
                     };
                     list.Add(stage);
                 }

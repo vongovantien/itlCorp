@@ -9,7 +9,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Operation.DL.IService.ICustomsDeclarationService,Microsoft.Extensions.Caching.Distributed.IDistributedCache,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Operation.DL.IService.ICustomsDeclarationService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             constructor
             </summary>
