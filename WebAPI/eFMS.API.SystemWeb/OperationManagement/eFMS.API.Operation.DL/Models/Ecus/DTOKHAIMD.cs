@@ -21,5 +21,7 @@ namespace eFMS.API.Operation.DL.Models.Ecus
         public Nullable<decimal> SO_CONTAINER { get; set; }
         public string PLUONG { get; set; }
         public string MA_HIEU_PTVC { get; set; }
+        public string DV_DT { get; set; }
+        public string _Ten_DV_L1 { get; set; }
     }
 }

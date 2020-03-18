@@ -27,7 +27,7 @@ namespace eFMS.API.System.DL.Services
         {
             List<SysUserPermissionGeneralViewModel> results = new List<SysUserPermissionGeneralViewModel>();
             var menus = menuRepository.Get().ToList();
-            var modules = menus.Where(x => x.ParentId == null).OrderBy(x => x.NameEn);
+            var modules = menus.Where(x => string.IsNullOrEmpty(x.ParentId)).OrderBy(x => x.NameEn);
             var permissionDetails = DataContext.Get(x => x.UserPermissionId == id).ToList();
             if (modules == null) return results;
             foreach (var module in modules)
@@ -76,7 +76,10 @@ namespace eFMS.API.System.DL.Services
                     }
                 }
                 item.SysPermissionGenerals = listPerDetails;
-                results.Add(item);
+                if(item.SysPermissionGenerals.Count() > 0)
+                {
+                    results.Add(item);
+                }
             }
             return results;
         }

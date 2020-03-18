@@ -41,6 +41,8 @@ export class CustomClearance {
     gatewayName: string;
     cargoType: string;
     convertTime: Date = null;
+    shipper: string;
+    consignee: string;
 
     permission: PermissionShipment = new PermissionShipment();
 }

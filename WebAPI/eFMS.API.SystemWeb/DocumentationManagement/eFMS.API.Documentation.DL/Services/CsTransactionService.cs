@@ -426,7 +426,7 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- DETAILS --
         private CsTransactionModel GetById(Guid id)
         {
-            var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            var data = DataContext.Get(x => x.Id == id && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).FirstOrDefault();
             if (data == null) return null;
             else
             {

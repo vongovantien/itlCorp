@@ -150,13 +150,13 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
             this.customDeclaration.clearanceDate = formatDate(this.customDeclaration.clearanceDate.startDate, 'yyyy-MM-dd', 'en');
             this._documentation.convertClearanceToJob({ opsTransaction: shipment, customsDeclaration: this.customDeclaration }).subscribe(
                 (response: any) => {
-            if (response.status) {
-                this.isConvertJob = false;
-                this._location.back();
-            } else {
-                this.isConvertJob = true;
+                    if (response.status) {
+                        this.isConvertJob = false;
+                        this._location.back();
+                    } else {
+                        this.isConvertJob = true;
                         this.customDeclaration.clearanceDate = { startDate: new Date(this.customDeclaration.clearanceDate), endDate: new Date(this.customDeclaration.clearanceDate) };
-            }
+                    }
                 });
         }
     }
@@ -197,6 +197,8 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
             shipment.sumGrossWeight = this.customDeclaration.grossWeight;
             shipment.sumNetWeight = this.customDeclaration.netWeight;
             shipment.sumCbm = this.customDeclaration.cbm;
+            shipment.shipper = this.customDeclaration.shipper;
+            shipment.consignee = this.customDeclaration.consignee;
             const claim = localStorage.getItem('id_token_claims_obj');
             const currenctUser = JSON.parse(claim)["id"];
             shipment.billingOpsId = currenctUser;

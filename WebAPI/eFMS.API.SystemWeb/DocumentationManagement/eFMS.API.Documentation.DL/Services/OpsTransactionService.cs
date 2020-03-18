@@ -154,7 +154,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         private OpsTransactionModel GetBy(Guid id)
         {
-            var details = Get(x => x.Id == id).FirstOrDefault();
+            var details = Get(x => x.Id == id && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).FirstOrDefault();
 
             if (details != null)
             {

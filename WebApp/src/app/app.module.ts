@@ -1,5 +1,5 @@
 
-import { NgModule } from "@angular/core";
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
@@ -114,7 +114,7 @@ const authConfig: AuthConfig = {
             useClass: CustomRouteReuseStrategy
         }
     ],
-
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
     bootstrap: [AppComponent],
     exports: []
 })
