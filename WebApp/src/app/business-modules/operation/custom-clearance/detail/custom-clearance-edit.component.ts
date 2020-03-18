@@ -219,6 +219,9 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
             shipment.sumGrossWeight = this.customDeclaration.grossWeight;
             shipment.sumNetWeight = this.customDeclaration.netWeight;
             shipment.sumCbm = this.customDeclaration.cbm;
+
+            shipment.shipper = this.customDeclaration.shipper;
+            shipment.consignee = this.customDeclaration.consignee;
             const claim = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
             const currenctUser = claim["id"];
             shipment.billingOpsId = currenctUser;

@@ -14,7 +14,7 @@ import { SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
 import { DataService } from 'src/app/shared/services';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
-import { CsTransactionDetail, Container } from 'src/app/shared/models';
+import { CsTransactionDetail, Container, Customer } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
 import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
@@ -398,6 +398,15 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CUSTOMER)
             .subscribe((res: any) => {
                 this.customers = res;
+                if (this.opsTransaction.salemanId === null) {
+
+                    // Get default using opstransation's customer.
+                    const customer: Customer = this.customers.find(x => x.id === this.opsTransaction.customerId);
+                    console.log(customer);
+                    if (!!customer) {
+                        this.opsTransaction.salemanId = customer.salePersonId;
+                    }
+                }
                 this._data.setDataService(SystemConstants.CSTORAGE.CUSTOMER, this.customers);
             });
     }

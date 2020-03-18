@@ -33,6 +33,7 @@ namespace eFMS.API.Operation.Service.Models
         public DateTime? Eta { get; set; }
         public Guid? Pol { get; set; }
         public Guid? Pod { get; set; }
+        public Guid? WarehouseId { get; set; }
         public Guid? FinalPod { get; set; }
         public string DeliveryPlace { get; set; }
         public string FinalDestinationPlace { get; set; }
@@ -141,5 +142,7 @@ namespace eFMS.API.Operation.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+
+        public virtual CsTransaction Job { get; set; }
     }
 }

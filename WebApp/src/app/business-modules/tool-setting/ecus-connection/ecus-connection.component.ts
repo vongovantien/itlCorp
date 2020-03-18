@@ -1,215 +1,190 @@
-import { Component, OnInit } from '@angular/core';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
-import { EcusConnection } from 'src/app/shared/models/tool-setting/ecus-connection';
-import { prepareNg2SelectData } from 'src/helper/data.helper';
-import { NgForm } from '@angular/forms';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { SortService } from 'src/app/shared/services/sort.service';
-declare var $: any;
+import { Component, OnInit, ViewChild } from '@angular/core';
+
+import { AppList } from 'src/app/app.list';
+import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
+import { OperationRepo } from '@repositories';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
+import { SortService } from '@services';
+import { CommonEnum } from '@enums';
+import { EcusConnection } from '@models';
+
+import { EcusConnectionFormPopupComponent } from './form-ecus/form-ecus.component';
+
+import merge from 'lodash/merge';
+import { finalize } from 'rxjs/operators';
+
 @Component({
     selector: 'app-ecus-connection',
     templateUrl: './ecus-connection.component.html',
 })
-export class EcusConnectionComponent implements OnInit {
+export class EcusConnectionComponent extends AppList implements OnInit {
 
-    criteria: EcusConnection = new EcusConnection();
-    pager: PagerSetting = PAGINGSETTING;
-    EcusConnectionAdd: EcusConnection = new EcusConnection();
+    @ViewChild(EcusConnectionFormPopupComponent, { static: false }) formEcus: EcusConnectionFormPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+
     EcusConnections: EcusConnection[] = [];
-    EcusConnectionEdit: EcusConnection = new EcusConnection()
-    Users: any[] = [];
-    SearchFields = [
-        // {fieldName:"",displayName:"All"},
+
+    SearchFields: CommonInterface.ISearchOption[] = [
         { fieldName: 'name', displayName: 'Name' },
         { fieldName: 'username', displayName: 'User Name' },
         { fieldName: 'serverName', displayName: 'Server Name' },
         { fieldName: 'dbname', displayName: 'Database Name' }
-    ]
-    configSearch: any = {
+    ];
+
+    configSearch: CommonInterface.IConfigSearchOption = {
         settingFields: this.SearchFields,
-        typeSearch: TypeSearch.outtab
+        typeSearch: CommonEnum.TypeSearch.outtab
     };
 
-    constructor(private baseService: BaseService, private api_menu: API_MENU,
-        private sortService: SortService) { }
+    indexConnectToDelete: number = -1;
+
+    constructor(
+        private _toastService: ToastrService,
+        private _ngProgessService: NgProgress,
+        private _operationRepo: OperationRepo,
+        private sortService: SortService) {
+        super();
+
+        this.requestSort = this.sortEcus;
+        this.requestList = this.getEcusConnections;
+        this._progressRef = this._ngProgessService.ref();
+    }
 
     ngOnInit() {
-        this.initNewPager();
-        this.getListUsers();
-        this.getEcusConnections(this.pager);
-    }
+        this.headers = [
+            { title: 'Name', field: 'name', sortable: true },
+            { title: 'User Name', field: 'username', sortable: true },
+            { title: 'Full Name', field: 'fullname', sortable: true },
+            { title: 'Server Name', field: 'serverName', sortable: true },
+            { title: 'DB Name', field: 'dbName', sortable: true },
+            { title: 'Status', field: 'inactive', sortable: true },
+            { title: 'Modified Date', field: 'datetimeModified', sortable: true },
+        ];
 
-    initNewPager() {
-        this.pager.totalItems = 0;
-        this.pager.currentPage = 1;
-    }
-
-    getListUsers() {
-        this.baseService.get(this.api_menu.System.User_Management.getAll).subscribe((data: any) => {
-            this.Users = prepareNg2SelectData(data, 'id', 'username');
-        });
+        this.getEcusConnections({});
     }
 
     onSearch(event: { field: string; searchString: any; }) {
-        this.criteria = new EcusConnection();
-        this.criteria[event.field] = event.searchString;
-        this.initNewPager();
-        this.getEcusConnections(this.pager);
+        this.dataSearch = {};
+        this.dataSearch[event.field] = event.searchString;
+        this.page = 1;
+        this.getEcusConnections(this.dataSearch);
     }
 
-    resetSearch(event: { field: string; searchString: any; }) {
-        this.criteria = new EcusConnection();
-        this.initNewPager();
-        this.getEcusConnections(this.pager);
+    resetSearch() {
+        this.dataSearch = {};
+        this.page = 1;
+        this.getEcusConnections(this.dataSearch);
     }
 
-    getEcusConnections(pager: PagerSetting) {
-
-        this.baseService.spinnerShow();
-        this.baseService.post(this.api_menu.Operation.EcusConnection.paging
-            + '?pageNumber=' + pager.currentPage + '&pageSize=' + pager.pageSize, this.criteria).subscribe((res: any) => {
-                if (res != null) {
-                    this.pager.totalItems = res.totalItems;
-                    this.EcusConnections = this.sortService.sort(res.data, 'name', this.isDesc);
-                    console.log(this.EcusConnections);
-                }
-                else {
-                    this.EcusConnections = [];
-                    this.pager.totalItems = 0;
-                }
-                this.baseService.spinnerHide();
-            });
-        this.baseService.spinnerHide();
-
+    showFormAdd() {
+        this.formEcus.title = 'Add new Ecus Connection';
+        this.formEcus.formGroup.reset();
+        this.formEcus.userCreatedName = null;
+        this.formEcus.userModifiedName = null;
+        this.formEcus.datetimeCreated = null;
+        this.formEcus.datetimeModified = null;
+        this.formEcus.isShowUpdate = false;
+        this.formEcus.isAllowUpdate = true;
+        this.formEcus.show();
     }
 
-    async getEcusConnectionDetails(id: number) {
-        this.EcusConnectionEdit = await this.baseService.getAsync(this.api_menu.Operation.EcusConnection.details
-            + '?id=' + id, true, false);
-    }
-
-    setPage(pager: PagerSetting) {
-        this.pager.currentPage = pager.currentPage;
-        this.pager.totalPages = pager.totalPages;
-        this.pager.pageSize = pager.pageSize;
-        this.getEcusConnections(this.pager);
-    }
-
-    SubmitNewConnect(form: NgForm) {
-
-        setTimeout(async () => {
-            if (form.submitted) {
-                const error = $('#add-connection-modal').find('div.has-danger');
-                if (error.length === 0) {
-                    const res = await this.baseService.postAsync(this.api_menu.Operation.EcusConnection.addNew, this.EcusConnectionAdd);
-                    if (res.status) {
-                        this.resetDisplay();
-                        form.onReset();
-                        $('#add-connection-modal').modal('hide');
-                        this.initNewPager();
-                        this.getEcusConnections(this.pager);
+    getEcusConnections(dataSearch: any) {
+        this._progressRef.start();
+        this.isLoading = true;
+        this._operationRepo.getListEcus(this.page, this.pageSize, dataSearch)
+            .pipe(
+                finalize(() => { this._progressRef.complete(); this.isLoading = false; })
+            ).subscribe(
+                (res: CommonInterface.IResponsePaging) => {
+                    if (!!res) {
+                        this.totalItems = res.totalItems;
+                        this.EcusConnections = res.data || [];
+                        console.log(this.EcusConnections);
                     }
                 }
-            }
-        }, 300);
-
+            );
     }
-    SubmitEditConnect(form: NgForm) {
 
-        setTimeout(async () => {
-            if (form.submitted) {
-                var error = $('#edit-connection-modal').find('div.has-danger');
-                if (error.length === 0) {
-                    var res = await this.baseService.putAsync(this.api_menu.Operation.EcusConnection.update, this.EcusConnectionEdit);
-                    if (res.status) {
-                        this.resetDisplay();
-                        form.onReset();
-                        $('#edit-connection-modal').modal('hide');
-                        this.initNewPager();
-                        this.getEcusConnections(this.pager);
+    getEcusConnectionDetails(id: number) {
+        this._progressRef.start();
+        this._operationRepo.checkDetailPermissionEcus(id)
+            .pipe(
+                finalize(() => { this._progressRef.complete(); this.confirmDeletePopup.hide(); })
+            )
+            .subscribe(
+                (response: boolean) => {
+                    if (!response) {
+                        this.permissionPopup.show();
+                    } else {
+                        this._operationRepo.getDetailEcus(id)
+                            .pipe()
+                            .subscribe(
+                                (res: EcusConnection) => {
+                                    if (!!res) {
+                                        const formObject = {
+                                            userId: [this.formEcus.Users.find(i => i.id === res.userId)]
+                                        };
+
+                                        this.formEcus.formGroup.patchValue(merge(res, formObject));
+                                        this.formEcus.title = 'Detail/Edit Connection';
+
+                                        this.formEcus.datetimeCreated = res.datetimeCreated;
+                                        this.formEcus.userCreatedName = res.userCreatedName;
+                                        this.formEcus.datetimeModified = res.datetimeModified;
+                                        this.formEcus.userModifiedName = res.userModifiedName;
+                                        this.formEcus.userCreated = res.userCreated;
+                                        this.formEcus.isShowUpdate = true;
+
+                                        this.formEcus.isAllowUpdate = res.permission.allowUpdate;
+                                        this.formEcus.show();
+                                    }
+                                }
+                            );
                     }
                 }
-            }
-        }, 300);
+            );
     }
 
-    indexConnectToDelete: number = -1
-    async deleteConfirm(confirm: boolean = false) {
-        const id = this.EcusConnections[this.indexConnectToDelete].id;
-        if (confirm === true) {
-            await this.baseService.deleteAsync(this.api_menu.Operation.EcusConnection.delete + '?id=' + id);
-            this.indexConnectToDelete = -1;
-            this.initNewPager();
-            this.getEcusConnections(this.pager);
-            $('#confirm-delete-connection-modal').modal('hide');
-        }
+    sortEcus() {
+        this.EcusConnections = this.sortService.sort(this.EcusConnections, this.sort, this.order);
     }
 
-    isDisplay: boolean = true;
-    resetDisplay() {
-        this.isDisplay = false;
-        setTimeout(() => {
-            this.isDisplay = true;
-        }, 300);
+    deleteEcus(ecus: EcusConnection) {
+        this._progressRef.start();
+        this._operationRepo.checkDeletePermissionEcus(ecus.id)
+            .pipe(
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: boolean) => {
+                    if (!res) {
+                        this.permissionPopup.show();
+                    } else {
+                        this.indexConnectToDelete = ecus.id;
+                        this.confirmDeletePopup.show();
+                    }
+                }
+            );
     }
 
-    isDesc = true;
-    sortKey: string = "name";
-    sort(property) {
-        this.isDesc = !this.isDesc;
-        this.sortKey = property;
-        this.EcusConnections = this.sortService.sort(this.EcusConnections, property, this.isDesc);
-    }
-
-
-    /**
-   * ng2-select
-   */
-    public items: Array<string> = ['Option 1', 'Option 2', 'Option 3', 'Option 4',
-        'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10',];
-
-    private value: any = {};
-    private _disabledV: string = '0';
-    public disabled: boolean = false;
-
-    private get disabledV(): string {
-        return this._disabledV;
-    }
-
-    private set disabledV(value: string) {
-        this._disabledV = value;
-        this.disabled = this._disabledV === '1';
-    }
-
-    public selected(value: any): void {
-        console.log('Selected value is: ', value);
-    }
-
-    public removed(value: any): void {
-        console.log('Removed value is: ', value);
-    }
-
-    public typed(value: any): void {
-        console.log('New search input: ', value);
-    }
-
-    public refreshValue(value: any): void {
-        this.value = value;
-    }
-
-
-    public closeModal(form: NgForm) {
-        form.onReset();
-        this.resetDisplay();
-
-        $('#add-connection-modal').modal('hide');
-        this.EcusConnectionAdd = new EcusConnection();
-
-        $('#edit-connection-modal').modal('hide');
-
+    onDeleteEcus() {
+        this._progressRef.start();
+        this._operationRepo.deleteEcus(this.indexConnectToDelete)
+            .pipe(
+                finalize(() => { this._progressRef.complete(); this.confirmDeletePopup.hide(); })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.resetSearch();
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                });
     }
 
 }

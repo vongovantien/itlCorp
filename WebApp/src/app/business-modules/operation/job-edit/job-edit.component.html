@@ -1,53 +1,66 @@
-<app-sub-header>
-    <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
-        <button type="button" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="lockShipment()">
-            <span>
-                <i class="la la-lock"></i>
-                <span>
-                    Lock
-                </span>
-            </span>
-        </button>
-    </div>
-    <span *ngIf="!!opsTransaction && !!opsTransaction.isLocked" class="m--margin-right-10">
-        <i class="fa fa-lock text-danger fa-3x"></i>
-    </span>
-    <div class="c-button-actions">
-        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="onOpePLPrint()">
-            <span>
-                <i class="la la-print"></i>
-                <span>
-                    P/L Sheet
-                </span>
-            </span>
-        </button>
-    </div>
-    <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
-        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="checkDelete()"
-            *ngIf="opsTransaction.permission.allowDelete" title="Shipment was deleted">
-            <span>
-                <i class="la la-trash"></i>
-                <span>
-                    delete
-                </span>
-            </span>
-        </button>
-    </div>
-    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=confirmCancelJob()></app-default-button>
+<form novalidate #addOpsForm="ngForm" name="addOpsForm" (ngSubmit)="saveShipment(addOpsForm)">
 
-</app-sub-header>
+    <app-sub-header>
+        <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
+            <button type="button" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                (click)="lockShipment()">
+                <span>
+                    <i class="la la-lock"></i>
+                    <span>
+                        Lock
+                    </span>
+                </span>
+            </button>
+        </div>
+        <span *ngIf="!!opsTransaction && !!opsTransaction.isLocked" class="m--margin-right-10">
+            <i class="fa fa-lock text-danger fa-3x"></i>
+        </span>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                (click)="onOpePLPrint()">
+                <span>
+                    <i class="la la-print"></i>
+                    <span>
+                        P/L Sheet
+                    </span>
+                </span>
+            </button>
+        </div>
+        <div class="c-button-actions">
+            <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate">
+                <span>
+                    <i class="la la la-save"></i>
+                    <span>
+                        save detail
+                    </span>
+                </span>
+            </button>
+        </div>
+        <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete" title="Shipment was deleted">
+                <span>
+                    <i class="la la-trash"></i>
+                    <span>
+                        delete
+                    </span>
+                </span>
+            </button>
+        </div>
+        <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=confirmCancelJob()></app-default-button>
 
-<div class="m-content" *ngIf="opsTransaction">
-    <div class="m-portlet__body">
-        <div class="row">
-            <div class="col-12">
-                <tabset type="tabs" class="custom-class-tab">
-                    <tab heading="Job detail" (selectTab)="selectTab($event,'job-edit')">
-                        <div *ngIf="tab === 'job-edit'">
-                            <form novalidate #addOpsForm="ngForm" name="addOpsForm"
-                                (ngSubmit)="saveShipment(addOpsForm)">
+    </app-sub-header>
+
+    <div class="m-content" *ngIf="opsTransaction">
+        <div class="m-portlet__body">
+            <div class="row">
+                <div class="col-12">
+                    <tabset type="tabs" class="custom-class-tab">
+                        <tab heading="Job detail" (selectTab)="selectTab($event,'job-edit')">
+                            <div *ngIf="tab === 'job-edit'">
+                                <!-- <form novalidate #addOpsForm="ngForm" name="addOpsForm"
+                                    (ngSubmit)="saveShipment(addOpsForm)"> -->
                                 <div class="m-form m-form--state">
                                     <div class="m-portlet">
                                         <div class="alert-block__heading">
@@ -55,7 +68,7 @@
                                         </div>
                                         <div class="m-portlet__body" id="edit-ops-job-form">
                                             <div class="form-actions m--align-right" *ngIf="!opsTransaction.isLocked">
-                                                <button type="submit"
+                                                <!-- <button type="submit"
                                                     class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                                                     *ngIf="opsTransaction.permission.allowUpdate">
                                                     <span>
@@ -64,17 +77,17 @@
                                                             save detail
                                                         </span>
                                                     </span>
-                                                </button>
+                                                </button> -->
                                                 <!-- <button type="button"
-                                                class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                                                (click)="confirmCancelJob()">
-                                                <span>
-                                                    <i class="la la-ban"></i>
+                                                    class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                                                    (click)="confirmCancelJob()">
                                                     <span>
-                                                        cancel
+                                                        <i class="la la-ban"></i>
+                                                        <span>
+                                                            cancel
+                                                        </span>
                                                     </span>
-                                                </span>
-                                            </button> -->
+                                                </button> -->
                                             </div>
 
                                             <div class="div-inside bg-secondary m--margin-bottom-15">
@@ -388,7 +401,7 @@
                                                                 [currentActiveItemId]="{field:'id',value:opsTransaction.salemanId}"
                                                                 (itemSelected)="opsTransaction.salemanId = $event.id"
                                                                 [selectedDisplayFields]="['employeeNameEn']"
-                                                                [dataSources]="salemans"
+                                                                [dataSources]="salemans" size="15"
                                                                 [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
                                                             </app-combo-grid-virtual-scroll>
                                                         </div>
@@ -439,6 +452,34 @@
                                                                 [dataSources]="ports"
                                                                 [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
                                                             </app-combo-grid-virtual-scroll>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Shipper
+                                                            </label>
+                                                            <input type="text"
+                                                                class="form-control m-input m-input--square"
+                                                                autocomplete="nope" min="0"
+                                                                [(ngModel)]="opsTransaction.shipper" name="shipper"
+                                                                (change)="opsTransaction.shipper=opsTransaction.shipper.trim()"
+                                                                #shipper="ngModel" placeholder="Enter text">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="">
+                                                                Consignee
+                                                            </label>
+                                                            <input type="text"
+                                                                class="form-control m-input m-input--square"
+                                                                autocomplete="nope" min="0"
+                                                                [(ngModel)]="opsTransaction.consignee" name="consignee"
+                                                                (change)="opsTransaction.consignee=opsTransaction.consignee.trim()"
+                                                                #consignee="ngModel" placeholder="Enter text">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -619,53 +660,55 @@
                                         </div>
                                     </div>
                                 </div>
-                            </form>
-                            <div class="m-portlet">
-                                <div class="m-portlet__body">
-                                    <tabset class="custom-class-tab">
-                                        <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
-                                            <ng-container
-                                                *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                                <buying-charge [showGetCharge]="false"></buying-charge>
-                                            </ng-container>
-                                        </tab>
-                                        <tab heading="Selling" (selectTab)="getSurCharges('SELL')">
-                                            <ng-container
-                                                *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                                <selling-charge [showSyncFreight]="false" [showGetCharge]="false">
-                                                </selling-charge>
-                                            </ng-container>
-                                        </tab>
-                                        <tab heading="OBH" (selectTab)="getSurCharges('OBH')">
-                                            <ng-container
-                                                *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                                <obh-charge></obh-charge>
-                                            </ng-container>
-                                        </tab>
-                                    </tabset>
+                                <!-- </form> -->
+                                <div class="m-portlet">
+                                    <div class="m-portlet__body">
+                                        <tabset class="custom-class-tab">
+                                            <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
+                                                <ng-container
+                                                    *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
+                                                    <buying-charge [showGetCharge]="false"></buying-charge>
+                                                </ng-container>
+                                            </tab>
+                                            <tab heading="Selling" (selectTab)="getSurCharges('SELL')">
+                                                <ng-container
+                                                    *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
+                                                    <selling-charge [showSyncFreight]="false" [showGetCharge]="false">
+                                                    </selling-charge>
+                                                </ng-container>
+                                            </tab>
+                                            <tab heading="OBH" (selectTab)="getSurCharges('OBH')">
+                                                <ng-container
+                                                    *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
+                                                    <obh-charge></obh-charge>
+                                                </ng-container>
+                                            </tab>
+                                        </tabset>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <hbl-profit-summary></hbl-profit-summary>
-                        </div>
-                    </tab>
-                    <tab heading="Custom declaration" (selectTab)="selectTab($event,'custom-declaration')">
-                        <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
-                        </ng-container>
-                    </tab>
-                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
-                        <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
-                        </ng-container>
-                    </tab>
-                    <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab($event, 'stage')">
-                        <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
-                    </tab>
-                </tabset>
+                                <hbl-profit-summary></hbl-profit-summary>
+                            </div>
+                        </tab>
+                        <tab heading="Custom declaration" (selectTab)="selectTab($event,'custom-declaration')">
+                            <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
+                            </ng-container>
+                        </tab>
+                        <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
+                            <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
+                            </ng-container>
+                        </tab>
+                        <tab heading="Stage management" [active]="tab === 'stage'"
+                            (selectTab)="selectTab($event, 'stage')">
+                            <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
+                        </tab>
+                    </tabset>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
+</form>
 <!-- <app-container-list [jobId]="jobId" [lstMasterContainers]='lstMasterContainers'
     (outputContainers)="saveContainers($event)" *ngIf="jobId && lstMasterContainers"></app-container-list> -->
 

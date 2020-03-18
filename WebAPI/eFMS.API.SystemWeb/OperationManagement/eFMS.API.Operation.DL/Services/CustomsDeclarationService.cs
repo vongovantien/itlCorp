@@ -110,10 +110,7 @@ namespace eFMS.API.Operation.DL.Services
             {
                 if (lists.Count > 0)
                 {
-                    foreach (var item in lists)
-                    {
-                        DataContext.Add(item, false);
-                    }
+                    DataContext.Add(lists);
                     DataContext.SubmitChanges();
                     result = new HandleState(true, lists.Count + stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS]);
                     ClearCache();
@@ -168,7 +165,9 @@ namespace eFMS.API.Operation.DL.Services
                 ServiceType = serviceType,
                 UserCreated = currentUser.UserID,
                 DatetimeCreated = DateTime.Now,
-                DatetimeModified = DateTime.Now
+                DatetimeModified = DateTime.Now,
+                Shipper = clearance.DV_DT,
+                Consignee = clearance._Ten_DV_L1
             };
             return newItem;
         }

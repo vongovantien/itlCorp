@@ -225,7 +225,7 @@ namespace eFMS.API.Operation.Controllers
             if (code == 403) return Forbid();
             var hs = customsDeclarationService.ImportClearancesFromEcus();
             var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
             if (!hs.Success)
             {
                 return BadRequest(result);

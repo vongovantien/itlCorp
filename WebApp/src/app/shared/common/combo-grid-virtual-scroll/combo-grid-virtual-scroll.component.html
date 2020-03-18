@@ -52,7 +52,7 @@
                                     data-id="{{(i+1)}}" (click)="emitSelected(item,i)"
                                     [class.data-selected]="indexSelected !== -1 && i === indexSelected">
                                     <td *ngFor="let display of DisplayFields; trackBy: trackByFn">
-                                        {{item[display.field] || 'Loading...'}}
+                                        {{item[display.field]}}
                                     </td>
                                 </tr>
                             </ng-container>

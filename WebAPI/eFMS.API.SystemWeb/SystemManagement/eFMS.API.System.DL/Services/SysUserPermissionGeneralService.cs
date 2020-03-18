@@ -76,7 +76,10 @@ namespace eFMS.API.System.DL.Services
                     }
                 }
                 item.SysPermissionGenerals = listPerDetails;
-                results.Add(item);
+                if(item.SysPermissionGenerals.Count() > 0)
+                {
+                    results.Add(item);
+                }
             }
             return results;
         }
