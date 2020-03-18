@@ -40,6 +40,8 @@ export * from './document/airway-bill';
 
 export * from './tool-setting/tariff';
 export * from './tool-setting/ecus-connection';
+export * from './tool-setting/exchange-rate';
+export { ExchangeRateHistory } from './tool-setting/exchange-rate';
 
 export * from './system/user';
 export * from './system/company';

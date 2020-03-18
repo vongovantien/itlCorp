@@ -878,4 +878,50 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    getListExchangeRate(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrencyExchange/GetExchangeRateHistory/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getExchangeRate(date: string, localCurrency: string = 'VND', fromCurrency: string = '') {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrencyExchange/GetExchangeRatesBy`, {
+            date: date,
+            localCurrency: localCurrency,
+            fromCurrency: fromCurrency
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getExchangeRateCurrency() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrencyExchange/GetCurrencies`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getNewestExchangeRate(currencyToId: string = 'VND') {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrencyExchange/GetNewest`, { currencyToId: currencyToId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateExchangeRate(body: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrencyExchange/UpdateRate`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    removeCurrencyExchangeRate(currency: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCurrencyExchange/RemoveExchangeCurrency`, { currencyFrom: currency }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+
 }

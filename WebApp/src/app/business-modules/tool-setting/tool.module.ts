@@ -10,7 +10,6 @@ import { SelectModule } from 'ng2-select';
 import { FormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { LogViewerComponent } from './log-viewer/log-viewer.component';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 @NgModule({
   imports: [
     CommonModule,
@@ -19,7 +18,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     SelectModule,
     FormsModule,
     NgxDaterangepickerMd,
-    DragDropModule
   ],
   declarations: [IDDefinitionComponent, KPIComponent, SupplierComponent, LogViewerComponent]
 })

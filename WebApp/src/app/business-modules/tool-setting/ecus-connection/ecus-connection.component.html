@@ -101,7 +101,7 @@
     </div>
 </div>
 
-<form-ecus-popup #formEcus (onUpdate)="resetSearch()"></form-ecus-popup>
+<form-ecus-popup #formEcus (onUpdate)="resetSearch($event)"></form-ecus-popup>
 
 <confirm-popup body="Do you want to delete?" (onSubmit)="onDeleteEcus()"></confirm-popup>
 

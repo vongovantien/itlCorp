@@ -1,7 +1,6 @@
 export * from './breadcrumb/breadcrumb.component';
 export * from './combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
 export * from './default-button/default-button.component';
-export * from './delete-confirm-modal/delete-confirm-modal.component';
 export * from './input-table-layout/input-table-layout.component';
 export * from './pagination/pagination.component';
 export * from './report-preview/report-preview.component';

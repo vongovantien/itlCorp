@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SubHeaderComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, TableDetailComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent, AppPermissionButtonComponent, ExportCrystalComponent } from '.';
+import { SubHeaderComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, SearchOptionsComponent, TableDetailComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent, AppPermissionButtonComponent, ExportCrystalComponent } from '.';
 import { ModalModule, CollapseModule, TooltipModule, PaginationModule, BsDropdownModule } from 'ngx-bootstrap';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from './popup';
 import { SelectModule } from 'ng2-select';
@@ -18,7 +18,6 @@ const COMPONENTS = [
     BreadcrumbComponent,
     DefaultButtonComponent,
     AppPaginationComponent,
-    DeleteConfirmModalComponent,
     SearchOptionsComponent,
     TableDetailComponent,
     ReportPreviewComponent,
