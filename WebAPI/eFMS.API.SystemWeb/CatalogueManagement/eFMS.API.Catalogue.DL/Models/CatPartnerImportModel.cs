@@ -34,5 +34,14 @@ namespace eFMS.API.Catalogue.DL.Models
         public string CountryShippingError { get; set; }
         public string SaleManNameError { get; set; }
         public string ProfileError { get; set; }
+        public string ServiceSalemanDefault { get; set; }
+        public string ServiceId { get; set; }
+        public string ServiceSalemanDefaultError { get; set; }
+        public string OfficeSalemanDefault { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
+        public string OfficeSalemanDefaultError { get; set; }
+        public string PaymentTerm { get; set; }
+        public string EffectDate { get; set; }
     }
 }

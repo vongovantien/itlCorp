@@ -216,6 +216,26 @@
                                 (click)="sort('note')">
                                 <span>Note</span>
                             </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
+                                (click)="sort('note')">
+                                <span>Service - Salesman Default</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
+                                (click)="sort('note')">
+                                <span>Office - Salesman Default</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
+                                (click)="sort('note')">
+                                <span>Payment Term - Salesman Default</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
+                                (click)="sort('note')">
+                                <span>Effect Date -Salesman Default</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody *ngIf="data">
@@ -334,6 +354,24 @@
                                 </td>
                                 <td>
                                     <span>{{ item.note }}</span>
+                                </td>
+                                <td>
+                                    <span
+                                        *ngIf="item.serviceSalemanDefaultError === null">{{ item.serviceSalemanDefault }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.serviceSalemanDefaultError !== null">{{ item.serviceSalemanDefaultError }}</span>
+                                </td>
+                                <td>
+                                    <span
+                                        *ngIf="item.officeSalemanDefaultError === null">{{ item.officeSalemanDefault }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.officeSalemanDefaultError !== null">{{ item.officeSalemanDefaultError }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.paymentTerm }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.effectDate }}</span>
                                 </td>
                             </tr>
                         </ng-container>
