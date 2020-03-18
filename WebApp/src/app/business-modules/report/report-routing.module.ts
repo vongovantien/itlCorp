@@ -21,14 +21,6 @@ const routes: Routes = [
     path: 'shipment-overview',
     component: ShipmentOverviewComponent
   },
-  {
-    path: 'general-report', loadChildren: () => import('./general-report/general-report.module').then(m => m.GeneralReportModule),
-    data: { name: 'General Report' }
-  },
-  {
-    path: 'sale-report', loadChildren: () => import('./sale-report/sale-report.module').then(m => m.SaleReportModule),
-    data: { name: 'Sale Report' }
-  },
 ];
 
 @NgModule({
