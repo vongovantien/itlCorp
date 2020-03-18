@@ -606,14 +606,14 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     }
 
     onSeaAirChange() {
-        this.formCreate.controls['seaAir'].valueChanges
+        this.formMAWB.controls['seaAir'].valueChanges
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    if (!this.formCreate.controls['min'].value) {
-                        this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
+                    if (!this.formMAWB.controls['min'].value) {
+                        this.formMAWB.controls['total'].setValue(this.formMAWB.controls['rateCharge'].value * this.formMAWB.controls['chargeWeight'].value - value);
                     } else {
-                        this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
+                        this.formMAWB.controls['total'].setValue(this.formMAWB.controls['rateCharge'].value - this.formMAWB.controls['seaAir'].value);
                     }
                 }
             );
