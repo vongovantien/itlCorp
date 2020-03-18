@@ -468,7 +468,8 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Sea-Air</label>
-                                <input type="number" class="form-control" formControlName="seaAir">
+                                <input type="number" class="form-control" formControlName="seaAir"
+                                    [decimals]="digitDecimal" numeric autoFormatCurrency>
                             </div>
                         </div>
                     </div>
