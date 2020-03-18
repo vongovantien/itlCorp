@@ -41,5 +41,17 @@ export class SettingRepo {
             map((data: any) => data)
         );
     }
+
+    checkPermissionAllowDetail(id: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/Tariff/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkPermissionAllowDelete(id: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/Tariff/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 

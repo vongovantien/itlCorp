@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Setting.DL.Models
 {
-    public class TariffViewModel
+    public class TariffViewModel:  TariffModel
     {
         public Guid Id { get; set; }
         public string TariffName { get; set; }
@@ -15,7 +15,8 @@ namespace eFMS.API.Setting.DL.Models
         public string ServiceMode { get; set; }
         public DateTime? EffectiveDate { get; set; }
         public DateTime? ExpiredDate { get; set; }
-        public DateTime? DatetimeCreated { get; set; }
+        public string UserCreated { get; set; }
+        public string DatetimeCreated { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Status { get; set; }
 

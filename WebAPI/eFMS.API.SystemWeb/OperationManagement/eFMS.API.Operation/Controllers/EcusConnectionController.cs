@@ -142,8 +142,19 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("Delete")]
+        [Authorize]
         public IActionResult Delete(int id)
         {
+            PermissionRange permissionRange;
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingEcusConnection);
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            bool isAllowDelete = ecusConnectionService.CheckAllowPermissionAction(id, permissionRange);
+            if (isAllowDelete == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = ecusConnectionService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);

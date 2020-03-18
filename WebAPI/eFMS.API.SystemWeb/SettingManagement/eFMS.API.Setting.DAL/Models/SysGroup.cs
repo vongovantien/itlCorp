@@ -8,7 +8,6 @@ namespace eFMS.API.Setting.Service.Models
         public SysGroup()
         {
             SysGroupRole = new HashSet<SysGroupRole>();
-            SysUserGroup = new HashSet<SysUserGroup>();
         }
 
         public short Id { get; set; }
@@ -19,6 +18,7 @@ namespace eFMS.API.Setting.Service.Models
         public short ParentId { get; set; }
         public string ManagerId { get; set; }
         public string ShortName { get; set; }
+        public bool? IsSpecial { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
@@ -28,6 +28,5 @@ namespace eFMS.API.Setting.Service.Models
 
         public virtual CatDepartment Department { get; set; }
         public virtual ICollection<SysGroupRole> SysGroupRole { get; set; }
-        public virtual ICollection<SysUserGroup> SysUserGroup { get; set; }
     }
 }

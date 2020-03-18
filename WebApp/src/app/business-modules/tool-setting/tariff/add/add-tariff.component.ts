@@ -67,7 +67,7 @@ export class TariffAddComponent extends AppList {
             id: SystemConstants.EMPTY_GUID,
             customerId: this.tariff.setTariff.customerId,
             agentId: this.tariff.setTariff.agentId,
-            officeId: this.tariff.setTariff.officeId,
+            applyOfficeId: this.tariff.setTariff.officeId,
             supplierId: this.tariff.setTariff.supplierId
         };
 

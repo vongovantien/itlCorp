@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': isSubmitted && !formAdd.value.tariff.effectiveDate}">
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && formAdd.value.tariff.effectiveDate === null}">
                         <label required>Effective Date</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -62,14 +62,15 @@
                                 </span>
                             </span>
                         </div>
-                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.effectiveDate">
+                        <div class="form-control-feedback"
+                            *ngIf="isSubmitted && formAdd.value.tariff.effectiveDate == null">
                             Effective Date is required !
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!formAdd.value.tariff.expiredDate.startDate)}">
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && formAdd.value.tariff.expiredDate === null}">
                         <label required>Expired Date</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -83,7 +84,7 @@
                             </span>
                         </div>
                         <div class="form-control-feedback"
-                            *ngIf="isSubmitted && !formAdd.value.tariff.expiredDate.startDate">
+                            *ngIf="isSubmitted && formAdd.value.tariff.expiredDate === null">
                             Expired Date is required !
                         </div>
                     </div>

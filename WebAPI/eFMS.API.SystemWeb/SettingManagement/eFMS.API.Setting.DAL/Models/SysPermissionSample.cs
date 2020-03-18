@@ -3,16 +3,15 @@ using System.Collections.Generic;
 
 namespace eFMS.API.Setting.Service.Models
 {
-    public partial class SysImage
+    public partial class SysPermissionSample
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Thumb { get; set; }
-        public string Url { get; set; }
-        public string Folder { get; set; }
-        public string ObjectId { get; set; }
+        public short? RoleId { get; set; }
+        public string Type { get; set; }
+        public bool? Active { get; set; }
         public string UserCreated { get; set; }
-        public DateTime? DateTimeCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
     }

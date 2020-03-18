@@ -1,4 +1,5 @@
-﻿using eFMS.API.Setting.DL.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Service.Models;
 using ITL.NetCore.Common;
@@ -22,5 +23,7 @@ namespace eFMS.API.Setting.DL.IService
         SetTariffDetailModel GetTariffDetailById(Guid tariffDetailId);
         IQueryable<SetTariffDetailModel> GetListTariffDetailByTariffId(Guid tariffId);
         HandleState CheckDuplicateTariff(SetTariffModel model);
+
+        bool CheckAllowPermissionAction(Guid id, PermissionRange range);
     }
 }

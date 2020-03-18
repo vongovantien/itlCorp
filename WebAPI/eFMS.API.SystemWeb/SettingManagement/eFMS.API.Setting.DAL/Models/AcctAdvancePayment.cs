@@ -14,10 +14,15 @@ namespace eFMS.API.Setting.Service.Models
         public DateTime? RequestDate { get; set; }
         public DateTime? DeadlinePayment { get; set; }
         public string StatusApproval { get; set; }
+        public string LockedLog { get; set; }
         public string AdvanceNote { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public short? GroupId { get; set; }
+        public int? DepartmentId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }

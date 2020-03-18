@@ -5,11 +5,6 @@ namespace eFMS.API.Setting.Service.Models
 {
     public partial class CatPartner
     {
-        public CatPartner()
-        {
-            CatPartnerContact = new HashSet<CatPartnerContact>();
-        }
-
         public string Id { get; set; }
         public string PartnerGroup { get; set; }
         public string PartnerNameVn { get; set; }
@@ -20,7 +15,7 @@ namespace eFMS.API.Setting.Service.Models
         public string AddressShippingVn { get; set; }
         public string AddressShippingEn { get; set; }
         public string ShortName { get; set; }
-        public string DepartmentId { get; set; }
+        public int? DepartmentId { get; set; }
         public short? CountryId { get; set; }
         public short? CountryShippingId { get; set; }
         public string AccountNo { get; set; }
@@ -64,7 +59,12 @@ namespace eFMS.API.Setting.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string InternalReferenceNo { get; set; }
-
-        public virtual ICollection<CatPartnerContact> CatPartnerContact { get; set; }
+        public string CoLoaderCode { get; set; }
+        public string WorkPhoneEx { get; set; }
+        public short? GroupId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
+        public string RoundUpMethod { get; set; }
+        public string ApplyDim { get; set; }
     }
 }

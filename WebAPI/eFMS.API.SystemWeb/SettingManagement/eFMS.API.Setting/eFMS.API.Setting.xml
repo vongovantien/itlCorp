@@ -35,11 +35,25 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.CheckAllowDelete(System.Guid)">
+            <summary>
+            Check permission view detail ecus
+            </summary>
+            <param name="id">id of item want to delete</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Setting.Controllers.TariffController.Delete(System.Guid)">
             <summary>
             Delete tariff and list tariff details
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.CheckAllowDetail(System.Guid)">
+            <summary>
+            Check permission view detail ecus
+            </summary>
+            <param name="id">id of item want to delete</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Setting.Controllers.TariffController.GetTariff(System.Guid)">
