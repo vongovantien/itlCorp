@@ -1,10 +1,11 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
-import { User } from 'src/app/shared/models';
+import { User, Currency } from 'src/app/shared/models';
 
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
+import { CatalogueRepo } from '@repositories';
 
 @Component({
     selector: 'adv-payment-form-search',
@@ -22,15 +23,19 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     statusApproval: AbstractControl;
     statusPayment: AbstractControl;
     paymentMethod: AbstractControl;
+    currencyId: AbstractControl;
 
     statusApprovals: CommonInterface.ICommonTitleValue[];
     statusPayments: CommonInterface.ICommonTitleValue[];
     paymentMethods: CommonInterface.ICommonTitleValue[] = [];
 
     userLogged: User;
+
+    currencies: Currency[] = [];
+
     constructor(
         private _fb: FormBuilder,
-
+        private _catalogueRepo: CatalogueRepo
 
     ) {
         super();
@@ -52,7 +57,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             modifiedDate: [],
             statusApproval: [],
             statusPayment: [],
-            paymentMethod: []
+            paymentMethod: [],
+            currencyId: [],
         });
 
         this.referenceNo = this.formSearch.controls['referenceNo'];
@@ -62,6 +68,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.statusApproval = this.formSearch.controls['statusApproval'];
         this.statusPayment = this.formSearch.controls['statusPayment'];
         this.paymentMethod = this.formSearch.controls['paymentMethod'];
+        this.currencyId = this.formSearch.controls['currencyId'];
+
     }
 
     initDataInform() {
@@ -70,6 +78,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.paymentMethods = this.getMethod();
 
         this.getUserLogged();
+        this.getCurrency();
+
     }
 
     onSubmit() {
@@ -82,6 +92,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value.value : 'All',
             statusApproval: !!this.statusApproval.value ? this.statusApproval.value.value : 'All',
             statusPayment: !!this.statusPayment.value ? this.statusPayment.value.value : 'All',
+            currencyId: !!this.currencyId.value ? this.currencyId.value.id : 'All',
             requester: this.userLogged.id
         };
         this.onSearch.emit(body);
@@ -120,6 +131,15 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         ];
     }
 
+    getCurrency() {
+        this._catalogueRepo.getListCurrency()
+            .subscribe(
+                (res) => {
+                    this.currencies = res;
+                }
+            );
+    }
+
     search() {
         this.onSubmit();
     }
@@ -132,6 +152,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.resetFormControl(this.paymentMethod);
         this.resetFormControl(this.statusApproval);
         this.resetFormControl(this.statusPayment);
+        this.resetFormControl(this.currencyId);
+
 
         this.onSearch.emit(<any>{});
     }
@@ -147,5 +169,6 @@ interface ISearchAdvancePayment {
     paymentMethod: string;
     statusApproval: string;
     statusPayment: string;
+    currencyId: string;
 }
 
