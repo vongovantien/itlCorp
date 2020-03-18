@@ -1737,7 +1737,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  DateSOA = s.DatetimeCreated,
                                  IssuedBy = s.UserCreated,
                              };
-            //infomation Partner
+            //information Partner
             var result = resultData.FirstOrDefault();
             if (result != null)
             {
@@ -1833,6 +1833,37 @@ namespace eFMS.API.Accounting.DL.Services
             result.AddressEn = officeData.AddressEn;
             result.SwiftCode = officeData.SwiftCode;
             return result;
+        }
+
+        public ExportSOAOPS GetSOAOPS(string soaNo,string type)
+        {
+            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var charge = GetChargeShipmentDocAndOperation(query);
+            var results = charge.GroupBy(x => x.JobId).AsQueryable();
+            ExportSOAOPS lstSOAOPS = new ExportSOAOPS();
+            lstSOAOPS.Charges = new List<ChargeSOAResult>();
+
+            foreach (var item in results.Select(x => x.Key))
+            {
+                var lstSOA = new ExportSOAOPS();
+                var commodity = csTransactionRepo.Get(x => x.JobNo == item).Select(t=>t.Commodity).FirstOrDefault();
+                var chargeData = charge.Where(x => x.JobId == item).ToList();
+                
+                lstSOA.Charges = chargeData;
+
+                foreach(var i in lstSOA.Charges)
+                {
+
+                }
+
+                lstSOAOPS.Charges.AddRange(lstSOA.Charges);
+
+
+
+            }
+
+            return lstSOAOPS;
+
         }
 
         public ExportSOADetailResult GetDataExportSOABySOANo(string soaNo, string currencyLocal)

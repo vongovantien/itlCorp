@@ -57,7 +57,7 @@ namespace eFMS.API.Accounting.DL.Models
 
         public DateTime? ExchangeDate { get; set; }
 
-
+        public string CommodityName { get; set; }
 
 
     }

@@ -326,6 +326,18 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Export SOA OPS by SOANo
+        /// </summary>
+        /// <param name="soaNo">soaNo that want to retrieve SOA</param>
+        /// <returns></returns>
+        [HttpGet("GetDataExportSOAOPS")]
+        public IActionResult GetDataExportSOAOPSBySOANo(string soaNo,string type)
+        {
+            var data = acctSOAService.GetSOAOPS(soaNo,type);
+            return Ok(data);
+        }
+
 
         /// <summary>
         /// Data Export Details SOA

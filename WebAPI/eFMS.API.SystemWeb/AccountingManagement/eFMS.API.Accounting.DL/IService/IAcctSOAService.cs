@@ -55,5 +55,9 @@ namespace eFMS.API.Accounting.DL.IService
 
         ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo,string officeId);
 
+        ExportSOAOPS GetSOAOPS(string soaNo,string type);
+
+
+
     }
 }
