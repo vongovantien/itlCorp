@@ -61,7 +61,8 @@
                                 <label>Amount
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input currencyMask type="text" class="form-control" placeholder="Amount" formControlName="amount">
+                                <input numeric autoFormatCurrency [decimals]="digitDecimal" type="text"
+                                    class="form-control" placeholder="Amount" formControlName="amount">
                             </div>
                         </div>
                         <div class="col-4">
@@ -114,12 +115,14 @@
     </div>
 </div>
 
-<confirm-popup #confirmDuplicatePopup (onSubmit)="onSubmitDuplicatePopup()" [title]="'Warning'" [body]="'Data already exists, do you want to save or not ?'" [labelCancel]="'No'" >
+<confirm-popup #confirmDuplicatePopup (onSubmit)="onSubmitDuplicatePopup()" [title]="'Warning'"
+    [body]="'Data already exists, do you want to save or not ?'" [labelCancel]="'No'">
 </confirm-popup>
 
-<confirm-popup #exitPopup (onSubmit)="onSubmitExitPopup()" [title]="'Warning'" [body]="'Do you want to exit ?'" [labelCancel]="'No'">
+<confirm-popup #exitPopup (onSubmit)="onSubmitExitPopup()" [title]="'Warning'" [body]="'Do you want to exit ?'"
+    [labelCancel]="'No'">
 </confirm-popup>
 
-<confirm-popup #existedPopup (onSubmit)="onSubmitShipmentExisted()" [title]="'Warning'" [body]="'Shipment has existed in another Advance'"
-    [title]="'Warning'">
+<confirm-popup #existedPopup (onSubmit)="onSubmitShipmentExisted()" [title]="'Warning'"
+    [body]="'Shipment has existed in another Advance'" [title]="'Warning'">
 </confirm-popup>
