@@ -92,6 +92,11 @@
                                 <span>No</span>
                             </th>
                             <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'shortName'), 'sorting_desc': (!isDesc && sortKey == 'shortName') }"
+                                (click)="sort('shortName')">
+                                <span>Name(Abreviation)</span>
+                            </th>
+                            <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerNameEn'), 'sorting_desc': (!isDesc && sortKey == 'partnerNameEn') }"
                                 (click)="sort('partnerNameEn')">
                                 <span>Name(EN)</span>
@@ -100,11 +105,6 @@
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerNameVn'), 'sorting_desc': (!isDesc && sortKey == 'partnerNameVn') }"
                                 (click)="sort('partnerNameVn')">
                                 <span>Name(Local)</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'shortName'), 'sorting_desc': (!isDesc && sortKey == 'shortName') }"
-                                (click)="sort('shortName')">
-                                <span>Name(Abreviation)</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'taxCode'), 'sorting_desc': (!isDesc && sortKey == 'taxCode') }"
@@ -217,18 +217,18 @@
                                 <span>Note</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
-                                (click)="sort('note')">
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceSalemanDefault'), 'sorting_desc': (!isDesc && sortKey == 'serviceSalemanDefault') }"
+                                (click)="sort('serviceSalemanDefault')">
                                 <span>Service - Salesman Default</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
-                                (click)="sort('note')">
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'officeSalemanDefault'), 'sorting_desc': (!isDesc && sortKey == 'officeSalemanDefault') }"
+                                (click)="sort('officeSalemanDefault')">
                                 <span>Office - Salesman Default</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
-                                (click)="sort('note')">
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paymentTerm'), 'sorting_desc': (!isDesc && sortKey == 'paymentTerm') }"
+                                (click)="sort('paymentTerm')">
                                 <span>Payment Term - Salesman Default</span>
                             </th>
                             <th class="sorting"

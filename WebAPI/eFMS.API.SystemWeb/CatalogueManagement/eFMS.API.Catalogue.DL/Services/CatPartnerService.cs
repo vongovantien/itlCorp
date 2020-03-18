@@ -661,7 +661,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    string taxCode = item.TaxCode.ToLower().Replace(" ", "");
+                    string taxCode = item.TaxCode.Replace(" ", "");
                     var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
                     var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
                     if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(taxCode))
@@ -669,14 +669,14 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
                         item.IsValid = false;
                     }
-                    else if (list.Count(x => x.TaxCode.ToLower() == taxCode) > 1)
+                    else if (list.Count(x => x.TaxCode == taxCode) > 1)
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
                     }
                     else
                     {
-                        if (partners.Any(x => x.TaxCode.ToLower() == taxCode))
+                        if (partners.Any(x => x.TaxCode == taxCode))
                         {
                             item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
                             item.IsValid = false;
@@ -799,8 +799,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.AddressShippingVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND];
                     item.IsValid = false;
                 }
-                string countryBilling = item.CountryBilling.ToLower();
-                if (countryBilling.Length == 0)
+                string countryBilling = item.CountryBilling?.ToLower();
+                if (countryBilling == null)
                 {
                     item.CountryBillingError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_BILLING_EMPTY];
                     item.IsValid = false;
@@ -883,7 +883,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 //        }
                 //    }
                 //}
-                string countShipping = item.CountryShipping.ToLower();
+                string countShipping = item.CountryShipping?.ToLower();
                 var countryShipping = countries.FirstOrDefault(i => i.NameEn.ToLower() == countShipping);
                 if (countryShipping == null)
                 {
@@ -892,7 +892,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    if (countShipping.Length == 0)
+                    if (countShipping == null)
                     {
                         item.CountryShippingError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_SHIPPING_EMPTY];
                         item.IsValid = false;
