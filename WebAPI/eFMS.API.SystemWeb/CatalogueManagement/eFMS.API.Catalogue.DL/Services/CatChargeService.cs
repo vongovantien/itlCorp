@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.Common;
 using Microsoft.Extensions.Localization;
-using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using AutoMapper.QueryableExtensions;
@@ -30,6 +29,8 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepository;
         private readonly ICatCurrencyService currencyService;
         private readonly ICatUnitService catUnitService;
+        private readonly ICatChargeGroupService charegeGroupService;
+
 
         public CatChargeService(IContextBase<CatCharge> repository,
             ICacheServiceBase<CatCharge> cacheService,

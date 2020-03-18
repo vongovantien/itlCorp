@@ -150,11 +150,24 @@ export class PartnerComponent extends AppList implements OnInit {
 
     showConfirmDelete(event) {
         this.partner = event;
-        this.confirmDeletePopup.show();
+        this._catalogueRepo.checkDeletePartnerPermission(this.partner.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.confirmDeletePopup.show();
+                    } else {
+                        this.info403Popup.show();
+                    }
+                }
+            );
+
     }
 
     showDetail(event) {
-        this.partner = event
+        this.partner = event;
         this._catalogueRepo.checkViewDetailPartnerPermission(this.partner.id)
             .pipe(
                 catchError(this.catchError),

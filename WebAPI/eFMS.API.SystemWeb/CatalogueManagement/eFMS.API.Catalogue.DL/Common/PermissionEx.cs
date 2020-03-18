@@ -32,14 +32,19 @@ namespace eFMS.API.Catalogue.DL.Common
             
                     break;
                 case PermissionRange.Group:
-                    if ((model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
-                    && model.Salemans.FindAll(x => x.SaleManId == currentUser.UserID).Count == 0 && model.UserCreator != currentUser.UserID)
+                    if ((model.GroupId != currentUser.GroupId
+                        && model.DepartmentId != currentUser.DepartmentId
+                        && model.OfficeId != currentUser.OfficeID
+                        && model.CompanyId != currentUser.CompanyID)
+                        && model.Salemans.FindAll(x => x.SaleManId == currentUser.UserID).Count == 0 && model.UserCreator != currentUser.UserID)
                     {
                         code = 403;
                     }
                     break;
                 case PermissionRange.Department:
                     if (model.DepartmentId != currentUser.DepartmentId
+                        && model.OfficeId != currentUser.OfficeID
+                        && model.CompanyId != currentUser.CompanyID
                         && model.Salemans.FindAll(x => x.SaleManId == currentUser.UserID).Count == 0 && model.UserCreator != currentUser.UserID)
                     {
                         code = 403;

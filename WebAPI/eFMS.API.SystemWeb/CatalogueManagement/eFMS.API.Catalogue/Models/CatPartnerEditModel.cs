@@ -69,6 +69,10 @@ namespace eFMS.API.Catalogue.Models
         public short? GroupId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public string RoundUpMethod { get; set; }
+        public string ApplyDim { get; set; }
+
+
 
     }
 }

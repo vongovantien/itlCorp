@@ -396,6 +396,15 @@ export class CatalogueRepo {
         );
     }
 
+    getChargeGroup() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChargeGroup/getAll`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
     getDetailPartner(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/${id}`).pipe(
             map((data: any) => data)

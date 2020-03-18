@@ -433,6 +433,24 @@
 
             </div>
             <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label"> Round Up Method </label>
+                        <ng-select [allowClear]="true" [items]="roundMethods" name="roundUp" formControlName="roundUp"
+                            placeholder="Select roundup">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label"> Apply for Dim </label>
+                        <ng-select [allowClear]="true" [items]="applyDims" name="applyDim" formControlName="applyDim"
+                            placeholder="Select apply for dim">
+                        </ng-select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-lg-12">
                     <div class="form-group">
                         <label class="form-control-label" for="">

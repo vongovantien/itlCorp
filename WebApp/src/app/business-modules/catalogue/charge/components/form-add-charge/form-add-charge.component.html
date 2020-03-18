@@ -144,7 +144,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6" *ngIf="isShowMappingSelling">
+                        <div class="col-lg-4" *ngIf="isShowMappingSelling">
                             <div class="form-group">
                                 <label class="form-control-label">
                                     Selling Mapping
@@ -156,6 +156,17 @@
                                     placeholder="Select charge" (remove)="resetFormControl(debitCharge)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Charge Group
+                                </label>
+                                <ng-select [allowClear]="true" [items]="ngDataChargeGroup"
+                                    placeholder="Select Chare Group" formControlName="chargeGroup">
+                                </ng-select>
+                            </div>
+
                         </div>
                     </div>
                 </div>

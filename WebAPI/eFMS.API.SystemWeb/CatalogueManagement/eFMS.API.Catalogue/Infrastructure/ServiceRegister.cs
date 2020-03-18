@@ -81,6 +81,10 @@ namespace eFMS.API.Catalogue.Infrastructure
             new CacheServiceBase<CatUnit>(x.GetRequiredService<IConnectionMultiplexer>()
             , Enum.GetName(typeof(CacheEntity), CacheEntity.CatStage)));
 
+            services.AddSingleton<ICacheServiceBase<CatChargeGroup>>(x =>
+            new CacheServiceBase<CatChargeGroup>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatChargeGroup)));
+
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ICatBranchService, CatBranchService>();
             services.AddTransient<ICatPlaceService, CatPlaceService>();
@@ -98,6 +102,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatCurrencyExchangeService, CatCurrencyExchangeService>();
             services.AddTransient<ICatSaleManService, CatSalemanService>();
             services.AddTransient<ICatPartnerChargeService, CatPartnerChargeService>();
+            services.AddTransient<ICatChargeGroupService, CatChargeGroupService>();
+
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
