@@ -11,7 +11,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
 import { ToastrService } from 'ngx-toastr';
 import { OperationRepo } from '@repositories';
-import { finalize } from 'rxjs/operators';
+import { finalize, catchError } from 'rxjs/operators';
 import { AppPage } from 'src/app/app.base';
 import { InfoPopupComponent } from '@common';
 
@@ -20,19 +20,7 @@ import { InfoPopupComponent } from '@common';
     templateUrl: './custom-clearance-import.component.html',
 })
 export class CustomClearanceImportComponent extends AppPage implements OnInit {
-
-    constructor(
-        private pagingService: PagingService,
-        private baseService: BaseService,
-        private api_menu: API_MENU,
-        private sortService: SortService,
-        private toastr: ToastrService,
-        private _operationRepo: OperationRepo,
-        private _progressService: NgProgress) {
-        super();
-        this._progressRef = this._progressService.ref();
-    }
-
+    @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];
@@ -40,11 +28,16 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
     totalRows: number = 0;
     isShowInvalid: boolean = true;
     pager: PagerSetting = PAGINGSETTING;
-    inProgress: boolean = false;
 
-    @ViewChild(AppPaginationComponent, { static: false }) child;
-    @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
+    constructor(
+        private pagingService: PagingService,
+        private sortService: SortService,
+        private toastr: ToastrService,
+        private _operationRepo: OperationRepo,
+        private _progressService: NgProgress) {
+        super();
+        this._progressRef = this._progressService.ref();
+    }
 
     isDesc = true;
     sortKey: string;
@@ -55,7 +48,7 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
 
     chooseFile(file: Event) {
         if (file.target['files'] == null) { return; }
-        this.progressBar.start();
+        this._progressRef.start();
         /**/
         this.resetBeforeSelecedFile();
         /**/
@@ -69,9 +62,10 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
                 this.data = response.data;
                 this.pager.totalItems = this.data.length;
                 this.totalValidRows = response.totalValidRows;
+                this.pager.currentPage = 1;
                 this.totalRows = this.data.length;
                 this.pagingData(this.data);
-                this.progressBar.complete();
+                this._progressRef.complete();
             }, () => {
             });
     }
@@ -82,21 +76,14 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
         this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
-
-    setPage(pager: PagerSetting) {
-        this.pager.currentPage = pager.currentPage;
-        this.pager.pageSize = pager.pageSize;
-        this.pager.totalPages = pager.totalPages;
-
-        if (this.isShowInvalid) {
-            this.pagingData(this.data);
-        } else {
-            this.pagingData(this.inValidItems);
-        }
-    }
-
     async downloadSample() {
-        await this.baseService.downloadfile(this.api_menu.Operation.CustomClearance.downloadExcel, 'CustomClearanceImportTemplate.xlsx');
+        this._operationRepo.downloadCustomClearanceExcel()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "CustomClearanceTemplate.xlsx");
+                },
+            );
     }
     sort(property) {
         this.isDesc = !this.isDesc;
@@ -104,8 +91,9 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
         this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
     }
 
+
     hideInvalid() {
-        if (this.data == null || this.data == undefined) return;
+        if (this.data == null) { return; }
         this.isShowInvalid = !this.isShowInvalid;
         this.sortKey = '';
         if (this.isShowInvalid) {
@@ -113,21 +101,17 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
             this.pagingData(this.data);
         } else {
             this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
             this.pager.totalItems = this.inValidItems.length;
-            this.setPage(this.pager);
-        }
-
-        this.pager.currentPage = 1;
-        if (this.inValidItems.length > 0) {
-            this.child.setPage(this.pager.currentPage);
         }
     }
 
-    reset() {
+    reset(element) {
         this.data = null;
         this.pagedItems = null;
         this.pager.totalItems = 0;
         this.totalRows = this.totalValidRows = 0;
+        element.value = "";
     }
 
     resetBeforeSelecedFile() {
@@ -138,27 +122,52 @@ export class CustomClearanceImportComponent extends AppPage implements OnInit {
         this.isShowInvalid = true;
     }
 
-    async import() {
-        if (this.data == null || this.data == undefined) {
+    import(element) {
+        if (this.data == null || this.data === undefined) {
             this.toastr.warning('Not selected import file', '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
             return;
         }
         if (this.totalRows - this.totalValidRows > 0) {
             this.invaliDataAlert.show();
         } else {
-            this.progressBar.start();
-            console.log(this.data);
-            const response = await this.baseService.postAsync(this.api_menu.Operation.CustomClearance.import, this.data, true, false);
-            if (response.success) {
-                this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
-                this.reset();
-                this.progressBar.complete();
-            } else {
-                this.progressBar.complete();
-                this.baseService.handleError(response);
-            }
-            console.log(response);
+            this._progressRef.start();
+            this._operationRepo.importCustomClearance(this.data)
+                .pipe(
+                    finalize(() => {
+                        this._progressRef.complete();
+                    })
+                )
+                .subscribe(
+                    (res) => {
+                        if (res.success) {
+                            this.toastr.success(language.NOTIFI_MESS.IMPORT_SUCCESS);
+                            this.pager.totalItems = 0;
+                            this.reset(element);
+                        } else {
+                            this.toastr.error(res.message);
+                        }
+                    }
+                );
         }
     }
+    selectPageSize() {
+        this.pager.currentPage = 1;
+        if (this.isShowInvalid) {
+            this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
 
+        } else {
+            this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
+            this.pager.totalItems = this.inValidItems.length;
+        }
+    }
+    pageChanged(event: any): void {
+        if (this.pager.currentPage !== event.page || this.pager.pageSize !== event.itemsPerPage) {
+            this.pager.currentPage = event.page;
+            this.pager.pageSize = event.itemsPerPage;
+
+            this.pagingData(this.data);
+        }
+    }
 }
