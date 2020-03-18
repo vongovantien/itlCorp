@@ -100,7 +100,7 @@ namespace eFMS.API.Documentation.Controllers
         /// download file excel from server
         /// </summary>
         /// <returns></returns>
-        [HttpPost("downloadFileExcel")]
+        [HttpGet("downloadFileExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
             string fileName = Templates.Container.ExelImportFileName + Templates.ExelImportEx;
