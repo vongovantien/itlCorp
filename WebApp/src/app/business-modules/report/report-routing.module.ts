@@ -6,21 +6,29 @@ import { ShipmentOverviewComponent } from './shipment-overview/shipment-overview
 
 const routes: Routes = [
   {
-    path:'',
-    redirectTo:'pl-report'
+    path: '',
+    redirectTo: 'pl-report'
   },
   {
-    path:'pl-report',
-    component:PLReportComponent
+    path: 'pl-report',
+    component: PLReportComponent
   },
   {
-    path:'performance-report',
-    component:PerformanceReportComponent
+    path: 'performance-report',
+    component: PerformanceReportComponent
   },
   {
-    path:'shipment-overview',
-    component:ShipmentOverviewComponent
-  }
+    path: 'shipment-overview',
+    component: ShipmentOverviewComponent
+  },
+  {
+    path: 'general-report', loadChildren: () => import('./general-report/general-report.module').then(m => m.GeneralReportModule),
+    data: { name: 'General Report' }
+  },
+  {
+    path: 'sale-report', loadChildren: () => import('./sale-report/sale-report.module').then(m => m.SaleReportModule),
+    data: { name: 'Sale Report' }
+  },
 ];
 
 @NgModule({

@@ -751,6 +751,13 @@
             <param name="keywords"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataGeneralReport(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria,System.Int32,System.Int32)">
+            <summary>
+            Get data for general report
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.TerminologyController.GetA">
             <summary>
             

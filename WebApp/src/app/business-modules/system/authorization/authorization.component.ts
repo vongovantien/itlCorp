@@ -47,17 +47,18 @@ export class AuthorizationComponent extends AppList {
       { title: 'Status', field: 'active', sortable: true },
     ];
 
-    this.searchAuthorization(this.dataSearch);
+    this.searchAuthorization();
   }
 
   onSearchAuthorization(data: any) {
     this.page = 1; // reset page.
-    this.searchAuthorization(data);
+    this.dataSearch = data;
+    this.searchAuthorization();
   }
 
-  searchAuthorization(dataSearch?: any) {
+  searchAuthorization() {
     this._progressRef.start();
-    this._systemRepo.getAuthorization(this.page, this.pageSize, Object.assign({}, dataSearch))
+    this._systemRepo.getAuthorization(this.page, this.pageSize, Object.assign({}, this.dataSearch))
       .pipe(
         catchError(this.catchError),
         finalize(() => {
@@ -96,7 +97,7 @@ export class AuthorizationComponent extends AppList {
         (res: CommonInterface.IResult) => {
           if (res.status) {
             this._toastService.success(res.message, '');
-            this.searchAuthorization(this.dataSearch);
+            this.searchAuthorization();
           } else {
             this._toastService.error(res.message || 'Có lỗi xảy ra', '');
           }
@@ -122,7 +123,7 @@ export class AuthorizationComponent extends AppList {
   }
 
   onRequestAuthorization() {
-    this.searchAuthorization(this.dataSearch);
+    this.searchAuthorization();
   }
 
   showDetailAuthorization(authorization) {

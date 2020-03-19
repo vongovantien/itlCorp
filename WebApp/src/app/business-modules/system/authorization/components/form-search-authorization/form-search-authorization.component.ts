@@ -61,7 +61,7 @@ export class AuthorizationFormSearchComponent extends AppForm {
     initDataInform() {
         this.getService();
         this.getUsers();
-        this.getStatus();       
+        this.getStatus();
     }
 
     getService() {
