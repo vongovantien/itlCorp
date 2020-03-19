@@ -1,9 +1,11 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { User } from 'src/app/shared/models';
+import { User, Currency } from 'src/app/shared/models';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
+import { CatalogueRepo } from '@repositories';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'settle-payment-form-search',
@@ -20,14 +22,18 @@ export class SettlementFormSearchComponent extends AppForm {
     modifiedDate: AbstractControl;
     statusApproval: AbstractControl;
     paymentMethod: AbstractControl;
+    currencyId: AbstractControl;
 
     statusApprovals: CommonInterface.ICommonTitleValue[];
     statusPayments: CommonInterface.ICommonTitleValue[];
     paymentMethods: CommonInterface.ICommonTitleValue[] = [];
 
     userLogged: User;
+
+    currencies: Observable<Currency[]>;
     constructor(
         private _fb: FormBuilder,
+        private _catalogueRepo: CatalogueRepo
 
     ) {
         super();
@@ -37,7 +43,14 @@ export class SettlementFormSearchComponent extends AppForm {
     ngOnInit() {
         this.initForm();
         this.initDataInform();
+        this.getCurrency();
     }
+
+    getCurrency() {
+        this.currencies = this._catalogueRepo.getListCurrency()
+
+    }
+
 
     initForm() {
         this.formSearch = this._fb.group({
@@ -49,7 +62,9 @@ export class SettlementFormSearchComponent extends AppForm {
             requestDate: [],
             modifiedDate: [],
             statusApproval: [],
-            paymentMethod: []
+            paymentMethod: [],
+            currencyId: [],
+
         });
 
         this.referenceNo = this.formSearch.controls['referenceNo'];
@@ -58,6 +73,7 @@ export class SettlementFormSearchComponent extends AppForm {
         this.modifiedDate = this.formSearch.controls['modifiedDate'];
         this.statusApproval = this.formSearch.controls['statusApproval'];
         this.paymentMethod = this.formSearch.controls['paymentMethod'];
+        this.currencyId = this.formSearch.controls['currencyId'];
     }
 
     initDataInform() {
@@ -77,6 +93,8 @@ export class SettlementFormSearchComponent extends AppForm {
             requestDateTo: !!this.requestDate.value && !!this.requestDate.value.endDate ? formatDate(this.requestDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value.value : 'All',
             statusApproval: !!this.statusApproval.value ? this.statusApproval.value.value : 'All',
+            currencyId: !!this.currencyId.value ? this.currencyId.value.id : 'All',
+
             requester: this.userLogged.id
         };
         this.onSearch.emit(body);
@@ -125,6 +143,7 @@ export class SettlementFormSearchComponent extends AppForm {
         this.resetFormControl(this.referenceNo);
         this.resetFormControl(this.paymentMethod);
         this.resetFormControl(this.statusApproval);
+        this.resetFormControl(this.currencyId);
 
         this.onSearch.emit(<any>{});
     }
@@ -139,4 +158,5 @@ interface ISearchSettlePayment {
     advanceModifiedDateTo: string;
     paymentMethod: string;
     statusApproval: string;
+    currencyId: string;
 }
