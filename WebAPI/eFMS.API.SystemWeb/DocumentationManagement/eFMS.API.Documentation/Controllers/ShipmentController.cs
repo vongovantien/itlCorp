@@ -123,5 +123,19 @@ namespace eFMS.API.Documentation.Controllers
             HandleState result = shipmentService.UnLockShipment(shipments);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Get data for general report
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataGeneralReport")]
+        public IActionResult GetDataGeneralReport(GeneralReportCriteria criteria, int page, int size)
+        {
+            var data = shipmentService.GetDataGeneralReport(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
+            return Ok(result);
+        }
+
     }
 }

@@ -452,5 +452,18 @@ namespace eFMS.API.System.Controllers
             }
             return isDuplicate;
         }
+
+        /// <summary>
+        /// Get user by type
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetUsersByType")]
+        public IActionResult GetUsersByType(UserLevelCriteria criteria)
+        {
+            var results = userLevelService.GetUsersByType(criteria);
+            return Ok(results);
+        }
     }
 }
