@@ -149,6 +149,29 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export SOA OPS
+        /// </summary>
+        /// <param name="soaNo"></param>
+        /// <returns></returns>
+        [Route("ExportSOAOPS")]
+        [HttpGet]
+        public async Task<IActionResult> ExportSOAOPS(string soaNo)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.GetDataSOAOPSUrl + soaNo);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<SOAOPSModel>();
+
+            var stream = new AccountingHelper().GenerateSOAOPSExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "SOA OPS.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
         /// Export detail settlement payment
         /// </summary>
         /// <param name="settlementId">Id of settlement payment</param>

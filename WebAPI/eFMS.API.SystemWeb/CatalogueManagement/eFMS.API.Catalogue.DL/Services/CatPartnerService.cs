@@ -363,93 +363,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var sysUsers = sysUserRepository.Get();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var salemans = salemanRepository.Get().ToList();
-            //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
-            //PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+
             var dataSalemans = salemans.Select(x => x.PartnerId);
-
-            //switch (rangeSearch)
-            //{
-            //    case PermissionRange.None:
-            //        partners = null;
-            //        break;
-            //    case PermissionRange.All:
-            //        break;
-            //    case PermissionRange.Owner:
-            //        if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-            //        {
-            //           partners = partners.Where(x=>
-            //           salemans.Any(y=>y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-            //           || x.UserCreated == currentUser.UserID
-            //           );
-            //        }
-            //        else
-            //        {
-            //            partners = partners.Where(x => x.UserCreated == currentUser.UserID);
-            //        }
-            //        break;
-            //    case PermissionRange.Group:
-            //        if(partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-            //        {
-            //            partners = partners.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-            //           || x.UserCreated == currentUser.UserID
-            //           || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-            //           );
-            //        }
-            //        else
-            //        {
-            //            partners = partners.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-            //            || x.UserCreated == currentUser.UserID
-            //            );
-            //        }
-            //        break;
-            //    case PermissionRange.Department:
-            //        if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-            //        {
-            //            partners = partners.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-            //           || x.UserCreated == currentUser.UserID
-            //           || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-            //           );
-            //        }
-            //        else
-            //        {
-            //            partners = partners.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.DepartmentId == currentUser.DepartmentId && x.CompanyId == currentUser.CompanyID)
-            //            || x.UserCreated == currentUser.UserID
-            //            );
-            //        }
-            //        break;
-            //    case PermissionRange.Office:
-            //        if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-            //        {
-            //            partners = partners.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-            //           || x.UserCreated == currentUser.UserID
-            //           || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-
-            //           );
-            //        }
-            //        else
-            //        {
-            //            partners = partners.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-            //            || x.UserCreated == currentUser.UserID
-            //            );
-            //        }
-            //        break;
-            //    case PermissionRange.Company:
-            //        if (partnerGroup == DataEnums.CustomerPartner || partnerGroup == string.Empty)
-            //        {
-            //            partners = partners.Where(x => (x.CompanyId == currentUser.CompanyID)
-            //           || x.UserCreated == currentUser.UserID
-            //           || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-
-            //           );
-            //        }
-            //        else
-            //        {
-            //            partners = partners.Where(x => (x.CompanyId == currentUser.CompanyID)
-            //            || x.UserCreated == currentUser.UserID
-            //            );
-            //        }
-            //        break;
-            //}
 
             if (partners == null) return null;
 
@@ -461,7 +376,7 @@ namespace eFMS.API.Catalogue.DL.Services
                           );
             if (criteria.All == null)
             {
-                query = query.Where(x => ((x.partner.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                query = query.Where(x => ((x.partner.AccountNo ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.PartnerNameEn ?? "").IndexOf(criteria.PartnerNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.PartnerNameVn ?? "").IndexOf(criteria.PartnerNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -471,7 +386,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            && (x.partner.Fax ?? "").IndexOf(criteria.Fax ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.user.Username ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.partner.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase) == true
+                           && (x.partner.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase)
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            ));
             }
@@ -479,7 +394,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 query = query.Where(x =>
                            (
-                           (x.partner.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.PartnerNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.PartnerNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -489,8 +404,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                           || (x.partner.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase) == true
-
+                           || (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
                            )
                            && (x.partner.Active == criteria.Active || criteria.Active == null));
             }

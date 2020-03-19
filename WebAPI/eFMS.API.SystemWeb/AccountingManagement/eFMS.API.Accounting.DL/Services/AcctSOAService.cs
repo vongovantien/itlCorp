@@ -35,6 +35,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepo;
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<SysOffice> officeRepo;
+        readonly IContextBase<CatCommodity> catCommodityRepo;
+
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -52,7 +54,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUser> sysUser,
             IContextBase<CatPlace> catplace,
             IContextBase<CatChargeDefaultAccount> chargeDefault,
-            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> sysOffice,
+            IContextBase<CatCommodity> catCommodity) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -69,6 +72,7 @@ namespace eFMS.API.Accounting.DL.Services
             chargeDefaultRepo = chargeDefault;
             catPlaceRepo = catplace;
             officeRepo = sysOffice;
+            catCommodityRepo = catCommodity;
         }
 
         #region -- Insert & Update SOA
@@ -677,7 +681,10 @@ namespace eFMS.API.Accounting.DL.Services
                                            GrossWeight = cstd.GrossWeight,
                                            ChargeWeight = cstd.ChargeWeight,
                                            FinalExchangeRate = sur.FinalExchangeRate,
-                                           ExchangeDate = sur.ExchangeDate
+                                           ExchangeDate = sur.ExchangeDate,
+                                           CBM = cstd.Cbm,
+                                           PackageContainer = cstd.PackageContainer,
+                                           TypeCharge = chg.Type
                                        };
             queryBuySellDocument = queryBuySellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -792,7 +799,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            GrossWeight = cstd.GrossWeight,
                                            ChargeWeight = cstd.ChargeWeight,
                                            FinalExchangeRate = sur.FinalExchangeRate,
-                                           ExchangeDate = sur.ExchangeDate
+                                           ExchangeDate = sur.ExchangeDate,
+                                           TypeCharge = chg.Type
                                        };
             queryObhSellDocument = queryObhSellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -902,7 +910,11 @@ namespace eFMS.API.Accounting.DL.Services
                                           GrossWeight = cstd.GrossWeight,
                                           ChargeWeight = cstd.ChargeWeight,
                                           FinalExchangeRate = sur.FinalExchangeRate,
-                                          ExchangeDate = sur.ExchangeDate
+                                          ExchangeDate = sur.ExchangeDate,
+                                          CBM = cstd.Cbm,
+                                          PackageContainer = cstd.PackageContainer,
+                                          TypeCharge = chg.Type
+
                                       };
             queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -983,7 +995,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 GrossWeight = data.GrossWeight,
                                 ChargeWeight = data.ChargeWeight,
                                 FinalExchangeRate = data.FinalExchangeRate,
-                                ExchangeDate = data.ExchangeDate
+                                ExchangeDate = data.ExchangeDate,
+                                CBM = data.CBM,
+                                PackageContainer = data.PackageContainer,
+                                TypeCharge = data.TypeCharge
                             };
             queryData = queryData.ToArray().OrderBy(x => x.Service).AsQueryable();
             return queryData;
@@ -1835,35 +1850,63 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
-        public ExportSOAOPS GetSOAOPS(string soaNo,string type)
+        public SOAOPSModel GetSOAOPS(string soaNo)
         {
+            SOAOPSModel opssoa = new SOAOPSModel();
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var soa = DataContext.Get(x => x.Soano == soaNo);
             var charge = GetChargeShipmentDocAndOperation(query);
-            var results = charge.GroupBy(x => x.JobId).AsQueryable();
-            ExportSOAOPS lstSOAOPS = new ExportSOAOPS();
-            lstSOAOPS.Charges = new List<ChargeSOAResult>();
-
-            foreach (var item in results.Select(x => x.Key))
+            if(soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
+            soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_DEBIT.ToLower())
             {
-                var lstSOA = new ExportSOAOPS();
-                var commodity = csTransactionRepo.Get(x => x.JobNo == item).Select(t=>t.Commodity).FirstOrDefault();
-                var chargeData = charge.Where(x => x.JobId == item).ToList();
-                
-                lstSOA.Charges = chargeData;
-
-                foreach(var i in lstSOA.Charges)
-                {
-
-                }
-
-                lstSOAOPS.Charges.AddRange(lstSOA.Charges);
-
-
-
+                charge = charge.Where(x => x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_DEBIT.ToLower());
             }
+            List<ExportSOAOPS> lstSOAOPS = new List<ExportSOAOPS>();
+            var partner = catPartnerRepo.Get();
+            var port = catPlaceRepo.Get();
+            var resultData = from s in soa
+                             join pat in partner on s.Customer equals pat.Id into pat2
+                             from pat in pat2.DefaultIfEmpty()
+                             select new SOAOPSModel
+                             {
+                                 PartnerNameVN = pat.PartnerNameVn,
+                                 BillingAddressVN = pat.AddressVn,
+                                 FromDate = s.SoaformDate,
+                                 ToDate = s.SoatoDate
+                             };
 
-            return lstSOAOPS;
+            var results = charge.GroupBy(x => x.JobId).AsQueryable();
 
+            foreach (var group in results)
+            {
+                ExportSOAOPS exportSOAOPS = new ExportSOAOPS();
+                exportSOAOPS.Charges = new List<ChargeSOAResult>();
+                var commodity = csTransactionRepo.Get(x => x.JobNo == group.Key).Select(t => t.Commodity).FirstOrDefault();
+                string commodityName = string.Empty;
+                if(commodity.Length >= 1)
+                {
+                    string[] commodityArr = commodity.Split(',');
+                    foreach(var item in commodityArr)
+                    {
+                        commodityName = commodityName + "," + catCommodityRepo.Get(x=>x.Code == item).Select(t=>t.CommodityNameVn).FirstOrDefault() ;
+                    }
+                    commodityName =  commodityName.Substring(1);
+                }
+                exportSOAOPS.CommodityName = commodityName;
+
+                exportSOAOPS.HwbNo = group.Select(t => t.HBL).FirstOrDefault();
+                exportSOAOPS.CBM = group.Select(t => t.CBM).FirstOrDefault();
+                exportSOAOPS.GW = group.Select(t => t.GrossWeight).FirstOrDefault();
+                exportSOAOPS.PackageContainer = group.Select(t => t.PackageContainer).FirstOrDefault();
+                exportSOAOPS.Charges.AddRange(group.Select(t => t));
+                lstSOAOPS.Add(exportSOAOPS);
+            }
+            opssoa.exportSOAOPs = lstSOAOPS;
+            opssoa.BillingAddressVN = resultData?.Select(t => t.BillingAddressVN).FirstOrDefault();
+            opssoa.PartnerNameVN = resultData?.Select(t => t.PartnerNameVN).FirstOrDefault();
+            opssoa.FromDate = resultData?.Select(t => t.FromDate).FirstOrDefault();
+            opssoa.ToDate = resultData?.Select(t => t.ToDate).FirstOrDefault();
+            return opssoa;
         }
 
         public ExportSOADetailResult GetDataExportSOABySOANo(string soaNo, string currencyLocal)

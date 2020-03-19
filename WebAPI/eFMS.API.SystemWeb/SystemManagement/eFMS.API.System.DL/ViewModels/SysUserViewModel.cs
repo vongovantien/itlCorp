@@ -20,6 +20,7 @@ namespace eFMS.API.System.DL.ViewModels
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
 
+        public string StaffCode { get; set; }
         public string EmployeeNameVn { get; set; }
         public string EmployeeNameEn { get; set; }
         public string Password { get; set; }
@@ -27,8 +28,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string Title { get; set; }
         public string WorkingStatus { get; set; }
         public string Tel { get; set; }
-        public string Position { get; set; }
-        public string CompanyName { get; set; }
-        public string OfficeName { get; set; }
+        public string Email { get; set; }
+        public string Description { get; set; }
     }
 }

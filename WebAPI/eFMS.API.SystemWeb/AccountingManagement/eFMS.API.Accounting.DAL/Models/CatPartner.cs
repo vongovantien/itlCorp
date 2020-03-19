@@ -64,5 +64,7 @@ namespace eFMS.API.Accounting.Service.Models
         public short? GroupId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public string RoundUpMethod { get; set; }
+        public string ApplyDim { get; set; }
     }
 }

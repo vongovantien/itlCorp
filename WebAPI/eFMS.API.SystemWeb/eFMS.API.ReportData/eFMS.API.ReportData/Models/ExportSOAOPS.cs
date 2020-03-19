@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
-namespace eFMS.API.Accounting.DL.Models
+namespace eFMS.API.ReportData.Models
 {
     public class ExportSOAOPS
     {
@@ -10,7 +9,6 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? GW { get; set; }
         public decimal? CBM { get; set; }
         public string PackageContainer { get; set; }
-
-        public List<ChargeSOAResult> Charges { get; set; }
+        public List<SoaOpsChargeModel> Charges { get; set; }
     }
 }

@@ -286,7 +286,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
-        [Authorize]
+        //[Authorize]
         public IActionResult UploadFile(IFormFile uploadedFile)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
@@ -303,20 +303,16 @@ namespace eFMS.API.System.Controllers
                     {
                         IsValid = true,
                         StaffCode = worksheet.Cells[row, 2].Value?.ToString(),
-
                         Username =  worksheet.Cells[row, 3].Value?.ToString(),
                         EmployeeNameEn = worksheet.Cells[row, 4].Value?.ToString(),
                         EmployeeNameVn = worksheet.Cells[row, 5].Value?.ToString(),
                         Title =  worksheet.Cells[row, 6].Value?.ToString(),
-                        Tel = worksheet.Cells[row, 7].Value?.ToString(),
-                        UserType =  worksheet.Cells[row, 8].Value?.ToString(),
-                        Role =  worksheet.Cells[row, 9].Value?.ToString(),
-                        LevelPermission = worksheet.Cells[row, 10].Value?.ToString(),
-                        Company = worksheet.Cells[row, 11].Value?.ToString(),
-                        Office = worksheet.Cells[row, 12].Value?.ToString(),
-                        Deparment = worksheet.Cells[row, 13].Value?.ToString(),
-                        WorkingStatus = worksheet.Cells[row, 15].Value?.ToString(),
-                        Status =worksheet.Cells[row, 16].Value?.ToString()
+                        UserType =  worksheet.Cells[row, 7].Value?.ToString(),
+                        Status = worksheet.Cells[row, 8].Value?.ToString(),
+                        WorkingStatus = worksheet.Cells[row, 9].Value?.ToString(),
+                        Email = worksheet.Cells[row, 10].Value?.ToString(),
+                        Tel = worksheet.Cells[row, 11].Value?.ToString(),
+                        Description = worksheet.Cells[row, 12].Value?.ToString()
                     };
                     list.Add(userobj);
                 }
@@ -332,7 +328,7 @@ namespace eFMS.API.System.Controllers
 
         [HttpPost]
         [Route("Import")]
-        [Authorize]
+        //[Authorize]
         public IActionResult Import([FromBody]List<SysUserViewModel> data)
         {
             var result = sysUserService.Import(data);

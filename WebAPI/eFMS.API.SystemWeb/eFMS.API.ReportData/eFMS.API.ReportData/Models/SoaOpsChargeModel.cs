@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace eFMS.API.Accounting.DL.Models
+namespace eFMS.API.ReportData.Models
 {
-    public class ChargeSOAResult
+    public class SoaOpsChargeModel
     {
         public Guid ID { get; set; }
         public Guid HBLID { get; set; }
@@ -19,7 +17,7 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? Debit { get; set; }
         public decimal? Credit { get; set; }
         public string SOANo { get; set; }
-        public bool IsOBH { get; set; } 
+        public bool IsOBH { get; set; }
         public string Currency { get; set; }
         public string InvoiceNo { get; set; }
         public string Note { get; set; }
@@ -62,7 +60,5 @@ namespace eFMS.API.Accounting.DL.Models
         public string PackageContainer { get; set; }
 
         public string TypeCharge { get; set; }
-
-
     }
 }

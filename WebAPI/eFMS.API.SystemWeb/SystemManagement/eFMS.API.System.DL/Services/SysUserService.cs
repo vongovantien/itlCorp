@@ -270,7 +270,7 @@ namespace eFMS.API.System.DL.Services
                     {
                         item.IsValid = false;
                         item.UsernameValid = false;
-                        item.Username = stringLocalizer[LanguageSub.MSG_NAME_EXISTED];
+                        item.Username = stringLocalizer[SystemLanguageSub.MSG_USER_USERNAME_EXISTED, item.Username].Value;
                     }
 
                 }
@@ -309,7 +309,7 @@ namespace eFMS.API.System.DL.Services
                     {
                         item.IsValid = false;
                         item.StaffCodeValid = false;
-                        item.StaffCode = stringLocalizer[LanguageSub.MSG_CODE_EXISTED];
+                        item.StaffCode = stringLocalizer[SystemLanguageSub.MSG_USER_STAFFCODE_EXISTED,item.StaffCode].Value;
                     }
                 }
 
@@ -333,7 +333,7 @@ namespace eFMS.API.System.DL.Services
                 }
                 else if (!userType.Equals("Normal User") && !userType.Equals("Local Admin") && !userType.Equals("Super Admin"))
                 {
-                    item.UserType = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                    item.UserType = stringLocalizer[SystemLanguageSub.MSG_USER_USERTYPE_NOTFOUND];
                     item.IsValid = false;
                     item.UserTypeValid = false;
                 }
@@ -365,9 +365,41 @@ namespace eFMS.API.System.DL.Services
                 }
                 else if (!status.Equals("Active") && !status.Equals("Inactive"))
                 {
-                    item.Status = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                    item.Status = string.Format( stringLocalizer[SystemLanguageSub.MSG_USER_STATUS_NOTFOUND], item.Status);
                     item.IsValid = false;
                     item.StatusValid = false;
+                }
+
+                //check empty and valid email
+                string email = item.Email;
+                item.EmailValid = true;
+                if (string.IsNullOrEmpty(email))
+                {
+                    item.Email = stringLocalizer[SystemLanguageSub.MSG_USER_EMAIL_EMPTY];
+                    item.IsValid = false;
+                    item.EmailValid = false;
+                }
+                var checkDupStaffCode = list.GroupBy(x => x.StaffCode)
+                                              .Where(t => t.Count() > 1)
+                                              .Select(y => y.Key)
+                                              .ToList();
+                var checkDupUserName = list.GroupBy(x => x.Username)
+                                          .Where(t => t.Count() > 1)
+                                          .Select(y => y.Key)
+                                          .ToList();
+                if (checkDupStaffCode.Count > 0)
+                {
+                    item.IsValid = false;
+                    item.StaffCode = stringLocalizer[SystemLanguageSub.MSG_USER_STAFFCODE_DUPLICATE, item.StaffCode].Value;
+                    item.StaffCodeValid = false;
+                }
+
+                if (checkDupUserName.Count > 0)
+                {
+                    item.IsValid = false;
+                    item.UsernameValid = false;
+                    item.Username = stringLocalizer[SystemLanguageSub.MSG_USER_USERNAME_DUPLICATE, item.Username].Value;
+
                 }
 
             });
@@ -428,9 +460,10 @@ namespace eFMS.API.System.DL.Services
                     objEmployee.EmployeeNameVn = item.EmployeeNameVn;
                     objEmployee.Tel = item.Tel;
                     objEmployee.Title = item.Title;
-
+                    objEmployee.StaffCode = item.StaffCode;
+                    
+                    objEmployee.Email = item.Email;
                     sysEmployees.Add(objEmployee);
-
                     objUser.Username = item.Username;
                     objUser.UserType = item.UserType;
                     objUser.WorkingStatus = item.WorkingStatus;
@@ -439,14 +472,12 @@ namespace eFMS.API.System.DL.Services
                     objUser.Id = Guid.NewGuid().ToString();
                     objUser.UserCreated = objUser.UserModified = currentUser.UserID;
                     objUser.Password = BCrypt.Net.BCrypt.HashPassword(Constants.PERMISSION_RANGE_OWNER);
+                    objUser.Description = item.Description;
                     sysUsers.Add(objUser);
-
                 }
 
                 dc.SysEmployee.AddRange(sysEmployees);
                 dc.SysUser.AddRange(sysUsers);
-
-                //cache.Remove(Templates.SysUser.n.ListName);
                 dc.SaveChanges();
                 return new HandleState();
             }

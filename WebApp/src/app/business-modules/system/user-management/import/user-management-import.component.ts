@@ -44,20 +44,17 @@ export class UserManagementImportComponent extends AppList {
     ngOnInit() {
         this.headers = [
             { title: 'No', field: 'no', width: 100 },
+            { title: 'Staff Code', field: 'staffCode', sortable: true },
             { title: 'User Name', field: 'username', sortable: true },
-            { title: 'Name EN', field: 'employeeNameEn', sortable: true },
             { title: 'Full Name', field: 'employeeNameEn', sortable: true },
+            { title: 'Name EN', field: 'employeeNameEn', sortable: true },
             { title: 'Title', field: 'title', sortable: true },
-            { title: 'Phone Number', field: 'tel', sortable: true },
             { title: 'User Type', field: 'userType', sortable: true },
-            { title: 'Role', field: 'role', sortable: true },
-            { title: 'Level permission', field: '', sortable: true },
-            { title: 'Company', field: 'company', sortable: true },
-            { title: 'Office', field: 'office', sortable: true },
-            { title: 'Department', field: 'department', sortable: true },
-            { title: 'Group', field: 'group', sortable: true },
-            { title: 'Working Status', field: 'workingstatus', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
+            { title: 'Working Status', field: 'workingstatus', sortable: true },
+            { title: 'Email', field: 'email', sortable: true },
+            { title: 'Phone Number', field: 'tel', sortable: true },
+            { title: 'Description', field: 'description', sortable: true }
         ];
     }
 
