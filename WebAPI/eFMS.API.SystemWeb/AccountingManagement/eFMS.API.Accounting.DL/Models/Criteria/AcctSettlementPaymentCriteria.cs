@@ -15,6 +15,7 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public DateTime? AdvanceDateTo { get; set; }
         public string PaymentMethod { get; set; }
         public string StatusApproval { get; set; }
+        public string CurrencyID { get; set; }
         public PermissionRange RangeSearch { get; set; }
     }
 }
