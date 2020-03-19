@@ -38,10 +38,17 @@ namespace eFMS.API.Setting.Service.Models
         public short? PackageTypeId { get; set; }
         public string CurrentStatus { get; set; }
         public short? CommodityGroupId { get; set; }
+        public string LockedLog { get; set; }
         public bool? IsLocked { get; set; }
+        public short? GroupId { get; set; }
+        public int? DepartmentId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public DateTime? ModifiedDate { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public DateTime? DatetimeModified { get; set; }
+        public string Shipper { get; set; }
+        public string Consignee { get; set; }
     }
 }

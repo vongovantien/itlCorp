@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { TariffAddComponent } from '../add/add-tariff.component';
 import { SettingRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -26,6 +26,7 @@ export class TariffDetailComponent extends TariffAddComponent {
         protected _progressService: NgProgress,
         protected _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
+        private _cd: ChangeDetectorRef,
         protected _router: Router
     ) {
         super(_settingRepo, _progressService, _toastService, _router);
@@ -46,6 +47,7 @@ export class TariffDetailComponent extends TariffAddComponent {
                 this.tariffId = param.id;
                 if (param.action) {
                     this.ACTION = (param.action).toUpperCase() || "UPDATE";
+                    this._cd.detectChanges();
                 }
             }),
             switchMap(
@@ -79,7 +81,7 @@ export class TariffDetailComponent extends TariffAddComponent {
         this.formAddTariffComponent.minDateExpired = this.formAddTariffComponent.createMoment(this.tariff.setTariff.effectiveDate);
 
         // * Update comboGrid.
-        this.formAddTariffComponent.selectedOffice = <CommonInterface.IComboGridData>{ field: 'id', value: this.tariff.setTariff.officeId };
+        this.formAddTariffComponent.selectedOffice = <CommonInterface.IComboGridData>{ field: 'id', value: this.tariff.setTariff.applyOfficeId };
 
         switch (this.tariff.setTariff.tariffType) {
             case 'Customer':

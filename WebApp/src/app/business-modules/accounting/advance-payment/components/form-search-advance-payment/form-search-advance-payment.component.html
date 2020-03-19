@@ -88,6 +88,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-4"></div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="">Currency</label>
+                        <select class="form-control" formControlName="currencyId">
+                            <option [ngValue]="null">All</option>
+                            <option *ngFor="let currency of currencies" [ngValue]="currency">{{currency.id}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
             </form>
             <div class="form-actions">
                 <div class="row">

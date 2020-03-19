@@ -11,6 +11,10 @@ import { SystemConstants } from 'src/constants/system.const';
 export class TariffListChargeComponent extends AppList {
 
     @Input() charges: any[] = [];
+    @Input() permission: {
+        allowUpdate: true, // * Default.
+    };
+
     @Output() chargesChange: EventEmitter<any[]> = new EventEmitter<any[]>();
 
     @ViewChild(TariffChargePopupComponent, { static: false }) tariffChargePopup: TariffChargePopupComponent;

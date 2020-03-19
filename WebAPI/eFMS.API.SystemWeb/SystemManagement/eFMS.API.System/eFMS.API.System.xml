@@ -527,6 +527,13 @@
             <param name="users"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.System.Controllers.SysUserLevelController.GetUsersByType(eFMS.API.System.DL.Models.Criteria.UserLevelCriteria)">
+            <summary>
+            Get user by type
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.System.Controllers.SysUserPermissionController">
             <summary>
             Controller Department

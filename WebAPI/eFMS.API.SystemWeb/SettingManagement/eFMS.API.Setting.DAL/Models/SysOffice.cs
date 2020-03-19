@@ -27,9 +27,12 @@ namespace eFMS.API.Setting.Service.Models
         public string Taxcode { get; set; }
         public string BankAccountVnd { get; set; }
         public string BankAccountUsd { get; set; }
-        public string BankAccountName { get; set; }
         public string BankName { get; set; }
-        public string BankAddress { get; set; }
+        public string BankAccountNameEn { get; set; }
+        public string BankAccountNameVn { get; set; }
+        public string BankAddressLocal { get; set; }
+        public string BankAddressEn { get; set; }
+        public string Location { get; set; }
         public bool Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public byte[] Logo { get; set; }

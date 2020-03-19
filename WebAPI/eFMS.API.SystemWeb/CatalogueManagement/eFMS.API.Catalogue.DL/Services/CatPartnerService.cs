@@ -36,6 +36,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICatPlaceService placeService;
         private readonly ICatCountryService countryService;
         private readonly IOptions<WebUrl> webUrl;
+        private readonly IContextBase<SysOffice> officeRepository;
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -45,7 +46,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysUser> sysUserRepo,
             ICatPlaceService place,
             ICatCountryService country,
-            IContextBase<CatSaleman> salemanRepo, IOptions<WebUrl> url) : base(repository, cacheService, mapper)
+            IContextBase<CatSaleman> salemanRepo, IOptions<WebUrl> url,
+            IContextBase<SysOffice> officeRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -54,6 +56,7 @@ namespace eFMS.API.Catalogue.DL.Services
             sysUserRepository = sysUserRepo;
             countryService = country;
             webUrl = url;
+            officeRepository = officeRepo;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -180,6 +183,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
+                var s = salemanRepository.Delete(x => x.PartnerId == id);
+                salemanRepository.SubmitChanges();
                 ClearCache();
                 Get();
             }
@@ -520,9 +525,27 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.AccountNo = partner.TaxCode;
                     partner.Active = active;
                     partner.InactiveOn = inactiveDate;
+                    var saleman = new CatSaleman
+                    {
+                        Id = Guid.NewGuid(),
+                        Office = item.OfficeId,
+                        Company = item.CompanyId,
+                        SaleManId = item.SalePersonId,
+                        FreightPayment = item.PaymentTerm,
+                        EffectDate = item.EffectDate!= null?Convert.ToDateTime(item.EffectDate): (DateTime?)null,
+                        Status = true,
+                        PartnerId = partner.Id,
+                        CreateDate = DateTime.Now,
+                        ModifiedDate = DateTime.Now,
+                        UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID,
+                        Service = item.ServiceId
+                    };
                     DataContext.Add(partner, false);
+                    salemanRepository.Add(saleman, false);
                 }
                 DataContext.SubmitChanges();
+                salemanRepository.SubmitChanges();
                 ClearCache();
                 Get();
                 return new HandleState();
@@ -540,20 +563,23 @@ namespace eFMS.API.Catalogue.DL.Services
             var provinces = placeService.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
             var branchs = placeService.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch)).ToList();
             var salemans = sysUserRepository.Get().ToList();
+            var offices = officeRepository.Get().ToList();
             var regexItem = new Regex("^[a-zA-Z0-9-]+$");
+            var paymentTerms = new List<string> { "All", "Prepaid", "Collect" };
+            var services = API.Common.Globals.CustomData.Services;
 
             var allGroup = DataEnums.PARTNER_GROUP;
             var partnerGroups = allGroup.Split(";");
             list.ForEach(item =>
             {
-                if (item.TaxCode.Length == 0)
+                if (string.IsNullOrEmpty(item.TaxCode))
                 {
                     item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EMPTY]);
                     item.IsValid = false;
                 }
                 else
                 {
-                    string taxCode = item.TaxCode.ToLower().Replace(" ", "");
+                    string taxCode = item.TaxCode.Replace(" ", "");
                     var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
                     var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
                     if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(taxCode))
@@ -561,21 +587,21 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
                         item.IsValid = false;
                     }
-                    else if (list.Count(x => x.TaxCode.ToLower() == taxCode) > 1)
+                    else if (list.Count(x => x.TaxCode == taxCode) > 1)
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
                     }
                     else
                     {
-                        if (partners.Any(x => x.TaxCode.ToLower() == taxCode))
+                        if (partners.Any(x => x.TaxCode == taxCode))
                         {
                             item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
                             item.IsValid = false;
                         }
                     }
                 }
-                if (item.PartnerGroup.Length == 0)
+                if (string.IsNullOrEmpty(item.PartnerGroup))
                 {
                     item.PartnerGroupError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_GROUP_EMPTY]);
                     item.IsValid = false;
@@ -599,160 +625,167 @@ namespace eFMS.API.Catalogue.DL.Services
                         else
                         {
                             item.PartnerGroup = String.Join(";", groups);
-                            if (item.PartnerGroup.Contains(DataEnums.CustomerPartner))
-                            {
-                                if (item.SaleManName.Length == 0)
-                                {
-                                    item.SaleManNameError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_SALEMAN_EMPTY];
-                                    item.IsValid = false;
-                                }
-                                else
-                                {
-                                    var salePerson = salemans.FirstOrDefault(i => i.Username == item.SaleManName);
-                                    if (salePerson == null)
-                                    {
-                                        item.SaleManNameError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_SALEMAN_NOT_FOUND], item.SaleManName);
-                                        item.IsValid = false;
-                                    }
-                                    else
-                                    {
-                                        item.SalePersonId = salePerson.Id;
-                                    }
-                                }
-                            }
                         }
                     }
+                    item = GetSaleManInfo(item, salemans, offices, services);
                 }
-                if (item.PartnerNameEn.Length == 0)
+                if (string.IsNullOrEmpty(item.PartnerNameEn))
                 {
                     item.PartnerNameEnError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_NAME_EN_EMPTY]);
                     item.IsValid = false;
                 }
-                if (item.PartnerNameVn.Length == 0)
+                if (string.IsNullOrEmpty(item.PartnerNameVn))
                 {
                     item.PartnerNameVnError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_NAME_VN_EMPTY]);
                     item.IsValid = false;
                 }
-                if (item.ShortName.Length == 0)
+                if (string.IsNullOrEmpty(item.ShortName))
                 {
                     item.ShortNameError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_SHORT_NAME_EMPTY]);
                     item.IsValid = false;
                 }
-                if (item.AddressEn.Length == 0)
+                if (string.IsNullOrEmpty(item.AddressEn))
                 {
                     item.AddressEnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_BILLING_EN_NOT_FOUND];
                     item.IsValid = false;
 
                 }
-                if (item.AddressVn.Length == 0)
+                if (string.IsNullOrEmpty(item.AddressVn))
                 {
                     item.AddressVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND];
                     item.IsValid = false;
                 }
-                if (item.AddressShippingEn.Length == 0)
+                if (string.IsNullOrEmpty(item.CountryBilling))
                 {
-                    item.AddressShippingEnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND];
-                    item.IsValid = false;
-                }
-                if (item.AddressShippingVn.Length == 0)
-                {
-                    item.AddressShippingVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND];
-                    item.IsValid = false;
-                }
-                if (item.CountryBilling.Length == 0)
-                {
-                    item.CountryBillingError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_BILLING_EMPTY];
-                    item.IsValid = false;
+                    if (!string.IsNullOrEmpty(item.CityBilling))
+                    {
+                        item.CityBillingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_REQUIRED_COUNTRY], item.CityBilling);
+                        item.IsValid = false;
+                    }
                 }
                 else
                 {
-                    string countryBilling = item.CountryBilling.ToLower();
-                    if (countryBilling.Length == 0)
+                    string countryBilling = item.CountryBilling?.ToLower();
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == countryBilling);
+                    if (country != null)
                     {
-                        item.CountryBillingError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_BILLING_EMPTY];
-                        item.IsValid = false;
-                    }
-                    else
-                    {
-                        var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == countryBilling);
-                        if (country == null)
+                        item.CountryId = country.Id;
+                        if (!string.IsNullOrEmpty(item.CityBilling))
                         {
-                            item.CountryBillingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND], item.CountryBilling);
-                            item.IsValid = false;
-                        }
-                        else
-                        {
-                            item.CountryId = country.Id;
-                            if (item.CityBilling.Length == 0)
+                            string cityBilling = item.CityBilling.ToLower();
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == cityBilling && i.CountryId == country.Id);
+                            if (province == null)
                             {
-                                item.CityBillingError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_BILLING_EMPTY];
+                                item.CityBillingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_BILLING_NOT_FOUND], item.CityBilling);
                                 item.IsValid = false;
                             }
                             else
                             {
-                                string cityBilling = item.CityBilling.ToLower();
-                                var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == cityBilling && i.CountryId == country.Id);
-                                if (province == null)
-                                {
-                                    item.CityBillingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_BILLING_NOT_FOUND], item.CityBilling);
-                                    item.IsValid = false;
-                                }
-                                else
-                                {
-                                    item.ProvinceId = province.Id;
-                                }
+                                item.ProvinceId = province.Id;
                             }
                         }
                     }
+                    else
+                    {
+                        item.CountryBillingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND], item.CountryBilling);
+                        item.IsValid = false;
+                    }
                 }
-                if (item.CountryShipping.Length == 0)
+                if (string.IsNullOrEmpty(item.CountryShipping))
                 {
-                    item.CountryShippingError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_SHIPPING_EMPTY];
-                    item.IsValid = false;
+                    if (!string.IsNullOrEmpty(item.CityShipping))
+                    {
+                        item.CityShippingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_REQUIRED_COUNTRY], item.CityShipping);
+                        item.IsValid = false;
+                    }
                 }
                 else
                 {
-                    string countShipping = item.CountryShipping.ToLower();
-                    var countryShipping = countries.FirstOrDefault(i => i.NameEn.ToLower() == countShipping);
-                    if (countryShipping == null)
+                    string countShipping = item.CountryShipping?.ToLower();
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == countShipping);
+                    if (country != null)
+                    {
+                        item.CountryShippingId = country.Id;
+                        if (!string.IsNullOrEmpty(item.CityShipping))
+                        {
+                            string cityShipping = item.CityShipping.ToLower();
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == cityShipping && i.CountryId == country.Id);
+                            if (province == null)
+                            {
+                                item.CityShippingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND], item.CityShipping);
+                                item.IsValid = false;
+                            }
+                            else
+                            {
+                                item.ProvinceShippingId = province.Id;
+                            }
+                        }
+                    }
+                    else
                     {
                         item.CountryShippingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_SHIPPING_NOT_FOUND], item.CountryShipping);
                         item.IsValid = false;
                     }
+                }
+            });
+            return list;
+        }
+
+        private CatPartnerImportModel GetSaleManInfo(CatPartnerImportModel item, List<SysUser> salemans, List<SysOffice> offices, List<API.Common.Globals.CommonData> services)
+        {
+            if (item.PartnerGroup.Contains(DataEnums.CustomerPartner))
+            {
+                if (string.IsNullOrEmpty(item.SaleManName))
+                {
+                    item.SaleManNameError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_SALEMAN_EMPTY];
+                    item.IsValid = false;
+                }
+                else
+                {
+                    var salePersonId = salemans.FirstOrDefault(i => i.Username == item.SaleManName && i.Active == true)?.Id;
+                    if (string.IsNullOrEmpty(salePersonId))
+                    {
+                        item.SaleManNameError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_SALEMAN_NOT_FOUND], item.SaleManName);
+                        item.IsValid = false;
+                    }
                     else
                     {
-                        if (countShipping.Length == 0)
+                        if (string.IsNullOrEmpty(item.OfficeSalemanDefault))
                         {
-                            item.CountryShippingError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_SHIPPING_EMPTY];
+                            item.OfficeSalemanDefaultError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_SALEMAN_DEFAULT_OFFICE_NOT_ALLOW_EMPTY];
+                            item.IsValid = false;
+                        }
+                        else if (string.IsNullOrEmpty(item.ServiceSalemanDefault))
+                        {
+                            item.ServiceSalemanDefaultError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_SALEMAN_DEFAULT_SERVICE_NOT_ALLOW_EMPTY];
                             item.IsValid = false;
                         }
                         else
                         {
-                            item.CountryShippingId = countryShipping.Id;
-
-                            if (item.CityShipping.Length == 0)
+                            var office = offices.FirstOrDefault(x => x.Code.ToLower() == item.OfficeSalemanDefault.ToLower());
+                            var service = services.FirstOrDefault(x => x.DisplayName == item.ServiceSalemanDefault)?.Value;
+                            if (office == null)
                             {
-                                item.CityShippingError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_EMPTY];
+                                item.OfficeSalemanDefaultError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_SALEMAN_DEFAULT_OFFICE_NOT_FOUND], item.OfficeSalemanDefault);
+                                item.IsValid = false;
+                            }
+                            else if (service == null)
+                            {
+                                item.ServiceSalemanDefaultError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_SALEMAN_DEFAULT_SERVICE_NOT_FOUND], item.ServiceSalemanDefaultError);
                                 item.IsValid = false;
                             }
                             else
                             {
-                                var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == item.CountryId);
-                                if (province == null)
-                                {
-                                    item.CityShippingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND], item.CityShipping);
-                                    item.IsValid = false;
-                                }
-                                else
-                                {
-                                    item.ProvinceShippingId = province.Id;
-                                }
+                                item.OfficeId = office.Id;
+                                item.CompanyId = office.Buid;
+                                item.SalePersonId = salePersonId;
+                                item.ServiceId = service;
                             }
                         }
                     }
                 }
-            });
-            return list;
+            }
+            return item;
         }
         #endregion
 

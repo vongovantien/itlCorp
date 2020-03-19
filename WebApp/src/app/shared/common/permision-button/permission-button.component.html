@@ -49,6 +49,12 @@
             <i class="la la-edit"></i>
         </button>
     </ng-container>
+    <ng-container *ngSwitchCase="'copy'">
+        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--icon-only"
+            *ngIf="(menuPermission | async)?.detail !== 'None'">
+            <i class="la la-copy"></i>
+        </button>
+    </ng-container>
     <ng-container *ngSwitchCase="'delete'">
         <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--icon-only"
             *ngIf="(menuPermission | async)?.delete !== 'None'">

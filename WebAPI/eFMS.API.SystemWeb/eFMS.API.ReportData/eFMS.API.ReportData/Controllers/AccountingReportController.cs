@@ -56,6 +56,38 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export Advance Payment with each Request.
+        /// </summary>
+        /// <param name="advancePaymentCriteria"></param>
+        /// <returns></returns>
+        [Route("ExportAdvancePaymentShipment")]
+        [HttpPost]
+        public async Task<IActionResult> ExportAdvancePaymentShipment(AdvancePaymentCriteria advancePaymentCriteria)
+        {
+            var advancePaymentsAPI = await HttpServiceExtension.GetDataFromApi(advancePaymentCriteria, aPis.HostStaging + Urls.Accounting.AdvancePaymentUrl);
+
+            var advancePayments = advancePaymentsAPI.Content.ReadAsAsync<List<AdvancePaymentModel>>();
+            List<string> codes = new List<string>();
+            foreach (var item in advancePayments.Result)
+            {
+                codes.Add(item.AdvanceNo);
+            }
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(codes, aPis.HostStaging + Urls.Accounting.GetGroupRequestsByAdvanceNoList);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AdvancePaymentRequestModel>>();
+
+            var stream = new AccountingHelper().GenerateAdvancePaymentShipmentExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Advance Payment List Shipment.xlsx");
+
+            return fileContent;
+        }
+
+
+        /// <summary>
         /// Export Settlement Payment
         /// </summary>
         /// <param name="settlementPaymentCriteria"></param>

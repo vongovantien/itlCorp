@@ -18,6 +18,7 @@ using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
 using eFMS.API.Accounting.DL.Models.ExportResults;
+using eFMS.API.Accounting.DL.Models.SettlementPayment;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -40,7 +41,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
-
+        
+        readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -59,6 +61,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<OpsStageAssigned> opsStageAssigned,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<CatPartner> catPartner,
+            IContextBase<AcctApproveSettlement> acctApproveSettlementRepository,
             IContextBase<CatCurrencyExchange> catCurrencyExchange) : base(repository, mapper)
         {
             currentUser = user;
@@ -77,6 +80,7 @@ namespace eFMS.API.Accounting.DL.Services
             opsStageAssignedRepo = opsStageAssigned;
             csShipmentSurchargeRepo = csShipmentSurcharge;
             catPartnerRepo = catPartner;
+            acctApproveSettlementRepo = acctApproveSettlementRepository;
             catCurrencyExchangeRepo = catCurrencyExchange;
         }
 
@@ -249,6 +253,13 @@ namespace eFMS.API.Accounting.DL.Services
                            :
                                 true
                           )
+                          &&
+                         (
+                           !string.IsNullOrEmpty(criteria.CurrencyID) && !criteria.CurrencyID.Equals("All") ?
+                                ad.AdvanceCurrency == criteria.CurrencyID
+                           :
+                                true
+                          )
 
                        select new AcctAdvancePaymentResult
                        {
@@ -356,6 +367,59 @@ namespace eFMS.API.Accounting.DL.Services
                     StatusPayment = se.First().StatusPayment
                 }).ToList();
             var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
+            return datamap;
+        }
+        public List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceNoList(string[] advanceNoList)
+        {
+            var list = acctAdvanceRequestRepo.Get(x => advanceNoList.Contains(x.AdvanceNo))
+                .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo, g.Mbl })
+                .Select(se => new AcctAdvanceRequest
+                {
+                    JobId = se.First().JobId,
+                    Hbl = se.First().Hbl,
+                    CustomNo = se.First().CustomNo,
+                    Amount = se.Sum(s => s.Amount),
+                    RequestCurrency = se.First().RequestCurrency,
+                    StatusPayment = se.First().StatusPayment,
+                    AdvanceNo = se.FirstOrDefault().AdvanceNo,
+                    Mbl = se.FirstOrDefault().Mbl,
+                    Description = se.FirstOrDefault().Description,
+                }).ToList();
+            var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
+            var surcharge = csShipmentSurchargeRepo.Get(); // lấy ds surcharge đã có advanceNo.
+
+            foreach (var item in datamap)
+            {
+                string requesterID = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).Requester;
+                if(!string.IsNullOrEmpty(requesterID))
+                {
+                    string employeeID = sysUserRepo.Get(x => x.Id == requesterID).FirstOrDefault()?.EmployeeId;
+                    item.Requester = sysEmployeeRepo.Get(x => x.Id == employeeID).FirstOrDefault()?.EmployeeNameVn;
+                }
+
+                item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
+                item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault()?.BuheadAprDate;
+
+                var surchargeAdvanceNo = surcharge.Where(x => x.AdvanceNo == item.AdvanceNo)?.FirstOrDefault();
+                if(surchargeAdvanceNo != null && surchargeAdvanceNo.SettlementCode != null)
+                {
+                    string _settleCode = surchargeAdvanceNo.SettlementCode;
+                    var data = acctApproveSettlementRepo.Get(x => x.SettlementNo == _settleCode)?.FirstOrDefault();
+                    if(data != null)
+                    {
+                        item.SettleDate = data.RequesterAprDate;
+                    }
+                    else
+                    {
+                        item.SettleDate = null;
+                    }
+                }
+                else
+                {
+                    item.SettleDate = null;
+                }
+
+            }
             return datamap;
         }
 
@@ -2553,5 +2617,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return 1;
         }
+
+        
     }
 }

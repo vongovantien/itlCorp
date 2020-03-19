@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { AccountingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
@@ -19,7 +19,7 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild(AdvancePaymentFormsearchComponent, { static: false }) formSearch: AdvancePaymentFormsearchComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
-    
+
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
 
@@ -36,6 +36,7 @@ export class AdvancePaymentComponent extends AppList {
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _progressService: NgProgress,
+        private _exportRepo: ExportRepo,
         private _router: Router
     ) {
         super();
@@ -93,7 +94,6 @@ export class AdvancePaymentComponent extends AppList {
             ).subscribe(
                 (res: any) => {
                     this.advancePayments = res.data || [];
-                    console.log(this.advancePayments);
                     this.totalItems = res.totalItems || 0;
                 },
             );
@@ -131,7 +131,7 @@ export class AdvancePaymentComponent extends AppList {
             );
     }
 
-    prepareDeleteAdvance(selectedAdv: AdvancePayment){
+    prepareDeleteAdvance(selectedAdv: AdvancePayment) {
         this._accoutingRepo.checkAllowDeleteAdvance(selectedAdv.id)
             .subscribe((value: boolean) => {
                 if (value) {
@@ -172,7 +172,7 @@ export class AdvancePaymentComponent extends AppList {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
     }
 
-    viewDetail(adv: AdvancePayment){
+    viewDetail(adv: AdvancePayment) {
         this._accoutingRepo.checkAllowGetDetailAdvance(adv.id)
             .subscribe((value: boolean) => {
                 if (value) {
@@ -191,20 +191,13 @@ export class AdvancePaymentComponent extends AppList {
             });
     }
 
-    // gotoDetailAdvPayment(adv: AdvancePayment) {
-    //     switch (adv.statusApproval) {
-    //         case 'New':
-    //         case 'Denied':
-    //             this._router.navigate([`home/accounting/advance-payment/${adv.id}`]);
-    //             break;
-    //         default:
-    //             this._router.navigate([`home/accounting/advance-payment/${adv.id}/approve`]);
-    //             break;
-    //     }
-    // }
-
     export() {
-        console.log('Export');
+        this._exportRepo.exportAdvancePaymentShipment(this.dataSearch)
+            .subscribe(
+                (res: Blob) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'advance-payment.xlsx');
+                }
+            );
     }
 }
 

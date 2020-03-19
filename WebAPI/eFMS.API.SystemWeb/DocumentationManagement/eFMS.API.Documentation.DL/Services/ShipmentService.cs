@@ -13,6 +13,7 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -24,6 +25,10 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         private readonly ICurrentUser currentUser;
+        readonly IContextBase<SysUser> sysUserRepo;
+        readonly IContextBase<SysEmployee> sysEmployeeRepo;
+        readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
+        readonly IContextBase<CatPlace> catPlaceRepo;
 
         public ShipmentService(IContextBase<CsTransaction> repository, IMapper mapper,
             IContextBase<OpsTransaction> ops,
@@ -31,7 +36,11 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShipmentSurcharge> surcharge,
             IContextBase<CatPartner> catPartner,
             IContextBase<OpsStageAssigned> opsStageAssigned,
-            ICurrentUser user) : base(repository, mapper)
+            ICurrentUser user,
+            IContextBase<SysUser> sysUser,
+            IContextBase<SysEmployee> sysEmployee,
+            IContextBase<CatCurrencyExchange> catCurrencyExchange,
+            IContextBase<CatPlace> catPlace) : base(repository, mapper)
         {
             opsRepository = ops;
             detailRepository = detail;
@@ -39,6 +48,10 @@ namespace eFMS.API.Documentation.DL.Services
             catPartnerRepo = catPartner;
             opsStageAssignedRepo = opsStageAssigned;
             currentUser = user;
+            sysEmployeeRepo = sysEmployee;
+            sysUserRepo = sysUser;
+            catCurrencyExchangeRepo = catCurrencyExchange;
+            catPlaceRepo = catPlace;
         }
 
         public IQueryable<Shipments> GetShipmentNotLocked()
@@ -466,6 +479,555 @@ namespace eFMS.API.Documentation.DL.Services
             });
             var shipments = shipmentsOperation.Union(shipmentsDocumention);
             return shipments;
+        }
+
+        #region -- GENERAL REPORT --
+
+        public List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria, int page,int size, out int rowsCount)
+        {
+            var dataDocumentation = GeneralReportDocumentation(criteria);
+            IQueryable<GeneralReportResult> list; 
+            if (criteria.Service.Contains("CL"))
+            {
+                var dataOperation = GeneralReportOperation(criteria);
+                list = dataDocumentation.Union(dataOperation);
+            }
+            else
+            {
+                list = dataDocumentation;
+            }
+                                
+            var results = new List<GeneralReportResult>();
+            if (list == null)
+            {
+                rowsCount = 0;
+                return results;
+            }
+            var tempList = list.ToList();
+            int no = 1;
+            tempList.ForEach(fe =>
+            {
+                fe.No = no;
+                no++;
+            });
+            rowsCount = tempList.Select(s => s.No).Count();
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                results = tempList.Skip((page - 1) * size).Take(size).ToList();
+            }
+            return results;
+        }
+
+        private IQueryable<OpsTransaction> QueryDataOperation(GeneralReportCriteria criteria)
+        {
+            var shipments = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            Expression<Func<OpsTransaction, bool>> query = q => true;
+            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+            {
+                query = q =>
+                    q.ServiceDate.HasValue ? q.ServiceDate.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.ServiceDate.Value.Date <= criteria.ServiceDateTo.Value.Date : false;
+            }
+            else
+            {
+                query = q =>
+                    q.DatetimeCreated.HasValue ? q.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && q.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date : false;
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CustomerId))
+            {
+                query = query.And(q => q.CustomerId == criteria.CustomerId);
+            }
+
+            query = query.And(q => criteria.Service.Contains("CL"));            
+
+            if (!string.IsNullOrEmpty(criteria.JobId))
+            {
+                query = query.And(q => q.JobNo == criteria.JobId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Mawb))
+            {
+                query = query.And(q => q.Mblno == criteria.Mawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Hawb))
+            {
+                query = query.And(q => q.Hwbno == criteria.Hawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.OfficeId))
+            {
+                query = query.And(q => criteria.OfficeId.Contains(q.OfficeId.ToString()));
+            }
+            else
+            {
+                query = query.And(q => q.OfficeId == Guid.Empty);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.DepartmentId))
+            {
+                query = query.And(q => criteria.DepartmentId.Contains(q.DepartmentId.ToString()));
+            }
+            else
+            {
+                query = query.And(q => q.DepartmentId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.GroupId))
+            {
+                query = query.And(q => criteria.GroupId.Contains(q.GroupId.ToString()));
+            }
+            else
+            {
+                query = query.And(q => q.GroupId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PersonInCharge))
+            {
+                query = query.And(q => criteria.PersonInCharge.Contains(q.BillingOpsId));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.SalesMan))
+            {
+                query = query.And(q => criteria.SalesMan.Contains(q.SalemanId));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Creator))
+            {
+                query = query.And(q => criteria.Creator.Contains(q.UserCreated));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CarrierId))
+            {
+                query = query.And(q => q.SupplierId == criteria.CarrierId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.AgentId))
+            {
+                query = query.And(q => q.AgentId == criteria.AgentId);
+            }
+
+            if (criteria.Pol != null && criteria.Pol != Guid.Empty)
+            {
+                query = query.And(q => q.Pol == criteria.Pol);
+            }
+
+            if (criteria.Pod != null && criteria.Pod != Guid.Empty)
+            {
+                query = query.And(q => q.Pod == criteria.Pod);
+            }
+            var queryShipment = shipments.Where(query);
+            return queryShipment;
+        }
+
+        private IQueryable<GeneralReportResult> GeneralReportOperation(GeneralReportCriteria criteria)
+        {          
+            List<GeneralReportResult> dataList = new List<GeneralReportResult>();
+            var dataShipment = QueryDataOperation(criteria);
+            foreach(var item in dataShipment)
+            {
+                GeneralReportResult data = new GeneralReportResult();
+                data.JobId = item.JobNo;
+                data.Mawb = item.Mblno;
+                data.Hawb = item.Hwbno;
+                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn;
+                data.CarrierName = catPartnerRepo.Get(x => x.Id == item.SupplierId).FirstOrDefault()?.PartnerNameEn;
+                data.AgentName = catPartnerRepo.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn;
+                data.ServiceDate = item.ServiceDate;
+
+                var _polCode = catPlaceRepo.Get(x => x.Id == item.Pol).FirstOrDefault()?.Code;
+                var _podCode = catPlaceRepo.Get(x => x.Id == item.Pod).FirstOrDefault()?.Code;
+                data.Route = _polCode + "/" + _podCode;
+
+                data.Qty = item.SumPackages ?? 0;
+
+                #region -- Phí Selling trước thuế --
+                decimal _revenue = 0;
+                var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.Hblid);
+                foreach(var charge in _chargeSell)
+                {
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {                        
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    _revenue += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                }
+                data.Revenue = _revenue;
+                #endregion -- Phí Selling trước thuế --
+
+                #region -- Phí Buying trước thuế --
+                decimal _cost = 0;
+                var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.Hblid);
+                foreach (var charge in _chargeBuy)
+                {
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    _cost += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                }
+                data.Cost = _cost;
+                #endregion -- Phí Buying trước thuế --
+
+                data.Profit = data.Revenue - data.Cost;
+
+                #region -- Phí OBH sau thuế --
+                decimal _obh = 0;
+                var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.Hblid);
+                foreach (var charge in _chargeObh)
+                {
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    _obh += charge.Total * _rate ?? 0; // Phí OBH sau thuế
+                }
+                data.Obh = _obh;
+                #endregion -- Phí OBH sau thuế --
+
+                var _empPic = sysUserRepo.Get(j => j.Id == item.BillingOpsId).FirstOrDefault()?.EmployeeId;
+                if (!string.IsNullOrEmpty(_empPic))
+                {
+                    data.PersonInCharge = sysEmployeeRepo.Get(x => x.Id == _empPic).FirstOrDefault()?.EmployeeNameEn;
+                }
+
+                var _empSale = sysUserRepo.Get(j => j.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
+                if (!string.IsNullOrEmpty(_empSale))
+                {
+
+                    data.Salesman = sysEmployeeRepo.Get(x => x.Id == _empSale).FirstOrDefault()?.EmployeeNameEn;
+                }
+
+                data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
+
+                dataList.Add(data);
+            }
+            return dataList.AsQueryable();
+        }
+
+        private IQueryable<GeneralReportResult> QueryDataDocumentation(GeneralReportCriteria criteria)
+        {
+            Expression<Func<CsTransaction, bool>> queryTrans;
+            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = null;
+            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+            {
+                queryTrans = q =>
+                    q.TransactionType.Contains("E") ?
+                    (q.Etd.HasValue ? q.Etd.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Etd.Value.Date <= criteria.ServiceDateTo.Value.Date : false)
+                    :
+                    (q.Eta.HasValue ? q.Eta.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Eta.Value.Date <= criteria.ServiceDateTo.Value.Date : false);
+            }
+            else
+            {
+                queryTrans = q =>
+                    q.DatetimeCreated.HasValue ? q.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && q.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date : false;
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CustomerId))
+            {
+                queryTranDetail = q => q.CustomerId == criteria.CustomerId;
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Service))
+            {
+                queryTrans = queryTrans.And(q => criteria.Service.Contains(q.TransactionType));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.TransactionType == criteria.Service);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.JobId))
+            {
+                queryTrans = queryTrans.And(q => q.JobNo == criteria.JobId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Mawb))
+            {
+                queryTrans = queryTrans.And(q => q.Mawb == criteria.Mawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Hawb))
+            {
+                queryTranDetail = queryTranDetail == null ? 
+                    (q => q.Hwbno == criteria.Hawb) 
+                    : 
+                    queryTranDetail.And(q => q.Hwbno == criteria.Hawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.OfficeId))
+            {
+                queryTrans = queryTrans.And(q => criteria.OfficeId.Contains(q.OfficeId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.OfficeId == Guid.Empty);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.DepartmentId))
+            {
+                queryTrans = queryTrans.And(q => criteria.DepartmentId.Contains(q.DepartmentId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.DepartmentId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.GroupId))
+            {
+                queryTrans = queryTrans.And(q => criteria.GroupId.Contains(q.GroupId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.GroupId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PersonInCharge))
+            {
+                queryTrans = queryTrans.And(q => criteria.PersonInCharge.Contains(q.PersonIncharge));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.SalesMan))
+            {
+                queryTranDetail = (queryTranDetail == null) ? 
+                    (q => criteria.SalesMan.Contains(q.SaleManId)) 
+                    : 
+                    queryTranDetail.And(q => criteria.SalesMan.Contains(q.SaleManId));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Creator))
+            {
+                queryTrans = queryTrans.And(q => criteria.Creator.Contains(q.UserCreated));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CarrierId))
+            {
+                queryTrans = queryTrans.And(q => q.ColoaderId == criteria.CarrierId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.AgentId))
+            {
+                queryTrans = queryTrans.And(q => q.AgentId == criteria.AgentId);
+            }
+
+            if (criteria.Pol != null && criteria.Pol != Guid.Empty)
+            {
+                queryTrans = queryTrans.And(q => q.Pol == criteria.Pol);
+            }
+
+            if (criteria.Pod != null && criteria.Pod != Guid.Empty)
+            {
+                queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
+            }
+
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);            
+            if (queryTranDetail == null)
+            {
+                var houseBills = detailRepository.Get();
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId into housebill
+                                    from house in housebill.DefaultIfEmpty()
+                                    select new GeneralReportResult
+                                    {
+                                        JobId = master.JobNo,
+                                        Mawb = master.Mawb,
+                                        HblId = house.Id,
+                                        Hawb = house.Hwbno,
+                                        CustomerId = house.CustomerId,
+                                        CarrierId = master.ColoaderId,
+                                        AgentId = master.AgentId,
+                                        Qty = master.PackageQty ?? 0,
+                                        Pol = master.Pol,
+                                        Pod = master.Pod,
+                                        ServiceDate = master.ServiceDate,
+                                        PicId = master.PersonIncharge,
+                                        SalesmanId = house.SaleManId,
+                                        Service = master.TransactionType
+                                    };
+                return queryShipment;
+            }
+            else
+            {
+                var houseBills = detailRepository.Get().Where(queryTranDetail);
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId
+                                    select new GeneralReportResult
+                                    {
+                                        JobId = master.JobNo,
+                                        Mawb = master.Mawb,
+                                        HblId = house.Id,
+                                        Hawb = house.Hwbno,
+                                        CustomerId = house.CustomerId,
+                                        CarrierId = master.ColoaderId,
+                                        AgentId = master.AgentId,
+                                        Qty = master.PackageQty ?? 0,
+                                        Pol = master.Pol,
+                                        Pod = master.Pod,
+                                        ServiceDate = master.ServiceDate,
+                                        PicId = master.PersonIncharge,
+                                        SalesmanId = house.SaleManId,
+                                        Service = master.TransactionType
+                                    };
+                return queryShipment;
+            }
+            
+        }
+
+        private IQueryable<GeneralReportResult> GeneralReportDocumentation(GeneralReportCriteria criteria)
+        {
+            var dataShipment = QueryDataDocumentation(criteria);
+            List<GeneralReportResult> dataList = new List<GeneralReportResult>();
+            foreach (var item in dataShipment)
+            {
+                GeneralReportResult data = new GeneralReportResult();
+                data.JobId = item.JobId;
+                data.Mawb = item.Mawb;
+                data.Hawb = item.Hawb;
+                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn;
+                data.CarrierName = catPartnerRepo.Get(x => x.Id == item.CarrierId).FirstOrDefault()?.PartnerNameEn;
+                data.AgentName = catPartnerRepo.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn;
+                data.ServiceDate = item.ServiceDate;
+
+                var _polCode = catPlaceRepo.Get(x => x.Id == item.Pol).FirstOrDefault()?.Code;
+                var _podCode = catPlaceRepo.Get(x => x.Id == item.Pod).FirstOrDefault()?.Code;
+                data.Route = _polCode + "/" + _podCode;
+
+                data.Qty = item.Qty;
+
+                #region -- Phí Selling trước thuế --
+                decimal _revenue = 0;
+                var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HblId);
+                foreach (var charge in _chargeSell)
+                {
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    _revenue += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                }
+                data.Revenue = _revenue;
+                #endregion -- Phí Selling trước thuế --
+
+                #region -- Phí Buying trước thuế --
+                decimal _cost = 0;
+                var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.HblId);
+                foreach (var charge in _chargeBuy)
+                {
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        if (charge.ExchangeDate.HasValue)
+                        {
+                            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                            _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                        }
+                    }
+                    _cost += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                }
+                data.Cost = _cost;
+                #endregion -- Phí Buying trước thuế --
+
+                data.Profit = data.Revenue - data.Cost;
+
+                #region -- Phí OBH sau thuế --
+                decimal _obh = 0;
+                var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.HblId);
+                foreach (var charge in _chargeObh)
+                {
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    _obh += charge.Total * _rate ?? 0; // Phí OBH sau thuế
+                }
+                data.Obh = _obh;
+                #endregion -- Phí OBH sau thuế --
+
+                var _empPic = sysUserRepo.Get(j => j.Id == item.PicId).FirstOrDefault()?.EmployeeId;
+                if (!string.IsNullOrEmpty(_empPic))
+                {
+                    data.PersonInCharge = sysEmployeeRepo.Get(x => x.Id == _empPic).FirstOrDefault()?.EmployeeNameEn;
+                }
+
+                var _empSale = sysUserRepo.Get(j => j.Id == item.SalesmanId).FirstOrDefault()?.EmployeeId;
+                if (!string.IsNullOrEmpty(_empSale))
+                {
+
+                    data.Salesman = sysEmployeeRepo.Get(x => x.Id == _empSale).FirstOrDefault()?.EmployeeNameEn;
+                }
+
+                data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
+
+                dataList.Add(data);
+            }
+            return dataList.AsQueryable();
+        }
+        #endregion -- GENERAL REPORT --
+
+        private decimal GetRateCurrencyExchange(List<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
+        {
+            if (currencyExchange.Count == 0 || string.IsNullOrEmpty(currencyFrom)) return 0;
+
+            currencyFrom = currencyFrom.Trim();
+            currencyTo = currencyTo.Trim();
+
+            if (currencyFrom != currencyTo)
+            {
+                var get1 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom && x.CurrencyToId.Trim() == currencyTo).OrderByDescending(x => x.Rate).FirstOrDefault();
+                if (get1 != null)
+                {
+                    return get1.Rate;
+                }
+                else
+                {
+                    var get2 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyTo && x.CurrencyToId.Trim() == currencyFrom).OrderByDescending(x => x.Rate).FirstOrDefault();
+                    if (get2 != null)
+                    {
+                        return 1 / get2.Rate;
+                    }
+                    else
+                    {
+                        var get3 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom || x.CurrencyFromId.Trim() == currencyTo).OrderByDescending(x => x.Rate).ToList();
+                        if (get3.Count > 1)
+                        {
+                            if (get3[0].CurrencyFromId.Trim() == currencyFrom && get3[1].CurrencyFromId.Trim() == currencyTo)
+                            {
+                                return get3[0].Rate / get3[1].Rate;
+                            }
+                            else
+                            {
+                                return get3[1].Rate / get3[0].Rate;
+                            }
+                        }
+                        else
+                        {
+                            //Nến không tồn tại Currency trong Exchange thì return về 0
+                            return 0;
+                        }
+                    }
+                }
+            }
+            return 1;
         }
     }
 }

@@ -7,29 +7,35 @@
                 Detail/Edit OPS Tariff
             </div>
             <div class="form-actions m--align-right">
-                <a [routerLink]="[]" [queryParams]="{action: 'copy'}"
-                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" title="Duplicate" role="button">
-                    <i class="la la-copy"></i>
-                    Duplicate
-                </a>
-                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="deleteTariff()" [disabled]="tariff.setTariff.status">
-                    <span>
-                        <i class="la la-remove"></i>
+                <ng-container *ngIf="tariff.setTariff.permission.allowDelete">
+                    <a [routerLink]="[]" [queryParams]="{action: 'copy'}"
+                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" title="Duplicate"
+                        role="button">
+                        <i class="la la-copy"></i>
+                        Duplicate
+                    </a>
+                </ng-container>
+                <ng-container *ngIf="tariff.setTariff.permission.allowDelete">
+                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="deleteTariff()" [disabled]="tariff.setTariff.status">
                         <span>
-                            Delete
+                            <i class="la la-remove"></i>
+                            <span>
+                                Delete
+                            </span>
                         </span>
-                    </span>
-                </button>
+                    </button>
+                </ng-container>
+
             </div>
             <div class="row m--margin-top-10">
                 <div class="col-md-6">
                     Create Date: {{tariff.setTariff.datetimeCreated | date:'dd/MM/yyyy HH:mm'}} by
-                    <span class="text-success"> {{tariff.setTariff.userCreated}} </span>
+                    <span class="text-success"> {{tariff.setTariff.userCreatedName}} </span>
                 </div>
                 <div class="col-md-6">
                     Modified Date: {{tariff.setTariff.datetimeModified | date:'dd/MM/yyyy HH:mm'}} by
-                    <span class="text-success"> {{tariff.setTariff.userModified}} </span>
+                    <span class="text-success"> {{tariff.setTariff.userModifieddName}} </span>
                 </div>
             </div>
         </form-add-tariff>
@@ -39,18 +45,21 @@
                 <tabset>
                     <tab heading="Tariff">
 
-                        <list-charge-tariff [(charges)]="tariff.setTariffDetails"></list-charge-tariff>
+                        <list-charge-tariff [(charges)]="tariff.setTariffDetails"
+                            [permission]="tariff.setTariff.permission"></list-charge-tariff>
 
                         <div class="form-actions m--align-center">
-                            <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                                (click)="updateTafiff()">
-                                <span>
-                                    <i class="la la-save"></i>
+                            <ng-container *ngIf="tariff.setTariff.permission.allowUpdate">
+                                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="updateTafiff()">
                                     <span>
-                                        {{ACTION === 'UPDATE' ? 'UPDATE': 'COPY'}}
+                                        <i class="la la-save"></i>
+                                        <span>
+                                            {{ACTION === 'UPDATE' ? 'UPDATE': 'COPY'}}
+                                        </span>
                                     </span>
-                                </span>
-                            </button>
+                                </button>
+                            </ng-container>
                             <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
                                 (click)="back()">
                                 <span>

@@ -141,8 +141,10 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && formChargeTariff.value.tariffChargeDetail.rangeFrom < formChargeTariff.value.tariffChargeDetail.rangeTo}">
                                 <label>Range From</label>
-                                <input currencyMask type="text" class="form-control" formControlName="rangeFrom">
-                                <div class="form-control-feedback" *ngIf="isSubmitted && formChargeTariff.value.tariffChargeDetail.rangeFrom < formChargeTariff.value.tariffChargeDetail.rangeTo">
+                                <input numeric [decimals]="digitDecimal" autoFormatCurrency type="text"
+                                    class="form-control" formControlName="rangeFrom">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && formChargeTariff.value.tariffChargeDetail.rangeFrom < formChargeTariff.value.tariffChargeDetail.rangeTo">
                                     Range From must be greater than or equal to Range To!
                                 </div>
                             </div>
@@ -151,25 +153,29 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && !formChargeTariff.value.tariffChargeDetail.route}">
                                 <label>Range To</label>
-                                <input currencyMask type="text" class="form-control" formControlName="rangeTo">
+                                <input numeric [decimals]="digitDecimal" autoFormatCurrency type="text"
+                                    class="form-control" formControlName="rangeTo">
                             </div>
                         </div>
                         <div class="col-md-4 m--margin-bottom-10">
                             <div class="form-group">
                                 <label>Unit Price</label>
-                                <input currencyMask type="text" class="form-control" formControlName="unitPrice">
+                                <input type="text" class="form-control" formControlName="unitPrice" numeric
+                                    [decimals]="digitDecimal" autoFormatCurrency>
                             </div>
                         </div>
                         <div class="col-md-4 m--margin-bottom-10">
                             <div class="form-group">
                                 <label>Min</label>
-                                <input currencyMask type="text" class="form-control" formControlName="min">
+                                <input numeric [decimals]="digitDecimal" autoFormatCurrency type="text"
+                                    class="form-control" formControlName="min">
                             </div>
                         </div>
                         <div class="col-md-4 m--margin-bottom-10">
                             <div class="form-group">
                                 <label>Max</label>
-                                <input currencyMask type="text" class="form-control" formControlName="max">
+                                <input numeric [decimals]="digitDecimal" type="text" class="form-control"
+                                    formControlName="max" autoFormatCurrency>
                             </div>
                         </div>
                         <div class="col-md-4 m--margin-bottom-10">
@@ -186,13 +192,15 @@
                         <div class="col-md-4 m--margin-bottom-10">
                             <div class="form-group">
                                 <label>Next Unit</label>
-                                <input currencyMask type="text" class="form-control" formControlName="nextUnit">
+                                <input numeric [decimals]="digitDecimal" autoFormatCurrency type="text"
+                                    class="form-control" formControlName="nextUnit">
                             </div>
                         </div>
                         <div class="col-md-4 m--margin-bottom-10">
                             <div class="form-group">
                                 <label>Next Unit Price</label>
-                                <input currencyMask type="text" class="form-control" formControlName="nextUnitPrice">
+                                <input numeric [decimals]="digitDecimal" autoFormatCurrency type="text"
+                                    class="form-control" formControlName="nextUnitPrice">
                             </div>
                         </div>
                         <div class="col-md-4 m--margin-bottom-10">
@@ -200,7 +208,8 @@
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label>VAT</label>
-                                        <input type="number" class="form-control" max="100" formControlName="vatrate">
+                                        <input type="number" class="form-control" max="100" formControlName="vatrate"
+                                            numeric [decimals]="digitDecimal" autoFormatCurrency>
                                     </div>
                                 </div>
                                 <div class="col-6">

@@ -4,9 +4,10 @@ import { SettingRepo } from 'src/app/shared/repositories';
 import { map, catchError, finalize } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { Tariff } from 'src/app/shared/models';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-tariff',
@@ -15,6 +16,7 @@ import { Tariff } from 'src/app/shared/models';
 export class TariffComponent extends AppList {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) permission403Popup: Permission403PopupComponent;
 
     tariffs: Tariff[] = [];
     headers: CommonInterface.IHeaderTable[] = [];
@@ -25,7 +27,8 @@ export class TariffComponent extends AppList {
         private _settingRepo: SettingRepo,
         private _progressService: NgProgress,
         private _sortService: SortService,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _router: Router
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -75,8 +78,18 @@ export class TariffComponent extends AppList {
     }
 
     showDeletePopup(tariff: ITariff) {
-        this.selectedTariff = tariff;
-        this.confirmDeletePopup.show();
+        this._settingRepo.checkPermissionAllowDelete(tariff.id)
+            .subscribe(
+                (res: boolean) => {
+                    if (!res) {
+                        this.permission403Popup.show();
+                    } else {
+                        this.selectedTariff = tariff;
+                        this.confirmDeletePopup.show();
+                    }
+                }
+            );
+
     }
 
     onDeleteTariff() {
@@ -96,6 +109,36 @@ export class TariffComponent extends AppList {
                         this._toastService.warning(res.message);
                     }
                 },
+            );
+    }
+
+    viewDetailTpCopy(tariff: ITariff) {
+        this._settingRepo.checkPermissionAllowDetail(tariff.id)
+            .subscribe(
+                (res: boolean) => {
+                    if (!res) {
+                        this.permission403Popup.show();
+                    } else {
+                        this._router.navigate(["home/tool/tariff", tariff.id], {
+                            queryParams: {
+                                action: 'copy'
+                            }
+                        });
+                    }
+                }
+            );
+    }
+
+    viewDetail(tariff: ITariff) {
+        this._settingRepo.checkPermissionAllowDetail(tariff.id)
+            .subscribe(
+                (res: boolean) => {
+                    if (!res) {
+                        this.permission403Popup.show();
+                    } else {
+                        this._router.navigate(["home/tool/tariff", tariff.id]);
+                    }
+                }
             );
     }
 }

@@ -42,6 +42,7 @@
             public const string DetailSettlementPaymentExportUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/DetailSettlementPaymentExport";
             public const string DetailSOAExportUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExportSOABySOANo?soaNo=";
             public const string GetDataSOAAirfreightExportUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExportAirFrieghtBySOANo?soaNo=";
+            public const string GetGroupRequestsByAdvanceNoList = "/Accounting/api/v1/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNoList";
         }
 
         public class Documentation

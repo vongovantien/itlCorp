@@ -265,6 +265,13 @@ namespace eFMS.API.Accounting.DL.Services
                            :
                                 true
                        )
+                       &&
+                       (
+                           !string.IsNullOrEmpty(criteria.CurrencyID) && !criteria.CurrencyID.Equals("All") ?
+                                set.SettlementCurrency == criteria.CurrencyID
+                           :
+                                true
+                       )
                        select new AcctSettlementPaymentResult
                        {
                            Id = set.Id,

@@ -1,15 +1,8 @@
 <div class="company-infomation-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                [routerLink]="'/home/tool/tariff/new'">
-                <span>
-                    <i class="la la-plus"></i>
-                    <span>
-                        Create
-                    </span>
-                </span>
-            </button>
+            <app-permission-button type="add" [routerLink]="'/home/tool/tariff/new'" title="Create">
+            </app-permission-button>
         </div>
     </app-sub-header>
     <div class="m-content">
@@ -43,25 +36,23 @@
                                         <th class="first table-actions-col"></th>
                                     </thead>
                                     <tbody>
-                                        <ng-container *ngIf="!isLoading && !!tariffs.length">
+                                        <ng-container *ngIf="!!tariffs.length">
                                             <tr class=""
                                                 *ngFor="let tariff of tariffs | filter : keyword : ['tariffName','tariffType','customerID','supplierID','serviceMode','status']; let i = index; trackBy: trackByFn">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions">
-                                                        <a [routerLink]="[tariff.id]" [queryParams]="{action: 'copy'}"
-                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Edit">
-                                                            <i class="la la-copy"></i>
-                                                        </a>
-                                                        <button (click)="showDeletePopup(tariff)"
-                                                            [disabled]="tariff.status"
-                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                            <i class="la la-trash"></i>
-                                                        </button>
+                                                        <app-permission-button type="copy"
+                                                            (click)="viewDetailTpCopy(tariff)">
+                                                        </app-permission-button>
+                                                        <ng-container *ngIf="!tariff.status">
+                                                            <app-permission-button type="delete"
+                                                                (click)="showDeletePopup(tariff)">
+                                                            </app-permission-button>
+                                                        </ng-container>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <a class="text-underline" [routerLink]="tariff.id"
+                                                    <a class="text-underline" (click)="viewDetail(tariff)"
                                                         [title]="tariff.tariffName">
                                                         {{tariff.tariffName}}
                                                     </a>
@@ -91,3 +82,5 @@
 </div>
 
 <confirm-popup [body]="'Do you want to delete this tariff ?'" (onSubmit)="onDeleteTariff()"></confirm-popup>
+
+<permission-403-popup></permission-403-popup>

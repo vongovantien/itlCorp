@@ -6,7 +6,7 @@ namespace eFMS.API.Setting.Service.Models
     public partial class CsMawbcontainer
     {
         public Guid Id { get; set; }
-        public Guid Mblid { get; set; }
+        public Guid? Mblid { get; set; }
         public Guid? Hblid { get; set; }
         public short? ContainerTypeId { get; set; }
         public int? Quantity { get; set; }
@@ -28,8 +28,5 @@ namespace eFMS.API.Setting.Service.Models
         public string OffHireRefNo { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-
-        public virtual CatUnit ContainerType { get; set; }
-        public virtual CatUnit UnitOfMeasure { get; set; }
     }
 }

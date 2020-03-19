@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.Extensions;
 
 namespace eFMS.API.Setting.Controllers
 {
@@ -78,10 +79,21 @@ namespace eFMS.API.Setting.Controllers
         [Authorize]
         public IActionResult AddTariff(TariffModel model)
         {
+
+            PermissionRange permissionRange;
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingTariff);
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             if (!ModelState.IsValid) return BadRequest();
 
             var checkData = tariffService.CheckExistsDataTariff(model);
             if (!checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
+
+
 
             var hs = tariffService.AddTariff(model);
 
@@ -99,8 +111,26 @@ namespace eFMS.API.Setting.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
+        [AuthorizeEx(Menu.settingTariff, UserPermission.Update)]
         public IActionResult UpdateTariff(TariffModel model)
         {
+
+            PermissionRange permissionRange;
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingTariff);
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+
+            if (permissionRange == PermissionRange.None)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            bool code = tariffService.CheckAllowPermissionAction(model.setTariff.Id, permissionRange);
+
+            if (code == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             if (!ModelState.IsValid) return BadRequest();
 
             var checkData = tariffService.CheckExistsDataTariff(model);
@@ -116,6 +146,29 @@ namespace eFMS.API.Setting.Controllers
         }
 
         /// <summary>
+        /// Check permission view detail ecus
+        /// </summary>
+        /// <param name="id">id of item want to delete</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            PermissionRange permissionRange;
+            ICurrentUser _user = null;
+            var result = new TariffModel();
+            result.setTariff = tariffService.GetTariffById(id);
+            if (result.setTariff == null)
+            {
+                return Ok(false);
+            }
+            _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingTariff);
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            return Ok(tariffService.CheckAllowPermissionAction(id, permissionRange));
+        }
+
+        /// <summary>
         /// Delete tariff and list tariff details
         /// </summary>
         /// <param name="id"></param>
@@ -125,9 +178,18 @@ namespace eFMS.API.Setting.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
+            PermissionRange permissionRange;
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingTariff);
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            bool isAllowDelete = tariffService.CheckAllowPermissionAction(id, permissionRange);
+            if(isAllowDelete == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
             //Check exists tariff & status tariff
             var checkStatus = tariffService.Get(x => x.Id == id).FirstOrDefault();
-            if(checkStatus == null)
+            if (checkStatus == null)
             {
                 return Ok(new ResultHandle { Status = false, Message = "Not found tariff" });
             }
@@ -144,6 +206,30 @@ namespace eFMS.API.Setting.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             return Ok(result);
         }
+        /// <summary>
+        /// Check permission view detail ecus
+        /// </summary>
+        /// <param name="id">id of item want to delete</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            PermissionRange permissionRange;
+            ICurrentUser _user = null;
+
+            var result = new TariffModel();
+            result.setTariff = tariffService.GetTariffById(id);
+
+            if (result.setTariff == null)
+            {
+                return Ok(false);
+            }
+            _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingTariff);
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            return Ok(tariffService.CheckAllowPermissionAction(id, permissionRange));
+        }
 
         /// <summary>
         /// Get tariff and list tariff detail by tariff id
@@ -151,8 +237,20 @@ namespace eFMS.API.Setting.Controllers
         /// <param name="tariffId"></param>
         /// <returns></returns>
         [HttpGet("GetTariff")]
+        [Authorize]
+
         public IActionResult GetTariff(Guid tariffId)
         {
+            PermissionRange permissionRange;
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingTariff);
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            bool isAllowDelete = tariffService.CheckAllowPermissionAction(tariffId, permissionRange);
+            if (isAllowDelete == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             var result = new TariffModel();
             result.setTariff = tariffService.GetTariffById(tariffId);
             result.setTariffDetails = tariffService.GetListTariffDetailByTariffId(tariffId).ToList();

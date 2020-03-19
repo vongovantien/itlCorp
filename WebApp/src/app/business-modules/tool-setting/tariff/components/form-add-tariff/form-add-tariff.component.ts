@@ -1,14 +1,15 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { TariffFormSearchComponent } from '../form-search-tariff/form-search-tariff.component';
 import { DataService } from 'src/app/shared/services';
-import { CatalogueRepo, SystemRepo, SettingRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { FormBuilder, FormGroup, AbstractControl, FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SystemConstants } from 'src/constants/system.const';
+
+import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
+
 import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
-import { Tariff, Partner, Company } from 'src/app/shared/models';
-import { Customer } from 'src/app/shared/models/catalogue/customer.model';
+import { Tariff, Partner, Company, Customer } from '@models';
 
 @Component({
     selector: 'form-add-tariff',
@@ -34,6 +35,7 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
     isDisabledSupplier: boolean = true;
     isDisabledAgent: boolean = true;
     minDateExpired: any = null;
+
     constructor(
         protected _dataService: DataService,
         protected _catalogueRepo: CatalogueRepo,
@@ -150,7 +152,6 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
                 map((data: any) => data.startDate)
             )
             .subscribe((value: any) => {
-                console.log(value);
                 this.resetFormControl(this.formAdd.controls['tariff'].get("expiredDate"));
                 this.minDateExpired = value; // * Update MinDate -> ExpiredDate.
             });

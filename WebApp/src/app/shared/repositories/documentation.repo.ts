@@ -718,4 +718,12 @@ export class DocumentationRepo {
         );
     }
 
+    getGeneralReport(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetDataGeneralReport`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
 }

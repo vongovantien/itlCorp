@@ -23,7 +23,5 @@ namespace eFMS.API.Setting.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string SugarId { get; set; }
-
-        public virtual CatPartner Partner { get; set; }
     }
 }

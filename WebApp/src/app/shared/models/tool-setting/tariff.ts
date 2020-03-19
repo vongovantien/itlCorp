@@ -1,10 +1,12 @@
+import { PermissionShipment } from "../document/permissionShipment";
+
 export class Tariff {
     id: string = '';
     tariffName: string = '';
     tariffType: any = null;
     effectiveDate: any = null;
     expiredDate: any = null;
-    officeId: any = null;
+    applyOfficeId: any = null;
     productService: any = null;
     cargoType: any = null;
     serviceMode: any = null;
@@ -19,6 +21,15 @@ export class Tariff {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
+    groupId: number = 0;
+    departmentId: number = 0;
+    officeId: string = null;
+    companyId: string = null;
+
+    userCreatedName: string = null;
+    userModifieddName: string = null;
+
+    permission: PermissionShipment = new PermissionShipment();
 
     constructor(object?: any) {
         const self = this;
