@@ -70,6 +70,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.paymentMethod = this.formSearch.controls['paymentMethod'];
         this.currencyId = this.formSearch.controls['currencyId'];
 
+
     }
 
     initDataInform() {

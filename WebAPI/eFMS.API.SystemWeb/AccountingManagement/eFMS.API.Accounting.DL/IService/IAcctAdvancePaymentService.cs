@@ -22,6 +22,7 @@ namespace eFMS.API.Accounting.DL.IService
         AcctAdvancePaymentModel GetAdvancePaymentByAdvanceId(Guid advanceId);
 
         List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceNo(string advanceNo);
+        List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceNoList(string[] advanceNoList);
 
         List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceId(Guid advanceId);
 

@@ -204,5 +204,12 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportAdvancePaymentShipment(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAdvancePaymentShipment`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 

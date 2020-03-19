@@ -88,6 +88,15 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpPost]
+        [Route("GetGroupRequestsByAdvanceNoList")]
+        public IActionResult GetGrpRequestsByAdvanceNo(string[] advanceNoList)
+        {
+            //Sum(Amount) theo lô hàng (JobId, HBL)
+            var data = acctAdvancePaymentService.GetGroupRequestsByAdvanceNoList(advanceNoList);
+            return Ok(data);
+        }
+
         /// <summary>
         /// Get Group Requests by AdvanceId
         /// </summary>

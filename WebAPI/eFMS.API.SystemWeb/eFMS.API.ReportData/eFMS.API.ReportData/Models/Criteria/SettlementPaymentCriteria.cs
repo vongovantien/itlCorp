@@ -13,5 +13,6 @@ namespace eFMS.API.ReportData.Models.Criteria
         public DateTime? AdvanceDateTo { get; set; }
         public string PaymentMethod { get; set; }
         public string StatusApproval { get; set; }
+        public string CurrencyID { get; set; }
     }
 }
