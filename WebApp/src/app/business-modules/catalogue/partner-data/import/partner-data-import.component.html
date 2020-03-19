@@ -94,12 +94,12 @@
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'shortName'), 'sorting_desc': (!isDesc && sortKey == 'shortName') }"
                                 (click)="sort('shortName')">
-                                <span>Name(Abreviation)</span>
+                                <span>Name(Abreviation) *</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerNameEn'), 'sorting_desc': (!isDesc && sortKey == 'partnerNameEn') }"
                                 (click)="sort('partnerNameEn')">
-                                <span>Name(EN)</span>
+                                <span>Name(EN) *</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerNameVn'), 'sorting_desc': (!isDesc && sortKey == 'partnerNameVn') }"
@@ -109,12 +109,12 @@
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'taxCode'), 'sorting_desc': (!isDesc && sortKey == 'taxCode') }"
                                 (click)="sort('taxCode')">
-                                <span>Tax Code</span>
+                                <span>Tax Code *</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerGroup'), 'sorting_desc': (!isDesc && sortKey == 'partnerGroup') }"
                                 (click)="sort('partnerGroup')">
-                                <span>Category</span>
+                                <span>Category *</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'contactPerson'), 'sorting_desc': (!isDesc && sortKey == 'contactPerson') }"
@@ -129,12 +129,12 @@
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'addressEn'), 'sorting_desc': (!isDesc && sortKey == 'addressEn') }"
                                 (click)="sort('addressEn')">
-                                <span>Billing Address EN</span>
+                                <span>Billing Address EN *</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'addressVn'), 'sorting_desc': (!isDesc && sortKey == 'addressVn') }"
                                 (click)="sort('addressVn')">
-                                <span>Billing Address Local</span>
+                                <span>Billing Address Local *</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cityBilling'), 'sorting_desc': (!isDesc && sortKey == 'cityBilling') }"
@@ -245,6 +245,11 @@
                                     <span>{{ (i + this.pager.startIndex + 1) }}</span>
                                 </td>
                                 <td>
+                                    <span *ngIf="item.shortNameError === null">{{ item.shortName }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.shortNameError !== null">{{ item.shortNameError }}</span>
+                                </td>
+                                <td>
                                     <span *ngIf="item.partnerNameEnError === null">{{ item.partnerNameEn }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.partnerNameEnError !== null">{{ item.partnerNameEnError === null }}</span>
@@ -255,19 +260,14 @@
                                         *ngIf="item.partnerNameVnError !== null">{{ item.partnerNameVnError }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.shortNameError === null">{{ item.shortName }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.shortNameError !== null">{{ item.shortNameError }}</span>
-                                </td>
-                                <td>
                                     <span *ngIf="item.taxCodeError === null">{{ item.taxCode }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.taxCodeError !== null">{{ item.taxCodeError }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.PartnerGroupError === null">{{ item.partnerGroup }}</span>
+                                    <span *ngIf="item.partnerGroupError === null">{{ item.partnerGroup }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.PartnerGroupError !== null">{{ item.PartnerGroupError }}</span>
+                                        *ngIf="item.partnerGroupError !== null">{{ item.partnerGroupError }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.contactPersonError === null">{{ item.contactPerson }}</span>
