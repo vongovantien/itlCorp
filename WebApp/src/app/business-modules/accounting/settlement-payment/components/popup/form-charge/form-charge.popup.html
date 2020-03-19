@@ -96,8 +96,7 @@
                                         <div class="form-group">
                                             <label for="">Qty <span class="text-danger">(*)</span></label>
                                             <input type="number" class="form-control" formControlName="qty"
-                                                placeholder="Quantity" (ngModelChange)="calculateTotalAmount()"
-                                                autoFormatCurrency numeric [decimals]="digitDecimal">
+                                                placeholder="Quantity" (ngModelChange)="calculateTotalAmount()">
                                         </div>
                                     </div>
                                     <div class="col-6">
@@ -116,8 +115,7 @@
                                 <div class="form-group">
                                     <label for="">Unit Price <span class="text-danger">(*)</span></label>
                                     <input class="form-control" formControlName="price" placeholder="Unit Price"
-                                        (ngModelChange)="calculateTotalAmount()" autoFormatCurrency numeric
-                                        [decimals]="digitDecimal">
+                                        (ngModelChange)="calculateTotalAmount()">
                                 </div>
                             </div>
                             <div class="col-4">
