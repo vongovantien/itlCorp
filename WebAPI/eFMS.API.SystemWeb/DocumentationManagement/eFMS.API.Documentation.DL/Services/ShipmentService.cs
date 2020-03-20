@@ -5,6 +5,7 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.ReportResults.Sales;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -1028,6 +1029,47 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             return 1;
+        }
+
+        public List<MonthlySaleReportResult> GetMonthlySaleReport(SaleReportCriteria criteria)
+        {
+            Expression<Func<CsTransaction, bool>> queryTrans = x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
+                                                                 && (x.AgentId == criteria.AgentId || criteria.AgentId == null)
+                                                                 && (x.Mawb.IndexOf(criteria.Mawb, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.Mawb))
+                                                                 && (x.JobNo.IndexOf(criteria.JobId, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.JobId))
+                                                                 && (criteria.Service.Contains(x.TransactionType) || string.IsNullOrEmpty(x.TransactionType))
+                                                                 && (x.Pod == criteria.Pod || criteria.Pod == null)
+                                                                 && (x.Pol == criteria.Pol || criteria.Pol == null)
+                                                                 && (x.ColoaderId == criteria.CarrierId || criteria.CarrierId == null)
+                                                                 && (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId))
+                                                                 && (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId))
+                                                                 && (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId))
+                                                                 && (criteria.PersonInCharge.Contains(x.PersonIncharge) || string.IsNullOrEmpty(criteria.PersonInCharge))
+                                                                 && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator))
+                                                                 ;
+
+            Expression<Func<OpsTransaction, bool>> queryOpsTrans = x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
+                                                                 && (x.AgentId == criteria.AgentId || criteria.AgentId == null)
+                                                                 && (x.Mblno.IndexOf(criteria.Mawb, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.Mawb))
+                                                                 && (x.JobNo.IndexOf(criteria.JobId, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.JobId))
+                                                                 && (x.Pod == criteria.Pod || criteria.Pod == null)
+                                                                 && (x.Pol == criteria.Pol || criteria.Pol == null)
+                                                                 && (x.SupplierId == criteria.CarrierId || criteria.CarrierId == null)
+                                                                 ;
+            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+            {
+                queryTrans = queryTrans.And(x => x.TransactionType.Contains("E") ? 
+                                    (!x.Etd.HasValue || (x.Etd.Value >= criteria.ServiceDateFrom.Value && x.Etd.Value <= criteria.ServiceDateTo.Value))
+                                   :(!x.Eta.HasValue || (x.Eta.Value >= criteria.ServiceDateFrom.Value && x.Eta.Value <= criteria.ServiceDateTo.Value))
+                                   );
+            }
+            if(criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
+            {
+                queryTrans = queryTrans.And(x => x.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value && x.DatetimeCreated.Value.Date <= criteria.CreatedDateTo);
+            }
+            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = null;
+
+            var data = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
         }
     }
 }
