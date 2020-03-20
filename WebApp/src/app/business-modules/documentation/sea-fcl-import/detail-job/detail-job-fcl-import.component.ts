@@ -152,6 +152,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         modelUpdate.jobNo = this.fclImportDetail.jobNo;
         modelUpdate.datetimeCreated = this.fclImportDetail.datetimeCreated;
         modelUpdate.userCreated = this.fclImportDetail.userCreated;
+        modelUpdate.currentStatus = this.fclImportDetail.currentStatus;
 
         if (this.ACTION === 'COPY') {
             this.duplicateJob(modelUpdate);
