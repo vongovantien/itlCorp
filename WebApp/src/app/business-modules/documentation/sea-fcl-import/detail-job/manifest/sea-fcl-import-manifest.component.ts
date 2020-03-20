@@ -281,29 +281,52 @@ export class SeaFclImportManifestComponent extends AppList {
             );
     }
     previewManifest() {
-        if (this.formManifest.referenceNo.value === null) {
-            this._toastService.warning('There is no data to display preview');
-            return;
-        }
-        const body: any = {
-            jobId: this.jobId,
-            refNo: this.formManifest.referenceNo.value,
-            supplier: this.formManifest.supplier.value,
-            attention: this.formManifest.attention.value,
-            masksOfRegistration: this.formManifest.marksOfNationality.value,
-            voyNo: this.formManifest.vesselNo.value,
-            invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
-            pol: this.formManifest.pol.value,
-            pod: this.formManifest.pod.value,
-            paymentTerm: this.formManifest.freightCharge.value !== null ? this.formManifest.freightCharge.value[0].text : null,
-            consolidator: this.formManifest.consolidator.value,
-            deConsolidator: this.formManifest.deconsolidator.value,
-            volume: this.formManifest.volume.value,
-            weight: this.formManifest.weight.value,
-            manifestIssuer: this.formManifest.agent.value,
-            csTransactionDetails: this.housebills.filter(x => x.isRemoved === false)
-        };
-        this._documentationRepo.previewSeaImportManifest(body)
+        // if (this.formManifest.referenceNo.value === null) {
+        //     this._toastService.warning('There is no data to display preview');
+        //     return;
+        // }
+        // const body: any = {
+        //     jobId: this.jobId,
+        //     refNo: this.formManifest.referenceNo.value,
+        //     supplier: this.formManifest.supplier.value,
+        //     attention: this.formManifest.attention.value,
+        //     masksOfRegistration: this.formManifest.marksOfNationality.value,
+        //     voyNo: this.formManifest.vesselNo.value,
+        //     invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
+        //     pol: this.formManifest.pol.value,
+        //     pod: this.formManifest.pod.value,
+        //     paymentTerm: this.formManifest.freightCharge.value !== null ? this.formManifest.freightCharge.value[0].text : null,
+        //     consolidator: this.formManifest.consolidator.value,
+        //     deConsolidator: this.formManifest.deconsolidator.value,
+        //     volume: this.formManifest.volume.value,
+        //     weight: this.formManifest.weight.value,
+        //     manifestIssuer: this.formManifest.agent.value,
+        //     csTransactionDetails: this.housebills.filter(x => x.isRemoved === false)
+        // };
+        // this._documentationRepo.previewSeaImportManifest(body)
+        //     .pipe(
+        //         catchError(this.catchError),
+        //         finalize(() => { })
+        //     )
+        //     .subscribe(
+        //         (res: any) => {
+        //             if (res != null) {
+        //                 this.dataReport = res;
+        //                 if (this.dataReport != null && res.dataSource.length > 0) {
+        //                     setTimeout(() => {
+        //                         this.reportPopup.frm.nativeElement.submit();
+        //                         this.reportPopup.show();
+        //                     }, 1000);
+        //                 } else {
+        //                     this._toastService.warning('There is no data to display preview');
+        //                 }
+        //             } else {
+        //                 this._toastService.warning('There is no container data to display preview');
+        //             }
+        //         },
+        //     );
+
+        this._documentationRepo.previewTest()
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })

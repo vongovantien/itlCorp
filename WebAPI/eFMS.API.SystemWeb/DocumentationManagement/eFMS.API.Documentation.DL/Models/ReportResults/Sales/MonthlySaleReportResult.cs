@@ -17,7 +17,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults.Sales
         public string Lines { get; set; }
         public string Agent { get; set; }
         public string NominationParty { get; set; }
-        public string assigned { get; set; }
+        public bool assigned { get; set; }
         public string TransID { get; set; }
         public DateTime? LoadingDate { get; set; }
         public string HWBNO { get; set; }
