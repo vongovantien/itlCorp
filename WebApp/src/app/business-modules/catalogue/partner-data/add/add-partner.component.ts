@@ -333,6 +333,8 @@ export class AddPartnerDataComponent extends AppList {
 
         this.formPartnerComponent.partnerWorkPlace.setErrors(null);
         this.formPartnerComponent.partnerAccountRef.setErrors(null);
+        this.formPartnerComponent.applyDim.setErrors(null);
+        this.formPartnerComponent.roundUp.setErrors(null);
         if (this.formPartnerComponent.partnerForm.valid) {
             if (this.saleMandetail.length === 0) {
                 if (this.isShowSaleMan) {
@@ -408,8 +410,8 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.active = this.formPartnerComponent.active.value;
         this.partner.internalReferenceNo = this.formPartnerComponent.internalReferenceNo.value;
         this.partner.coLoaderCode = this.formPartnerComponent.coLoaderCode.value;
-        this.partner.roundUpMethod = this.formPartnerComponent.roundUp.value[0].id;
-        this.partner.applyDim = this.formPartnerComponent.applyDim.value[0].id;
+        this.partner.roundUpMethod = !!this.formPartnerComponent.roundUp.value ? this.formPartnerComponent.roundUp.value[0].id : null;
+        this.partner.applyDim = !!this.formPartnerComponent.applyDim.value ? this.formPartnerComponent.applyDim.value[0].id : null;
     }
 
     trimInputForm(formBody) {

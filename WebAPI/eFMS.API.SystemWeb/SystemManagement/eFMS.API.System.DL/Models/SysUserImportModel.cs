@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace eFMS.API.System.DL.Models
 {
     public class SysUserImportModel: SysEmployeeModel
@@ -9,15 +6,9 @@ namespace eFMS.API.System.DL.Models
         public string Username { get; set; }
         public bool UsernameValid { get; set; }
         public string UserType { get; set; }
-        public string Role { get; set; }
-        public string LevelPermission { get; set; }
-        public string Company { get; set; }
-        public string Office { get; set; }
-        public string Deparment { get; set; }
-        public string Group { get; set; }
         public string WorkingStatus { get; set; }
         public string Status { get; set; }
-        
+        public string Description { get; set; }
         public bool EmployeeNameEnValid { get; set; }
         public bool EmployeeNameVnValid { get; set; }
         public bool UserTypeValid { get; set; }
@@ -25,6 +16,7 @@ namespace eFMS.API.System.DL.Models
         public bool StatusValid { get; set; }
         public bool StaffCodeValid { get; set; }
         public bool TitleValid { get; set; }
+        public bool EmailValid { get; set; }
 
 
         public bool IsValid { get; set; }

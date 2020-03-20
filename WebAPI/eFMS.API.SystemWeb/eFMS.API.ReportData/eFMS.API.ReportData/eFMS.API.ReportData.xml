@@ -55,6 +55,13 @@
             <param name="soaNo"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOAOPS(System.String)">
+            <summary>
+            Export SOA OPS
+            </summary>
+            <param name="soaNo"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPayment(System.Guid,System.String)">
             <summary>
             Export detail settlement payment

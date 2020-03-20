@@ -368,7 +368,9 @@ namespace eFMS.API.Catalogue.DL.Services
             var sysUsers = sysUserRepository.Get();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var salemans = salemanRepository.Get().ToList();
+
             var dataSalemans = salemans.Select(x => x.PartnerId);
+
             if (partners == null) return null;
 
             var query = (from partner in partners
@@ -379,7 +381,7 @@ namespace eFMS.API.Catalogue.DL.Services
                           );
             if (criteria.All == null)
             {
-                query = query.Where(x => ((x.partner.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                query = query.Where(x => ((x.partner.AccountNo ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.PartnerNameEn ?? "").IndexOf(criteria.PartnerNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.PartnerNameVn ?? "").IndexOf(criteria.PartnerNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -389,7 +391,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            && (x.partner.Fax ?? "").IndexOf(criteria.Fax ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.user.Username ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.partner.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase) == true
+                           && (x.partner.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase)
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            ));
             }
@@ -397,7 +399,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 query = query.Where(x =>
                            (
-                           (x.partner.Id ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.PartnerNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.PartnerNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -407,8 +409,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                           || (x.partner.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase) == true
-
+                           || (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
                            )
                            && (x.partner.Active == criteria.Active || criteria.Active == null));
             }

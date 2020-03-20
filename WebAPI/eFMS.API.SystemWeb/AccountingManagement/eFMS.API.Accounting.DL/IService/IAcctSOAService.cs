@@ -4,6 +4,7 @@ using eFMS.API.Accounting.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -54,6 +55,10 @@ namespace eFMS.API.Accounting.DL.IService
         IQueryable<ExportImportBravoFromSOAResult> GetDataExportImportBravoFromSOA(string soaNo);
 
         ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo,string officeId);
+
+        SOAOPSModel GetSOAOPS(string soaNo);
+
+
 
     }
 }

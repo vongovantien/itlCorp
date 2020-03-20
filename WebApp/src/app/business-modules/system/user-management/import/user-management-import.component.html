@@ -93,38 +93,40 @@
                                 <span>{{(i + this.pager.startIndex + 1)}}</span>
                             </td>
                             <td>
-                                <span [ngClass]="{'m--font-danger' : !item.username}">{{ item.username }}</span>
+                                <span [ngClass]="{'m--font-danger' : !item.staffCode}">{{ item.staffCode }}</span>
                             </td>
                             <td>
-                                <span
-                                    [ngClass]="{'m--font-danger' : !item.employeeNameEn}">{{ item.employeeNameEn }}</span>
+                                <span [ngClass]="{'m--font-danger' : !item.username}">{{ item.username }}</span>
                             </td>
                             <td>
                                 <span
                                     [ngClass]="{'m--font-danger' : !item.employeeNameVn}">{{ item.employeeNameVn }}</span>
                             </td>
-                            <td> <span [ngClass]="{'m--font-danger' : !item.title}">{{ item.title }}</span></td>
-
-
                             <td>
-                                <span [ngClass]="{'m--font-danger' : !item.tel}">{{ item.tel }}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.employeeNameEn}">{{ item.employeeNameEn }}</span>
                             </td>
+
+                            <td> <span [ngClass]="{'m--font-danger' : !item.title}">{{ item.title }}</span></td>
                             <td>
                                 <span [ngClass]="{'m--font-danger' : !item.userType}">{{ item.userType }}</span>
-                            </td>
-                            <td><span></span></td>
-                            <td><span></span></td>
-                            <td><span></span></td>
-                            <td><span></span></td>
-                            <td><span></span></td>
-                            <td><span></span></td>
-
-                            <td>
-                                <span [ngClass]="{'m--font-danger' : !item.userType}">{{ item.workingStatus }}</span>
                             </td>
                             <td>
                                 <span [ngClass]="{'m--font-danger' : !item.userType}">{{ item.status }}</span>
                             </td>
+                            <td>
+                                <span [ngClass]="{'m--font-danger' : !item.userType}">{{ item.workingStatus }}</span>
+                            </td>
+                            <td>
+                                <span [ngClass]="{'m--font-danger' : !item.email}">{{ item.email }}</span>
+                            </td>
+                            <td>
+                                <span [ngClass]="{'m--font-danger' : !item.tel}">{{ item.tel }}</span>
+                            </td>
+                            <td>
+                                <span [ngClass]="{'m--font-danger' : !item.description}">{{ item.description }}</span>
+                            </td>
+
                         </tr>
                     </tbody>
                 </table>
