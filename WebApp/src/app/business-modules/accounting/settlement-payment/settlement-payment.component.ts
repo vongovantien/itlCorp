@@ -20,7 +20,7 @@ export class SettlementPaymentComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
-    
+
     headers: CommonInterface.IHeaderTable[];
     settlements: SettlementPayment[] = [];
     selectedSettlement: SettlementPayment;
@@ -67,7 +67,7 @@ export class SettlementPaymentComponent extends AppList {
             { title: 'Currency', field: 'chargeCurrency', sortable: true }
         ];
         this.getUserLogged();
-        this.getListSettlePayment();
+        this.getListSettlePayment(this.dataSearch);
 
     }
 
@@ -94,7 +94,7 @@ export class SettlementPaymentComponent extends AppList {
 
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-
+        this.dataSearch = { requester: this.userLogged.id };
     }
 
 
@@ -113,7 +113,7 @@ export class SettlementPaymentComponent extends AppList {
     getListSettlePayment(dataSearch?: any) {
         this.isLoading = true;
         this._progressRef.start();
-        this._accoutingRepo.getListSettlementPayment(this.page, this.pageSize, Object.assign({}, dataSearch, { requester: this.userLogged.id }))
+        this._accoutingRepo.getListSettlementPayment(this.page, this.pageSize, dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
@@ -131,7 +131,7 @@ export class SettlementPaymentComponent extends AppList {
             );
     }
 
-    prepareDeleteAdvance(settlement: SettlementPayment){
+    prepareDeleteAdvance(settlement: SettlementPayment) {
         this._accoutingRepo.checkAllowDeleteSettlement(settlement.id)
             .subscribe((value: boolean) => {
                 if (value) {
@@ -176,7 +176,7 @@ export class SettlementPaymentComponent extends AppList {
         this.settlements = this._sortService.sort(this.settlements, sort, this.order);
     }
 
-    viewDetail(settlement: SettlementPayment){
+    viewDetail(settlement: SettlementPayment) {
         this._accoutingRepo.checkAllowGetDetailSettlement(settlement.id)
             .subscribe((value: boolean) => {
                 if (value) {
@@ -228,7 +228,8 @@ export class SettlementPaymentComponent extends AppList {
             );
     }
 
-    export(){
+    export() {
+        console.log(this.dataSearch);
         console.log('export settlement');
     }
 

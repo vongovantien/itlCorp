@@ -70,7 +70,7 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Status Payment', field: 'statusPayment', sortable: true },
         ];
         this.getUserLogged();
-        this.getListAdvancePayment();
+        this.getListAdvancePayment(this.dataSearch);
     }
 
     onSearchAdvPayment(data: any) {
@@ -81,7 +81,7 @@ export class AdvancePaymentComponent extends AppList {
     getListAdvancePayment(dataSearch?: any) {
         this.isLoading = true;
         this._progressRef.start();
-        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, Object.assign({}, dataSearch, { requester: this.userLogged.id }))
+        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
@@ -170,6 +170,7 @@ export class AdvancePaymentComponent extends AppList {
 
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this.dataSearch = { requester: this.userLogged.id };
     }
 
     viewDetail(adv: AdvancePayment) {

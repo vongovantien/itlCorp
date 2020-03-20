@@ -8,6 +8,7 @@ using eFMS.API.ReportData.HttpServices;
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
 using eFMS.API.ReportData.Models.Criteria;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -62,9 +63,11 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportAdvancePaymentShipment")]
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> ExportAdvancePaymentShipment(AdvancePaymentCriteria advancePaymentCriteria)
         {
-            var advancePaymentsAPI = await HttpServiceExtension.GetDataFromApi(advancePaymentCriteria, aPis.HostStaging + Urls.Accounting.AdvancePaymentUrl);
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var advancePaymentsAPI = await HttpServiceExtension.PostAPI(advancePaymentCriteria, aPis.HostStaging + Urls.Accounting.AdvancePaymentUrl, accessToken);
 
             var advancePayments = advancePaymentsAPI.Content.ReadAsAsync<List<AdvancePaymentModel>>();
             List<string> codes = new List<string>();
@@ -72,7 +75,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 codes.Add(item.AdvanceNo);
             }
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(codes, aPis.HostStaging + Urls.Accounting.GetGroupRequestsByAdvanceNoList);
+            var responseFromApi = await HttpServiceExtension.PostAPI(codes, aPis.HostStaging + Urls.Accounting.GetGroupRequestsByAdvanceNoList, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AdvancePaymentRequestModel>>();
 
