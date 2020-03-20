@@ -1170,6 +1170,30 @@ namespace eFMS.API.ReportData.FormatExcel
                "Tổng cộng/ Total (VND) ", //3
             };
 
+            List<string> headerTable = new List<string>()
+            {
+               "STT/No",
+               "Tên hàng hóa/Commodity",
+               "Cảng/Port",
+               "Đơn Vị Tính/Đơn vị",
+               "Số Tờ Khai/Customs Declaration No",
+               "Số Vận Đơn/HBL No",
+               "Trọng Lượng/VOLUMNE",
+               "Phí dịch vụ làm hàng/Customs clearance fee",
+               "Phí thu hộ/Authorized fees", 
+               "Tổng cộng/Total",
+             
+            };
+
+            List<string> subheaderTable = new List<string>()
+            {
+               "KGS",
+               "CBM",
+               "Container",
+               "Chi phí/Fee",
+               "VAT",
+               "Tổng cộng/Total"
+            };
 
             workSheet.Cells["P1:U1"].Merge = true;
             workSheet.Cells["P1"].Value = headers[0];
@@ -1178,6 +1202,144 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["P2:U2"].Merge = true;
             workSheet.Cells["P2:U2"].Style.WrapText = true;
             workSheet.Cells["P2"].Value = headers[1];
+            workSheet.Cells["P2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10));
+            workSheet.Row(2).Height = 50;
+            //Title
+            workSheet.Cells["A4:U4"].Merge = true;
+            workSheet.Cells["A4"].Style.Font.SetFromFont(new Font("Times New Roman", 16));
+            workSheet.Cells["A4"].Value = headers[2];
+            workSheet.Cells["A4"].Style.Font.Size = 16;
+            workSheet.Cells["A4"].Style.Font.Bold = true;
+            workSheet.Cells["A4"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Cells["A5:U5"].Merge = true;
+            DateTime fromDate = lstSoa.FromDate ?? DateTime.Now ;
+            DateTime toDate = lstSoa.ToDate ?? DateTime.Now;
+            workSheet.Cells["A5"].Style.Font.SetFromFont(new Font("Times New Roman", 12));
+            workSheet.Cells["A5"].Value = "Từ Ngày: " + fromDate.ToString("dd/MM/yyyy") + " đến: " + toDate.ToString("dd/MM/yyyy") ;
+            workSheet.Cells["A5"].Style.Font.Size = 10;
+            workSheet.Cells["A5"].Style.Font.Bold = true;
+            workSheet.Cells["A5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Cells["A6:U6"].Merge = true;
+            workSheet.Cells["A6"].Value = lstSoa.PartnerNameVN;
+            workSheet.Cells["A7:U7"].Merge = true;
+            workSheet.Cells["A7"].Value = lstSoa.BillingAddressVN;
+
+            workSheet.Cells["A6"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A6"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            // Tạo header
+            for (int i = 0; i < headerTable.Count; i++)
+            {
+                if (i == 7)
+                {
+                    workSheet.Cells[8, i + 3].Value = headerTable[i];
+                }
+                if (i < 7)
+                {
+                    workSheet.Cells[8, i + 1].Value = headerTable[i];
+                }
+                if (i > 7)
+                {
+                    workSheet.Cells[8, i + 3].Value = headerTable[i];
+                    workSheet.Cells[8, i + 3].Style.Font.Bold = true;
+                }
+                if (i > 8)
+                {
+                    workSheet.Cells[8, i + 3].Value = headerTable[i];
+                    workSheet.Cells[8, i + 3].Style.Font.Bold = true;
+                }
+
+                if (i == 8)
+                {
+                    workSheet.Cells[8, i + 3].Value = headerTable[i];
+                }
+
+
+                workSheet.Cells[8, i + 1].Style.Font.Bold = true;
+                workSheet.Cells[8, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[8, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            }
+            workSheet.Cells["A8:A9"].Merge = true;
+            workSheet.Cells["B8:B9"].Merge = true;
+            workSheet.Cells["C8:C9"].Merge = true;
+            workSheet.Cells["D8:D9"].Merge = true;
+            workSheet.Cells["E8:E9"].Merge = true;
+            workSheet.Cells["F8:F9"].Merge = true;
+
+            workSheet.Cells["G8:I8"].Merge = true;
+            workSheet.Cells["J8:L8"].Merge = true;
+
+            workSheet.Cells["M8:O8"].Merge = true;
+
+            workSheet.Cells["M8"].Value = headerTable[8];
+            workSheet.Cells["P8:P9"].Merge = true;
+            workSheet.Cells["P8"].Value = headerTable[9];
+            workSheet.Cells["M8:P8"].Style.Font.Bold = true;
+
+            workSheet.Cells["M8:P8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Cells["M8:P8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            workSheet.Cells["G9"].Value = subheaderTable[0];
+            workSheet.Cells["H9"].Value = subheaderTable[1];
+            workSheet.Cells["I9"].Value = subheaderTable[2];
+
+            workSheet.Cells["J9"].Value = subheaderTable[3];
+            workSheet.Cells["K9"].Value = subheaderTable[4];
+            workSheet.Cells["L9"].Value = subheaderTable[5];
+
+            workSheet.Cells["M9"].Value = subheaderTable[3];
+            workSheet.Cells["N9"].Value = subheaderTable[4];
+            workSheet.Cells["O9"].Value = subheaderTable[5];
+
+            workSheet.Cells["G9:O9"].Style.Font.Bold = true;
+            workSheet.Cells["G9:O9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["G9:O9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            int addressStartContent = 10;
+            int subaddressStartContent = addressStartContent + 1;
+
+            for (int i = 0; i < lstSoa.exportSOAOPs.Count; i++)
+            {
+                var item = lstSoa.exportSOAOPs[i];
+           
+                workSheet.Cells[i + addressStartContent, 1].Value = i + 1;
+                workSheet.Cells[i + addressStartContent, 2].Value = item.CommodityName;
+                workSheet.Cells[i + addressStartContent, 3].Value = item.AOL;
+                workSheet.Cells[i + addressStartContent, 4].Value = string.Empty;
+
+                workSheet.Cells[i + addressStartContent, 5].Value = item.Charges.Select(t=>t.CustomNo).FirstOrDefault();
+                workSheet.Cells[i + addressStartContent, 6].Value = item.HwbNo;
+                workSheet.Cells[i + addressStartContent, 7].Value = item.GW;
+                workSheet.Cells[i + addressStartContent, 8].Value = item.CBM;
+                workSheet.Cells[i + addressStartContent, 9].Value = item.PackageContainer;
+                for (int j = 0; j < item.Charges.Count; j++)
+                {
+                    addressStartContent++;
+                    var itemCharge = item.Charges[j];
+                    workSheet.Cells[i + addressStartContent, 2].Value = itemCharge.ChargeName;
+                    workSheet.Cells[i + addressStartContent, 4].Value = itemCharge.Unit;
+                }
+
+
+            }
+
+
+            //workSheet.Cells["H8:H9"].Merge = true;
+            //workSheet.Cells["I8:I9"].Merge = true;
+
+
+
+
+
+
 
         }
 
