@@ -68,5 +68,8 @@ namespace eFMS.API.Accounting.DL.IService
         bool CheckUpdatePermissionBySettlementId(Guid settlementId);
 
         SettlementExport SettlementExport(Guid settlementId);
+
+        List<SettlementExportDefault> QueryDataSettlementExport(string[] settlementCode);
+
     }
 }

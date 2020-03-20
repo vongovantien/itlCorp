@@ -214,6 +214,70 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
+        public Stream GenerateSettlementPaymentShipmentExcel(List<SettlementExportDefault> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+                "Job ID",
+                "MBL",
+                "HBL",
+                "Custom No",
+                "Settle No",
+                "Request Date",
+                "Requestor",
+                "Settlement Amount",
+                "AdvanceNo",
+                "Advance Amount",
+                "Balance",
+                "Currency",
+                "ApproveDate",
+                "Description"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Settlement Payment");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "SETTLEMENT PAYMENT INFORMATION");
+
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = i + 1;
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.MBL;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.HBL;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.CustomNo;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.SettleNo;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.RequestDate.HasValue ? item.RequestDate.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.Requester;
+                        worksheet.Cells[i + addressStartContent, 8].Value = item.SettlementAmount;
+                        worksheet.Cells[i + addressStartContent, 9].Value = item.AdvanceNo;
+                        worksheet.Cells[i + addressStartContent,10].Value = item.AdvanceAmount;
+                        worksheet.Cells[i + addressStartContent, 11].Value = item.SettlementAmount - item.AdvanceAmount;
+                        worksheet.Cells[i + addressStartContent, 12].Value = item.Currency;
+                        worksheet.Cells[i + addressStartContent, 13].Value = item.ApproveDate;
+                        worksheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = "dd/MM/yyyy  HH:mm:ss AM/PM";
+                        worksheet.Cells[i + addressStartContent, 14].Value = item.Description;
+
+                        //Add border left right for cells
+                        AddBorderLeftRightCell(worksheet, headers, addressStartContent, i);
+
+                        //Add border bottom for last cells
+                        AddBorderBottomLastCell(worksheet, headers, addressStartContent, i, listObj.Count);
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
         private void AddBorderBottomLastCell(ExcelWorksheet worksheet, List<string> headers, int addressStartContent, int indexDataRow, int totalItem)
         {
             if (indexDataRow == totalItem - 1)

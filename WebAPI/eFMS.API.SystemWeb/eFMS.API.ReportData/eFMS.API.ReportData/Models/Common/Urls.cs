@@ -30,19 +30,21 @@
 
         public class Accounting
         {
-            public const string AdvancePaymentUrl = "/Accounting/api/v1/en-US/AcctAdvancePayment/QueryData";
+            public const string AdvancePaymentUrl = "/api/v1/en-US/AcctAdvancePayment/QueryData";
 
             public const string GetDataBravoSOAUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExporttBravoFromSOA?soaNo=";
 
             public const string GetDataSOAOPSUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOAOPS?soaNo=";
 
 
-            public const string SettlementPaymentUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/QueryData";
+            public const string SettlementPaymentUrl = "/api/v1/en-US/AcctSettlementPayment/QueryData";
             public const string DetailAdvancePaymentExportUrl = "/Accounting/api/v1/en-US/AcctAdvancePayment/DetailAdvancePaymentExport";
             public const string DetailSettlementPaymentExportUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/DetailSettlementPaymentExport";
             public const string DetailSOAExportUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExportSOABySOANo?soaNo=";
             public const string GetDataSOAAirfreightExportUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExportAirFrieghtBySOANo?soaNo=";
-            public const string GetGroupRequestsByAdvanceNoList = "/Accounting/api/v1/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNoList";
+            public const string GetGroupRequestsByAdvanceNoList = "/api/v1/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNoList";
+            public const string QueryDataSettlementExport = "/api/v1/en-US/AcctSettlementPayment/QueryDataSettlementExport";
+
         }
 
         public class Documentation

@@ -114,6 +114,39 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export Settlement Payment
+        /// </summary>
+        /// <param name="settlementPaymentCriteria"></param>
+        /// <returns></returns>
+        [Route("ExportSettlementPaymentShipment")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportSettlementPaymentShipment(SettlementPaymentCriteria settlementPaymentCriteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var settlementsAPI = await HttpServiceExtension.PostAPI(settlementPaymentCriteria, aPis.HostStaging + Urls.Accounting.SettlementPaymentUrl, accessToken);
+
+            var settlementPayments = settlementsAPI.Content.ReadAsAsync<List<SettlementPaymentModel>>();
+            List<string> codes = new List<string>();
+            foreach (var item in settlementPayments.Result)
+            {
+                codes.Add(item.SettlementNo);
+            }
+            var responseFromApi = await HttpServiceExtension.PostAPI(codes, aPis.HostStaging + Urls.Accounting.QueryDataSettlementExport, accessToken);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<SettlementExportDefault>>();
+
+            var stream = new AccountingHelper().GenerateSettlementPaymentShipmentExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Payment List.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
         /// Export detail advance payment
         /// </summary>
         /// <param name="advanceId">Id of advance payment</param>

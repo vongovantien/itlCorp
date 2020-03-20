@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { AccountingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -38,7 +38,8 @@ export class SettlementPaymentComponent extends AppList {
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _progressService: NgProgress,
-        private _router: Router
+        private _router: Router,
+        private _exportRepo: ExportRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -229,8 +230,12 @@ export class SettlementPaymentComponent extends AppList {
     }
 
     export() {
-        console.log(this.dataSearch);
-        console.log('export settlement');
+        this._exportRepo.exportSettlementPaymentShipment(this.dataSearch)
+            .subscribe(
+                (res: Blob) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'settlement-payment.xlsx');
+                }
+            );
     }
 
 }

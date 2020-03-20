@@ -300,10 +300,10 @@ namespace eFMS.API.Accounting.DL.Services
             var data = GetDatas(criteria, settlements);
             return data;
         }
-        
+
         public IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria)
         {
-            var settlements = DataContext.Get();
+            var settlements = GetSettlementsPermission();
             var data = GetDatas(criteria, settlements);
             return data;
         }
@@ -377,7 +377,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
-            if (permissionRange == PermissionRange.None) return new HandleState(403,"");
+            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
             try
             {
@@ -2662,7 +2662,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Quy đổi tỉ giá theo ngày Request Date
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlement.RequestDate.Value.Date).ToList();
-            
+
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
             var requesterName = GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
@@ -2754,7 +2754,7 @@ namespace eFMS.API.Accounting.DL.Services
         private bool SendMailApproved(string settlementNo, DateTime approvedDate)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
-            
+
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return false;
@@ -2828,7 +2828,7 @@ namespace eFMS.API.Accounting.DL.Services
         private bool SendMailDeniedApproval(string settlementNo, string comment, DateTime DeniedDate)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
-            
+
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return false;
@@ -3222,7 +3222,7 @@ namespace eFMS.API.Accounting.DL.Services
         public InfoSettlementExport GetInfoSettlementExport(AcctSettlementPaymentModel settlementPayment)
         {
             string _requester = string.IsNullOrEmpty(settlementPayment.Requester) ? string.Empty : GetEmployeeByUserId(settlementPayment.Requester)?.EmployeeNameVn;
-            
+
             #region -- Info Manager, Accoutant & Department --
             var _settlementApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementPayment.SettlementNo && x.IsDeputy == false).FirstOrDefault();
             string _manager = string.Empty;
@@ -3256,13 +3256,13 @@ namespace eFMS.API.Accounting.DL.Services
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlementPayment.RequestDate.Value.Date).ToList();
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
-            
+
             var houseBillIds = surChargeBySettleCode.Select(s => new { hblId = s.Hblid, customNo = s.ClearanceNo }).Distinct();
-            foreach(var houseBillId in houseBillIds)
+            foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
                 var ops = opsTransactionRepo.Get(x => x.Hblid == houseBillId.hblId).FirstOrDefault();
-                if(ops != null)
+                if (ops != null)
                 {
                     shipmentSettlement.JobNo = ops.JobNo;
                     shipmentSettlement.CustomNo = houseBillId.customNo;
@@ -3289,10 +3289,10 @@ namespace eFMS.API.Accounting.DL.Services
                             shipmentSettlement.AdvanceRequestDate = advancePayment.RequestDate;
                         }
                     }
-                    
+
                     var list = new List<InfoShipmentChargeSettlementExport>();
                     var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == houseBillId.hblId);
-                    foreach(var sur in surChargeByHblId)
+                    foreach (var sur in surChargeByHblId)
                     {
                         var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
                         infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
@@ -3301,11 +3301,11 @@ namespace eFMS.API.Accounting.DL.Services
                         infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
                         infoShipmentCharge.ChargeNote = sur.Notes;
                         string _chargeType = string.Empty;
-                        if(sur.Type == "OBH" || (sur.IsFromShipment == false && sur.TypeOfFee == "OBH"))
+                        if (sur.Type == "OBH" || (sur.IsFromShipment == false && sur.TypeOfFee == "OBH"))
                         {
                             _chargeType = "OBH";
                         }
-                        else if(sur.TypeOfFee == "Invoice" || (sur.IsFromShipment == true && sur.Type != "OBH"))
+                        else if (sur.TypeOfFee == "Invoice" || (sur.IsFromShipment == true && sur.Type != "OBH"))
                         {
                             _chargeType = "INVOICE";
                         }
@@ -3324,7 +3324,7 @@ namespace eFMS.API.Accounting.DL.Services
                 else
                 {
                     var tranDetail = csTransactionDetailRepo.Get(x => x.Id == houseBillId.hblId).FirstOrDefault();
-                    if(tranDetail != null)
+                    if (tranDetail != null)
                     {
                         shipmentSettlement.JobNo = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault().JobNo;
                         shipmentSettlement.CustomNo = houseBillId.customNo;
@@ -3337,10 +3337,10 @@ namespace eFMS.API.Accounting.DL.Services
                         shipmentSettlement.Cw = tranDetail.ChargeWeight;
                         shipmentSettlement.Pcs = tranDetail.PackageQty;
                         shipmentSettlement.Cbm = tranDetail.Cbm;
-                        var advanceRequests = acctAdvanceRequestRepo.Get(x => x.JobId == shipmentSettlement.JobNo 
-                                                                           && x.Mbl == shipmentSettlement.MBL 
+                        var advanceRequests = acctAdvanceRequestRepo.Get(x => x.JobId == shipmentSettlement.JobNo
+                                                                           && x.Mbl == shipmentSettlement.MBL
                                                                            && x.Hbl == shipmentSettlement.HBL);
-                        
+
                         var advanceRequest = advanceRequests.FirstOrDefault();
 
                         //Chỉ lấy những advance đã được phê duyệt
@@ -3388,6 +3388,109 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             return listData;
+        }
+
+        public List<SettlementExportDefault> QueryDataSettlementExport(string[] settlementCode)
+        {
+            var results = new List<SettlementExportDefault>();
+            var settlements = DataContext.Get();
+            var surcharges = csShipmentSurchargeRepo.Get();
+            var opsTransations = opsTransactionRepo.Get();
+            var csTransations = csTransactionRepo.Get();
+            var csTranstionDetails = csTransactionDetailRepo.Get();  // HBL
+            var custom = customsDeclarationRepo.Get();
+            var advRequest = acctAdvanceRequestRepo.Get();
+
+            try
+            {
+                if (settlementCode.Count() > 0)
+                {
+                    foreach (var settleCode in settlementCode)
+                    {
+                        var currentSettlement = settlements.Where(x => x.SettlementNo == settleCode).FirstOrDefault();
+
+                        string requesterID = DataContext.First(x => x.SettlementNo == settleCode).Requester;
+                        string employeeID = "";
+                        if (!string.IsNullOrEmpty(requesterID))
+                        {
+                             employeeID = sysUserRepo.Get(x => x.Id == requesterID).FirstOrDefault()?.EmployeeId;
+                        }
+
+                        var approveDate = acctApproveSettlementRepo.Get(x => x.SettlementNo == settleCode).FirstOrDefault()?.BuheadAprDate;
+                        string requesterName = sysEmployeeRepo.Get(x => x.Id == employeeID).FirstOrDefault()?.EmployeeNameVn;
+
+                        // Get Operation
+                        var dataOperation = from set in settlements
+                                            join sur in surcharges on set.SettlementNo equals sur.SettlementCode into sc // Join Surcharge.
+                                            from sur in sc.DefaultIfEmpty()
+                                            join ops in opsTransations on sur.Hblid equals ops.Hblid // Join OpsTranstion
+                                            join cus in custom on new { JobNo = (ops.JobNo != null ? ops.JobNo : ops.JobNo), HBL = (ops.Hwbno != null ? ops.Hwbno : ops.Hwbno), MBL = (ops.Mblno != null ? ops.Mblno : ops.Mblno) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
+                                            from cus in cus1.DefaultIfEmpty()
+                                            where sur.SettlementCode == settleCode
+                                            select new SettlementExportDefault
+                                            {
+                                                JobID = ops.JobNo,
+                                                HBL = ops.Hwbno,
+                                                MBL = ops.Mblno,
+                                                SettlementAmount = sur.Total,
+                                                CustomNo = cus.ClearanceNo,
+                                                SettleNo = currentSettlement.SettlementNo,
+                                                Currency = currentSettlement.SettlementCurrency,
+                                                AdvanceNo = sur.AdvanceNo,
+                                                Requester = requesterName,
+                                                RequestDate = currentSettlement.RequestDate,
+                                                ApproveDate = approveDate,
+                                                Description = sur.Notes,
+
+                                            };
+                        // Get Document
+                        var dataService = from set in settlements
+                                          join sur in surcharges on set.SettlementNo equals sur.SettlementCode into sc  // Join Surcharge.
+                                          from sur in sc.DefaultIfEmpty()
+                                          join cstd in csTranstionDetails on sur.Hblid equals cstd.Id // Join HBL
+                                          join cst in csTransations on cstd.JobId equals cst.Id into cs // join Cs Transation
+                                          from cst in cs.DefaultIfEmpty()
+                                          join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : cst.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : cstd.Hwbno), MBL = (cstd.Mawb != null ? cstd.Mawb : cstd.Mawb) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
+                                          from cus in cus1.DefaultIfEmpty()
+                                          where sur.SettlementCode == settleCode
+                                          select new SettlementExportDefault
+                                          {
+                                              JobID = cst.JobNo,
+                                              HBL = cstd.Hwbno,
+                                              MBL = cst.Mawb,
+                                              SettlementAmount = sur.Total,
+                                              CustomNo = cus.ClearanceNo,
+                                              SettleNo = currentSettlement.SettlementNo,
+                                              Currency = currentSettlement.SettlementCurrency,
+                                              AdvanceNo = sur.AdvanceNo,
+                                              Requester = requesterName,
+                                              RequestDate = currentSettlement.RequestDate,
+                                              ApproveDate = approveDate,
+                                              Description = sur.Notes,
+
+                                          };
+                        var data = dataOperation.Union(dataService);
+                        data = data.ToArray().OrderByDescending(x => x.JobID).AsQueryable();
+                        foreach (var item in data)
+                        {
+                            results.Add(item);
+
+                        }
+                    }
+                }
+                else
+                {
+                    return null;
+
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return results;
+
         }
         #endregion --- EXPORT SETTLEMENT ---
     }

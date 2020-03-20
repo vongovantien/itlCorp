@@ -347,10 +347,17 @@
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.DetailSettlementPaymentExport(System.Guid)">
             <summary>
-            Export settlement payment by settlement id
+            Export detail settlement payment by settlement id
             </summary>
             <param name="settlementId">Id of settlement payment</param>
             <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Preview(System.String[])">
+             <summary>
+            Settlement export List within Shipment.
+             </summary>
+             <param name="settlement ListList"></param>
+             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSOAController">
             <summary>

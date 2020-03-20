@@ -39,6 +39,13 @@
             <param name="settlementPaymentCriteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSettlementPaymentShipment(eFMS.API.ReportData.Models.Criteria.SettlementPaymentCriteria)">
+            <summary>
+            Export Settlement Payment
+            </summary>
+            <param name="settlementPaymentCriteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailAdvancePayment(System.Guid,System.String)">
             <summary>
             Export detail advance payment
