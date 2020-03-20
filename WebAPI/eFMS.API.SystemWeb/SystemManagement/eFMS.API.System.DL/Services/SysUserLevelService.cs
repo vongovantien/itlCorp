@@ -88,6 +88,10 @@ namespace eFMS.API.System.DL.Services
                           from depart in departs.DefaultIfEmpty()
                           select new SysUserLevelModel
                           {
+                              CompanyId = d.CompanyId,
+                              OfficeId = d.OfficeId,
+                              DepartmentId = d.DepartmentId,
+                              GroupId = d.GroupId,
                               GroupName = g.NameVn,
                               CompanyName = c.BunameVn,
                               OfficeName = o.BranchNameVn,
@@ -109,6 +113,7 @@ namespace eFMS.API.System.DL.Services
                         {
                             Id = x.User.UserLevel.Id,
                             UserId = x.User.UserLevel.UserId,
+                            UserName = x.User.User.Username,
                             GroupId = x.User.UserLevel.GroupId,
                             EmployeeName = x.Employee.EmployeeNameVn,
                             Active = x.User.UserLevel.Active,
@@ -190,5 +195,52 @@ namespace eFMS.API.System.DL.Services
             }
         }
         #endregion
+
+        public IQueryable<SysUserLevelModel> GetUsersByType(UserLevelCriteria criteria)
+        {
+            var userLevels = DataContext.Get(x => x.Active == true);
+            var users = userRepository.Get();
+            var employess = employeeRepository.Get();
+            var results = userLevels.Join(users, x => x.UserId, y => y.Id, (x, y) => new { User = y, UserLevel = x })
+                        .Join(employess, x => x.User.EmployeeId, y => y.Id, (x, y) => new { User = x, Employee = y })
+                        .Select(x => new SysUserLevelModel
+                        {
+                            Id = x.User.UserLevel.Id,
+                            UserId = x.User.UserLevel.UserId,
+                            UserName = x.User.User.Username,
+                            GroupId = x.User.UserLevel.GroupId,
+                            EmployeeName = x.Employee.EmployeeNameVn,
+                            Active = x.User.UserLevel.Active,
+                            CompanyId = x.User.UserLevel.CompanyId,
+                            OfficeId = x.User.UserLevel.OfficeId,
+                            DepartmentId = x.User.UserLevel.DepartmentId,
+                            DatetimeCreated = x.User.UserLevel.DatetimeCreated,
+                            DatetimeModified = x.User.UserLevel.DatetimeModified,
+                            UserCreated = x.User.UserLevel.UserCreated,
+                            UserModified = x.User.UserLevel.UserModified,
+                            Position = x.User.UserLevel.Position
+                        });
+            if (criteria.Type == "company")
+            {
+                results = results.Where(x => x.CompanyId == criteria.CompanyId);
+            }
+            else if (criteria.Type == "office")
+            {
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId);
+            }
+            else if (criteria.Type == "department")
+            {
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId);
+            }
+            else if (criteria.Type == "group")
+            {
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId && x.GroupId == criteria.GroupId);
+            }
+            else if (criteria.Type == "owner")
+            {
+                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId && x.GroupId == criteria.GroupId && x.UserId == criteria.UserId);
+            }
+            return results;
+        }
     }
 }
