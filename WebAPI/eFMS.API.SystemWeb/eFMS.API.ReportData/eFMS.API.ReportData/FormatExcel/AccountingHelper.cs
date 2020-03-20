@@ -1174,7 +1174,7 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                "STT/No",
                "Tên hàng hóa/Commodity",
-               "Cảng/Port",
+               "Quantity/Số lượng",
                "Đơn Vị Tính/Đơn vị",
                "Số Tờ Khai/Customs Declaration No",
                "Số Vận Đơn/HBL No",
@@ -1312,9 +1312,8 @@ namespace eFMS.API.ReportData.FormatExcel
            
                 workSheet.Cells[i + addressStartContent, 1].Value = i + 1;
                 workSheet.Cells[i + addressStartContent, 2].Value = item.CommodityName;
-                workSheet.Cells[i + addressStartContent, 3].Value = item.AOL;
+                //workSheet.Cells[i + addressStartContent, 3].Value = item.AOL;
                 workSheet.Cells[i + addressStartContent, 4].Value = string.Empty;
-
                 workSheet.Cells[i + addressStartContent, 5].Value = item.Charges.Select(t=>t.CustomNo).FirstOrDefault();
                 workSheet.Cells[i + addressStartContent, 6].Value = item.HwbNo;
                 workSheet.Cells[i + addressStartContent, 7].Value = item.GW;
@@ -1325,7 +1324,9 @@ namespace eFMS.API.ReportData.FormatExcel
                     addressStartContent++;
                     var itemCharge = item.Charges[j];
                     workSheet.Cells[i + addressStartContent, 2].Value = itemCharge.ChargeName;
+                    workSheet.Cells[i + addressStartContent, 3].Value = itemCharge.Quantity;
                     workSheet.Cells[i + addressStartContent, 4].Value = itemCharge.Unit;
+
                 }
 
 
