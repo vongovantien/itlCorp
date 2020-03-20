@@ -134,6 +134,8 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         modelAdd.jobNo = this.shipmentDetail.jobNo;
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
+        modelAdd.currentStatus = this.shipmentDetail.currentStatus;
+
         if (this.ACTION === 'COPY') {
             this.duplicateJob(modelAdd);
         } else {

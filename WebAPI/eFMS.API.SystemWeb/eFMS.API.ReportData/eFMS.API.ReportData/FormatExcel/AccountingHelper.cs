@@ -1133,6 +1133,54 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
+        public Stream GenerateSOAOPSExcel(SOAOPSModel lstSoa, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("SOA OPS");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BinddingDatalSOAOPS(workSheet, lstSoa);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public void BinddingDatalSOAOPS(ExcelWorksheet workSheet, SOAOPSModel lstSoa)
+        {
+            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            {
+                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                //add the image to row 1, column B
+                excelImage.SetPosition(0, 0, 1, 0);
+            }
+
+            List<string> headers = new List<string>()
+            {
+               "INDO TRANS LOGISTICS CORPORATION", //0
+               "52-54-56 Truong Son St. Tan Binh Dist. HCM City. Vietnam\nTel: (84-8) 3948 6888  Fax: +84 8 38488 570\nE-mail:\nWebsite: www.itlvn.com", //1
+               "BẢNG TỔNG HỢP CHI PHÍ PHÁT SINH/SUMMARY OF COSTS INCURRED", //2
+               "Tổng cộng/ Total (VND) ", //3
+            };
+
+
+            workSheet.Cells["P1:U1"].Merge = true;
+            workSheet.Cells["P1"].Value = headers[0];
+            workSheet.Cells["P1"].Style.Font.SetFromFont(new Font("Arial Black", 13));
+            workSheet.Cells["P1"].Style.Font.Italic = true;
+            workSheet.Cells["P2:U2"].Merge = true;
+            workSheet.Cells["P2:U2"].Style.WrapText = true;
+            workSheet.Cells["P2"].Value = headers[1];
+
+        }
+
         /// <returns></returns>
         public Stream GenerateSOAAirfreightExcel(ExportSOAAirfreightModel soaAir, Stream stream = null)
         {
