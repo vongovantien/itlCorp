@@ -1910,8 +1910,24 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var it in item.Charges)
                 {
-                    item.AOL = port.Where(x => x.Id == it.AOL).Select(t => t.NameVn).FirstOrDefault();
-                    break;
+                    decimal? percent = 0;
+                    if (it.VATRate > 0)
+                    {
+                        percent = (it.VATRate * 10) / 100;
+                        it.VATAmount = percent * (it.UnitPrice * it.Quantity);
+                        if(it.Currency != "VND")
+                        {
+                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
+
+                        }
+                    }
+                    else
+                    {
+                        it.VATAmount = it.VATRate;
+                    }
+                    
+                    it.NetAmount = it.UnitPrice * it.Quantity;
+                    
                 }
 
             }

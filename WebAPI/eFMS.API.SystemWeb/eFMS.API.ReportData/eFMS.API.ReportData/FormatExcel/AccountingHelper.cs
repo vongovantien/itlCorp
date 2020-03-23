@@ -19,6 +19,8 @@ namespace eFMS.API.ReportData.FormatExcel
         const double minWidth = 0.00;
         const double maxWidth = 500.00;
         const string numberFormat = "_-* #,##0.00_-;-* #,##0.00_-;_-* \"-\"??_-;_-@_-_(_)";
+        const string numberFormatUSD = "_-* #,##0.000_-;-* #,##0.000_-;_-* \"-\"??_-;_-@_-_(_)";
+
         const string numberFormatVND = "_-\"VND\"* #,##0.00_-;-\"VND\"* #,##0.00_-;_-\"VND\"* \"-\"??_-;_-@_-_(_)";
 
         /// <summary>
@@ -1319,13 +1321,69 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[i + addressStartContent, 7].Value = item.GW;
                 workSheet.Cells[i + addressStartContent, 8].Value = item.CBM;
                 workSheet.Cells[i + addressStartContent, 9].Value = item.PackageContainer;
+                workSheet.Cells[i + addressStartContent, 10].Value = item.Charges.Sum(t => t.NetAmount);
+                workSheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[i + addressStartContent, 11].Value = item.Charges.Sum(t => t.VATAmount);
+                workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[i + addressStartContent, 12].Value = item.Charges.Sum(t => t.VATAmount) + item.Charges.Sum(t => t.NetAmount);
+                workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
+
                 for (int j = 0; j < item.Charges.Count; j++)
                 {
                     addressStartContent++;
                     var itemCharge = item.Charges[j];
+                    decimal? totalNormalCharge = 0;
+                    decimal? totalOBHCharge = 0;
+
                     workSheet.Cells[i + addressStartContent, 2].Value = itemCharge.ChargeName;
                     workSheet.Cells[i + addressStartContent, 3].Value = itemCharge.Quantity;
                     workSheet.Cells[i + addressStartContent, 4].Value = itemCharge.Unit;
+                    workSheet.Cells[i + addressStartContent, 10].Value = itemCharge.NetAmount;
+                    workSheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
+                    string vatAmount = "( " + itemCharge.VATAmount + " )";
+
+              
+                    if (itemCharge.VATAmount < 0)
+                    {
+                        workSheet.Cells[i + addressStartContent, 11].Value = vatAmount;
+                        workSheet.Cells[i + addressStartContent, 14].Value = vatAmount;
+
+
+                    }
+                    else
+                    {
+                        workSheet.Cells[i + addressStartContent, 11].Value = itemCharge.VATAmount;
+                        workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormatUSD;
+                    }
+                    
+
+                    workSheet.Cells[i + addressStartContent, 12].Value = itemCharge.VATAmount.GetValueOrDefault(0M)  + itemCharge.NetAmount.GetValueOrDefault(0M);
+                    workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
+                    totalNormalCharge = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
+
+
+                    if (itemCharge.Type.Contains("OBH"))
+                    {
+                        totalOBHCharge = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
+                        workSheet.Cells[i + addressStartContent, 13].Value = itemCharge.NetAmount;
+                        workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat;
+                        workSheet.Cells[i + addressStartContent, 15].Value = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
+                        workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat;
+                        workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
+                        workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormatUSD;
+                        workSheet.Cells[i + addressStartContent, 10].Value = null;
+                        workSheet.Cells[i + addressStartContent, 11].Value = null;
+                        workSheet.Cells[i + addressStartContent, 12].Value = null;
+
+
+                    }
+
+                    workSheet.Cells[i + addressStartContent, 16].Value = 
+
+
+
+
+
 
                 }
 
