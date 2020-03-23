@@ -26,5 +26,12 @@ namespace eFMS.API.Common.Globals
             new CommonData { Value = "SCI", DisplayName = "Sea Consol Import" },
             new CommonData { Value = "IT", DisplayName = "Inland Trucking" }
         };
+
+        //Define list department type
+        public static readonly List<CommonData> DeptTypes = new List<CommonData>
+        {
+            new CommonData { Value = "ACCOUNTANT", DisplayName = "Accountant" },
+            new CommonData { Value = "NORMAL", DisplayName = "Normal" },
+        };
     }
 }

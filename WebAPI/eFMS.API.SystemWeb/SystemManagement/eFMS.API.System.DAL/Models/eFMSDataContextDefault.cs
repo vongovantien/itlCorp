@@ -80,8 +80,8 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
-                entity.Property(e => e.ManagerId)
-                    .HasColumnName("ManagerID")
+                entity.Property(e => e.DeptType)
+                    .HasColumnName("DeptType")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 

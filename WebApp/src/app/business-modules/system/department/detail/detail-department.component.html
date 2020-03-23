@@ -133,6 +133,15 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-4" *ngIf="!!department">
+                            <div class="form-group">
+                                <label class="form-control-label">Department Type</label>
+                                <ng-select formControlName="departmentType" [allowClear]="false"
+                                    [items]="departmentTypeList" [active]="departmentTypeActive"
+                                    (selected)="onSelectDataFormInfo($event, 'deptType')">
+                                </ng-select>
+                            </div>
+                        </div>
                         <div class="col-4">
                             <div class="form-group">
                                 <label class="form-control-label">Status</label>

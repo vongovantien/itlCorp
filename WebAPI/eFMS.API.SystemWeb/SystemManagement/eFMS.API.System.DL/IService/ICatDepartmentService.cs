@@ -24,6 +24,10 @@ namespace eFMS.API.System.DL.IService
 
         IQueryable<CatDepartmentModel> GetDepartmentsByOfficeId(Guid id);
 
+        bool CheckExistsDeptAccountantInOffice(CatDepartmentModel model);
+
+        object GetDepartmentTypes();
+
     }
 
 }

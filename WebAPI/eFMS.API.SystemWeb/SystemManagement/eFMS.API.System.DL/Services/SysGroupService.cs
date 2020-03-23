@@ -177,7 +177,7 @@ namespace eFMS.API.System.DL.Services
                                         DepartmentId = (int)lv.DepartmentId,
                                         DepartmentName = dp.DeptNameAbbr,
                                         GroupId = lv.GroupId,
-                                        GroupName = sg.NameEn,
+                                        GroupName = sg.ShortName,
                                     };
                         results =  query;
                     }

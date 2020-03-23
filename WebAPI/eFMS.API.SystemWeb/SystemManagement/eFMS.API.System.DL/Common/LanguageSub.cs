@@ -171,5 +171,7 @@ namespace eFMS.API.System.DL.Common
 
         public static readonly string MSG_ITEM_DUPLICATE_ROLE_ON_USER = "MSG_ITEM_DUPLICATE_ROLE_ON_USER";
 
+        public static readonly string MSG_ITEM__EXISTED_ACCOUNTANT_DEPT_IN_OFFICE = "MSG_ITEM__EXISTED_ACCOUNTANT_DEPT_IN_OFFICE";
+
     }
 }

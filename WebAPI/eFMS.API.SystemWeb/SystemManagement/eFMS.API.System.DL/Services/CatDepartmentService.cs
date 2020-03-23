@@ -9,7 +9,6 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.Localization;
 using System;
 using System.Linq;
 
@@ -48,7 +47,7 @@ namespace eFMS.API.System.DL.Services
                             Description = d.Description,
                             BranchId = d.BranchId,
                             OfficeName = off.BranchNameEn,
-                            ManagerId = d.ManagerId,
+                            DeptType = d.DeptType,
                             UserCreated = d.UserCreated,
                             DatetimeCreated = d.DatetimeCreated,
                             UserModified = d.UserModified,
@@ -60,13 +59,6 @@ namespace eFMS.API.System.DL.Services
             {
                 if (!string.IsNullOrEmpty(criteria.Keyword))
                 {
-                    //query = query.Where(x =>
-                    //       x.Code == criteria.Keyword
-                    //    || x.DeptName == criteria.Keyword
-                    //    || x.DeptNameEn == criteria.Keyword
-                    //    || x.DeptNameAbbr == criteria.Keyword
-                    //    || x.OfficeName == criteria.Keyword
-                    //);
                     //Search gần đúng
                     query = query.Where(x =>
                            x.Code.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -81,13 +73,6 @@ namespace eFMS.API.System.DL.Services
             {
                 if (!string.IsNullOrEmpty(criteria.Keyword))
                 {
-                    //query = query.Where(x =>
-                    //       criteria.Type == "Code" ? x.Code == criteria.Keyword : true
-                    //    && criteria.Type == "DeptName" ? x.DeptName == criteria.Keyword : true
-                    //    && criteria.Type == "DeptNameEn" ? x.DeptNameEn == criteria.Keyword : true
-                    //    && criteria.Type == "DeptNameAbbr" ? x.DeptNameAbbr == criteria.Keyword : true
-                    //    && criteria.Type == "OfficeName" ? x.OfficeName == criteria.Keyword : true
-                    //);
                     //Search gần đúng
                     query = query.Where(x =>
                            criteria.Type == "Code" ? x.Code.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
@@ -180,7 +165,6 @@ namespace eFMS.API.System.DL.Services
                 modelUpdate.DatetimeCreated = deptCurrent.DatetimeCreated;
                 modelUpdate.Code = deptCurrent.Code;
                 modelUpdate.Description = deptCurrent.Description;
-                modelUpdate.ManagerId = deptCurrent.ManagerId;
                 modelUpdate.UserModified = userCurrent;
                 modelUpdate.DatetimeModified = today;
                 if (modelUpdate.Active == false)
@@ -226,7 +210,7 @@ namespace eFMS.API.System.DL.Services
                             Description = d.Description,
                             BranchId = d.BranchId,
                             OfficeName = off.BranchNameEn,
-                            ManagerId = d.ManagerId,
+                            DeptType = d.DeptType,
                             UserCreated = d.UserCreated,
                             DatetimeCreated = d.DatetimeCreated,
                             UserModified = d.UserModified,
@@ -236,6 +220,31 @@ namespace eFMS.API.System.DL.Services
                         };
             var result = query.OrderByDescending(x => x.DatetimeModified);
             return result;
+        }
+
+        public bool CheckExistsDeptAccountantInOffice(CatDepartmentModel model)
+        {
+            var isExists = false;
+            if(string.IsNullOrEmpty(model.Code))
+            {
+                isExists = DataContext.Get(x => 
+                    x.DeptType == SystemConstants.DeptTypeAccountant
+                 && x.BranchId == model.BranchId).Any();
+            }
+            else
+            {
+                isExists = DataContext.Get(x => 
+                    x.DeptType == SystemConstants.DeptTypeAccountant
+                 && x.BranchId == model.BranchId 
+                 && x.Code != model.Code 
+                 && model.DeptType == SystemConstants.DeptTypeAccountant).Any();
+            }
+            return isExists;
+        }
+
+        public object GetDepartmentTypes()
+        {
+            return API.Common.Globals.CustomData.DeptTypes;
         }
     }
 

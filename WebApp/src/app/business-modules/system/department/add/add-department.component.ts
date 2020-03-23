@@ -22,6 +22,9 @@ export class DepartmentAddNewComponent extends AppForm {
     office: AbstractControl;
     status: AbstractControl;
     officeList: any[] = [];
+    departmentType: AbstractControl;
+    departmentTypeList: any[] = [];
+    departmentTypeActive: any[] = [];
 
     isValidForm: boolean = false;
     isSubmited: boolean = false;
@@ -70,7 +73,8 @@ export class DepartmentAddNewComponent extends AppForm {
                     Validators.required
                 ])
             ],
-            status: []
+            status: [],
+            departmentType: [this.departmentTypeActive]
         });
 
         this.departmentCode = this.formAdd.controls['departmentCode'];
@@ -79,15 +83,18 @@ export class DepartmentAddNewComponent extends AppForm {
         this.nameAbbr = this.formAdd.controls['nameAbbr'];
         this.office = this.formAdd.controls['office'];
         this.status = this.formAdd.controls['status'];
+        this.departmentType = this.formAdd.controls['departmentType'];
 
         this.status.setValue(true);
     }
 
     initDataInform() {
         this.getOffices();
+        this.getDeptTypes();
     }
 
     saveDepartment() {
+        [this.departmentType].forEach((control: AbstractControl) => this.setError(control));
         this.isSubmited = true;
         if (this.formAdd.valid) {
             const dept: Department = {
@@ -99,7 +106,7 @@ export class DepartmentAddNewComponent extends AppForm {
                 branchId: this.office.value[0].id,
                 officeName: this.office.value[0].text,
                 companyName: '',
-                managerId: '',
+                deptType: this.departmentTypeActive[0].id,
                 userCreated: '',
                 datetimeCreated: '',
                 userModified: '',
@@ -110,6 +117,7 @@ export class DepartmentAddNewComponent extends AppForm {
                 userNameCreated: '',
                 userNameModified: ''
             };
+            console.log(dept);
             this._progressRef.start();
             // Add new Department
             this._systemRepo.addNewDepartment(dept)
@@ -138,6 +146,32 @@ export class DepartmentAddNewComponent extends AppForm {
                     this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));
                 },
             );
+    }
+
+    getDeptTypes() {
+        this._systemRepo.getListDeptType()
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (data: any) => {
+                    this.departmentTypeList = data.map((item: any) => ({ id: item.value, text: item.displayName }));
+                    this.departmentTypeActive = [this.departmentTypeList[1]];
+                },
+            );
+    }
+
+    onSelectDataFormInfo(data: any, type: string) {
+        switch (type) {
+            case 'deptType':
+                this.departmentTypeActive = [];
+                this.departmentTypeActive.push(data);
+                this.departmentType.setValue(this.departmentTypeActive);
+                break;
+            default:
+                break;
+        }
     }
 
     back() {

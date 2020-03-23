@@ -123,5 +123,6 @@
   "MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE": "Expiration date phải lớn hơn hoặc bằng effective date",
   "MSG_ITEM_SIMILAR_AUTHORIZATION": "Một ủy quyền tương tự đã được tạo trên hệ thống với khoảng thời gian này. Vui lòng kiểm tra lại hoặc chọn khoảng thời gian khác",
   "MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL": "Duplicate user in {0}! Please Check hightlight field!!",
-  "MSG_ITEM_EXISTED_USER_ON_USER_LEVEL": "User existed on {0}! Please Check higlight field!!"
+  "MSG_ITEM_EXISTED_USER_ON_USER_LEVEL": "User existed on {0}! Please Check higlight field!!",
+  "MSG_ITEM__EXISTED_ACCOUNTANT_DEPT_IN_OFFICE": "Phòng kế toán đã tồn tại trong Office. Vui lòng kiểm tra lại"
 }

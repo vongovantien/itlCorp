@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
@@ -108,6 +109,11 @@ namespace eFMS.API.System.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
+            if (catDepartmentService.CheckExistsDeptAccountantInOffice(model))
+            {
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM__EXISTED_ACCOUNTANT_DEPT_IN_OFFICE].Value, Data = model });
+        }
+
             var hs = catDepartmentService.Insert(model);
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -131,6 +137,11 @@ namespace eFMS.API.System.Controllers
         public IActionResult Update(CatDepartmentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+
+            if (catDepartmentService.CheckExistsDeptAccountantInOffice(model))
+            {
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM__EXISTED_ACCOUNTANT_DEPT_IN_OFFICE].Value, Data = model });
+            }
 
             var hs = catDepartmentService.Update(model);
 
@@ -174,6 +185,17 @@ namespace eFMS.API.System.Controllers
         {
             var data = catDepartmentService.GetDepartmentsByOfficeId(id);
             return Ok(data);
+        }
+        
+        /// <summary>
+        /// Get list department type
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetDepartmentTypes")]
+        public IActionResult GetDeptTypes()
+        {
+            var result = catDepartmentService.GetDepartmentTypes();
+            return Ok(result);
         }
     }
 

@@ -73,6 +73,12 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.System.Controllers.CatDepartmentController.GetDeptTypes">
+            <summary>
+            Get list department type
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.System.Controllers.MenuController">
             <summary>
             Controller Menu
