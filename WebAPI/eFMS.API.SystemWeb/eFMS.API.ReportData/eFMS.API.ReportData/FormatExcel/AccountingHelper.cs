@@ -1309,23 +1309,54 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["G9:O9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
             int addressStartContent = 10;
-            int row1 = addressStartContent - 1;
+            Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#eab286");
 
             for (int i = 0; i < lstSoa.exportSOAOPs.Count; i++)
             {
-                var item = lstSoa.exportSOAOPs[i];
 
+                var item = lstSoa.exportSOAOPs[i];
                 workSheet.Cells[i + addressStartContent, 1].Value = i + 1;
+                workSheet.Cells[i + addressStartContent, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 1].Style.Fill.BackgroundColor.SetColor(colFromHex);
                 workSheet.Cells[i + addressStartContent, 2].Value = item.CommodityName;
-                //workSheet.Cells[i + addressStartContent, 3].Value = item.AOL;
+                workSheet.Cells[i + addressStartContent, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 2].Style.Fill.BackgroundColor.SetColor(colFromHex);
                 workSheet.Cells[i + addressStartContent, 4].Value = string.Empty;
+                workSheet.Cells[i + addressStartContent, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 3].Style.Fill.BackgroundColor.SetColor(colFromHex);
+                workSheet.Cells[i + addressStartContent, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 4].Style.Fill.BackgroundColor.SetColor(colFromHex);
                 workSheet.Cells[i + addressStartContent, 5].Value = item.Charges.Select(t => t.CustomNo).FirstOrDefault();
+                workSheet.Cells[i + addressStartContent, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 5].Style.Fill.BackgroundColor.SetColor(colFromHex);
                 workSheet.Cells[i + addressStartContent, 6].Value = item.HwbNo;
+                workSheet.Cells[i + addressStartContent, 6].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 6].Style.Fill.BackgroundColor.SetColor(colFromHex);
                 workSheet.Cells[i + addressStartContent, 7].Value = item.GW;
+                workSheet.Cells[i + addressStartContent, 7].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 7].Style.Fill.BackgroundColor.SetColor(colFromHex);
                 workSheet.Cells[i + addressStartContent, 8].Value = item.CBM;
+                workSheet.Cells[i + addressStartContent, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 8].Style.Fill.BackgroundColor.SetColor(colFromHex);
                 workSheet.Cells[i + addressStartContent, 9].Value = item.PackageContainer;
+                workSheet.Cells[i + addressStartContent, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 9].Style.Fill.BackgroundColor.SetColor(colFromHex);
                 workSheet.Cells[i + addressStartContent, 10].Value = item.Charges.Sum(t => t.NetAmount);
                 workSheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[i + addressStartContent, 10].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 10].Style.Fill.BackgroundColor.SetColor(colFromHex);
+                workSheet.Cells[i + addressStartContent, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 11].Style.Fill.BackgroundColor.SetColor(colFromHex);
+                workSheet.Cells[i + addressStartContent, 12].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 12].Style.Fill.BackgroundColor.SetColor(colFromHex);
+                workSheet.Cells[i + addressStartContent, 13].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 13].Style.Fill.BackgroundColor.SetColor(colFromHex);
+                workSheet.Cells[i + addressStartContent, 14].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 14].Style.Fill.BackgroundColor.SetColor(colFromHex);
+                workSheet.Cells[i + addressStartContent, 15].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 15].Style.Fill.BackgroundColor.SetColor(colFromHex);
+                workSheet.Cells[i + addressStartContent, 16].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[i + addressStartContent, 16].Style.Fill.BackgroundColor.SetColor(colFromHex);
                 workSheet.Cells[i + addressStartContent, 11].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.VATAmount);
                 workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormat;
                 workSheet.Cells[i + addressStartContent, 12].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.VATAmount) + item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.NetAmount);
@@ -1391,7 +1422,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                     totalALLValue += TotalNormalCharge.GetValueOrDefault(0M) + TotalOBHCharge.GetValueOrDefault(0M);
                 }
-
+       
             }
 
             workSheet.Cells[8, 1, addressStartContent + 2, 16].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
