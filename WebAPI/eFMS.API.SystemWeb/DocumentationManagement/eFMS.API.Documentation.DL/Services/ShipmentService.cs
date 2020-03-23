@@ -321,7 +321,8 @@ namespace eFMS.API.Documentation.DL.Services
                 result = GetLogHistory(opShipments);
                 return result;
             }
-            if(criteria.TransactionType > 0){ 
+            if (criteria.TransactionType > 0)
+            {
 
                 transactionType = DataTypeEx.GetType(criteria.TransactionType);
             }
@@ -349,15 +350,15 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (opShipments != null && csShipments != null)
             {
-                 shipments =  opShipments.Union(csShipments);
+                shipments = opShipments.Union(csShipments);
             }
-            else if( csShipments == null && opShipments != null)
+            else if (csShipments == null && opShipments != null)
             {
-                 shipments = opShipments;
+                shipments = opShipments;
             }
-            else if(opShipments == null && csShipments != null)
+            else if (opShipments == null && csShipments != null)
             {
-                 shipments = csShipments;
+                shipments = csShipments;
             }
             result = GetLogHistory(shipments);
             return result;
@@ -367,12 +368,12 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = new LockedLogResultModel();
             if (shipments == null) return result;
-            result.LockedLogs = shipments.Where(x=>x.IsLocked == true);
+            result.LockedLogs = shipments.Where(x => x.IsLocked == true);
             result.Logs = new List<string>();
-            foreach(var item in shipments)
+            foreach (var item in shipments)
             {
                 var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
-                if(logs.Count > 0)
+                if (logs.Count > 0)
                 {
                     result.Logs.AddRange(logs);
                 }
@@ -484,10 +485,10 @@ namespace eFMS.API.Documentation.DL.Services
 
         #region -- GENERAL REPORT --
 
-        public List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria, int page,int size, out int rowsCount)
+        public List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria, int page, int size, out int rowsCount)
         {
             var dataDocumentation = GeneralReportDocumentation(criteria);
-            IQueryable<GeneralReportResult> list; 
+            IQueryable<GeneralReportResult> list;
             if (criteria.Service.Contains("CL"))
             {
                 var dataOperation = GeneralReportOperation(criteria);
@@ -497,7 +498,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 list = dataDocumentation;
             }
-                                
+
             var results = new List<GeneralReportResult>();
             if (list == null)
             {
@@ -543,7 +544,7 @@ namespace eFMS.API.Documentation.DL.Services
                 query = query.And(q => q.CustomerId == criteria.CustomerId);
             }
 
-            query = query.And(q => criteria.Service.Contains("CL"));            
+            query = query.And(q => criteria.Service.Contains("CL"));
 
             if (!string.IsNullOrEmpty(criteria.JobId))
             {
@@ -626,10 +627,10 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         private IQueryable<GeneralReportResult> GeneralReportOperation(GeneralReportCriteria criteria)
-        {          
+        {
             List<GeneralReportResult> dataList = new List<GeneralReportResult>();
             var dataShipment = QueryDataOperation(criteria);
-            foreach(var item in dataShipment)
+            foreach (var item in dataShipment)
             {
                 GeneralReportResult data = new GeneralReportResult();
                 data.JobId = item.JobNo;
@@ -649,12 +650,12 @@ namespace eFMS.API.Documentation.DL.Services
                 #region -- Phí Selling trước thuế --
                 decimal _revenue = 0;
                 var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.Hblid);
-                foreach(var charge in _chargeSell)
+                foreach (var charge in _chargeSell)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = charge.FinalExchangeRate;
                     if (_rate == null)
-                    {                        
+                    {
                         var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
                         _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
                     }
@@ -763,9 +764,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (!string.IsNullOrEmpty(criteria.Hawb))
             {
-                queryTranDetail = queryTranDetail == null ? 
-                    (q => q.Hwbno == criteria.Hawb) 
-                    : 
+                queryTranDetail = queryTranDetail == null ?
+                    (q => q.Hwbno == criteria.Hawb)
+                    :
                     queryTranDetail.And(q => q.Hwbno == criteria.Hawb);
             }
 
@@ -803,9 +804,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (!string.IsNullOrEmpty(criteria.SalesMan))
             {
-                queryTranDetail = (queryTranDetail == null) ? 
-                    (q => criteria.SalesMan.Contains(q.SaleManId)) 
-                    : 
+                queryTranDetail = (queryTranDetail == null) ?
+                    (q => criteria.SalesMan.Contains(q.SaleManId))
+                    :
                     queryTranDetail.And(q => criteria.SalesMan.Contains(q.SaleManId));
             }
 
@@ -834,7 +835,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
 
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);            
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
             if (queryTranDetail == null)
             {
                 var houseBills = detailRepository.Get();
@@ -884,7 +885,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     };
                 return queryShipment;
             }
-            
+
         }
 
         private IQueryable<GeneralReportResult> GeneralReportDocumentation(GeneralReportCriteria criteria)
@@ -1029,47 +1030,6 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             return 1;
-        }
-
-        public List<MonthlySaleReportResult> GetMonthlySaleReport(SaleReportCriteria criteria)
-        {
-            Expression<Func<CsTransaction, bool>> queryTrans = x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
-                                                                 && (x.AgentId == criteria.AgentId || criteria.AgentId == null)
-                                                                 && (x.Mawb.IndexOf(criteria.Mawb, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.Mawb))
-                                                                 && (x.JobNo.IndexOf(criteria.JobId, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.JobId))
-                                                                 && (criteria.Service.Contains(x.TransactionType) || string.IsNullOrEmpty(x.TransactionType))
-                                                                 && (x.Pod == criteria.Pod || criteria.Pod == null)
-                                                                 && (x.Pol == criteria.Pol || criteria.Pol == null)
-                                                                 && (x.ColoaderId == criteria.CarrierId || criteria.CarrierId == null)
-                                                                 && (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId))
-                                                                 && (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId))
-                                                                 && (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId))
-                                                                 && (criteria.PersonInCharge.Contains(x.PersonIncharge) || string.IsNullOrEmpty(criteria.PersonInCharge))
-                                                                 && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator))
-                                                                 ;
-
-            Expression<Func<OpsTransaction, bool>> queryOpsTrans = x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
-                                                                 && (x.AgentId == criteria.AgentId || criteria.AgentId == null)
-                                                                 && (x.Mblno.IndexOf(criteria.Mawb, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.Mawb))
-                                                                 && (x.JobNo.IndexOf(criteria.JobId, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.JobId))
-                                                                 && (x.Pod == criteria.Pod || criteria.Pod == null)
-                                                                 && (x.Pol == criteria.Pol || criteria.Pol == null)
-                                                                 && (x.SupplierId == criteria.CarrierId || criteria.CarrierId == null)
-                                                                 ;
-            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
-            {
-                queryTrans = queryTrans.And(x => x.TransactionType.Contains("E") ? 
-                                    (!x.Etd.HasValue || (x.Etd.Value >= criteria.ServiceDateFrom.Value && x.Etd.Value <= criteria.ServiceDateTo.Value))
-                                   :(!x.Eta.HasValue || (x.Eta.Value >= criteria.ServiceDateFrom.Value && x.Eta.Value <= criteria.ServiceDateTo.Value))
-                                   );
-            }
-            if(criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
-            {
-                queryTrans = queryTrans.And(x => x.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value && x.DatetimeCreated.Value.Date <= criteria.CreatedDateTo);
-            }
-            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = null;
-
-            var data = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
         }
     }
 }

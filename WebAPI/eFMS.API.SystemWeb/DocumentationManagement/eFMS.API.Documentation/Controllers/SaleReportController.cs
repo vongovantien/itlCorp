@@ -22,7 +22,7 @@ namespace eFMS.API.Documentation.Controllers
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class SaleReportController : ControllerBase
     {
-        readonly IShipmentService shipmentService;
+        readonly ISaleReportService saleReportService;
         private readonly IStringLocalizer stringLocalizer;
 
         /// <summary>
@@ -30,15 +30,15 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="service"></param>
         /// <param name="localizer"></param>
-        public SaleReportController(IShipmentService service, IStringLocalizer<LanguageSub> localizer)
+        public SaleReportController(ISaleReportService service, IStringLocalizer<LanguageSub> localizer)
         {
-            shipmentService = service;
+            saleReportService = service;
         }
 
         [HttpPost]
         public IActionResult MonthlySalereport(SaleReportCriteria criteria)
         {
-            var data = shipmentService.GetMonthlySaleReport(criteria);
+            var data = saleReportService.GetMonthlySaleReport(criteria);
             var list = new List<MonthlySaleReportResult>() {
                 new MonthlySaleReportResult
                 {

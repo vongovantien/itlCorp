@@ -536,11 +536,6 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-    previewTest() {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport`).pipe(
-            map((data: any) => data)
-        );
-    }
     previewSeaExportManifest(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewSeaExportManifest`, body).pipe(
             map((data: any) => data)
