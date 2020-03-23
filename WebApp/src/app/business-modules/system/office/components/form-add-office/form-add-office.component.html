@@ -141,7 +141,6 @@
                         <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmited && !company.value}">
                             <label class="form-control-label">
                                 Company <span class="m--font-danger">(*)</span>
-                                {{isReadonly | async}}
                             </label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: company.value}"
                                 (itemSelected)="onSelectDataFormInfo($event)"

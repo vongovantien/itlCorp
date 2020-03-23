@@ -129,6 +129,8 @@ namespace eFMS.API.System.DL.Common
         #endregion
         #region User
         public static readonly string MSG_USER_USERNAME_EMPTY = "MSG_USER_USERNAME_EMPTY";
+        public static readonly string MSG_USER_USERNAME_EXISTED = "MSG_USER_USERNAME_EXISTED";
+
         public static readonly string MSG_USER_NAMEEN_EMPTY = "MSG_USER_NAMEEN_EMPTY";
         public static readonly string MSG_USER_NAMEVN_EMPTY = "MSG_USER_NAMEVN_EMPTY";
         public static readonly string MSG_USER_USERTYPE_EMPTY = "MSG_USER_USERTYPE_EMPTY";
@@ -136,6 +138,17 @@ namespace eFMS.API.System.DL.Common
         public static readonly string MSG_USER_STATUS_EMPTY = "MSG_USER_WORKINGSTATUS_EMPTY";
         public static readonly string MSG_USER_STAFFCODE_EMPTY = "MSG_USER_STAFFCODE_EMPTY";
         public static readonly string MSG_USER_TITLE_EMPTY = "MSG_USER_TITLE_EMPTY";
+        public static readonly string MSG_USER_STAFFCODE_EXISTED = "MSG_USER_STAFFCODE_EXISTED";
+        public static readonly string MSG_USER_STAFFCODE_DUPLICATE = "MSG_USER_STAFFCODE_DUPLICATE";
+        public static readonly string MSG_USER_USERNAME_DUPLICATE = "MSG_USER_USERNAME_DUPLICATE";
+
+        public static readonly string MSG_USER_USERTYPE_NOTFOUND = "MSG_USER_USERTYPE_NOTFOUND";
+        public static readonly string MSG_USER_EMAIL_EMPTY = "MSG_USER_EMAIL_EMPTY";
+        public static readonly string MSG_USER_STATUS_NOTFOUND = "MSG_USER_STATUS_NOTFOUND";
+        public static readonly string MSG_USER_TEL_EMPTY = "MSG_USER_TEL_EMPTY";
+
+
+
 
 
 

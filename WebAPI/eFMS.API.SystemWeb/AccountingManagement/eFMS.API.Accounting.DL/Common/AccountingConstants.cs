@@ -74,6 +74,13 @@
         public static readonly string CHARGE_AWB_FEE = "Air Waybill fee";
 
         public static readonly string CHARGE_HANDLING_FEE = "Handling fee";
+        #region -- TYPE SOA--
+        public static readonly string TYPE_SOA_CREDIT = "Credit";
+        public static readonly string TYPE_SOA_DEBIT = "Debit";
+
+
+
+        #endregion
 
 
 
