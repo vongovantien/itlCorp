@@ -34,7 +34,7 @@
 
             public const string GetDataBravoSOAUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExporttBravoFromSOA?soaNo=";
 
-            public const string GetDataSOAOPSUrl = "Accounting/api/v1/en-US/AcctSOA/GetDataExportSOAOPS?soaNo=";
+            public const string GetDataSOAOPSUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExportSOAOPS?soaNo=";
 
 
             public const string SettlementPaymentUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/QueryData";
