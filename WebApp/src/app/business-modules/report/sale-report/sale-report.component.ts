@@ -1,6 +1,5 @@
 import { AppList } from "src/app/app.list";
 import { Component } from "@angular/core";
-import { SortService } from "@services";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
 
@@ -10,7 +9,6 @@ import { ToastrService } from "ngx-toastr";
 })
 export class SaleReportComponent extends AppList {
     constructor(
-        private _sortService: SortService,
         private _progressService: NgProgress,
         private _toastService: ToastrService,
     ) {
@@ -19,6 +17,11 @@ export class SaleReportComponent extends AppList {
     }
 
     ngOnInit() {
+    }
+
+    onSearchSaleReport(data: any) {
+        console.log(data);
+        this.dataSearch = data;
     }
 
 }
