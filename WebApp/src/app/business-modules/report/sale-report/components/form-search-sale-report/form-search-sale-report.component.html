@@ -223,7 +223,7 @@
                                 Report Type
                             </label>
                             <ng-select formControlName="typeReport" [allowClear]="false" [items]="typeReportList"
-                                [active]="typeReportActive">
+                                [active]="typeReportActive" (selected)="onSelectDataFormInfo($event, 'typeReport')">
                             </ng-select>
                         </div>
                     </div>
