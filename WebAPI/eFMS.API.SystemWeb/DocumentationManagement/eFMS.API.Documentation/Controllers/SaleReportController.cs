@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models.ReportResults.Sales;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -23,7 +24,7 @@ namespace eFMS.API.Documentation.Controllers
     public class SaleReportController : ControllerBase
     {
         readonly ISaleReportService saleReportService;
-        private readonly IStringLocalizer stringLocalizer;
+        readonly IStringLocalizer stringLocalizer;
 
         /// <summary>
         /// 
@@ -33,135 +34,14 @@ namespace eFMS.API.Documentation.Controllers
         public SaleReportController(ISaleReportService service, IStringLocalizer<LanguageSub> localizer)
         {
             saleReportService = service;
+            stringLocalizer = localizer;
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult MonthlySalereport(SaleReportCriteria criteria)
         {
-            //var data = saleReportService.GetMonthlySaleReport(criteria);
-            var list = new List<MonthlySaleReportResult>() {
-                new MonthlySaleReportResult
-                {
-                    Department = "Department A",
-                    ContactName = "An Mai Loan",
-                    SalesManager ="SalesManager A",
-                    PartnerName = "PartnerName A",
-                    Description = "Logistics",
-                    Area ="Area A",
-                    POL = "POL A",
-                    POD ="POD A",
-                    Lines ="Lines A",
-                    Agent ="Agent A",
-                    NominationParty ="NominationParty A",
-                    assigned =false,
-                    TransID ="TransID A",
-                    HWBNO ="HWBNO A",
-                    Qty20 =2,
-                    Qty40 =2,
-                    Cont40HC =2,
-                    KGS = 3,
-                    CBM=3,
-                    SellingRate =3,
-                    SharedProfit =3,
-                    BuyingRate = 3,
-                    OtherCharges =3,
-                    SalesTarget =3,
-                    Bonus = 3,
-                    TpyeofService ="TpyeofService A",
-                    Shipper = "Shipper A",
-                    Consignee = "Consignee A"
-                },
-                new MonthlySaleReportResult
-                {
-                    Department = "Department B",
-                    ContactName = "An Mai Loan",
-                    SalesManager ="SalesManager B",
-                    PartnerName = "PartnerName B",
-                    Description = "Logistics",
-                    Area ="Area B",
-                    POL = "POL B",
-                    POD ="POD B",
-                    Lines ="Lines B",
-                    Agent ="Agent B",
-                    NominationParty ="NominationParty B",
-                    assigned =false,
-                    TransID ="TransID B",
-                    HWBNO ="HWBNO B",
-                    Qty20 =2,
-                    Qty40 =2,
-                    Cont40HC =2,
-                    KGS = 3,
-                    CBM=3,
-                    SellingRate =3,
-                    SharedProfit =3,
-                    BuyingRate = 3,
-                    OtherCharges =3,
-                    SalesTarget =3,
-                    Bonus = 3,
-                    TpyeofService ="TpyeofService B",
-                    Shipper = "Shipper B",
-                    Consignee = "Consignee B"
-                },
-                new MonthlySaleReportResult
-                {
-                    Department = "Department C",
-                    ContactName = "An Mai Loan",
-                    SalesManager ="SalesManager C",
-                    PartnerName = "PartnerName C",
-                    Description = "Logistics",
-                    Area ="Area C",
-                    POL = "POL C",
-                    POD ="POD C",
-                    Lines ="Lines C",
-                    Agent ="Agent C",
-                    NominationParty ="NominationParty C",
-                    assigned =false,
-                    TransID ="TransID C",
-                    HWBNO ="HWBNO C",
-                    Qty20 =2,
-                    Qty40 =2,
-                    Cont40HC =2,
-                    KGS = 3,
-                    CBM=3,
-                    SellingRate =3,
-                    SharedProfit =3,
-                    BuyingRate = 3,
-                    OtherCharges =3,
-                    SalesTarget =3,
-                    Bonus = 3,
-                    TpyeofService ="TpyeofService C",
-                    Shipper = "Shipper C",
-                    Consignee = "Consignee C"
-                }
-
-            };
-            Crystal result = new Crystal();
-            var parameter = new MonthlySaleReportParameter
-            {
-                FromDate = DateTime.Now,
-                ToDate = DateTime.Now,
-                Contact = "admin",
-                CompanyName ="Company Name",
-                CompanyAddress1 = "CompanyAddress1",
-                CurrDecimalNo =2,
-                ReportBy ="Tui day ne",
-                Director = "Director",
-                ChiefAccountant = "ChiefAccountant",
-                CompanyDescription = "CompanyDescription",
-                CompanyAddress2 = "CompanyAddress2",
-                Website = "Website",
-                SalesManager = "SaleManager"
-            };
-            result = new Crystal
-            {
-                ReportName = "Monthly Sale Report.rpt",
-                AllowPrint = true,
-                AllowExport = true,
-                IsLandscape = true
-            };
-            result.AddDataSource(list);
-            result.FormatType = ExportFormatType.PortableDocFormat;
-            result.SetParameter(parameter);
+            var result = saleReportService.PreviewGetMonthlySaleReport(criteria);
             return Ok(result);
         }
     }

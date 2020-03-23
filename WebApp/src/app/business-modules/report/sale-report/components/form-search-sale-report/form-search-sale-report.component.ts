@@ -17,7 +17,7 @@ import { SystemConstants } from "src/constants/system.const";
 })
 
 export class SaleReportFormSearchComponent extends AppForm {
-    @Output() onSearch: EventEmitter<ISaleReportCriteria> = new EventEmitter<ISaleReportCriteria>();
+    @Output() onSearch: EventEmitter<ReportInterface.ISaleReportCriteria> = new EventEmitter<ReportInterface.ISaleReportCriteria>();
 
     menuPermission: SystemInterface.IUserPermission;
 
@@ -478,17 +478,17 @@ export class SaleReportFormSearchComponent extends AppForm {
 
     getTypeReport() {
         this.typeReportList = [
-            { text: 'Monthly Sale Report', id: 'SR_MONTHLY' },
-            { text: 'Sale Report By Department', id: 'SR_DEPARTMENT' },
-            { text: 'Sale Report By Quarter', id: 'SR_QUARTER' },
-            { text: 'Summary Sale Report', id: 'SR_SUMMARY' },
+            { text: 'Monthly Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_MONTHLY },
+            { text: 'Sale Report By Department', id: CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT },
+            { text: 'Sale Report By Quarter', id: CommonEnum.SALE_REPORT_TYPE.SR_QUARTER },
+            { text: 'Summary Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY },
         ];
         // Default value: Monthly Sale Report
         this.typeReportActive = [this.typeReportList[0]];
     }
 
     searchReport() {
-        const body: ISaleReportCriteria = {
+        const body: ReportInterface.ISaleReportCriteria = {
             serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -587,26 +587,3 @@ export class SaleReportFormSearchComponent extends AppForm {
     }
 }
 
-interface ISaleReportCriteria {
-    serviceDateFrom: string;
-    serviceDateTo: string;
-    createdDateFrom: string;
-    createdDateTo: string;
-    customerId: string;
-    service: string;
-    currency: string;
-    jobId: string;
-    mawb: string;
-    hawb: string;
-    officeId: string;
-    departmentId: string;
-    groupId: string;
-    personInCharge: string;
-    salesMan: string;
-    creator: string;
-    carrierId: string;
-    agentId: string;
-    pol: string;
-    pod: string;
-    typeReport: string;
-}

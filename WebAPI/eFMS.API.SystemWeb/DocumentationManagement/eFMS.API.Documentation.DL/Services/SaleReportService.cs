@@ -1,7 +1,9 @@
-﻿using eFMS.API.Documentation.DL.Common;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models.ReportResults.Sales;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using System;
@@ -24,6 +26,10 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatUnit> uniRepository;
         readonly IContextBase<CsShipmentSurcharge> surchargeRepository;
         readonly IContextBase<CatCurrencyExchange> exchangeRepository;
+        readonly IContextBase<SysUser> userRepository;
+        readonly IContextBase<SysEmployee> employeeRepository;
+        readonly IContextBase<SysCompany> companyRepository;
+        readonly ICurrentUser currentUser;
         public SaleReportService(IContextBase<OpsTransaction> opsRepo,
             IContextBase<CsTransaction> csRepo,
             IContextBase<CsTransactionDetail> detailRepo,
@@ -33,7 +39,11 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPlace> placeRepo,
             IContextBase<CatUnit> uniRepo,
             IContextBase<CsShipmentSurcharge> surchargeRepo,
-            IContextBase<CatCurrencyExchange> exchangeRepo)
+            IContextBase<CatCurrencyExchange> exchangeRepo,
+            IContextBase<SysUser> userRepo,
+            IContextBase<SysEmployee> employeeRepo,
+            ICurrentUser currUser,
+            IContextBase<SysCompany> companyRepo)
         {
             opsRepository = opsRepo;
             csRepository = csRepo;
@@ -45,8 +55,12 @@ namespace eFMS.API.Documentation.DL.Services
             uniRepository = uniRepo;
             surchargeRepository = surchargeRepo;
             exchangeRepository = exchangeRepo;
+            userRepository = userRepo;
+            employeeRepository = employeeRepo;
+            currentUser = currUser;
+            companyRepository = companyRepo;
         }
-        public IQueryable<MonthlySaleReportResult> GetMonthlySaleReport(SaleReportCriteria criteria)
+        private IQueryable<MonthlySaleReportResult> GetMonthlySaleReport(SaleReportCriteria criteria)
         {
             IQueryable<MonthlySaleReportResult> opsShipments = null;
             IQueryable<MonthlySaleReportResult> csShipments = null;
@@ -73,36 +87,45 @@ namespace eFMS.API.Documentation.DL.Services
                 var report = new MonthlySaleReportResult
                 {
                     Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameEn,
-                    ContactName = "An Mai Loan",
-                    SalesManager = "SalesManager A",
+                    //ContactName = userRepository.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.Username,
+                    SalesManager = string.Empty,
                     PartnerName = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn,
                     Description = "Logistics",
-                    Area = "Area " + item.JobNo,
+                    Area = string.Empty,
                     POL = item.Pol != null ? catPlaceRepository.Get(x => x.Id == item.Pol).FirstOrDefault()?.NameEn : string.Empty,
                     POD = item.Pod != null ? catPlaceRepository.Get(x => x.Id == item.Pod).FirstOrDefault()?.NameEn : string.Empty,
-                    Lines = "Lines " + item.JobNo,
+                    Lines = item.SupplierId,
                     Agent = item.AgentId != null ? catPartnerRepository.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn : string.Empty,
-                    NominationParty = "NominationParty " + item.JobNo,
+                    NominationParty = string.Empty,
                     assigned = false,
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
                     //Qty20 = 0,
                     //Qty40 = 2,
                     //Cont40HC = 2,
-                    KGS = item.SumNetWeight ?? (decimal)item.SumNetWeight,
-                    CBM = item.SumCbm ?? (decimal)item.SumCbm,
+                    KGS = item.SumNetWeight == null?0: (decimal)item.SumNetWeight,
+                    CBM = item.SumCbm == null ? 0 : (decimal)item.SumCbm,
                     //SellingRate = 3,
                     SharedProfit = 3,
                     //BuyingRate = 3,
                     OtherCharges = 3,
                     SalesTarget = 0,
                     Bonus = 0,
-                    TpyeofService = "TpyeofService " + item.JobNo,
+                    TpyeofService = "CL",
                     Shipper = item.Shipper,
                     Consignee = item.Consignee
                 };
-                report.SellingRate = GetSellingRate(item.Hblid);
-                report.BuyingRate = GetBuyingRate(item.Hblid);
+                string employeeId = userRepository.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
+                if(employeeId != null)
+                {
+                    report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
+                }
+                //Tổng amount trước thuế selling của HBL
+                report.SellingRate = GetSellingRate(item.Hblid, criteria.Currency);
+                //Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB)
+                report.BuyingRate = GetBuyingRate(item.Hblid, criteria.Currency);
+                //Tổng amount Trước thuế của phí tick chon Kick Back
+                report.SharedProfit = GetShareProfit(item.Hblid, criteria.Currency);
                 var contInfo = GetContainer(containerData, item.Id);
                 report.Cont40HC = (decimal)contInfo?.Cont40HC;
                 report.Qty20 = (decimal)contInfo?.Qty20;
@@ -150,14 +173,19 @@ namespace eFMS.API.Documentation.DL.Services
                              shipment.TransactionType,
                              shipment.JobNo,
                              shipment.ShipmentType,
+                             shipment.Pol,
+                             shipment.Pod,
+                             shipment.ColoaderId,
+                             shipment.AgentId,
                              housebill.CustomerId,
                              housebill.NotifyPartyDescription,
-                             housebill.Id,
+                             HBLID = housebill.Id,
                              housebill.Hwbno,
                              housebill.NetWeight,
                              housebill.Cbm,
                              housebill.ShipperDescription,
-                             housebill.ConsigneeDescription
+                             housebill.ConsigneeDescription,
+                             housebill.SaleManId
                          });
             if (data == null) return null;
             var results = new List<MonthlySaleReportResult>();
@@ -167,32 +195,41 @@ namespace eFMS.API.Documentation.DL.Services
                 var report = new MonthlySaleReportResult
                 {
                     Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameEn,
-                    ContactName = "An Mai Loan",
-                    SalesManager = "SalesManager A",
+                    //ContactName = "An Mai Loan",
+                    SalesManager = string.Empty,
                     PartnerName = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn,
-                    Description = item.TransactionType,
-                    Area = "Area " + item.JobNo,
-                    POL = "Chưa biết lấy gì",
-                    POD = "Chưa biết lấy gì",
-                    Lines = "Lines " + item.JobNo,
-                    Agent = "Chưa biết lấy gì",
+                    Description = API.Common.Globals.CustomData.Services.FirstOrDefault(x => x.Value == item.TransactionType)?.DisplayName,
+                    Area = string.Empty,
+                    POL = item.Pol != null ? catPlaceRepository.Get(x => x.Id == item.Pol).FirstOrDefault()?.NameEn : string.Empty,
+                    POD = item.Pod != null ? catPlaceRepository.Get(x => x.Id == item.Pod).FirstOrDefault()?.NameEn : string.Empty,
+                    Lines = item.ColoaderId != null? catPartnerRepository.Get(x => x.Id == item.ColoaderId).FirstOrDefault()?.PartnerNameEn: string.Empty,
+                    Agent = item.AgentId != null ? catPartnerRepository.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn : string.Empty,
                     NominationParty = item.NotifyPartyDescription,
                     assigned = item.ShipmentType == "Nominated",
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
-                    KGS = item.NetWeight??(decimal)item.NetWeight,
-                    CBM = item.Cbm ?? (decimal)item.Cbm,
+                    KGS = item.NetWeight == null?0:(decimal)item.NetWeight,
+                    CBM = item.Cbm == null ? 0 : (decimal)item.Cbm,
                     SharedProfit = 3,
                     OtherCharges = 3,
                     SalesTarget = 0,
                     Bonus = 0,
-                    TpyeofService = "TpyeofService " + item.JobNo,
+                    TpyeofService = item.TransactionType.Contains("I")? "IMP": "EXP",
                     Shipper = item.ShipperDescription,
                     Consignee = item.ConsigneeDescription
                 };
-                report.SellingRate = GetSellingRate(item.Id);
-                report.BuyingRate = GetBuyingRate(item.Id);
-                var contInfo = GetContainer(containerData, item.Id);
+                string employeeId = userRepository.Get(x => x.Id == item.SaleManId).FirstOrDefault()?.EmployeeId;
+                if (employeeId != null)
+                {
+                    report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
+                }
+                //Tổng amount trước thuế selling của HBL
+                report.SellingRate = GetSellingRate(item.HBLID, criteria.Currency);
+                //Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB)
+                report.BuyingRate = GetBuyingRate(item.HBLID, criteria.Currency);
+                //Tổng Amount Trước thuế của phí tick chon Kick Back
+                report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency);
+                var contInfo = GetContainer(containerData, item.HBLID);
                 report.Cont40HC = (decimal)contInfo?.Cont40HC;
                 report.Qty20 = (decimal)contInfo?.Qty20;
                 report.Qty40 = (decimal)contInfo?.Qty40;
@@ -277,10 +314,10 @@ namespace eFMS.API.Documentation.DL.Services
             return report;
         }
 
-        private decimal GetBuyingRate(Guid hblid)
+        private decimal GetBuyingRate(Guid hblid, string toCurrency)
         {
             decimal cost = 0;
-            var buyingCharges = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblid);
+            var buyingCharges = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblid && x.KickBack == false);
             if (buyingCharges != null)
             {
                 foreach (var charge in buyingCharges)
@@ -289,16 +326,33 @@ namespace eFMS.API.Documentation.DL.Services
                     var rate = charge.FinalExchangeRate;
                     if (rate == null)
                     {
-                        var currencyExchange = exchangeRepository.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
-                        //_rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                        rate = GetCurrencyExchangeRate(charge, toCurrency);
                     }
                     cost += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Selling trước thuế
                 }
             }
             return cost;
         }
-
-        private decimal GetSellingRate(Guid hblid)
+        private decimal GetShareProfit(Guid hblid, string currencyTo)
+        {
+            decimal cost = 0;
+            var buyingCharges = surchargeRepository.Get(x => x.Hblid == hblid && x.KickBack == true);
+            if (buyingCharges != null)
+            {
+                foreach (var charge in buyingCharges)
+                {
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var rate = charge.FinalExchangeRate;
+                    if (rate == null)
+                    {
+                        rate = GetCurrencyExchangeRate(charge, currencyTo);
+                    }
+                    cost += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Selling trước thuế
+                }
+            }
+            return cost;
+        }
+        private decimal GetSellingRate(Guid hblid, string toCurrency)
         {
             decimal revenue = 0;
             var sellingCharges = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblid);
@@ -310,13 +364,72 @@ namespace eFMS.API.Documentation.DL.Services
                     var rate = charge.FinalExchangeRate;
                     if (rate == null)
                     {
-                        var currencyExchange = exchangeRepository.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
-                        //_rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                        rate = GetCurrencyExchangeRate(charge, toCurrency);
                     }
-                    revenue += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Selling trước thuế
+                    revenue += charge.Quantity * charge.UnitPrice * rate ?? 0;
                 }
             }
             return revenue;
+        }
+
+        private decimal GetCurrencyExchangeRate(CsShipmentSurcharge charge, string toCurrency)
+        {
+            if (charge.CurrencyId == toCurrency) return 1;
+            var currencyExchange = exchangeRepository.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date 
+                                                            && x.CurrencyFromId == charge.CurrencyId && x.CurrencyToId == toCurrency)?.OrderByDescending(x => x.DatetimeModified)?.FirstOrDefault();
+            if (currencyExchange != null) return currencyExchange.Rate;
+            else
+            {
+                currencyExchange = exchangeRepository.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date
+                                                            && x.CurrencyFromId == charge.CurrencyId && x.CurrencyToId == toCurrency)?.OrderByDescending(x => x.DatetimeModified)?.FirstOrDefault();
+                if(currencyExchange != null)
+                {
+                    return (1 / currencyExchange.Rate);
+                }
+                return 0;
+            }
+        }
+
+        public Crystal PreviewGetMonthlySaleReport(SaleReportCriteria criteria)
+        {
+            var data = GetMonthlySaleReport(criteria);
+            Crystal result = new Crystal();
+            if (data == null) result = null;
+            else
+            {
+                var list = data.ToList();
+                var employeeId = userRepository.Get(x => x.Id == currentUser.UserID).FirstOrDefault()?.EmployeeId;
+                string employeeContact = string.Empty;
+                if(employeeId == null)
+                {
+                    employeeContact = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
+                }
+                var company = companyRepository.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
+                var parameter = new MonthlySaleReportParameter
+                {
+                    FromDate = DateTime.Now,
+                    ToDate = DateTime.Now,
+                    Contact = employeeContact,
+                    CompanyName = company?.BunameVn,
+                    CompanyAddress1 = company?.AddressVn,
+                    CurrDecimalNo = 2,
+                    ReportBy = employeeContact,
+                    Director = string.Empty,
+                    ChiefAccountant = string.Empty,
+                    SalesManager = string.Empty
+                };
+                result = new Crystal
+                {
+                    ReportName = "Monthly Sale Report.rpt",
+                    AllowPrint = true,
+                    AllowExport = true,
+                    IsLandscape = true
+                };
+                result.AddDataSource(list);
+                result.FormatType = ExportFormatType.PortableDocFormat;
+                result.SetParameter(parameter);
+            }
+            return result;
         }
     }
 }
