@@ -531,5 +531,13 @@ export class SystemRepo {
         );
     }
 
+    getListDeptType() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/GetDepartmentTypes`)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+
 }
 

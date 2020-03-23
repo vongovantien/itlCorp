@@ -8,15 +8,15 @@ export class Department {
     officeName: string = '';
     companyName: string = '';
     companyId: string = null;
-    managerId: string = '';
+    deptType: string = '';
     userCreated: string = '';
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
     active: boolean = true;
-    inactiveOn: string = ''; 
+    inactiveOn: string = '';
     userNameCreated: string = '';
-    userNameModified: string = '';  
+    userNameModified: string = '';
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
