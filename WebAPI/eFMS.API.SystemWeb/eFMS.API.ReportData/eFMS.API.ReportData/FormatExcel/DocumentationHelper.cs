@@ -947,7 +947,121 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["L57"].Value = _hawb1; //3 ký tự đầu của HBL
             workSheet.Cells["M57"].Value = _hawb2; //Các ký tự còn lại của HBL
         }
+
         #endregion --- MAWB and HAWB Air Export Excel ---
 
+        #region -- Export SCSC & TCS Air Export --
+        /// <summary>
+        /// Generate SCSC Air Export Excel
+        /// </summary>
+        /// <param name="airwayBillExport"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public Stream GenerateSCSCAirExportExcel(AirwayBillExportResult airwayBillExport, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("SCSC");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BindingDataSCSCAirExportExcel(workSheet, airwayBillExport);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+        
+        private void BindingDataSCSCAirExportExcel(ExcelWorksheet workSheet, AirwayBillExportResult airwayBillExport)
+        {
+            workSheet.Cells[1, 1, 28, 14].Style.Font.Name = "MS Sans Serif";
+            workSheet.Cells[1, 1, 28, 14].Style.Font.Size = 10;
+
+            workSheet.Cells["B1"].Style.Font.Bold = true;
+            workSheet.Cells["B1"].Value = "INDO TRANS LOGISTICS CORPORATION";
+
+            workSheet.Cells["B2"].Value = "52-54-56 TRUONG SON STR., TAN BINH DIST,";
+            workSheet.Cells["B3"].Value = "HOCHIMINH CITY, VIETNAM.";
+
+            workSheet.Row(4).Height = 29.25;
+            workSheet.Row(4).Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["B4"].Value = "84 8 39486888";
+            workSheet.Cells["D4"].Value = "84 8 8488593";
+
+            workSheet.Cells["B7:F10"].Merge = true;
+            workSheet.Cells["B7:F10"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["B7"].Style.Font.Bold = true;
+            workSheet.Cells["B7"].Style.WrapText = true;
+            workSheet.Cells["B7"].Value = airwayBillExport.Shipper?.ToUpper();
+
+            workSheet.Cells["B14:F17"].Merge = true;
+            workSheet.Cells["B14:F17"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["B14"].Style.Font.Bold = true;
+            workSheet.Cells["B14"].Style.WrapText = true;
+            workSheet.Cells["B14"].Value = airwayBillExport.Consignee?.ToUpper();
+
+            workSheet.Cells["A27"].Value = "CONSOLIDATION AS PER ATTACHED MANIFEST. DOCS ATTD";
+            workSheet.Cells["A27"].Style.Font.Size = 9;
+            workSheet.Cells["A27:F27"].Merge = true;
+            workSheet.Cells["A27:F27"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        }
+
+        /// <summary>
+        /// Generate TCS Air Export Excel
+        /// </summary>
+        /// <param name="airwayBillExport"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public Stream GenerateTCSAirExportExcel(AirwayBillExportResult airwayBillExport, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("TCS");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BindingDataTCSAirExportExcel(workSheet, airwayBillExport);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        private void BindingDataTCSAirExportExcel(ExcelWorksheet workSheet, AirwayBillExportResult airwayBillExport)
+        {
+            workSheet.Cells[1, 1, 19, 14].Style.Font.Name = "MS Sans Serif";
+            workSheet.Cells[1, 1, 19, 14].Style.Font.Size = 10;
+            workSheet.Cells[1, 1, 19, 14].Style.Font.Bold = true;
+
+            workSheet.Cells["B2"].Value = "INDO TRANS LOGISTICS (ITL) .MST: 0301909173";
+            workSheet.Cells["B3"].Value = "52-54-56 TRUONG SON STR., TAN BINH DIST, HOCHIMINH CITY";
+            workSheet.Cells["B4"].Value = "TEL: 84 8 8488567. FAX: 84 8 8488593";
+            
+            workSheet.Cells["B8:F12"].Merge = true;
+            workSheet.Cells["B8:F12"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["B8"].Style.WrapText = true;
+            workSheet.Cells["B8"].Value = airwayBillExport.Shipper?.ToUpper();
+
+            workSheet.Cells["C15:G19"].Merge = true;
+            workSheet.Cells["C15:G19"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["C15"].Style.WrapText = true;
+            workSheet.Cells["C15"].Value = airwayBillExport.Consignee?.ToUpper();
+
+            workSheet.Cells["H15"].Value = "CONSOLIDATION AS PER ";
+            workSheet.Cells["H16"].Value = "ATTACHED MANIFEST. DOCS ATTD";
+            workSheet.Cells["H17"].Value = "MOULD";
+            workSheet.Cells["H17"].Style.Font.Color.SetColor(Color.Blue);
+        }
+        #endregion -- Export SCSC & TCS Air Export --
     }
 }

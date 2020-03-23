@@ -665,7 +665,6 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     }
 
     exportMawb() {
-        console.log(this.jobId);
         this._progressRef.start();
         this._exportRepo.exportMawbAirwayBill(this.jobId)
             .pipe(
@@ -683,4 +682,39 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             );
     }
 
+    exportSCSC() {
+        this._progressRef.start();
+        this._exportRepo.exportSCSCAirwayBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Air Export - SCSC.xlsx');
+                    } else {
+                        this._toastService.warning('There is no mawb data to print', '');
+                    }
+                },
+            );
+    }
+
+    exportTCS() {
+        this._progressRef.start();
+        this._exportRepo.exportTCSAirwayBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Air Export - TCS.xlsx');
+                    } else {
+                        this._toastService.warning('There is no mawb data to print', '');
+                    }
+                },
+            );
+    }
 }

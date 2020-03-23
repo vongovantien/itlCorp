@@ -4,9 +4,16 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button class="btn btn-default" type="button" (click)="exportMawb()">
-                <i class="la la-print"></i>Print MAWB
-            </button>
+            <div class="dropdown m-dropdown m-dropdown--inline">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    <i class="la la-print"></i>Print<span class="caret"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item pointer" (click)="exportMawb()">Print MAWB</a>
+                    <a class="dropdown-item pointer" (click)="exportSCSC()">Print SCSC</a>
+                    <a class="dropdown-item pointer" (click)="exportTCS()">Print TCS</a>
+                </div>
+            </div>
             <span *ngIf="(isLocked | async) === true" class="m--margin-right-10 align-middle">
                 <i class="fa fa-lock text-danger fa-3x"></i>
             </span>

@@ -173,5 +173,59 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+        
+        /// <summary>
+        /// Export SCSC of MAWB Air Export
+        /// </summary>
+        /// <param name="jobId">Id of shipment</param>
+        /// <returns></returns>
+        [Route("ExportSCSCAirExport")]
+        [HttpGet]
+        public async Task<IActionResult> ExportSCSCAirExport(string jobId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.AirwayBillExportUrl + jobId);
+
+            var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
+            if (dataObject.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateSCSCAirExportExcel(dataObject.Result);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - Phiếu Cân SCSC.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export TCS of MAWB Air Export
+        /// </summary>
+        /// <param name="jobId">Id of shipment</param>
+        /// <returns></returns>
+        [Route("ExportTCSAirExport")]
+        [HttpGet]
+        public async Task<IActionResult> ExportTCSAirExport(string jobId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.AirwayBillExportUrl + jobId);
+
+            var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
+            if (dataObject.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateTCSAirExportExcel(dataObject.Result);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - Phiếu Cân TCS.xlsx");
+
+            return fileContent;
+        }
     }
 }
