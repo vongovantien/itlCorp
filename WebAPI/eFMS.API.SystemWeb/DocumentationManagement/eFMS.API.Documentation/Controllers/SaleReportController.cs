@@ -38,7 +38,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost]
         public IActionResult MonthlySalereport(SaleReportCriteria criteria)
         {
-            var data = saleReportService.GetMonthlySaleReport(criteria);
+            //var data = saleReportService.GetMonthlySaleReport(criteria);
             var list = new List<MonthlySaleReportResult>() {
                 new MonthlySaleReportResult
                 {
