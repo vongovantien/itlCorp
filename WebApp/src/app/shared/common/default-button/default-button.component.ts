@@ -1,11 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonModalSetting, ButtonAttributeSetting } from '../../models/layout/button-modal-setting.model';
 import { ButtonType } from '../../enums/type-button.enum';
 import { AddDefaultButton, EditDefaultButton, DeleteDefaultButton, ImportDefaultButton, ExportDefaultButton, SaveDefaultButton, CancelDefaultButton, ResetDefaultButton, DetailDefaultButton, SearchDefaultButton, PreviewDefaultButton, LockDefaultButton } from '../../enums/default-button-enum';
 
 @Component({
     selector: 'app-default-button',
-    templateUrl: './default-button.component.html'
+    templateUrl: './default-button.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DefaultButtonComponent implements OnInit {
 

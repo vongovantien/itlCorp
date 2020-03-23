@@ -211,7 +211,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                                 chargeWeight: res.chargeWeight,
                                 packageQty: res.packageQty,
                                 issuedBy: res.issuedBy,
-                                route: res.route
+                                route: res.route,
+                                personIncharge: res.personIncharge
 
                                 // commodity: 
                             };

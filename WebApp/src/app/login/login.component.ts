@@ -101,8 +101,6 @@ export class LoginComponent {
                             this.setupLocalInfo();
                             this.rememberMe();
 
-
-
                             // * CURRENT_URL: url before into auth guard.
                             if (this.currenURL.includes("login")) {
                                 this.currenURL = "home/dashboard";

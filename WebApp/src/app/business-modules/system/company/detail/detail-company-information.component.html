@@ -8,24 +8,11 @@
             </div>
             <div class="col-6 text-right">
                 <div class="c-button-actions">
-                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="saveInformation()">
-                        <span>
-                            <i class="la la-save"></i>
-                            <span>
-                                Save
-                            </span>
-                        </span>
-                    </button>
-                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="cancel()">
-                        <span>
-                            <i class="la la-ban"></i>
-                            <span>
-                                Cancel
-                            </span>
-                        </span>
-                    </button>
+
+                    <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveInformation()">
+                    </app-default-button>
+
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="cancel()"></app-default-button>
                 </div>
             </div>
         </div>
@@ -92,7 +79,7 @@
                         </perfect-scrollbar>
                     </div>
                 </tab>
-                <tab heading="User">
+                <tab heading="Management Group">
                     <ng-container *ngIf="!!company">
                         <form-user-level type="company" [object]="company"></form-user-level>
                     </ng-container>
