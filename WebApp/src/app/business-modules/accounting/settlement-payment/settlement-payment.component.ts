@@ -100,7 +100,7 @@ export class SettlementPaymentComponent extends AppList {
 
 
     onSearchSettlement(data: any) {
-        this.dataSearch = data;
+        this.dataSearch = Object.assign({}, data, { requester: this.userLogged.id });
         this.getListSettlePayment(this.dataSearch);
     }
 
@@ -143,11 +143,6 @@ export class SettlementPaymentComponent extends AppList {
                 }
             });
     }
-
-    // showDeletePopup(settlement: SettlementPayment) {
-    //     this.selectedSettlement = settlement;
-    //     this.confirmDeletePopup.show();
-    // }
 
     onDeleteSettlemenPayment() {
         this.confirmDeletePopup.hide();
@@ -195,19 +190,6 @@ export class SettlementPaymentComponent extends AppList {
                 }
             });
     }
-
-    // gotoDetailSettlement(settlement: SettlementPayment) {
-    //     switch (settlement.statusApproval) {
-    //         case 'New':
-    //         case 'Denied':
-    //             this._router.navigate([`home/accounting/settlement-payment/${settlement.id}`]);
-    //             break;
-    //         default:
-    //             this._router.navigate([`home/accounting/settlement-payment/${settlement.id}/approve`]);
-    //             break;
-    //     }
-
-    // }
 
     printSettlement(settlementNo: string) {
         this._accoutingRepo.previewSettlementPayment(settlementNo)

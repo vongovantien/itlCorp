@@ -3495,8 +3495,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    return null;
-
+                    return new List<SettlementExportGroupDefault>();
                 }
             }
             catch (Exception)

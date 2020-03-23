@@ -74,7 +74,7 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     onSearchAdvPayment(data: any) {
-        this.dataSearch = data;
+        this.dataSearch = Object.assign({}, data, { requester: this.userLogged.id });
         this.getListAdvancePayment(this.dataSearch);
     }
 
@@ -142,11 +142,6 @@ export class AdvancePaymentComponent extends AppList {
                 }
             });
     }
-
-    // deleteAdvancePayment(selectedAdv: AdvancePayment) {
-    //     this.confirmDeletePopup.show();
-    //     this.selectedAdv = new AdvancePayment(selectedAdv);
-    // }
 
     getRequestAdvancePaymentGroup(advanceNo: string, index: number) {
         if (!!this.advancePayments[index].advanceRequests.length) {
