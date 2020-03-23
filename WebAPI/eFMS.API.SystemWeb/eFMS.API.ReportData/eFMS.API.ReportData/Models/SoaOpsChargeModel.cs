@@ -60,5 +60,10 @@ namespace eFMS.API.ReportData.Models
         public string PackageContainer { get; set; }
 
         public string TypeCharge { get; set; }
+
+        public decimal? VATAmount { get; set; }
+
+        public decimal? NetAmount { get; set; }
+
     }
 }

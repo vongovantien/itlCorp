@@ -9,6 +9,7 @@ namespace eFMS.API.ReportData.Models
         public decimal? GW { get; set; }
         public decimal? CBM { get; set; }
         public string PackageContainer { get; set; }
+        public string AOL { get; set; }
         public List<SoaOpsChargeModel> Charges { get; set; }
     }
 }

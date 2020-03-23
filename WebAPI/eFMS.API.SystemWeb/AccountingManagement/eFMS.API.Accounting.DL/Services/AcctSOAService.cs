@@ -1905,7 +1905,33 @@ namespace eFMS.API.Accounting.DL.Services
             opssoa.BillingAddressVN = resultData?.Select(t => t.BillingAddressVN).FirstOrDefault();
             opssoa.PartnerNameVN = resultData?.Select(t => t.PartnerNameVN).FirstOrDefault();
             opssoa.FromDate = resultData?.Select(t => t.FromDate).FirstOrDefault();
-            opssoa.ToDate = resultData?.Select(t => t.ToDate).FirstOrDefault();
+ 
+            foreach(var item in opssoa.exportSOAOPs)
+            {
+                foreach (var it in item.Charges)
+                {
+                    decimal? percent = 0;
+                    if (it.VATRate > 0)
+                    {
+                        percent = (it.VATRate * 10) / 100;
+                        it.VATAmount = percent * (it.UnitPrice * it.Quantity);
+                        if(it.Currency != "VND")
+                        {
+                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
+
+                        }
+                    }
+                    else
+                    {
+                        it.VATAmount = it.VATRate;
+                    }
+                    
+                    it.NetAmount = it.UnitPrice * it.Quantity;
+                    
+                }
+
+            }
+
             return opssoa;
         }
 

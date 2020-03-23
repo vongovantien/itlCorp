@@ -347,6 +347,19 @@ export class StatementOfAccountDetailComponent extends AppList {
             );
     }
 
+    exportSOAOPS(){
+        this._exportRepo.exportSOAOPS(this.soaNO)
+        .pipe(
+            catchError(this.catchError),
+            finalize(() => this._progressRef.complete())
+        )
+        .subscribe(
+            (response: ArrayBuffer) => {
+                this.downLoadFile(response, "application/ms-excel", 'SOA OPS.xlsx');
+            },
+        );
+    }
+
 }
 
 interface IExcel {
