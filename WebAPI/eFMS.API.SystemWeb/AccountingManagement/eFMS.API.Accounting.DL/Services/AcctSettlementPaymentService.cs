@@ -3390,9 +3390,9 @@ namespace eFMS.API.Accounting.DL.Services
             return listData;
         }
 
-        public List<SettlementExportDefault> QueryDataSettlementExport(string[] settlementCode)
+        public List<SettlementExportGroupDefault> QueryDataSettlementExport(string[] settlementCode)
         {
-            var results = new List<SettlementExportDefault>();
+            var results = new List<SettlementExportGroupDefault>();
             var settlements = DataContext.Get();
             var surcharges = csShipmentSurchargeRepo.Get();
             var opsTransations = opsTransactionRepo.Get();
@@ -3413,7 +3413,7 @@ namespace eFMS.API.Accounting.DL.Services
                         string employeeID = "";
                         if (!string.IsNullOrEmpty(requesterID))
                         {
-                             employeeID = sysUserRepo.Get(x => x.Id == requesterID).FirstOrDefault()?.EmployeeId;
+                            employeeID = sysUserRepo.Get(x => x.Id == requesterID).FirstOrDefault()?.EmployeeId;
                         }
 
                         var approveDate = acctApproveSettlementRepo.Get(x => x.SettlementNo == settleCode).FirstOrDefault()?.BuheadAprDate;
@@ -3432,7 +3432,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 JobID = ops.JobNo,
                                                 HBL = ops.Hwbno,
                                                 MBL = ops.Mblno,
-                                                SettlementAmount = sur.Total,
+
                                                 CustomNo = cus.ClearanceNo,
                                                 SettleNo = currentSettlement.SettlementNo,
                                                 Currency = currentSettlement.SettlementCurrency,
@@ -3441,8 +3441,10 @@ namespace eFMS.API.Accounting.DL.Services
                                                 RequestDate = currentSettlement.RequestDate,
                                                 ApproveDate = approveDate,
                                                 Description = sur.Notes,
+                                                SettlementAmount = sur.Total,
 
                                             };
+
                         // Get Document
                         var dataService = from set in settlements
                                           join sur in surcharges on set.SettlementNo equals sur.SettlementCode into sc  // Join Surcharge.
@@ -3469,12 +3471,25 @@ namespace eFMS.API.Accounting.DL.Services
                                               Description = sur.Notes,
 
                                           };
-                        var data = dataOperation.Union(dataService);
-                        data = data.ToArray().OrderByDescending(x => x.JobID).AsQueryable();
-                        foreach (var item in data)
+
+                        var data = dataOperation.Union(dataService).ToList();
+
+                        var group = data.GroupBy(d => new { d.JobID, d.HBL, d.MBL, d.CustomNo }).Select(s => new SettlementExportGroupDefault
+                        {
+                            JobID = s.Key.JobID,
+                            MBL = s.Key.MBL,
+                            HBL = s.Key.HBL,
+                            CustomNo = s.Key.CustomNo,
+                            AdvanceTotalAmount = s.Sum(su => su.AdvanceAmount),
+                            SettlementTotalAmount = s.Sum(d => d.SettlementAmount),
+                            BalanceTotalAmount = s.Sum(d => d.SettlementAmount) - s.Sum(su => su.AdvanceAmount),
+                            requestList = data.Where(w => w.JobID == s.Key.JobID && w.MBL == s.Key.MBL && w.HBL == s.Key.HBL && w.CustomNo == s.Key.CustomNo).ToList()
+                        });
+
+                        // data = data.o.OrderByDescending(x => x.JobID).AsQueryable();
+                        foreach (var item in group)
                         {
                             results.Add(item);
-
                         }
                     }
                 }

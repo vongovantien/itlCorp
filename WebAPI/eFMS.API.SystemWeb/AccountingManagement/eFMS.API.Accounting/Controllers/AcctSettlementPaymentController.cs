@@ -679,7 +679,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult Preview(string[] settlementNoList)
         {
-            List<SettlementExportDefault> data = acctSettlementPaymentService.QueryDataSettlementExport(settlementNoList);
+            List<SettlementExportGroupDefault> data = acctSettlementPaymentService.QueryDataSettlementExport(settlementNoList);
             return Ok(data);
         }
     }

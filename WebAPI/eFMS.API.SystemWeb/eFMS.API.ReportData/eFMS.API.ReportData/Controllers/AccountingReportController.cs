@@ -134,7 +134,7 @@ namespace eFMS.API.ReportData.Controllers
             }
             var responseFromApi = await HttpServiceExtension.PostAPI(codes, aPis.HostStaging + Urls.Accounting.QueryDataSettlementExport, accessToken);
 
-            var dataObjects = responseFromApi.Content.ReadAsAsync<List<SettlementExportDefault>>();
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<SettlementExportGroupDefault>>();
 
             var stream = new AccountingHelper().GenerateSettlementPaymentShipmentExcel(dataObjects.Result);
             if (stream == null)

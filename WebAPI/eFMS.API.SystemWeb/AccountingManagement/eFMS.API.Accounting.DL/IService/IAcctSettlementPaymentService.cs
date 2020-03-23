@@ -69,7 +69,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         SettlementExport SettlementExport(Guid settlementId);
 
-        List<SettlementExportDefault> QueryDataSettlementExport(string[] settlementCode);
+        List<SettlementExportGroupDefault> QueryDataSettlementExport(string[] settlementCode);
 
     }
 }
