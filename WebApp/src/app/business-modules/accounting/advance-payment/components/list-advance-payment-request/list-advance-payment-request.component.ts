@@ -131,7 +131,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
 
     updateTotalAmount(listRequest: AdvancePaymentRequest[]) {
         try {
-            return listRequest.reduce((acc, curr) => acc + curr.amount, 0) || 0;
+            return listRequest.reduce((acc, curr) => acc + (+curr.amount), 0) || 0;
         } catch (error) {
             this._toastService.error(error + '', 'Không lấy được amount');
         }

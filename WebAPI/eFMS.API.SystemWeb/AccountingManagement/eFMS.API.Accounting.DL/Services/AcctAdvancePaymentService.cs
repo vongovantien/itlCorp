@@ -332,7 +332,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IQueryable<AcctAdvancePaymentResult> QueryData(AcctAdvancePaymentCriteria criteria)
         {
-            var advances = DataContext.Get();
+            var advances = GetAdvancesPermission();
             var data = GetDatas(criteria, advances);
             return data;
         }
@@ -371,8 +371,8 @@ namespace eFMS.API.Accounting.DL.Services
         }
         public List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceNoList(string[] advanceNoList)
         {
-            var list = acctAdvanceRequestRepo.Get(x => advanceNoList.Contains(x.AdvanceNo))
-                .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo, g.Mbl })
+            var list = acctAdvanceRequestRepo.Where(x => advanceNoList.Contains(x.AdvanceNo))
+                .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo, g.Mbl, g.AdvanceNo })
                 .Select(se => new AcctAdvanceRequest
                 {
                     JobId = se.First().JobId,
@@ -382,7 +382,7 @@ namespace eFMS.API.Accounting.DL.Services
                     RequestCurrency = se.First().RequestCurrency,
                     StatusPayment = se.First().StatusPayment,
                     AdvanceNo = se.FirstOrDefault().AdvanceNo,
-                    Mbl = se.FirstOrDefault().Mbl,
+                    Mbl = se.First().Mbl,
                     Description = se.FirstOrDefault().Description,
                 }).ToList();
             var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);

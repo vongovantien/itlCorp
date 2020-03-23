@@ -70,18 +70,18 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Status Payment', field: 'statusPayment', sortable: true },
         ];
         this.getUserLogged();
-        this.getListAdvancePayment();
+        this.getListAdvancePayment(this.dataSearch);
     }
 
     onSearchAdvPayment(data: any) {
-        this.dataSearch = data;
+        this.dataSearch = Object.assign({}, data, { requester: this.userLogged.id });
         this.getListAdvancePayment(this.dataSearch);
     }
 
     getListAdvancePayment(dataSearch?: any) {
         this.isLoading = true;
         this._progressRef.start();
-        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, Object.assign({}, dataSearch, { requester: this.userLogged.id }))
+        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
@@ -143,11 +143,6 @@ export class AdvancePaymentComponent extends AppList {
             });
     }
 
-    // deleteAdvancePayment(selectedAdv: AdvancePayment) {
-    //     this.confirmDeletePopup.show();
-    //     this.selectedAdv = new AdvancePayment(selectedAdv);
-    // }
-
     getRequestAdvancePaymentGroup(advanceNo: string, index: number) {
         if (!!this.advancePayments[index].advanceRequests.length) {
             this.groupRequest = this.advancePayments[index].advanceRequests;
@@ -170,6 +165,7 @@ export class AdvancePaymentComponent extends AppList {
 
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this.dataSearch = { requester: this.userLogged.id };
     }
 
     viewDetail(adv: AdvancePayment) {

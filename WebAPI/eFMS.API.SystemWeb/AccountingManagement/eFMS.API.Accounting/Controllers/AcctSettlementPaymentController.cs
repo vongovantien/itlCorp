@@ -17,6 +17,7 @@ using System.Linq;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Accounting.DL.Models.ExportResults;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -72,6 +73,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("QueryData")]
+        [Authorize]
         public IActionResult QueryData(AcctSettlementPaymentCriteria criteria)
         {
             var data = acctSettlementPaymentService.QueryData(criteria);
@@ -598,6 +600,8 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetListSceneChargeSettlementBySettlementNo")]
+        [Authorize]
+
         public IActionResult GetListSceneChargeSettlementBySettlementNo(string settlementNo)
         {
             //Start change request Modified 14/10/2019 by Andy.Hoa
@@ -653,7 +657,7 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
-        /// Export settlement payment by settlement id
+        /// Export detail settlement payment by settlement id
         /// </summary>
         /// <param name="settlementId">Id of settlement payment</param>
         /// <returns></returns>
@@ -663,6 +667,20 @@ namespace eFMS.API.Accounting.Controllers
         {
             var result = acctSettlementPaymentService.SettlementExport(settlementId);
             return Ok(result);
+        }
+
+        /// <summary>
+        ///Settlement export List within Shipment.
+        /// </summary>
+        /// <param name="settlement List"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("QueryDataSettlementExport")]
+        [Authorize]
+        public IActionResult Preview(string[] settlementNoList)
+        {
+            List<SettlementExportGroupDefault> data = acctSettlementPaymentService.QueryDataSettlementExport(settlementNoList);
+            return Ok(data);
         }
     }
 }

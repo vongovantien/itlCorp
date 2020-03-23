@@ -214,6 +214,112 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
+        public Stream GenerateSettlementPaymentShipmentExcel(List<SettlementExportGroupDefault> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+                "Job ID",
+                "MBL",
+                "HBL",
+                "Custom No",
+                "Settle No",
+                "Request Date",
+                "Requestor",
+                "Settlement Amount",
+                "AdvanceNo",
+                "Advance Amount",
+                "Balance",
+                "Currency",
+                "ApproveDate",
+                "Description"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Settlement Payment");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "SETTLEMENT PAYMENT INFORMATION");
+                    
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+
+                        worksheet.Cells[addressStartContent, 1].Value = item.JobID;
+                        worksheet.Cells[addressStartContent, 2].Value = item.MBL;
+                        worksheet.Cells[addressStartContent, 3].Value = item.HBL;
+                        worksheet.Cells[addressStartContent, 4].Value = item.CustomNo;
+                        worksheet.Cells[addressStartContent, 8].Value = item.SettlementTotalAmount;
+                        worksheet.Cells[addressStartContent, 10].Value = item.AdvanceTotalAmount;
+                        worksheet.Cells[addressStartContent, 11].Value = item.BalanceTotalAmount;
+
+                        using (var range = worksheet.Cells[addressStartContent,1, addressStartContent,14])  
+                        {
+                            range.Style.Font.Bold = true;
+                            range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            range.Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+                        }
+
+                        for (int j = 0; j < item.requestList.Count; j++)
+                        {
+                            addressStartContent++;
+
+                            var request = item.requestList[j];
+
+                            worksheet.Cells[addressStartContent, 1].Value = request.JobID;
+                            worksheet.Cells[addressStartContent, 2].Value = request.MBL;
+                            worksheet.Cells[addressStartContent, 3].Value = request.HBL;
+                            worksheet.Cells[addressStartContent, 4].Value = request.CustomNo;
+                            worksheet.Cells[addressStartContent, 5].Value = request.SettleNo;
+                            worksheet.Cells[addressStartContent, 6].Value = request.RequestDate.HasValue ? request.RequestDate.Value.ToString("dd/MM/yyyy") : "";
+                            worksheet.Cells[addressStartContent, 7].Value = request.Requester;
+                            worksheet.Cells[addressStartContent, 8].Value = request.SettlementAmount;
+                            worksheet.Cells[addressStartContent, 9].Value = request.AdvanceNo;
+                            worksheet.Cells[addressStartContent, 10].Value = request.AdvanceAmount;
+                            worksheet.Cells[addressStartContent, 11].Value = request.SettlementAmount - request.AdvanceAmount;
+                            worksheet.Cells[addressStartContent, 12].Value = request.Currency;
+                            worksheet.Cells[addressStartContent, 13].Value = request.ApproveDate;
+                            worksheet.Cells[addressStartContent, 13].Style.Numberformat.Format = "dd/MM/yyyy  HH:mm:ss AM/PM";
+                            worksheet.Cells[addressStartContent, 14].Value = request.Description;
+
+                        }
+                        addressStartContent++;
+
+                        //Add border left right for cells
+                        // AddBorderLeftRightCell(worksheet, headers, addressStartContent, i);
+
+                        //Add border bottom for last cells
+                        // AddBorderBottomLastCell(worksheet, headers, addressStartContent, i, listObj.Count);
+                    }
+
+
+                    // Total
+                    worksheet.Cells[addressStartContent + 4, 1].Value = "Total Settlement";
+                    worksheet.Cells[addressStartContent + 4, 1].Style.Font.Bold = true;
+                    worksheet.Cells[addressStartContent + 4, 1].Style.Font.Bold = true;
+
+                    worksheet.Cells[addressStartContent + 4, 2].Value = listObj.Sum(s => s.SettlementTotalAmount);
+
+                    worksheet.Cells[addressStartContent + 5, 1].Value = "Total Advance";
+                    worksheet.Cells[addressStartContent + 5, 1].Style.Font.Bold = true;
+                    worksheet.Cells[addressStartContent + 5, 2].Value = listObj.Sum(d => d.AdvanceTotalAmount);
+
+                    worksheet.Cells[addressStartContent + 6, 1].Value = "Total Balance";
+                    worksheet.Cells[addressStartContent + 6, 1].Style.Font.Bold = true;
+                    worksheet.Cells[addressStartContent + 6, 2].Value = listObj.Sum(b => b.BalanceTotalAmount);
+
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
         private void AddBorderBottomLastCell(ExcelWorksheet worksheet, List<string> headers, int addressStartContent, int indexDataRow, int totalItem)
         {
             if (indexDataRow == totalItem - 1)
@@ -1620,7 +1726,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             if (!string.IsNullOrEmpty(airfreightObj.BankAccountVND))
             {
-                textBottom = textBottom + "\n" +"A/C: " + airfreightObj.BankAccountVND;
+                textBottom = textBottom + "\n" + "A/C: " + airfreightObj.BankAccountVND;
             }
 
             if (!string.IsNullOrEmpty(airfreightObj.BankNameEn))
@@ -1635,7 +1741,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             if (!string.IsNullOrEmpty(airfreightObj.SwiftCode))
             {
-                textBottom = textBottom + "\n" + "SWIFT Code: "+ airfreightObj.SwiftCode;
+                textBottom = textBottom + "\n" + "SWIFT Code: " + airfreightObj.SwiftCode;
             }
             textBottom = textBottom + "\n" + "Thanks for your kind co-operation.";
 
