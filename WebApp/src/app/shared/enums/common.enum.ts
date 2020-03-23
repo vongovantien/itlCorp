@@ -112,6 +112,12 @@ export namespace CommonEnum {
         AIR = 1,
         SEA = 2,
     }
+    export enum SALE_REPORT_TYPE {
+        SR_MONTHLY = 'SR_MONTHLY',
+        SR_DEPARTMENT = 'SR_DEPARTMENT',
+        SR_QUARTER = 'SR_QUARTER',
+        SR_SUMMARY = 'SR_SUMMARY'
+    }
 }
 
 

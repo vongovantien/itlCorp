@@ -27,5 +27,6 @@ namespace eFMS.API.Documentation.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public Guid? ChargeGroup { get; set; }
     }
 }

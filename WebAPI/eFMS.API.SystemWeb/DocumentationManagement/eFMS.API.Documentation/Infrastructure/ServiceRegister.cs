@@ -43,6 +43,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ISysImageService, SysImageService>();
             services.AddTransient<ICsAirWayBillService, CsAirWayBillService>();
             services.AddTransient<ICsShipmentOtherChargeService, CsShipmentOtherChargeService>();
+            services.AddTransient<ISaleReportService, SaleReportService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

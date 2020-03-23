@@ -25,7 +25,6 @@
     <Compile Remove="Common\WebUrl.cs" />
     <Compile Remove="Models\CreditDebitNote.cs" />
     <Compile Remove="Models\PermissionAllowBase.cs" />
-    <Compile Remove="Models\ReportResults\OCLContainerReportResult.cs" />
     <Compile Remove="Models\Surcharge.cs" />
     <Compile Remove="Models\SysUserPermissionModel.cs" />
   </ItemGroup>

@@ -2,3 +2,7 @@
 <div class="m-content">
     <sale-report-form-search (onSearch)="onSearchSaleReport($event)"></sale-report-form-search>
 </div>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>
