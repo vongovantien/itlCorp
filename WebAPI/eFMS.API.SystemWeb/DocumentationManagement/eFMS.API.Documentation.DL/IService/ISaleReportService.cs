@@ -9,7 +9,6 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ISaleReportService
     {
-        //IQueryable<MonthlySaleReportResult> GetMonthlySaleReport(SaleReportCriteria criteria);
         Crystal PreviewGetMonthlySaleReport(SaleReportCriteria criteria);
     }
 }
