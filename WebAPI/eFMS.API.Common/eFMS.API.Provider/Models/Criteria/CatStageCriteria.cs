@@ -1,7 +1,4 @@
 ﻿using eFMS.API.Common.Globals;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Provider.Models.Criteria
 {
