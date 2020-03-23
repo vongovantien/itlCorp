@@ -232,6 +232,11 @@ export class SaleReportFormSearchComponent extends AppForm {
                 this.currencyActive.push(data);
                 this.currency.setValue(this.currencyActive);
                 break;
+            case 'typeReport':
+                this.typeReportActive = [];
+                this.typeReportActive.push(data);
+                this.typeReport.setValue(this.typeReportActive);
+                break;
             default:
                 break;
         }
