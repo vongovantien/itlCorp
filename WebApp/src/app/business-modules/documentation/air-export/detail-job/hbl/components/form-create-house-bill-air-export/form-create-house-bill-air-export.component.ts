@@ -226,7 +226,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
                                 flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
                                 flightNo: shipment.flightVesselName,
-                                warehouseId: shipment.warehouseId
+                                warehouseId: shipment.warehouseId,
+                                firstCarrierBy: shipment.flightVesselName
                             });
                         }
                     }
