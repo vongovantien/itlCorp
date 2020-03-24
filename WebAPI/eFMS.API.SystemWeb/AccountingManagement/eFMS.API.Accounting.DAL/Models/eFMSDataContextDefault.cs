@@ -1233,10 +1233,6 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Kb)
-                    .HasColumnName("KB")
-                    .HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.Mblno)
                     .HasColumnName("MBLNo")
                     .HasMaxLength(200)
