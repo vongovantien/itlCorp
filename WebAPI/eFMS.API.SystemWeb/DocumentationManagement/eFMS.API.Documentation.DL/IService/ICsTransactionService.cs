@@ -27,7 +27,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState DeleteCSTransaction(Guid jobId);
         HandleState SoftDeleteJob(Guid jobId);
         List<object> GetListTotalHB(Guid JobId);
-        Crystal PreviewSIFFormPLsheet(Guid jobId, string currency);
+        Crystal PreviewSIFFormPLsheet(Guid jobId, Guid hblId, string currency);
         ResultHandle SyncHouseBills(Guid JobId,CsTransactionSyncHBLCriteria model);
         int CheckDeletePermission(Guid id);
     }

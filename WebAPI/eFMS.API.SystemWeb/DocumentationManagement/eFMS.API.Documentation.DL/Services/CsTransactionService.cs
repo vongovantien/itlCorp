@@ -1811,7 +1811,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         #region -- PREVIEW --
-        public Crystal PreviewSIFFormPLsheet(Guid jobId, string currency)
+        public Crystal PreviewSIFFormPLsheet(Guid jobId, Guid hblId, string currency)
         {
             Crystal result = null;
             var _currentUser = currentUser.UserName;
@@ -1855,6 +1855,10 @@ namespace eFMS.API.Documentation.DL.Services
 
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
             var listHousebill = transactionDetailService.GetByJob(criteria);
+            if(hblId != Guid.Empty)
+            {
+                listHousebill = listHousebill.Where(x => x.Id == hblId).ToList();
+            }
             var _hblNoList = string.Empty;
             var _shipmentType = GetShipmentTypeForPreviewPL(shipment.TransactionType) + shipment.TypeOfService;
             if (listHousebill.Count > 0)
