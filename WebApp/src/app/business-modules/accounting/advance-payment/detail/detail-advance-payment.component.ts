@@ -17,7 +17,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 })
 export class AdvancePaymentDetailComponent extends AppPage {
 
-    @ViewChild(AdvancePaymentFormCreateComponent, { static: false }) formCreateComponent: AdvancePaymentFormCreateComponent;
+    @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
@@ -50,12 +50,12 @@ export class AdvancePaymentDetailComponent extends AppPage {
         });
     }
 
-    onChangeCurrency(currency: Currency) {
+    onChangeCurrency(currency: string) {
         this.listRequestAdvancePaymentComponent.changeCurrency(currency);
         for (const item of this.listRequestAdvancePaymentComponent.listRequestAdvancePayment) {
-            item.requestCurrency = currency.id;
+            item.requestCurrency = currency;
         }
-        this.listRequestAdvancePaymentComponent.currency = currency.id;
+        this.listRequestAdvancePaymentComponent.currency = currency;
 
     }
 
@@ -86,18 +86,16 @@ export class AdvancePaymentDetailComponent extends AppPage {
                             break;
                     }
                     // * wait to currecy list api
-                    setTimeout(() => {
-                        this.formCreateComponent.formCreate.setValue({
-                            advanceNo: this.advancePayment.advanceNo,
-                            requester: this.advancePayment.requester,
-                            requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
-                            paymentMethod: this.formCreateComponent.methods.filter(method => method.value === this.advancePayment.paymentMethod)[0],
-                            department: this.advancePayment.department,
-                            deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
-                            note: this.advancePayment.advanceNote,
-                            currency: this.formCreateComponent.currencyList.filter(currency => currency.id === this.advancePayment.advanceCurrency)[0]
-                        });
-                    }, 100);
+                    this.formCreateComponent.formCreate.setValue({
+                        advanceNo: this.advancePayment.advanceNo,
+                        requester: this.advancePayment.requester,
+                        requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
+                        paymentMethod: this.formCreateComponent.methods.filter(method => method.value === this.advancePayment.paymentMethod)[0],
+                        department: this.advancePayment.department,
+                        deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
+                        note: this.advancePayment.advanceNote,
+                        currency: this.advancePayment.advanceCurrency
+                    });
 
                     this.listRequestAdvancePaymentComponent.listRequestAdvancePayment = this.advancePayment.advanceRequests;
                     this.listRequestAdvancePaymentComponent.totalAmount = this.listRequestAdvancePaymentComponent.updateTotalAmount(this.advancePayment.advanceRequests);
@@ -126,7 +124,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 requester: this.formCreateComponent.requester.value || 'Admin',
                 department: this.formCreateComponent.department.value || '',
                 paymentMethod: this.formCreateComponent.paymentMethod.value.value,
-                advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
+                advanceCurrency: this.formCreateComponent.currency.value || 'VND',
                 requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
                 deadlinePayment: !!this.formCreateComponent.deadLine.value.startDate ? formatDate(this.formCreateComponent.deadLine.value.startDate, 'yyyy-MM-dd', 'en') : null,
                 advanceNote: this.formCreateComponent.note.value || '',
@@ -195,7 +193,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
             requester: this.formCreateComponent.requester.value || 'Admin',
             department: this.formCreateComponent.department.value || '',
             paymentMethod: this.formCreateComponent.paymentMethod.value.value,
-            advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
+            advanceCurrency: this.formCreateComponent.currency.value || 'VND',
             requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             deadlinePayment: !!this.formCreateComponent.deadLine.value.startDate ? formatDate(this.formCreateComponent.deadLine.value.startDate, 'yyyy-MM-dd', 'en') : null,
             advanceNote: this.formCreateComponent.note.value || '',

@@ -93,7 +93,7 @@ export class SettlementFormCreateComponent extends AppForm {
             .subscribe(
                 (data: any) => {
                     this.currencyList = data || [];
-                    this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
+                    this.currency.setValue("VND");
                 },
             );
     }

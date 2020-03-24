@@ -19,7 +19,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 export class SettlementPaymentDetailComponent extends AppPage {
 
     @ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
-    @ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
+    @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     settlementId: string = '';
@@ -75,7 +75,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                 requester: this.formCreateSurcharge.requester.value,
                 requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
                 paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
-                settlementCurrency: this.formCreateSurcharge.currency.value.id,
+                settlementCurrency: this.formCreateSurcharge.currency.value,
                 note: this.formCreateSurcharge.note.value,
                 userCreated: this.settlementPayment.settlement.userCreated,
                 datetimeCreated: this.settlementPayment.settlement.datetimeCreated,
@@ -127,17 +127,15 @@ export class SettlementPaymentDetailComponent extends AppPage {
                     }
 
                     // * wait to currecy list api
-                    setTimeout(() => {
-                        this.formCreateSurcharge.form.setValue({
-                            settlementNo: this.settlementPayment.settlement.settlementNo,
-                            requester: this.settlementPayment.settlement.requester,
-                            requestDate: new Date(this.settlementPayment.settlement.requestDate),
-                            paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
-                            note: this.settlementPayment.settlement.note,
-                            amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
-                            currency: this.formCreateSurcharge.currencyList.filter(currency => currency.id === this.settlementPayment.settlement.settlementCurrency)[0]
-                        });
-                    }, 10);
+                    this.formCreateSurcharge.form.setValue({
+                        settlementNo: this.settlementPayment.settlement.settlementNo,
+                        requester: this.settlementPayment.settlement.requester,
+                        requestDate: { startDate: new Date(this.settlementPayment.settlement.requestDate), endDate: new Date(this.settlementPayment.settlement.requestDate) },
+                        paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
+                        note: this.settlementPayment.settlement.note,
+                        amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
+                        currency: this.settlementPayment.settlement.settlementCurrency
+                    });
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
@@ -165,7 +163,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                 requester: this.formCreateSurcharge.requester.value,
                 requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
                 paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
-                settlementCurrency: this.formCreateSurcharge.currency.value.id,
+                settlementCurrency: this.formCreateSurcharge.currency.value,
                 note: this.formCreateSurcharge.note.value,
                 userCreated: this.settlementPayment.settlement.userCreated,
                 datetimeCreated: this.settlementPayment.settlement.datetimeCreated,

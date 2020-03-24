@@ -34,12 +34,12 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
     ngOnInit() { }
 
-    onChangeCurrency(currency: Currency) {
+    onChangeCurrency(currency: string) {
         this.listRequestAdvancePaymentComponent.changeCurrency(currency);
         for (const item of this.listRequestAdvancePaymentComponent.listRequestAdvancePayment) {
-            item.requestCurrency = currency.id;
+            item.requestCurrency = currency;
         }
-        this.listRequestAdvancePaymentComponent.currency = currency.id;
+        this.listRequestAdvancePaymentComponent.currency = currency;
     }
 
     saveAdvancePayment() {
@@ -56,7 +56,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 requester: this.formCreateComponent.requester.value || 'Admin',
                 department: this.formCreateComponent.department.value || '',
                 paymentMethod: this.formCreateComponent.paymentMethod.value.value,
-                advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
+                advanceCurrency: this.formCreateComponent.currency.value || 'VND',
                 requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
                 deadlinePayment: formatDate(this.formCreateComponent.deadLine.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
                 advanceNote: this.formCreateComponent.note.value || '',
@@ -98,7 +98,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
             requester: this.formCreateComponent.requester.value || 'Admin',
             department: this.formCreateComponent.department.value || '',
             paymentMethod: this.formCreateComponent.paymentMethod.value.value,
-            advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
+            advanceCurrency: this.formCreateComponent.currency.value || 'VND',
             requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
             deadlinePayment: formatDate(this.formCreateComponent.deadLine.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
             advanceNote: this.formCreateComponent.note.value || '',

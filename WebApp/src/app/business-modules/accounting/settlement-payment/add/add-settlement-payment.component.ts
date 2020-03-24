@@ -41,7 +41,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         this.cdRef.detectChanges(); // * Force to update view
     }
 
-    onChangeCurrency(currency: Currency) {
+    onChangeCurrency(currency: string) {
         if (!!this.requestSurchargeListComponent) {
             this.requestSurchargeListComponent.changeCurrency(currency);
         }
@@ -66,7 +66,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                 requester: this.formCreateSurcharge.requester.value,
                 requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
                 paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
-                settlementCurrency: this.formCreateSurcharge.currency.value.id,
+                settlementCurrency: this.formCreateSurcharge.currency.value,
                 note: this.formCreateSurcharge.note.value,
             },
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
@@ -81,7 +81,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
 
                         this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}`]);
                     } else {
-                        this._toastService.warning(res.message,'',{ enableHtml: true });
+                        this._toastService.warning(res.message, '', { enableHtml: true });
                     }
                     this.requestSurchargeListComponent.selectedIndexSurcharge = null;
                 }
@@ -101,7 +101,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                 requester: this.formCreateSurcharge.requester.value,
                 requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
                 paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
-                settlementCurrency: this.formCreateSurcharge.currency.value.id,
+                settlementCurrency: this.formCreateSurcharge.currency.value,
                 note: this.formCreateSurcharge.note.value,
             },
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
