@@ -360,13 +360,14 @@ namespace eFMS.API.Documentation.Controllers
         /// Preview PLsheet of Sea FCL Import
         /// </summary>
         /// <param name="jobId"></param>
+        /// <param name="hblId"></param>
         /// <param name="currency"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("PreviewSIFPLsheet")]
-        public IActionResult PreviewSIFPLsheet(Guid jobId, string currency)
+        public IActionResult PreviewSIFPLsheet(Guid jobId, Guid hblId, string currency)
         {
-            var result = csTransactionService.PreviewSIFFormPLsheet(jobId, currency);
+            var result = csTransactionService.PreviewSIFFormPLsheet(jobId, hblId, currency);
             return Ok(result);
         }
 
