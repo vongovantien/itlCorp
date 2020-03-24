@@ -19,7 +19,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string Route { get; set; }
         public Guid? Pol { get; set; }
         public Guid? Pod { get; set; }
-        public decimal? Qty { get; set; }
+        public int? Qty { get; set; }
         public decimal? Revenue { get; set; }
         public decimal? Cost { get; set; }
         public decimal? Profit { get; set; }
