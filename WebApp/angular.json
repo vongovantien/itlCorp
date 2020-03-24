@@ -177,6 +177,14 @@
                                 }
                             ]
                         },
+                        "staging-debug": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.staging.ts"
+                                }
+                            ]
+                        },
                         "production": {
                             "fileReplacements": [
                                 {
@@ -212,6 +220,9 @@
                     "configurations": {
                         "test": {
                             "browserTarget": "eFMS-Web:build"
+                        },
+                        "stag": {
+                            "browserTarget": "eFMS-Web:build:staging-debug"
                         },
                         "vi": {
                             "browserTarget": "eFMS-Web:build:vi"

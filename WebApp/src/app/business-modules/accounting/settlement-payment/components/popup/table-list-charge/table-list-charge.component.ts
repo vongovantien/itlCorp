@@ -300,7 +300,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 }
 
                 // * Detect charge type
-                if (data.type !== CommonEnum.CHARGE_TYPE.OBH) {
+                if ((data.type || '').toLowerCase() !== CommonEnum.CHARGE_TYPE.OBH.toLowerCase()) {
                     chargeItem.obhPartnerName = null;
                 } else {
                     this.headers = [...this.headers];
@@ -446,11 +446,10 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 if (!!date && !!date.startDate) {
                     charge.invoiceDate = new Date(date.startDate);
                 } else {
-                    charge.invoiceDate = null
+                    charge.invoiceDate = null;
                 }
             }
         }
-        console.log(listChargesToSave);
 
         if (this.isUpdate) {
             this.onUpdate.emit(listChargesToSave);
@@ -486,7 +485,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 || charge.quantity < 0
                 || charge.unitPrice < 0
                 || charge.vatrate > 100
-                || charge.type === 'OBH' && !charge.obhId
+                || charge.type.toLowerCase() === 'obh' && !charge.obhId
             ) {
                 valid = false;
                 break;

@@ -401,6 +401,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         for (const charge of this.charges) {
             if (!!charge.exchangeDate && !!charge.exchangeDate.startDate) {
                 charge.exchangeDate = formatDate(charge.exchangeDate.startDate, 'yyyy-MM-dd', 'en');
+            } else {
+                charge.exchangeDate = null;
             }
 
             if (!!charge.invoiceDate && !!charge.invoiceDate.startDate) {
