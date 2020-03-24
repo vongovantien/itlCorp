@@ -103,7 +103,7 @@ namespace eFMS.API.Documentation.DL.Services
                     KGS = item.SumNetWeight == null?0: (decimal)item.SumNetWeight,
                     CBM = item.SumCbm == null ? 0 : (decimal)item.SumCbm,
                     SharedProfit = 0,
-                    OtherCharges = 3,
+                    OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
                     TpyeofService = "CL",
@@ -150,7 +150,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
             {
-                queryOpsTrans = queryOpsTrans.And(x => x.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value && x.DatetimeCreated.Value.Date <= criteria.CreatedDateTo);
+                queryOpsTrans = queryOpsTrans.And(x => x.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && x.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date);
             }
             var data = opsRepository.Get(queryOpsTrans);
             return data;
@@ -199,7 +199,7 @@ namespace eFMS.API.Documentation.DL.Services
                     POD = item.Pod != null ? catPlaceRepository.Get(x => x.Id == item.Pod).FirstOrDefault()?.NameEn : string.Empty,
                     Lines = item.ColoaderId != null? catPartnerRepository.Get(x => x.Id == item.ColoaderId).FirstOrDefault()?.PartnerNameEn: string.Empty,
                     Agent = item.AgentId != null ? catPartnerRepository.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn : string.Empty,
-                    NominationParty = item.NotifyPartyDescription,
+                    NominationParty = item.NotifyPartyDescription?? string.Empty,
                     assigned = item.ShipmentType == "Nominated",
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,

@@ -126,21 +126,21 @@ namespace eFMS.API.System.DL.Services
                             UserModified = x.User.UserLevel.UserModified,
                             Position = x.User.UserLevel.Position
                         });
-            //if (criteria.Type == "company")
-            //{
-            //    results = results.Where(x => x.CompanyId == criteria.CompanyId && x.GroupId == SystemConstants.SpecialGroup && x.OfficeId == null && x.DepartmentId == null);
-            //}
-            if (criteria.Type == "office")
+            if (criteria.Type == "company")
             {
-                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.GroupId == SystemConstants.SpecialGroup && x.DepartmentId == null);
+                results = results.Where(x => x.GroupId == SystemConstants.SpecialGroup && x.OfficeId == null && x.DepartmentId == null);
+            }
+            else if (criteria.Type == "office")
+            {
+                results = results.Where(x => x.OfficeId == criteria.OfficeId && x.GroupId == SystemConstants.SpecialGroup && x.DepartmentId == null);
             }
             else if (criteria.Type == "department")
             {
-                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId && x.GroupId == SystemConstants.SpecialGroup);
+                results = results.Where(x => x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId && x.GroupId == SystemConstants.SpecialGroup);
             }
             else if (criteria.Type == "group")
             {
-                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId && x.GroupId == criteria.GroupId);
+                results = results.Where(x => x.OfficeId == criteria.OfficeId && x.DepartmentId == criteria.DepartmentId && x.GroupId == criteria.GroupId);
             }
 
             return results;
