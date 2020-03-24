@@ -33,5 +33,11 @@ namespace eFMS.API.Common.Globals
             new CommonData { Value = "ACCOUNTANT", DisplayName = "Accountant" },
             new CommonData { Value = "NORMAL", DisplayName = "Normal" },
         };
+
+        public static readonly List<string> ChargeTypes = new List<string> {
+            "CREDIT",
+            "DEBIT",
+            "OBH"
+        };
     }
 }
