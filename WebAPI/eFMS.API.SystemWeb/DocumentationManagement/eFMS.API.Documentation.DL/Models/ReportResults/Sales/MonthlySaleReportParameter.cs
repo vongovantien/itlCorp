@@ -13,7 +13,6 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults.Sales
         public string CompanyAddress1 { get; set; }
         public decimal CurrDecimalNo { get; set; }
         public string ReportBy { get; set; }
-        public string SalesManager { get; set; }
         public string Director { get; set; }
         public string ChiefAccountant { get; set; }
     }

@@ -402,7 +402,8 @@ namespace eFMS.API.Documentation.DL.Services
                 string employeeContact = string.Empty;
                 if(employeeId == null)
                 {
-                    employeeContact = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
+                    var employee = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault();
+                    employeeContact = employee!= null? employee.EmployeeNameVn??string.Empty: string.Empty;
                 }
                 var company = companyRepository.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
                 var parameter = new MonthlySaleReportParameter
@@ -410,13 +411,12 @@ namespace eFMS.API.Documentation.DL.Services
                     FromDate = DateTime.Now,
                     ToDate = DateTime.Now,
                     Contact = employeeContact,
-                    CompanyName = company?.BunameVn,
-                    CompanyAddress1 = company?.AddressVn,
+                    CompanyName = company != null? (company.BunameVn ?? string.Empty) : string.Empty,
+                    CompanyAddress1 = company != null ? (company.AddressVn ?? string.Empty) : string.Empty,
                     CurrDecimalNo = 2,
                     ReportBy = employeeContact,
                     Director = string.Empty,
                     ChiefAccountant = string.Empty,
-                    SalesManager = string.Empty
                 };
                 result = new Crystal
                 {
