@@ -1,8 +1,12 @@
 :host /deep/ {
+    div::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
     .list-charge-popup {
         .table-wrapper {
-            height: 300px;
-            max-height: 350px;
+            height: 500px;
+            max-height: 750px;
             &.h {
                 max-height: 510px;
                 min-height: 300px;
@@ -22,7 +26,7 @@
         }
         .dropdown-partner {
             .dropdown-partner__content {
-                width: 320px;
+                width: 450px;
 
                 .dropdown-partner__header {
                     padding: 10px 0px;
