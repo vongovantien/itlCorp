@@ -547,7 +547,7 @@ export class GeneralReportFormSearchComponent extends AppForm {
             }
             this.group.setValue(this.groupActive);
 
-            if (this.menuPermission.list === 'Group' || this.menuPermission.list === 'Owner') {
+            if (this.menuPermission.list === 'Group') {
                 this.staffActive = [this.staffList[0]];
             } else {
                 this.staffActive = [this.staffList.filter((stf) => stf.id === this.userLogged.id)[0]];
