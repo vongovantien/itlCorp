@@ -482,6 +482,254 @@ namespace eFMS.API.Documentation.DL.Services
             var shipments = shipmentsOperation.Union(shipmentsDocumention);
             return shipments;
         }
+        #region -- EXPORT SHIPMENT OVERVIEW
+        public IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria)
+        {
+            List<GeneralExportShipmentOverviewResult> lstShipment = new List<GeneralExportShipmentOverviewResult>();
+            var dataShipment = QueryDataShipmentOverview(criteria);
+            foreach (var item in dataShipment)
+            {
+                GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
+                if (item.ServiceName == TermData.InlandTrucking)
+                {
+                    data.ServiceName = "Inland Trucking ";
+                }
+                if (item.ServiceName == TermData.AirExport)
+                {
+                    data.ServiceName = "Export (Air) ";
+                }
+                if (item.ServiceName == TermData.AirImport)
+                {
+                    data.ServiceName = "Import (Air) ";
+                }
+                if (item.ServiceName == TermData.SeaConsolExport)
+                {
+                    data.ServiceName = "Export (Sea Consol) ";
+                }
+                if (item.ServiceName == TermData.SeaConsolImport)
+                {
+                    data.ServiceName = "Import (Sea Consol) ";
+                }
+                if (item.ServiceName == TermData.SeaFCLExport)
+                {
+                    data.ServiceName = "Export (Sea FCL) ";
+                }
+                if (item.ServiceName == TermData.SeaFCLImport)
+                {
+                    data.ServiceName = "Import (Sea FCL) ";
+                }
+                if (item.ServiceName == TermData.SeaLCLExport)
+                {
+                    data.ServiceName = "Export (Sea LCL) ";
+                }
+                if (item.ServiceName == TermData.SeaLCLImport)
+                {
+                    data.ServiceName = "Import (Sea LCL) ";
+                }
+                data.JobNo = item.JobNo;
+                data.etd = item.etd;
+                data.eta = item.eta;
+                data.FlightNo = item.FlightNo;
+                data.MblMawb = item.MblMawb;
+                data.HblHawb = item.HblHawb;
+                data.PolPod = catPlaceRepo.Get(x => x.Id == data.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == data.Pod).Select(t => t.Code).FirstOrDefault();
+                data.Carrier = catPartnerRepo.Get(x => x.Id == item.Carrier).FirstOrDefault()?.ShortName;
+                data.Agent = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.ShortName;
+                data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
+                data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                data.ShipmentType = item.ShipmentType;
+                data.Salesman = sysUserRepo.Get(x => x.Id == item.Salesman).FirstOrDefault().Username;
+
+                lstShipment.Add(data);
+            }
+            return lstShipment.AsQueryable();
+
+        }
+        private IQueryable<GeneralExportShipmentOverviewResult> QueryDataShipmentOverview(GeneralReportCriteria criteria)
+        {
+            Expression<Func<CsTransaction, bool>> queryTrans;
+            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = null;
+            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+            {
+                queryTrans = q =>
+                    q.TransactionType.Contains("E") ?
+                    (q.Etd.HasValue ? q.Etd.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Etd.Value.Date <= criteria.ServiceDateTo.Value.Date : false)
+                    :
+                    (q.Eta.HasValue ? q.Eta.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Eta.Value.Date <= criteria.ServiceDateTo.Value.Date : false);
+            }
+            else
+            {
+                queryTrans = q =>
+                    q.DatetimeCreated.HasValue ? q.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && q.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date : false;
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CustomerId))
+            {
+                queryTranDetail = q => q.CustomerId == criteria.CustomerId;
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Service))
+            {
+                queryTrans = queryTrans.And(q => criteria.Service.Contains(q.TransactionType));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.TransactionType == criteria.Service);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.JobId))
+            {
+                queryTrans = queryTrans.And(q => q.JobNo == criteria.JobId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Mawb))
+            {
+                queryTrans = queryTrans.And(q => q.Mawb == criteria.Mawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Hawb))
+            {
+                queryTranDetail = queryTranDetail == null ?
+                    (q => q.Hwbno == criteria.Hawb)
+                    :
+                    queryTranDetail.And(q => q.Hwbno == criteria.Hawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.OfficeId))
+            {
+                queryTrans = queryTrans.And(q => criteria.OfficeId.Contains(q.OfficeId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.OfficeId == Guid.Empty);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.DepartmentId))
+            {
+                queryTrans = queryTrans.And(q => criteria.DepartmentId.Contains(q.DepartmentId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.DepartmentId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.GroupId))
+            {
+                queryTrans = queryTrans.And(q => criteria.GroupId.Contains(q.GroupId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.GroupId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PersonInCharge))
+            {
+                queryTrans = queryTrans.And(q => criteria.PersonInCharge.Contains(q.PersonIncharge));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.SalesMan))
+            {
+                queryTranDetail = (queryTranDetail == null) ?
+                    (q => criteria.SalesMan.Contains(q.SaleManId))
+                    :
+                    queryTranDetail.And(q => criteria.SalesMan.Contains(q.SaleManId));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Creator))
+            {
+                queryTrans = queryTrans.And(q => criteria.Creator.Contains(q.UserCreated));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CarrierId))
+            {
+                queryTrans = queryTrans.And(q => q.ColoaderId == criteria.CarrierId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.AgentId))
+            {
+                queryTrans = queryTrans.And(q => q.AgentId == criteria.AgentId);
+            }
+
+            if (criteria.Pol != null && criteria.Pol != Guid.Empty)
+            {
+                queryTrans = queryTrans.And(q => q.Pol == criteria.Pol);
+            }
+
+            if (criteria.Pod != null && criteria.Pod != Guid.Empty)
+            {
+                queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
+            }
+
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+
+            if (queryTranDetail == null)
+            {
+                var houseBills = detailRepository.Get();
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId into housebill
+                                    from house in housebill.DefaultIfEmpty()
+                                    select new GeneralExportShipmentOverviewResult
+                                    {
+                                        ServiceName = master.TransactionType,
+                                        JobNo = master.JobNo,
+                                        etd = master.Etd,
+                                        eta = master.Eta,
+                                        FlightNo = master.FlightVesselName,
+                                        MblMawb = master.Mawb,
+                                        HblHawb = house.Hwbno,
+                                        Pol = house.Pol,
+                                        Pod = house.Pod,
+                                        ShipmentType = master.ShipmentType,
+                                        Salesman = house.SaleManId,
+                                        Carrier = master.ColoaderId,
+                                        Agent = master.AgentId,
+                                        Shipper = house.ShipperId,
+                                        Consignee = house.ConsigneeId,
+                                        PackageType = house.PackageType,
+                                        QTy = house.PackageQty,
+                                        Cont20 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont20"))),
+                                        Cont40 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40"))),
+                                        Cont40HC = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40HC"))),
+                                        Cont45 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont45"))),
+                                        CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm
+                                    };
+                return queryShipment;
+            }
+            else
+            {
+                var houseBills = detailRepository.Get().Where(queryTranDetail);
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId
+                                    select new GeneralExportShipmentOverviewResult
+                                    {
+                                        ServiceName = master.TransactionType,
+                                        JobNo = master.JobNo,
+                                        etd = master.Etd,
+                                        eta = master.Eta,
+                                        FlightNo = master.FlightVesselName,
+                                        MblMawb = master.Mawb,
+                                        HblHawb = house.Hwbno,
+                                        Pol = house.Pol,
+                                        Pod = house.Pod,
+                                        ShipmentType = master.ShipmentType,
+                                        Salesman = house.SaleManId,
+                                        Carrier = master.ColoaderId,
+                                        Agent = master.AgentId,
+                                        Shipper = house.ShipperId,
+                                        Consignee = house.ConsigneeId,
+                                        PackageType = house.PackageType,
+                                        QTy = house.PackageQty,
+                                        Cont20 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont20"))),
+                                        Cont40 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40"))),
+                                        Cont40HC = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40HC"))),
+                                        Cont45 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont45"))),
+                                        CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm
+                                    };
+                return queryShipment;
+            }
+        }
+
+        #endregion
 
         #region -- GENERAL REPORT --
 
