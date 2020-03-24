@@ -51,7 +51,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
         });
     }
 
-    onChangeCurrency(currency: Currency) {
+    onChangeCurrency(currency: string) {
         if (!!this.requestSurchargeListComponent) {
             this.requestSurchargeListComponent.changeCurrency(currency);
         }

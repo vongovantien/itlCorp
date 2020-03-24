@@ -19,7 +19,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 export class ApproveAdvancePaymentComponent extends AppPage {
 
-    @ViewChild(AdvancePaymentFormCreateComponent, { static: false }) formCreateComponent: AdvancePaymentFormCreateComponent;
+    @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDenyPopup', { static: false }) confirmDenyPopup: ConfirmPopupComponent;
@@ -71,18 +71,16 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                         this.formCreateComponent.isDisabled = true;
 
                         // * wait to currecy list api
-                        setTimeout(() => {
-                            this.formCreateComponent.formCreate.setValue({
-                                advanceNo: this.advancePayment.advanceNo,
-                                requester: this.advancePayment.requester,
-                                requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
-                                paymentMethod: this.formCreateComponent.methods.filter(method => method.value === this.advancePayment.paymentMethod)[0],
-                                department: this.advancePayment.department,
-                                deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
-                                note: this.advancePayment.advanceNote,
-                                currency: this.formCreateComponent.currencyList.filter(currency => currency.id === this.advancePayment.advanceCurrency)[0]
-                            });
-                        }, 1000);
+                        this.formCreateComponent.formCreate.setValue({
+                            advanceNo: this.advancePayment.advanceNo,
+                            requester: this.advancePayment.requester,
+                            requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
+                            paymentMethod: this.formCreateComponent.methods.filter(method => method.value === this.advancePayment.paymentMethod)[0],
+                            department: this.advancePayment.department,
+                            deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
+                            note: this.advancePayment.advanceNote,
+                            currency: this.advancePayment.advanceCurrency
+                        });
 
                         this.listRequestAdvancePaymentComponent.listRequestAdvancePayment = this.advancePayment.advanceRequests;
                         this.listRequestAdvancePaymentComponent.totalAmount = this.listRequestAdvancePaymentComponent.updateTotalAmount(this.advancePayment.advanceRequests);
@@ -190,12 +188,12 @@ export class ApproveAdvancePaymentComponent extends AppPage {
         this.apporve();
     }
 
-    onChangeCurrency(currency: Currency) {
+    onChangeCurrency(currency: string) {
         this.listRequestAdvancePaymentComponent.changeCurrency(currency);
         for (const item of this.listRequestAdvancePaymentComponent.listRequestAdvancePayment) {
-            item.requestCurrency = currency.id;
+            item.requestCurrency = currency;
         }
-        this.listRequestAdvancePaymentComponent.currency = currency.id;
+        this.listRequestAdvancePaymentComponent.currency = currency;
     }
 
     exportAdvPayment(lang: string) {
