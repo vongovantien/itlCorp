@@ -64,7 +64,6 @@
         public static readonly string CURRENCY_LOCAL = "VND";
         public static readonly string CURRENCY_USD = "USD";
         public static readonly short SpecialGroup = 11;
-        public static readonly int AccountantDeptId = 1;
         #region -- CHARGE
         public static readonly string CHARGE_AIR_FREIGHT = "Air freight";
         public static readonly string CHARGE_FUEL_SURCHARGE = "Fuel Surcharge";
