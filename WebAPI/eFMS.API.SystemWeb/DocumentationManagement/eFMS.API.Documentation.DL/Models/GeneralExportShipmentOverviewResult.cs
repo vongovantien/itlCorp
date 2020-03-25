@@ -45,10 +45,12 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? TotalBuy { get; set; }
         public decimal? Profit { get; set; }
         public decimal? AmountOBH { get; set; }
+        public string CustomerId { get; set; }
         public string Destination { get; set; }
         public string CustomerName { get; set; }
         public string RalatedHblHawb { get; set; }
         public string RalatedJobNo { get; set; }
+        public Guid? OfficeId { get; set; }
         public string HandleOffice { get; set; }
         public string SalesOffice { get; set; }
         public string Creator { get; set; }

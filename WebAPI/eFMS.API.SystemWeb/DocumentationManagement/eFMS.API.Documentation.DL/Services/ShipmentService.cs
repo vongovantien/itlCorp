@@ -32,6 +32,9 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<CatCharge> catChargeRepo;
         readonly IContextBase<CatChargeGroup> catChargeGroupRepo;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
+        readonly IContextBase<SysUserLevel> sysUserLevelRepo;
+
 
 
 
@@ -47,7 +50,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<CatPlace> catPlace,
             IContextBase<CatCharge> catCharge,
-            IContextBase<CatChargeGroup> catChargeGroup) : base(repository, mapper)
+            IContextBase<CatChargeGroup> catChargeGroup,
+            IContextBase<SysOffice> sysOffice,
+            IContextBase<SysUserLevel> sysUserLevel) : base(repository, mapper)
         {
             opsRepository = ops;
             detailRepository = detail;
@@ -61,6 +66,8 @@ namespace eFMS.API.Documentation.DL.Services
             catPlaceRepo = catPlace;
             catChargeRepo = catCharge;
             catChargeGroupRepo = catChargeGroup;
+            sysOfficeRepo = sysOffice;
+            sysUserLevelRepo = sysUserLevel;
         }
 
         public IQueryable<Shipments> GetShipmentNotLocked()
@@ -546,7 +553,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
                 data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ShipmentType;
-                data.Salesman = sysUserRepo.Get(x => x.Id == item.Salesman).FirstOrDefault().Username;
+                data.Salesman = sysUserRepo.Get(x => x.Id == item.Salesman).FirstOrDefault()?.Username;
                 data.AgentName = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.PartnerNameVn;
                 data.GW = item.GW;
                 data.CW = item.CW;
@@ -663,9 +670,22 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 data.AmountOBH = _obh;
                 #endregion -- Phí OBH sau thuế --
-
-
-
+                data.Destination = catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault();
+                data.CustomerId = item.CustomerId;
+                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
+                data.RalatedHblHawb = string.Empty;// tạm thời để trống
+                data.RalatedJobNo = string.Empty;// tạm thời để trống
+                data.HandleOffice = sysOfficeRepo.Get(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault();
+                var OfficeSaleman = sysUserLevelRepo.Get(x => x.UserId == item.Salesman).Select(t => t.OfficeId).FirstOrDefault();
+                data.SalesOffice = sysOfficeRepo.Get(x => x.Id == OfficeSaleman).Select(t => t.Code).FirstOrDefault();
+                data.Creator = sysUserRepo.Get(x=>x.Id == item.Creator).Select(t=>t.Username).FirstOrDefault();
+                data.POINV = item.POINV;
+                data.BKRefNo = item.JobNo;
+                data.Commodity = item.Commodity;
+                data.ServiceMode = item.ServiceMode;//chua co thong tin
+                data.PMTerm = item.PMTerm;
+                data.ShipmentNotes = item.ShipmentNotes;
+                data.Created = item.Created;
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
@@ -820,7 +840,17 @@ namespace eFMS.API.Documentation.DL.Services
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
-                                        HblId = house.Id
+                                        HblId = house.Id,
+                                        CustomerId = house.CustomerId,
+                                        OfficeId = master.OfficeId,
+                                        Creator = master.UserCreated,
+                                        POINV = master.Pono,
+                                        Commodity = master.Commodity,
+                                        PMTerm = master.PaymentTerm,
+                                        ShipmentNotes = master.Notes,
+                                        Created = master.DatetimeCreated
+
+                                        
                                     };
                 return queryShipment;
             }
@@ -855,7 +885,15 @@ namespace eFMS.API.Documentation.DL.Services
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
-                                        HblId = house.Id
+                                        HblId = house.Id,
+                                        CustomerId = house.CustomerId,
+                                        OfficeId = master.OfficeId,
+                                        Creator = master.UserCreated,
+                                        POINV = master.Pono,
+                                        Commodity = master.Commodity,
+                                        PMTerm = master.PaymentTerm,
+                                        ShipmentNotes = master.Notes,
+                                        Created = master.DatetimeCreated
                                     };
                 return queryShipment;
             }
