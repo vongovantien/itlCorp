@@ -21,7 +21,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap';
 
 export class ApporveSettlementPaymentComponent extends AppPage {
 
-    @ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
+    @ViewChild(SettlementListChargeComponent, { static: true }) requestSurchargeListComponent: SettlementListChargeComponent;
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
 
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;

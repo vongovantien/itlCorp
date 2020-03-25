@@ -89,7 +89,7 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
     }
 
     getCharge() {
-        const serviceTypeId: string = `;${ChargeConstants.AI_CODE};${ChargeConstants.AE_CODE}`;
+        const serviceTypeId: string = `${ChargeConstants.AI_CODE};${ChargeConstants.AE_CODE}`;
         this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId })
             .subscribe(
                 (charges: Charge[]) => {

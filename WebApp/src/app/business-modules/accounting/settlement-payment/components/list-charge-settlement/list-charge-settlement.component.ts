@@ -15,6 +15,7 @@ import { SettlementTableListChargePopupComponent } from '../popup/table-list-cha
 import _includes from 'lodash/includes';
 import _cloneDeep from 'lodash/cloneDeep';
 import cloneDeep from 'lodash/cloneDeep';
+import { CommonEnum } from '@enums';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -27,7 +28,7 @@ export class SettlementListChargeComponent extends AppList {
     @ViewChild(SettlementFormChargePopupComponent, { static: false }) formChargePopup: SettlementFormChargePopupComponent;
     @ViewChild(SettlementPaymentManagementPopupComponent, { static: false }) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
     @ViewChild(SettlementFormCopyPopupComponent, { static: false }) copyChargePopup: SettlementFormCopyPopupComponent;
-    @ViewChild(SettlementTableListChargePopupComponent, { static: false }) tableListChargePopup: SettlementTableListChargePopupComponent;
+    @ViewChild(SettlementTableListChargePopupComponent, { static: true }) tableListChargePopup: SettlementTableListChargePopupComponent;
 
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
@@ -98,7 +99,6 @@ export class SettlementListChargeComponent extends AppList {
     onRequestSurcharge(surcharge: any) {
         // this.surcharges.push(surcharge);
         this.surcharges = [...this.surcharges, ...surcharge];
-        console.log(this.surcharges);
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
     }
 
@@ -118,8 +118,6 @@ export class SettlementListChargeComponent extends AppList {
                     this.surcharges = [...this.surcharges, i];
                 }
             }
-            console.log(this.surcharges);
-
         }
     }
 
@@ -283,6 +281,7 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     updateChargeWithJob(charge: Surcharge, index?: number) {
+        if (this.STATE !== 'WRITE') { return; }
         this.selectedIndexSurcharge = index;
         if (!charge || charge.isFromShipment) {
             return;
@@ -297,9 +296,20 @@ export class SettlementListChargeComponent extends AppList {
                 this.tableListChargePopup.charges = cloneDeep(surcharges);
 
                 this.tableListChargePopup.charges.forEach(item => {
-                    const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.paymentObjectId);
-                    if (!!partner) {
-                        item.payer = partner.shortName;
+
+                    if (item.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()) {
+                        // get partner theo payerId.
+                        const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.payerId);
+                        if (!!partner) {
+                            item.payer = partner.shortName;
+                            item.obhId = item.paymentObjectId;
+                        }
+                    } else {
+                        // get partner theo paymentObjectId.
+                        const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.paymentObjectId);
+                        if (!!partner) {
+                            item.payer = partner.shortName;
+                        }
                     }
 
                     if (!!item.invoiceDate && typeof item.invoiceDate === 'string') {
@@ -316,6 +326,7 @@ export class SettlementListChargeComponent extends AppList {
                 this.tableListChargePopup.isUpdate = true;
                 this.tableListChargePopup.show();
             }
+
         }
     }
 }

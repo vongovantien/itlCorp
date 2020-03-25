@@ -494,6 +494,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     saveCharge() {
+        this.isContinue = false;
         this.submit();
     }
 

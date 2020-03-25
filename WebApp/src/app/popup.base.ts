@@ -1,6 +1,6 @@
 import { ModalOptions, ModalDirective } from "ngx-bootstrap";
 import { AppPage } from "src/app/app.base";
-import { ViewChild, QueryList, ViewChildren } from "@angular/core";
+import { ViewChild, QueryList, ViewChildren, HostListener } from "@angular/core";
 import { FormControl, AbstractControl, ValidationErrors } from "@angular/forms";
 import { SelectComponent } from "ng2-select";
 
@@ -28,9 +28,15 @@ export abstract class PopupBase extends AppPage {
 
     isSubmitted: boolean = false;
     headers: CommonInterface.IHeaderTable[];
+
+    @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+        if (this.popup.isShown) {
+            this.popup.hide();
+        }
+    }
+
     constructor() {
         super();
-
     }
 
     // * fn set options

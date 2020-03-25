@@ -11,12 +11,16 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid}">
+                            [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid }">
                             <label required>MAWB No </label>
                             <input class="form-control" formControlName="mawb" (blur)="onBlurGetAirline($event)">
-                            <div class="form-control-feedback"
-                                *ngIf="mawb.dirty && (mawb.errors | equalError:'maxlength' || mawb.errors | equalError:'maxlength')">
-                                MAWB invalid
+                            <div class="form-control-feedback" *ngIf="isSubmitted && mawb.errors | equalError:'maxlength' 
+                                ">
+                                MAWB inputted is not correct format
+                            </div>
+                            <div class="form-control-feedback" *ngIf="isSubmitted && mawb.errors | equalError:'minlength' 
+                            ">
+                                MAWB inputted is not correct format
                             </div>
                         </div>
                     </div>
@@ -115,8 +119,8 @@
                                         </span>
                                     </div>
                                     <div class="form-control-feedback"
-                                        *ngIf="isSubmitted && formGroup.errors | equalError:'validateEta_Etd'">ETA must
-                                        greater than or equal ETD
+                                        *ngIf="isSubmitted && formGroup.errors | equalError:'validateEta_Etd'">
+                                        {{errorETA}}
                                     </div>
                                 </div>
                             </div>

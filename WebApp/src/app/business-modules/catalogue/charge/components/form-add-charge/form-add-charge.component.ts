@@ -128,6 +128,8 @@ export class FormAddChargeComponent extends AppForm {
     checkValidateForm() {
         let valid: boolean = true;
         this.setError(this.service);
+        this.setError(this.chargeGroup);
+
         if (!this.formGroup.valid) {
             valid = false;
         }
