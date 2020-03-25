@@ -40,6 +40,8 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? TotalBuyTrucking { get; set; }
         public decimal? TotalBuyHandling { get; set; }
         public decimal? TotalBuyOthers { get; set; }
+        public decimal? TotalBuyKB { get; set; }
+
         public decimal? TotalBuy { get; set; }
         public decimal? Profit { get; set; }
         public decimal? AmountOBH { get; set; }
@@ -57,23 +59,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string PMTerm { get; set; }
         public string ShipmentNotes { get; set; }
         public DateTime? Created { get; set; }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        public Guid? HblId { get; set; }
 
 
     }
