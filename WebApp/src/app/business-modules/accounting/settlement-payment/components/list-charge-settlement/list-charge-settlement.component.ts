@@ -166,9 +166,9 @@ export class SettlementListChargeComponent extends AppList {
         }
     }
 
-    changeCurrency(currency: Currency) {
+    changeCurrency(currency: string) {
         // this.formChargePopup.currency.setValue(currency.id);
-        this.tableListChargePopup.currencyId = currency.id || 'VND';
+        this.tableListChargePopup.currencyId = currency || 'VND';
     }
 
     returnShipmet(item: any) {

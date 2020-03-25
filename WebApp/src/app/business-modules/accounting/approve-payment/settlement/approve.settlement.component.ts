@@ -22,7 +22,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap';
 export class ApporveSettlementPaymentComponent extends AppPage {
 
     @ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
-    @ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
+    @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
 
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDenyPopup', { static: false }) confirmDenyPopup: ConfirmPopupComponent;
@@ -61,7 +61,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
         });
     }
 
-    onChangeCurrency(currency: Currency) {
+    onChangeCurrency(currency: string) {
         this.requestSurchargeListComponent.changeCurrency(currency);
     }
 
@@ -83,17 +83,15 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     this.formCreateSurcharge.isDisabled = true;
 
                     // * wait to currecy list api
-                    setTimeout(() => {
-                        this.formCreateSurcharge.form.setValue({
-                            settlementNo: this.settlementPayment.settlement.settlementNo,
-                            requester: this.settlementPayment.settlement.requester,
-                            requestDate: new Date(this.settlementPayment.settlement.requestDate),
-                            paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
-                            note: this.settlementPayment.settlement.note,
-                            amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
-                            currency: this.formCreateSurcharge.currencyList.filter(currency => currency.id === this.settlementPayment.settlement.settlementCurrency)[0]
-                        });
-                    }, 100);
+                    this.formCreateSurcharge.form.setValue({
+                        settlementNo: this.settlementPayment.settlement.settlementNo,
+                        requester: this.settlementPayment.settlement.requester,
+                        requestDate: new Date(this.settlementPayment.settlement.requestDate),
+                        paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
+                        note: this.settlementPayment.settlement.note,
+                        amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
+                        currency: this.settlementPayment.settlement.settlementCurrency
+                    });
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;

@@ -128,20 +128,20 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     getCurrency() {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
             this.currencyList = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY) || [];
-            this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
+            this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0].id);
         } else {
             this._catalogueRepo.getListCurrency()
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (data: any) => {
                         this.currencyList = data || [];
-                        this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
+                        this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0].id);
                     },
                 );
         }
     }
 
-    changeCurrency(currency: Currency) {
+    changeCurrency(currency: string) {
         if (!!currency) {
             this.onChangeCurrency.emit(currency);
         }
