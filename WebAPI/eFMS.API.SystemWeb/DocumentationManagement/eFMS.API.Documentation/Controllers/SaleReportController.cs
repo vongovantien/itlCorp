@@ -44,5 +44,18 @@ namespace eFMS.API.Documentation.Controllers
             var result = saleReportService.PreviewGetMonthlySaleReport(criteria);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Get data sale report by quater
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("QuaterSaleReport")]
+        [Authorize]
+        public IActionResult QuaterSaleReport(SaleReportCriteria criteria)
+        {
+            var result = saleReportService.PreviewGetQuaterSaleReport(criteria);
+            return Ok(result);
+        }
     }
 }

@@ -73,7 +73,7 @@ namespace eFMS.API.Documentation.DL.Services
             else if (csShipments == null) return opsShipments;
             else return opsShipments.Union(csShipments);
         }
-        
+
 
         private IQueryable<MonthlySaleReportResult> GetOpsSaleReport(SaleReportCriteria criteria)
         {
@@ -100,7 +100,7 @@ namespace eFMS.API.Documentation.DL.Services
                     assigned = false,
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
-                    KGS = item.SumNetWeight == null?0: (decimal)item.SumNetWeight,
+                    KGS = item.SumNetWeight == null ? 0 : (decimal)item.SumNetWeight,
                     CBM = item.SumCbm == null ? 0 : (decimal)item.SumCbm,
                     SharedProfit = 0,
                     OtherCharges = 0,
@@ -111,7 +111,7 @@ namespace eFMS.API.Documentation.DL.Services
                     Consignee = item.Consignee
                 };
                 string employeeId = userRepository.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
-                if(employeeId != null)
+                if (employeeId != null)
                 {
                     report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
                 }
@@ -162,26 +162,27 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<CsTransactionDetail> housebills = QueryHouseBills(criteria);
 
             var data = (from shipment in shipments
-                         join housebill in housebills on shipment.Id equals housebill.JobId
-                         select new {
-                             shipment.DepartmentId,
-                             shipment.TransactionType,
-                             shipment.JobNo,
-                             shipment.ShipmentType,
-                             shipment.Pol,
-                             shipment.Pod,
-                             shipment.ColoaderId,
-                             shipment.AgentId,
-                             housebill.CustomerId,
-                             housebill.NotifyPartyDescription,
-                             HBLID = housebill.Id,
-                             housebill.Hwbno,
-                             housebill.NetWeight,
-                             housebill.Cbm,
-                             housebill.ShipperDescription,
-                             housebill.ConsigneeDescription,
-                             housebill.SaleManId
-                         });
+                        join housebill in housebills on shipment.Id equals housebill.JobId
+                        select new
+                        {
+                            shipment.DepartmentId,
+                            shipment.TransactionType,
+                            shipment.JobNo,
+                            shipment.ShipmentType,
+                            shipment.Pol,
+                            shipment.Pod,
+                            shipment.ColoaderId,
+                            shipment.AgentId,
+                            housebill.CustomerId,
+                            housebill.NotifyPartyDescription,
+                            HBLID = housebill.Id,
+                            housebill.Hwbno,
+                            housebill.NetWeight,
+                            housebill.Cbm,
+                            housebill.ShipperDescription,
+                            housebill.ConsigneeDescription,
+                            housebill.SaleManId
+                        });
             if (data == null) return null;
             var results = new List<MonthlySaleReportResult>();
             var containerData = uniRepository.Get(x => x.UnitType == "Container");
@@ -197,19 +198,19 @@ namespace eFMS.API.Documentation.DL.Services
                     Area = string.Empty,
                     POL = item.Pol != null ? catPlaceRepository.Get(x => x.Id == item.Pol).FirstOrDefault()?.NameEn : string.Empty,
                     POD = item.Pod != null ? catPlaceRepository.Get(x => x.Id == item.Pod).FirstOrDefault()?.NameEn : string.Empty,
-                    Lines = item.ColoaderId != null? catPartnerRepository.Get(x => x.Id == item.ColoaderId).FirstOrDefault()?.PartnerNameEn: string.Empty,
+                    Lines = item.ColoaderId != null ? catPartnerRepository.Get(x => x.Id == item.ColoaderId).FirstOrDefault()?.PartnerNameEn : string.Empty,
                     Agent = item.AgentId != null ? catPartnerRepository.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn : string.Empty,
-                    NominationParty = item.NotifyPartyDescription?? string.Empty,
+                    NominationParty = item.NotifyPartyDescription ?? string.Empty,
                     assigned = item.ShipmentType == "Nominated",
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
-                    KGS = item.NetWeight == null?0:(decimal)item.NetWeight,
+                    KGS = item.NetWeight == null ? 0 : (decimal)item.NetWeight,
                     CBM = item.Cbm == null ? 0 : (decimal)item.Cbm,
                     SharedProfit = 0,
                     OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
-                    TpyeofService = item.TransactionType.Contains("I")? "IMP": "EXP",
+                    TpyeofService = item.TransactionType.Contains("I") ? "IMP" : "EXP",
                     Shipper = item.ShipperDescription,
                     Consignee = item.ConsigneeDescription
                 };
@@ -289,7 +290,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             MonthlySaleReportResult report = null;
             IQueryable<CsMawbcontainer> containers = null;
-            if (mblid!= null)
+            if (mblid != null)
             {
                 containers = containerRepository.Get(x => x.Mblid == mblid);
             }
@@ -312,8 +313,8 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal GetBuyingRate(Guid hblid, string toCurrency)
         {
             decimal cost = 0;
-            var buyingCharges = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE 
-                                                          && x.Hblid == hblid 
+            var buyingCharges = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
+                                                          && x.Hblid == hblid
                                                           && (x.KickBack == false || x.KickBack == null));
             if (buyingCharges != null)
             {
@@ -372,14 +373,14 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal GetCurrencyExchangeRate(CsShipmentSurcharge charge, string toCurrency)
         {
             if (charge.CurrencyId == toCurrency) return 1;
-            var currencyExchange = exchangeRepository.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date 
+            var currencyExchange = exchangeRepository.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date
                                                             && x.CurrencyFromId == charge.CurrencyId && x.CurrencyToId == toCurrency)?.OrderByDescending(x => x.DatetimeModified)?.FirstOrDefault();
             if (currencyExchange != null) return currencyExchange.Rate;
             else
             {
                 currencyExchange = exchangeRepository.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date
                                                             && x.CurrencyFromId == charge.CurrencyId && x.CurrencyToId == toCurrency)?.OrderByDescending(x => x.DatetimeModified)?.FirstOrDefault();
-                if(currencyExchange != null)
+                if (currencyExchange != null)
                 {
                     return (1 / currencyExchange.Rate);
                 }
@@ -397,10 +398,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var list = data.ToList();
                 var employeeId = userRepository.Get(x => x.Id == currentUser.UserID).FirstOrDefault()?.EmployeeId;
                 string employeeContact = string.Empty;
-                if(employeeId == null)
+                if (employeeId == null)
                 {
                     var employee = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault();
-                    employeeContact = employee!= null? employee.EmployeeNameVn??string.Empty: string.Empty;
+                    employeeContact = employee != null ? employee.EmployeeNameVn ?? string.Empty : string.Empty;
                 }
                 var company = companyRepository.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
                 var parameter = new MonthlySaleReportParameter
@@ -408,7 +409,7 @@ namespace eFMS.API.Documentation.DL.Services
                     FromDate = DateTime.Now,
                     ToDate = DateTime.Now,
                     Contact = employeeContact,
-                    CompanyName = company != null? (company.BunameVn ?? string.Empty) : string.Empty,
+                    CompanyName = company != null ? (company.BunameVn ?? string.Empty) : string.Empty,
                     CompanyAddress1 = company != null ? (company.AddressVn ?? string.Empty) : string.Empty,
                     CurrDecimalNo = 2,
                     ReportBy = employeeContact,
@@ -419,13 +420,81 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     ReportName = "Monthly Sale Report.rpt",
                     AllowPrint = true,
-                    AllowExport = true,
-                    IsLandscape = true
+                    AllowExport = true
                 };
                 result.AddDataSource(list);
                 result.FormatType = ExportFormatType.PortableDocFormat;
                 result.SetParameter(parameter);
             }
+            return result;
+        }
+
+        public Crystal PreviewGetQuaterSaleReport(SaleReportCriteria criteria)
+        {
+            Crystal result = null;
+            var saleQuaters = new List<QuaterSaleReportResult>();
+            var saleQuater = new QuaterSaleReportResult();
+            saleQuater.Department = string.Empty; //
+            saleQuater.ContactName = string.Empty; //
+            saleQuater.SalesManager = string.Empty; //
+            saleQuater.PartnerName = string.Empty;
+            saleQuater.Description = string.Empty;
+            saleQuater.Area = string.Empty;
+            saleQuater.POL = string.Empty;
+            saleQuater.POD = string.Empty;
+            saleQuater.Lines = string.Empty;
+            saleQuater.Agent = string.Empty;
+            saleQuater.NominationParty = string.Empty;
+            saleQuater.assigned = false;
+            saleQuater.TransID = string.Empty;
+            saleQuater.LoadingDate = DateTime.Now; //
+            saleQuater.HWBNO = string.Empty;
+            saleQuater.Volumne = string.Empty;
+            saleQuater.Qty20 = 0;
+            saleQuater.Qty40 = 0;
+            saleQuater.Cont40HC = 0;
+            saleQuater.KGS = 0;
+            saleQuater.CBM = 0;
+            saleQuater.SellingRate = 0; //
+            saleQuater.SharedProfit = 0; //
+            saleQuater.BuyingRate = 0; //
+            saleQuater.OtherCharges = 0; //
+            saleQuater.SalesTarget = 0; //
+            saleQuater.Bonus = 0; //
+            saleQuater.DptSalesTarget = 0; //
+            saleQuater.DptBonus = 0; //
+            saleQuater.KeyContact = string.Empty;
+            saleQuater.MBLNO = string.Empty;
+            saleQuater.Vessel = string.Empty;
+            saleQuater.TpyeofService = string.Empty;
+
+            saleQuaters.Add(saleQuater);
+
+            var parameter = new QuaterSaleReportParameter
+            {
+                FromDate = DateTime.Now, //
+                ToDate = DateTime.Now, //
+                Contact = string.Empty, //
+                CompanyName = string.Empty, //
+                CompanyDescription = string.Empty,
+                CompanyAddress1 = "52 Trường Sơn", //
+                CompanyAddress2 = string.Empty,
+                Website = string.Empty,
+                CurrDecimalNo = 2, //
+                ReportBy = string.Empty,
+                SalesManager = string.Empty,
+                Director = "ITL", //
+                ChiefAccountant = "Ellen Hanh" //
+            };
+            result = new Crystal
+            {
+                ReportName = "SalesReportByQuater.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(saleQuaters);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
             return result;
         }
     }

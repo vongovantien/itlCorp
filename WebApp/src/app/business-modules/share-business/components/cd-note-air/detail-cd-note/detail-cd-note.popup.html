@@ -87,7 +87,8 @@
                                             <span class="m--font-bolder">
                                                 {{labelDetail.pol}}:
                                             </span>
-                                            <span>{{CdNoteDetail.pol}} {{CdNoteDetail.polCountry ? ',' : ''}} {{CdNoteDetail.polCountry}}</span>
+                                            <span>{{CdNoteDetail.pol}} {{CdNoteDetail.polCountry ? ',' : ''}}
+                                                {{CdNoteDetail.polCountry}}</span>
                                         </div>
                                     </div>
                                     <div class="col-xl-6">
@@ -95,7 +96,8 @@
                                             <span class="m--font-bolder">
                                                 {{labelDetail.pod}}:
                                             </span>
-                                            <span>{{CdNoteDetail.pod}} {{CdNoteDetail.podCountry ? ',' : ''}} {{CdNoteDetail.podCountry}}</span>
+                                            <span>{{CdNoteDetail.pod}} {{CdNoteDetail.podCountry ? ',' : ''}}
+                                                {{CdNoteDetail.podCountry}}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -268,7 +270,7 @@
 
 <div class="modal fade" role="dialog" bsModal #popupReport="bs-modal" (onHide)="onHide($event)">
     <div class="modal-dialog modal-report" role="document">
-        <div class="modal-content">
+        <div class="modal-content" [ngClass]="!!dataReport && dataReport.isLandscape === true ? '' : 'modal-lg__width'">
             <div class="modal-header">
                 <h5 class="modal-title">Preview</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hidePreview()">
@@ -282,6 +284,16 @@
                 </form>
                 <iframe name="reportFrame" src="" type="application/pdf" height="1080px" width="100%" allowfullscreen
                     frameborder="0"></iframe>
+            </div>
+            <div class="modal-footer m--align-center" (click)="hidePreview()">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
             </div>
         </div>
     </div>

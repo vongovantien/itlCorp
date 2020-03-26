@@ -10,5 +10,6 @@ namespace eFMS.API.Documentation.DL.IService
     public interface ISaleReportService
     {
         Crystal PreviewGetMonthlySaleReport(SaleReportCriteria criteria);
+        Crystal PreviewGetQuaterSaleReport(SaleReportCriteria criteria);
     }
 }
