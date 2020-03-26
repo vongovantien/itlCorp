@@ -469,10 +469,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/28/2016 14:22:24</publishTime>
     </File>
     <File Include="bin/ReportPerview.dll">
-      <publishTime>03/18/2020 08:54:50</publishTime>
+      <publishTime>03/25/2020 09:18:32</publishTime>
     </File>
     <File Include="bin/ReportPerview.pdb">
-      <publishTime>03/18/2020 08:54:50</publishTime>
+      <publishTime>03/25/2020 09:18:32</publishTime>
     </File>
     <File Include="bin/Reports/AcsSettlementPaymentRequest.rpt">
       <publishTime>09/24/2019 09:35:32</publishTime>
@@ -791,6 +791,12 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="Reports/ManifestHouseBillDetail.ttx">
       <publishTime>02/25/2020 08:56:16</publishTime>
+    </File>
+    <File Include="Reports/Monthly Sale Report.rpt">
+      <publishTime>03/24/2020 14:09:37</publishTime>
+    </File>
+    <File Include="Reports/Monthly Sale Report.ttx">
+      <publishTime>03/24/2020 16:55:31</publishTime>
     </File>
     <File Include="Reports/OCL.ttx">
       <publishTime>02/25/2020 08:56:16</publishTime>

@@ -94,21 +94,16 @@ namespace eFMS.API.Documentation.DL.Services
                     Area = string.Empty,
                     POL = item.Pol != null ? catPlaceRepository.Get(x => x.Id == item.Pol).FirstOrDefault()?.NameEn : string.Empty,
                     POD = item.Pod != null ? catPlaceRepository.Get(x => x.Id == item.Pod).FirstOrDefault()?.NameEn : string.Empty,
-                    Lines = item.SupplierId,
+                    Lines = catPartnerRepository.Get(x => x.Id == item.SupplierId).FirstOrDefault()?.PartnerNameEn,
                     Agent = item.AgentId != null ? catPartnerRepository.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn : string.Empty,
                     NominationParty = string.Empty,
                     assigned = false,
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
-                    //Qty20 = 0,
-                    //Qty40 = 2,
-                    //Cont40HC = 2,
                     KGS = item.SumNetWeight == null?0: (decimal)item.SumNetWeight,
                     CBM = item.SumCbm == null ? 0 : (decimal)item.SumCbm,
-                    //SellingRate = 3,
-                    SharedProfit = 3,
-                    //BuyingRate = 3,
-                    OtherCharges = 3,
+                    SharedProfit = 0,
+                    OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
                     TpyeofService = "CL",
@@ -155,7 +150,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
             {
-                queryOpsTrans = queryOpsTrans.And(x => x.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value && x.DatetimeCreated.Value.Date <= criteria.CreatedDateTo);
+                queryOpsTrans = queryOpsTrans.And(x => x.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && x.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date);
             }
             var data = opsRepository.Get(queryOpsTrans);
             return data;
@@ -204,14 +199,14 @@ namespace eFMS.API.Documentation.DL.Services
                     POD = item.Pod != null ? catPlaceRepository.Get(x => x.Id == item.Pod).FirstOrDefault()?.NameEn : string.Empty,
                     Lines = item.ColoaderId != null? catPartnerRepository.Get(x => x.Id == item.ColoaderId).FirstOrDefault()?.PartnerNameEn: string.Empty,
                     Agent = item.AgentId != null ? catPartnerRepository.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn : string.Empty,
-                    NominationParty = item.NotifyPartyDescription,
+                    NominationParty = item.NotifyPartyDescription?? string.Empty,
                     assigned = item.ShipmentType == "Nominated",
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
                     KGS = item.NetWeight == null?0:(decimal)item.NetWeight,
                     CBM = item.Cbm == null ? 0 : (decimal)item.Cbm,
-                    SharedProfit = 3,
-                    OtherCharges = 3,
+                    SharedProfit = 0,
+                    OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
                     TpyeofService = item.TransactionType.Contains("I")? "IMP": "EXP",
@@ -317,7 +312,9 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal GetBuyingRate(Guid hblid, string toCurrency)
         {
             decimal cost = 0;
-            var buyingCharges = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblid && x.KickBack == false);
+            var buyingCharges = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE 
+                                                          && x.Hblid == hblid 
+                                                          && (x.KickBack == false || x.KickBack == null));
             if (buyingCharges != null)
             {
                 foreach (var charge in buyingCharges)
@@ -336,10 +333,10 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal GetShareProfit(Guid hblid, string currencyTo)
         {
             decimal cost = 0;
-            var buyingCharges = surchargeRepository.Get(x => x.Hblid == hblid && x.KickBack == true);
-            if (buyingCharges != null)
+            var shareProfits = surchargeRepository.Get(x => x.Hblid == hblid && x.KickBack == true);
+            if (shareProfits != null)
             {
-                foreach (var charge in buyingCharges)
+                foreach (var charge in shareProfits)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var rate = charge.FinalExchangeRate;

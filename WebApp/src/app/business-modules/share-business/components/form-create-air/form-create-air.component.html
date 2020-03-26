@@ -67,8 +67,9 @@
                     <div class="col-md-4">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) || (isSubmitted && type !== 'import' && !etd.value) || (isSubmitted && !!etd.value && !etd.value.startDate && type !== 'import')}">
+                                <div class="form-group" [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) 
+                                    || (isSubmitted && type !== 'import' && !etd.value) 
+                                    || (isSubmitted && !!etd.value && !etd.value.startDate && type !== 'import')}">
                                     <label>ETD
                                         <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
                                     </label>
@@ -90,8 +91,10 @@
                                 </div>
                             </div>
                             <div class="col-md-6 eta-date-picker">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) || (isSubmitted && type === 'import' && !eta.value) || (isSubmitted && !!eta.value && !eta.value.startDate && type === 'import') || (isSubmitted && formGroup.errors | equalError:'validateEta_Etd')}">
+                                <div class="form-group" [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) 
+                                    || (isSubmitted && type === 'import' && !eta.value) 
+                                    || (isSubmitted && !!eta.value && !eta.value.startDate && type === 'import') 
+                                    || (isSubmitted && formGroup.errors | equalError:'validateEta_Etd')}">
                                     <label>ETA
                                         <span class="text-danger" *ngIf="type === 'import'">(*)</span>
                                     </label>
@@ -120,8 +123,12 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label>A.O.L - Departure </label>
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': 
+                        (isSubmitted && type !== 'import' && !pol.value) 
+                        || (formGroup.errors | equalError:'invalidPort')}">
+                            <label>A.O.L - Departure
+                                <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
+                            </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                                 [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
@@ -131,9 +138,12 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted && !pod.value || (formGroup.errors | equalError:'invalidPort')}">
-                            <label required>A.O.D - Destination</label>
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                            (isSubmitted && type === 'import' && !pod.value) 
+                            || (formGroup.errors | equalError:'invalidPort')}">
+                            <label>A.O.D - Destination
+                                <span class="text-danger" *ngIf="type === 'import'">(*)</span>
+                            </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                                 [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
@@ -289,7 +299,7 @@
                                         (itemSelected)="onSelectDataFormInfo($event, 'warehouse')"
                                         [currentActiveItemId]="{ field: 'id', value: warehouseId.value}"
                                         [selectedDisplayFields]="['nameEn']" [dataSources]="warehouses"
-                                        [displayFields]="displayFieldPort" placeholder="Select warehouse"
+                                        [displayFields]="displayFieldWarehouse" placeholder="Select warehouse"
                                         (remove)="resetFormControl(warehouseId)" #CombogridWh>
                                     </app-combo-grid-virtual-scroll>
                                 </div>

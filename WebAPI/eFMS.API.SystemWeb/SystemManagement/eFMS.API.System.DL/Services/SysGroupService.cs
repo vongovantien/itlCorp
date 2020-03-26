@@ -165,10 +165,10 @@ namespace eFMS.API.System.DL.Services
                 if (currentUserDepartments.Count() > 0)
                 {
                     // các groups user đc phân
-                    var currentUserGroups = sysLevelRepository.Get(lv => lv.UserId == userId)?.Select(l => l.GroupId).ToList(); 
+                    var currentUserGroups = sysLevelRepository.Get(lv => lv.UserId == userId && lv.DepartmentId == currentUserDepartments.First())?.Select(l => l.GroupId).ToList(); 
                     if (currentUserGroups.Count() > 0)
                     {
-                        var query = from lv in sysLevelRepository.Get(lv => lv.UserId == userId)
+                        var query = from lv in sysLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId == officeId)
                                     join dp in departmentRepository.Get() on lv.DepartmentId equals dp.Id
                                     join sg in DataContext.Get() on lv.GroupId equals sg.Id
                                     select new CatDepartmentGroupCriteria

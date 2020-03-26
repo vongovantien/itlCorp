@@ -26,6 +26,7 @@ import * as fromShareBussiness from './../../share-business/store';
 import _groupBy from 'lodash/groupBy';
 import { OPSTransactionGetDetailSuccessAction } from '../store';
 import { formatDate } from '@angular/common';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -39,6 +40,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     @ViewChild('confirmLockShipment', { static: false }) confirmLockShipmentPopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessSellingChargeComponent, { static: false }) sellingChargeComponent: ShareBussinessSellingChargeComponent;
     @ViewChild(ShareBussinessContainerListPopupComponent, { static: false }) containerPopup: ShareBussinessContainerListPopupComponent;
+
+    @ViewChild('addOpsForm', { static: false }) formOps: NgForm;
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
     serviceDate: any;
@@ -74,6 +77,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     deleteMessage: string = '';
 
     packagesUnitActive = [];
+
+    submitted: boolean = false;
 
     constructor(
         private _spinner: NgxSpinnerService,
@@ -214,23 +219,24 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
 
-    saveShipment(form: NgForm) {
+    saveShipment() {
         this.lstMasterContainers.forEach((c: Container) => {
             c.mblid = this.jobId;
             c.hblid = this.hblid;
         });
+        this.submitted = true;
         this.opsTransaction.serviceDate = !!this.serviceDate ? (this.serviceDate.startDate != null ? formatDate(this.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.opsTransaction.finishDate = !!this.finishDate ? (this.finishDate.startDate != null ? formatDate(this.finishDate.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
-        const s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
-        if (form.invalid || this.opsTransaction.shipmentMode == null
+        const isValidDate = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
+        if (this.formOps.invalid || this.opsTransaction.shipmentMode == null
             || (this.opsTransaction.pod === this.opsTransaction.pol && this.opsTransaction.pod != null && this.opsTransaction.pol != null)
             || this.opsTransaction.serviceMode == null
             || this.opsTransaction.productService == null
             || this.opsTransaction.customerId == null
             || this.opsTransaction.billingOpsId == null
             || this.opsTransaction.serviceDate == null
-            || s
+            || isValidDate
             || this.opsTransaction.sumGrossWeight === 0
             || this.opsTransaction.sumNetWeight === 0
             || this.opsTransaction.sumCbm === 0
@@ -243,7 +249,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.opsTransaction.sumNetWeight = this.opsTransaction.sumNetWeight != null ? Number(this.opsTransaction.sumNetWeight.toFixed(2)) : null;
             this.opsTransaction.sumCbm = this.opsTransaction.sumCbm != null ? Number(this.opsTransaction.sumCbm.toFixed(2)) : null;
 
-            console.log(this.opsTransaction);
             this.updateShipment();
         }
     }
@@ -330,12 +335,11 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 (response: any) => {
                     this.opsTransaction = new OpsTransaction(response);
                     this.hblid = this.opsTransaction.hblid;
-                    console.log(this.opsTransaction);
 
                     if (this.opsTransaction != null) {
                         this.getListContainersOfJob();
                         if (this.opsTransaction != null) {
-                            this.getAllSurCharges();
+                            this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
                             this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: new Date(this.opsTransaction.serviceDate), endDate: new Date(this.opsTransaction.serviceDate) } : null;
                             this.finishDate = this.opsTransaction.finishDate != null ? { startDate: new Date(this.opsTransaction.finishDate), endDate: new Date(this.opsTransaction.finishDate) } : null;
                             let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);
@@ -402,7 +406,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
                     // Get default using opstransation's customer.
                     const customer: Customer = this.customers.find(x => x.id === this.opsTransaction.customerId);
-                    console.log(customer);
                     if (!!customer) {
                         this.opsTransaction.salemanId = customer.salePersonId;
                     }
@@ -473,51 +476,23 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             );
     }
 
-    onSaveBuyingRate(event) {
-        if (event === true) {
-            this.getSurCharges('BUY');
-        }
-    }
-
-    onSaveSellingRate(event) {
-        if (event === true) {
-            this.getSurCharges('SELL');
-        }
-    }
-
-    onSaveOHBRate(event) {
-        if (event === true) {
-            this.getSurCharges('OBH');
-        }
-    }
-
-
     getSurCharges(type: 'BUY' | 'SELL' | 'OBH') {
-        this._documentRepo.getSurchargeByHbl(type, this.opsTransaction.hblid)
-            .subscribe((res: any) => {
-                if (type === 'BUY') {
-                    this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.opsTransaction.hblid }));
-                }
-                if (type === 'SELL') {
-                    this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.opsTransaction.hblid }));
-                }
-                if (type === 'OBH') {
-                    this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: 'OBH', hblId: this.opsTransaction.hblid }));
-                }
-            });
-    }
-
-    getAllSurCharges() {
-        this.getSurCharges('BUY');
-        this.getSurCharges('SELL');
-        this.getSurCharges('OBH');
+        if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+            this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE, hblId: this.opsTransaction.hblid }));
+        }
+        if (type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+            this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE, hblId: this.opsTransaction.hblid }));
+        }
+        if (type === CommonEnum.SurchargeTypeEnum.OBH) {
+            this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.OBH, hblId: this.opsTransaction.hblid }));
+        }
     }
 
     selectTab($event: any, tabName: string) {
         this.tab = tabName;
         if (tabName === 'job-edit') {
             this.getShipmentDetails(this.jobId);
-            this.getAllSurCharges();
+            this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
         }
     }
 
@@ -529,16 +504,15 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.tabCharge = tabName;
         switch (tabName) {
             case 'buying':
-                this.getSurCharges('BUY');
+                this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
                 break;
             case 'selling':
-                this.getSurCharges('SELL');
+                this.getSurCharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
                 break;
             case 'obh':
-                this.getSurCharges('OBH');
+                this.getSurCharges(CommonEnum.SurchargeTypeEnum.OBH);
                 break;
             default:
-                this.getSurCharges('BUY');
                 break;
         }
     }

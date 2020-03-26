@@ -57,11 +57,9 @@ export class SaleReportComponent extends AppList {
                                 this.reportPopup.frm.nativeElement.submit();
                                 this.reportPopup.show();
                             }, 1000);
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
                         }
                     } else {
-                        this._toastService.warning('There is no container data to display preview');
+                        this._toastService.warning('There is no data to display preview');
                     }
                 },
             );

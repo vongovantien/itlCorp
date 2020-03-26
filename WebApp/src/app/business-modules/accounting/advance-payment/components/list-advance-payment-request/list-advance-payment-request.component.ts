@@ -118,8 +118,8 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
     }
 
-    changeCurrency(currency: Currency) {
-        this.addNewRequestPaymentPopup.currency.setValue(currency.id);
+    changeCurrency(currency: string) {
+        this.addNewRequestPaymentPopup.currency.setValue(currency);
     }
 
     updateCurrencyForRequest(request: AdvancePaymentRequest) {

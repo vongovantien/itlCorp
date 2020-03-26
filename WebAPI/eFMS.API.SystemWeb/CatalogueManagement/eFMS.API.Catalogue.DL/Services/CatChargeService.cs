@@ -334,7 +334,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.ServiceName))
                 {
-                    item.ServiceNameError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_SERVICE_TYPE_EMPTY];
+                    item.ServiceNameError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -414,6 +414,19 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     item.TypeError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_TYPE_EMPTY];
                     item.IsValid = false;
+                }
+                else
+                {
+                    string type = CustomData.ChargeTypes.FirstOrDefault(x => x == item.Type.ToUpper());
+                    if(string.IsNullOrEmpty(type))
+                    {
+                        item.TypeError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_TYPE_NOT_FOUND, item.Type];
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.Type = item.Type.ToUpper();
+                    }
                 }
                 if (!string.IsNullOrEmpty(item.Code))
                 {

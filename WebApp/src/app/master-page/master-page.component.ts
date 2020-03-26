@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -7,7 +7,6 @@ import { Office } from '@models';
 
 import { environment } from 'src/environments/environment';
 import { IAppState } from '../store/reducers';
-import { ChangeOfficeClaimUserAction, ChangeDepartGroupClaimUserAction } from '@store';
 import { SystemConstants } from 'src/constants/system.const';
 import { RSAHelper } from 'src/helper/RSAHelper';
 import { CookieService } from 'ngx-cookie-service';
@@ -18,12 +17,17 @@ import crypto_js from 'crypto-js';
 import { interval, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { JwtService } from '../shared/services/jwt.service';
+import { HeaderComponent } from './header/header.component';
+import { ChangeOfficeClaimUserAction } from '@store';
 
 @Component({
     selector: 'app-master-page',
     templateUrl: './master-page.component.html',
 })
 export class MasterPageComponent implements OnInit {
+
+    @ViewChild(HeaderComponent, { static: false }) headerComponent: HeaderComponent;
+
     selectedOffice: Office;
     selectedDepartGroup: SystemInterface.IDepartmentGroup;
 
@@ -134,8 +138,9 @@ export class MasterPageComponent implements OnInit {
                             this._spinner.hide();
                             localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfo));
                             if (userInfo) {
+                                this.headerComponent.getOfficeDepartGroupCurrentUser(userInfo);
                                 if (this.isChangeDepartgroup) {
-                                    this._store.dispatch(new ChangeDepartGroupClaimUserAction({ departmentId: this.selectedDepartGroup.departmentId, groupId: this.selectedDepartGroup.groupId }));
+                                    // this._store.dispatch(new ChangeDepartGroupClaimUserAction({ departmentId: this.selectedDepartGroup.departmentId, groupId: this.selectedDepartGroup.groupId }));
                                     this._toastService.info(userInfo.userName.toUpperCase(), "Change Department - Group Success");
                                 } else {
                                     this._store.dispatch(new ChangeOfficeClaimUserAction(this.selectedOffice.id));

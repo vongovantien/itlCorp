@@ -522,8 +522,8 @@ export class DocumentationRepo {
     }
 
 
-    previewSIFPLsheet(jobId: string, currency: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/PreviewSIFPLsheet`, { jobId: jobId, currency: currency }).pipe(
+    previewSIFPLsheet(jobId: string, hblId: string, currency: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/PreviewSIFPLsheet`, { jobId: jobId, hblId: hblId, currency: currency }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;

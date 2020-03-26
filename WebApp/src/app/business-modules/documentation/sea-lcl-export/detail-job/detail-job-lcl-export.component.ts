@@ -199,7 +199,8 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     }
 
     previewPLsheet(currency: string) {
-        this._documenRepo.previewSIFPLsheet(this.jobId, currency)
+        const hblid = "00000000-0000-0000-0000-000000000000";
+        this._documenRepo.previewSIFPLsheet(this.jobId, hblid, currency)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {

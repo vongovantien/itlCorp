@@ -316,7 +316,11 @@ export class AirImportHBLComponent extends AppList implements OnInit {
     }
 
     previewPLsheet(currency: string) {
-        this._documentRepo.previewSIFPLsheet(this.jobId, currency)
+        let hblid = "00000000-0000-0000-0000-000000000000";
+        if (!!this.selectedHbl) {
+            hblid = this.selectedHbl.id;
+        }
+        this._documentRepo.previewSIFPLsheet(this.jobId, hblid, currency)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
