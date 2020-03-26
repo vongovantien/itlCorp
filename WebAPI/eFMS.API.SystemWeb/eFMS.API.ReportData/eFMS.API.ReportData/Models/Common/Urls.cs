@@ -4,15 +4,15 @@
     {
         public class Catelogue
         {
-            public const string CountryUrl = "/Catalogue/api/v1/en-US/CatCountry/query";
-            public const string CatplaceUrl = "/Catalogue/api/v1/en-US/CatPlace/query";
-            public const string CatPartnerUrl = "/Catalogue/api/v1/en-US/CatPartner/query";
-            public const string CatCommodityUrl = "/Catalogue/api/v1/en-US/CatCommonity/query";
-            public const string CatCommodityGroupUrl = "/Catalogue/api/v1/en-US/CatCommodityGroup/query";
-            public const string CatStageUrl = "/Catalogue/api/v1/en-US/CatStage/query";
+            public const string CountryUrl = "/api/v1/en-US/CatCountry/query";
+            public const string CatplaceUrl = "/api/v1/en-US/CatPlace/QueryExport";
+            public const string CatPartnerUrl = "/api/v1/en-US/CatPartner/query";
+            public const string CatCommodityUrl = "/api/v1/en-US/CatCommonity/query";
+            public const string CatCommodityGroupUrl = "/api/v1/en-US/CatCommodityGroup/query";
+            public const string CatStageUrl = "/api/v1/en-US/CatStage/query";
             public const string CatUnitUrl = "/api/v1/en-US/CatUnit/query";
-            public const string CatchargeUrl = "/Catalogue/api/v1/en-US/CatCharge/query";
-            public const string CatCurrencyUrl = "/Catalogue/api/v1/en-US/CatCurrency/getAllByQuery";
+            public const string CatchargeUrl = "/api/v1/en-US/CatCharge/query";
+            public const string CatCurrencyUrl = "/api/v1/en-US/CatCurrency/getAllByQuery";
         }
         public class CustomClearance
         {

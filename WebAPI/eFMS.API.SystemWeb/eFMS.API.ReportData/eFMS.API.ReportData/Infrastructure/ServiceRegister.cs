@@ -19,8 +19,8 @@ namespace eFMS.API.ReportData.Infrastructure
         {
             service.Configure<APIs>(options =>
             {
-                options.HostStaging
-                    = configuration.GetSection("APIs:HostStating").Value;
+                options.HostStaging = configuration.GetSection("APIs:HostStating").Value;
+                options.CatalogueAPI = configuration.GetSection("APIs:CatalogueAPI").Value;
             });
             return service;
         }

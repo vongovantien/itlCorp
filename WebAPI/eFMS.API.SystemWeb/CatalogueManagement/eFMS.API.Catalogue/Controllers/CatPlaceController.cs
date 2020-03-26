@@ -97,6 +97,14 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        [HttpPost]
+        [Route("QueryExport")]
+        public IActionResult QueryExport(CatPlaceCriteria criteria)
+        {
+            var results = catPlaceService.QueryExport(criteria);
+            return Ok(results);
+        }
+
         /// <summary>
         /// get and paging the list of places by conditions
         /// </summary>

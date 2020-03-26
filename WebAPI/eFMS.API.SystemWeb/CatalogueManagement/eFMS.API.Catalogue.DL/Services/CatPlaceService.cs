@@ -1004,5 +1004,37 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
+        public IQueryable<sp_GetCatPlace> QueryExport(CatPlaceCriteria criteria)
+        {
+            IQueryable<sp_GetCatPlace> data = null;
+
+            if (criteria.PlaceType == CatPlaceTypeEnum.Warehouse)
+            {
+                ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catWarehouse);
+                var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+                if (rangeSearch == PermissionRange.None)
+                {
+                    return null;
+                }
+                data = QueryByPermission(criteria, rangeSearch);
+            }
+            else if (criteria.PlaceType == CatPlaceTypeEnum.Port)
+            {
+                ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
+                var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+                if (rangeSearch == PermissionRange.None)
+                {
+                    return null;
+                }
+                data = QueryByPermission(criteria, rangeSearch);
+            }
+            else
+            {
+                data = Query(criteria);
+
+            }
+
+            return data;
+        }
     }
 } 

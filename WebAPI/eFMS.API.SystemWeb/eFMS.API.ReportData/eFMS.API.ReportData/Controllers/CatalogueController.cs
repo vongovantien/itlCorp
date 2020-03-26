@@ -6,6 +6,7 @@ using eFMS.API.ReportData.HttpServices;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using eFMS.API.ReportData.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace eFMS.API.ReportData.Controllers
 {
@@ -36,8 +37,10 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportCountry(CatCountryCriteria catCountryCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCountryCriteria, aPis.HostStaging + Urls.Catelogue.CountryUrl);
-            var dataObjects =  responseFromApi.Content.ReadAsAsync<List<CatCountry>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCountryCriteria, aPis.CatalogueAPI + Urls.Catelogue.CountryUrl);
+            var dataObjects =  responseFromApi.Content.ReadAsAsync<List<CatCountry>>();
+
             var stream = helper.CreateCountryExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.CountryName);
         }
@@ -47,11 +50,16 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportWareHouse")]
         [HttpPost]
+        [Authorize]
+
         public async Task<IActionResult> ExportWareHouse(CatPlaceCriteria catPlaceCriteria)
         {
+            var accessToken = Request.Headers["Authorization"].ToString();
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
+
+            var responseFromApi = await HttpServiceExtension.PostAPI(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatplaceUrl, accessToken);
             var dataObjects =  responseFromApi.Content.ReadAsAsync<List<CatWareHouse>>();
+
             var stream = helper.CreateWareHourseExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.WareHouse);
         }
@@ -61,11 +69,17 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportPortIndex")]
         [HttpPost]
+        [Authorize]
+
         public async Task<IActionResult> ExportPortIndex(CatPlaceCriteria catPlaceCriteria)
         {
+
+            var accessToken = Request.Headers["Authorization"].ToString();
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
+
+            var responseFromApi = await HttpServiceExtension.PostAPI(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatplaceUrl, accessToken);
             var dataObjects =  responseFromApi.Content.ReadAsAsync<List<CatPortIndex>>();  
+
             var stream = helper.CreatePortIndexExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.PortIndex);
         }
@@ -78,8 +92,9 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportPartner(CatPartnerCriteria catPartnerCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPartnerCriteria, aPis.HostStaging + Urls.Catelogue.CatPartnerUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPartnerCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatPartnerUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatPartner>>();  
+
             var stream = helper.CreatePartnerExcelFile(dataObjects.Result, catPartnerCriteria.PartnerType, catPartnerCriteria.Author);
             return new FileHelper().ExportExcel(stream, FilesNames.PartnerData);
         }
@@ -92,7 +107,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportCommodityList(CatCommodityCriteria catCommodityCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCommodityCriteria, aPis.HostStaging + Urls.Catelogue.CatCommodityUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCommodityCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatCommodityUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCommodityModel>>();  
             var stream = helper.CreateCommoditylistExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.CommodityList);
@@ -106,7 +121,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportCommodityGroup(CatCommodityGroupCriteria catCommodityGroupCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCommodityGroupCriteria, aPis.HostStaging + Urls.Catelogue.CatCommodityGroupUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCommodityGroupCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatCommodityGroupUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCommodityGroup>>();
             var stream = helper.CreateCommoditygroupExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.CommodityGroupList);
@@ -121,8 +136,9 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportStage(CatStageCriteria catStageCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catStageCriteria, aPis.HostStaging + Urls.Catelogue.CatStageUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catStageCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatStageUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatStage>>();
+
             var stream = helper.CreateCatStateExcelFile(dataObjects.Result);
 
             return new FileHelper().ExportExcel(stream, FilesNames.StageList);
@@ -137,8 +153,10 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportUnit(CatUnitCriteria catUnitCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catUnitCriteria, aPis.HostStaging + Urls.Catelogue.CatUnitUrl);
+
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catUnitCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatUnitUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatUnit>>();
+
             var stream = helper.CreateCatUnitExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.UnitList);
         }
@@ -151,8 +169,10 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportProvince(CatPlaceCriteria catPlaceCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
+
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatplaceUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatProvince>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+
             var stream = helper.CreateProvinceExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.ProvinceName);
         }
@@ -166,8 +186,10 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportDistrict(CatPlaceCriteria catPlaceCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
+
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatplaceUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatDistrict>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+
             var stream = helper.CreateDistrictExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.DistrictName);
         }
@@ -181,8 +203,10 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportTownWard(CatPlaceCriteria catPlaceCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
+
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatplaceUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatTownWard>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+
             var stream = helper.CreateTownWardExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.TowardName);
         }
@@ -196,7 +220,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportCharge(CatChargeCriteria catChargeCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catChargeCriteria, aPis.HostStaging + Urls.Catelogue.CatchargeUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catChargeCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatchargeUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCharge>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateChargeExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.ChargeName);
@@ -210,8 +234,9 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportCurrency(CatCurrrencyCriteria catCurrrencyCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCurrrencyCriteria, aPis.HostStaging + Urls.Catelogue.CatCurrencyUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCurrrencyCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatCurrencyUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCurrency>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+
             var stream = helper.CreateCurrencyExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.CurrencyName);
         }
@@ -227,8 +252,9 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportCustomClearance(CustomsDeclarationCriteria customsDeclarationCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(customsDeclarationCriteria, aPis.HostStaging + Urls.CustomClearance.CustomClearanceUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(customsDeclarationCriteria, aPis.CatalogueAPI + Urls.CustomClearance.CustomClearanceUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CustomsDeclaration>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+
             var stream = helper.CreateCustomClearanceExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.CustomClearanceName);
         }
